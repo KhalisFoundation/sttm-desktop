@@ -1,0 +1,3 @@
+[submodule "www"]
+	path = www
+	url = git@bitbucket.org:khalisfoundation/sttm-everywhere-html.git
