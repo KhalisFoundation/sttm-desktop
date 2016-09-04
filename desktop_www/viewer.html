@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STTM Everywhere Viewer</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <style>
+    <!--
+      html, body {
+        height: 100%;
+      }
+      body {
+        font-family: "GurbaniAkharThick";
+        padding: 70px 30px;
+        text-align: center;
+        background-color: #000;
+        color:#fff;
+      }
+      #h1 {}
+      h1 {
+        font-size: 8.15vw;
+        line-height: 1.5em;
+
+      }
+      h2 {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="h1"><h1></h1></div>
+    <script>window.$ = window.jQuery = require('./js/jquery-2.1.4.min.js');</script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      var ipc = require("electron").ipcRenderer;
+      ipc.on('show-line', function(event, data) {
+        $("#h1 h1").fadeOut(function() {
+          $(this).remove();
+          $("<h1></h1>").text(data.line).prependTo("#h1");
+        });
+      })
+    </script>
+  </body>
+</html>
