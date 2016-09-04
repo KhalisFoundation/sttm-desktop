@@ -1,4 +1,5 @@
 {
+  "productName": "STTM Everywhere",
   "name": "sttm-everywhere-desktop",
   "version": "1.0.0",
   "description": "The STTM Everywhere desktop app, built on Electron, using sttm-everywhere-html as a submodule",
