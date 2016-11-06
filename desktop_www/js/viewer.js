@@ -1,6 +1,6 @@
 //IPC
 var ipc = require("electron").ipcRenderer;
-ipc.on('show-line', function(event, data) {
+ipc.on("show-line", function(event, data) {
   makeSlide([$("<h1></h1>").text(data.lineID)]);
 });
 

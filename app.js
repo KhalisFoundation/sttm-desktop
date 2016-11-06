@@ -43,3 +43,8 @@ ipc.on('show-line', function(event, arg) {
   console.log('show-line app.js');
   viewerWindow.webContents.send('show-line', arg);
 });
+
+ipc.on("show-text", function(event, arg) {
+  console.log("show-text app.js");
+  viewerWindow.webContents.send("show-text", arg);
+});
