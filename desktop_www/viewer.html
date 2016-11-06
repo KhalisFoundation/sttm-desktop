@@ -7,49 +7,19 @@
     <title>STTM Everywhere Viewer</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <style>
-    <!--
-      @font-face {
-        font-family: "GurbaniAkharThick";
-        src:  url('fonts/gurbaniakharthick-webfont.woff2') format('woff2'),
-              url('fonts/gurbaniakharthick-webfont.woff') format('woff');
-        font-weight: normal;
-        font-style: normal;
-      }
-      html, body {
-        height: 100%;
-      }
-      body {
-        font-family: "GurbaniAkharThick";
-        padding: 70px 30px;
-        text-align: center;
-        background-color: #000;
-        color:#fff;
-      }
-      #h1 {}
-      h1 {
-        font-size: 8.15vw;
-        line-height: 1.5em;
-
-      }
-      h2 {
-        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-      }
-    </style>
+    <link rel="stylesheet" href="css/viewer.css">
   </head>
   <body>
 
-    <div id="h1"><h1></h1></div>
+    <div id="slide">
+      <div id="h1"><h1></h1></div>
+      <div id="h2"><h2></h2></div>
+    </div>
     <script>window.$ = window.jQuery = require('./js/jquery-2.1.4.min.js');</script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../www/js/sql.js"></script>
     <script type="text/javascript">
-      var ipc = require("electron").ipcRenderer;
-      ipc.on('show-line', function(event, data) {
-        $("#h1 h1").fadeOut(function() {
-          $(this).remove();
-          $("<h1></h1>").text(data.line).prependTo("#h1");
-        });
-      })
+      var scripts = ["../desktop_scripts/js/viewer.js"];
     </script>
+    <script type="text/javascript" src="../www/js/index.js"></script>
   </body>
 </html>

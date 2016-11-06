@@ -15,5 +15,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron-prebuilt": "^0.37.7"
+  },
+  "dependencies": {
+    "electron-json-storage": "^2.0.3",
+    "express": "^4.14.0"
   }
 }

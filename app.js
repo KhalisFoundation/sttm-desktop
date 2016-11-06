@@ -23,12 +23,21 @@ app.on("ready", function () {
   viewerWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    x: externalDisplay.bounds.x + 50,
-    y: externalDisplay.bounds.y + 50,
-    fullscreen: true,
+    //x: externalDisplay.bounds.x + 50,
+    //y: externalDisplay.bounds.y + 50,
+    //fullscreen: true,
   });
   viewerWindow.loadURL("file://" + __dirname + "/desktop_www/viewer.html");
-})
+});
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
 ipc.on('show-line', function(event, arg) {
   console.log('show-line app.js');
