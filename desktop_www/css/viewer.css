@@ -9,11 +9,13 @@ html, body {
   height: 100%;
 }
 body {
-  font-family: "GurbaniAkharThick";
   padding: 70px 30px;
   text-align: center;
   background-color: #333;
   color: #fff;
+}
+.gurmukhi {
+  font-family: "GurbaniAkharThick";
 }
 #h1 {}
 h1 {
