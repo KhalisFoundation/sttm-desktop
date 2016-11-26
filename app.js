@@ -1,8 +1,18 @@
-var electron = require('electron');
-var app = require("app");
+var electron      = require("electron");
+var app           = require("app");
 var BrowserWindow = require("browser-window");
-var ipc = require("electron").ipcMain;
+var ipc           = require("electron").ipcMain;
+var autoUpdater   = require("auto-updater");
+var appVersion    = require("./package.json").version;
+var os            = require("os").platform();
 var mainWindow, viewerWindow;
+
+autoUpdater.setFeedURL("http://releases.khalis.net/sttme/darwin/" + appVersion);
+autoUpdater.checkForUpdates();
+
+autoUpdater.on("update-downloaded", function () {
+  autoUpdater.quitAndInstall();
+});
 
 app.on("ready", function () {
   var electronScreen = electron.screen;
@@ -23,6 +33,8 @@ app.on("ready", function () {
   viewerWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    x: 50,
+    y: 50,
     //x: externalDisplay.bounds.x + 50,
     //y: externalDisplay.bounds.y + 50,
     //fullscreen: true,
@@ -34,9 +46,9 @@ app.on("ready", function () {
 app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  //if (process.platform !== 'darwin') {
     app.quit();
-  }
+  //}
 });
 
 ipc.on('show-line', function(event, arg) {
