@@ -2,15 +2,24 @@ var electron      = require("electron");
 var app           = require("app");
 var BrowserWindow = require("browser-window");
 var ipc           = require("electron").ipcMain;
-var autoUpdater   = require("auto-updater");
 var appVersion    = require("./package.json").version;
 var os            = require("os").platform();
 var mainWindow, viewerWindow;
 
-autoUpdater.setFeedURL("http://releases.khalis.net/sttme/darwin/" + appVersion);
+if(require("electron-squirrel-startup")) return;
+var autoUpdater   = require("auto-updater");
+
+if (process.env.NODE_ENV !== "development") {
+  updateFeed = "http://releases.khalis.net/sttme/" + os + "/";
+  if (os === "darwin") {
+    updateFeed += appversion;
+  }
+  autoUpdater.setFeedURL("http://releases.khalis.net/sttme/darwin/" + appVersion);
+}
 autoUpdater.checkForUpdates();
 
-autoUpdater.on("update-downloaded", function () {
+autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, releaseDate, updateURL) {
+  alert("A new update is ready to install. Version " + releaseName + " is downloaded and will be automatically installed on Quit");
   autoUpdater.quitAndInstall();
 });
 
