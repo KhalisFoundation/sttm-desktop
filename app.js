@@ -34,8 +34,9 @@ app.on("ready", function () {
     }
   }
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600
+    width: 1024,
+    height: 600,
+    titleBarStyle: "hidden"
   })
   mainWindow.loadURL("file://" + __dirname + "/www/index.html");
 
