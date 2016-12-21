@@ -1,9 +1,8 @@
 var ipc     = require("electron").ipcRenderer;
 var fs      = require("fs");
 var path    = require("path");
-var file    = path.join(__dirname, dbPath + "iGurbani.sqlite");
-var bfr     = fs.readFileSync(file);
-    db      = new SQL.Database(bfr);
+var sqlite3 = require("sqlite3").verbose();
+    db      = new sqlite3.Database(dbPath + "iGurbani.sqlite");
 
 function sendLine(lineID) {
   ipc.send("show-line", {lineID: lineID});

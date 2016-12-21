@@ -4,15 +4,14 @@ var currentShabad,
 //IPC
 var ipc = require("electron").ipcRenderer;
 ipc.on("show-line", function(event, data) {
-  var content = db.exec("SELECT gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE _id = " + data.lineID);
-  var item = content[0].values[0];
-  
-  makeSlide([
-    $("<h1></h1>").addClass("gurmukhi").text(item[0]),
-    $("<h2></h2>").css("color","#fcf").text(item[1]),
-    $("<h2></h2>").css("color","#ffc").text(item[2]),
-    $("<h2></h2>").css("color","#cff").text(item[3]),
-  ]);
+  db.get("SELECT gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE _id = " + data.lineID, function(err, row) {
+      makeSlide([
+        $("<h1></h1>").addClass("gurmukhi").text(row.gurmukhi),
+        $("<h2></h2>").css("color","#fcf").text(row.english_ssk),
+        $("<h2></h2>").css("color","#ffc").text(row.transliteration),
+        $("<h2></h2>").css("color","#cff").text(row.sggs_darpan),
+      ]);
+  });
 });
 
 ipc.on("show-text", function(event, data) {
