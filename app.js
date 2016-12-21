@@ -12,7 +12,7 @@ var autoUpdater   = require("auto-updater");
 if (process.env.NODE_ENV !== "development") {
   updateFeed = "http://releases.khalis.net/sttme/" + os + "/";
   if (os === "darwin") {
-    updateFeed += appversion;
+    updateFeed += appVersion;
   }
   autoUpdater.setFeedURL("http://releases.khalis.net/sttme/darwin/" + appVersion);
 }

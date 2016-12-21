@@ -1,12 +1,12 @@
 {
-  "productName": "STTM Everywhere",
+  "productName": "SikhiToTheMax",
   "name": "sttm-everywhere-desktop",
-  "version": "0.0.1",
-  "description": "The STTM Everywhere desktop app, built on Electron, using sttm-everywhere-html as a submodule",
+  "version": "0.0.2",
+  "description": "The SikhiToTheMax Everywhere desktop app, built on Electron, using sttm-everywhere-html as a submodule",
   "main": "app.js",
   "scripts": {
     "start": "NODE_ENV=development electron .",
-    "pack:osx": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.36.7 --out=builds --ignore='^/builds$' --ignore='assets' --platform=darwin --arch=x64 --sign='Developer ID Application: Khalis, Inc. (B3W82WVBU9)' --icon='assets/STTME.icns' --overwrite",
+    "pack:osx": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.36.7 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='www/node_modules' --platform=darwin --arch=x64 --sign='Developer ID Application: Khalis, Inc. (B3W82WVBU9)' --icon='assets/STTME.icns' --overwrite",
     "pack:win": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.36.7 --out=builds --ignore='^/builds$' --ignore='assets' --platform=win32 --arch=ia32 --version-string.CompanyName='Khalis, Inc.' --version-string.LegalCopyright='Copyright (C) 2016 Khalis, Inc.' --version-string.FileDescription=$npm_package_productName --version-string.OriginalFilename='sttme.exe' --version-string.InternalName=$npm_package_productName --version-string.ProductName=$npm_package_productName --version-string.ProductVersion=$npm_package_version --asar=true --icon='assets/STTME.ico' --overwrite"
   },
   "repository": {
