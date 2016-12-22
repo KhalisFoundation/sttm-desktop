@@ -45,7 +45,6 @@ app.on("ready", function () {
     titleBarStyle: "hidden"
   })
   mainWindow.webContents.on('did-finish-load', () => {
-    console.log('ready-to-show mainWindow');
     mainWindow.show();
   })
   mainWindow.loadURL("file://" + __dirname + "/www/index.html");
@@ -68,7 +67,6 @@ app.on('window-all-closed', () => {
 });
 
 function createViewer(ipcData) {
-  console.log(typeof ipcData);
   viewerWindow = new BrowserWindow({
     width       : 800,
     height      : 600,
