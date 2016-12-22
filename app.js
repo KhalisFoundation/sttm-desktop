@@ -1,18 +1,18 @@
-const electron        = require("electron");
-const app             = require("app");
-const {BrowserWindow} = electron;
-const ipc             = electron.ipcMain;
-const appVersion      = require("./package.json").version;
-const os              = require("os").platform();
-let mainWindow,
+var electron        = require("electron");
+var app             = require("app");
+var BrowserWindow   = electron.BrowserWindow;
+var ipc             = electron.ipcMain;
+var appVersion      = require("./package.json").version;
+var os              = require("os").platform();
+var mainWindow,
     viewerWindow,
     viewerWindowOpen  = false,
-    viewerWindowX     = 50,
-    viewerWindowY     = 50,
-    viewerWindowFS    = false;
+    viewerWindowX,
+    viewerWindowY,
+    viewerWindowFS;
 
 if (require("electron-squirrel-startup")) return;
-const autoUpdater   = require("auto-updater");
+var autoUpdater   = require("auto-updater");
 
 if (process.env.NODE_ENV !== "development") {
   updateFeed = "http://releases.khalis.net/sttme/" + os + "/";
@@ -23,21 +23,16 @@ if (process.env.NODE_ENV !== "development") {
 }
 autoUpdater.checkForUpdates();
 
+autoUpdater.addListener("update-available", function() {
+  mainWindow.webContents.send("updating");
+});
+
+
 autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, releaseDate, updateURL) {
-  alert("A new update is ready to install. Version " + releaseName + " is downloaded and will be automatically installed on Quit");
   autoUpdater.quitAndInstall();
 });
 
 app.on("ready", function () {
-  const electronScreen  = electron.screen;
-  const displays        = electronScreen.getAllDisplays();
-  let externalDisplay   = null;
-  for (var i in displays) {
-    if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
-      externalDisplay = displays[i];
-      break;
-    }
-  }
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 600,
@@ -48,12 +43,6 @@ app.on("ready", function () {
     mainWindow.show();
   })
   mainWindow.loadURL("file://" + __dirname + "/www/index.html");
-
-  if (externalDisplay) {
-    viewerWindowX   = externalDisplay.bounds.x + 50,
-    viewerWindowY   = externalDisplay.bounds.y + 50,
-    viewerWindowFS  = true;
-  }
 });
 
 
@@ -67,6 +56,7 @@ app.on('window-all-closed', () => {
 });
 
 function createViewer(ipcData) {
+  checkForExternalDisplay();
   viewerWindow = new BrowserWindow({
     width       : 800,
     height      : 600,
@@ -87,6 +77,28 @@ function createViewer(ipcData) {
     viewerWindowOpen = false;
     viewerWindow = null;
   });
+}
+
+function checkForExternalDisplay() {
+  var electronScreen  = electron.screen;
+  var displays        = electronScreen.getAllDisplays();
+  var externalDisplay   = null;
+  for (var i in displays) {
+    if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
+      externalDisplay = displays[i];
+      break;
+    }
+  }
+
+  if (externalDisplay) {
+    viewerWindowX   = externalDisplay.bounds.x + 50;
+    viewerWindowY   = externalDisplay.bounds.y + 50;
+    viewerWindowFS  = true;
+  } else {
+    viewerWindowX   = 50;
+    viewerWindowY   = 50;
+    viewerWindowFS  = false;
+  }
 }
 
 ipc.on('show-line', function(event, arg) {
