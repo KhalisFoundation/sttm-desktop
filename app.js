@@ -12,16 +12,7 @@ var mainWindow,
     viewerWindowFS;
 
 if (require("electron-squirrel-startup")) return;
-var autoUpdater   = require("auto-updater");
-
-if (process.env.NODE_ENV !== "development") {
-  updateFeed = "http://releases.khalis.net/sttme/" + os + "/";
-  if (os === "darwin") {
-    updateFeed += appVersion;
-  }
-  autoUpdater.setFeedURL("http://releases.khalis.net/sttme/darwin/" + appVersion);
-}
-autoUpdater.checkForUpdates();
+var autoUpdater = require("auto-updater");
 
 autoUpdater.addListener("update-available", function() {
   mainWindow.webContents.send("updating");
@@ -41,6 +32,7 @@ app.on("ready", function () {
   })
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
+    checkForUpdates();
   })
   mainWindow.loadURL("file://" + __dirname + "/www/index.html");
 });
@@ -99,6 +91,19 @@ function checkForExternalDisplay() {
     viewerWindowY   = 50;
     viewerWindowFS  = false;
   }
+}
+
+function checkForUpdates() {
+  var updateFeed = "http://localhost:8000/";
+  if (process.env.NODE_ENV !== "development") {
+    updateFeed = "http://releases.khalis.net/";
+  }
+  updateFeed += os === "win32" ?
+    "sttme-win32/" :
+    "darwin/" + appVersion;
+
+  autoUpdater.setFeedURL(updateFeed);
+  autoUpdater.checkForUpdates();
 }
 
 ipc.on('show-line', function(event, arg) {
