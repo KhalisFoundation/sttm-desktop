@@ -100,7 +100,7 @@ function checkForUpdates() {
   }
   updateFeed += os === "win32" ?
     "sttme-win32/" :
-    "darwin/" + appVersion;
+    "sttme/darwin/" + appVersion;
 
   autoUpdater.setFeedURL(updateFeed);
   autoUpdater.checkForUpdates();
