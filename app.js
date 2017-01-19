@@ -4,12 +4,19 @@ var BrowserWindow   = electron.BrowserWindow;
 var ipc             = electron.ipcMain;
 var appVersion      = require("./package.json").version;
 var os              = require("os").platform();
+const Store         = require("./desktop_www/js/store.js");
+const defaultPrefs  = require("./desktop_www/js/defaults.json");
 var mainWindow,
     viewerWindow,
     viewerWindowOpen  = false,
     viewerWindowX,
     viewerWindowY,
     viewerWindowFS;
+
+const store = new Store({
+  configName: 'user-preferences',
+  defaults: defaultPrefs
+});
 
 if (require("electron-squirrel-startup")) return;
 var autoUpdater = require("auto-updater");
@@ -24,9 +31,12 @@ autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, rele
 });
 
 app.on("ready", function () {
+  let windowBounds = store.get("windowBounds");
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 600,
+    width: windowBounds.width,
+    height: windowBounds.height,
+    x: windowBounds.x,
+    y: windowBounds.y,
     show: false,
     titleBarStyle: "hidden"
   })
@@ -35,6 +45,13 @@ app.on("ready", function () {
     checkForUpdates();
   })
   mainWindow.loadURL("file://" + __dirname + "/www/index.html");
+  function saveWindowBounds() {
+    store.set('windowBounds', mainWindow.getBounds());
+  }
+
+  // listen to `resize` and `move` and save the settings
+  mainWindow.on('resize', saveWindowBounds);
+  mainWindow.on('move', saveWindowBounds);
 });
 
 
