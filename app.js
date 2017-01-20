@@ -111,16 +111,15 @@ function checkForExternalDisplay() {
 }
 
 function checkForUpdates() {
-  var updateFeed = "http://localhost:8000/";
   if (process.env.NODE_ENV !== "development") {
-    updateFeed = "http://releases.khalis.net/";
-  }
-  updateFeed += os === "win32" ?
-    "sttme-win32/" :
-    "sttme/darwin/" + appVersion;
+    let updateFeed = "http://releases.khalis.net/";
+    updateFeed += os === "win32" ?
+      "sttme-win32/" :
+      "sttme/darwin/" + appVersion;
 
-  autoUpdater.setFeedURL(updateFeed);
-  autoUpdater.checkForUpdates();
+    autoUpdater.setFeedURL(updateFeed);
+    autoUpdater.checkForUpdates();
+  }
 }
 
 ipc.on('show-line', function(event, arg) {
