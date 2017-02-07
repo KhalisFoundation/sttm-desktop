@@ -1,10 +1,9 @@
-var currentShabad,
+let currentShabad,
     currentLine;
 
 //IPC
-var ipc = require("electron").ipcRenderer;
 ipc.on("show-line", function(event, data) {
-  var stmt = db.get("SELECT gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE _id = " + data.lineID, function(err, row) {
+  let stmt = db.get("SELECT gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE _id = " + data.lineID, (err, row) => {
     makeSlide([
       $("<h1></h1>").addClass("gurmukhi").text(row.gurmukhi),
       $("<h2></h2>").css("color","#fcf").text(row.english_ssk),
@@ -21,7 +20,7 @@ ipc.on("show-text", function(event, data) {
 function makeSlide(appendObj) {
   $("#slide").fadeOut(function() {
     $(this).remove();
-    var slide = $("<div></div>")
+    let slide = $("<div></div>")
                   .attr("id", "slide");
     for (x = 0; x < appendObj.length; x++) {
       slide.append(appendObj[x]);
