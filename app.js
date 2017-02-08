@@ -33,6 +33,8 @@ autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, rele
 app.on("ready", function () {
   let windowBounds = store.get("windowBounds");
   mainWindow = new BrowserWindow({
+    minWidth: 320,
+    minHeight: 480,
     width: windowBounds.width,
     height: windowBounds.height,
     x: windowBounds.x,
