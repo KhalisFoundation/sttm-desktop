@@ -1,0 +1,33 @@
+SikhiToTheMax Desktop App
+=========================
+
+##Prerequisites
+ 1. Node
+ 2. npm
+ 3. Have the Developer ID certificate for Khalis Foundation installed from Apple Developer Console
+
+##Installation
+ * Clone repository
+ * Run `npm i`
+
+##Packaging
+
+###macOS
+ * Run `npm run pack:osx` to create the app
+ * Compress `SikhiToTheMax.app` in `builds/SikhiToTheMax-darwin-x64/` as `sttme.zip`
+ * Run `npm run dist:osx` to create the DMG
+ * Create a file called `notes.txt` with the changelog
+ * Upload `sttme.zip`, `SikhiToTheMax.dmg`, and `notes.txt` to khalis.net `/home/releases/_version_`
+ * Move the `_version_` folder to `/home/releases/sttme-darwin`
+
+###Windows
+ * On a Mac, run `npm run pack:win` to create the app (temporary limitation due to SQLite plugin)
+ * Copy `SikhiToTheMax-win32-x64` to Windows machine `builds` folder within project folder
+ * Switch to Windows machine
+ * Ensure that `builds/SikhiToTheMax64` is a clone of khalis.net server dir `/home/releases/sttme-win32` (excluding version directories and index.php)
+ * Run `npm run dist:win` to generate `RELEASES`, diff, and setup files
+ * Upload new nupkg files in `builds/SikhiToTheMax64` to `/home/releases/sttme-win32`
+ * Upload `RELEASES` file in `builds/SikhiToTheMax64` to `/home/releases/sttme-win32`
+ * Upload `SikhiToTheMaxSetup.exe` in `builds/SikhiToTheMax64` to `/home/releases/_version_`
+ * Move the `_version_` folder to `/home/releases/sttme-win32`
+
