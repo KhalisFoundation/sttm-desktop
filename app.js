@@ -54,6 +54,13 @@ app.on("ready", function () {
   // listen to `resize` and `move` and save the settings
   mainWindow.on('resize', saveWindowBounds);
   mainWindow.on('move', saveWindowBounds);
+
+  //Close all other windows if closing the main
+  mainWindow.on("close", () => {
+    if (viewerWindowOpen) {
+      viewerWindow.close();
+    }
+  });
 });
 
 
@@ -79,10 +86,18 @@ function createViewer(ipcData) {
   viewerWindow.loadURL("file://" + __dirname + "/desktop_www/viewer.html");
   viewerWindow.webContents.on("did-finish-load", () => {
     viewerWindow.show();
+    mainWindow.focus();
     viewerWindowOpen = true;
     if (typeof ipcData !== "undefined") {
       viewerWindow.webContents.send(ipcData.send, ipcData.data);
     }
+  });
+  viewerWindow.on("enter-full-screen", () => {
+    console.log("enter-full-screen");
+    mainWindow.focus();
+  });
+  viewerWindow.on("focus", () => {
+    mainWindow.focus();
   });
   viewerWindow.on("closed", () => {
     viewerWindowOpen = false;
