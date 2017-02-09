@@ -6,7 +6,7 @@ var appVersion      = require("./package.json").version;
 var os              = require("os").platform();
 const Store         = require("./desktop_www/js/store.js");
 const defaultPrefs  = require("./desktop_www/js/defaults.json");
-var mainWindow,
+let mainWindow,
     viewerWindow,
     viewerWindowOpen  = false,
     viewerWindowX,

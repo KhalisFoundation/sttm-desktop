@@ -4,5 +4,12 @@
     "height": 600 ,
     "x": 0,
     "y": 0
+  },
+  "searchResults": {
+    "translationEnglish": "ssk",
+    "transliteration": true,
+    "source": true,
+    "raag": true,
+    "ang": true
   }
 }
