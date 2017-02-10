@@ -165,7 +165,9 @@ app.on("ready", function () {
         {
           label: "Quit SikhiToTheMax",
           accelerator: "CmdOrCtrl+Q",
-          role: 'quit'
+          click: () => {
+            app.quit();
+          }
         }
       ]
     });
