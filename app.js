@@ -1,9 +1,10 @@
-var electron        = require("electron");
-var app             = require("app");
-var BrowserWindow   = electron.BrowserWindow;
-var ipc             = electron.ipcMain;
-var appVersion      = require("./package.json").version;
-var os              = require("os").platform();
+const electron      = require("electron");
+const app           = require("app");
+const Menu          = electron.Menu;
+const BrowserWindow = electron.BrowserWindow;
+const ipc           = electron.ipcMain;
+const appVersion    = require("./package.json").version;
+const os            = require("os").platform();
 const Store         = require("./desktop_www/js/store.js");
 const defaultPrefs  = require("./desktop_www/js/defaults.json");
 let mainWindow,
@@ -61,6 +62,137 @@ app.on("ready", function () {
       viewerWindow.close();
     }
   });
+
+  //Menu
+  const template = [
+    {
+      label: 'Edit',
+      submenu: [
+        {
+          label: "Undo",
+          accelerator: "CmdOrCtrl+Z",
+          role: 'undo'
+        },
+        {
+          label: "Redo",
+          accelerator: "CmdOrCtrl+Shift+Z",
+          role: 'redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: "Cut",
+          accelerator: "CmdOrCtrl+X",
+          role: 'cut'
+        },
+        {
+          label: "Copy",
+          accelerator: "CmdOrCtrl+C",
+          role: 'copy'
+        },
+        {
+          label: "Paste",
+          accelerator: "CmdOrCtrl+V",
+          role: 'paste'
+        },
+        {
+          label: "Select All",
+          accelerator: "CmdOrCtrl+A",
+          role: 'selectall'
+        }
+      ]
+    },
+    {
+      label: "Window",
+      role: 'window',
+      submenu: [
+        {
+          label: "Minimize",
+          accelerator: "CmdOrCtrl+M",
+          role: 'minimize'
+        },
+        {
+          label: "Close",
+          accelerator: "CmdOrCtrl+W",
+          role: 'close'
+        }
+      ]
+    }
+  ];
+  if (process.platform === 'darwin') {
+    template.unshift({
+      label: "SikhiToTheMax",
+      submenu: [
+        {
+          label: 'About SikhiToTheMax',
+          role: 'about'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: "Preferences",
+          accelerator: "Cmd+,",
+          click: () => {
+            mainWindow.webContents.send("openSettings");
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Services',
+          role: 'services',
+          submenu: []
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: "Hide SikhiToTheMax",
+          accelerator: "Cmd+H",
+          role: 'hide'
+        },
+        {
+          label: "Hide Others",
+          accelerator: "Cmd+Alt+H",
+          role: 'hideothers'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: "Quit SikhiToTheMax",
+          accelerator: "CmdOrCtrl+Q",
+          role: 'quit'
+        }
+      ]
+    });
+  }
+  if (process.env.NODE_ENV === "development") {
+    template.push({
+      label: "Dev",
+      submenu: [
+        {
+          label: "Toggle Developer Tools",
+          accelerator: "CmdOrCtrl+Alt+I",
+          click: () => {
+            mainWindow.webContents.toggleDevTools();
+          }
+        },
+        {
+          label: "Reload",
+          accelerator: "CmdOrCtrl+R",
+          click: () => {
+            mainWindow.webContents.reload();
+          }
+        }
+      ]
+    })
+  }
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 });
 
 
