@@ -1,8 +1,9 @@
+const platform = require("./js/desktop_scripts");
 let currentShabad,
     currentLine;
 
 //IPC
-ipc.on("show-line", function(event, data) {
+platform.ipc.on("show-line", function(event, data) {
   let stmt = db.get("SELECT gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE _id = " + data.lineID, (err, row) => {
     makeSlide([
       $("<h1></h1>").addClass("gurmukhi").text(row.gurmukhi),
@@ -13,7 +14,7 @@ ipc.on("show-line", function(event, data) {
   });
 });
 
-ipc.on("show-text", function(event, data) {
+platform.ipc.on("show-text", function(event, data) {
   makeSlide([$("<h1></h1>").addClass("gurmukhi").text(data.text)]);
 })
 

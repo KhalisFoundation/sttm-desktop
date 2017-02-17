@@ -227,7 +227,6 @@ function createViewer(ipcData) {
     }
   });
   viewerWindow.on("enter-full-screen", () => {
-    console.log("enter-full-screen");
     mainWindow.focus();
   });
   viewerWindow.on("focus", () => {

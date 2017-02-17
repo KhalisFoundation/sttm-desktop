@@ -1,12 +1,15 @@
-function sendLine(lineID) {
-  ipc.send("show-line", {lineID: lineID});
+module.exports = {
+  sendLine: function(lineID) {
+    platform.ipc.send("show-line", {lineID: lineID});
+  },
+
+  sendText: function(text) {
+    platform.ipc.send("show-text", {text: text});
+  }
 }
-function sendText(text) {
-  ipc.send("show-text", {text: text});
-}
-ipc.on("updating", function(event, data) {
+platform.ipc.on("updating", function(event, data) {
   document.body.classList.add("updating");
 });
-ipc.on("openSettings", () => {
-  openSettings();
+platform.ipc.on("openSettings", () => {
+  settings.openSettings();
 });

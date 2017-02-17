@@ -15,13 +15,47 @@ class Store {
   }
   
   // This will just return the property on the `data` object
-  get(key) {
-    return this.data[key] || this.defaults[key];
+  get(key, schema = this.data, original = null, gettingDefaults = false) {
+    if (typeof original !== "string") {
+      original = key;
+    }
+    let _index = key.indexOf(".");
+    if (_index > -1) {
+      let child = schema[key.substring(0, _index)]
+      if (!child) {
+        return this.get(original, this.defaults);
+      }
+      return this.get(key.substring(_index+1), child, original);
+    }
+    // Check if key exists, otherwise return from defaults
+    if (schema[key]) {
+      // If we're not already returning defaults and the key exists, check if it has children, otherwise return it
+      if (!gettingDefaults && typeof schema[key] === "object") {
+        // If it has children, see if any unwritten should be pulled in from defaults
+        let   prefs     = schema[key];
+        const defaults  = this.get(original, this.defaults, null, true);
+        prefs           = mergePrefs(prefs, defaults);
+        return prefs;
+      } else {
+        return schema[key];
+      }
+    } else {
+      return this.get(original, this.defaults, null, true);
+    }
   }
   
   // ...and this will set it
   set(key, val) {
-    this.data[key] = val;
+    let   schema    = this.data;  // a moving reference to internal objects within obj
+    const pathList  = key.split('.');
+    const len       = pathList.length;
+    for (let i = 0; i < len-1; i++) {
+      const elem = pathList[i];
+      if (!schema[elem]) schema[elem] = {}
+      schema = schema[elem];
+    }
+
+    schema[pathList[len-1]] = val;
     // Wait, I thought using the node.js' synchronous APIs was bad form?
     // We're not writing a server so there's not nearly the same IO demand on the process
     // Also if we used an async API and our app was quit before the asynchronous write had a chance to complete,
@@ -44,6 +78,22 @@ function parseDataFile(filePath, defaults) {
     // if there was some kind of error, return the passed in defaults instead.
     return defaults;
   }
+}
+
+function mergePrefs(prefs, defaults) {
+  let merged = {};
+  for (const i in defaults) {
+    if (typeof prefs[i] !== "undefined") {
+      if (typeof defaults[i] == "object" && prefs[i]) {
+        merged[i] = mergePrefs(prefs[i], defaults[i]);
+      } else {
+        merged[i] = prefs[i];
+      }
+    } else {
+      merged[i] = defaults[i];
+    }
+  }
+  return merged;
 }
 
 // expose the class
