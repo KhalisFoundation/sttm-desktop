@@ -28,7 +28,7 @@ class Store {
       return this.get(key.substring(_index+1), child, original);
     }
     // Check if key exists, otherwise return from defaults
-    if (schema[key]) {
+    if (typeof schema[key] !== "undefined") {
       // If we're not already returning defaults and the key exists, check if it has children, otherwise return it
       if (!gettingDefaults && typeof schema[key] === "object") {
         // If it has children, see if any unwritten should be pulled in from defaults
