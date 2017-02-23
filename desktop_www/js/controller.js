@@ -1,6 +1,6 @@
 module.exports = {
-  sendLine: function(lineID) {
-    platform.ipc.send("show-line", {lineID: lineID});
+  sendLine: function(shabadID, lineID) {
+    platform.ipc.send("show-line", {shabadID: shabadID, lineID: lineID});
   },
 
   sendText: function(text) {

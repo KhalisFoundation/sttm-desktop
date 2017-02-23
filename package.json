@@ -6,11 +6,13 @@
   "main": "app.js",
   "scripts": {
     "start": "NODE_ENV=development electron .",
-    "pack:osx": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.7 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=darwin --arch=x64 --asar=true --icon='assets/STTME.icns' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app/Contents/Resources/iGurbani.sqlite && npm run sign:osx",
-    "pack:win": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.8 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=win32 --arch=x64 --asar=true --version-string.CompanyName='Khalis, Inc.' --version-string.LegalCopyright='Copyright (C) 2017 Khalis, Inc.' --version-string.FileDescription=$npm_package_productName --version-string.OriginalFilename='SikhiToTheMax.exe' --version-string.InternalName=$npm_package_productName --version-string.ProductName=$npm_package_productName --version-string.ProductVersion=$npm_package_version --icon='assets/STTME.ico' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-win32-x64/resources/iGurbani.sqlite && cd builds && zip -rq -X sttme-win32.zip SikhiToTheMax-win32-x64",
+    "pack:osx": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.7 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='desktop_www/scss' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=darwin --arch=x64 --asar=true --icon='assets/STTME.icns' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app/Contents/Resources/iGurbani.sqlite && npm run sign:osx",
+    "pack:win": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.8 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='desktop_www/scss' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=win32 --arch=x64 --asar=true --version-string.CompanyName='Khalis, Inc.' --version-string.LegalCopyright='Copyright (C) 2017 Khalis, Inc.' --version-string.FileDescription=$npm_package_productName --version-string.OriginalFilename='SikhiToTheMax.exe' --version-string.InternalName=$npm_package_productName --version-string.ProductName=$npm_package_productName --version-string.ProductVersion=$npm_package_version --icon='assets/STTME.ico' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-win32-x64/resources/iGurbani.sqlite && cd builds && zip -rq -X sttme-win32.zip SikhiToTheMax-win32-x64",
     "sign:osx": "codesign --deep --force --verbose --sign 'Developer ID Application: Khalis, Inc. (B3W82WVBU9)' builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app",
     "dist:osx": "electron-installer-dmg builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app SikhiToTheMax --icon='assets/STTME.icns' --out=builds --overwrite",
-    "dist:win": "node install/winstaller.js"
+    "dist:win": "node install/winstaller.js",
+    "build-css": "node-sass --output-style compressed --source-map true --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css",
+    "watch-css": "nodemon --watch desktop_www -e scss -x \"npm run build-css\""
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,9 @@
     "electron-installer-squirrel-windows": "^1.3.0",
     "electron-packager": "^8.3.0",
     "electron-prebuilt": "^0.37.7",
-    "electron-winstaller": "^2.5.1"
+    "electron-winstaller": "^2.5.1",
+    "node-sass": "^4.5.0",
+    "nodemon": "^1.11.0"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",

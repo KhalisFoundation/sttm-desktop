@@ -194,7 +194,7 @@ app.on("ready", function () {
     })
   }
   const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+  //Menu.setApplicationMenu(menu);
 });
 
 
@@ -230,7 +230,7 @@ function createViewer(ipcData) {
     mainWindow.focus();
   });
   viewerWindow.on("focus", () => {
-    mainWindow.focus();
+    //mainWindow.focus();
   });
   viewerWindow.on("closed", () => {
     viewerWindowOpen = false;
