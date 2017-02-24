@@ -1,7 +1,7 @@
+$gurmukhi-font-family: 'gurbaniakhar';
 @font-face {
-  font-family: "GurbaniAkharThick";
-  src:  url('../fonts/gurbaniakharthick-webfont.woff2') format('woff2'),
-        url('../fonts/gurbaniakharthick-webfont.woff') format('woff');
+  font-family: $gurmukhi-font-family;
+  src: url('../../www/fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,7 +24,7 @@ body {
   text-align: center;
 }
 .gurmukhi {
-  font-family: "GurbaniAkharThick";
+  font-family: $gurmukhi-font-family;
 }
 .deck {
   opacity: 0;
@@ -56,7 +56,7 @@ h1, h2 {
 }
 h1 {
   font-size: 10vh;
-  font-weight: 400;
+  font-weight: normal;
   line-height: 1.5em;
 }
 h2 {
