@@ -5,14 +5,16 @@
   "description": "The SikhiToTheMax Everywhere desktop app",
   "main": "app.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development electron .",
-    "pack:osx": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.7 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='desktop_www/scss' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=darwin --arch=x64 --asar=true --icon='assets/STTME.icns' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app/Contents/Resources/iGurbani.sqlite && npm run sign:osx",
-    "pack:win": "./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.8 --out=builds --ignore='^/builds$' --ignore='assets' --ignore='desktop_www/scss' --ignore='www/node_modules' --ignore='www/scss' --ignore='install' --ignore='iGurbani.sqlite' --ignore='README' --platform=win32 --arch=x64 --asar=true --version-string.CompanyName='Khalis, Inc.' --version-string.LegalCopyright='Copyright (C) 2017 Khalis, Inc.' --version-string.FileDescription=$npm_package_productName --version-string.OriginalFilename='SikhiToTheMax.exe' --version-string.InternalName=$npm_package_productName --version-string.ProductName=$npm_package_productName --version-string.ProductVersion=$npm_package_version --icon='assets/STTME.ico' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-win32-x64/resources/iGurbani.sqlite && cd builds && zip -rq -X sttme-win32.zip SikhiToTheMax-win32-x64",
+    "start": "concurrently --kill-others \"npm run watch-css\" \"npm run watch-www-css\" \"cross-env NODE_ENV=development electron .\"",
+    "pack:osx": "npm run build-css && npm run build-www-css && ./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.7 --out=builds --ignore='assets' --ignore='builds' --ignore='install' --ignore='www/node_modules' --ignore='www/package.json' --ignore='(.*).git(.*)' --ignore='(.*).map' --ignore='(.*)scss' --ignore='iGurbani.sqlite' --ignore='README' --platform=darwin --arch=x64 --asar=true --icon='assets/STTME.icns' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app/Contents/Resources/iGurbani.sqlite && npm run sign:osx && cd builds/SikhiToTheMax-darwin-x64 && zip -ryq -X sttme.zip SikhiToTheMax.app",
+    "pack:win": "npm run build-css && npm run build-www-css && ./node_modules/.bin/electron-packager . $npm_package_productName --app-version=$npm_package_version --version=0.37.8 --out=builds --ignore='assets' --ignore='builds' --ignore='install' --ignore='www/node_modules' --ignore='www/package.json' --ignore='(.*).git(.*)' --ignore='(.*).map' --ignore='(.*)scss' --ignore='iGurbani.sqlite' --ignore='README' --platform=win32 --arch=x64 --asar=true --version-string.CompanyName='Khalis, Inc.' --version-string.LegalCopyright='Copyright (C) 2017 Khalis, Inc.' --version-string.FileDescription=$npm_package_productName --version-string.OriginalFilename='SikhiToTheMax.exe' --version-string.InternalName=$npm_package_productName --version-string.ProductName=$npm_package_productName --version-string.ProductVersion=$npm_package_version --icon='assets/STTME.ico' --overwrite && cp iGurbani.sqlite builds/SikhiToTheMax-win32-x64/resources/iGurbani.sqlite && cd builds && zip -rq -X sttme-win32.zip SikhiToTheMax-win32-x64",
     "sign:osx": "codesign --deep --force --verbose --sign 'Developer ID Application: Khalis, Inc. (B3W82WVBU9)' builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app",
-    "dist:osx": "electron-installer-dmg builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app SikhiToTheMax --icon='assets/STTME.icns' --out=builds --overwrite",
+    "dist:osx": "npm run build:osx && electron-installer-dmg builds/SikhiToTheMax-darwin-x64/SikhiToTheMax.app SikhiToTheMax --icon='assets/STTME.icns' --out=builds --overwrite",
     "dist:win": "node install/winstaller.js",
-    "build-css": "node-sass --output-style compressed --source-map true --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css",
-    "watch-css": "nodemon --watch desktop_www -e scss -x \"npm run build-css\""
+    "build-css": "node-sass --output-style compressed --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css",
+    "build-www-css": "node-sass --output-style compressed --include-path www/scss www/scss/foundation.scss www/css/bundle.css",
+    "watch-css": "nodemon --watch desktop_www -e scss -x \"node-sass --output-style nested --source-map true --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css\"",
+    "watch-www-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/scss www/scss/foundation.scss www/css/bundle.css\""
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,7 @@
   "author": "Khalis, Inc. <techsupport@khalisfoundation.org>",
   "license": "KNC-GSL",
   "devDependencies": {
+    "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron-builder": "^8.6.0",
     "electron-installer-dmg": "^0.2.0",
