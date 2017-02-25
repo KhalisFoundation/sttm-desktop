@@ -25,10 +25,10 @@ platform.ipc.on("show-line", function(event, data) {
           rows.forEach((row, i) => {
             cards.push(
               h("div", { id: "slide" + row._id, class: "slide" + (row._id == data.lineID ? " active" : "") }, [
-                h("h1", { class: "gurmukhi" }, row.gurmukhi),
-                h("h2", { style: "color:#fcf" }, row.english_ssk),
-                h("h2", { style: "color:#ffc" }, row.transliteration),
-                h("h2", { style: "color:#cff" }, row.sggs_darpan)
+                h("h1", { class: "gurbani gurmukhi" }, row.gurmukhi),
+                h("h2", { class: "translation" }, row.english_ssk),
+                h("h2", { class: "transliteration" }, row.transliteration),
+                h("h2", { class: "teeka" }, row.sggs_darpan)
               ])
             );
           });
@@ -49,6 +49,15 @@ platform.ipc.on("show-text", function(event, data) {
     $message.removeChild($message.firstChild);
   }
   $message.appendChild(h("div", { class: "slide active" }, h("h1", { class: "gurmukhi" }, data.text)));
+});
+
+platform.ipc.on("change-theme", (event, data) => {
+  document.body.classList.forEach(bodyClass => {
+    if (bodyClass.indexOf("theme") > -1) {
+      document.body.classList.remove(i);
+    }
+  });
+  document.body.classList.add(data.theme);
 });
 
 function hideDecks() {

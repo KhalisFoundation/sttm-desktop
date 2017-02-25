@@ -5,6 +5,19 @@ $gurmukhi-font-family: 'gurbaniakhar';
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../../www/fonts/Roboto-Bold.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+  font-family: 'AnmolUniBaniTrue';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../../www/fonts/AnmolUniBaniTrue.ttf') format('truetype');
+}
 * {
   box-sizing: border-box;
 }
@@ -15,16 +28,10 @@ html {
   overflow: hidden;
 }
 body {
-  background-color: #333;
-  background-image: url(../../www/img/sttm_logo_beta.png);
-  background-position: right 10px bottom;
-  background-repeat: no-repeat;
-  background-size: auto 10%;
-  color: #fff;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: 0;
   overflow: auto;
-  padding: 70px 30px;
+  padding: 50px 30px;
   text-align: center;
 }
 .gurmukhi {
@@ -33,7 +40,7 @@ body {
 .deck {
   opacity: 0;
   position: absolute;
-  height: calc(100% - 140px);
+  height: calc(100% - 100px);
   transition: opacity 400ms ease-out;
   width: calc(100% - 60px);
 
@@ -58,12 +65,31 @@ body {
 h1, h2 {
   margin: 0;
 }
-h1 {
+.gurbani {
   font-size: 10vh;
   font-weight: normal;
-  line-height: 1.5em;
+  line-height: 1.3em;
 }
-h2 {
+.translation,
+.transliteration {
+  font-family: 'Roboto';
   font-size: 5vh;
-  font-weight: 500;
+  font-weight: 700;
 }
+.transliteration {
+  text-transform: lowercase;
+}
+.teeka {
+  font-family: 'AnmolUniBaniTrue';
+  font-size: 4vh;
+}
+#logo {
+  bottom: 20px;
+  height: 5.5%;
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
+}
+@import
+  "dark-theme",
+  "light-theme";
