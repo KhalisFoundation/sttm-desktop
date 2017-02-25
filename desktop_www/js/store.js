@@ -25,7 +25,7 @@ class Store {
       if (!child) {
         return this.get(original, this.defaults);
       }
-      return this.get(key.substring(_index+1), child, original);
+      return this.get(key.substring(_index+1), child, original, gettingDefaults);
     }
     // Check if key exists, otherwise return from defaults
     if (typeof schema[key] !== "undefined") {
