@@ -52,7 +52,7 @@ platform.ipc.on("show-text", function(event, data) {
   while ($message.firstChild) {
     $message.removeChild($message.firstChild);
   }
-  $message.appendChild(h("div", { class: "slide active" }, h("h1", { class: "gurmukhi" }, data.text)));
+  $message.appendChild(h("div", { class: "slide active" }, h("h1", { class: "gurmukhi gurbani" }, data.text)));
 });
 
 function hideDecks() {
