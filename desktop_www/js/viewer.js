@@ -3,7 +3,11 @@ const h = require("../www/js/h");
 const decks = [];
 let currentShabad,
     currentLine;
-const $message = document.getElementById("message");
+const $message  = document.getElementById("message");
+const $body     = document.body;
+
+let prefs = platform.store.get("userPrefs.presenterWindow");
+applyPresenterPrefs(prefs);
 
 //IPC
 platform.ipc.on("show-line", function(event, data) {
@@ -33,7 +37,7 @@ platform.ipc.on("show-line", function(event, data) {
             );
           });
           hideDecks();
-          document.body.appendChild(h("div", { id: "shabad" + newShabadID, class: "deck active" }, cards));
+          $body.appendChild(h("div", { id: "shabad" + newShabadID, class: "deck active" }, cards));
           currentShabad = parseInt(newShabadID);
           decks.push(newShabadID);
         }
@@ -51,17 +55,20 @@ platform.ipc.on("show-text", function(event, data) {
   $message.appendChild(h("div", { class: "slide active" }, h("h1", { class: "gurmukhi" }, data.text)));
 });
 
-platform.ipc.on("change-theme", (event, data) => {
-  document.body.classList.forEach(bodyClass => {
-    if (bodyClass.indexOf("theme") > -1) {
-      document.body.classList.remove(i);
-    }
-  });
-  document.body.classList.add(data.theme);
-});
-
 function hideDecks() {
   Array.from(document.querySelectorAll(".deck")).forEach(el => {
     el.classList.remove("active")
   });
+}
+
+function applyPresenterPrefs(prefs) {
+  changeTheme(prefs.theme);
+}
+function changeTheme(theme) {
+  $body.classList.forEach(bodyClass => {
+    if (bodyClass.indexOf("theme") > -1) {
+      $body.classList.remove(i);
+    }
+  });
+  $body.classList.add(theme);
 }
