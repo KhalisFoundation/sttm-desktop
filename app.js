@@ -30,6 +30,9 @@ autoUpdater.addListener("update-available", function() {
 autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, releaseDate, updateURL) {
   autoUpdater.quitAndInstall();
 });
+autoUpdater.on("error", () => {
+  mainWindow.webContents.send("offline");
+})
 
 app.on("ready", function () {
   let windowBounds = store.get("windowBounds");

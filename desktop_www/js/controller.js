@@ -10,6 +10,9 @@ module.exports = {
 platform.ipc.on("updating", function(event, data) {
   document.body.classList.add("updating");
 });
+platform.ipc.on("offline", () => {
+  document.body.classList.add("offline");
+});
 platform.ipc.on("openSettings", () => {
   settings.openSettings();
 });
