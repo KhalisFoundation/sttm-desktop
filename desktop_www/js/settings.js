@@ -26,7 +26,7 @@ class Settings {
       const $prefCat = document.getElementById(prefCat + "_settings");
 
       for (const pref in allPrefs[prefCat]) {
-        if (allPrefs[prefCat][pref]) {
+        if (allPrefs[prefCat][pref] && document.getElementById(prefCat + "_" + pref)) {
           document.getElementById(prefCat + "_" + pref).checked = true;
           document.body.classList.add(prefCat + "_" + pref);
         }
