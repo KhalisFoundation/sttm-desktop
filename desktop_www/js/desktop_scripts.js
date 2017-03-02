@@ -1,3 +1,4 @@
+const {remote}      = require("electron");
 const ipc           = require("electron").ipcRenderer;
 const fs            = require("fs");
 const path          = require("path");
@@ -16,6 +17,32 @@ const store = new Store({
   defaults: defaultPrefs
 });
 
+const $titleButtons = document.querySelectorAll("#titlebar .controls a");
+Array.from($titleButtons).forEach(el => {
+  el.addEventListener("click", e => windowAction(e));
+});
+
+function windowAction(e) {
+  const win = remote.getCurrentWindow();
+  const el = e.currentTarget;
+  switch (el.dataset.windowAction) {
+    case "minimize":
+      win.minimize();
+      break;
+    case "max-restore":
+      if (win.isMaximized()) {
+        win.unmaximize();
+        document.body.classList.remove("maximized");
+      } else {
+        win.maximize();
+        document.body.classList.add("maximized");
+      }
+      break;
+    case "close":
+      win.close();
+      break;
+  }
+}
 module.exports = {
   ipc: ipc,
   db: db,

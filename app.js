@@ -37,14 +37,15 @@ autoUpdater.on("error", () => {
 app.on("ready", function () {
   let windowBounds = store.get("windowBounds");
   mainWindow = new BrowserWindow({
-    minWidth: 320,
-    minHeight: 480,
-    width: windowBounds.width,
-    height: windowBounds.height,
-    x: windowBounds.x,
-    y: windowBounds.y,
-    show: false,
-    titleBarStyle: "hidden"
+    minWidth:       320,
+    minHeight:      480,
+    width:          windowBounds.width,
+    height:         windowBounds.height,
+    x:              windowBounds.x,
+    y:              windowBounds.y,
+    frame:          (process.platform == "win32" ? false : true),
+    show:           false,
+    titleBarStyle:  "hidden"
   })
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
