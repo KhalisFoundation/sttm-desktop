@@ -6,6 +6,8 @@ let currentShabad,
 const $message  = document.getElementById("message");
 const $body     = document.body;
 
+$body.classList.add(process.platform);
+
 let prefs = platform.store.get("userPrefs.presenterWindow");
 applyPresenterPrefs(prefs);
 

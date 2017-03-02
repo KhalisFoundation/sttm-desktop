@@ -214,12 +214,15 @@ app.on('window-all-closed', () => {
 function createViewer(ipcData) {
   checkForExternalDisplay();
   viewerWindow = new BrowserWindow({
-    width       : 800,
-    height      : 600,
-    x           : viewerWindowX,
-    y           : viewerWindowY,
-    fullscreen  : viewerWindowFS,
-    show        : false,
+    width:            800,
+    height:           600,
+    x:                viewerWindowX,
+    y:                viewerWindowY,
+    fullscreen:       viewerWindowFS,
+    autoHideMenuBar:  true,
+    show:             false,
+    titleBarStyle:    "hidden",
+    frame:            (process.platform == "win32" ? false : true),
   });
   viewerWindow.loadURL("file://" + __dirname + "/desktop_www/viewer.html");
   viewerWindow.webContents.on("did-finish-load", () => {
