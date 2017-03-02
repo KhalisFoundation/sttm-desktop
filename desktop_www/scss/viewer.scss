@@ -37,6 +37,9 @@ body {
 .gurmukhi {
   font-family: $gurmukhi-font-family;
 }
+#titlebar {
+  display: none;
+}
 .deck {
   opacity: 0;
   position: absolute;
