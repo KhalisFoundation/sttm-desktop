@@ -78,6 +78,13 @@ app.on("ready", function () {
             role: 'about'
           },
           {
+            label: "Check for Updates...",
+            accelerator: "Cmd+U",
+            click: () => {
+              checkForUpdates();
+          }
+          },
+          {
             type: 'separator'
           },
           {
