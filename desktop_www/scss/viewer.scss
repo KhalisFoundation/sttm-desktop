@@ -76,10 +76,13 @@ h1, h2 {
 .translation,
 .transliteration {
   font-family: 'Roboto';
-  font-size: 5vh;
   font-weight: 700;
 }
+.translation {
+  font-size: 6vh;
+}
 .transliteration {
+  font-size: 5vh;
   text-transform: lowercase;
 }
 .teeka {
