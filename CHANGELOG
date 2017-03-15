@@ -1,4 +1,15 @@
-#### 0.1.5 - 2015-03-02
+#### 0.1.6 - 2017-03-15
+##### Added
+- When presenting a Shabad, spacebar will bring you back to the current line
+- You can change the main line when presenting a Shabad by clicking on the 'home' icon on the line and spacebar will take you there
+- *Shortcut*
+  - Check for updates Ctrl+U (win) Cmd+U (mac)
+
+##### Improved
+- When an update is available, then app no longer restarts unexpectedly. This was a slightly jarring, especially when the user had already started searching. You will now be given the option of clicking to restart and install the latest version.
+- English translations are now larger by default by user request
+
+#### 0.1.5 - 2017-03-02
 ##### Added
 - *Windows Keyboard Shortcuts*
  	- Ctrl+Q - Quit
