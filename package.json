@@ -1,8 +1,8 @@
 {
   "productName": "SikhiToTheMax",
-  "name": "sttm-everywhere-desktop",
+  "name": "sttm3-desktop",
   "version": "0.1.5",
-  "description": "The SikhiToTheMax Everywhere desktop app",
+  "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
     "start": "concurrently --kill-others \"npm run watch-css\" \"npm run watch-www-css\" \"cross-env NODE_ENV=development electron .\"",

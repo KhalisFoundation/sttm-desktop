@@ -10,6 +10,13 @@ const WinMenu = Menu.buildFromTemplate([
     label: "File",
     submenu: [
       {
+        label: "Check for Updates...",
+        accelerator: "Ctrl+U",
+        click: () => {
+          platform.ipc.send("checkForUpdates");
+        }
+      },
+      {
         label: "Preferences",
         accelerator: "Ctrl+,",
         click: () => {
@@ -57,11 +64,30 @@ module.exports = {
     platform.ipc.send("show-text", {text: text});
   }
 }
+platform.ipc.on("checkingForUpdates", () => {
+  document.body.classList.add("checkingForUpdates");
+});
+platform.ipc.on("no-update", () => {
+  document.body.classList.remove("checkingForUpdates");
+  document.body.classList.add("no-update");
+  setTimeout(() => {
+    document.body.classList.remove("no-update");
+  }, 5000);
+});
 platform.ipc.on("updating", function(event, data) {
+  document.body.classList.remove("checkingForUpdates");
   document.body.classList.add("updating");
 });
+platform.ipc.on("updateReady", () => {
+  document.body.classList.remove("checkingForUpdates updating no-update offline");
+  document.body.classList.add("updateReady");
+});
 platform.ipc.on("offline", () => {
+  document.body.classList.remove("checkingForUpdates");
   document.body.classList.add("offline");
+  setTimeout(() => {
+    document.body.classList.remove("offline");
+  }, 5000);
 });
 platform.ipc.on("openSettings", () => {
   settings.openSettings();

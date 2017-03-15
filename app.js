@@ -22,17 +22,18 @@ const store = new Store({
 if (require("electron-squirrel-startup")) return;
 var autoUpdater = require("auto-updater");
 
-autoUpdater.addListener("update-available", function() {
+autoUpdater.on("update-available", () => {
   mainWindow.webContents.send("updating");
 });
-
-
-autoUpdater.on("update-downloaded", function (e, releaseNotes, releaseName, releaseDate, updateURL) {
-  autoUpdater.quitAndInstall();
+autoUpdater.on("update-not-available", () => {
+  mainWindow.webContents.send("no-update");
+});
+autoUpdater.on("update-downloaded", (e, releaseNotes, releaseName, releaseDate, updateURL) => {
+  mainWindow.webContents.send("updateReady");
 });
 autoUpdater.on("error", () => {
   mainWindow.webContents.send("offline");
-})
+});
 
 app.on("ready", function () {
   let windowBounds = store.get("windowBounds");
@@ -82,7 +83,7 @@ app.on("ready", function () {
             accelerator: "Cmd+U",
             click: () => {
               checkForUpdates();
-          }
+            }
           },
           {
             type: 'separator'
@@ -283,8 +284,12 @@ function checkForUpdates() {
 
     autoUpdater.setFeedURL(updateFeed);
     autoUpdater.checkForUpdates();
+    mainWindow.webContents.send("checkingForUpdates");
   }
 }
+
+ipc.on("checkForUpdates", checkForUpdates);
+ipc.on("quitAndInstall", () => autoUpdater.quitAndInstall());
 
 ipc.on('show-line', function(event, arg) {
   if (viewerWindowOpen) {
