@@ -15,5 +15,6 @@
       "theme": "light-theme"
     }
   },
-  "gurmukhiKB": false
+  "gurmukhiKB": false,
+  "changelog-seen": "0.0.0"
 }
