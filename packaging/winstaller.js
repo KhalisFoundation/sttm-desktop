@@ -1,5 +1,6 @@
 var electronInstaller = require('electron-winstaller');
 var path = require('path');
+const version = require("../package.json").version;
 
 var rootPath = path.join('./');
 var buildDir = path.join(rootPath, 'builds');
@@ -11,7 +12,7 @@ resultPromise = electronInstaller.createWindowsInstaller({
   authors: 'Khalis, Inc.',
   exe: 'SikhiToTheMax.exe',
   noMsi: true,
-  setupExe: 'SikhiToTheMaxSetup.exe',
+  setupExe: 'SikhiToTheMaxSetup-' + version + '.exe',
   setupIcon: path.join(assetsDir, 'STTME.ico'),
   loadingGif: path.join(assetsDir, 'sttm-install.gif')
 });
