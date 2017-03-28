@@ -65,25 +65,25 @@ module.exports = {
   }
 }
 platform.ipc.on("checkingForUpdates", () => {
-  document.body.classList.add("checkingForUpdates");
+  document.body.classList.add("checking-for-updates");
 });
 platform.ipc.on("no-update", () => {
-  document.body.classList.remove("checkingForUpdates");
+  document.body.classList.remove("checking-for-updates");
   document.body.classList.add("no-update");
   setTimeout(() => {
     document.body.classList.remove("no-update");
   }, 5000);
 });
 platform.ipc.on("updating", function(event, data) {
-  document.body.classList.remove("checkingForUpdates");
+  document.body.classList.remove("checking-for-updates");
   document.body.classList.add("updating");
 });
 platform.ipc.on("updateReady", () => {
-  document.body.classList.remove("checkingForUpdates updating no-update offline");
-  document.body.classList.add("updateReady");
+  document.body.classList.remove("checking-for-updates updating no-update offline");
+  document.body.classList.add("update-ready");
 });
 platform.ipc.on("offline", () => {
-  document.body.classList.remove("checkingForUpdates");
+  document.body.classList.remove("checking-for-updates");
   document.body.classList.add("offline");
   setTimeout(() => {
     document.body.classList.remove("offline");
