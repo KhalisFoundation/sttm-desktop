@@ -33,8 +33,15 @@
     "electron-packager": "^8.3.0",
     "electron-prebuilt": "^0.37.7",
     "electron-winstaller": "^2.5.1",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.2",
+    "eslint-plugin-import": "^2.2.0",
+    "htmlhint": "^0.9.13",
     "node-sass": "^4.5.0",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "stylelint": "^7.9.0",
+    "stylelint-config-standard": "^16.0.0",
+    "stylelint-order": "^0.4.1"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
