@@ -1,7 +1,6 @@
 node_modules
-STTM\ Everywhere-darwin-x64
-STTM\ Everywhere-win32-x64
 builds
 desktop_www/css/viewer.css
 **/*.map
 packaging/aws.json
+packaging/keys.json

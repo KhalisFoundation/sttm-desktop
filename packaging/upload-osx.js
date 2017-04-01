@@ -1,13 +1,14 @@
-/* eslint no-console: "off" */
+/* eslint no-console: "off", import/no-extraneous-dependencies: 0 */
 // Load the SDK
-// eslint-disable-next-line import/no-extraneous-dependencies
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const version = require('../package.json').version;
+const keys = require('./keys.json');
+const SSH = require('ssh2').Client;
 
 const buildsDir = './builds/';
 const dmgFile = `SikhiToTheMax-${version}.dmg`;
-const zipFile = `sttme-${version}.zip`;
+const zipFile = `sttm-${version}.zip`;
 const bucketName = 'sttm-releases';
 const remoteDir = 'darwin/';
 
@@ -16,6 +17,29 @@ const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
   params: { Bucket: bucketName },
 });
+
+function updateRemoteVersion() {
+  const conn = new SSH();
+  conn.on('ready', () => {
+    console.log('Client :: ready');
+    conn.exec(`echo ${version} > /home/releases/sttm-darwin`, (err, stream) => {
+      if (err) throw err;
+      stream.on('close', (code, signal) => {
+        console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
+        conn.end();
+      }).on('data', (data) => {
+        console.log(`STDOUT: ${data}`);
+      }).stderr.on('data', (data) => {
+        console.log(`STDERR: ${data}`);
+      });
+    });
+  }).connect({
+    host: 'khalis.net',
+    port: 1157,
+    username: 'kns',
+    privateKey: fs.readFileSync(keys.privateKeyFile),
+  });
+}
 
 function upload(files) {
   const file = files.splice(0, 1);
@@ -31,6 +55,8 @@ function upload(files) {
       console.log(`Successfully uploaded ${file}`);
       if (files.length > 0) {
         upload(files);
+      } else {
+        updateRemoteVersion();
       }
     });
     request.on('httpUploadProgress', (evt) => {

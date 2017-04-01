@@ -12,6 +12,13 @@ SikhiToTheMax Desktop App
  * Run `git checkout -t origin/dev` in the repository root and the www folder
  * Run `npm i` in the repository root and www folder
 
+##Configuration
+###Uploading to Remote
+Create file packaging/aws.json using packaging/aws-sample.json and fill out AWS information
+
+###Updating macOS version for automatic updates
+Create file packaging/keys.json using packaging/keys-sample.json
+
 ##Running
  * Run `npm start` in the repository root
 
