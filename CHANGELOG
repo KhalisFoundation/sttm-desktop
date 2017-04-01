@@ -1,3 +1,12 @@
+#### 0.1.7 - 2017-03-31
+##### Added
+- Click on the headers in the controller window to expand and collapse the top section
+- Click on the logo to go back to that beautiful start look
+
+##### Improved
+- The logo now sits prettily above the search bar full-time
+- The macOS logo isn't enormous anymore
+
 #### 0.1.6 - 2017-03-15
 ##### Added
 - When presenting a Shabad, spacebar will bring you back to the current line
