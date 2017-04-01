@@ -1,94 +1,95 @@
-'use strict';
+/* global Mousetrap platform settings */
+/* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0 */
+const electron = require('electron');
 
-const electron  = require('electron');
-const remote    = electron.remote;
-const app       = remote.app;
-const Menu      = remote.Menu;
+const remote = electron.remote;
+const app = remote.app;
+const Menu = remote.Menu;
 
 const WinMenu = Menu.buildFromTemplate([
   {
-    label: "File",
+    label: 'File',
     submenu: [
       {
-        label: "Check for Updates...",
-        accelerator: "Ctrl+U",
+        label: 'Check for Updates...',
+        accelerator: 'Ctrl+U',
         click: () => {
-          platform.ipc.send("checkForUpdates");
-        }
+          platform.ipc.send('checkForUpdates');
+        },
       },
       {
-        label: "Preferences",
-        accelerator: "Ctrl+,",
+        label: 'Preferences',
+        accelerator: 'Ctrl+,',
         click: () => {
           settings.openSettings();
-        }
+        },
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        label: "Quit",
-        accelerator: "Ctrl+Q",
+        label: 'Quit',
+        accelerator: 'Ctrl+Q',
         click: () => {
           app.quit();
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
 ]);
 
 Mousetrap.bindGlobal('mod+,', () => settings.openSettings());
 Mousetrap.bindGlobal('mod+q', () => {
   app.quit();
-})
-
-const $menuButton = document.querySelector(".menu-button");
-$menuButton.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    WinMenu.popup(remote.getCurrentWindow());
 });
-$menuButton.addEventListener("click", e => {
-  e = $menuButton.ownerDocument.createEvent('MouseEvents');
+
+const $menuButton = document.querySelector('.menu-button');
+$menuButton.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  WinMenu.popup(remote.getCurrentWindow());
+});
+$menuButton.addEventListener('click', () => {
+  const e = $menuButton.ownerDocument.createEvent('MouseEvents');
   e.initMouseEvent('contextmenu', true, true,
-     $menuButton.ownerDocument.defaultView, 1, 0, 0, 0, 0, false,
-     false, false, false,2, null);
+    $menuButton.ownerDocument.defaultView, 1, 0, 0, 0, 0, false,
+    false, false, false, 2, null);
   return !$menuButton.dispatchEvent(e);
 });
 module.exports = {
-  sendLine: function(shabadID, lineID) {
-    platform.ipc.send("show-line", {shabadID: shabadID, lineID: lineID});
+  sendLine(shabadID, lineID) {
+    platform.ipc.send('show-line', { shabadID, lineID });
   },
 
-  sendText: function(text) {
-    platform.ipc.send("show-text", {text: text});
-  }
-}
-platform.ipc.on("checkingForUpdates", () => {
-  document.body.classList.add("checking-for-updates");
+  sendText(text) {
+    platform.ipc.send('show-text', { text });
+  },
+};
+platform.ipc.on('checkingForUpdates', () => {
+  document.body.classList.add('checking-for-updates');
 });
-platform.ipc.on("no-update", () => {
-  document.body.classList.remove("checking-for-updates");
-  document.body.classList.add("no-update");
+platform.ipc.on('no-update', () => {
+  document.body.classList.remove('checking-for-updates');
+  document.body.classList.add('no-update');
   setTimeout(() => {
-    document.body.classList.remove("no-update");
+    document.body.classList.remove('no-update');
   }, 5000);
 });
-platform.ipc.on("updating", function(event, data) {
-  document.body.classList.remove("checking-for-updates");
-  document.body.classList.add("updating");
+platform.ipc.on('updating', () => {
+  document.body.classList.remove('checking-for-updates');
+  document.body.classList.add('updating');
 });
-platform.ipc.on("updateReady", () => {
-  document.body.classList.remove("checking-for-updates updating no-update offline");
-  document.body.classList.add("update-ready");
+platform.ipc.on('updateReady', () => {
+  document.body.classList.remove('checking-for-updates', 'updating', 'no-update', 'offline');
+  document.body.classList.add('update-ready');
 });
-platform.ipc.on("offline", () => {
-  document.body.classList.remove("checking-for-updates");
-  document.body.classList.add("offline");
+platform.ipc.on('offline', () => {
+  document.body.classList.remove('checking-for-updates');
+  document.body.classList.add('offline');
   setTimeout(() => {
-    document.body.classList.remove("offline");
+    document.body.classList.remove('offline');
   }, 5000);
 });
-platform.ipc.on("openSettings", () => {
+platform.ipc.on('openSettings', () => {
   settings.openSettings();
 });
