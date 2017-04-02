@@ -8,7 +8,7 @@ const SSH = require('ssh2').Client;
 
 const buildsDir = './builds/';
 const dmgFile = `SikhiToTheMax-${version}.dmg`;
-const zipFile = `sttm-${version}.zip`;
+const zipFile = `SikhiToTheMax-${version}-mac.zip`;
 const bucketName = 'sttm-releases';
 const remoteDir = 'darwin/';
 
