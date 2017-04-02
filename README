@@ -5,6 +5,8 @@ SikhiToTheMax Desktop App
  1. Node
  2. npm
  3. Have the Developer ID certificate for Khalis Foundation installed from Apple Developer Console
+ 4. pageant on Windows for SSH access to remote server
+ 5. AWS S3 keys
 
 ##Installation
  * Clone repository
@@ -16,25 +18,11 @@ SikhiToTheMax Desktop App
 ###Uploading to Remote
 Create file packaging/aws.json using packaging/aws-sample.json and fill out AWS information
 
-###Updating macOS version for automatic updates
-Create file packaging/keys.json using packaging/keys-sample.json
+###Updating remote version file for automatic updates
+Create file packaging/keys.json using packaging/keys-sample.json and enter location of private key for SSH access to remote server where version number will be stored
 
 ##Running
  * Run `npm start` in the repository root
 
 ##Packaging
-
-###macOS
- * Run `npm run dist:osx` to create and upload the app
-
-###Windows
- * On a Mac, run `npm run pack:win` to create the app (temporary limitation due to SQLite plugin)
- * Copy `sttme-win32-{version}.zip` to Windows machine `builds` folder within project folder
- * Switch to Windows machine
- * Ensure that `builds/SikhiToTheMax64` is a clone of khalis.net server dir `/home/releases/sttme-win32` (excluding version directories and index.php)
- * Run `npm run dist:win` to generate `RELEASES`, diff, and setup files
- * Upload new nupkg files in `builds/SikhiToTheMax64` to `/home/releases/sttme-win32`
- * Upload `RELEASES` file in `builds/SikhiToTheMax64` to `/home/releases/sttme-win32`
- * Upload `SikhiToTheMaxSetup.exe` in `builds/SikhiToTheMax64` to `/home/releases/_version_`
- * Move the `_version_` folder to `/home/releases/sttme-win32`
-
+ * Run `npm run dist:osx` on macOS or `npm run dist:win` on Windows to create and upload the app
