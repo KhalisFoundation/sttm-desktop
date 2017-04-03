@@ -65,29 +65,29 @@ module.exports = {
     platform.ipc.send('show-text', { text });
   },
 };
-platform.ipc.on('checkingForUpdates', () => {
-  document.body.classList.add('checking-for-updates');
+platform.ipc.on('checking-for-update', () => {
+  document.body.classList.add('checking-for-update');
 });
 platform.ipc.on('no-update', () => {
-  document.body.classList.remove('checking-for-updates');
+  document.body.classList.remove('checking-for-update');
   document.body.classList.add('no-update');
   setTimeout(() => {
     document.body.classList.remove('no-update');
   }, 5000);
 });
 platform.ipc.on('updating', () => {
-  document.body.classList.remove('checking-for-updates');
+  document.body.classList.remove('checking-for-update');
   document.body.classList.add('updating');
 });
 platform.ipc.on('updateReady', () => {
-  document.body.classList.remove('checking-for-updates', 'updating', 'no-update', 'offline');
+  document.body.classList.remove('checking-for-update', 'updating', 'no-update', 'offline');
   document.body.classList.add('update-ready');
 });
 platform.ipc.on('offline', () => {
-  document.body.classList.remove('checking-for-updates');
+  document.body.classList.remove('checking-for-update');
   document.body.classList.add('offline');
   setTimeout(() => {
-    document.body.classList.remove('offline');
+    document.body.classList.remove('offline', 'checking-for-update');
   }, 5000);
 });
 platform.ipc.on('openSettings', () => {

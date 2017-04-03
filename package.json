@@ -8,13 +8,12 @@
     "test": "htmlhint www/index.html desktop_www/viewer.html && eslint app.js packaging/ www/js desktop_www/js && stylelint \"www/scss/custom/*.scss\" \"desktop_www/scss/*.scss\" --syntax scss",
     "start": "concurrently --kill-others \"npm run watch-css\" \"npm run watch-www-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css && npm run build-www-css",
-    "pack:osx": "npm run build && build --mac --dir",
-    "pack:win": "npm run build-css && npm run build-www-css && electron-packager ./ %npm_package_productName% --app-version=%npm_package_version% --version=0.37.8 --out=builds --ignore=\"assets\" --ignore=\"builds\" --ignore=\"packaging\" --ignore=\"www/node_modules\" --ignore=\"www/.git(.*)\" --ignore=\"www/package.json\" --ignore=\".(.*)config\" --ignore=\".(.*)rc\" --ignore=\".git(.*)\" --ignore=\"(.*).map\" --ignore=\"(.*)scss\" --ignore=\"iGurbani.sqlite\" --ignore=\"README\" --platform=win32 --arch=x64 --asar=true --version-string.CompanyName=\"Khalis, Inc.\" --version-string.LegalCopyright=\"Copyright (C) 2017 Khalis, Inc.\" --version-string.FileDescription=%npm_package_productName% --version-string.OriginalFilename=\"SikhiToTheMax.exe\" --version-string.InternalName=%npm_package_productName% --version-string.ProductName=%npm_package_productName% --version-string.ProductVersion=%npm_package_version% --icon=\"assets\\STTME.ico\" --overwrite && copy iGurbani.sqlite builds\\SikhiToTheMax-win32-x64\\resources\\iGurbani.sqlite",
-    "installers:win": "node packaging/winstaller.js",
-    "upload:osx": "node packaging/upload-osx.js",
+    "pack:mac": "npm run build && build --mac",
+    "pack:win": "npm run build && build --win --x64",
+    "upload:mac": "node packaging/upload-osx.js",
     "upload:win": "node packaging/upload-win.js",
-    "dist:osx": "npm run pack:osx && npm run upload:osx",
-    "dist:win": "npm run pack:win && npm run installers:win && npm run upload:win",
+    "dist:mac": "npm run pack:mac && npm run upload:mac",
+    "dist:win": "npm run pack:win && npm run upload:win",
     "build-css": "node-sass --output-style compressed --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css",
     "build-www-css": "node-sass --output-style compressed --include-path www/scss www/scss/foundation.scss www/css/bundle.css",
     "watch-css": "nodemon --watch desktop_www -e scss -x \"node-sass --output-style nested --source-map true --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css\"",
@@ -30,10 +29,9 @@
     "aws-sdk": "^2.28.0",
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
+    "electron": "^1.6.2",
     "electron-builder": "^16.6.1",
-    "electron-installer-squirrel-windows": "^1.3.0",
-    "electron-packager": "^8.3.0",
-    "electron-prebuilt": "^0.37.7",
+    "electron-publisher-s3": "^16.6.0",
     "electron-winstaller": "^2.5.1",
     "eslint": "^3.18.0",
     "eslint-config-airbnb-base": "^11.1.2",
@@ -47,13 +45,13 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^1.11.2",
     "hyperscript": "^2.0.2",
     "marked": "^0.3.6",
     "sqlite3": "^3.1.8"
   },
   "build": {
-    "appId": "org.khalisfoundation.sttme",
+    "appId": "org.khalisfoundation.sttm",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -62,7 +60,8 @@
       "!packaging${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,iGurbani.sqlite,README}"
+      "!**/{.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,iGurbani.sqlite,README}",
+      "!**/*.map"
     ],
     "extraResources": [
       "iGurbani.sqlite"
@@ -72,7 +71,12 @@
       "output": "builds",
       "app": "./"
     },
-    "electronVersion": "0.37.7",
+    "publish": {
+      "provider": "s3",
+      "bucket": "sttm-release",
+      "path": "${os}-${arch}",
+      "region": "us-west-2"
+    },
     "dmg": {
       "icon": "STTM-DMG.icns"
     },
@@ -83,6 +87,17 @@
         "dmg",
         "mas",
         "zip"
+      ]
+    },
+    "nsis": {
+      "artifactName": "${productName}Setup-${version}.${ext}",
+      "deleteAppDataOnUninstall": true,
+      "perMachine": true
+    },
+    "win": {
+      "icon": "assets/STTME.ico",
+      "target": [
+        "nsis"
       ]
     }
   }

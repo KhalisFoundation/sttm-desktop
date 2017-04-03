@@ -1,16 +1,15 @@
 /* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0, global-require:0 */
 const electron = require('electron');
-const app = require('app');
-if (require('electron-squirrel-startup')) app.quit();
-const appVersion = require('./package.json').version;
-const os = require('os').platform();
 const Store = require('./desktop_www/js/store.js');
 const defaultPrefs = require('./desktop_www/js/defaults.json');
-const autoUpdater = require('auto-updater');
+const { autoUpdater } = require('electron-updater');
 
-const Menu = electron.Menu;
-const BrowserWindow = electron.BrowserWindow;
-const ipc = electron.ipcMain;
+const { app, BrowserWindow, ipcMain, Menu } = electron;
+const store = new Store({
+  configName: 'user-preferences',
+  defaults: defaultPrefs,
+});
+
 let mainWindow;
 let viewerWindow;
 let viewerWindowOpen = false;
@@ -18,12 +17,10 @@ let viewerWindowX;
 let viewerWindowY;
 let viewerWindowFS;
 
-const store = new Store({
-  configName: 'user-preferences',
-  defaults: defaultPrefs,
-});
-
 // autoUpdater events
+autoUpdater.on('checking-for-update', () => {
+  mainWindow.webContents.send('checking-for-update');
+});
 autoUpdater.on('update-available', () => {
   mainWindow.webContents.send('updating');
 });
@@ -39,16 +36,7 @@ autoUpdater.on('error', () => {
 
 function checkForUpdates() {
   if (process.env.NODE_ENV !== 'development') {
-    let updateFeed;
-    if (os === 'win32') {
-      updateFeed = 'http://sttm-releases.s3-website-us-west-2.amazonaws.com/win32/';
-    } else {
-      updateFeed = `http://releases.khalis.net/sttme/darwin/${appVersion}`;
-    }
-
-    autoUpdater.setFeedURL(updateFeed);
     autoUpdater.checkForUpdates();
-    mainWindow.webContents.send('checkingForUpdates');
   }
 }
 
@@ -291,10 +279,10 @@ function createViewer(ipcData) {
   });
 }
 
-ipc.on('checkForUpdates', checkForUpdates);
-ipc.on('quitAndInstall', () => autoUpdater.quitAndInstall());
+ipcMain.on('checkForUpdates', checkForUpdates);
+ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
-ipc.on('show-line', (event, arg) => {
+ipcMain.on('show-line', (event, arg) => {
   if (viewerWindowOpen) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
@@ -305,7 +293,7 @@ ipc.on('show-line', (event, arg) => {
   }
 });
 
-ipc.on('show-text', (event, arg) => {
+ipcMain.on('show-text', (event, arg) => {
   if (viewerWindowOpen) {
     viewerWindow.webContents.send('show-text', arg);
   } else {

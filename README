@@ -13,6 +13,7 @@ SikhiToTheMax Desktop App
  * Run `git submodule update --init --recursive` after you `cd` into the repository
  * Run `git checkout -t origin/dev` in the repository root and the www folder
  * Run `npm i` in the repository root and www folder
+ * Depending on your current operating system, run `npm run pack:win` or `npm run pack:mac` to rebuild the native plugins for your system
 
 ##Configuration
 ###Uploading to Remote

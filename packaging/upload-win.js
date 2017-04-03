@@ -2,19 +2,16 @@
 // Load the SDK
 const AWS = require('aws-sdk');
 const fs = require('fs');
-const { version, name } = require('../package.json');
+const { version } = require('../package.json');
 const path = require('path');
 const keys = require('./keys.json');
 const SSH = require('ssh2').Client;
 
-const rootPath = path.join('./');
-const buildsDir = path.join(rootPath, 'builds');
-const outputDir = path.join(buildsDir, 'SikhiToTheMax64');
+const buildsDir = path.join('./', 'builds');
 const exeFile = `SikhiToTheMaxSetup-${version}.exe`;
-const fullUpdateFile = `${name}-${version}-full.nupkg`;
-const deltaUpdateFile = `${name}-${version}-delta.nupkg`;
+const updateFile = 'latest.yml';
 const bucketName = 'sttm-releases';
-const remoteDir = 'win32/';
+const remoteDir = 'win-x64/';
 
 AWS.config.loadFromPath('./packaging/aws.json');
 const s3 = new AWS.S3({
@@ -48,7 +45,7 @@ function updateRemoteVersion() {
 
 function upload(files) {
   const file = files.splice(0, 1)[0];
-  fs.readFile(path.join(outputDir, file), (err, data) => {
+  fs.readFile(path.join(buildsDir, file), (err, data) => {
     if (err) { throw err; }
 
     console.log(`Uploading ${file} ...`);
@@ -70,4 +67,4 @@ function upload(files) {
   });
 }
 
-upload([exeFile, fullUpdateFile, deltaUpdateFile, 'RELEASES']);
+upload([exeFile, updateFile]);
