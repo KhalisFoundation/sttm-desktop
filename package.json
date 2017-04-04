@@ -45,6 +45,7 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
+    "electron-log": "^2.0.2",
     "electron-updater": "^1.11.2",
     "hyperscript": "^2.0.2",
     "marked": "^0.3.6",
@@ -73,7 +74,7 @@
     },
     "publish": {
       "provider": "s3",
-      "bucket": "sttm-release",
+      "bucket": "sttm-releases",
       "path": "${os}-${arch}",
       "region": "us-west-2"
     },

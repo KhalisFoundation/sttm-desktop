@@ -3,6 +3,7 @@ const electron = require('electron');
 const Store = require('./desktop_www/js/store.js');
 const defaultPrefs = require('./desktop_www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 const { app, BrowserWindow, ipcMain, Menu } = electron;
 const store = new Store({
@@ -16,6 +17,9 @@ let viewerWindowOpen = false;
 let viewerWindowX;
 let viewerWindowY;
 let viewerWindowFS;
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
 
 // autoUpdater events
 autoUpdater.on('checking-for-update', () => {
@@ -31,7 +35,7 @@ autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('updateReady');
 });
 autoUpdater.on('error', () => {
-  mainWindow.webContents.send('offline');
+  mainWindow.webContents.send('update-error');
 });
 
 function checkForUpdates() {
