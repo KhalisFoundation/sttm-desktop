@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm3-desktop",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build": "npm run build-css && npm run build-www-css",
     "pack:mac": "npm run build && build --mac",
     "pack:win": "npm run build && build --win --x64",
-    "upload:mac": "node packaging/upload-osx.js",
+    "upload:mac": "node packaging/upload-mac.js",
     "upload:win": "node packaging/upload-win.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
     "dist:win": "npm run pack:win && npm run upload:win",

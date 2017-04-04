@@ -9,8 +9,9 @@ const SSH = require('ssh2').Client;
 const buildsDir = './builds/';
 const dmgFile = `SikhiToTheMax-${version}.dmg`;
 const zipFile = `SikhiToTheMax-${version}-mac.zip`;
+const updateFile = 'latest-mac.json';
 const bucketName = 'sttm-releases';
-const remoteDir = 'darwin/';
+const remoteDir = 'mac-x64/';
 
 AWS.config.loadFromPath('./packaging/aws.json');
 const s3 = new AWS.S3({
@@ -22,7 +23,7 @@ function updateRemoteVersion() {
   const conn = new SSH();
   conn.on('ready', () => {
     console.log('Client :: ready');
-    conn.exec(`echo ${version} > /home/releases/sttm-darwin`, (err, stream) => {
+    conn.exec(`echo ${version} > /home/releases/sttm-mac-x64 && cat /home/releases/sttm-mac-x64`, (err, stream) => {
       if (err) throw err;
       stream.on('close', (code, signal) => {
         console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
@@ -65,4 +66,4 @@ function upload(files) {
   });
 }
 
-upload([dmgFile, zipFile]);
+upload([dmgFile, zipFile, updateFile]);
