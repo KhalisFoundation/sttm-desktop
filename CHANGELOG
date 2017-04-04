@@ -1,3 +1,11 @@
+#### 0.1.8 - 2017-04-03
+##### Inconvenience
+- Apologies to our Windows users, who had to re-install to take advantage of the new, much better build system that will ensure smaller downloads for updates.
+
+##### Improved
+- Messaging updated to better reflect download status
+- Major under-the-hood updates using a better build system that will allow us to offer the app more easily on more platforms
+
 #### 0.1.7 - 2017-03-31
 ##### Added
 - Click on the headers in the controller window to expand and collapse the top section
