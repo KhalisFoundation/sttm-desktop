@@ -23,7 +23,7 @@ function updateRemoteVersion() {
   const conn = new SSH();
   conn.on('ready', () => {
     console.log('Client :: ready');
-    conn.exec(`echo ${version} > /home/releases/sttm-win32 && cat /home/releases/sttm-win32`, (err, stream) => {
+    conn.exec(`echo ${version} > /home/releases/sttm-win-x64 && cat /home/releases/sttm-win-x64`, (err, stream) => {
       if (err) throw err;
       stream.on('close', (code, signal) => {
         console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
