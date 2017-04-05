@@ -3,10 +3,8 @@ body.win32 {
 
   #titlebar {
     -webkit-app-region: drag;
-    -webkit-user-select: none;
     background-color: #333;
     color: #fff;
-    display: block;
     font-family: "Segoe UI", sans-serif;
     font-size: 12px;
     height: 32px;
@@ -19,6 +17,10 @@ body.win32 {
     top: 1px;
     transition: opacity 0.2s ease-out;
     width: calc(100% - 2px);
+
+    > * {
+      display: initial;
+    }
 
     ul.controls {
       -webkit-app-region: no-drag;
@@ -44,28 +46,33 @@ body.win32 {
             width: 10px;
           }
         }
+
         &:hover {
           background-color: rgba(255, 255, 255, 0.1);
         }
       }
     }
   }
-  &:after,
-  .controls:after {
+
+  &::after,
+  .controls::after {
     clear: both;
     content: ' ';
     display: table;
   }
+
   &.maximized {
     .controls .maximize {
       display: none;
     }
   }
+
   &:not(.maximized) {
     .controls .restore {
       display: none;
     }
   }
+
   &:hover {
     #titlebar {
       opacity: 1;

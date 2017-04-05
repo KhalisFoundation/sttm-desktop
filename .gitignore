@@ -6,3 +6,4 @@ packaging/aws.json
 packaging/keys.json
 iGurbani.sqlite
 *.provisionprofile
+npm-debug.log*
