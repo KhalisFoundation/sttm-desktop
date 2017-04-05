@@ -32,7 +32,6 @@
     "electron": "^1.6.2",
     "electron-builder": "^16.6.1",
     "electron-publisher-s3": "^16.6.0",
-    "electron-winstaller": "^2.5.1",
     "eslint": "^3.18.0",
     "eslint-config-airbnb-base": "^11.1.2",
     "eslint-plugin-import": "^2.2.0",
