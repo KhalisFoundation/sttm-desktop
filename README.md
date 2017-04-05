@@ -7,6 +7,8 @@ SikhiToTheMax Desktop App
  3. Have the Developer ID certificate for Khalis Foundation installed from Apple Developer Console
  4. pageant on Windows for SSH access to remote server
  5. AWS S3 keys
+ 6. macOS
+     * Distribution provision profile in app root directory for Mac App Store
 
 ##Installation
  * Clone repository

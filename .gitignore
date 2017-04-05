@@ -5,3 +5,4 @@ desktop_www/css/viewer.css
 packaging/aws.json
 packaging/keys.json
 iGurbani.sqlite
+*.provisionprofile
