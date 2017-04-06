@@ -1,4 +1,4 @@
-#### 0.2.0 - 2017-04-06
+#### 0.2.1 - 2017-04-06
 ##### Updated
  - We now use a new database, with more available sources and many corrections in digitization
 
