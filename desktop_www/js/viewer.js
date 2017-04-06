@@ -44,19 +44,19 @@ platform.ipc.on('show-line', (event, data) => {
     Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
     document.getElementById(`slide${data.lineID}`).classList.add('active');
   } else {
-    platform.db.all(`SELECT _id, gurmukhi, english_ssk, transliteration, sggs_darpan FROM shabad WHERE shabad_no = ${newShabadID}`,
+    platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
       (err, rows) => {
         if (rows.length > 0) {
           const cards = [];
           rows.forEach((row) => {
             cards.push(
               h(
-                `div#slide${row._id}.slide${row._id === data.lineID ? '.active' : ''}`,
+                `div#slide${row.ID}.slide${row.ID === data.lineID ? '.active' : ''}`,
                 [
-                  h('h1.gurbani.gurmukhi', row.gurmukhi),
-                  h('h2.translation', row.english_ssk),
-                  h('h2.transliteration', row.transliteration),
-                  h('h2.teeka', row.sggs_darpan),
+                  h('h1.gurbani.gurmukhi', row.Gurmukhi),
+                  h('h2.translation', row.English),
+                  h('h2.transliteration', row.Transliteration),
+                  h('h2.teeka', row.PunjabiUni),
                 ]));
           });
           hideDecks();
