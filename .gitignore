@@ -4,6 +4,6 @@ desktop_www/css/viewer.css
 **/*.map
 packaging/aws.json
 packaging/keys.json
-iGurbani.sqlite
+data.db
 *.provisionprofile
 npm-debug.log*

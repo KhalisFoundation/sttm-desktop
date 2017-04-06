@@ -1,74 +1,78 @@
-const {remote}      = require("electron");
-const ipc           = require("electron").ipcRenderer;
-const fs            = require("fs");
-const path          = require("path");
+/* eslint import/no-extraneous-dependencies: 0 */
+const electron = require('electron');
+const defaultPrefs = require('./defaults.json');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const Store = require('./store');
 
-//If not in dev, DB path is outside of app.asar
-let dbPath          = window.process.env.NODE_ENV != "development" ? "../../../" : "../../";
-    dbPath          = path.resolve(__dirname, dbPath + "iGurbani.sqlite")
+const { remote } = electron;
+const ipc = electron.ipcRenderer;
 
-const sqlite3       = require("sqlite3").verbose();
-      db            = new sqlite3.Database(dbPath);
-const Store         = require("./store");
-const defaultPrefs  = require("./defaults.json");
+// If not in dev, DB path is outside of app.asar
+let dbPath = window.process.env.NODE_ENV !== 'development' ? '../../../' : '../../';
+dbPath = path.resolve(__dirname, `${dbPath}data.db`);
+
+const db = new sqlite3.Database(dbPath);
 
 const store = new Store({
   configName: 'user-preferences',
-  defaults: defaultPrefs
-});
-
-const $titleButtons = document.querySelectorAll("#titlebar .controls a");
-Array.from($titleButtons).forEach(el => {
-  el.addEventListener("click", e => windowAction(e));
+  defaults: defaultPrefs,
 });
 
 function windowAction(e) {
   const win = remote.getCurrentWindow();
   const el = e.currentTarget;
   switch (el.dataset.windowAction) {
-    case "minimize":
+    case 'minimize':
       win.minimize();
       break;
-    case "max-restore":
+    case 'max-restore':
       if (win.isMaximized()) {
         win.unmaximize();
-        document.body.classList.remove("maximized");
+        document.body.classList.remove('maximized');
       } else {
         win.maximize();
-        document.body.classList.add("maximized");
+        document.body.classList.add('maximized');
       }
       break;
-    case "close":
+    case 'close':
       win.close();
+      break;
+    default:
       break;
   }
 }
 module.exports = {
-  ipc: ipc,
-  db: db,
-  store: store,
+  ipc,
+  db,
+  store,
 
-  getAllPrefs: function() {
-    return this.getPref("userPrefs")
+  getAllPrefs() {
+    return this.getPref('userPrefs');
   },
 
-  getUserPref: function(key) {
-    return this.getPref("userPrefs." + key);
+  getUserPref(key) {
+    return this.getPref(`userPrefs.${key}`);
   },
 
-  getPref: function(key, schema = store.data) {
+  getPref(key, schema = store.data) {
     return store.get(key, schema);
   },
 
-  setUserPref: function(key, val) {
-    this.setPref("userPrefs." + key, val);
+  setUserPref(key, val) {
+    this.setPref(`userPrefs.${key}`, val);
   },
 
-  setPref: function(key, val) {
+  setPref(key, val) {
     store.set(key, val);
   },
 
-  deletePref: function(key) {
+  deletePref(key) {
     store.delete(key);
-  }
-}
+  },
+};
+
+const $titleButtons = document.querySelectorAll('#titlebar .controls a');
+Array.from($titleButtons).forEach((el) => {
+  el.addEventListener('click', e => windowAction(e));
+});
