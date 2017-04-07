@@ -47,6 +47,9 @@
     "electron-log": "^2.0.2",
     "electron-updater": "^1.11.2",
     "hyperscript": "^2.0.2",
+    "lodash.defaultsdeep": "^4.6.0",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
     "marked": "^0.3.6",
     "sqlite3": "^3.1.8"
   },
