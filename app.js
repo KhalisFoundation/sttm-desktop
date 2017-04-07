@@ -1,15 +1,15 @@
 /* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0, global-require:0 */
 const electron = require('electron');
-const Store = require('./desktop_www/js/store.js');
-const defaultPrefs = require('./desktop_www/js/defaults.json');
+// const Store = require('./desktop_www/js/store.js');
+// const defaultPrefs = require('./desktop_www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
 const { app, BrowserWindow, ipcMain, Menu } = electron;
-const store = new Store({
+/* const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
-});
+}); */
 
 let mainWindow;
 let viewerWindow;
@@ -45,14 +45,13 @@ function checkForUpdates() {
 }
 
 app.on('ready', () => {
-  const windowBounds = store.get('windowBounds');
   mainWindow = new BrowserWindow({
     minWidth: 320,
     minHeight: 480,
-    width: windowBounds.width,
-    height: windowBounds.height,
-    x: windowBounds.x,
-    y: windowBounds.y,
+    width: 7680,
+    height: 4320,
+    x: 0,
+    y: 0,
     frame: (process.platform !== 'win32'),
     show: false,
     titleBarStyle: 'hidden',
@@ -62,13 +61,6 @@ app.on('ready', () => {
     checkForUpdates();
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
-  function saveWindowBounds() {
-    store.set('windowBounds', mainWindow.getBounds());
-  }
-
-  // listen to `resize` and `move` and save the settings
-  mainWindow.on('resize', saveWindowBounds);
-  mainWindow.on('move', saveWindowBounds);
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
