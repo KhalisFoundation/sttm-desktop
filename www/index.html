@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>SikhiToTheMax</title>
+  <link rel="stylesheet" href="css/bundle.css">
+  <link rel="stylesheet" href="core/css/font-awesome.min.css">
+</head>
+<body class="home">
+  <div id="titlebar" class="noselect">
+    <a href="#" class="menu-button">
+      <svg x="0px" y="0px" viewbox="0 0 10 10">
+        <rect fill="#ffffff" width="10" height="1" x="0" y="2"></rect>
+        <rect fill="#ffffff" width="10" height="1" x="0" y="5"></rect>
+        <rect fill="#ffffff" width="10" height="1" x="0" y="8"></rect>
+      </svg>
+    </a>
+    <span class="title">SikhiToTheMax</span>
+    <ul class="controls">
+      <li>
+        <a href="#" data-window-action="minimize">
+          <svg x="0px" y="0px" viewbox="0 0 10 1">
+            <rect fill="#ffffff" width="10" height="1"></rect>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="#" data-window-action="max-restore">
+          <svg class="maximize" x="0px" y="0px" viewbox="0 0 10 10">
+            <path fill="#ffffff" d="M 0 0 L 0 10 L 10 10 L 10 0 L 0 0 z M 1 1 L 9 1 L 9 9 L 1 9 L 1 1 z "/>
+          </svg>
+          <svg class="restore" x="0px" y="0px" viewbox="0 0 10 10">
+            <mask id="mask">
+              <rect fill="#ffffff" width="10" height="10"></rect>
+              <path fill="#000000" d="M 3 1 L 9 1 L 9 7 L 8 7 L 8 2 L 3 2 L 3 1 z"/>
+              <path fill="#000000" d="M 1 3 L 7 3 L 7 9 L 1 9 L 1 3 z"/>
+            </mask>
+            <path fill="#ffffff" d="M 2 0 L 10 0 L 10 8 L 8 8 L 8 10 L 0 10 L 0 2 L 2 2 L 2 0 z" mask="url(#mask)"/>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="#" data-window-action="close">
+          <svg x="0px" y="0px" viewbox="0 0 10 10">
+            <polygon fill="#ffffff" points="10,1 9,0 5,4 1,0 0,1 4,5 0,9 1,10 5,6 9,10 10,9 6,5"></polygon>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div id="app-frame">
+    <div id="header" class="shrink collapse">
+      <nav class="global-nav">
+        <ul class="title-area no-bullet noselect">
+          <li class="name"></li>
+        </ul>
+        <div class="shrink collapse grid-block search-div"></div>
+        <ul class="right no-bullet noselect" id="buttons">
+          <li><a href="#" class="msg gurmukhi">vwihgurU</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div id="main-ui" class="vertical grid-block noselect">
+      <div class="grid-block vertical medium-horizontal" id="top-blocks">
+        <div class="grid-block vertical order-1 medium-6" id="results-block">
+          <div class="grid-block shrink">
+            <section class="block-list">
+              <header>Search Results</header>
+            </section>
+          </div>
+          <div class="grid-block">
+            <section class="block-list">
+              <ul id="results" class="gurmukhi"></ul>
+            </section>
+          </div>
+        </div>
+        <div class="grid-block vertical order-2 medium-6" id="session-block">
+          <div class="grid-block shrink">
+            <section class="block-list">
+              <ul class="right"><li><a href="#" class="action" data-action="search.clearSession"><i class="fa fa-trash"></i></a></li></ul>
+              <header>Recent Shabads</header>
+            </section>
+          </div>
+          <div class="grid-block" id="session-container">
+            <section class="block-list">
+              <ul id="session" class="gurmukhi"></ul>
+            </section>
+          </div>
+        </div>
+      </div>
+      <div class="grid-block vertical" id="shabad-block">
+        <div class="grid-block shrink">
+          <section class="block-list">
+            <header>Current Shabad</header>
+          </section>
+        </div>
+        <div class="grid-block" id="shabad-container">
+          <section class="block-list">
+            <ul id="shabad" class="gurmukhi"></ul>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div id="footer" class="shrink collapse grid-content noselect">
+      <div class="menu-group">
+        <div class="menu-group-left">
+          <ul class="menu-bar">
+            <li>
+              <a class="action" data-action="changelog.openChangelog" id="app-version"></a>
+            </li>
+            <li id="checking-for-update">
+              <a class="nolink">Checking for updates.</a>
+            </li>
+            <li id="updating">
+              <a class="nolink medium"><i class="fa fa-refresh fa-spin fa-fw"></i> </a>
+            </li>
+            <li id="updating-text">
+              <a class="nolink">New version downloading.</a>
+            </li>
+            <li id="update-error">
+              <a class="nolink">Update error</a>
+            </li>
+            <li id="no-update">
+              <a class="nolink">No update available.</a>
+            </li>
+            <li id="update-ready">
+              <a class="action" data-action="platform.ipc.send('quitAndInstall')">Update ready. Click to install.</a>
+            </li>
+          </ul>
+        </div>
+        <div class="menu-group-right">
+          <ul class="menu-bar">
+            <li>
+              <a class="action" data-action="settings.openSettings"><span class="small"><i class="fa fa-fw fa-cog"></i></span><span class="medium">Settings</span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="settings" class="grid-frame vertical noselect">
+    <div class="grid-content shrink">
+      <h1>Settings</h1>
+      <a class="action" data-action="settings.closeSettings">×</a>
+    </div>
+    <div class="settings-container grid-block">
+      <div class="grid-content small-4 sections">
+        <ul>
+          <li><a class="active" data-tab="searchResults_settings">Search Results</a></li>
+          <li><a data-tab="presenterView_settings">Presenter</a></li>
+        </ul>
+      </div>
+      <div class="grid-content small-8 options">
+        <div id="searchResults_settings" class="settings-tab active">
+          <div id="searchResults_settings_fieldsDisplayed" class="settings-section">
+            <h4>Fields Displayed</h4>
+            <div class="grid-block">
+              <div class="grid-content small-6">
+                <input type="checkbox" id="searchResults_transliteration" class="setting"> <label for="searchResults_transliteration">Transliteration</label><br>
+                <input type="checkbox" id="searchResults_translationEnglish" value="ssk" class="setting"> <label for="searchResults_translationEnglish">English Translation</label><br>
+                <input type="checkbox" id="searchResults_meta" class="setting"> <label for="searchResults_meta">Meta Data</label>
+              </div>
+              <div class="grid-content small-6">
+                <div id="searchResults_settings_preview" class="preview panktee search-result noselect">
+                  <span class="gurmukhi">Awie imlu gurisK Awie imlu qU myry gurU ky ipAwry ] rhwau ]</span><span class="roman transliteration">Aae Mil Gurasikh Aae Mil Thoo Maerae Guroo Kae Piaarae || Rehaao ||</span><span class="roman translation english">Come, join with me, O Sikh of the Guru, come and join with me. You are my Guru's Beloved. ||Pause||</span><span class="roman meta">Guru Granth Sahib - 725 - Raag Tilang - Guru Raam Das Ji</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="presenterView_settings" class="settings-tab">
+          <div id="presenterView_settings_fieldsDisplayed" class="settings-section">
+            <h4>Fields Displayed</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="changelog-modal">
+    <div class="modal" animation-in="slideInDown" animation-out="slideOutDown">
+      <a class="close-button action" data-action="changelog.closeChangelog">×</a>
+      <h3>Changelog</h3>
+      <div id="changelog"></div>
+    </div>
+  </div>
+  <script src="core/js/vendor/mousetrap.min.js"></script>
+  <script src="core/js/index.js"></script>
+</body>
+</html>

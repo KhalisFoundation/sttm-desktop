@@ -1,23 +1,21 @@
 {
   "productName": "SikhiToTheMax",
-  "name": "sttm3-desktop",
+  "name": "sttm-desktop",
   "version": "0.2.1",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
-    "test": "htmlhint www/index.html desktop_www/viewer.html && eslint app.js packaging/ www/js desktop_www/js && stylelint \"www/scss/custom/*.scss\" \"desktop_www/scss/*.scss\" --syntax scss",
-    "start": "concurrently --kill-others \"npm run watch-css\" \"npm run watch-www-css\" \"cross-env NODE_ENV=development electron .\"",
-    "build": "npm run build-css && npm run build-www-css",
+    "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/core/scss/custom/*.scss\" \"www/scss/*.scss\" --syntax scss",
+    "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
+    "build": "npm run build-css",
     "pack:mac": "npm run build && build --mac",
     "pack:win": "npm run build && build --win --x64",
     "upload:mac": "node packaging/upload-mac.js",
     "upload:win": "node packaging/upload-win.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
     "dist:win": "npm run pack:win && npm run upload:win",
-    "build-css": "node-sass --output-style compressed --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css",
-    "build-www-css": "node-sass --output-style compressed --include-path www/scss www/scss/foundation.scss www/css/bundle.css",
-    "watch-css": "nodemon --watch desktop_www -e scss -x \"node-sass --output-style nested --source-map true --include-path desktop_www/scss desktop_www/scss/viewer.scss desktop_www/css/viewer.css\"",
-    "watch-www-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/scss www/scss/foundation.scss www/css/bundle.css\""
+    "build-css": "node-sass --output-style compressed --include-path www/scss www/scss/styles.scss www/css/bundle.css",
+    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/scss www/scss/styles.scss www/css/bundle.css\""
   },
   "repository": {
     "type": "git",
