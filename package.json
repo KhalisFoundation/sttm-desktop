@@ -60,7 +60,7 @@
       "!packaging${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README}",
+      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README}",
       "!**/*.map"
     ],
     "extraResources": [
