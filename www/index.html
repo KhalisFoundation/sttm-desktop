@@ -49,96 +49,7 @@
       </li>
     </ul>
   </div>
-  <div id="app-frame">
-    <div id="header" class="shrink collapse">
-      <nav class="global-nav">
-        <ul class="title-area no-bullet noselect">
-          <li class="name"></li>
-        </ul>
-        <div class="shrink collapse grid-block search-div"></div>
-        <ul class="right no-bullet noselect" id="buttons">
-          <li><a href="#" class="msg gurmukhi">vwihgurU</a></li>
-        </ul>
-      </nav>
-    </div>
-    <div id="main-ui" class="vertical grid-block noselect">
-      <div class="grid-block vertical medium-horizontal" id="top-blocks">
-        <div class="grid-block vertical order-1 medium-6" id="results-block">
-          <div class="grid-block shrink">
-            <section class="block-list">
-              <header>Search Results</header>
-            </section>
-          </div>
-          <div class="grid-block">
-            <section class="block-list">
-              <ul id="results" class="gurmukhi"></ul>
-            </section>
-          </div>
-        </div>
-        <div class="grid-block vertical order-2 medium-6" id="session-block">
-          <div class="grid-block shrink">
-            <section class="block-list">
-              <ul class="right"><li><a href="#" class="action" data-action="search.clearSession"><i class="fa fa-trash"></i></a></li></ul>
-              <header>Recent Shabads</header>
-            </section>
-          </div>
-          <div class="grid-block" id="session-container">
-            <section class="block-list">
-              <ul id="session" class="gurmukhi"></ul>
-            </section>
-          </div>
-        </div>
-      </div>
-      <div class="grid-block vertical" id="shabad-block">
-        <div class="grid-block shrink">
-          <section class="block-list">
-            <header>Current Shabad</header>
-          </section>
-        </div>
-        <div class="grid-block" id="shabad-container">
-          <section class="block-list">
-            <ul id="shabad" class="gurmukhi"></ul>
-          </section>
-        </div>
-      </div>
-    </div>
-    <div id="footer" class="shrink collapse grid-content noselect">
-      <div class="menu-group">
-        <div class="menu-group-left">
-          <ul class="menu-bar">
-            <li>
-              <a class="action" data-action="changelog.openChangelog" id="app-version"></a>
-            </li>
-            <li id="checking-for-update">
-              <a class="nolink">Checking for updates.</a>
-            </li>
-            <li id="updating">
-              <a class="nolink medium"><i class="fa fa-refresh fa-spin fa-fw"></i> </a>
-            </li>
-            <li id="updating-text">
-              <a class="nolink">New version downloading.</a>
-            </li>
-            <li id="update-error">
-              <a class="nolink">Update error</a>
-            </li>
-            <li id="no-update">
-              <a class="nolink">No update available.</a>
-            </li>
-            <li id="update-ready">
-              <a class="action" data-action="platform.ipc.send('quitAndInstall')">Update ready. Click to install.</a>
-            </li>
-          </ul>
-        </div>
-        <div class="menu-group-right">
-          <ul class="menu-bar">
-            <li>
-              <a class="action" data-action="settings.openSettings"><span class="small"><i class="fa fa-fw fa-cog"></i></span><span class="medium">Settings</span></a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="app-frame"></div>
   <div id="settings" class="grid-frame vertical noselect">
     <div class="grid-content shrink">
       <h1>Settings</h1>
@@ -185,6 +96,6 @@
     </div>
   </div>
   <script src="core/js/vendor/mousetrap.min.js"></script>
-  <script src="core/js/index.js"></script>
+  <script src="js/desktop_index.js"></script>
 </body>
 </html>
