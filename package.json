@@ -5,7 +5,7 @@
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
-    "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/core/scss/custom/*.scss\" \"www/scss/*.scss\" --syntax scss",
+    "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/custom/*.scss\" --syntax scss",
     "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css",
     "pack:mac": "npm run build && build --mac",
@@ -14,8 +14,8 @@
     "upload:win": "node packaging/upload-win.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
     "dist:win": "npm run pack:win && npm run upload:win",
-    "build-css": "node-sass --output-style compressed --include-path www/scss www/scss/styles.scss www/css/bundle.css",
-    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/scss www/scss/styles.scss www/css/bundle.css\""
+    "build-css": "node-sass --output-style compressed --include-path www/scss www/src/scss/styles.scss www/assets/css/bundle.css",
+    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css\""
   },
   "repository": {
     "type": "git",
