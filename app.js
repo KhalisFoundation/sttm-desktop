@@ -15,35 +15,11 @@ const appVersion = app.getVersion();
 let mainWindow;
 let viewerWindow = false;
 let changelogWindow = false;
+let updateWindow = false;
+let manualUpdate = false;
 let viewerWindowX;
 let viewerWindowY;
 let viewerWindowFS;
-
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-
-// autoUpdater events
-autoUpdater.on('checking-for-update', () => {
-  mainWindow.webContents.send('checking-for-update');
-});
-autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('updating');
-});
-autoUpdater.on('update-not-available', () => {
-  mainWindow.webContents.send('no-update');
-});
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('updateReady');
-});
-autoUpdater.on('error', () => {
-  mainWindow.webContents.send('update-error');
-});
-
-function checkForUpdates() {
-  if (process.env.NODE_ENV !== 'development') {
-    autoUpdater.checkForUpdates();
-  }
-}
 
 function openChangelog() {
   changelogWindow = new BrowserWindow({
@@ -61,6 +37,79 @@ function openChangelog() {
     store.set('changelog-seen', appVersion);
     changelogWindow = false;
   });
+}
+
+function showUpdate(status) {
+  if (updateWindow) {
+    updateWindow.webContents.send(status);
+    if (status === 'update-ready') {
+      updateWindow.show();
+    }
+  } else {
+    updateWindow = new BrowserWindow({
+      width: 400,
+      height: 135,
+      minWidth: 400,
+      minHeight: 135,
+      fullscreenable: false,
+      maximizable: false,
+      minimizable: false,
+      parent: mainWindow,
+      show: false,
+    });
+    updateWindow.webContents.on('did-finish-load', () => {
+      updateWindow.show();
+      if (status === 'init') {
+        autoUpdater.checkForUpdates();
+      } else {
+        updateWindow.webContents.send(status);
+      }
+    });
+    updateWindow.loadURL(`file://${__dirname}/www/update.html`);
+    updateWindow.on('close', () => {
+      updateWindow = false;
+      manualUpdate = false;
+    });
+  }
+}
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+
+// autoUpdater events
+autoUpdater.on('checking-for-update', () => {
+  if (manualUpdate) {
+    showUpdate('checking-for-update');
+  }
+});
+autoUpdater.on('update-available', () => {
+  if (manualUpdate) {
+    showUpdate('updating');
+  }
+});
+autoUpdater.on('update-not-available', () => {
+  if (manualUpdate) {
+    showUpdate('no-update');
+  }
+});
+autoUpdater.on('update-downloaded', () => {
+  showUpdate('updateReady');
+});
+autoUpdater.on('error', () => {
+  if (manualUpdate) {
+    showUpdate('update-error');
+  }
+});
+
+function checkForUpdates(manual = false) {
+  if (process.env.NODE_ENV !== 'development') {
+    if (manual) {
+      manualUpdate = true;
+      showUpdate('init');
+    } else {
+      autoUpdater.checkForUpdates();
+    }
+  }
 }
 
 app.on('ready', () => {
@@ -109,7 +158,7 @@ app.on('ready', () => {
             label: 'Check for Updates...',
             accelerator: 'Cmd+U',
             click: () => {
-              checkForUpdates();
+              checkForUpdates(true);
             },
           },
           {
@@ -121,13 +170,13 @@ app.on('ready', () => {
           {
             type: 'separator',
           },
-          {
+          /* {
             label: 'Preferences',
             accelerator: 'Cmd+,',
             click: () => {
               mainWindow.webContents.send('openSettings');
             },
-          },
+          }, */
           {
             type: 'separator',
           },

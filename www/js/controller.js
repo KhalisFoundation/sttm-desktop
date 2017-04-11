@@ -10,7 +10,7 @@ const WinMenu = Menu.buildFromTemplate([
   {
     label: 'File',
     submenu: [
-      {
+      /* {
         label: 'Preferences',
         accelerator: 'Ctrl+,',
         click: () => {
@@ -19,7 +19,7 @@ const WinMenu = Menu.buildFromTemplate([
       },
       {
         type: 'separator',
-      },
+      }, */
       {
         label: 'Quit',
         accelerator: 'Ctrl+Q',
@@ -76,31 +76,6 @@ module.exports = {
     platform.ipc.send('show-text', { text });
   },
 };
-platform.ipc.on('checking-for-update', () => {
-  document.body.classList.add('checking-for-update');
-});
-platform.ipc.on('no-update', () => {
-  document.body.classList.remove('checking-for-update');
-  document.body.classList.add('no-update');
-  setTimeout(() => {
-    document.body.classList.remove('no-update');
-  }, 5000);
-});
-platform.ipc.on('updating', () => {
-  document.body.classList.remove('checking-for-update');
-  document.body.classList.add('updating');
-});
-platform.ipc.on('updateReady', () => {
-  document.body.classList.remove('checking-for-update', 'updating', 'no-update', 'update-error');
-  document.body.classList.add('update-ready');
-});
-platform.ipc.on('update-error', () => {
-  document.body.classList.remove('checking-for-update');
-  document.body.classList.add('update-error');
-  setTimeout(() => {
-    document.body.classList.remove('update-error', 'checking-for-update');
-  }, 5000);
-});
 platform.ipc.on('openSettings', () => {
   settings.openSettings();
 });

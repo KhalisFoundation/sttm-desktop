@@ -1,0 +1,32 @@
+#update-frame {
+  height: 100%;
+  padding: 25px 20px;
+}
+
+.update-message {
+  span {
+    display: none;
+  }
+}
+
+.update-buttons {
+  text-align: right;
+
+  .button {
+    display: none;
+  }
+}
+
+body.checking-for-update .checking-for-update,
+body.updating .updating,
+body.update-error .update-error,
+body.no-update .no-update,
+body.update-ready .update-ready {
+  display: initial;
+}
+
+body.no-update {
+  .checking-for-update {
+    display: none;
+  }
+}
