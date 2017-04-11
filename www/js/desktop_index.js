@@ -4,7 +4,7 @@ const path = require('path');
 
 // Pull in navigator from core
 const navigator = fs.readFileSync(path.resolve(__dirname, 'core/navigator.html'));
-document.querySelector('#app-frame').innerHTML = navigator;
+document.querySelector('#navigator').innerHTML = navigator;
 
 const platform = require('./js/desktop_scripts');
 require('./core/js/index.js');

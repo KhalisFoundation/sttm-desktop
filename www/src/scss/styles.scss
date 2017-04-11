@@ -1,2 +1,15 @@
 @import
+  "window",
   "../../core/scss/foundation.scss";
+
+#app-frame {
+  height: 100%;
+}
+
+#navigator {
+  bottom: 0;
+  height: 255px;
+  position: fixed;
+  right: 0;
+  width: 425px;
+}

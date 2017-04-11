@@ -1,0 +1,119 @@
+#titlebar {
+  -webkit-app-region: drag;
+  height: 22px;
+  position: fixed;
+  width: 100%;
+
+  > * {
+    display: none;
+  }
+}
+
+body.win32 {
+  #titlebar {
+    background-color: #333;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 12px;
+    height: 32px;
+    left: 1px;
+    line-height: 32px;
+    top: 1px;
+    width: calc(100% - 2px);
+
+    > * {
+      display: initial;
+    }
+
+    a.menu-button {
+      -webkit-app-region: no-drag;
+      cursor: default;
+      display: inline-block;
+      height: 32px;
+      text-align: center;
+      width: 45px;
+
+      svg {
+        height: 10px;
+        shape-rendering: crispEdges;
+        width: 10px;
+      }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    ul.controls {
+      -webkit-app-region: no-drag;
+      float: right;
+
+      li {
+        float: left;
+        list-style-type: none;
+        margin-right: 1px;
+        width: 45px;
+
+        a {
+          cursor: default;
+          display: block;
+          line-height: 32px;
+          text-align: center;
+          transition: background-color 0.2s;
+
+          svg {
+            height: 10px;
+            shape-rendering: crispEdges;
+            width: 10px;
+          }
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+
+  &::after,
+  .controls::after {
+    clear: both;
+    content: ' ';
+    display: table;
+  }
+
+  #app-frame {
+    border: 1px solid #333;
+    padding-top: 32px;
+  }
+
+  #header {
+    .global-nav ul.right {
+      top: 43px;
+    }
+  }
+
+  #settings {
+    height: auto;
+  }
+
+  #settings,
+  .modal-overlay {
+    bottom: 1px;
+    left: 1px;
+    right: 1px;
+    top: 33px;
+  }
+
+  &.maximized {
+    .controls .maximize {
+      display: none;
+    }
+  }
+
+  &:not(.maximized) {
+    .controls .restore {
+      display: none;
+    }
+  }
+}
