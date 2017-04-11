@@ -11,13 +11,6 @@ const WinMenu = Menu.buildFromTemplate([
     label: 'File',
     submenu: [
       {
-        label: 'Check for Updates...',
-        accelerator: 'Ctrl+U',
-        click: () => {
-          platform.ipc.send('checkForUpdates');
-        },
-      },
-      {
         label: 'Preferences',
         accelerator: 'Ctrl+,',
         click: () => {
@@ -32,6 +25,24 @@ const WinMenu = Menu.buildFromTemplate([
         accelerator: 'Ctrl+Q',
         click: () => {
           app.quit();
+        },
+      },
+    ],
+  },
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'Check for Updates...',
+        accelerator: 'Ctrl+U',
+        click: () => {
+          platform.ipc.send('checkForUpdates');
+        },
+      },
+      {
+        label: 'Changelog...',
+        click: () => {
+          platform.ipc.send('openChangelog');
         },
       },
     ],

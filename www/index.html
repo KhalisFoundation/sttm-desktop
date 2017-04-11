@@ -53,51 +53,6 @@
     <div id="viewer"></div>
     <div id="navigator"></div>
   </div>
-  <div id="settings" class="grid-frame vertical noselect">
-    <div class="grid-content shrink">
-      <h1>Settings</h1>
-      <a class="action" data-action="settings.closeSettings">×</a>
-    </div>
-    <div class="settings-container grid-block">
-      <div class="grid-content small-4 sections">
-        <ul>
-          <li><a class="active" data-tab="searchResults_settings">Search Results</a></li>
-          <li><a data-tab="presenterView_settings">Presenter</a></li>
-        </ul>
-      </div>
-      <div class="grid-content small-8 options">
-        <div id="searchResults_settings" class="settings-tab active">
-          <div id="searchResults_settings_fieldsDisplayed" class="settings-section">
-            <h4>Fields Displayed</h4>
-            <div class="grid-block">
-              <div class="grid-content small-6">
-                <input type="checkbox" id="searchResults_transliteration" class="setting"> <label for="searchResults_transliteration">Transliteration</label><br>
-                <input type="checkbox" id="searchResults_translationEnglish" value="ssk" class="setting"> <label for="searchResults_translationEnglish">English Translation</label><br>
-                <input type="checkbox" id="searchResults_meta" class="setting"> <label for="searchResults_meta">Meta Data</label>
-              </div>
-              <div class="grid-content small-6">
-                <div id="searchResults_settings_preview" class="preview panktee search-result noselect">
-                  <span class="gurmukhi">Awie imlu gurisK Awie imlu qU myry gurU ky ipAwry ] rhwau ]</span><span class="roman transliteration">Aae Mil Gurasikh Aae Mil Thoo Maerae Guroo Kae Piaarae || Rehaao ||</span><span class="roman translation english">Come, join with me, O Sikh of the Guru, come and join with me. You are my Guru's Beloved. ||Pause||</span><span class="roman meta">Guru Granth Sahib - 725 - Raag Tilang - Guru Raam Das Ji</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="presenterView_settings" class="settings-tab">
-          <div id="presenterView_settings_fieldsDisplayed" class="settings-section">
-            <h4>Fields Displayed</h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-overlay" id="changelog-modal">
-    <div class="modal" animation-in="slideInDown" animation-out="slideOutDown">
-      <a class="close-button action" data-action="changelog.closeChangelog">×</a>
-      <h3>Changelog</h3>
-      <div id="changelog"></div>
-    </div>
-  </div>
   <script src="core/js/vendor/mousetrap.min.js"></script>
   <script src="js/desktop_index.js"></script>
 </body>

@@ -1,19 +1,20 @@
 /* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0, global-require:0 */
 const electron = require('electron');
-// const Store = require('./desktop_www/js/store.js');
-// const defaultPrefs = require('./desktop_www/js/defaults.json');
+const Store = require('./www/js/store.js');
+const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
 const { app, BrowserWindow, ipcMain, Menu } = electron;
-/* const store = new Store({
+const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
-}); */
+});
+const appVersion = app.getVersion();
 
 let mainWindow;
-let viewerWindow;
-let viewerWindowOpen = false;
+let viewerWindow = false;
+let changelogWindow = false;
 let viewerWindowX;
 let viewerWindowY;
 let viewerWindowFS;
@@ -44,14 +45,31 @@ function checkForUpdates() {
   }
 }
 
+function openChangelog() {
+  changelogWindow = new BrowserWindow({
+    width: 725,
+    height: 800,
+    show: false,
+  });
+  changelogWindow.webContents.on('did-finish-load', () => {
+    changelogWindow.show();
+  });
+  changelogWindow.loadURL(`file://${__dirname}/www/changelog.html`);
+
+  // Update changelog last seen pref when seen
+  changelogWindow.on('close', () => {
+    store.set('changelog-seen', appVersion);
+    changelogWindow = false;
+  });
+}
+
 app.on('ready', () => {
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
     minWidth: 320,
     minHeight: 480,
-    width: 7680,
-    height: 4320,
-    x: 0,
-    y: 0,
+    width,
+    height,
     frame: (process.platform !== 'win32'),
     show: false,
     titleBarStyle: 'hidden',
@@ -59,13 +77,21 @@ app.on('ready', () => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
     checkForUpdates();
+    // Show changelog if last version wasn't seen
+    const lastSeen = store.get('changelog-seen');
+    if (lastSeen !== appVersion) {
+      openChangelog();
+    }
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
-    if (viewerWindowOpen) {
+    if (viewerWindow && !viewerWindow.isDestroyed()) {
       viewerWindow.close();
+    }
+    if (changelogWindow && !changelogWindow.isDestroyed()) {
+      changelogWindow.close();
     }
   });
 
@@ -84,6 +110,12 @@ app.on('ready', () => {
             accelerator: 'Cmd+U',
             click: () => {
               checkForUpdates();
+            },
+          },
+          {
+            label: 'Changelog...',
+            click: () => {
+              openChangelog();
             },
           },
           {
@@ -258,7 +290,6 @@ function createViewer(ipcData) {
   viewerWindow.webContents.on('did-finish-load', () => {
     viewerWindow.show();
     mainWindow.focus();
-    viewerWindowOpen = true;
     if (typeof ipcData !== 'undefined') {
       viewerWindow.webContents.send(ipcData.send, ipcData.data);
     }
@@ -270,8 +301,7 @@ function createViewer(ipcData) {
     // mainWindow.focus();
   });
   viewerWindow.on('closed', () => {
-    viewerWindowOpen = false;
-    viewerWindow = null;
+    viewerWindow = false;
   });
 }
 
@@ -279,7 +309,7 @@ ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
 ipcMain.on('show-line', (event, arg) => {
-  if (viewerWindowOpen) {
+  if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
     createViewer({
@@ -290,7 +320,7 @@ ipcMain.on('show-line', (event, arg) => {
 });
 
 ipcMain.on('show-text', (event, arg) => {
-  if (viewerWindowOpen) {
+  if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
   } else {
     createViewer({
@@ -299,3 +329,5 @@ ipcMain.on('show-text', (event, arg) => {
     });
   }
 });
+
+ipcMain.on('openChangelog', openChangelog);
