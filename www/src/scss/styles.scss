@@ -1,5 +1,7 @@
 @import
   "changelog",
+  "theme-dark",
+  "theme-light",
   "update",
   "window",
   "../../core/scss/styles.scss";
@@ -8,9 +10,14 @@
   height: 100%;
 }
 
+#viewer {
+  height: 100%;
+  width: 100%;
+}
+
 #navigator {
   bottom: 0;
-  height: 255px;
+  height: 260px;
   position: fixed;
   right: 0;
   width: 425px;
