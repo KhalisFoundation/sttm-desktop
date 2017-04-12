@@ -1,4 +1,3 @@
-/* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0, global-require:0 */
 const electron = require('electron');
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');

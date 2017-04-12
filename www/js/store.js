@@ -1,4 +1,3 @@
-/* eslint import/no-extraneous-dependencies: 0 */
 const electron = require('electron');
 const fs = require('fs');
 const ldDefaultsDeep = require('lodash.defaultsdeep');

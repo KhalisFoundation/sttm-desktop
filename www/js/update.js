@@ -1,4 +1,3 @@
-/* eslint import/no-extraneous-dependencies: 0 */
 const { ipcRenderer, remote } = require('electron');
 const h = require('hyperscript');
 

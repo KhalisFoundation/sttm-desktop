@@ -1,5 +1,4 @@
 /* global Mousetrap platform settings */
-/* eslint import/no-extraneous-dependencies: 0, import/no-unresolved: 0 */
 const electron = require('electron');
 
 const remote = electron.remote;
