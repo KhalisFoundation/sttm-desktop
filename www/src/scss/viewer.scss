@@ -74,6 +74,10 @@ html {
   }
 }
 
+body.viewer .slide {
+  height: 100%;
+}
+
 h1,
 h2 {
   cursor: default;
