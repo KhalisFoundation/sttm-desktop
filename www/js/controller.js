@@ -1,4 +1,4 @@
-/* global Mousetrap platform settings */
+/* global Mousetrap */
 const electron = require('electron');
 
 const remote = electron.remote;
@@ -35,20 +35,20 @@ const WinMenu = Menu.buildFromTemplate([
         label: 'Check for Updates...',
         accelerator: 'Ctrl+U',
         click: () => {
-          platform.ipc.send('checkForUpdates');
+          global.platform.ipc.send('checkForUpdates');
         },
       },
       {
         label: 'Changelog...',
         click: () => {
-          platform.ipc.send('openChangelog');
+          global.platform.ipc.send('openChangelog');
         },
       },
     ],
   },
 ]);
 
-Mousetrap.bindGlobal('mod+,', () => settings.openSettings());
+// Mousetrap.bindGlobal('mod+,', () => settings.openSettings());
 Mousetrap.bindGlobal('mod+q', () => {
   app.quit();
 });
@@ -68,13 +68,13 @@ $menuButton.addEventListener('click', () => {
 });
 module.exports = {
   sendLine(shabadID, lineID) {
-    platform.ipc.send('show-line', { shabadID, lineID });
+    global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
   sendText(text) {
-    platform.ipc.send('show-text', { text });
+    global.platform.ipc.send('show-text', { text });
   },
 };
-platform.ipc.on('openSettings', () => {
+/* global.platform.ipc.on('openSettings', () => {
   settings.openSettings();
-});
+}); */
