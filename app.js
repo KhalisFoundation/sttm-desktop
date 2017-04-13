@@ -16,9 +16,7 @@ let viewerWindow = false;
 let changelogWindow = false;
 let updateWindow = false;
 let manualUpdate = false;
-let viewerWindowX;
-let viewerWindowY;
-let viewerWindowFS;
+const viewerWindowPos = {};
 
 function openChangelog() {
   changelogWindow = new BrowserWindow({
@@ -286,7 +284,7 @@ app.on('ready', () => {
       });
     }
     const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    // Menu.setApplicationMenu(menu);
   }
 });
 
@@ -311,46 +309,45 @@ function checkForExternalDisplay() {
   });
 
   if (externalDisplay) {
-    viewerWindowX = externalDisplay.bounds.x + 50;
-    viewerWindowY = externalDisplay.bounds.y + 50;
-    viewerWindowFS = true;
-  } else {
-    viewerWindowX = 50;
-    viewerWindowY = 50;
-    viewerWindowFS = false;
+    viewerWindowPos.x = externalDisplay.bounds.x + 50;
+    viewerWindowPos.y = externalDisplay.bounds.y + 50;
+    return true;
   }
+  return false;
 }
 
 function createViewer(ipcData) {
-  checkForExternalDisplay();
-  viewerWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    x: viewerWindowX,
-    y: viewerWindowY,
-    fullscreen: viewerWindowFS,
-    autoHideMenuBar: true,
-    show: false,
-    titleBarStyle: 'hidden',
-    frame: (process.platform !== 'win32'),
-  });
-  viewerWindow.loadURL(`file://${__dirname}/desktop_www/viewer.html`);
-  viewerWindow.webContents.on('did-finish-load', () => {
-    viewerWindow.show();
-    mainWindow.focus();
-    if (typeof ipcData !== 'undefined') {
-      viewerWindow.webContents.send(ipcData.send, ipcData.data);
-    }
-  });
-  viewerWindow.on('enter-full-screen', () => {
-    mainWindow.focus();
-  });
-  viewerWindow.on('focus', () => {
-    // mainWindow.focus();
-  });
-  viewerWindow.on('closed', () => {
-    viewerWindow = false;
-  });
+  const isExternal = checkForExternalDisplay();
+  if (isExternal) {
+    viewerWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      x: viewerWindowPos.x,
+      y: viewerWindowPos.y,
+      fullscreen: true,
+      autoHideMenuBar: true,
+      show: false,
+      titleBarStyle: 'hidden',
+      frame: (process.platform !== 'win32'),
+    });
+    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.webContents.on('did-finish-load', () => {
+      viewerWindow.show();
+      mainWindow.focus();
+      if (typeof ipcData !== 'undefined') {
+        viewerWindow.webContents.send(ipcData.send, ipcData.data);
+      }
+    });
+    viewerWindow.on('enter-full-screen', () => {
+      mainWindow.focus();
+    });
+    viewerWindow.on('focus', () => {
+      // mainWindow.focus();
+    });
+    viewerWindow.on('closed', () => {
+      viewerWindow = false;
+    });
+  }
 }
 
 ipcMain.on('checkForUpdates', checkForUpdates);
