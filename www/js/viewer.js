@@ -27,7 +27,7 @@ function changeTheme(theme) {
 
 function applyPresenterPrefs(prefs) {
   // changeTheme(prefs.theme);
-  changeTheme('dark-theme');
+  changeTheme('light-theme');
 }
 
 const prefs = platform.store.get('userPrefs.presenterWindow');
