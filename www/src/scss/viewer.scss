@@ -1,17 +1,17 @@
-$gurmukhi-font-family: 'gurbaniakhar';
+$viewer-gurmukhi-font-family: 'gurbaniakharthick';
 
 @font-face {
-  font-family: $gurmukhi-font-family;
+  font-family: $viewer-gurmukhi-font-family;
   font-style: normal;
   font-weight: normal;
-  src: url('../../www/fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
+  src: url('../../core/fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 700;
-  src: url('../../www/fonts/Roboto-Bold.woff2') format('woff2');
+  src: url('../../core/fonts/Roboto-Bold.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 
@@ -19,7 +19,7 @@ $gurmukhi-font-family: 'gurbaniakhar';
   font-family: 'AnmolUniBaniTrue';
   font-style: normal;
   font-weight: normal;
-  src: url('../../www/fonts/AnmolUniBaniTrue.ttf') format('truetype');
+  src: url('../../core/fonts/AnmolUniBaniTrue.ttf') format('truetype');
 }
 
 * {
@@ -35,28 +35,15 @@ html {
   overflow: hidden;
 }
 
-body {
+#viewer {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: 0;
   overflow: auto;
-  padding: 50px 30px;
+  padding: 30px;
   text-align: center;
-}
 
-.gurmukhi {
-  font-family: $gurmukhi-font-family;
-}
-
-#titlebar {
-  -webkit-app-region: drag;
-  height: 22px;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-
-  > * {
-    display: none;
+  .gurmukhi {
+    font-family: $viewer-gurmukhi-font-family;
   }
 }
 
@@ -75,7 +62,7 @@ body {
 .slide {
   display: flex;
   flex-flow: column nowrap;
-  height: 100%;
+  height: calc(100% - 250px);
   justify-content: space-around;
   opacity: 0;
   position: absolute;
@@ -93,7 +80,7 @@ h2 {
 }
 
 .gurbani {
-  font-size: 10vh;
+  font-size: 9vh;
   font-weight: normal;
   line-height: 1.3em;
 }
@@ -105,17 +92,18 @@ h2 {
 }
 
 .translation {
-  font-size: 6vh;
+  font-size: 5vh;
 }
 
 .transliteration {
-  font-size: 5vh;
+  font-size: 4vh;
   text-transform: lowercase;
 }
 
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   font-size: 4vh;
+  line-height: 1.3;
 }
 
 #logo {
@@ -127,6 +115,6 @@ h2 {
 }
 
 @import
-  "dark-theme",
-  "light-theme",
+  "theme-dark",
+  "theme-light",
   "win32";

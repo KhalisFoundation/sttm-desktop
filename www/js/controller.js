@@ -1,5 +1,6 @@
 /* global Mousetrap */
 const electron = require('electron');
+const viewer = require('./viewer');
 
 const remote = electron.remote;
 const app = remote.app;
@@ -68,10 +69,12 @@ $menuButton.addEventListener('click', () => {
 });
 module.exports = {
   sendLine(shabadID, lineID) {
+    viewer.showLine(shabadID, lineID);
     global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
   sendText(text) {
+    viewer.showText(text);
     global.platform.ipc.send('show-text', { text });
   },
 };
