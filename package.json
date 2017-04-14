@@ -10,6 +10,7 @@
     "build": "npm run build-css",
     "pack:mac": "npm run build && build --mac",
     "pack:win": "npm run build && build --win --x64",
+    "pack:win32": "npm run build && build --win --ia32",
     "upload:mac": "node packaging/upload-mac.js",
     "upload:win": "node packaging/upload-win.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
