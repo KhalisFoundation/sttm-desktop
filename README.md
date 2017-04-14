@@ -1,7 +1,7 @@
 SikhiToTheMax Desktop App
 =========================
 
-##Prerequisites
+## Prerequisites
  1. Node - [https://nodejs.org/en/download/]()
  2. yarn - [https://yarnpkg.com/en/docs/install]()
  3. Have the Developer ID certificate for Khalis Foundation installed from Apple Developer Console
@@ -12,22 +12,22 @@ SikhiToTheMax Desktop App
  7. Windows
    * Set `CSC_LINK` and `CSC_KEY_PASSWORD` environment variables with the .p12 path and decryption password respectively
 
-##Installation
+## Installation
  * Clone repository
  * Run `git submodule update --init --recursive` after you `cd` into the repository
  * Run `git checkout -t origin/dev` in the repository root and the www folder
  * Run `yarn install` in the repository root
  * Depending on your current operating system, run `yarn run pack:win` or `yarn run pack:mac` to rebuild the native plugins for your system
 
-##Configuration
-###Uploading to Remote
+## Configuration
+### Uploading to Remote
 Create file packaging/aws.json using packaging/aws-sample.json and fill out AWS information
 
-###Updating remote version file for downloading latest setup file
+### Updating remote version file for downloading latest setup file
 Create file packaging/keys.json using packaging/keys-sample.json and enter location of private key for SSH access to remote server where version number will be stored
 
-##Running
+## Running
  * Run `yarn start` in the repository root
 
-##Packaging
+## Packaging
  * Run `yarn dist:osx` on macOS or `yarn dist:win` and `yarn dist:win32` on Windows to create and upload the app setup and update files
