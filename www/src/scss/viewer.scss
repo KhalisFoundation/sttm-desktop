@@ -112,11 +112,27 @@ h2 {
 }
 
 #logo {
-  bottom: 20px;
-  height: 5.5%;
+  display: none;
+  height: 20%;
   left: 50%;
   position: fixed;
+  top: 20%;
   transform: translateX(-50%);
+
+  path {
+    fill: #c8c8c8;
+  }
+}
+
+.home #logo {
+  display: block;
+}
+
+.viewer #logo {
+  bottom: 20px;
+  display: block;
+  height: 5.5%;
+  top: auto;
 }
 
 @import
