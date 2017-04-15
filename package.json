@@ -6,14 +6,14 @@
   "main": "app.js",
   "scripts": {
     "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/custom/*.scss\" --syntax scss",
-    "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
-    "build": "npm run build-css",
-    "pack:mac": "npm run build && build --mac",
-    "pack:win": "npm run build && build --win --x64",
-    "pack:win32": "npm run build && build --win --ia32",
     "upload:mac": "node packaging/upload-mac.js",
+    "start": "concurrently --kill-others \"yarn watch-css\" \"cross-env NODE_ENV=development electron .\"",
+    "build": "yarn build-css",
+    "pack:mac": "yarn build && build --mac",
+    "pack:win": "yarn build && build --win --x64",
+    "pack:win32": "yarn build && build --win --ia32",
     "upload:win": "node packaging/upload-win.js",
-    "upload:win32": "node packagin/upload-win32.js",
+    "upload:win32": "node packaging/upload-win32.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
     "dist:win": "npm run pack:win && npm run upload:win",
     "dist:win32": "npm run pack:win32 && npm run upload:win32",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@bitbucket.org:khalisfoundation/sttm-everywhere-desktop.git"
+    "url": "ssh://git@github.com:khalisfoundation/sttm-desktop.git"
   },
   "author": "Khalis, Inc. <techsupport@khalisfoundation.org>",
   "license": "KNC-GSL",
@@ -64,7 +64,7 @@
       "!packaging${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README}",
+      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README,STTM.provisionprofile}",
       "!**/*.map"
     ],
     "extraResources": [
@@ -72,8 +72,7 @@
     ],
     "directories": {
       "buildResources": "assets",
-      "output": "builds",
-      "app": "./"
+      "output": "builds"
     },
     "publish": {
       "provider": "s3",
