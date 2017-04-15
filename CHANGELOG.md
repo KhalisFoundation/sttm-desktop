@@ -5,6 +5,10 @@
 
 ## SikhiToTheMax Desktop App
 
+### 3.0.1 - _170415_
+#### Fixed
+ * ਯ was showing up as ਣ in the on-screen keyboard
+
 ### 3.0.0 - _170414_
 #### First-time User Instructions
  1. Start your First Letter search in the bottom right _Navigator_
