@@ -5,6 +5,10 @@
 
 ## SikhiToTheMax Desktop App
 
+### 3.0.2 - _170416_
+#### Fixed
+ * Database issue that was causing lack of results or Shabad not loading in the viewer. 
+
 ### 3.0.1 - _170415_
 #### Fixed
  * ਯ was showing up as ਣ in the on-screen keyboard
