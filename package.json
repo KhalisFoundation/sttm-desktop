@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "test": "yarn lint && mocha",
-    "lint": "htmlhint www ; eslint app.js packaging/ www/js www/core/js ; stylelint \"www/src/scss/*.scss\" \"www/core/scss/custom/*.scss\" --syntax scss",
+    "lint": "htmlhint www ; eslint app.js packaging/ www/js www/core/js ; stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "upload:mac": "node packaging/upload-mac.js",
     "start": "concurrently --kill-others \"yarn watch-css\" \"cross-env NODE_ENV=development electron .\"",
