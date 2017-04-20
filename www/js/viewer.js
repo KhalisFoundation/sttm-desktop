@@ -1,6 +1,11 @@
-/* eslint global-require: 0, import/no-unresolved: 0 */
-const platform = global.platform || require('./js/desktop_scripts');
+/* eslint global-require: 0, import/no-unresolved: 0, import/no-dynamic-require: 0 */
+global.platform = global.platform || require('./js/desktop_scripts');
 const h = require('hyperscript');
+
+const corePath = (global.mainWindow ? '..' : '.');
+const core = require(`${corePath}/core/js/index`);
+
+let prefs = JSON.parse(window.localStorage.getItem('prefs'));
 
 const decks = [];
 let currentShabad;
@@ -10,36 +15,28 @@ const $viewer = document.getElementById('viewer');
 
 $body.classList.add(process.platform);
 
+if (!global.mainWindow) {
+  core.menu.settings.applySettings(prefs);
+}
+
 function hideDecks() {
   Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.remove('active');
   });
 }
 
-function changeTheme(theme) {
-  $body.classList.forEach((bodyClass) => {
-    if (bodyClass.indexOf('theme') > -1) {
-      // $body.classList.remove(i);
-    }
-  });
-  $body.classList.add(theme);
-}
-
-function applyPresenterPrefs(prefs) {
-  // changeTheme(prefs.theme);
-  changeTheme('light-theme');
-}
-
-const prefs = platform.store.get('userPrefs.presenterWindow');
-applyPresenterPrefs(prefs);
-
 // IPC
-platform.ipc.on('show-line', (event, data) => {
+global.platform.ipc.on('show-line', (event, data) => {
   module.exports.showLine(data.shabadID, data.lineID);
 });
 
-platform.ipc.on('show-text', (event, data) => {
+global.platform.ipc.on('show-text', (event, data) => {
   module.exports.showText(data.text);
+});
+
+global.platform.ipc.on('update-settings', () => {
+  prefs = JSON.parse(window.localStorage.getItem('prefs'));
+  core.menu.settings.applySettings(prefs);
 });
 
 module.exports = {
@@ -55,7 +52,7 @@ module.exports = {
       Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
       document.getElementById(`slide${lineID}`).classList.add('active');
     } else {
-      platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
+      global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
         (err, rows) => {
           if (rows.length > 0) {
             const cards = [];

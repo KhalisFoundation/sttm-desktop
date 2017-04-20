@@ -375,4 +375,10 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
+ipcMain.on('update-settings', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('update-settings');
+  }
+});
+
 ipcMain.on('openChangelog', openChangelog);

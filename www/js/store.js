@@ -29,17 +29,21 @@ class Store {
 
     this.data = parseDataFile(this.path, opts.defaults);
     this.defaults = opts.defaults;
+
+    // Write preferences to localStorage for viewers
+    this.combined = ldDefaultsDeep(this.data, this.defaults);
+    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
   }
 
   // This will just return the property on the `data` object
   get(key) {
-    const combined = ldDefaultsDeep(this.data, this.defaults);
-    return ldGet(combined, key);
+    return ldGet(this.combined, key);
   }
 
   // ...and this will set it
   set(key, val) {
     ldSet(this.data, key, val);
+    this.combined = ldDefaultsDeep(this.data, this.defaults);
 
     // Wait, I thought using the node.js' synchronous APIs was bad form?
     // We're not writing a server so there's not nearly the same IO demand on the process
@@ -47,11 +51,19 @@ class Store {
     // before the asynchronous write had a chance to complete,
     // we might lose that data. Note that in a real app, we would try/catch this.
     fs.writeFileSync(this.path, JSON.stringify(this.data));
+
+    // Update localStorage for viewer
+    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
   }
 
   delete(key) {
     delete this.data[key];
+    this.combined = ldDefaultsDeep(this.data, this.defaults);
+
     fs.writeFileSync(this.path, JSON.stringify(this.data));
+
+    // Update localStorage for viewer
+    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
   }
 }
 

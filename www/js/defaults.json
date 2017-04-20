@@ -1,12 +1,12 @@
 {
   "userPrefs": {
+    "app": {
+      "theme": "light-theme"
+    },
     "searchResults": {
       "translationEnglish": "ssk",
       "transliteration": true,
       "meta": true
-    },
-    "presenterWindow": {
-      "theme": "light-theme"
     }
   },
   "gurmukhiKB": false,

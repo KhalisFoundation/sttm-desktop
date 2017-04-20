@@ -46,8 +46,8 @@ module.exports = {
   db,
   store,
 
-  getAllPrefs() {
-    return this.getPref('userPrefs');
+  getAllPrefs(schema = store.data) {
+    return this.getPref('userPrefs', schema);
   },
 
   getUserPref(key) {
