@@ -32,7 +32,9 @@ class Store {
 
     // Write preferences to localStorage for viewers
     this.combined = ldDefaultsDeep(this.data, this.defaults);
-    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    if (typeof localStorage === 'object') {
+      localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    }
   }
 
   // This will just return the property on the `data` object
@@ -53,7 +55,9 @@ class Store {
     fs.writeFileSync(this.path, JSON.stringify(this.data));
 
     // Update localStorage for viewer
-    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    if (typeof localStorage === 'object') {
+      localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    }
   }
 
   delete(key) {
@@ -63,7 +67,9 @@ class Store {
     fs.writeFileSync(this.path, JSON.stringify(this.data));
 
     // Update localStorage for viewer
-    window.localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    if (typeof localStorage === 'object') {
+      localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
+    }
   }
 }
 
