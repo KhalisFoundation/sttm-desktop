@@ -113,11 +113,11 @@ h2 {
 .transliteration {
   font-family: 'Roboto';
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .translation {
   font-size: 5vh;
-  line-height: 1.2;
 }
 
 .transliteration {
@@ -128,19 +128,23 @@ h2 {
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   font-size: 4vh;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .translation,
 .transliteration,
 .teeka {
-  display: none;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity $transition-time $transition-easing;
 }
 
 .display-translation .translation,
 .display-transliteration .transliteration,
 .display-teeka .teeka {
-  display: block;
+  height: auto;
+  opacity: 1;
 }
 
 #logo {

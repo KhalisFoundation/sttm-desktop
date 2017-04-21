@@ -1,12 +1,11 @@
 @import
+  "../../core/scss/styles.scss",
   "changelog",
   "theme-dark",
   "theme-light",
   "update",
   "viewer",
-  "window",
-  // "../../core/scss/foundation/foundation.scss",
-  "../../core/scss/styles.scss";
+  "window";
 
 #app-frame {
   height: 100%;
