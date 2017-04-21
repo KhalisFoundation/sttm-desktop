@@ -7,6 +7,13 @@
       "translationEnglish": "ssk",
       "transliteration": true,
       "meta": true
+    },
+    "slide-layout": {
+      "fields": {
+        "display-translation": true,
+        "display-transliteration": true,
+        "display-teeka": true
+      }
     }
   },
   "gurmukhiKB": false,

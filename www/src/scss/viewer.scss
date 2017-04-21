@@ -63,7 +63,7 @@ html {
   display: flex;
   flex-flow: column nowrap;
   height: calc(100% - 250px);
-  justify-content: space-around;
+  justify-content: flex-start;
   opacity: 0;
   position: absolute;
   transition: opacity 400ms ease-out;
@@ -81,7 +81,7 @@ body.viewer .slide {
 h1,
 h2 {
   cursor: default;
-  margin: 0;
+  margin: 0 0 20px;
 }
 
 .gurbani {
@@ -98,6 +98,7 @@ h2 {
 
 .translation {
   font-size: 5vh;
+  line-height: 1.2;
 }
 
 .transliteration {
@@ -108,7 +109,19 @@ h2 {
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   font-size: 4vh;
-  line-height: 1.3;
+  line-height: 1.4;
+}
+
+.translation,
+.transliteration,
+.teeka {
+  display: none;
+}
+
+.display-translation .translation,
+.display-transliteration .transliteration,
+.display-teeka .teeka {
+  display: block;
 }
 
 #logo {
