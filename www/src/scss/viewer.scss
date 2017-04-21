@@ -88,6 +88,25 @@ h2 {
   font-size: 9vh;
   font-weight: normal;
   line-height: 1.3em;
+
+  i {
+    font-style: normal;
+  }
+}
+
+.larivaar {
+  .gurbani {
+    div {
+      font-size: 0;
+    }
+
+    i,
+    span {
+      font-size: 9vh;
+      vertical-align: bottom;
+      white-space: nowrap;
+    }
+  }
 }
 
 .translation,

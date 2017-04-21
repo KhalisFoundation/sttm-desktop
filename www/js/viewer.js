@@ -57,11 +57,24 @@ module.exports = {
           if (rows.length > 0) {
             const cards = [];
             rows.forEach((row) => {
+              const gurmukhiShabads = row.Gurmukhi.split(' ');
+              let taggedGurmukhi = '';
+              gurmukhiShabads.forEach((val) => {
+                let tag;
+                if (val.indexOf(']') !== -1) {
+                  tag = 'i';
+                } else {
+                  tag = 'span';
+                }
+                taggedGurmukhi += `<${tag}>${val}${tag === 'i' ? ' ' : ''}</${tag}> `;
+              });
+              const gurmukhiContainer = document.createElement('div');
+              gurmukhiContainer.innerHTML = taggedGurmukhi;
               cards.push(
                 h(
                   `div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`,
                   [
-                    h('h1.gurbani.gurmukhi', row.Gurmukhi),
+                    h('h1.gurbani.gurmukhi', gurmukhiContainer),
                     h('h2.translation', row.English),
                     h('h2.transliteration', row.Transliteration),
                     h('h2.teeka', row.PunjabiUni),

@@ -13,6 +13,9 @@
         "display-translation": true,
         "display-transliteration": true,
         "display-teeka": true
+      },
+      "display-options": {
+        "larivaar": false
       }
     }
   },
