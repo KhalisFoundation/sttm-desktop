@@ -5,9 +5,14 @@
 
 ## SikhiToTheMax Desktop App
 
+### 3.0.3 - _170421_
+#### Added
+ * A strong, dark theme
+ * Settings added to give control over what is displayed in the Viewer, with choice of theme, font sizes and Larivaar
+
 ### 3.0.2 - _170416_
 #### Fixed
- * Database issue that was causing lack of results or Shabad not loading in the viewer. 
+ * Database issue that was causing lack of results or Shabad not loading in the viewer.
 
 ### 3.0.1 - _170415_
 #### Fixed
