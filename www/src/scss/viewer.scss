@@ -168,11 +168,17 @@ h2 {
   display: block;
 }
 
-.viewer #logo {
-  bottom: 20px;
-  display: block;
-  height: 5.5%;
-  top: auto;
+.viewer {
+  #logo {
+    bottom: 20px;
+    display: block;
+    height: 5.5%;
+    top: auto;
+  }
+
+  .slide {
+    justify-content: space-between;
+  }
 }
 
 @import
