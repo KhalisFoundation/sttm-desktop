@@ -26,5 +26,8 @@
     }
   },
   "gurmukhiKB": false,
-  "changelog-seen": "0.0.0"
+  "changelog-seen": "0.0.0",
+  "searchOptions": {
+    "searchType": 0
+  }
 }
