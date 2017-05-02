@@ -19,6 +19,12 @@ module.exports = {
           dbQuery = `%${dbQuery}`;
         }
         break;
+      case 2: {
+        searchCol = 'v.Gurmukhi';
+        const words = searchQuery.split(' ');
+        dbQuery = `%${words.join(' %')}%`;
+        break;
+      }
       default:
         break;
     }
