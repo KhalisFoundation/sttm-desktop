@@ -19,8 +19,13 @@ module.exports = {
           dbQuery = `%${dbQuery}`;
         }
         break;
-      case 2: {
-        searchCol = 'v.Gurmukhi';
+      case 2: // Full word (Gurmukhi)
+      case 3: { // Full word (English)
+        if (searchType === 2) {
+          searchCol = 'v.Gurmukhi';
+        } else {
+          searchCol = 'v.English';
+        }
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
         break;
