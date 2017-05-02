@@ -141,7 +141,7 @@ h2 {
   }
 }
 
-#logo {
+.logo {
   display: none;
   height: 20%;
   left: 50%;
@@ -154,12 +154,12 @@ h2 {
   }
 }
 
-.home #logo {
+.home #previewer-logo {
   display: block;
 }
 
 .viewer {
-  #logo {
+  #viewer-logo {
     bottom: 20px;
     display: block;
     height: 5.5%;
