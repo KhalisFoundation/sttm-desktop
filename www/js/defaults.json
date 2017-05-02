@@ -21,7 +21,8 @@
         "teeka": 4
       },
       "display-options": {
-        "larivaar": false
+        "larivaar": false,
+        "left-align": false
       }
     }
   },

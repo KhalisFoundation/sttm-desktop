@@ -38,6 +38,12 @@ html {
   }
 }
 
+.left-align {
+  #viewer {
+    text-align: left;
+  }
+}
+
 .deck {
   height: calc(100% - 100px);
   opacity: 0;
