@@ -1,0 +1,42 @@
+module.exports = {
+  search(searchQuery, searchType) {
+    let dbQuery = '';
+    let searchCol = '';
+    switch (searchType) {
+      case 0: // First letter start
+      case 1: // First letter anywhere
+        searchCol = 'v.FirstLetterStr';
+        for (let x = 0, len = searchQuery.length; x < len; x += 1) {
+          let charCode = searchQuery.charCodeAt(x);
+          if (charCode < 100) {
+            charCode = `0${charCode}`;
+          }
+          dbQuery += `,${charCode}`;
+        }
+        // Add trailing wildcard
+        dbQuery += '%';
+        if (searchType === 1) {
+          dbQuery = `%${dbQuery}`;
+        }
+        break;
+      default:
+        break;
+    }
+    const query = `SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+      LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
+      LEFT JOIN Writer w USING(WriterID)
+      LEFT JOIN Raag r USING(RaagID)
+      WHERE ${searchCol} LIKE '${dbQuery}' LIMIT 0,20`;
+    this.db.all(query, (err, rows) => {
+      global.core.search.printResults(rows);
+    });
+  },
+
+  loadShabad(ShabadID, LineID) {
+    global.platform.db.all(`SELECT v.ID, v.Gurmukhi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+      if (rows.length > 0) {
+        global.core.search.printShabad(rows, ShabadID, LineID);
+      }
+    });
+  },
+};

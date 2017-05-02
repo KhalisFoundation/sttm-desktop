@@ -3,6 +3,7 @@ const defaultPrefs = require('./defaults.json');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const Store = require('./store');
+const search = require('./search');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
@@ -12,6 +13,7 @@ let dbPath = window.process.env.NODE_ENV !== 'development' ? '../../../' : '../.
 dbPath = path.resolve(__dirname, `${dbPath}data.db`);
 
 const db = new sqlite3.Database(dbPath);
+search.db = db;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -44,6 +46,7 @@ function windowAction(e) {
 module.exports = {
   ipc,
   db,
+  search,
   store,
 
   getAllPrefs(schema = store.data) {
