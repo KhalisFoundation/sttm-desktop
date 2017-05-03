@@ -58,18 +58,19 @@ module.exports = {
             const cards = [];
             rows.forEach((row) => {
               const gurmukhiShabads = row.Gurmukhi.split(' ');
-              let taggedGurmukhi = '';
-              gurmukhiShabads.forEach((val) => {
+              const taggedGurmukhi = [];
+              gurmukhiShabads.forEach((val, index) => {
                 let tag;
                 if (val.indexOf(']') !== -1) {
                   tag = 'i';
+                  taggedGurmukhi[index - 1] = `<i>${taggedGurmukhi[index - 1]}`;
                 } else {
                   tag = 'span';
                 }
-                taggedGurmukhi += `<${tag}>${val}${tag === 'i' ? ' ' : ''}</${tag}> `;
+                taggedGurmukhi[index] = `<span>${val}${tag === 'i' ? ' ' : ''}</span>${tag === 'i' ? '</i>' : ''}`;
               });
               const gurmukhiContainer = document.createElement('div');
-              gurmukhiContainer.innerHTML = taggedGurmukhi;
+              gurmukhiContainer.innerHTML = taggedGurmukhi.join(' ');
               cards.push(
                 h(
                   `div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`,
