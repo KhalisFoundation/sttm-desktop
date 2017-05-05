@@ -7,7 +7,7 @@ body.display-next-line {
   .slide {
     display: none;
     height: initial;
-    min-height: calc(100% - 2.5em);
+    min-height: calc(100% - 3em);
     position: initial;
     width: initial;
     opacity: 1;
@@ -19,7 +19,6 @@ body.display-next-line {
 
   .slide.active + .slide {
     display: inline-block;
-    padding-top: .5em;
 
     .translation, .transliteration, .teeka {
       display: none;
