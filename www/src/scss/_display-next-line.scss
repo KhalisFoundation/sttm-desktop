@@ -1,0 +1,31 @@
+@for $i from 1 through 12 {
+  body.display-next-line.gurbani-#{$i} .slide {
+    font-size: #{$i}vh;
+  }
+}
+body.display-next-line {
+  .slide {
+    display: none;
+    height: initial;
+    min-height: calc(100% - 2.5em);
+    position: initial;
+    width: initial;
+    opacity: 1;
+  }
+
+  .slide.active {
+    display: inline-block;
+  }
+
+  .slide.active + .slide {
+    display: inline-block;
+    padding-top: .5em;
+
+    .translation, .transliteration, .teeka {
+      display: none;
+    }
+  }
+}
+body.display-next-line::-webkit-scrollbar {
+  display: none;
+}
