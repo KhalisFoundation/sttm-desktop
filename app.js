@@ -129,7 +129,7 @@ app.on('ready', () => {
       openChangelog();
     }
   });
-  //mainWindow.webContents.openDevTools(); // comment out when not in dev
+  // mainWindow.webContents.openDevTools(); // comment out when not in dev
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
   // Close all other windows if closing the main

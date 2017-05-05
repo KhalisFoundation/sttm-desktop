@@ -1,4 +1,5 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
+$viewer-padding: 30px;
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -30,7 +31,7 @@ html {
 #viewer {
   margin: 0;
   overflow: auto;
-  padding: 30px;
+  padding: #{$viewer-padding};
   text-align: center;
 
   .gurmukhi {
@@ -45,11 +46,12 @@ html {
 }
 
 .deck {
-  height: calc(100% - 100px);
+  height: calc(100% - #{$viewer-padding} * 1); /* Reason for 1 is that words can fit to the bottom of the screen now */
   opacity: 0;
+  overflow: hidden;
   position: absolute;
   transition: opacity 400ms ease-out;
-  width: calc(100% - 60px);
+  width: calc(100% - #{$viewer-padding} * 2);
 
   &.active {
     opacity: 1;
