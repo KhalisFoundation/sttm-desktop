@@ -1,7 +1,10 @@
 {
   "userPrefs": {
     "app": {
-      "theme": "light-theme"
+      "theme": "light-theme",
+      "layout": {
+        "presenter-view": true
+      }
     },
     "searchResults": {
       "translationEnglish": "ssk",

@@ -109,11 +109,78 @@ function checkForUpdates(manual = false) {
   }
 }
 
+function checkForExternalDisplay() {
+  const electronScreen = electron.screen;
+  const displays = electronScreen.getAllDisplays();
+  let externalDisplay = null;
+  Object.keys(displays).forEach((i) => {
+    if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
+      externalDisplay = displays[i];
+    }
+  });
+
+  if (externalDisplay) {
+    viewerWindowPos.x = externalDisplay.bounds.x + 50;
+    viewerWindowPos.y = externalDisplay.bounds.y + 50;
+    viewerWindowPos.w = externalDisplay.size.width;
+    viewerWindowPos.h = externalDisplay.size.height;
+    return true;
+  }
+  return false;
+}
+
+function createViewer(ipcData) {
+  const isExternal = checkForExternalDisplay();
+  if (isExternal) {
+    viewerWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      x: viewerWindowPos.x,
+      y: viewerWindowPos.y,
+      fullscreen: true,
+      autoHideMenuBar: true,
+      show: false,
+      titleBarStyle: 'hidden',
+      frame: (process.platform !== 'win32'),
+    });
+    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.webContents.on('did-finish-load', () => {
+      viewerWindow.show();
+      const [width, height] = viewerWindow.getSize();
+      mainWindow.webContents.send('presenter-view', {
+        width,
+        height,
+      });
+      mainWindow.focus();
+      if (typeof ipcData !== 'undefined') {
+        viewerWindow.webContents.send(ipcData.send, ipcData.data);
+      }
+    });
+    viewerWindow.on('enter-full-screen', () => {
+      mainWindow.focus();
+    });
+    viewerWindow.on('focus', () => {
+      // mainWindow.focus();
+    });
+    viewerWindow.on('closed', () => {
+      viewerWindow = false;
+      mainWindow.webContents.send('remove-presenter-view');
+    });
+    viewerWindow.on('resize', () => {
+      const [width, height] = viewerWindow.getSize();
+      mainWindow.webContents.send('presenter-view', {
+        width,
+        height,
+      });
+    });
+  }
+}
+
 app.on('ready', () => {
   const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    minWidth: 320,
-    minHeight: 480,
+    minWidth: 800,
+    minHeight: 600,
     width,
     height,
     frame: (process.platform !== 'win32'),
@@ -121,12 +188,21 @@ app.on('ready', () => {
     titleBarStyle: 'hidden',
   });
   mainWindow.webContents.on('did-finish-load', () => {
+    if (checkForExternalDisplay()) {
+      mainWindow.webContents.send('presenter-view', {
+        width: viewerWindowPos.w,
+        height: viewerWindowPos.h,
+      });
+    }
     mainWindow.show();
     checkForUpdates();
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
     if (lastSeen !== appVersion) {
       openChangelog();
+    }
+    if (!viewerWindow) {
+      createViewer();
     }
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
@@ -297,58 +373,6 @@ app.on('window-all-closed', () => {
   app.quit();
   // }
 });
-
-function checkForExternalDisplay() {
-  const electronScreen = electron.screen;
-  const displays = electronScreen.getAllDisplays();
-  let externalDisplay = null;
-  Object.keys(displays).forEach((i) => {
-    if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
-      externalDisplay = displays[i];
-    }
-  });
-
-  if (externalDisplay) {
-    viewerWindowPos.x = externalDisplay.bounds.x + 50;
-    viewerWindowPos.y = externalDisplay.bounds.y + 50;
-    return true;
-  }
-  return false;
-}
-
-function createViewer(ipcData) {
-  const isExternal = checkForExternalDisplay();
-  if (isExternal) {
-    viewerWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
-      x: viewerWindowPos.x,
-      y: viewerWindowPos.y,
-      fullscreen: true,
-      autoHideMenuBar: true,
-      show: false,
-      titleBarStyle: 'hidden',
-      frame: (process.platform !== 'win32'),
-    });
-    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
-    viewerWindow.webContents.on('did-finish-load', () => {
-      viewerWindow.show();
-      mainWindow.focus();
-      if (typeof ipcData !== 'undefined') {
-        viewerWindow.webContents.send(ipcData.send, ipcData.data);
-      }
-    });
-    viewerWindow.on('enter-full-screen', () => {
-      mainWindow.focus();
-    });
-    viewerWindow.on('focus', () => {
-      // mainWindow.focus();
-    });
-    viewerWindow.on('closed', () => {
-      viewerWindow = false;
-    });
-  }
-}
 
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());

@@ -1,3 +1,5 @@
+$presenter-pane-gap: 25px;
+
 @import
   "../../core/scss/styles.scss",
   "changelog",
@@ -26,4 +28,67 @@ a {
   position: fixed;
   right: 0;
   width: 425px;
+}
+
+.controller.scale-viewer.presenter-view {
+  #navigator {
+    bottom: $presenter-pane-gap;
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    right: $presenter-pane-gap;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+  }
+
+  #header {
+    .navigator-header {
+      display: none;
+    }
+  }
+
+  .nav-page {
+    display: block;
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    position: fixed;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    &:nth-child(1) {
+      left: $presenter-pane-gap;
+      top: $presenter-pane-gap;
+    }
+
+    &:nth-child(2) {
+      left: $presenter-pane-gap;
+      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    }
+
+    &:nth-child(3) {
+      left: auto;
+      right: $presenter-pane-gap;
+      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    }
+  }
+
+  #footer {
+    .menu-group-left {
+      display: none;
+    }
+  }
+}
+
+.scale-viewer {
+  #viewer {
+    border-style: solid;
+    border-width: 1px;
+    position: fixed;
+    transform-origin: right top;
+  }
+
+  /* ***** FONT SIZES ***** */
+  @for $i from 1 through 12 {
+    &.gurbani-#{$i} #viewer .gurbani,
+    &.translation-#{$i} #viewer .translation,
+    &.transliteration-#{$i} #viewer .transliteration,
+    &.teeka-#{$i} #viewer .teeka {
+      font-size: #{$i}em;
+    }
+  }
 }
