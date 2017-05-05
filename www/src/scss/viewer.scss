@@ -25,6 +25,7 @@ body {
 }
 
 html {
+  cursor: default;
   overflow: hidden;
 }
 
@@ -64,12 +65,24 @@ html {
   justify-content: flex-start;
   opacity: 0;
   position: absolute;
-  transition: opacity 400ms ease-out;
   width: 100%;
 
   &.active {
     opacity: 1;
   }
+}
+
+.slide.active .translation {
+    animation: backlight .2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.slide.active .teeka {
+	animation: backlight .4s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.slide.active .transliteration {
+    animation: backlight .6s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.slide.active + .slide .gurbani {
+	animation: blank .2s, backlight 1s .2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 body.viewer .slide {
@@ -80,7 +93,7 @@ body.viewer .slide {
 h1,
 h2 {
   cursor: default;
-  margin: 0 0 20px;
+  margin: 0;
 }
 
 .gurbani {
@@ -125,6 +138,7 @@ h2 {
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   line-height: 1.5;
+  margin-top: .25em;
 }
 
 .translation,
