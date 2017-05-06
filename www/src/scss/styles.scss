@@ -61,9 +61,27 @@ a {
     }
 
     &:nth-child(3) {
+      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
       left: auto;
       right: $presenter-pane-gap;
       top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    }
+  }
+
+  #navigator.kb-active {
+    .nav-page {
+      &:nth-child(1),
+      &:nth-child(2) {
+        height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - calc(128px / 2));
+      }
+
+      &:nth-child(1) {
+        top: calc(#{$presenter-pane-gap} + 128px);
+      }
+
+      &:nth-child(2) {
+        top: calc(50% + calc(#{$presenter-pane-gap} * 0.5) + calc(128px / 2));
+      }
     }
   }
 

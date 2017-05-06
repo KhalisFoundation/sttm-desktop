@@ -69,7 +69,7 @@ $menuButton.addEventListener('click', () => {
 });
 
 function updateViewerScale() {
-  const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('shabad-page') : document.body;
+  const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('navigator') : document.body;
   let scale = 1;
   let previewStyles = '';
   previewStyles += `width: ${global.viewer.width}px;`;
