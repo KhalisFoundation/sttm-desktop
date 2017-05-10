@@ -3,14 +3,15 @@
     font-size: #{$i}vh;
   }
 }
+
 body.display-next-line {
   .slide {
     display: none;
     height: initial;
     min-height: calc(100% - 3.25em);
+    opacity: 1;
     position: initial;
     width: initial;
-    opacity: 1;
   }
 
   .slide.active {
@@ -19,13 +20,16 @@ body.display-next-line {
 
   .slide.active + .slide {
     display: inline-block;
-    padding-top: .25em;
+    padding-top: 0.25em;
 
-    .translation, .transliteration, .teeka {
+    .translation,
+    .transliteration,
+    .teeka {
       display: none;
     }
   }
 }
+
 body.display-next-line::-webkit-scrollbar {
   display: none;
 }

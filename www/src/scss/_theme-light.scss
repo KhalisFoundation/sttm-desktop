@@ -1,8 +1,8 @@
 body.light-theme {
-  background-color: #ffffff;
+  background-color: #fff;
 
   .gurbani {
-    color: #01579B;
+    color: #01579b;
   }
 
   .translation {
@@ -19,7 +19,13 @@ body.light-theme {
 
   .logo {
     path {
-      fill: #E0E0E0;
+      fill: #e0e0e0;
+    }
+  }
+
+  .controller.presenter-view {
+    #viewer {
+      border-color: #333;
     }
   }
 }

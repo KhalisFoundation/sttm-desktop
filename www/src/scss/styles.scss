@@ -1,3 +1,5 @@
+$presenter-pane-gap: 25px;
+
 @import
   "../../core/scss/styles.scss",
   "changelog",
@@ -22,9 +24,90 @@ a {
 
 #navigator {
   bottom: 0;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   height: 260px;
   position: fixed;
   right: 0;
   width: 425px;
+}
+
+.controller.scale-viewer.presenter-view {
+  #navigator {
+    bottom: $presenter-pane-gap;
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    right: $presenter-pane-gap;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+  }
+
+  #header {
+    .navigator-header {
+      display: none;
+    }
+  }
+
+  .nav-page {
+    display: block;
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    position: fixed;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    &:nth-child(1) {
+      left: $presenter-pane-gap;
+      top: $presenter-pane-gap;
+    }
+
+    &:nth-child(2) {
+      left: $presenter-pane-gap;
+      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    }
+
+    &:nth-child(3) {
+      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
+      left: auto;
+      right: $presenter-pane-gap;
+      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    }
+  }
+
+  #navigator.kb-active {
+    .nav-page {
+      &:nth-child(1),
+      &:nth-child(2) {
+        height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - calc(128px / 2));
+      }
+
+      &:nth-child(1) {
+        top: calc(#{$presenter-pane-gap} + 128px);
+      }
+
+      &:nth-child(2) {
+        top: calc(50% + calc(#{$presenter-pane-gap} * 0.5) + calc(128px / 2));
+      }
+    }
+  }
+
+  #footer {
+    .menu-group-left {
+      display: none;
+    }
+  }
+}
+
+.scale-viewer {
+  #viewer {
+    border-style: solid;
+    border-width: 1px;
+    position: fixed;
+    transform-origin: right top;
+  }
+
+  /* ***** FONT SIZES ***** */
+  @for $i from 1 through 12 {
+    &.gurbani-#{$i} #viewer .gurbani,
+    &.translation-#{$i} #viewer .translation,
+    &.transliteration-#{$i} #viewer .transliteration,
+    &.teeka-#{$i} #viewer .teeka {
+      font-size: #{$i}em;
+    }
+  }
 }

@@ -73,16 +73,19 @@ html {
 }
 
 .slide.active .translation {
-    animation: backlight .2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  animation: backlight 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
 .slide.active .teeka {
-	animation: backlight .4s cubic-bezier(0.645, 0.045, 0.355, 1);
+  animation: backlight 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
 .slide.active .transliteration {
-    animation: backlight .6s cubic-bezier(0.645, 0.045, 0.355, 1);
+  animation: backlight 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
 .slide.active + .slide .gurbani {
-	animation: blank .2s, backlight 1s .2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  animation: blank 0.2s, backlight 1s 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 body.viewer .slide {
@@ -92,35 +95,43 @@ body.viewer .slide {
 
 h1,
 h2 {
-  cursor: default;
   margin: 0;
+  transition: all $transition-time $transition-easing;
 }
 
 .gurbani {
   font-weight: normal;
   line-height: 1.5;
 
-  i {
-    font-size: 0;
-    font-style: normal;
-    white-space: nowrap;
+  .padchhed {
+    span {
+      white-space: nowrap;
 
-    span:last-child {
-      margin-left: 1rem;
+      i {
+        font-size: 0;
+        margin-left: 1rem;
+      }
+    }
+  }
+
+  .larivaar {
+    display: none;
+
+    i {
+      display: none;
+      font-style: normal;
     }
   }
 }
 
 .larivaar {
   .gurbani {
-    div {
-      font-size: 0;
+    .padchhed {
+      display: none;
     }
 
-    i,
-    span {
-      vertical-align: bottom;
-      white-space: nowrap;
+    .larivaar {
+      display: inline;
     }
   }
 }
@@ -138,7 +149,7 @@ h2 {
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   line-height: 1.5;
-  margin-top: .25em;
+  margin-top: 0.25em;
 }
 
 .translation,
@@ -147,7 +158,6 @@ h2 {
   height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: opacity $transition-time $transition-easing;
 }
 
 .display-translation .translation,
@@ -160,7 +170,6 @@ h2 {
 /* ***** FONT SIZES ***** */
 @for $i from 1 through 12 {
   .gurbani-#{$i} .gurbani,
-  .gurbani-#{$i} .gurbani span,
   .translation-#{$i} .translation,
   .transliteration-#{$i} .transliteration,
   .teeka-#{$i} .teeka {
@@ -185,16 +194,23 @@ h2 {
   display: block;
 }
 
-.viewer {
+.viewer,
+.scale-viewer {
+  .slide {
+    display: flex;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  #previewer-logo {
+    display: none;
+  }
+
   #viewer-logo {
     bottom: 20px;
     display: block;
     height: 5.5%;
     top: auto;
-  }
-
-  .slide {
-    justify-content: space-between;
   }
 }
 

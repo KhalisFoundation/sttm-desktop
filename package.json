@@ -1,12 +1,12 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
     "precommit": "yarn test",
-    "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
+    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
     "test:app": "mocha",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "upload:mac": "node packaging/upload-mac.js",
@@ -34,7 +34,7 @@
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron": "^1.6.2",
-    "electron-builder": "^16.6.1",
+    "electron-builder": "^17.3.1",
     "electron-publisher-s3": "^16.6.0",
     "electron-rebuild": "^1.5.7",
     "eslint": "^3.18.0",

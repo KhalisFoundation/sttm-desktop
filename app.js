@@ -4,7 +4,7 @@ const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
-const { app, BrowserWindow, ipcMain, Menu } = electron;
+const { app, BrowserWindow, dialog, ipcMain } = electron;
 const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
@@ -14,7 +14,6 @@ const appVersion = app.getVersion();
 let mainWindow;
 let viewerWindow = false;
 let changelogWindow = false;
-let updateWindow = false;
 let manualUpdate = false;
 const viewerWindowPos = {};
 
@@ -36,65 +35,53 @@ function openChangelog() {
   });
 }
 
-function showUpdate(status) {
-  if (updateWindow) {
-    updateWindow.webContents.send(status);
-    if (status === 'update-ready') {
-      updateWindow.show();
-    }
-  } else {
-    updateWindow = new BrowserWindow({
-      width: 400,
-      height: 135,
-      minWidth: 400,
-      minHeight: 135,
-      fullscreenable: false,
-      maximizable: false,
-      minimizable: false,
-      parent: mainWindow,
-      show: false,
-    });
-    updateWindow.webContents.on('did-finish-load', () => {
-      updateWindow.show();
-      if (status === 'init') {
-        autoUpdater.checkForUpdates();
-      } else {
-        updateWindow.webContents.send(status);
-      }
-    });
-    updateWindow.loadURL(`file://${__dirname}/www/update.html`);
-    updateWindow.on('close', () => {
-      updateWindow = false;
-      manualUpdate = false;
-    });
-  }
-}
-
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 // autoUpdater events
 autoUpdater.on('checking-for-update', () => {
-  if (manualUpdate) {
-    showUpdate('checking-for-update');
-  }
+  mainWindow.webContents.send('checking-for-update');
 });
 autoUpdater.on('update-available', () => {
-  if (manualUpdate) {
-    showUpdate('updating');
-  }
+  mainWindow.webContents.send('update-available');
 });
 autoUpdater.on('update-not-available', () => {
+  mainWindow.webContents.send('update-not-available');
   if (manualUpdate) {
-    showUpdate('no-update');
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: [
+        'OK',
+      ],
+      defaultId: 0,
+      title: 'No update available.',
+      message: 'No update available.',
+      detail: `Version ${appVersion} is the latest version.`,
+    });
   }
 });
 autoUpdater.on('update-downloaded', () => {
-  showUpdate('updateReady');
+  mainWindow.webContents.send('update-downloaded');
+  dialog.showMessageBox({
+    type: 'info',
+    buttons: [
+      'Dismiss',
+      'Install & Restart',
+    ],
+    defaultId: 1,
+    title: 'Update available.',
+    message: 'Update available.',
+    detail: 'Update downloaded and ready to install',
+    cancelId: 0,
+  }, (response) => {
+    if (response === 1) {
+      autoUpdater.quitAndInstall();
+    }
+  });
 });
 autoUpdater.on('error', () => {
   if (manualUpdate) {
-    showUpdate('update-error');
+    // showUpdate('update-error');
   }
 });
 
@@ -102,202 +89,10 @@ function checkForUpdates(manual = false) {
   if (process.env.NODE_ENV !== 'development') {
     if (manual) {
       manualUpdate = true;
-      showUpdate('init');
-    } else {
-      autoUpdater.checkForUpdates();
     }
+    autoUpdater.checkForUpdates();
   }
 }
-
-app.on('ready', () => {
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
-  mainWindow = new BrowserWindow({
-    minWidth: 320,
-    minHeight: 480,
-    width,
-    height,
-    frame: (process.platform !== 'win32'),
-    show: false,
-    titleBarStyle: 'hidden',
-  });
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.show();
-    checkForUpdates();
-    // Show changelog if last version wasn't seen
-    const lastSeen = store.get('changelog-seen');
-    if (lastSeen !== appVersion) {
-      openChangelog();
-    }
-  });
-  // mainWindow.webContents.openDevTools(); // comment out when not in dev
-  mainWindow.loadURL(`file://${__dirname}/www/index.html`);
-
-  // Close all other windows if closing the main
-  mainWindow.on('close', () => {
-    if (viewerWindow && !viewerWindow.isDestroyed()) {
-      viewerWindow.close();
-    }
-    if (changelogWindow && !changelogWindow.isDestroyed()) {
-      changelogWindow.close();
-    }
-  });
-
-  // macOS Menu
-  if (process.platform === 'darwin') {
-    const template = [
-      {
-        label: 'SikhiToTheMax',
-        submenu: [
-          {
-            label: 'About SikhiToTheMax',
-            role: 'about',
-          },
-          {
-            label: 'Check for Updates...',
-            accelerator: 'Cmd+U',
-            click: () => {
-              checkForUpdates(true);
-            },
-          },
-          {
-            label: 'Changelog...',
-            click: () => {
-              openChangelog();
-            },
-          },
-          {
-            type: 'separator',
-          },
-          /* {
-            label: 'Preferences',
-            accelerator: 'Cmd+,',
-            click: () => {
-              mainWindow.webContents.send('openSettings');
-            },
-          }, */
-          {
-            type: 'separator',
-          },
-          {
-            label: 'Services',
-            role: 'services',
-            submenu: [],
-          },
-          {
-            type: 'separator',
-          },
-          {
-            label: 'Hide SikhiToTheMax',
-            accelerator: 'Cmd+H',
-            role: 'hide',
-          },
-          {
-            label: 'Hide Others',
-            accelerator: 'Cmd+Alt+H',
-            role: 'hideothers',
-          },
-          {
-            type: 'separator',
-          },
-          {
-            label: 'Quit SikhiToTheMax',
-            accelerator: 'CmdOrCtrl+Q',
-            click: () => {
-              app.quit();
-            },
-          },
-        ],
-      },
-      {
-        label: 'Edit',
-        submenu: [
-          {
-            label: 'Undo',
-            accelerator: 'CmdOrCtrl+Z',
-            role: 'undo',
-          },
-          {
-            label: 'Redo',
-            accelerator: 'CmdOrCtrl+Shift+Z',
-            role: 'redo',
-          },
-          {
-            type: 'separator',
-          },
-          {
-            label: 'Cut',
-            accelerator: 'CmdOrCtrl+X',
-            role: 'cut',
-          },
-          {
-            label: 'Copy',
-            accelerator: 'CmdOrCtrl+C',
-            role: 'copy',
-          },
-          {
-            label: 'Paste',
-            accelerator: 'CmdOrCtrl+V',
-            role: 'paste',
-          },
-          {
-            label: 'Select All',
-            accelerator: 'CmdOrCtrl+A',
-            role: 'selectall',
-          },
-        ],
-      },
-      {
-        label: 'Window',
-        role: 'window',
-        submenu: [
-          {
-            label: 'Minimize',
-            accelerator: 'CmdOrCtrl+M',
-            role: 'minimize',
-          },
-          {
-            label: 'Close',
-            accelerator: 'CmdOrCtrl+W',
-            role: 'close',
-          },
-        ],
-      },
-    ];
-    if (process.env.NODE_ENV === 'development') {
-      template.push({
-        label: 'Dev',
-        submenu: [
-          {
-            label: 'Toggle Developer Tools',
-            accelerator: 'CmdOrCtrl+Alt+I',
-            click: () => {
-              mainWindow.webContents.toggleDevTools();
-            },
-          },
-          {
-            label: 'Reload',
-            accelerator: 'CmdOrCtrl+R',
-            click: () => {
-              mainWindow.webContents.reload();
-            },
-          },
-        ],
-      });
-    }
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
-  }
-});
-
-
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-  // if (process.platform !== 'darwin') {
-  app.quit();
-  // }
-});
 
 function checkForExternalDisplay() {
   const electronScreen = electron.screen;
@@ -312,6 +107,8 @@ function checkForExternalDisplay() {
   if (externalDisplay) {
     viewerWindowPos.x = externalDisplay.bounds.x + 50;
     viewerWindowPos.y = externalDisplay.bounds.y + 50;
+    viewerWindowPos.w = externalDisplay.size.width;
+    viewerWindowPos.h = externalDisplay.size.height;
     return true;
   }
   return false;
@@ -334,6 +131,11 @@ function createViewer(ipcData) {
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
+      const [width, height] = viewerWindow.getSize();
+      mainWindow.webContents.send('presenter-view', {
+        width,
+        height,
+      });
       mainWindow.focus();
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
@@ -347,9 +149,69 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('closed', () => {
       viewerWindow = false;
+      mainWindow.webContents.send('remove-presenter-view');
+    });
+    viewerWindow.on('resize', () => {
+      const [width, height] = viewerWindow.getSize();
+      mainWindow.webContents.send('presenter-view', {
+        width,
+        height,
+      });
     });
   }
 }
+
+app.on('ready', () => {
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+  mainWindow = new BrowserWindow({
+    minWidth: 800,
+    minHeight: 600,
+    width,
+    height,
+    frame: (process.platform !== 'win32'),
+    show: false,
+    titleBarStyle: 'hidden',
+  });
+  mainWindow.webContents.on('did-finish-load', () => {
+    if (checkForExternalDisplay()) {
+      mainWindow.webContents.send('presenter-view', {
+        width: viewerWindowPos.w,
+        height: viewerWindowPos.h,
+      });
+    }
+    mainWindow.show();
+    checkForUpdates();
+    // Show changelog if last version wasn't seen
+    const lastSeen = store.get('changelog-seen');
+    if (lastSeen !== appVersion) {
+      openChangelog();
+    }
+    if (!viewerWindow) {
+      createViewer();
+    }
+  });
+  mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+
+  // Close all other windows if closing the main
+  mainWindow.on('close', () => {
+    if (viewerWindow && !viewerWindow.isDestroyed()) {
+      viewerWindow.close();
+    }
+    if (changelogWindow && !changelogWindow.isDestroyed()) {
+      changelogWindow.close();
+    }
+  });
+});
+
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+  // if (process.platform !== 'darwin') {
+  app.quit();
+  // }
+});
 
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
@@ -382,4 +244,7 @@ ipcMain.on('update-settings', () => {
   }
 });
 
-ipcMain.on('openChangelog', openChangelog);
+exports.openChangelog = openChangelog;
+exports.appVersion = appVersion;
+exports.checkForUpdates = checkForUpdates;
+exports.autoUpdater = autoUpdater;

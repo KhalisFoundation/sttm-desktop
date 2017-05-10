@@ -1,9 +1,13 @@
-ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-==================
-### By the grace of the Guru, we seek your blessings.
-
-
 ## SikhiToTheMax Desktop App
+
+### 3.1.0 - _170506_
+#### Added
+ * Presenter View - When presenting on an external monitor, see the controller in a beautiful and highly practical view for better efficiency in controlling the Viewer.
+ * Search Types - Choose from four different search types by clicking on the gear icon in the search field
+ * Left-Align option 
+
+#### Improved
+ * Aesthetics - The themes have gotten a fresh, new coat of paint to look even better. Animations have been updated.
 
 ### 3.0.3 - _170421_
 #### Added
