@@ -237,7 +237,7 @@ const $menuButton = document.querySelector('.menu-button');
 $menuButton.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   e.stopPropagation();
-  winMenu.popup(remote.getCurrentWindow());
+  menu.popup(remote.getCurrentWindow());
 });
 $menuButton.addEventListener('click', () => {
   const e = $menuButton.ownerDocument.createEvent('MouseEvents');

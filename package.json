@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "precommit": "yarn test",
-    "test": "htmlhint www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
+    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
     "test:app": "mocha",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "upload:mac": "node packaging/upload-mac.js",
