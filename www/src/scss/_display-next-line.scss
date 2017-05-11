@@ -12,6 +12,10 @@
 }
 
 .display-next-line {
+  .deck {
+    height: calc(100% - #{$viewer-padding} * 1);
+  }
+
   .slide {
     display: none;
     height: initial;

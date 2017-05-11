@@ -47,7 +47,7 @@ html {
 }
 
 .deck {
-  height: calc(100% - #{$viewer-padding} * 1); /* Reason for 1 is that words can fit to the bottom of the screen now */
+  height: calc(100% - 100px);
   opacity: 0;
   overflow: hidden;
   position: absolute;
