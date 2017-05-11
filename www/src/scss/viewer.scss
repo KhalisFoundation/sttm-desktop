@@ -1,4 +1,5 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
+$viewer-padding: 30px;
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -24,13 +25,14 @@ body {
 }
 
 html {
+  cursor: default;
   overflow: hidden;
 }
 
 #viewer {
   margin: 0;
   overflow: auto;
-  padding: 30px;
+  padding: #{$viewer-padding};
   text-align: center;
 
   .gurmukhi {
@@ -47,9 +49,10 @@ html {
 .deck {
   height: calc(100% - 100px);
   opacity: 0;
+  overflow: hidden;
   position: absolute;
   transition: opacity 400ms ease-out;
-  width: calc(100% - 60px);
+  width: calc(100% - #{$viewer-padding} * 2);
 
   &.active {
     opacity: 1;
@@ -62,7 +65,6 @@ html {
   justify-content: flex-start;
   opacity: 0;
   position: absolute;
-  transition: opacity 400ms ease-out;
   width: 100%;
 
   &.active {
@@ -70,17 +72,36 @@ html {
   }
 }
 
+.slide.active .translation {
+  animation: backlight 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.slide.active .teeka {
+  animation: backlight 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.slide.active .transliteration {
+  animation: backlight 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.slide.active + .slide .gurbani {
+  animation: blank 0.2s, backlight 1s 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.viewer .slide {
+  display: flex;
+  height: 100%;
+}
+
 h1,
 h2 {
-  cursor: default;
-  font-size: 100%;
-  margin: 0 0 20px;
+  margin: 0;
   transition: all $transition-time $transition-easing;
 }
 
 .gurbani {
   font-weight: normal;
-  line-height: 1.3;
+  line-height: 1.5;
 
   .padchhed {
     span {
@@ -118,7 +139,7 @@ h2 {
 .translation,
 .transliteration {
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 .transliteration {
@@ -128,6 +149,7 @@ h2 {
 .teeka {
   font-family: 'AnmolUniBaniTrue';
   line-height: 1.5;
+  margin-top: 0.25em;
 }
 
 .translation,
@@ -193,6 +215,7 @@ h2 {
 }
 
 @import
+  "display-next-line",
   "theme-dark",
   "theme-light",
   "win32";

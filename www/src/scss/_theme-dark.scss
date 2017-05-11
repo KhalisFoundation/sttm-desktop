@@ -2,24 +2,24 @@ body.dark-theme {
   background-color: #000;
 
   .gurbani {
-    color: #f1f1f1;
+    color: #fff;
   }
 
   .translation {
-    color: #f1f1f1;
-  }
-
-  .transliteration {
-    color: #868383;
+    color: #e2e2e2;
   }
 
   .teeka {
-    color: #f1f1f1;
+    color: #c6c6c6;
   }
 
-  #logo {
+  .transliteration {
+    color: #ababab;
+  }
+
+  .logo {
     path {
-      fill: #868383;
+      fill: #212121;
     }
   }
 

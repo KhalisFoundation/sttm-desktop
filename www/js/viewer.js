@@ -74,8 +74,8 @@ module.exports = {
                   [
                     h('h1.gurbani.gurmukhi', gurmukhiContainer),
                     h('h2.translation', row.English),
-                    h('h2.transliteration', row.Transliteration),
                     h('h2.teeka', row.PunjabiUni),
+                    h('h2.transliteration', row.Transliteration),
                   ]));
             });
             hideDecks();
