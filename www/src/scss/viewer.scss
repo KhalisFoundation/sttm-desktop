@@ -88,7 +88,7 @@ html {
   animation: blank 0.2s, backlight 1s 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
-body.viewer .slide {
+.viewer .slide {
   display: flex;
   height: 100%;
 }
