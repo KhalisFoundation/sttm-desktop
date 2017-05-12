@@ -12,8 +12,8 @@
     "upload:mac": "node packaging/upload-mac.js",
     "start": "concurrently --kill-others \"yarn watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "yarn build-css",
-    "pack:mac": "yarn build && build --mac",
-    "pack:win": "yarn build && build --win --x64",
+    "pack:mac": "yarn build && build --mac --publish always",
+    "pack:win": "yarn build && build --win --x64 --ia32 --publish always",
     "pack:win32": "yarn build && build --win --ia32",
     "upload:win": "node packaging/upload-win.js",
     "upload:win32": "node packaging/upload-win32.js",
@@ -82,13 +82,6 @@
       "buildResources": "assets",
       "output": "builds"
     },
-    "npmRebuild": false,
-    "publish": {
-      "provider": "s3",
-      "bucket": "sttm-releases",
-      "path": "${os}-${arch}",
-      "region": "us-west-2"
-    },
     "dmg": {
       "icon": "STTM-DMG.icns"
     },
@@ -97,12 +90,11 @@
       "icon": "assets/STTM3.icns",
       "target": [
         "dmg",
-        "mas",
         "zip"
       ]
     },
     "nsis": {
-      "artifactName": "${productName}Setup-${version}.${ext}",
+      "artifactName": "${productName}Setup-${version}-${arch}.${ext}",
       "deleteAppDataOnUninstall": true,
       "perMachine": true
     },
