@@ -7,6 +7,7 @@ environment:
   matrix:
     - nodejs_version: 6
 install:
+  - git clone https://github.com/khalisfoundation/sttm-core.git www/core
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
   - npm install -g npm@latest yarn
@@ -19,4 +20,4 @@ version: '{build}'
 shallow_clone: true
 clone_depth: 1
 test_script:
-  - npm run pack:win
+  - npm run test && npm run pack:win

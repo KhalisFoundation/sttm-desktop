@@ -1,6 +1,9 @@
 sudo: required
 dist: trusty
 
+git:
+  submodules: false
+
 language: c
 
 matrix:
@@ -39,9 +42,10 @@ install:
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 before_script:
+  - git clone https://github.com/khalisfoundation/sttm-core.git www/core
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start &
   - sleep 3
 
 script:
-  - npm run pack:mac
+  - npm run test && npm run pack:mac
