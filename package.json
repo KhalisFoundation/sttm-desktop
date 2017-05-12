@@ -13,8 +13,8 @@
     "start": "concurrently --kill-others \"yarn watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "yarn build-css",
     "pack:mac": "yarn build && build --mac --publish always",
-    "pack:win": "yarn build && build --win --x64 --ia32 --publish always",
-    "pack:win32": "yarn build && build --win --ia32",
+    "pack:win": "yarn build && build --win --x64 --publish always",
+    "pack:win32": "yarn build && build --win --ia32 --publish always",
     "upload:win": "node packaging/upload-win.js",
     "upload:win32": "node packaging/upload-win32.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
@@ -72,7 +72,7 @@
       "!test${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README,STTM.provisionprofile}",
+      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,README,STTM.provisionprofile}",
       "!**/*.map"
     ],
     "extraResources": [

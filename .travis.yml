@@ -25,6 +25,7 @@ install:
 
 before_script:
   - git clone https://github.com/khalisfoundation/sttm-core.git www/core
+  - curl -O $ShabadOSDB
   - sleep 3
 
 script:
