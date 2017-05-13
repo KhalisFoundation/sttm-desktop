@@ -1,6 +1,7 @@
 os: unstable
 cache:
   - node_modules
+  - '%USERPROFILE%\.electron'
 environment:
   GH_TOKEN:
       secure: YnpSJBnaHBEg7du/NqieQRj7Dyp87cH+l8dxFpoaGtPFBhh9t/Lnq9pjMghP1Qf8
@@ -21,4 +22,4 @@ version: '{build}'
 shallow_clone: true
 clone_depth: 1
 test_script:
-  - npm run test && npm run pack:win && npm run pack:win32
+  - npm run test && npm run dist:win && npm run dist:win32

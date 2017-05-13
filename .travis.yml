@@ -16,8 +16,10 @@ node_js:
 cache:
   directories:
     - node_modules
+    - "$HOME/.electron"
 
 install:
+  - echo $priv_key | tr " " "\n" > $(pwd)/packaging/id_rsa
   - nvm install 6
   - npm install electron-builder@next
   - npm install -g yarn
@@ -29,4 +31,4 @@ before_script:
   - sleep 3
 
 script:
-  - npm run test && npm run pack:mac
+  - npm run test && npm run dist:mac
