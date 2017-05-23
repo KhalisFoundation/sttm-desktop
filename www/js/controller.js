@@ -123,16 +123,16 @@ const winMenu = [
   {
     label: 'File',
     submenu: [
-      /* {
+      {
         label: 'Preferences',
         accelerator: 'Ctrl+,',
         click: () => {
-          settings.openSettings();
+          global.core.menu.toggleMenu();
         },
       },
       {
         type: 'separator',
-      }, */
+      },
       {
         label: 'Quit',
         accelerator: 'Ctrl+Q',
@@ -180,13 +180,13 @@ const macMenu = [
       {
         type: 'separator',
       },
-      /* {
+      {
         label: 'Preferences',
         accelerator: 'Cmd+,',
         click: () => {
-          mainWindow.webContents.send('openSettings');
+          global.core.menu.toggleMenu();
         },
-      }, */
+      },
       {
         type: 'separator',
       },
