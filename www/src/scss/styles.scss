@@ -57,14 +57,14 @@ a {
     }
 
     &:nth-child(2) {
-      left: $presenter-pane-gap;
+      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
+      left: auto;
+      right: $presenter-pane-gap;
       top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
     }
 
     &:nth-child(3) {
-      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
-      left: auto;
-      right: $presenter-pane-gap;
+      left: $presenter-pane-gap;
       top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
     }
   }
