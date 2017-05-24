@@ -1,5 +1,13 @@
 ## SikhiToTheMax Desktop App
 
+### 3.1.1 - _170524_
+#### Added
+ * Next Line - Show the next line in the Shabad while presenting
+
+#### Improved
+ * Preferences are now available in the app menu
+ * The History and Shabad Controller panes have been switched in Presenter View for a better experience
+
 ### 3.1.0 - _170506_
 #### Added
  * Presenter View - When presenting on an external monitor, see the controller in a beautiful and highly practical view for better efficiency in controlling the Viewer.
