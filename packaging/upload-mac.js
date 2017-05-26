@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const version = require('../package.json').version;
-const keys = require('./keys.json');
+const path = require('path');
 const SSH = require('ssh2').Client;
 
 const buildsDir = './builds/';
@@ -13,7 +13,7 @@ const updateFile = 'latest-mac.json';
 const bucketName = 'sttm-releases';
 const remoteDir = 'mac-x64/';
 
-AWS.config.loadFromPath('./packaging/aws.json');
+AWS.config.update({ region: 'us-west-2' });
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
   params: { Bucket: bucketName },
@@ -38,7 +38,7 @@ function updateRemoteVersion() {
     host: 'khalis.net',
     port: 1157,
     username: 'kns',
-    privateKey: fs.readFileSync(keys.privateKeyFile),
+    privateKey: fs.readFileSync(path.resolve(__dirname, 'id_rsa')),
   });
 }
 

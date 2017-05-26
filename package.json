@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "3.1.1",
+  "version": "3.2.1",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
@@ -9,12 +9,12 @@
     "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
     "test:app": "mocha",
     "rebuild": "electron-rebuild -f -w sqlite3",
-    "upload:mac": "node packaging/upload-mac.js",
     "start": "concurrently --kill-others \"yarn watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "yarn build-css",
     "pack:mac": "yarn build && build --mac",
     "pack:win": "yarn build && build --win --x64",
     "pack:win32": "yarn build && build --win --ia32",
+    "upload:mac": "node packaging/upload-mac.js",
     "upload:win": "node packaging/upload-win.js",
     "upload:win32": "node packaging/upload-win32.js",
     "dist:mac": "npm run pack:mac && npm run upload:mac",
@@ -52,13 +52,17 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
+    "adm-zip": "^0.4.7",
     "electron-log": "^2.0.2",
     "electron-updater": "^1.11.2",
     "hyperscript": "^2.0.2",
+    "is-online": "^7.0.0",
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
     "marked": "^0.3.6",
+    "request": "^2.81.0",
+    "request-progress": "^3.0.0",
     "sqlite3": "^3.1.8"
   },
   "build": {
@@ -72,7 +76,7 @@
       "!test${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,data.db,README,STTM.provisionprofile}",
+      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map"
     ],
     "extraResources": [
@@ -82,7 +86,6 @@
       "buildResources": "assets",
       "output": "builds"
     },
-    "npmRebuild": false,
     "publish": {
       "provider": "s3",
       "bucket": "sttm-releases",
@@ -97,7 +100,6 @@
       "icon": "assets/STTM3.icns",
       "target": [
         "dmg",
-        "mas",
         "zip"
       ]
     },

@@ -1,5 +1,9 @@
 ## SikhiToTheMax Desktop App
 
+### 3.2.0 - _170526_
+#### Improved
+ * Faster updates - We've reduced the size of the app and subsequent updates by storing the database separately on your device. It now downloads on first run and saves you from re-downloading every time we update the app. When there are updates to the database, those will get pulled transparently and allow you to use the app without interruption.
+
 ### 3.1.1 - _170524_
 #### Added
  * Next Line - Show the next line in the Shabad while presenting
