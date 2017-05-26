@@ -1,19 +1,20 @@
 const electron = require('electron');
-const defaultPrefs = require('./defaults.json');
+const AdmZip = require('adm-zip');
+const fs = require('fs');
+const isOnline = require('is-online');
 const path = require('path');
+const request = require('request');
+const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
-const Store = require('./store');
+
+const defaultPrefs = require('./defaults.json');
 const search = require('./search');
+const Store = require('./store');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
-
-// If not in dev, DB path is outside of app.asar
-let dbPath = window.process.env.NODE_ENV !== 'development' ? '../../../' : '../../';
-dbPath = path.resolve(__dirname, `${dbPath}data.db`);
-
-const db = new sqlite3.Database(dbPath);
-search.db = db;
+const userDataPath = remote.app.getPath('userData');
+const dbPath = path.resolve(userDataPath, 'data.db');
 
 const store = new Store({
   configName: 'user-preferences',
@@ -43,11 +44,60 @@ function windowAction(e) {
       break;
   }
 }
+
 module.exports = {
   ipc,
-  db,
   search,
   store,
+
+  init() {
+    // Initialize DB right away if it exists
+    if (fs.existsSync(dbPath)) {
+      this.initDB();
+      // Check if there's a newer version
+      this.downloadLatestDB();
+    } else {
+      // Download the DB
+      this.downloadLatestDB(true);
+    }
+  },
+
+  downloadLatestDB(force = false) {
+    if (force) {
+      global.core.search.$search.placeholder = 'Downloading database...';
+    }
+    isOnline().then((online) => {
+      if (online) {
+        request('https://khajana.org/data.md5', (error, response, newestDBHash) => {
+          if (!error && response.statusCode === 200) {
+            const curDBHash = module.exports.getPref('curDBHash');
+            if (force || curDBHash !== newestDBHash) {
+              const dbZip = path.resolve(userDataPath, 'data.zip');
+              progress(request('https://khajana.org/data.zip'))
+                .on('progress', state => global.core.search.updateDLProgress(state))
+                .on('end', () => {
+                  const zip = new AdmZip(dbZip);
+                  zip.extractEntryTo('data.db', userDataPath, true, true);
+                  module.exports.initDB();
+                  module.exports.setPref('curDBHash', newestDBHash);
+                  fs.unlinkSync(dbZip);
+                })
+                .pipe(fs.createWriteStream(dbZip));
+            }
+          }
+        });
+      } else if (force) {
+        global.core.search.offline(10);
+      }
+    });
+  },
+
+  initDB() {
+    const db = new sqlite3.Database(dbPath);
+    this.db = db;
+    search.db = db;
+    global.core.search.initSearch();
+  },
 
   getAllPrefs(schema = store.data) {
     return this.getPref('userPrefs', schema);
