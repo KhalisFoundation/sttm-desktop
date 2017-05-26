@@ -1,0 +1,46 @@
+@for $i from 1 through 12 {
+  .display-next-line.gurbani-#{$i} .deck {
+    font-size: #{$i}em;
+  }
+
+  .display-next-line.scale-viewer.gurbani-#{$i} #viewer .gurbani,
+  .display-next-line.scale-viewer.translation-#{$i} #viewer .translation,
+  .display-next-line.scale-viewer.transliteration-#{$i} #viewer .transliteration,
+  .display-next-line.scale-viewer.teeka-#{$i} #viewer .teeka {
+    font-size: calc(#{$i}em / 10);
+  }
+}
+
+.display-next-line {
+  .deck {
+    height: calc(100% - #{$viewer-padding} * 1);
+  }
+
+  .slide {
+    display: none;
+    height: initial;
+    min-height: calc(100% - 3.25em);
+    opacity: 1;
+    position: initial;
+    width: initial;
+  }
+
+  .slide.active {
+    display: inline-block;
+  }
+
+  .slide.active + .slide {
+    display: inline-block;
+    padding-top: 0.25em;
+
+    .translation,
+    .transliteration,
+    .teeka {
+      display: none;
+    }
+  }
+}
+
+body.display-next-line::-webkit-scrollbar {
+  display: none;
+}

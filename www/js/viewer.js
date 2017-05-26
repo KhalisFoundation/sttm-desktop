@@ -52,6 +52,9 @@ module.exports = {
       Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
       document.getElementById(`slide${lineID}`).classList.add('active');
     } else {
+      if (!global.platform.db) {
+        global.platform.initDB();
+      }
       global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
         (err, rows) => {
           if (rows.length > 0) {
@@ -74,8 +77,8 @@ module.exports = {
                   [
                     h('h1.gurbani.gurmukhi', gurmukhiContainer),
                     h('h2.translation', row.English),
-                    h('h2.transliteration', row.Transliteration),
                     h('h2.teeka', row.PunjabiUni),
+                    h('h2.transliteration', row.Transliteration),
                   ]));
             });
             hideDecks();

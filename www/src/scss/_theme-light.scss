@@ -1,20 +1,26 @@
 body.light-theme {
-  background-color: #f1f1f1;
+  background-color: #fff;
 
   .gurbani {
-    color: #006799;
+    color: #01579b;
   }
 
   .translation {
-    color: #333;
-  }
-
-  .transliteration {
-    color: #868383;
+    color: #4e4e4e;
   }
 
   .teeka {
-    color: #333;
+    color: #5a5a5a;
+  }
+
+  .transliteration {
+    color: #666;
+  }
+
+  .logo {
+    path {
+      fill: #e0e0e0;
+    }
   }
 
   .controller.presenter-view {

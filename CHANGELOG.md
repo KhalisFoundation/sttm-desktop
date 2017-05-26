@@ -1,5 +1,17 @@
 ## SikhiToTheMax Desktop App
 
+### 3.2.0 - _170526_
+#### Improved
+ * Faster updates - We've reduced the size of the app and subsequent updates by storing the database separately on your device. It now downloads on first run and saves you from re-downloading every time we update the app. When there are updates to the database, those will get pulled transparently and allow you to use the app without interruption.
+
+### 3.1.1 - _170524_
+#### Added
+ * Next Line - Show the next line in the Shabad while presenting
+
+#### Improved
+ * Preferences are now available in the app menu
+ * The History and Shabad Controller panes have been switched in Presenter View for a better experience
+
 ### 3.1.0 - _170506_
 #### Added
  * Presenter View - When presenting on an external monitor, see the controller in a beautiful and highly practical view for better efficiency in controlling the Viewer.
