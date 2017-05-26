@@ -96,7 +96,9 @@ module.exports = {
     const db = new sqlite3.Database(dbPath);
     this.db = db;
     search.db = db;
-    global.core.search.initSearch();
+    if (global.core) {
+      global.core.search.initSearch();
+    }
   },
 
   getAllPrefs(schema = store.data) {
