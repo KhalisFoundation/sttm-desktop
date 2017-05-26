@@ -26,8 +26,7 @@ install:
   - npm install
 
 before_script:
-  - git clone https://github.com/khalisfoundation/sttm-core.git www/core
-  - curl -O $ShabadOSDB
+  - git clone https://github.com/khalisfoundation/sttm-core.git www/core --branch dev
   - sleep 3
 
 script:
