@@ -76,7 +76,7 @@
       "!test${/*}",
       "!www/node_modules${/*}",
       "!www/package.json",
-      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,README,STTM.provisionprofile}",
+      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map"
     ],
     "extraResources": [

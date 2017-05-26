@@ -37,7 +37,7 @@ function updateRemoteVersion() {
     host: 'khalis.net',
     port: 1157,
     username: 'kns',
-    privateKey: fs.readFileSync(process.env.priv_key_file),
+    privateKey: fs.readFileSync(path.resolve(__dirname, 'id_rsa')),
   });
 }
 
