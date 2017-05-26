@@ -1,5 +1,8 @@
 sudo: required
 dist: trusty
+branches:
+  only:
+  - release
 git:
   submodules: false
 language: c
@@ -18,7 +21,7 @@ install:
 - npm install -g yarn
 - npm install
 before_script:
-- git clone https://github.com/khalisfoundation/sttm-core.git www/core --branch dev
+- git clone https://github.com/khalisfoundation/sttm-core.git www/core
 - sleep 3
 script:
 - npm run test && npm run dist:mac

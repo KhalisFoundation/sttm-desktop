@@ -1,4 +1,8 @@
 os: unstable
+branches:
+  only:
+    - release
+skip_non_tags: true
 cache:
   - node_modules
   - '%USERPROFILE%\.electron'
@@ -8,7 +12,7 @@ environment:
   matrix:
     - nodejs_version: 6
 install:
-  - git clone https://github.com/khalisfoundation/sttm-core.git www/core --branch dev
+  - git clone https://github.com/khalisfoundation/sttm-core.git www/core
   - ps: $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
   - ps: $fileContent += $env:priv_key.Replace(' ', "`n")
   - ps: $fileContent += "`n-----END RSA PRIVATE KEY-----`n"
