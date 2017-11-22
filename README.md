@@ -30,4 +30,10 @@ Create file packaging/keys.json using packaging/keys-sample.json and enter locat
  * Run `yarn start` in the repository root
 
 ## Packaging
- * Run `yarn dist:osx` on macOS or `yarn dist:win` and `yarn dist:win32` on Windows to create and upload the app setup and update files
+
+Create the app package for your system:
+
+ * **macOS** - Run `yarn pack:osx`
+ * **Windows 64-bit** - Run `yarn pack:win`
+ * **Windows 32-bit** - Run `yarn pack:win32`
+ * **Linux/Ubuntu 64-bit** - Run `yarn pack:linux`
