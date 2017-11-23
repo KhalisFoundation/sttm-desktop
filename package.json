@@ -14,6 +14,7 @@
     "pack:mac": "yarn build && build --mac",
     "pack:win": "yarn build && build --win --x64",
     "pack:win32": "yarn build && build --win --ia32",
+    "pack:linux": "yarn build && build --linux --x64",
     "upload:mac": "node packaging/upload-mac.js",
     "upload:win": "node packaging/upload-win.js",
     "upload:win32": "node packaging/upload-win32.js",
@@ -114,6 +115,10 @@
       "target": [
         "nsis"
       ]
+    },
+    "linux": {
+      "target": "deb",
+      "icon": "assets"
     }
   }
 }
