@@ -37,3 +37,6 @@ Create the app package for your system:
  * **Windows 64-bit** - Run `yarn pack:win`
  * **Windows 32-bit** - Run `yarn pack:win32`
  * **Linux/Ubuntu 64-bit** - Run `yarn pack:linux`
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md)
