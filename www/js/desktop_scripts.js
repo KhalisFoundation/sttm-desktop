@@ -111,6 +111,10 @@ module.exports = {
     return this.getPref('userPrefs', schema);
   },
 
+  getDefaults() {
+    return store.getDefaults();
+  },
+
   getUserPref(key) {
     return this.getPref(`userPrefs.${key}`);
   },

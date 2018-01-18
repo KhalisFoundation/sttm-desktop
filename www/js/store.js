@@ -37,6 +37,11 @@ class Store {
     }
   }
 
+  // This will return the default values
+  getDefaults() {
+    return this.defaults;
+  }
+
   // This will just return the property on the `data` object
   get(key) {
     return ldGet(this.combined, key);
