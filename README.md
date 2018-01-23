@@ -2,7 +2,7 @@ SikhiToTheMax Desktop App
 =========================
 
 ## Prerequisites
- 1. Node - [https://nodejs.org/en/download/]()
+ 1. Node - [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
  2. yarn - [https://yarnpkg.com/en/docs/install]()
  3. Have the Developer ID certificate for Khalis Foundation installed from Apple Developer Console
  4. pageant on Windows for SSH access to remote server
