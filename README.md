@@ -18,4 +18,13 @@ SikhiToTheMax Desktop App
  * Run `yarn start` in the repository root
 
 ## Packaging
- * Run `yarn pack:osx` on macOS or `yarn pack:win` and `yarn pack:win32` on Windows to create the app setup and update files
+
+Create the app package for your system:
+
+ * **macOS** - Run `yarn pack:osx`
+ * **Windows 64-bit** - Run `yarn pack:win`
+ * **Windows 32-bit** - Run `yarn pack:win32`
+ * **Linux/Ubuntu 64-bit** - Run `yarn pack:linux`
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md)

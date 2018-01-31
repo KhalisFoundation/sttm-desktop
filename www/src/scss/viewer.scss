@@ -168,7 +168,7 @@ h2 {
 }
 
 /* ***** FONT SIZES ***** */
-@for $i from 1 through 12 {
+@for $i from 1 through 20 {
   .gurbani-#{$i} .gurbani,
   .translation-#{$i} .translation,
   .transliteration-#{$i} .transliteration,

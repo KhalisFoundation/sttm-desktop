@@ -74,13 +74,19 @@ module.exports = {
             if (force || curDBHash !== newestDBHash) {
               const dbZip = path.resolve(userDataPath, 'data.zip');
               progress(request('https://khajana.org/data.zip'))
-                .on('progress', state => global.core.search.updateDLProgress(state))
+                .on('progress', (state) => {
+                  const win = remote.getCurrentWindow();
+                  win.setProgressBar(state.percent);
+                  global.core.search.updateDLProgress(state);
+                })
                 .on('end', () => {
                   const zip = new AdmZip(dbZip);
                   zip.extractEntryTo('data.db', userDataPath, true, true);
                   module.exports.initDB();
                   module.exports.setPref('curDBHash', newestDBHash);
                   fs.unlinkSync(dbZip);
+                  const win = remote.getCurrentWindow();
+                  win.setProgressBar(-1);
                 })
                 .pipe(fs.createWriteStream(dbZip));
             }
@@ -103,6 +109,10 @@ module.exports = {
 
   getAllPrefs(schema = store.data) {
     return this.getPref('userPrefs', schema);
+  },
+
+  getDefaults() {
+    return store.getDefaults();
   },
 
   getUserPref(key) {
