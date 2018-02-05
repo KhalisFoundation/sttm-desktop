@@ -34,6 +34,10 @@ global.platform.ipc.on('show-text', (event, data) => {
   module.exports.showText(data.text);
 });
 
+global.platform.ipc.on('show-empty-slide', () => {
+  module.exports.showEmptySlide();
+});
+
 global.platform.ipc.on('update-settings', () => {
   prefs = JSON.parse(window.localStorage.getItem('prefs'));
   core.menu.settings.applySettings(prefs);
@@ -97,5 +101,10 @@ module.exports = {
       $message.removeChild($message.firstChild);
     }
     $message.appendChild(h('div.slide.active', h('h1.gurmukhi.gurbani', text)));
+  },
+
+showEmptySlide() {
+    hideDecks();
+    document.getElementById('empty-slide-button').classList.add('empty-on');
   },
 };

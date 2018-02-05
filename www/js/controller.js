@@ -340,6 +340,11 @@ module.exports = {
     global.platform.ipc.send('show-text', { text });
   },
 
+  sendEmptySlide() {
+    viewer.showEmptySlide();
+    global.platform.ipc.send('show-empty-slide');
+  },
+
   'presenter-view': function presenterView() {
     updateViewerScale();
   },
