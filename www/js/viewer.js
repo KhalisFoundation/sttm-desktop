@@ -103,7 +103,7 @@ module.exports = {
     $message.appendChild(h('div.slide.active', h('h1.gurmukhi.gurbani', text)));
   },
 
-showEmptySlide() {
+  showEmptySlide() {
     hideDecks();
     document.getElementById('empty-slide-button').classList.add('empty-on');
   },

@@ -246,8 +246,8 @@ ipcMain.on('show-empty-slide', (event, arg) => {
       send: 'show-empty-slide',
       data: arg,
     });
-   }
- });
+  }
+});
 
 ipcMain.on('update-settings', () => {
   if (viewerWindow) {
