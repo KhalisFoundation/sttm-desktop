@@ -238,6 +238,17 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
+ipcMain.on('show-empty-slide', (event, arg) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('show-empty-slide', arg);
+  } else {
+    createViewer({
+      send: 'show-empty-slide',
+      data: arg,
+    });
+  }
+});
+
 ipcMain.on('update-settings', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-settings');
