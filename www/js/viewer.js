@@ -31,7 +31,7 @@ global.platform.ipc.on('show-line', (event, data) => {
 });
 
 global.platform.ipc.on('show-text', (event, data) => {
-  module.exports.showText(data.text);
+  module.exports.showText(data.text, data.isGurmukhi);
 });
 
 global.platform.ipc.on('update-settings', () => {
@@ -90,12 +90,13 @@ module.exports = {
     }
   },
 
-  showText(text) {
+  showText(text, isGurmukhi = false) {
     hideDecks();
     $message.classList.add('active');
     while ($message.firstChild) {
       $message.removeChild($message.firstChild);
     }
-    $message.appendChild(h('div.slide.active', h('h1.gurmukhi.gurbani', text)));
+    const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
+    $message.appendChild(h('div.slide.active', textNode));
   },
 };
