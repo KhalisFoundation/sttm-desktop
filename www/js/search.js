@@ -51,21 +51,21 @@ module.exports = {
     });
   },
 
-  loadAdjacentShabad(FirstLine, LastLine, Forward) {
+  loadAdjacentShabad(previousVerseID, nextVerseID, Forward) {
     global.platform.db.all(`
     SELECT
       'previous' as navigation, ShabadID
     FROM
       Shabad
     WHERE
-      VerseID='${FirstLine - 1}'
+      VerseID='${previousVerseID}'
     UNION
     SELECT
       'next' as navigation, ShabadID
     FROM
       Shabad
     WHERE
-      VerseID='${LastLine + 1}'`,
+      VerseID='${nextVerseID}'`,
     (err, adjacentShabads) => {
       if (adjacentShabads.length > 0) {
         const ShabadID = Forward ? adjacentShabads[0].ShabadID : adjacentShabads[1].ShabadID;
