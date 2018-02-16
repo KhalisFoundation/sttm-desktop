@@ -17,6 +17,7 @@ a {
   height: 100%;
 }
 
+#main-viewer,
 #viewer {
   height: 100%;
   width: 100%;
@@ -94,20 +95,10 @@ a {
 }
 
 .scale-viewer {
-  #viewer {
+  #main-viewer {
     border-style: solid;
     border-width: 1px;
     position: fixed;
     transform-origin: right top;
-  }
-
-  /* ***** FONT SIZES ***** */
-  @for $i from 1 through 12 {
-    &.gurbani-#{$i} #viewer .gurbani,
-    &.translation-#{$i} #viewer .translation,
-    &.transliteration-#{$i} #viewer .transliteration,
-    &.teeka-#{$i} #viewer .teeka {
-      font-size: #{$i}em;
-    }
   }
 }

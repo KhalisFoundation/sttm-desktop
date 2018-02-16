@@ -238,6 +238,16 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
+ipcMain.on('scroll-from-main', (event, arg) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('send-scroll', arg);
+  }
+});
+
+ipcMain.on('scroll-pos', (event, arg) => {
+  mainWindow.webContents.send('send-scroll', arg);
+});
+
 ipcMain.on('update-settings', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-settings');

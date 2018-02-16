@@ -1,11 +1,28 @@
 /* global Mousetrap */
 const electron = require('electron');
-const viewer = require('./viewer');
 
 const remote = electron.remote;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
+
+global.webview = document.querySelector('webview');
+
+global.webview.addEventListener('dom-ready', () => {
+  global.webview.send('is-webview');
+});
+
+global.webview.addEventListener('ipc-message', (event) => {
+  switch (event.channel) {
+    case 'scroll-pos': {
+      const pos = event.args[0];
+      global.platform.ipc.send('scroll-from-main', pos);
+      break;
+    }
+    default:
+      break;
+  }
+});
 
 const updateMenu = [
   {
@@ -274,7 +291,7 @@ function updateViewerScale() {
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) / 2}px);`;
   }
   previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(`.scale-viewer #viewer { ${previewStyles} }`);
+  previewStyles = document.createTextNode(`.scale-viewer #main-viewer { ${previewStyles} }`);
   const $previewStyles = document.getElementById('preview-styles');
 
   if ($previewStyles) {
@@ -325,19 +342,37 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[5].visible = true;
 });
 
+global.platform.ipc.on('send-scroll', (event, arg) => {
+  global.webview.send('send-scroll', arg);
+});
+
+function viewerScrollPos(pos) {
+  if (document.body.classList.contains('akhandpaatth') && pos >= 0.9) {
+    global.platform.search.akhandPaatt();
+  }
+}
+
 /* global.platform.ipc.on('openSettings', () => {
   settings.openSettings();
 }); */
 
 module.exports = {
   sendLine(shabadID, lineID) {
-    viewer.showLine(shabadID, lineID);
+    global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
+  updateSettings() {
+    global.webview.send('update-settings');
+    global.platform.ipc.send('update-settings');
+  },
+
   sendText(text) {
-    viewer.showText(text);
     global.platform.ipc.send('show-text', { text });
+  },
+
+  sendScroll(pos) {
+    global.platform.ipc.send('send-scroll', { pos });
   },
 
   'presenter-view': function presenterView() {
