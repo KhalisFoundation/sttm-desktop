@@ -46,6 +46,34 @@ a {
     }
   }
 
+  .preferences-open {
+    display: none;
+  }
+
+  #search-page .preferences-open {
+    display: block;
+  }
+
+  .fixed-takeover-pages {
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    position: fixed;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+  }
+
+  #custom-slides-page {
+    @extend .fixed-takeover-pages;
+
+    left: $presenter-pane-gap;
+    top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+  }
+
+  #menu-page {
+    @extend .fixed-takeover-pages;
+
+    left: $presenter-pane-gap;
+    top: $presenter-pane-gap;
+  }
+
   .nav-page {
     display: block;
     height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));

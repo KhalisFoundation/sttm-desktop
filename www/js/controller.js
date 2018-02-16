@@ -367,8 +367,8 @@ module.exports = {
     global.platform.ipc.send('update-settings');
   },
 
-  sendText(text) {
-    global.platform.ipc.send('show-text', { text });
+  sendText(text, isGurmukhi) {
+    global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
 
   sendScroll(pos) {
