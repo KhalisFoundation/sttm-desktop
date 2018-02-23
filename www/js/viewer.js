@@ -6,6 +6,7 @@
 */
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
+// eslint-disable-next-line no-unused-vars
 const scroll = require('scroll');
 const core = require('./core/js/index');
 
@@ -77,37 +78,37 @@ module.exports = {
       if (!global.platform.db) {
         global.platform.initDB();
       }
-          global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
+      global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
         (err, rows) => {
-        if (rows.length > 0) {
-          const cards = [];
-          rows.forEach((row) => {
-            const gurmukhiShabads = row.Gurmukhi.split(' ');
-            const taggedGurmukhi = [];
-            gurmukhiShabads.forEach((val, index) => {
-              if (val.indexOf(']') !== -1) {
-                taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-              } else {
-                taggedGurmukhi[index] = val;
-              }
+          if (rows.length > 0) {
+            const cards = [];
+            rows.forEach((row) => {
+              const gurmukhiShabads = row.Gurmukhi.split(' ');
+              const taggedGurmukhi = [];
+              gurmukhiShabads.forEach((val, index) => {
+                if (val.indexOf(']') !== -1) {
+                  taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+                } else {
+                  taggedGurmukhi[index] = val;
+                }
+              });
+              const gurmukhiContainer = document.createElement('div');
+              gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+              cards.push(
+                h(
+                    `div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`,
+                  [
+                    h('h1.gurbani.gurmukhi', gurmukhiContainer),
+                    h('h2.translation', row.English),
+                    h('h2.teeka', row.PunjabiUni),
+                    h('h2.transliteration', row.Transliteration),
+                  ]));
             });
-            const gurmukhiContainer = document.createElement('div');
-            gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-            cards.push(
-              h(
-                  `div#slide${row.ID}.slide${row.ID === lineID ? '.active' : ''}`,
-                [
-                  h('h1.gurbani.gurmukhi', gurmukhiContainer),
-                  h('h2.translation', row.English),
-                  h('h2.teeka', row.PunjabiUni),
-                  h('h2.transliteration', row.Transliteration),
-                ]));
-          });
-          hideDecks();
-          $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
-          currentShabad = parseInt(newShabadID, 10);
+            hideDecks();
+            $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
+            currentShabad = parseInt(newShabadID, 10);
             decks.push(newShabadID);
-      }
+          }
         });
     }
   },

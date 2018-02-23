@@ -1,4 +1,5 @@
 $presenter-pane-gap: 25px;
+$titlebar-offset: 25px;
 
 @import
   "../../core/scss/styles.scss",
@@ -64,14 +65,14 @@ a {
     @extend .fixed-takeover-pages;
 
     left: $presenter-pane-gap;
-    top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+    top: calc(50% + calc(#{$presenter-pane-gap + $titlebar-offset} * 0.5));
   }
 
   #menu-page {
     @extend .fixed-takeover-pages;
 
     left: $presenter-pane-gap;
-    top: $presenter-pane-gap;
+    top: $presenter-pane-gap + $titlebar-offset;
   }
 
   .nav-page {
@@ -82,19 +83,19 @@ a {
 
     &:nth-child(1) {
       left: $presenter-pane-gap;
-      top: $presenter-pane-gap;
+      top: $presenter-pane-gap + $titlebar-offset;
     }
 
     &:nth-child(2) {
       height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
       left: auto;
       right: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+      top: calc(50% + calc(#{$presenter-pane-gap + $titlebar-offset} * 0.5));
     }
 
     &:nth-child(3) {
       left: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+      top: calc(50% + calc(#{$presenter-pane-gap + $titlebar-offset} * 0.5));
     }
   }
 
@@ -106,11 +107,11 @@ a {
       }
 
       &:nth-child(1) {
-        top: calc(#{$presenter-pane-gap} + 128px);
+        top: calc(#{$presenter-pane-gap + $titlebar-offset} + 128px);
       }
 
       &:nth-child(2) {
-        top: calc(50% + calc(#{$presenter-pane-gap} * 0.5) + calc(128px / 2));
+        top: calc(50% + calc(#{$presenter-pane-gap + $titlebar-offset} * 0.5) + calc(128px / 2));
       }
     }
   }
