@@ -241,7 +241,7 @@ const macMenu = [
   ...devMenu,
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' ? macMenu : winMenu);
-if (process.platform === 'darwin') {
+if (process.platform === 'darwin' || process.platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
 
@@ -283,11 +283,11 @@ function updateViewerScale() {
   if (fitInsideHeight > proposedHeight) {
     scale = fitInsideWidth / global.viewer.width;
     previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${fitInsidePadding} + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
   } else {
     scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: ${fitInsidePadding};`;
+    previewStyles += `top: calc(${fitInsidePadding} + 25px);`;
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) / 2}px);`;
   }
   previewStyles += `transform: scale(${scale});`;
@@ -324,7 +324,7 @@ window.onresize = () => {
   updateViewerScale();
 };
 
-const menuUpdate = (process.platform === 'darwin' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
@@ -346,6 +346,7 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
   global.webview.send('send-scroll', arg);
 });
 
+// eslint-disable-next-line no-unused-vars
 function viewerScrollPos(pos) {
   if (document.body.classList.contains('akhandpaatth') && pos >= 0.9) {
     global.platform.search.akhandPaatt();
