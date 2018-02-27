@@ -241,7 +241,7 @@ const macMenu = [
   ...devMenu,
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' ? macMenu : winMenu);
-if (process.platform === 'darwin') {
+if (process.platform === 'darwin' || process.platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
 
@@ -324,7 +324,7 @@ window.onresize = () => {
   updateViewerScale();
 };
 
-const menuUpdate = (process.platform === 'darwin' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
