@@ -111,6 +111,7 @@ module.exports = {
           }
         });
     }
+    //document.getElementById(`line${lineID}`).addClass('x');
   },
 
   showText(text, isGurmukhi = false) {
