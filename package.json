@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "ease-component": "^1.0.0",
     "electron-log": "^2.0.2",
     "electron-updater": "^1.11.2",
     "hyperscript": "^2.0.2",

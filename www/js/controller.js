@@ -346,11 +346,9 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
   global.webview.send('send-scroll', arg);
 });
 
-function viewerScrollPos(pos) {
-  if (document.body.classList.contains('akhandpaatth') && pos >= 0.9) {
-    global.platform.search.akhandPaatt();
-  }
-}
+global.platform.ipc.on('next-ang', (event, arg) => {
+  global.core.search.loadAng(arg.PageNo, arg.SourceID);
+});
 
 /* global.platform.ipc.on('openSettings', () => {
   settings.openSettings();
@@ -360,11 +358,6 @@ module.exports = {
   sendLine(shabadID, lineID) {
     global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
-  },
-
-  updateSettings() {
-    global.webview.send('update-settings');
-    global.platform.ipc.send('update-settings');
   },
 
   sendText(text, isGurmukhi) {

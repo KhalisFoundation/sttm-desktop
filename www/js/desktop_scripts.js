@@ -107,6 +107,11 @@ module.exports = {
     }
   },
 
+  updateSettings() {
+    global.webview.send('update-settings');
+    global.platform.ipc.send('update-settings');
+  },
+
   getAllPrefs(schema = store.data) {
     return this.getPref('userPrefs', schema);
   },
