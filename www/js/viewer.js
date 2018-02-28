@@ -7,7 +7,6 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
-const ease = require('ease-component');
 const core = require('./core/js/index');
 
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));

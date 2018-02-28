@@ -10,7 +10,7 @@ module.exports = {
     let condition = '';
     switch (searchType) {
       case 0: // First letter start
-      case 1: // First letter anywhere
+      case 1: { // First letter anywhere
         searchCol = 'v.FirstLetterStr';
         for (let x = 0, len = searchQuery.length; x < len; x += 1) {
           let charCode = searchQuery.charCodeAt(x);
@@ -24,8 +24,14 @@ module.exports = {
         if (searchType === 1) {
           dbQuery = `%${dbQuery}`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' LIMIT 0,20`;
+        // Replace kh with kh pair bindi
+        let bindiQuery = '';
+        if (dbQuery.includes('075')) {
+          bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
+        }
+        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery} LIMIT 0,20`;
         break;
+      }
       case 2: // Full word (Gurmukhi)
       case 3: { // Full word (English)
         if (searchType === 2) {
@@ -95,6 +101,29 @@ module.exports = {
           reject();
         }
       });
+    });
+  },
+
+  loadAdjacentShabad(previousVerseID, nextVerseID, Forward) {
+    global.platform.db.all(`
+    SELECT
+      'previous' as navigation, ShabadID
+    FROM
+      Shabad
+    WHERE
+      VerseID='${previousVerseID}'
+    UNION
+    SELECT
+      'next' as navigation, ShabadID
+    FROM
+      Shabad
+    WHERE
+      VerseID='${nextVerseID}'`,
+    (err, adjacentShabads) => {
+      if (adjacentShabads.length > 0) {
+        const ShabadID = Forward ? adjacentShabads[0].ShabadID : adjacentShabads[1].ShabadID;
+        this.loadShabad(ShabadID, null);
+      }
     });
   },
 };
