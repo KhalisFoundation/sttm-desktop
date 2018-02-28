@@ -72,22 +72,6 @@ html {
   }
 }
 
-.slide.active .translation {
-  animation: backlight 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.slide.active .teeka {
-  animation: backlight 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.slide.active .transliteration {
-  animation: backlight 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.slide.active + .slide .gurbani {
-  animation: blank 0.2s, backlight 1s 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
 .viewer .slide {
   display: flex;
   height: 100%;

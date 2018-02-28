@@ -1,5 +1,5 @@
 $presenter-pane-gap: 25px;
-$title-bar-offset:25px;
+$title-bar-offset: 25px;
 
 @mixin calculateTop ($row-num, $is-windows:0) {
   $screen-offset: 50 * $row-num;
@@ -20,7 +20,8 @@ $title-bar-offset:25px;
   "theme-light",
   "update",
   "viewer",
-  "window";
+  "window",
+  "akhandpaatt";
 
 a {
   cursor: default;

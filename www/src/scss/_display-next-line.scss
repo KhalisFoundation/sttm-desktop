@@ -2,16 +2,9 @@
   .display-next-line.gurbani-#{$i} .deck {
     font-size: #{$i}em;
   }
-
-  .display-next-line.scale-viewer.gurbani-#{$i} #viewer .gurbani,
-  .display-next-line.scale-viewer.translation-#{$i} #viewer .translation,
-  .display-next-line.scale-viewer.transliteration-#{$i} #viewer .transliteration,
-  .display-next-line.scale-viewer.teeka-#{$i} #viewer .teeka {
-    font-size: calc(#{$i}em / 10);
-  }
 }
 
-.display-next-line {
+.display-next-line:not(.akhandpaatt) {
   .deck {
     height: calc(100% - #{$viewer-padding} * 1);
   }
@@ -27,16 +20,32 @@
 
   .slide.active {
     display: inline-block;
-  }
 
-  .slide.active + .slide {
-    display: inline-block;
-    padding-top: 0.25em;
+    & + .slide {
+      display: inline-block;
+      padding-top: 0.25em;
 
-    .translation,
-    .transliteration,
+      .gurbani {
+        animation: blank 0.2s, backlight 1s 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+      }
+
+      .translation,
+      .transliteration,
+      .teeka {
+        display: none;
+      }
+    }
+
+    .translation {
+      animation: backlight 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+
     .teeka {
-      display: none;
+      animation: backlight 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+
+    .transliteration {
+      animation: backlight 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
     }
   }
 }
