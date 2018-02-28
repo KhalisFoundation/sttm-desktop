@@ -50,4 +50,27 @@ module.exports = {
       }
     });
   },
+
+  loadAdjacentShabad(previousVerseID, nextVerseID, Forward) {
+    global.platform.db.all(`
+    SELECT
+      'previous' as navigation, ShabadID
+    FROM
+      Shabad
+    WHERE
+      VerseID='${previousVerseID}'
+    UNION
+    SELECT
+      'next' as navigation, ShabadID
+    FROM
+      Shabad
+    WHERE
+      VerseID='${nextVerseID}'`,
+    (err, adjacentShabads) => {
+      if (adjacentShabads.length > 0) {
+        const ShabadID = Forward ? adjacentShabads[0].ShabadID : adjacentShabads[1].ShabadID;
+        this.loadShabad(ShabadID, null);
+      }
+    });
+  },
 };
