@@ -169,9 +169,15 @@ const winMenu = [
       },
       ...updateMenu,
       {
+        label: 'Guide...',
+        click: () => {
+          main.openSecondaryWindow('helpWindow');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
-          main.openChangelog();
+          main.openSecondaryWindow('changelogWindow');
         },
       },
     ],
@@ -189,9 +195,15 @@ const macMenu = [
       },
       ...updateMenu,
       {
+        label: 'Guide...',
+        click: () => {
+          main.openSecondaryWindow('helpWindow');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
-          main.openChangelog();
+          main.openSecondaryWindow('changelogWindow');
         },
       },
       {
