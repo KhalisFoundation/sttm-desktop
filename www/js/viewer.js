@@ -83,7 +83,7 @@ module.exports = {
       if (!global.platform.db) {
         global.platform.initDB();
       }
-      global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
+      global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni, v.Punjabi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
         (err, rows) => {
           if (rows.length > 0) {
             const cards = [];
@@ -110,7 +110,7 @@ module.exports = {
                   h('h2.transliteration', row.Transliteration),
                 ]));
 
-              newShabad[row.ID] = { gurmukhi: row.Gurmukhi, translation: row.English, teeka: row.PunjabiUni, transliteration: row.Transliteration };
+              newShabad[row.ID] = { gurmukhi: row.Gurmukhi, translation: row.English, teeka: row.Punjabi, transliteration: row.Transliteration };
             });
             hideDecks();
             $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
