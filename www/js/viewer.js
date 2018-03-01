@@ -12,7 +12,7 @@ const core = require('./core/js/index');
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));
 let isWebView = false;
 
-const decks = [];
+const decks = {};
 let currentShabad;
 const $message = document.getElementById('message');
 const $body = document.body;
@@ -37,6 +37,11 @@ function hideDecks() {
   Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.remove('active');
   });
+}
+
+function castShabadLine(lineID) {
+  const lineToDisplay = decks[currentShabad][lineID];
+  sendMessage(lineToDisplay.gurmukhi);
 }
 
 // IPC
@@ -64,7 +69,7 @@ global.platform.ipc.on('update-settings', () => {
 module.exports = {
   showLine(shabadID, lineID) {
     const newShabadID = parseInt(shabadID, 10);
-    if (decks.indexOf(newShabadID) > -1) {
+    if (newShabadID in decks) {
       const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
       if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
         hideDecks();
@@ -73,6 +78,7 @@ module.exports = {
       }
       Array.from($shabadDeck.querySelectorAll('.slide')).forEach(el => el.classList.remove('active'));
       document.getElementById(`slide${lineID}`).classList.add('active');
+      castShabadLine(lineID);
     } else {
       if (!global.platform.db) {
         global.platform.initDB();
@@ -81,6 +87,7 @@ module.exports = {
         (err, rows) => {
           if (rows.length > 0) {
             const cards = [];
+            const newShabad = {};
             rows.forEach((row) => {
               const gurmukhiShabads = row.Gurmukhi.split(' ');
               const taggedGurmukhi = [];
@@ -102,16 +109,17 @@ module.exports = {
                   h('h2.teeka', row.PunjabiUni),
                   h('h2.transliteration', row.Transliteration),
                 ]));
-              sendMessage(row.Gurmukhi);
+
+              newShabad[row.ID] = { gurmukhi: row.Gurmukhi, translation: row.English, teeka: row.PunjabiUni, transliteration: row.Transliteration };
             });
             hideDecks();
             $viewer.appendChild(h(`div#shabad${newShabadID}.deck.active`, cards));
             currentShabad = parseInt(newShabadID, 10);
-            decks.push(newShabadID);
+            decks[newShabadID] = newShabad;
+            castShabadLine(lineID);
           }
         });
     }
-    //sendMessage(newShabadID);
   },
 
   showText(text, isGurmukhi = false) {
