@@ -244,6 +244,13 @@ ipcMain.on('scroll-from-main', (event, arg) => {
   }
 });
 
+ipcMain.on('next-ang', (event, arg) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('show-ang', arg);
+  }
+  mainWindow.webContents.send('next-ang', arg);
+});
+
 ipcMain.on('scroll-pos', (event, arg) => {
   mainWindow.webContents.send('send-scroll', arg);
 });

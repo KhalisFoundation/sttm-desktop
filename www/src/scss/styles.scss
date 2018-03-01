@@ -1,4 +1,17 @@
 $presenter-pane-gap: 25px;
+$title-bar-offset: 25px;
+
+@mixin calculateTop ($row-num, $is-windows:0) {
+  $screen-offset: 50 * $row-num;
+
+  @if $is-windows == 0 {
+    top: calc(#{$screen-offset}% + calc(#{$presenter-pane-gap} * 0.5));
+  }
+
+  @else if $is-windows == 1 {
+    top: calc(#{$screen-offset}% + calc(#{$presenter-pane-gap + $title-bar-offset} * 0.5));
+  }
+}
 
 @import
   "../../core/scss/styles.scss",
@@ -7,7 +20,8 @@ $presenter-pane-gap: 25px;
   "theme-light",
   "update",
   "viewer",
-  "window";
+  "window",
+  "akhandpaatt";
 
 a {
   cursor: default;
@@ -64,14 +78,16 @@ a {
     @extend .fixed-takeover-pages;
 
     left: $presenter-pane-gap;
-    top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+
+    @include calculateTop(1);
   }
 
   #menu-page {
     @extend .fixed-takeover-pages;
 
     left: $presenter-pane-gap;
-    top: $presenter-pane-gap;
+
+    @include calculateTop(0);
   }
 
   .nav-page {
@@ -82,19 +98,22 @@ a {
 
     &:nth-child(1) {
       left: $presenter-pane-gap;
-      top: $presenter-pane-gap;
+
+      @include calculateTop(0);
     }
 
     &:nth-child(2) {
       height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
       left: auto;
       right: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+
+      @include calculateTop(1);
     }
 
     &:nth-child(3) {
       left: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+
+      @include calculateTop(1);
     }
   }
 
@@ -105,13 +124,8 @@ a {
         height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - calc(128px / 2));
       }
 
-      &:nth-child(1) {
-        top: calc(#{$presenter-pane-gap} + 128px);
-      }
-
-      &:nth-child(2) {
-        top: calc(50% + calc(#{$presenter-pane-gap} * 0.5) + calc(128px / 2));
-      }
+      &:nth-child(1),
+      &:nth-child(2) { @include calculateTop(1); }
     }
   }
 
@@ -129,4 +143,13 @@ a {
     position: fixed;
     transform-origin: right top;
   }
+}
+
+.controller.scale-viewer.presenter-view.win32 {
+  .nav-page:nth-child(1),
+  #menu-page { @include calculateTop(0, 1); }
+
+  .nav-page:nth-child(2),
+  .nav-page:nth-child(3),
+  #custom-slides-page { @include calculateTop(1, 1); }
 }
