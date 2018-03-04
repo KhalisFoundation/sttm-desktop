@@ -151,14 +151,14 @@ a {
   #menu-page { @include calculateTop(0, 1); }
 
   #navigator.kb-active {
-    $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(128px / 2));
+    $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
 
     .nav-page {
       &:nth-child(1) {
         height: $height;
       }
 
-      &:nth-child(1) { @include calculateTop(0,1,128px); }
+      &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     }
   }
 }
