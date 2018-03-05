@@ -1,15 +1,16 @@
 $presenter-pane-gap: 25px;
 $title-bar-offset: 25px;
+$keyboard-height:128px;
 
-@mixin calculateTop ($row-num, $is-windows:0) {
+@mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
   $screen-offset: 50 * $row-num;
 
   @if $is-windows == 0 {
-    top: calc(#{$screen-offset}% + calc(#{$presenter-pane-gap} * 0.5));
+    top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $keyboard-offset});
   }
 
   @else if $is-windows == 1 {
-    top: calc(#{$screen-offset}% + calc(#{$presenter-pane-gap + $title-bar-offset} * 0.5));
+    top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
   }
 }
 
@@ -118,14 +119,14 @@ a {
   }
 
   #navigator.kb-active {
+    $height:calc(50% - calc(#{$presenter-pane-gap} * 3) - calc(#{$keyboard-height} / 2));
+
     .nav-page {
-      &:nth-child(1),
-      &:nth-child(2) {
-        height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - calc(128px / 2));
+      &:nth-child(1) {
+        height: $height;
       }
 
-      &:nth-child(1),
-      &:nth-child(2) { @include calculateTop(1); }
+      &:nth-child(1) { @include calculateTop(0,0,$keyboard-height); }
     }
   }
 
@@ -149,7 +150,15 @@ a {
   .nav-page:nth-child(1),
   #menu-page { @include calculateTop(0, 1); }
 
-  .nav-page:nth-child(2),
-  .nav-page:nth-child(3),
-  #custom-slides-page { @include calculateTop(1, 1); }
+  #navigator.kb-active {
+    $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
+
+    .nav-page {
+      &:nth-child(1) {
+        height: $height;
+      }
+
+      &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
+    }
+  }
 }
