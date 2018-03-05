@@ -63,6 +63,7 @@
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
     "marked": "^0.3.6",
+    "npm": "^5.7.1",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "scroll": "^2.0.1",

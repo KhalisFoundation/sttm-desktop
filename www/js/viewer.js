@@ -47,7 +47,7 @@ function hideDecks() {
 
 function castShabadLine(lineID) {
   const lineToDisplay = decks[currentShabad][lineID];
-  appendMessage(lineToDisplay.gurmukhi);
+  sendMessage(JSON.stringify(lineToDisplay));
 }
 
 // IPC
