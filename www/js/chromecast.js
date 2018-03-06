@@ -1,9 +1,20 @@
+/* eslint
+  global-require: 0,
+  import/no-unresolved: 0,
+  no-inner-declarations: 0,
+  no-use-before-define: 0,
+  no-console: 0,
+  no-shadow: 0,
+  no-unused-vars: 0,
+  no-undef: 0,
+  prefer-template: 0
+*/
 let trigID = 0;
 const receiverFn = receivers =>
   new Promise((resolve) => {
     let dialog = document.createElement('paper-dialog');
     trigID += 1;
-    const body = document.getElementById('choose_device');
+    const body = document.getElementById('choose-device');
 
     const title = 'Choose Cast Device';
     const h3 = document.createElement('h3');
@@ -35,26 +46,13 @@ const applicationID = 'ECF05819';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
 
-function reqSession() {
-  initializeCastApi();
-  chrome.cast.requestSession(onRequestSessionSuccess, onError);
-}
-
-function clearDebugAll() {
-  var debugarea = document.getElementById('debugmessage');
-  debugarea.innerHTML = "";
-}
-
 /**
- * initialization
+ * append message to debug message window
+ * @param {string} message A message string
  */
-function initializeCastApi() {
-  appendMessage('initializing');
-  var sessionRequest = new chrome.cast.SessionRequest(applicationID);
-  var apiConfig = new chrome.cast.ApiConfig(sessionRequest,
-    sessionListener,
-    receiverListener);
-  chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+function appendMessage(message) {
+  console.log(message);
+  // document.getElementById('debugmessage').innerHTML += '\n' + JSON.stringify(message);
 }
 
 /**
@@ -62,7 +60,6 @@ function initializeCastApi() {
  */
 function onInitSuccess() {
   appendMessage('onInitSuccess');
-  //chrome.cast.requestSession(onRequestSessionSuccess, onError);
 }
 
 /**
@@ -77,35 +74,21 @@ function onRequestSessionSuccess(e) {
   session = e;
 }
 
-/**
- * initialization error callback
- */
-function onError(message) {
-  appendMessage('onError: ' + JSON.stringify(message));
+function reqSession() {
+  initializeCastApi();
+  chrome.cast.requestSession(onRequestSessionSuccess, onError);
 }
 
-/**
- * callback on success for stopping app
- */
-function onStopAppSuccess() {
-  appendMessage('onStopAppSuccess');
-}
-
-/**
- * session listener during initialization
- */
-function sessionListener(e) {
-  appendMessage('New session ID:' + e.sessionId);
-  session = e;
-  session.addUpdateListener(sessionUpdateListener);
-  session.addMessageListener(namespace, receiverMessage);
+function clearDebugAll() {
+  const debugarea = document.getElementById('debugmessage');
+  debugarea.innerHTML = '';
 }
 
 /**
  * listener for session updates
  */
 function sessionUpdateListener(isAlive) {
-  var message = isAlive ? 'Session Updated' : 'Session Removed';
+  let message = isAlive ? 'Session Updated' : 'Session Removed';
   message += ': ' + session.sessionId;
   appendMessage(message);
   if (!isAlive) {
@@ -123,15 +106,50 @@ function receiverMessage(namespace, message) {
 }
 
 /**
+ * session listener during initialization
+ */
+function sessionListener(e) {
+  appendMessage('New session ID:' + e.sessionId);
+  session = e;
+  session.addUpdateListener(sessionUpdateListener);
+  session.addMessageListener(namespace, receiverMessage);
+}
+
+/**
  * receiver listener during initialization
  */
 function receiverListener(e) {
   if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
     appendMessage('receiver found');
+  } else {
+    appendMessage('receiver list empty: ' + e);
   }
-  else {
-    appendMessage('receiver list empty' + e);
-  }
+}
+
+/**
+ * initialization error callback
+ */
+function onError(message) {
+  appendMessage('onError: ' + JSON.stringify(message));
+}
+
+/**
+ * initialization
+ */
+function initializeCastApi() {
+  appendMessage('initializing');
+  const sessionRequest = new chrome.cast.SessionRequest(applicationID);
+  const apiConfig = new chrome.cast.ApiConfig(sessionRequest,
+    sessionListener,
+    receiverListener);
+  chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+}
+
+/**
+ * callback on success for stopping app
+ */
+function onStopAppSuccess() {
+  appendMessage('onStopAppSuccess');
 }
 
 /**
@@ -150,32 +168,7 @@ function sendMessage(message) {
   if (session != null) {
     session.sendMessage(namespace, message, onSuccess.bind(this, 'Message sent: ' + message),
       onError);
-  }
-  else {
+  } else {
     appendMessage('Cannot send because session is null');
   }
-}
-
-/**
- * append message to debug message window
- * @param {string} message A message string
- */
-function appendMessage(message) {
-  console.log(message);
-  document.getElementById('debugmessage').innerHTML += '\n' + JSON.stringify(message);
-}
-
-/**
- * utility function to handle text typed in by user in the input field
- */
-function update() {
-  sendMessage(document.getElementById('input').value);
-}
-
-/**
- * handler for the transcribed text from the speech input
- * @param {string} words A transcibed speech string
- */
-function transcribe(words) {
-  sendMessage(words);
 }

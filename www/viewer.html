@@ -43,11 +43,15 @@
       </ul>
     </div>
     <br><br>
-      <button onclick="reqSession()">request session!</button>
-      <div id="choose_device"></div>
-      <textarea rows="20" cols="70" id="debugmessage">
+
+      <button id="request-session">request session!</button>
+      <script>
+        document.getElementById('request-session').addEventListener("click", reqSession);
+      </script>
+      <div id="choose-device"></div>
+      <!-- <textarea rows="20" cols="70" id="debugmessage">
         </textarea>
-        <button onclick="clearDebugAll()">clear!</button><br>
+        <button onclick="clearDebugAll()">clear!</button><br> -->
 
     <div id="viewer">
       <div class="deck" id="message"></div>

@@ -2,7 +2,8 @@
   global-require: 0,
   import/no-unresolved: 0,
   no-inner-declarations: 0,
-  no-use-before-define: 0
+  no-use-before-define: 0,
+  no-undef: 0
 */
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
@@ -47,6 +48,12 @@ function hideDecks() {
 
 function castShabadLine(lineID) {
   const lineToDisplay = decks[currentShabad][lineID];
+  let nextLine = '';
+  if (decks[currentShabad][lineID + 1]) {
+    nextLine = decks[currentShabad][lineID + 1].gurmukhi;
+  }
+  lineToDisplay.nextLine = nextLine;
+  lineToDisplay.prefs = JSON.parse(window.localStorage.getItem('prefs'));
   sendMessage(JSON.stringify(lineToDisplay));
 }
 
@@ -126,7 +133,10 @@ function createCards(rows, LineID) {
               h('h2.teeka', row.PunjabiUni),
               h('h2.transliteration', row.Transliteration),
             ]));
-        shabad[row.ID] = { gurmukhi: row.Gurmukhi, translation: row.English, teeka: row.Punjabi, transliteration: row.Transliteration };
+        shabad[row.ID] = { gurmukhi: row.Gurmukhi,
+          translation: row.English,
+          teeka: row.Punjabi,
+          transliteration: row.Transliteration };
       });
       resolve({ cards, lines, shabad });
     }
