@@ -43,10 +43,12 @@
       </ul>
     </div>
     <br><br>
-
       <button id="request-session">request session!</button>
       <script>
-        document.getElementById('request-session').addEventListener("click", reqSession);
+      var element = document.getElementById('request-session');
+      element.onclick = function() {
+        reqSession();
+      }
       </script>
       <div id="choose-device"></div>
       <!-- <textarea rows="20" cols="70" id="debugmessage">
