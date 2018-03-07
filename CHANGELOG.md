@@ -5,6 +5,7 @@
  * Akhand Paatth View - Infinitely scroll through Angs/pages until the end of the Granth
  * Navigation Arrows - Go to the next/previous Shabad with the click of a button!
  * Custom Slides - Send custom text to the presenter or choose from presets. Don't want anything on the screen? You can even send a blank slide.
+ * Unsure which was the last Antraa that was sung? We've got checkmarks to indicate what lines you have already clicked.
 
 #### Improved
  * Download progress - See the progress of the database download right on the app icon
