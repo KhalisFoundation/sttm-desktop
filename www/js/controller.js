@@ -360,6 +360,11 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 }); */
 
 module.exports = {
+  clearAPV() {
+    global.webview.send('clear-apv');
+    global.platform.ipc.send('clear-apv');
+  },
+
   sendLine(shabadID, lineID) {
     global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
