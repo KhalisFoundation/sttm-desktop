@@ -91,6 +91,10 @@ function createAPVContainer() {
       $apvObserver = new IntersectionObserver(nextAng);
     }
   }
+  if (!$apv.classList.contains('active')) {
+    hideDecks();
+    $apv.classList.add('active');
+  }
 }
 
 function createCards(rows, LineID) {
