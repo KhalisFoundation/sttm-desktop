@@ -366,6 +366,7 @@ module.exports = {
   },
 
   sendText(text, isGurmukhi) {
+    global.webview.send('show-text', { text, isGurmukhi });
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
 
