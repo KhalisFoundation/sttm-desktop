@@ -1,11 +1,28 @@
 /* global Mousetrap */
 const electron = require('electron');
-const viewer = require('./viewer');
 
 const remote = electron.remote;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
+
+global.webview = document.querySelector('webview');
+
+global.webview.addEventListener('dom-ready', () => {
+  global.webview.send('is-webview');
+});
+
+global.webview.addEventListener('ipc-message', (event) => {
+  switch (event.channel) {
+    case 'scroll-pos': {
+      const pos = event.args[0];
+      global.platform.ipc.send('scroll-from-main', pos);
+      break;
+    }
+    default:
+      break;
+  }
+});
 
 const updateMenu = [
   {
@@ -223,8 +240,8 @@ const macMenu = [
   ...menuTemplate,
   ...devMenu,
 ];
-const menu = Menu.buildFromTemplate(process.platform === 'darwin' ? macMenu : winMenu);
-if (process.platform === 'darwin') {
+const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
+if (process.platform === 'darwin' || process.platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
 
@@ -251,6 +268,7 @@ function updateViewerScale() {
   const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('navigator') : document.body;
   let scale = 1;
   let previewStyles = '';
+  let previewWinStyles = '';
   previewStyles += `width: ${global.viewer.width}px;`;
   previewStyles += `height: ${global.viewer.height}px;`;
   previewStyles += `font-size: ${global.viewer.height / 100}px;`;
@@ -267,14 +285,18 @@ function updateViewerScale() {
     scale = fitInsideWidth / global.viewer.width;
     previewStyles += `right: ${fitInsidePadding};`;
     previewStyles += `top: calc(${fitInsidePadding} + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
   } else {
     scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
     previewStyles += `top: ${fitInsidePadding};`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px);`;
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) / 2}px);`;
   }
   previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(`.scale-viewer #viewer { ${previewStyles} }`);
+  previewStyles = document.createTextNode(
+    `.scale-viewer #main-viewer { ${previewStyles} }
+    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`);
   const $previewStyles = document.getElementById('preview-styles');
 
   if ($previewStyles) {
@@ -307,7 +329,7 @@ window.onresize = () => {
   updateViewerScale();
 };
 
-const menuUpdate = (process.platform === 'darwin' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
@@ -325,19 +347,36 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[5].visible = true;
 });
 
+global.platform.ipc.on('send-scroll', (event, arg) => {
+  global.webview.send('send-scroll', arg);
+});
+
+global.platform.ipc.on('next-ang', (event, arg) => {
+  global.core.search.loadAng(arg.PageNo, arg.SourceID);
+});
+
 /* global.platform.ipc.on('openSettings', () => {
   settings.openSettings();
 }); */
 
 module.exports = {
+  clearAPV() {
+    global.webview.send('clear-apv');
+    global.platform.ipc.send('clear-apv');
+  },
+
   sendLine(shabadID, lineID) {
-    viewer.showLine(shabadID, lineID);
+    global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
-  sendText(text) {
-    viewer.showText(text);
-    global.platform.ipc.send('show-text', { text });
+  sendText(text, isGurmukhi) {
+    global.webview.send('show-text', { text, isGurmukhi });
+    global.platform.ipc.send('show-text', { text, isGurmukhi });
+  },
+
+  sendScroll(pos) {
+    global.platform.ipc.send('send-scroll', { pos });
   },
 
   'presenter-view': function presenterView() {

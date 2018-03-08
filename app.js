@@ -216,6 +216,12 @@ app.on('window-all-closed', () => {
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
+ipcMain.on('clear-apv', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('clear-apv');
+  }
+});
+
 ipcMain.on('show-line', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
@@ -236,6 +242,23 @@ ipcMain.on('show-text', (event, arg) => {
       data: arg,
     });
   }
+});
+
+ipcMain.on('scroll-from-main', (event, arg) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('send-scroll', arg);
+  }
+});
+
+ipcMain.on('next-ang', (event, arg) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('show-ang', arg);
+  }
+  mainWindow.webContents.send('next-ang', arg);
+});
+
+ipcMain.on('scroll-pos', (event, arg) => {
+  mainWindow.webContents.send('send-scroll', arg);
 });
 
 ipcMain.on('update-settings', () => {

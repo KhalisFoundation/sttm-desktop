@@ -1,4 +1,23 @@
 $presenter-pane-gap: 25px;
+$title-bar-offset: 25px;
+$keyboard-height:128px;
+
+@mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
+  $screen-offset: 50 * $row-num;
+  $pane-gap-ratio: 1;
+
+  @if $row-num == 1 {
+    $pane-gap-ratio: 0.5;
+  }
+
+  @if $is-windows == 0 {
+    top: calc(#{$screen-offset}% + #{($presenter-pane-gap * $pane-gap-ratio) + $keyboard-offset});
+  }
+
+  @else if $is-windows == 1 {
+    top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
+  }
+}
 
 @import
   "../../core/scss/styles.scss",
@@ -7,7 +26,8 @@ $presenter-pane-gap: 25px;
   "theme-light",
   "update",
   "viewer",
-  "window";
+  "window",
+  "akhandpaatt";
 
 a {
   cursor: default;
@@ -17,6 +37,7 @@ a {
   height: 100%;
 }
 
+#main-viewer,
 #viewer {
   height: 100%;
   width: 100%;
@@ -45,6 +66,36 @@ a {
     }
   }
 
+  .preferences-open {
+    display: none;
+  }
+
+  #search-page .preferences-open {
+    display: block;
+  }
+
+  .fixed-takeover-pages {
+    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+    position: fixed;
+    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+  }
+
+  #custom-slides-page {
+    @extend .fixed-takeover-pages;
+
+    left: $presenter-pane-gap;
+
+    @include calculateTop(1);
+  }
+
+  #menu-page {
+    @extend .fixed-takeover-pages;
+
+    left: $presenter-pane-gap;
+
+    @include calculateTop(0);
+  }
+
   .nav-page {
     display: block;
     height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
@@ -53,36 +104,34 @@ a {
 
     &:nth-child(1) {
       left: $presenter-pane-gap;
-      top: $presenter-pane-gap;
+
+      @include calculateTop(0);
     }
 
     &:nth-child(2) {
       height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
       left: auto;
       right: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+
+      @include calculateTop(1);
     }
 
     &:nth-child(3) {
       left: $presenter-pane-gap;
-      top: calc(50% + calc(#{$presenter-pane-gap} * 0.5));
+
+      @include calculateTop(1);
     }
   }
 
   #navigator.kb-active {
+    $height:calc(50% - calc(#{$presenter-pane-gap} * 3) - calc(#{$keyboard-height} / 2));
+
     .nav-page {
-      &:nth-child(1),
-      &:nth-child(2) {
-        height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - calc(128px / 2));
-      }
-
       &:nth-child(1) {
-        top: calc(#{$presenter-pane-gap} + 128px);
+        height: $height;
       }
 
-      &:nth-child(2) {
-        top: calc(50% + calc(#{$presenter-pane-gap} * 0.5) + calc(128px / 2));
-      }
+      &:nth-child(1) { @include calculateTop(0,0,$keyboard-height); }
     }
   }
 
@@ -94,20 +143,27 @@ a {
 }
 
 .scale-viewer {
-  #viewer {
+  #main-viewer {
     border-style: solid;
     border-width: 1px;
     position: fixed;
     transform-origin: right top;
   }
+}
 
-  /* ***** FONT SIZES ***** */
-  @for $i from 1 through 12 {
-    &.gurbani-#{$i} #viewer .gurbani,
-    &.translation-#{$i} #viewer .translation,
-    &.transliteration-#{$i} #viewer .transliteration,
-    &.teeka-#{$i} #viewer .teeka {
-      font-size: #{$i}em;
+.controller.scale-viewer.presenter-view.win32 {
+  .nav-page:nth-child(1),
+  #menu-page { @include calculateTop(0, 1); }
+
+  #navigator.kb-active {
+    $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
+
+    .nav-page {
+      &:nth-child(1) {
+        height: $height;
+      }
+
+      &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     }
   }
 }

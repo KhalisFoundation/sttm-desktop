@@ -1,0 +1,16 @@
+.akhandpaatt {
+  .deck {
+    display: none;
+    height: auto;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  .slide {
+    display: block;
+    opacity: 1;
+    position: relative;
+  }
+}
