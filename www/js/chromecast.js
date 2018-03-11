@@ -12,32 +12,40 @@
 let trigID = 0;
 const receiverFn = receivers =>
   new Promise((resolve) => {
-    let dialog = document.createElement('paper-dialog');
     trigID += 1;
-    const body = document.getElementById('choose-device');
-
-    const title = 'Choose Cast Device';
-    const h3 = document.createElement('h3');
-    h3.textContent = title;
-    dialog.appendChild(h3);
-
-    const listContainer = document.createElement('paper-listbox');
-    receivers.forEach((receiver) => {
-      const cast = document.createElement('button');
-      cast.textContent = receiver.friendlyName;
-      cast.setAttribute('data-reciever-id', `${receiver.ipAddress}_${receiver.port}_${trigID}`);
-      listContainer.appendChild(cast);
-      document.body.addEventListener('click', (e) => {
-        if (e.target.getAttribute('data-reciever-id') === `${receiver.ipAddress}_${receiver.port}_${trigID}`) {
-          dialog.parentNode.removeChild(dialog);
-          dialog = null;
-          resolve(receiver);
-          appendMessage(receiver);
-        }
-      });
+    // instanciate new modal
+    const modal = new tingle.Modal({
+      footer: true,
+      stickyFooter: false,
+      closeMethods: ['overlay', 'button', 'escape'],
     });
-    dialog.appendChild(listContainer);
-    body.appendChild(dialog);
+    let numReceivers = 0;
+    receivers.forEach((receiver) => {
+      if (receiver.service_fullname.includes('Chromecast')) {
+        numReceivers += 1;
+      // add a button
+        modal.addCastBtn(receiver.friendlyName, 'tingle-btn tingle-btn--primary', `${receiver.ipAddress}_${receiver.port}_${trigID}`, (e) => {
+          if (e.target.getAttribute('data-reciever-id') === `${receiver.ipAddress}_${receiver.port}_${trigID}`) {
+            resolve(receiver);
+            appendMessage(receiver);
+          }
+          modal.close();
+        });
+      }
+    });
+
+    // set content
+    const message = numReceivers === 0 ? 'No Chromecast devices found' : 'Select Cast device';
+    modal.setContent('<h2>' + message + '</h2>');
+    // add another button
+    const cancelTitle = numReceivers === 0 ? 'OK' : 'Cancel';
+    modal.addFooterBtn(cancelTitle, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+      // here goes some logic
+      modal.close();
+    });
+
+    // open modal
+    modal.open();
   });
 
 require('electron-chromecast')(receiverFn);
@@ -52,7 +60,6 @@ let session = null;
  */
 function appendMessage(message) {
   console.log(message);
-  // document.getElementById('debugmessage').innerHTML += '\n' + JSON.stringify(message);
 }
 
 /**
@@ -72,16 +79,12 @@ function onSuccess(message) {
 function onRequestSessionSuccess(e) {
   appendMessage('onRequestSessionSuccess');
   session = e;
+  global.platform.ipc.send('cast-session-active');
 }
 
-function reqSession() {
+function requestSession() {
   initializeCastApi();
   chrome.cast.requestSession(onRequestSessionSuccess, onError);
-}
-
-function clearDebugAll() {
-  const debugarea = document.getElementById('debugmessage');
-  debugarea.innerHTML = '';
 }
 
 /**
@@ -93,6 +96,7 @@ function sessionUpdateListener(isAlive) {
   appendMessage(message);
   if (!isAlive) {
     session = null;
+    global.platform.ipc.send('cast-session-stopped');
   }
 }
 
@@ -156,6 +160,7 @@ function onStopAppSuccess() {
  * stop app/session
  */
 function stopApp() {
+  global.platform.ipc.send('cast-session-stopped');
   session.stop(onStopAppSuccess, onError);
 }
 

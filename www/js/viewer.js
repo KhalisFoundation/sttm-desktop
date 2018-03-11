@@ -57,7 +57,27 @@ function castShabadLine(lineID) {
   sendMessage(JSON.stringify(lineToDisplay));
 }
 
+function castText(text, isGurmukhi) {
+  let lineToDisplay;
+  if (isGurmukhi === true) {
+    lineToDisplay.gurmukhi = text;
+  } else {
+    lineToDisplay.translation = text;
+  }
+  sendMessage(JSON.stringify(lineToDisplay));
+}
+
 // IPC
+global.platform.ipc.on('search-cast', (event, pos) => {
+  requestSession();
+  appendMessage(event);
+  appendMessage(pos);
+});
+
+global.platform.ipc.on('stop-cast', () => {
+  stopApp();
+});
+
 global.platform.ipc.on('is-webview', () => {
   isWebView = true;
   document.body.classList.add('webview');
@@ -232,4 +252,5 @@ function showText(text, isGurmukhi = false) {
   }
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
+  castText(textNode, isGurmukhi);
 }

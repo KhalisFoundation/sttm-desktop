@@ -67,7 +67,8 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "scroll": "^2.0.1",
-    "sqlite3": "^3.1.13"
+    "sqlite3": "^3.1.13",
+    "update": "^0.7.4"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
