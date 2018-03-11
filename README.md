@@ -2,6 +2,7 @@ SikhiToTheMax Desktop App
 =========================
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [![Build Status](https://api.travis-ci.org/KhalisFoundation/sttm-desktop.svg?branch=release)](https://travis-ci.org/KhalisFoundation/sttm-desktop) [![Build Status](https://ci.appveyor.com/api/projects/status/github/khalisfoundation/sttm-desktop?branch=release&svg=true)](https://ci.appveyor.com/project/navdeepsinghkhalsa/sttm-desktop)
 =======
 ## Prerequisites
@@ -15,6 +16,9 @@ SikhiToTheMax Desktop App
  7. Windows
    * Set `CSC_LINK` and `CSC_KEY_PASSWORD` environment variables with the .p12 path and decryption password respectively
 >>>>>>> KhalisFoundation/master
+=======
+[![Build Status](https://api.travis-ci.org/KhalisFoundation/sttm-desktop.svg?branch=release)](https://travis-ci.org/KhalisFoundation/sttm-desktop) [![Build Status](https://ci.appveyor.com/api/projects/status/github/khalisfoundation/sttm-desktop?branch=release&svg=true)](https://ci.appveyor.com/project/navdeepsinghkhalsa/sttm-desktop)
+>>>>>>> KhalisFoundation/dev
 
 ## Prerequisites
  1. [Node](https://nodejs.org/en/download/)

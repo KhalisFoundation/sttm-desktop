@@ -224,6 +224,12 @@ ipcMain.on('cast-session-stopped', () => {
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
+ipcMain.on('clear-apv', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('clear-apv');
+  }
+});
+
 ipcMain.on('show-line', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);

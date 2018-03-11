@@ -82,6 +82,23 @@ global.platform.ipc.on('is-webview', () => {
   isWebView = true;
   document.body.classList.add('webview');
 });
+
+global.platform.ipc.on('clear-apv', () => {
+  apv = document.body.classList.contains('akhandpaatt');
+  if (apv) {
+    hideDecks();
+  }
+  if ($apv) {
+    $apv.innerHTML = '';
+  }
+  Object.keys(apvCur).forEach((key) => {
+    delete apvCur[key];
+  });
+  Object.keys(apvPages).forEach((key) => {
+    delete apvPages[key];
+  });
+});
+
 global.platform.ipc.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
   showLine(data.shabadID, data.lineID);
@@ -122,6 +139,10 @@ function createAPVContainer() {
     if (isWebView) {
       $apvObserver = new IntersectionObserver(nextAng);
     }
+  }
+  if (!$apv.classList.contains('active')) {
+    hideDecks();
+    $apv.classList.add('active');
   }
 }
 

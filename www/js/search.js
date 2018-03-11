@@ -82,7 +82,7 @@ module.exports = {
 /**
  * Retrieve all lines from a page
  *
- * @since 3.2.2
+ * @since 3.3.0
  * @param {number} PageNo Page number to get
  * @param {string} [SourceID=G] Source from which to get
  * @returns {array} Returns array of objects for each line

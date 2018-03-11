@@ -287,6 +287,7 @@ function updateViewerScale() {
   const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('navigator') : document.body;
   let scale = 1;
   let previewStyles = '';
+  let previewWinStyles = '';
   previewStyles += `width: ${global.viewer.width}px;`;
   previewStyles += `height: ${global.viewer.height}px;`;
   previewStyles += `font-size: ${global.viewer.height / 100}px;`;
@@ -302,15 +303,19 @@ function updateViewerScale() {
   if (fitInsideHeight > proposedHeight) {
     scale = fitInsideWidth / global.viewer.width;
     previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewStyles += `top: calc(${fitInsidePadding} + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
   } else {
     scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: calc(${fitInsidePadding} + 25px);`;
+    previewStyles += `top: ${fitInsidePadding};`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px);`;
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) / 2}px);`;
   }
   previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(`.scale-viewer #main-viewer { ${previewStyles} }`);
+  previewStyles = document.createTextNode(
+    `.scale-viewer #main-viewer { ${previewStyles} }
+    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`);
   const $previewStyles = document.getElementById('preview-styles');
 
   if ($previewStyles) {
@@ -383,12 +388,18 @@ global.platform.ipc.on('cast-session-stopped', () => {
 }); */
 
 module.exports = {
+  clearAPV() {
+    global.webview.send('clear-apv');
+    global.platform.ipc.send('clear-apv');
+  },
+
   sendLine(shabadID, lineID) {
     global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
   sendText(text, isGurmukhi) {
+    global.webview.send('show-text', { text, isGurmukhi });
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
 

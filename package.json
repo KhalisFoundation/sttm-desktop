@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron": "^1.6.2",
-    "electron-builder": "^17.3.1",
+    "electron-builder": "^20.4.0",
     "electron-publisher-s3": "^16.6.0",
     "electron-rebuild": "^1.5.7",
     "eslint": "^3.18.0",
@@ -56,7 +56,7 @@
     "adm-zip": "^0.4.7",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
-    "electron-updater": "^1.11.2",
+    "electron-updater": "^2.21.0",
     "hyperscript": "^2.0.2",
     "is-online": "^7.0.0",
     "lodash.defaultsdeep": "^4.6.0",
