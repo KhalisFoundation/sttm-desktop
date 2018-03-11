@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/Cellar/node/9.8.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js test
+  /usr/local/Cellar/node/9.8.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js install
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/kee/Documents/Khalis/sttm-desktop/node_modules/.bin:/Applications/GitHub Desktop.app/Contents/Resources/git/bin:/Applications/GitHub Desktop.app/Contents/Resources/git/libexec/git-core:/Applications/GitHub Desktop.app/Contents/Resources/git-lfs/bin:/Applications/GitHub Desktop.app/Contents/Resources/git/bin:/Applications/GitHub Desktop.app/Contents/Resources/git/libexec/git-core:/Applications/GitHub Desktop.app/Contents/Resources/git-lfs/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 
 Yarn version: 
   1.5.1
@@ -17,7 +17,7 @@ npm manifest:
   {
     "productName": "SikhiToTheMax",
     "name": "sttm-desktop",
-    "version": "3.2.1",
+    "version": "3.3.0",
     "description": "The SikhiToTheMax 3 desktop app",
     "main": "app.js",
     "scripts": {
@@ -51,7 +51,7 @@ npm manifest:
       "concurrently": "^3.3.0",
       "cross-env": "^3.1.4",
       "electron": "^1.6.2",
-      "electron-builder": "^17.3.1",
+      "electron-builder": "^20.4.0",
       "electron-publisher-s3": "^16.6.0",
       "electron-rebuild": "^1.5.7",
       "eslint": "^3.18.0",
@@ -72,7 +72,7 @@ npm manifest:
       "adm-zip": "^0.4.7",
       "electron-chromecast": "^1.1.0",
       "electron-log": "^2.0.2",
-      "electron-updater": "^1.11.2",
+      "electron-updater": "^2.21.0",
       "hyperscript": "^2.0.2",
       "is-online": "^7.0.0",
       "lodash.defaultsdeep": "^4.6.0",
@@ -9627,13 +9627,17 @@ Lockfile:
       readable-stream "^2.0.0"
 
 Trace: 
-  Error: Command failed.
+  Error: /Users/kee/Documents/Khalis/sttm-desktop/node_modules/electron: Command failed.
   Exit code: 1
   Command: sh
-  Arguments: -c htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint "www/src/scss/*.scss" "www/core/scss/*.scss" --syntax scss
-  Directory: /Users/kee/Documents/Khalis/sttm-desktop
+  Arguments: -c node install.js
+  Directory: /Users/kee/Documents/Khalis/sttm-desktop/node_modules/electron
   Output:
+  /Users/kee/Documents/Khalis/sttm-desktop/node_modules/electron/install.js:47
+    throw err
+    ^
   
+  Error: EEXIST: file already exists, symlink 'Versions/Current/Electron Framework' -> '/Users/kee/Documents/Khalis/sttm-desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Electron Framework'
       at ProcessTermError.MessageError (/usr/local/Cellar/yarn/1.5.1_1/libexec/lib/cli.js:186:110)
       at new ProcessTermError (/usr/local/Cellar/yarn/1.5.1_1/libexec/lib/cli.js:226:113)
       at ChildProcess.<anonymous> (/usr/local/Cellar/yarn/1.5.1_1/libexec/lib/cli.js:30281:17)

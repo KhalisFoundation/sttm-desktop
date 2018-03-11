@@ -16,6 +16,7 @@ let apv = false;
 let $apv;
 let $apvObserver;
 let $apvObserving;
+let castCur = {};
 const apvPages = {};
 const apvCur = {};
 
@@ -46,25 +47,27 @@ function hideDecks() {
   });
 }
 
+function castToReceiver() {
+  castCur.prefs = JSON.parse(window.localStorage.getItem('prefs'));
+  sendMessage(JSON.stringify(castCur));
+}
+
 function castShabadLine(lineID) {
-  const lineToDisplay = decks[currentShabad][lineID];
+  castCur = decks[currentShabad][lineID];
   let nextLine = '';
   if (decks[currentShabad][lineID + 1]) {
     nextLine = decks[currentShabad][lineID + 1].gurmukhi;
   }
-  lineToDisplay.nextLine = nextLine;
-  lineToDisplay.prefs = JSON.parse(window.localStorage.getItem('prefs'));
-  sendMessage(JSON.stringify(lineToDisplay));
+  castCur.nextLine = nextLine;
+  castToReceiver();
 }
 
 function castText(text, isGurmukhi) {
-  let lineToDisplay;
-  if (isGurmukhi === true) {
-    lineToDisplay.gurmukhi = text;
-  } else {
-    lineToDisplay.translation = text;
-  }
-  sendMessage(JSON.stringify(lineToDisplay));
+  castCur = {};
+  castCur.showInEnglish = isGurmukhi !== true;
+  castCur.gurmukhi = text;
+  castCur.larivaar = text;
+  castToReceiver();
 }
 
 // IPC
@@ -121,6 +124,7 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 global.platform.ipc.on('update-settings', () => {
   prefs = JSON.parse(window.localStorage.getItem('prefs'));
   core.menu.settings.applySettings(prefs);
+  castToReceiver();
 });
 
 function nextAng() {
@@ -175,6 +179,7 @@ function createCards(rows, LineID) {
               h('h2.transliteration', row.Transliteration),
             ]));
         shabad[row.ID] = { gurmukhi: row.Gurmukhi,
+          larivaar: taggedGurmukhi.join('<wbr>'),
           translation: row.English,
           teeka: row.Punjabi,
           transliteration: row.Transliteration };
@@ -273,5 +278,5 @@ function showText(text, isGurmukhi = false) {
   }
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
-  castText(textNode, isGurmukhi);
+  castText(text, isGurmukhi);
 }

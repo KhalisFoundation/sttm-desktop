@@ -53,6 +53,7 @@ require('electron-chromecast')(receiverFn);
 const applicationID = 'ECF05819';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
+let isCastInitialized = false;
 
 /**
  * append message to debug message window
@@ -67,6 +68,7 @@ function appendMessage(message) {
  */
 function onInitSuccess() {
   appendMessage('onInitSuccess');
+  isCastInitialized = true;
 }
 
 /**
@@ -80,10 +82,13 @@ function onRequestSessionSuccess(e) {
   appendMessage('onRequestSessionSuccess');
   session = e;
   global.platform.ipc.send('cast-session-active');
+  castToReceiver();
 }
 
 function requestSession() {
-  initializeCastApi();
+  if (!isCastInitialized) {
+    initializeCastApi();
+  }
   chrome.cast.requestSession(onRequestSessionSuccess, onError);
 }
 
