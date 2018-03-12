@@ -16,7 +16,7 @@ $vertical-rhythm: $base-font-size * $ratio;
   h4 {
     color: #333;
     line-height: 1;
-    margin-bottom: $vertical-rhythm/2;
+    margin-bottom: $vertical-rhythm / 2;
     margin-top: $vertical-rhythm;
   }
 
@@ -51,15 +51,15 @@ $vertical-rhythm: $base-font-size * $ratio;
   }
 
   img {
-    border-radius: $vertical-rhythm/2;
+    border-radius: $vertical-rhythm / 2;
     display: block;
     margin: auto;
     margin-bottom: $vertical-rhythm;
-    margin-top: $vertical-rhythm/2;
+    margin-top: $vertical-rhythm / 2;
     max-width: 100%;
   }
 
   iframe {
-    border-radius: $vertical-rhythm/2;
+    border-radius: $vertical-rhythm / 2;
   }
 }
