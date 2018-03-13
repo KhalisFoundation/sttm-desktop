@@ -110,6 +110,25 @@ const menuTemplate = [
       },
     ],
   },
+  {
+    label: 'Cast',
+    icon: './www/assets/img/ic_cast_black.png',
+    submenu: [
+      {
+        label: 'Search for Cast device',
+        click: () => {
+          global.webview.send('search-cast');
+        },
+      },
+      {
+        label: 'Stop Casting',
+        visible: false,
+        click: () => {
+          global.webview.send('stop-cast');
+        },
+      },
+    ],
+  },
 ];
 
 const devMenu = [];
@@ -268,6 +287,7 @@ function updateViewerScale() {
   const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('navigator') : document.body;
   let scale = 1;
   let previewStyles = '';
+  let previewWinStyles = '';
   previewStyles += `width: ${global.viewer.width}px;`;
   previewStyles += `height: ${global.viewer.height}px;`;
   previewStyles += `font-size: ${global.viewer.height / 100}px;`;
@@ -283,15 +303,19 @@ function updateViewerScale() {
   if (fitInsideHeight > proposedHeight) {
     scale = fitInsideWidth / global.viewer.width;
     previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewStyles += `top: calc(${fitInsidePadding} + ${(fitInsideHeight - proposedHeight) / 2}px);`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight - proposedHeight) / 2}px);`;
   } else {
     scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: calc(${fitInsidePadding} + 25px);`;
+    previewStyles += `top: ${fitInsidePadding};`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 25px);`;
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) / 2}px);`;
   }
   previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(`.scale-viewer #main-viewer { ${previewStyles} }`);
+  previewStyles = document.createTextNode(
+    `.scale-viewer #main-viewer { ${previewStyles} }
+    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`);
   const $previewStyles = document.getElementById('preview-styles');
 
   if ($previewStyles) {
@@ -325,6 +349,7 @@ window.onresize = () => {
 };
 
 const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuCast = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[3].submenu : menu.items[6].submenu);
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
@@ -341,13 +366,21 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[4].visible = false;
   menuUpdate.items[5].visible = true;
 });
-
 global.platform.ipc.on('send-scroll', (event, arg) => {
   global.webview.send('send-scroll', arg);
 });
-
 global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(arg.PageNo, arg.SourceID);
+});
+global.platform.ipc.on('cast-session-active', () => {
+  menuCast.items[0].visible = false;
+  menuCast.items[1].visible = true;
+  // menuCast.icon = './www/assets/img/ic_cast_black_connected.png';
+});
+global.platform.ipc.on('cast-session-stopped', () => {
+  menuCast.items[1].visible = false;
+  menuCast.items[0].visible = true;
+  // menuCast.icon = './www/assets/img/ic_cast_black.png';
 });
 
 /* global.platform.ipc.on('openSettings', () => {
@@ -355,12 +388,18 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 }); */
 
 module.exports = {
+  clearAPV() {
+    global.webview.send('clear-apv');
+    global.platform.ipc.send('clear-apv');
+  },
+
   sendLine(shabadID, lineID) {
     global.webview.send('show-line', { shabadID, lineID });
     global.platform.ipc.send('show-line', { shabadID, lineID });
   },
 
   sendText(text, isGurmukhi) {
+    global.webview.send('show-text', { text, isGurmukhi });
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
 

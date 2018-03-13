@@ -4,9 +4,14 @@ $keyboard-height:128px;
 
 @mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
   $screen-offset: 50 * $row-num;
+  $pane-gap-ratio: 1;
+
+  @if $row-num == 1 {
+    $pane-gap-ratio: 0.5;
+  }
 
   @if $is-windows == 0 {
-    top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $keyboard-offset});
+    top: calc(#{$screen-offset}% + #{($presenter-pane-gap * $pane-gap-ratio) + $keyboard-offset});
   }
 
   @else if $is-windows == 1 {

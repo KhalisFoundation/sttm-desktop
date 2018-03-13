@@ -213,8 +213,22 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.on('cast-session-active', () => {
+  mainWindow.webContents.send('cast-session-active');
+});
+
+ipcMain.on('cast-session-stopped', () => {
+  mainWindow.webContents.send('cast-session-stopped');
+});
+
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
+
+ipcMain.on('clear-apv', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('clear-apv');
+  }
+});
 
 ipcMain.on('show-line', (event, arg) => {
   if (viewerWindow) {
