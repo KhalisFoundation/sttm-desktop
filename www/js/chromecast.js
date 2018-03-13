@@ -13,7 +13,7 @@ let trigID = 0;
 const receiverFn = receivers =>
   new Promise((resolve) => {
     trigID += 1;
-    // instanciate new modal
+    // instantiate new modal
     const modal = new tingle.Modal({
       footer: true,
       stickyFooter: false,
@@ -23,7 +23,7 @@ const receiverFn = receivers =>
     receivers.forEach((receiver) => {
       if (receiver.service_fullname.includes('Chromecast')) {
         numReceivers += 1;
-      // add a button
+        // add cast button
         modal.addCastBtn(receiver.friendlyName, 'tingle-btn tingle-btn--primary', `${receiver.ipAddress}_${receiver.port}_${trigID}`, (e) => {
           if (e.target.getAttribute('data-reciever-id') === `${receiver.ipAddress}_${receiver.port}_${trigID}`) {
             resolve(receiver);
@@ -35,12 +35,11 @@ const receiverFn = receivers =>
     });
 
     // set content
-    const message = numReceivers === 0 ? 'No Chromecast devices found' : 'Select Cast device';
+    const message = numReceivers === 0 ? 'No compatible Chromecast devices found.' : 'Select Cast device';
     modal.setContent('<h2>' + message + '</h2>');
-    // add another button
+    // add cancel button
     const cancelTitle = numReceivers === 0 ? 'OK' : 'Cancel';
     modal.addFooterBtn(cancelTitle, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
-      // here goes some logic
       modal.close();
     });
 
@@ -140,6 +139,32 @@ function receiverListener(e) {
  */
 function onError(message) {
   appendMessage('onError: ' + JSON.stringify(message));
+
+  switch (message.code) {
+    case 'RECEIVER_UNAVAILABLE':
+      displayError('No Chromecast devices detected.');
+      break;
+    default:
+      displayError('An error occured. Please try again.');
+      break;
+  }
+}
+
+function displayError(errorMessage) {
+  const modal = new tingle.Modal({
+    footer: true,
+    stickyFooter: false,
+    closeMethods: ['overlay', 'button', 'escape'],
+  });
+
+  modal.setContent('<h2>' + errorMessage + '</h2>');
+  // add ok button
+  modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+    modal.close();
+  });
+
+  // open modal
+  modal.open();
 }
 
 /**
