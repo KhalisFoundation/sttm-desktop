@@ -1,5 +1,17 @@
 ## SikhiToTheMax Desktop App
 
+### 3.3.0 - _180306_
+#### Added
+ * Akhand Paatth View - Infinitely scroll through Angs/pages until the end of the Granth
+ * Navigation Arrows - Go to the next/previous Shabad with the click of a button!
+ * Custom Slides - Send custom text to the presenter or choose from presets. Don't want anything on the screen? You can even send a blank slide.
+ * Unsure which was the last Antraa that was sung? We've got checkmarks to indicate what lines you have already clicked.
+
+#### Improved
+ * Download progress - See the progress of the database download right on the app icon
+ * Can't find the ਖ਼ character on your keyboard? No worries - just search for ਖ and we'll do the heavy lifting for you
+ * You might want to sit down for this one, but the latest database update brought the number of corrections done by the BaniDB project up over 5,000! With Guru's Grace, SikhiToTheMax is using the most accurate digital Gurbani source available today.
+
 ### 3.2.0 - _170526_
 #### Improved
  * Faster updates - We've reduced the size of the app and subsequent updates by storing the database separately on your device. It now downloads on first run and saves you from re-downloading every time we update the app. When there are updates to the database, those will get pulled transparently and allow you to use the app without interruption.
