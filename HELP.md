@@ -1,6 +1,6 @@
 ###  Video Tutorial
 
-<div class="videoWrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/ZDX8nPkDBSc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
+<div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/ZDX8nPkDBSc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
 
 ### How do I install the desktop application?
 
