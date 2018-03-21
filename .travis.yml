@@ -1,32 +1,30 @@
+os: osx
+osx_image: xcode8
+
 sudo: required
-dist: trusty
 branches:
   only:
   - release
   - dev
 git:
   submodules: false
-language: c
-matrix:
-  include:
-  - os: osx
-node_js:
-- 6
+language: node_js
+node_js: "8"
 cache:
+  yarn: true
   directories:
-  - node_modules
   - $HOME/.electron
 before_install:
-- openssl aes-256-cbc -K $encrypted_fec05b564c85_key -iv $encrypted_fec05b564c85_iv
-  -in id_rsa.enc -out packaging/id_rsa -d
+- if [ "$TRAVIS_BRANCH" = "release" ]; then openssl aes-256-cbc -K $encrypted_fec05b564c85_key -iv $encrypted_fec05b564c85_iv
+  -in id_rsa.enc -out packaging/id_rsa -d; fi
 install:
-- nvm install 6
-- npm install electron-builder@next
-- npm install -g yarn
-- npm install
+- yarn
 before_script:
 - git clone https://github.com/khalisfoundation/sttm-core.git www/core
 - sleep 3
 script:
-- if [ "$TRAVIS_BRANCH" = "release" ]; then npm run test && npm run dist:mac; fi
-- if [ "$TRAVIS_BRANCH" = "dev" ]; then npm run test && npm run test:app; fi
+- if [ "$TRAVIS_BRANCH" = "release" ]; then
+    npm run test && npm run dist:mac;
+  else
+    npm test;
+  fi
