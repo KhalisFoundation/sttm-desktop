@@ -23,6 +23,9 @@
         "transliteration": 4,
         "teeka": 4
       },
+      "autoplay-options": {
+        "autoplayTimer":10
+      },
       "display-options": {
         "larivaar": false,
         "left-align": false
