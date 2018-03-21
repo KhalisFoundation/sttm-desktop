@@ -8,7 +8,7 @@ module.exports = {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
-    let order = '';
+    const order = [];
     const limit = ' 0,20';
     switch (searchType) {
       case 0: // First letter start
@@ -33,7 +33,7 @@ module.exports = {
         }
         condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
         if (searchQuery.length < 3) {
-          order += 'v.FirstLetterLen, ';
+          order.push('v.FirstLetterLen');
         }
         break;
       }
@@ -57,8 +57,8 @@ module.exports = {
       default:
         break;
     }
-    order += 's.ShabadID';
-    const query = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order} LIMIT ${limit}`;
+    order.push('s.ShabadID');
+    const query = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order.join()} LIMIT ${limit}`;
     this.db.all(query, (err, rows) => {
       global.core.search.printResults(rows);
     });
