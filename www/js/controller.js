@@ -193,6 +193,7 @@ const macMenu = [
         label: 'About SikhiToTheMax',
         role: 'about',
       },
+      ...updateMenu,
       {
         type: 'separator',
       },
@@ -240,11 +241,6 @@ const macMenu = [
   {
     label: 'Help',
     submenu: [
-      {
-        label: '',
-        enabled: false,
-      },
-      ...updateMenu,
       {
         label: 'Guide...',
         click: () => {
