@@ -193,19 +193,6 @@ const macMenu = [
         label: 'About SikhiToTheMax',
         role: 'about',
       },
-      ...updateMenu,
-      {
-        label: 'Guide...',
-        click: () => {
-          main.openSecondaryWindow('helpWindow');
-        },
-      },
-      {
-        label: 'Changelog...',
-        click: () => {
-          main.openSecondaryWindow('changelogWindow');
-        },
-      },
       {
         type: 'separator',
       },
@@ -250,6 +237,28 @@ const macMenu = [
     ],
   },
   ...menuTemplate,
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: '',
+        enabled: false,
+      },
+      ...updateMenu,
+      {
+        label: 'Guide...',
+        click: () => {
+          main.openSecondaryWindow('helpWindow');
+        },
+      },
+      {
+        label: 'Changelog...',
+        click: () => {
+          main.openSecondaryWindow('changelogWindow');
+        },
+      },
+    ],
+  },
   ...devMenu,
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
