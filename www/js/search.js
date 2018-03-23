@@ -8,6 +8,8 @@ module.exports = {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    const order = [];
+    const limit = ' 0,20';
     switch (searchType) {
       case 0: // First letter start
       case 1: { // First letter anywhere
@@ -29,7 +31,10 @@ module.exports = {
         if (dbQuery.includes('075')) {
           bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery} LIMIT 0,20`;
+        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        if (searchQuery.length < 3) {
+          order.push('v.FirstLetterLen');
+        }
         break;
       }
       case 2: // Full word (Gurmukhi)
@@ -41,7 +46,7 @@ module.exports = {
         }
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
-        condition = `${searchCol} LIKE '${dbQuery}' LIMIT 0,20`;
+        condition = `${searchCol} LIKE '${dbQuery}'`;
         break;
       }
       case 5: // Ang
@@ -52,7 +57,8 @@ module.exports = {
       default:
         break;
     }
-    const query = `SELECT ${allColumns} WHERE ${condition}`;
+    order.push('s.ShabadID');
+    const query = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order.join()} LIMIT ${limit}`;
     this.db.all(query, (err, rows) => {
       global.core.search.printResults(rows);
     });
