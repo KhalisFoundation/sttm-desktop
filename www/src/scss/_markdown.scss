@@ -1,0 +1,65 @@
+$container: 700px;
+$base-font-size: 16px;
+$ratio: 1.5;
+$vertical-rhythm: $base-font-size * $ratio;
+
+.markdown-frame {
+  color: #555;
+  font-size: $base-font-size;
+  line-height: $ratio;
+  margin: auto;
+  max-width: $container;
+  padding: $vertical-rhythm;
+
+  h2,
+  h3,
+  h4 {
+    color: #333;
+    line-height: 1;
+    margin-bottom: $vertical-rhythm / 2;
+    margin-top: $vertical-rhythm;
+  }
+
+  h1 {
+    color: #111;
+    font-size: $vertical-rhythm * 2;
+    line-height: 1;
+    margin-bottom: $vertical-rhythm * 2;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: $vertical-rhythm;
+  }
+
+  h3 {
+    font-size: $vertical-rhythm;
+    font-weight: normal;
+  }
+
+  h4 {
+    font-size: $base-font-size;
+    line-height: $ratio;
+  }
+
+  p {
+    margin-top: 0;
+  }
+
+  ul {
+    margin-left: $vertical-rhythm;
+  }
+
+  img {
+    border-radius: $vertical-rhythm / 2;
+    display: block;
+    margin: auto;
+    margin-bottom: $vertical-rhythm;
+    margin-top: $vertical-rhythm / 2;
+    max-width: 100%;
+  }
+
+  iframe {
+    border-radius: $vertical-rhythm / 2;
+  }
+}

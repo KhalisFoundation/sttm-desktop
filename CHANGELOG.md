@@ -1,6 +1,6 @@
 ## SikhiToTheMax Desktop App
 
-### 3.3.0 - _180306_
+### 3.3.0 - _180323_
 #### Added
  * Akhand Paatth View - Infinitely scroll through Angs/pages until the end of the Granth
  * Navigation Arrows - Go to the next/previous Shabad with the click of a button!
