@@ -13,6 +13,7 @@ const navigator = fs.readFileSync(path.resolve(__dirname, 'core/navigator.html')
 document.querySelector('#navigator').innerHTML = navigator;
 global.core.search.init();
 global.core.menu.init();
+global.core.themeEditor.init();
 global.platform.init();
 
 document.body.classList.add(process.platform);

@@ -157,6 +157,10 @@ a {
   #menu-page,
   #shabad-menu-page { @include calculateTop(0, 1); }
 
+  .options-page {
+    top: 30px;
+  }
+
   #navigator.kb-active {
     $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
 
