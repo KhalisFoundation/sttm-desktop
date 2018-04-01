@@ -1,6 +1,15 @@
 ## SikhiToTheMax Desktop App
 
-### 3.3.0 - _180323_
+### 3.3.1 - _180401_
+#### Added
+ * Help Section - Get your most frequently asked questions answered in the help section
+ * 2-Letter Search - When searching for two letters, preference is given to shorter lines
+
+#### Improved
+ * Style updates
+ * Bug fixes
+
+### 3.3.0 - _180306_
 #### Added
  * Akhand Paatth View - Infinitely scroll through Angs/pages until the end of the Granth
  * Navigation Arrows - Go to the next/previous Shabad with the click of a button!
