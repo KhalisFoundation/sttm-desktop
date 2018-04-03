@@ -132,4 +132,25 @@ module.exports = {
       }
     });
   },
+
+/**
+ * Retrieve a random Shabad from a source
+ *
+ * @since 3.3.2
+ * @param {string} [SourceID=G] Source from which to get
+ * @returns {integer} Returns integer for ShabadID
+ * @example
+ *
+ * randomShabad();
+ * // => 13
+ */
+  randomShabad(SourceID = 'G') {
+    return new Promise((resolve) => {
+      global.platform.db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
+      [SourceID],
+      (err, row) => {
+        resolve(row.ShabadID);
+      });
+    });
+  },
 };
