@@ -10,6 +10,8 @@ const scroll = require('scroll');
 const core = require('./core/js/index');
 
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));
+let userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
+applyTheme(userTheme);
 let isWebView = false;
 let apv = false;
 let $apv;
@@ -89,6 +91,11 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 global.platform.ipc.on('update-settings', () => {
   prefs = JSON.parse(window.localStorage.getItem('prefs'));
   core.menu.settings.applySettings(prefs);
+});
+
+global.platform.ipc.on('update-theme', () => {
+  userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
+  applyTheme(userTheme);
 });
 
 function nextAng() {
@@ -220,7 +227,7 @@ function showLine(ShabadID, LineID) {
     global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
       (err, rows) => {
         createCards(rows, LineID)
-          .then(({ cards }) => createDeck(cards, LineID));
+          .then(({ cards }) => createDeck(cards, LineID, ShabadID));
       });
   }
 }
@@ -233,4 +240,16 @@ function showText(text, isGurmukhi = false) {
   }
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
+}
+
+function applyTheme(theme) {
+  let css = `body.custom-theme { background-color: ${theme['background-color']}}`;
+  Object.keys(theme).forEach((themeParam) => {
+    const elementClass = themeParam.split('-')[0];
+    css += `body.custom-theme .${elementClass} { color: ${theme[themeParam]}}`;
+  });
+  const style = document.querySelector('style') || document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = css;
+  document.head.appendChild(style);
 }
