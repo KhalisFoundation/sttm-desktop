@@ -10,6 +10,7 @@ const buildsDir = './builds/';
 const dmgFile = `SikhiToTheMax-${version}.dmg`;
 const zipFile = `SikhiToTheMax-${version}-mac.zip`;
 const updateFile = 'latest-mac.json';
+const updateFileYML = 'latest-mac.yml';
 const bucketName = 'sttm-releases';
 const remoteDir = 'mac-x64/';
 
@@ -66,4 +67,4 @@ function upload(files) {
   });
 }
 
-upload([dmgFile, zipFile, updateFile]);
+upload([dmgFile, zipFile, updateFile, updateFileYML]);
