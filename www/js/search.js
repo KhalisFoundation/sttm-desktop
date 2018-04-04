@@ -38,21 +38,21 @@ module.exports = {
         break;
       }
       case 2: // Full word (Gurmukhi)
-      case 3: { // Full word (English)
+      case 3: // Full word (English)
+      case 4: { // Full word (Transliteration)
         if (searchType === 2) {
           searchCol = 'v.Gurmukhi';
-        } else {
+        } else if (searchType === 3) {
           searchCol = 'v.English';
+        } else {
+          searchCol = 'v.Transliteration';
         }
-        const words = searchQuery.split(' ');
-        dbQuery = `%${words.join(' %')}%`;
-        condition = `${searchCol} LIKE '${dbQuery}'`;
         break;
       }
       case 5: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.platform.search.currentMeta.source}'`;
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
         break;
       default:
         break;
