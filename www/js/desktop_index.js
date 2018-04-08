@@ -9,7 +9,7 @@ global.controller = require('./js/controller');
 global.core = require('./core/js/index');
 
 // Pull in navigator from core
-const navigator = fs.readFileSync(path.resolve(__dirname, 'core/navigator.html'));
+const navigator = fs.readFileSync(path.resolve(__dirname, 'navigator.html'));
 document.querySelector('#navigator').innerHTML = navigator;
 global.core.search.init();
 global.core.menu.init();
