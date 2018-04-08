@@ -8,6 +8,8 @@ module.exports = {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    const order = [];
+    const limit = ' 0,20';
     switch (searchType) {
       case 0: // First letter start
       case 1: { // First letter anywhere
@@ -29,7 +31,10 @@ module.exports = {
         if (dbQuery.includes('075')) {
           bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery} LIMIT 0,20`;
+        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        if (searchQuery.length < 3) {
+          order.push('v.FirstLetterLen');
+        }
         break;
       }
       case 2: // Full word (Gurmukhi)
@@ -41,7 +46,7 @@ module.exports = {
         }
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
-        condition = `${searchCol} LIKE '${dbQuery}' LIMIT 0,20`;
+        condition = `${searchCol} LIKE '${dbQuery}'`;
         break;
       }
       case 5: // Ang
@@ -52,7 +57,8 @@ module.exports = {
       default:
         break;
     }
-    const query = `SELECT ${allColumns} WHERE ${condition}`;
+    order.push('s.ShabadID');
+    const query = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order.join()} LIMIT ${limit}`;
     this.db.all(query, (err, rows) => {
       global.core.search.printResults(rows);
     });
@@ -61,7 +67,7 @@ module.exports = {
   loadShabad(ShabadID, LineID) {
     global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (rows.length > 0) {
-        global.core.search.printShabad(rows, ShabadID, LineID);
+        global.core.search.printShabad(rows, ShabadID, LineID || rows[0].ID);
       }
     });
   },
@@ -124,6 +130,27 @@ module.exports = {
         const ShabadID = Forward ? adjacentShabads[0].ShabadID : adjacentShabads[1].ShabadID;
         this.loadShabad(ShabadID, null);
       }
+    });
+  },
+
+/**
+ * Retrieve a random Shabad from a source
+ *
+ * @since 3.3.2
+ * @param {string} [SourceID=G] Source from which to get
+ * @returns {integer} Returns integer for ShabadID
+ * @example
+ *
+ * randomShabad();
+ * // => 13
+ */
+  randomShabad(SourceID = 'G') {
+    return new Promise((resolve) => {
+      global.platform.db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
+      [SourceID],
+      (err, row) => {
+        resolve(row.ShabadID);
+      });
     });
   },
 };

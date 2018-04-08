@@ -13,25 +13,37 @@ const appVersion = app.getVersion();
 
 let mainWindow;
 let viewerWindow = false;
-let changelogWindow = false;
+const secondaryWindows = {
+  changelogWindow: {
+    obj: false,
+    url: `file://${__dirname}/www/changelog.html`,
+    onClose: () => { store.set('changelog-seen', appVersion); },
+  },
+  helpWindow: {
+    obj: false,
+    url: `file://${__dirname}/www/help.html`,
+  },
+};
 let manualUpdate = false;
 const viewerWindowPos = {};
 
-function openChangelog() {
-  changelogWindow = new BrowserWindow({
+function openSecondaryWindow(windowName) {
+  const window = secondaryWindows[windowName];
+  window.obj = new BrowserWindow({
     width: 725,
     height: 800,
     show: false,
   });
-  changelogWindow.webContents.on('did-finish-load', () => {
-    changelogWindow.show();
+  window.obj.webContents.on('did-finish-load', () => {
+    window.obj.show();
   });
-  changelogWindow.loadURL(`file://${__dirname}/www/changelog.html`);
+  window.obj.loadURL(window.url);
 
-  // Update changelog last seen pref when seen
-  changelogWindow.on('close', () => {
-    store.set('changelog-seen', appVersion);
-    changelogWindow = false;
+  window.obj.on('close', () => {
+    window.obj = false;
+    if (window.onClose) {
+      window.onClose();
+    }
   });
 }
 
@@ -184,7 +196,7 @@ app.on('ready', () => {
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
     if (lastSeen !== appVersion) {
-      openChangelog();
+      openSecondaryWindow('changelogWindow');
     }
     if (!viewerWindow) {
       createViewer();
@@ -197,6 +209,7 @@ app.on('ready', () => {
     if (viewerWindow && !viewerWindow.isDestroyed()) {
       viewerWindow.close();
     }
+    const changelogWindow = secondaryWindows.changelogWindow.obj;
     if (changelogWindow && !changelogWindow.isDestroyed()) {
       changelogWindow.close();
     }
@@ -267,7 +280,7 @@ ipcMain.on('update-settings', () => {
   }
 });
 
-exports.openChangelog = openChangelog;
+exports.openSecondaryWindow = openSecondaryWindow;
 exports.appVersion = appVersion;
 exports.checkForUpdates = checkForUpdates;
 exports.autoUpdater = autoUpdater;
