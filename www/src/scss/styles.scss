@@ -88,7 +88,8 @@ a {
     @include calculateTop(1);
   }
 
-  #menu-page {
+  #menu-page,
+  #shabad-menu-page {
     @extend .fixed-takeover-pages;
 
     left: $presenter-pane-gap;
@@ -153,7 +154,8 @@ a {
 
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
-  #menu-page { @include calculateTop(0, 1); }
+  #menu-page,
+  #shabad-menu-page { @include calculateTop(0, 1); }
 
   #navigator.kb-active {
     $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
