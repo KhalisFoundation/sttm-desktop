@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "precommit": "npm test",
-    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" \"www/core/scss/*.scss\" --syntax scss",
+    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" --syntax scss",
     "test:app": "mocha",
     "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css",
