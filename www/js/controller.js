@@ -399,4 +399,8 @@ module.exports = {
   'presenter-view': function presenterView() {
     updateViewerScale();
   },
+
+  autoplay() {
+    global.core.search.checkAutoPlay();
+  },
 };
