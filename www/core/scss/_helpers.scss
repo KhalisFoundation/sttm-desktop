@@ -1,0 +1,33 @@
+.button {
+  -webkit-appearance: none;
+  background: $sttm-blue;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 0.9rem;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1;
+  margin: 0 1rem 1rem 0;
+  padding: 0.85em 1em;
+  text-align: center;
+  transition: all 0.25s ease-out;
+  vertical-align: middle;
+  width: auto;
+
+  &:hover {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+    color: #eee;
+  }
+
+  &:active {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  user-select: none;
+}
