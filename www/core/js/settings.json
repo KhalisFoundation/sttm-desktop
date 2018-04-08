@@ -68,7 +68,20 @@
         "options": {
           "akhandpaatt": "Akhand Paatth View (Beta)",
           "larivaar": "Larivaar",
-          "left-align": "Left-Align"
+          "left-align": "Left-Align",
+          "autoplay": "Auto Play"
+        }
+      },
+      "autoplay-options": {
+        "title": "Autoplay Options",
+        "type": "range",
+        "options": {
+          "autoplayTimer": {
+            "title": "Delay (Seconds)",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
         }
       }
     }

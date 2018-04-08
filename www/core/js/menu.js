@@ -1,5 +1,6 @@
 const h = require('hyperscript');
 const settings = require('./settings');
+const getJSON = require('get-json');
 
 const menuButton = h(
   'a.menu-button.navigator-button.active',
@@ -18,6 +19,20 @@ const customSlidesButton = h(
       module.exports.toggleMenu('#custom-slides-page');
     } },
   h('i.fa.fa-clone'));
+const shabadMenuButton = h(
+  'a#shabad-menu.navigator-button.active',
+  {
+    onclick: () => {
+      module.exports.toggleMenu('#shabad-menu-page');
+    } },
+  h('i.fa.fa-briefcase'));
+const shabadMenuCloseButton = h(
+  'a.close-button.navigator-button',
+  {
+    onclick: () => {
+      module.exports.toggleMenu('#shabad-menu-page');
+    } },
+  h('i.fa.fa-times'));
 const customSlidesCloseButton = h(
   'a.close-button.navigator-button',
   {
@@ -25,6 +40,50 @@ const customSlidesCloseButton = h(
       module.exports.toggleMenu('#custom-slides-page');
     } },
   h('i.fa.fa-times'));
+const randomShabadButton = h(
+  'li',
+  h(
+    'a.random-shabad-button',
+    {
+      onclick: () => {
+        global.platform.search.randomShabad()
+          .then((shabadId) => {
+            global.core.search.loadShabad(shabadId);
+            module.exports.toggleMenu('#shabad-menu-page');
+            // go to shabad page
+            document.querySelector('#shabad-pageLink').click();
+          });
+      } },
+    h('i.fa.fa-random.list-icon'),
+    'Show Random Shabad'));
+const anandKarajButton = h(
+  'li',
+  h(
+    'a.anand-karaj-button',
+    {
+      onclick: () => {
+        global.core.search.loadShabad(2897);
+        module.exports.toggleMenu('#shabad-menu-page');
+        // go to shabad page
+        document.querySelector('#shabad-pageLink').click();
+      } },
+    h('i.fa.fa-heart.list-icon'),
+    'Anand Karaj / Sikh Marriage'));
+const hukamnamaButton = h(
+  'li',
+  h(
+    'a.hukamnama-button',
+    {
+      onclick: () => {
+        getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
+          global.core.search.loadShabad(response.hukamnamainfo.shabadid[0]);
+          module.exports.toggleMenu('#shabad-menu-page');
+          // go to shabad page
+          document.querySelector('#shabad-pageLink').click();
+        });
+      } },
+    h('i.fa.fa-gavel.list-icon'),
+    'Hukamnama of the day'));
 const emptySlideButton = h(
   'li',
   h(
@@ -129,11 +188,20 @@ module.exports = {
     document.getElementById('current-shabad-menu').appendChild(customSlidesButton);
     document.querySelector('.custom-slides-close').appendChild(customSlidesCloseButton);
 
+
+    document.getElementById('shabad-menu').appendChild(shabadMenuButton);
+    document.querySelector('.shabad-menu-close').appendChild(shabadMenuCloseButton);
+
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
     $listOfCustomSlides.appendChild(emptySlideButton);
     $listOfCustomSlides.appendChild(waheguruSlideButton);
     $listOfCustomSlides.appendChild(dhanGuruSlideButton);
     $listOfCustomSlides.appendChild(announcementSlideButton);
+
+    const $listOfShabadOptions = document.querySelector('#list-of-shabad-options');
+    $listOfShabadOptions.appendChild(randomShabadButton);
+    $listOfShabadOptions.appendChild(hukamnamaButton);
+    $listOfShabadOptions.appendChild(anandKarajButton);
     settings.init();
   },
 
