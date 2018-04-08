@@ -5,14 +5,14 @@ $viewer-padding: 30px;
   font-family: $viewer-gurmukhi-font-family;
   font-style: normal;
   font-weight: normal;
-  src: url('../../core/fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
+  src: url('../fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'AnmolUniBaniTrue';
   font-style: normal;
   font-weight: normal;
-  src: url('../../core/fonts/AnmolUniBaniTrue.ttf') format('truetype');
+  src: url('../fonts/AnmolUniBaniTrue.ttf') format('truetype');
 }
 
 * {
