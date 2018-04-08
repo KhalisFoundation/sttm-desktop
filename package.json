@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
@@ -22,7 +22,8 @@
     "dist:win": "npm run pack:win && npm run upload:win",
     "dist:win32": "npm run pack:win32 && npm run upload:win32",
     "build-css": "node-sass --output-style compressed --include-path www/scss www/src/scss/styles.scss www/assets/css/bundle.css",
-    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css\""
+    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css\"",
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
     "type": "git",
