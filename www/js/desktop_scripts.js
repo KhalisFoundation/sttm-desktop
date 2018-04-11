@@ -8,7 +8,7 @@ const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
 
 const defaultPrefs = require('./defaults.json');
-const search = require('./search');
+const search = require('./search-database');
 const Store = require('./store');
 
 const { remote } = electron;
