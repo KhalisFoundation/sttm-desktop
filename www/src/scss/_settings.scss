@@ -1,0 +1,59 @@
+#settings,
+#list-of-custom-slides {
+  h2 {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    display: none;
+    font-size: 1.3rem;
+    font-weight: bold;
+    line-height: 2;
+    margin-top: 0;
+    text-align: center;
+  }
+
+  header {
+    border-top: 1px #757575 solid;
+    color: #757575;
+    letter-spacing: 0.2em;
+    padding-top: 0.75em;
+    word-spacing: 0.2em;
+  }
+
+  h2:first-child + section.block-list > header:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  li {
+    border: none;
+  }
+
+  .block-list li {
+    span i {
+      color: #999;
+      font-size: 0.8em;
+      margin-left: 3px;
+    }
+
+    a,
+    label {
+      cursor: default;
+    }
+  }
+
+  .switch input + label {
+    border-radius: 999px;
+  }
+
+  .range {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+
+    input::before {
+      content: attr(data-value);
+      display: inherit;
+      transform: translateX(-150%);
+    }
+  }
+}

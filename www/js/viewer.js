@@ -7,7 +7,7 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
-const core = require('./core/js/index');
+const core = require('./js/index');
 
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));
 let isWebView = false;

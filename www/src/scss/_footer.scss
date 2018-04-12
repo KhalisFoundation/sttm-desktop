@@ -1,0 +1,28 @@
+#footer {
+  height: 40px;
+
+  .menu-group > .menu-group-left,
+  .menu-group > .menu-group-right {
+    flex: 0 0 auto;
+  }
+
+  .menu-bar {
+    list-style-type: none;
+
+    > li {
+      display: inline-block;
+
+      > a {
+        display: block;
+        font-size: 0.8em;
+        line-height: 40px;
+        text-align: center;
+        width: 40px;
+
+        .fa {
+          line-height: 40px;
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 node_modules
 builds
-www/assets/css
+www/assets/css/*.css
 **/*.map
 packaging/aws.json
 packaging/keys.json
