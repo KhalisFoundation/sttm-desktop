@@ -7,7 +7,15 @@
         "type": "radio",
         "options": {
           "light-theme": "Light Theme",
-          "dark-theme": "Dark Theme"
+          "dark-theme": "Dark Theme",
+          "custom-theme": "Custom Theme"
+        }
+      },
+      "custom-theme-options": {
+        "title": "Custom Theme Options",
+        "type": "switch",
+        "options": {
+          "show-theme-editor": "Show Theme Editor"
         }
       },
       "layout": {

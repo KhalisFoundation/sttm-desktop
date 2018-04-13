@@ -112,6 +112,11 @@ module.exports = {
     global.platform.ipc.send('update-settings');
   },
 
+  updateTheme() {
+    global.webview.send('update-theme');
+    global.platform.ipc.send('update-theme');
+  },
+
   getAllPrefs(schema = store.data) {
     return this.getPref('userPrefs', schema);
   },

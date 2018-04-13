@@ -152,10 +152,87 @@ a {
   }
 }
 
+.options-page {
+  background: #f0f0f0;
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.3);
+  height: 100vh;
+  left: -400px;
+  position: fixed;
+  top: 0;
+  transition: 1s all ease;
+  width: 300px;
+  z-index: 4;
+
+  .options-page-header {
+    background: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    position: relative;
+
+    .options-header-text {
+      text-align: center;
+    }
+
+    .close-button {
+      cursor: pointer;
+      display: block;
+      height: 46px;
+      line-height: 46px;
+      position: absolute;
+      right: 0;
+      text-align: center;
+      top: 0;
+      width: 46px;
+    }
+  }
+
+  .options-page-content {
+    margin-left: 0;
+    margin-right: 0;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      text-transform: capitalize;
+    }
+
+    input[type="color"] {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 3px;
+    }
+
+    button {
+      display: block;
+      margin: auto;
+      margin-top: 15px;
+    }
+  }
+}
+
+.custom-theme.show-theme-editor #custom-theme-page {
+  left: 0;
+}
+
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
   #shabad-menu-page { @include calculateTop(0, 1); }
+
+  .options-page {
+    top: 30px;
+  }
 
   #navigator.kb-active {
     $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
