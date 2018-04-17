@@ -1,0 +1,34 @@
+[
+  {
+    "name":"melancholia",
+    "background-color": "#f0fcff",
+    "gurbani-color": "#518ed2",
+    "translation-color": "#51b5c4",
+    "transliteration-color": "#acacac",
+    "teeka-color": "#155baa"
+  },
+  {
+    "name": "Night Lantern",
+    "background-color": "#000000",
+    "gurbani-color": "#ffcf5d",
+    "translation-color": "#ffe4a4",
+    "transliteration-color": "#ffb8aa",
+    "teeka-color": "#d7d7d7"
+  },
+  {
+    "name": "The Khalsa",
+    "background-color": "#ff6d25",
+    "gurbani-color": "#001280",
+    "translation-color": "#ffffff",
+    "transliteration-color": "#4d1b03",
+    "teeka-color": "#2543a2"
+  },
+  {
+    "name": "Simplicity",
+    "background-color": "#ffffff",
+    "gurbani-color": "#000000",
+    "translation-color": "#5d5d5d",
+    "transliteration-color": "#7c7c7c",
+    "teeka-color": "#bbbbbb"
+  }
+]
