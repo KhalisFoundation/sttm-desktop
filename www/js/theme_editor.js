@@ -47,21 +47,23 @@ const swatchFactory = themeInstance =>
       },
       themeInstance.name));
 
-const bgTileFactory = bgImage =>
-   h(
-     'li.theme-instance',
-     {
-       style: {
-         'background-image': `url(../${imagesPath}/${bgImage})`,
-       },
-       onclick: () => {
-         const currentTheme = getCurrentTheme();
-         currentTheme.bgImage = bgImage;
-         localStorage.setItem('customTheme', JSON.stringify(currentTheme));
-         global.core.platformMethod('updateTheme');
-       },
-     },
-    );
+const bgTileFactory = (bgImage) => {
+  const bgImageUrl = bgImage ? `url(../${imagesPath}/${bgImage})` : '';
+  return h(
+    'li.theme-instance',
+    {
+      style: {
+        'background-image': bgImageUrl,
+      },
+      onclick: () => {
+        const currentTheme = getCurrentTheme();
+        currentTheme.bgImage = bgImage;
+        localStorage.setItem('customTheme', JSON.stringify(currentTheme));
+        global.core.platformMethod('updateTheme');
+      },
+    },
+  );
+};
 
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
