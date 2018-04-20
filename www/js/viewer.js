@@ -6,14 +6,26 @@
 */
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
+const Noty = require('noty');
 const scroll = require('scroll');
 const core = require('./js/index');
 
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));
 
 if (window.localStorage.getItem('customTheme')) {
-  const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
-  applyTheme(userTheme);
+  try {
+    const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
+    applyTheme(userTheme);
+  } catch (error) {
+    new Noty({
+      type: 'error',
+      text: `There is an error getting custom theme.
+      Try checking theme file for errors. If error persists,
+      report it at www.sttm.co`,
+      timeout: 5000,
+      modal: true,
+    }).show();
+  }
 }
 
 let isWebView = false;
@@ -98,8 +110,21 @@ global.platform.ipc.on('update-settings', () => {
 });
 
 global.platform.ipc.on('update-theme', () => {
-  const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
-  applyTheme(userTheme);
+  try {
+    const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
+    applyTheme(userTheme);
+  } catch (error) {
+    // if there's an error, empty the custom theme object
+    window.localStorage.setItem('customTheme', '');
+    new Noty({
+      type: 'error',
+      text: `There is an error updating custom theme.
+      Try checking theme file for errors. If error persists,
+      report it at www.sttm.co`,
+      timeout: 5000,
+      modal: true,
+    }).show();
+  }
 });
 
 function nextAng() {

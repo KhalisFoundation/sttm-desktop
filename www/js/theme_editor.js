@@ -1,5 +1,6 @@
 const h = require('hyperscript');
 const fs = require('fs');
+const Noty = require('noty');
 const customThemes = require('./themes.json');
 
 const imagesPath = 'assets/custom_backgrounds';
@@ -10,7 +11,19 @@ defaultTheme.bgImage = '';
 const getCurrentTheme = () => {
   const currentThemeString = localStorage.getItem('customTheme');
   if (currentThemeString) {
-    return JSON.parse(currentThemeString);
+    try {
+      return JSON.parse(currentThemeString);
+    } catch (error) {
+      new Noty({
+        type: 'error',
+        text: `There is an error reading current theme.
+        Try checking theme file for errors. If error persists,
+        report it at www.sttm.co`,
+        timeout: 3000,
+        modal: true,
+      }).show();
+      return defaultTheme;
+    }
   }
   return defaultTheme;
 };
@@ -34,8 +47,19 @@ const swatchFactory = themeInstance =>
       onclick: () => {
         const newTheme = themeInstance;
         newTheme.bgImage = getCurrentTheme().bgImage;
-        localStorage.setItem('customTheme', JSON.stringify(newTheme));
-        global.core.platformMethod('updateTheme');
+        try {
+          localStorage.setItem('customTheme', JSON.stringify(newTheme));
+          global.core.platformMethod('updateTheme');
+        } catch (error) {
+          new Noty({
+            type: 'error',
+            text: `There is an error parsing this theme.
+            Try checking theme file for errors. If error persists,
+            report it at www.sttm.co`,
+            timeout: 3000,
+            modal: true,
+          }).show();
+        }
       },
     },
     h(
@@ -58,8 +82,19 @@ const bgTileFactory = (bgImage) => {
       onclick: () => {
         const currentTheme = getCurrentTheme();
         currentTheme.bgImage = bgImage;
-        localStorage.setItem('customTheme', JSON.stringify(currentTheme));
-        global.core.platformMethod('updateTheme');
+        try {
+          localStorage.setItem('customTheme', JSON.stringify(currentTheme));
+          global.core.platformMethod('updateTheme');
+        } catch (error) {
+          new Noty({
+            type: 'error',
+            text: `There is an error adding this background to current theme.
+            Try checking themes.json for errors. If error persists,
+            report it at www.sttm.co`,
+            timeout: 3000,
+            modal: true,
+          }).show();
+        }
       },
     },
   );
@@ -79,7 +114,7 @@ module.exports = {
     });
 
     customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));
-    customThemeOptions.appendChild(bgTileFactory(''));
+    // customThemeOptions.appendChild(bgTileFactory(''));
     fs.readdir(imagesPath, (err, images) => {
       images.forEach((image) => {
         customThemeOptions.appendChild(bgTileFactory(image));

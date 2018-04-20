@@ -2,12 +2,15 @@ const h = require('hyperscript');
 const settings = require('./settings');
 const getJSON = require('get-json');
 
-const buttonFactory = (options) => {
+const buttonFactory = ({
+  buttonId = '',
+  buttonIcon = 'fa-times',
+  buttonType = 'open',
+  pageToToggle,
+}) => {
   let classList;
-  const btnId = options.buttonId || '';
-  const btnIcon = options.buttonIcon || 'fa-times';
-  if (options.buttonType === 'open') {
-    classList = `#${btnId}.active`;
+  if (buttonType === 'open') {
+    classList = `#${buttonId}.active`;
   } else {
     classList = '.close-button';
   }
@@ -15,9 +18,9 @@ const buttonFactory = (options) => {
     `a${classList}.navigator-button`,
     {
       onclick: () => {
-        module.exports.toggleMenu(options.pageToToggle);
+        module.exports.toggleMenu(pageToToggle);
       } },
-    h(`i.fa.${btnIcon}`));
+    h(`i.fa.${buttonIcon}`));
 };
 
 const goToShabadPage = (shabadId) => {
@@ -63,7 +66,7 @@ const randomShabadButton = h(
     {
       onclick: () => {
         global.platform.search.randomShabad()
-          .then((shabadId) => { goToShabadPage(shabadId); });
+          .then(goToShabadPage);
       } },
     h('i.fa.fa-random.list-icon'),
     'Show Random Shabad'));
