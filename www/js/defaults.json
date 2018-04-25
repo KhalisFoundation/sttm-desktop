@@ -6,7 +6,8 @@
         "presenter-view": true
       },
       "custom-theme-options": {
-        "show-theme-editor": true
+        "show-theme-editor": true,
+        "show-dasam-bani": false
       }
     },
     "searchResults": {

@@ -86,9 +86,16 @@ Object.keys(keyboardLayout).forEach((i) => {
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
-const searchTypes = ['First Letter Start (Gurmukhi)', 'First Letter Anywhere (Gurmukhi)', 'Full Word (Gurmukhi)', 'English Translations (Full Word)'];
+const SEARCH_TYPES = {
+  FIRST_LETTERS: 0,
+  FIRST_LETTERS_ANYWHERE: 1,
+  GURMUKHI_WORD: 2,
+  ENGLISH_WORD: 3,
+  ROMANIZED: 4,
+  ANG: 5,
+};
 
-const searchTypeOptions = searchTypes.map((string, value) => h('option', { value }, string));
+const searchTypeOptions = Object.keys(SEARCH_TYPES).map((string, value) => h('option', { value }, string));
 
 const shabadNavFwd = h(
   'div#shabad-next.navigator-button',

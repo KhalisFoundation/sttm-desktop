@@ -12,10 +12,11 @@
         }
       },
       "custom-theme-options": {
-        "title": "Custom Theme Options",
-        "type": "switch",
+        "title": "Panel",
+        "type": "radio",
         "options": {
-          "show-theme-editor": "Show Theme Editor"
+          "show-theme-editor": "Show Theme Editor",
+          "show-dasam-bani-index": "Sri Dasam Granth Banis"
         }
       },
       "layout": {
