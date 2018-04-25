@@ -145,7 +145,7 @@ const granthIndex = {
       },
       {
         name: 'Bachittar Natak',
-        pages: [39, 73]
+        pages: [39, 73],
       },
       {
         name: 'Chandi Charitar Ukti Bilas',
@@ -238,19 +238,6 @@ module.exports = {
     const dasamBanis = document.querySelector('#dasam-banis');
     document.querySelector('#dbi-page-close').appendChild(closeDasamBani);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Custom Themes'));
-    customThemes.forEach((themeInstance) => {
-      customThemeOptions.appendChild(swatchFactory(themeInstance));
-    });
-
-    /* Postponed till next release
-    customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));
-    customThemeOptions.appendChild(bgTileFactory(''));
-    fs.readdir(imagesPath, (err, images) => {
-      images.forEach((image) => {
-        customThemeOptions.appendChild(bgTileFactory(image));
-      });
-    });
-    */
+    dasamBanis.appendChild('placeholder');
   },
 };
