@@ -1,14 +1,14 @@
 const h = require('hyperscript');
-const fs = require('fs');
+// const fs = require('fs');
 const Noty = require('noty');
 const customThemes = require('./themes.json');
 
-const imagesPath = 'assets/custom_backgrounds';
+// const imagesPath = 'assets/custom_backgrounds';
 
 const defaultTheme = customThemes[0];
-defaultTheme.bgImage = '';
+// defaultTheme.bgImage = '';
 
-const getCurrentTheme = () => {
+/* const getCurrentTheme = () => {
   const currentThemeString = localStorage.getItem('customTheme');
   if (currentThemeString) {
     try {
@@ -26,7 +26,7 @@ const getCurrentTheme = () => {
     }
   }
   return defaultTheme;
-};
+}; */
 
 const closeCustomTheme = h(
   'a.close-button',
@@ -43,10 +43,11 @@ const swatchFactory = themeInstance =>
     {
       style: {
         'background-color': themeInstance['background-color'],
+        'background-image': `url(../assets/custom_backgrounds/${themeInstance['background-image']})`,
       },
       onclick: () => {
         const newTheme = themeInstance;
-        newTheme.bgImage = getCurrentTheme().bgImage;
+        // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
           localStorage.setItem('customTheme', JSON.stringify(newTheme));
           global.core.platformMethod('updateTheme');
@@ -71,6 +72,7 @@ const swatchFactory = themeInstance =>
       },
       themeInstance.name));
 
+/* Postponed till next release
 const bgTileFactory = (bgImage) => {
   const bgImageUrl = bgImage ? `url(../${imagesPath}/${bgImage})` : '';
   return h(
@@ -99,7 +101,7 @@ const bgTileFactory = (bgImage) => {
     },
   );
 };
-
+*/
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
 module.exports = {
@@ -113,12 +115,14 @@ module.exports = {
       customThemeOptions.appendChild(swatchFactory(themeInstance));
     });
 
+    /* Postponed till next release
     customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));
-    // customThemeOptions.appendChild(bgTileFactory(''));
+    customThemeOptions.appendChild(bgTileFactory(''));
     fs.readdir(imagesPath, (err, images) => {
       images.forEach((image) => {
         customThemeOptions.appendChild(bgTileFactory(image));
       });
     });
+    */
   },
 };

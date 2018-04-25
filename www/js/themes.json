@@ -5,7 +5,8 @@
     "gurbani-color": "#518ed2",
     "translation-color": "#51b5c4",
     "transliteration-color": "#acacac",
-    "teeka-color": "#155baa"
+    "teeka-color": "#155baa",
+    "background-image": "golden_temple.jpg"
   },
   {
     "name": "Night Lantern",
@@ -13,7 +14,8 @@
     "gurbani-color": "#ffcf5d",
     "translation-color": "#ffe4a4",
     "transliteration-color": "#ffb8aa",
-    "teeka-color": "#d7d7d7"
+    "teeka-color": "#d7d7d7",
+    "background-image": "7.JPG"
   },
   {
     "name": "The Khalsa",
@@ -21,7 +23,8 @@
     "gurbani-color": "#001280",
     "translation-color": "#ffffff",
     "transliteration-color": "#4d1b03",
-    "teeka-color": "#2543a2"
+    "teeka-color": "#2543a2",
+    "background-image": "golden_temple.jpg"
   },
   {
     "name": "Simplicity",
@@ -29,6 +32,7 @@
     "gurbani-color": "#000000",
     "translation-color": "#5d5d5d",
     "transliteration-color": "#7c7c7c",
-    "teeka-color": "#bbbbbb"
+    "teeka-color": "#bbbbbb",
+    "background-image": "golden_temple.jpg"
   }
 ]
