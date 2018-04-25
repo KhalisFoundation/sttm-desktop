@@ -49,10 +49,10 @@ module.exports = {
         condition = `${searchCol} LIKE '${dbQuery}'`;
         break;
       }
-      case 5: // Ang
+      case 4: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.platform.search.currentMeta.source}'`;
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
         break;
       default:
         break;

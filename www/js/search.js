@@ -86,7 +86,13 @@ Object.keys(keyboardLayout).forEach((i) => {
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
-const searchTypes = ['First Letter Start (Gurmukhi)', 'First Letter Anywhere (Gurmukhi)', 'Full Word (Gurmukhi)', 'English Translations (Full Word)'];
+const searchTypes = [
+  'First Letter Start (Gurmukhi)',
+  'First Letter Anywhere (Gurmukhi)',
+  'Full Word (Gurmukhi)',
+  'English Translations (Full Word)',
+  'Ang Search',
+];
 
 const searchTypeOptions = searchTypes.map((string, value) => h('option', { value }, string));
 
