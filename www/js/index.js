@@ -49,13 +49,25 @@ function nextLine() {
   }
 }
 
+function nextAvailableLine() {
+    if (search.currentShabadNavigation === false || search.currentShabadNavigation > (search.currentShabad.length - 1)) {
+        search.currentShabadNavigation = 0;
+    } else {
+        search.currentShabadNavigation++;
+    }
+
+    highlightLine(search.currentShabad[search.currentShabadNavigation]);
+}
+
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
+  Mousetrap.bind('left', prevLine);
+  Mousetrap.bind('right', nextLine);
+  Mousetrap.bind('down', nextAvailableLine);
   Mousetrap.bind(['up', 'left'], prevLine);
-  Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
-  Mousetrap.bind('space', spaceBar);
+  Mousetrap.bind(['up', 'space'], spaceBar);
 }
 
 /**

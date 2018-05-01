@@ -16,6 +16,7 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+let currentShabadNavigation;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
@@ -148,6 +149,7 @@ function akhandPaatt() {
 module.exports = {
   currentShabad,
   currentMeta,
+  currentShabadNavigation,
 
   init() {
     this.searchType = parseInt(global.platform.getPref('searchOptions.searchType'), 10);
@@ -406,6 +408,7 @@ module.exports = {
   },
 
   printShabad(rows, ShabadID, LineID) {
+    this.currentShabadNavigation = false;
     const lineID = LineID || rows[0].ID;
     rows.forEach((item) => {
       const shabadLine = h(
@@ -483,6 +486,7 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID) {
+    // this.currentShabadNavigation = false;
     const lines = this.$shabad.querySelectorAll('a.panktee');
     if (e.target.classList.contains('fa-home')) {
       // Change main line
