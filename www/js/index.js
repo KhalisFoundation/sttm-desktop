@@ -50,13 +50,15 @@ function nextLine() {
 }
 
 function nextAvailableLine() {
-    if (search.currentShabadNavigation === false || search.currentShabadNavigation > (search.currentShabad.length - 1)) {
-        search.currentShabadNavigation = 0;
-    } else {
-        search.currentShabadNavigation++;
-    }
+  if (search.currentShabadNavigation === false ||
+      search.currentShabadNavigation > (search.currentShabad.length - 1)
+  ) {
+    search.currentShabadNavigation = 0;
+  } else {
+    search.currentShabadNavigation += 1;
+  }
 
-    highlightLine(search.currentShabad[search.currentShabadNavigation]);
+  highlightLine(search.currentShabad[search.currentShabadNavigation]);
 }
 
 // Keyboard shortcuts
