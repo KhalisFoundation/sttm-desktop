@@ -183,6 +183,12 @@ const winMenu = [
     ],
   },
   ...devMenu,
+  {
+    label: 'Donate',
+    click: () => {
+      main.openSecondaryWindow('dontaionWindow');
+    },
+  },
 ];
 
 const macMenu = [
@@ -256,6 +262,12 @@ const macMenu = [
     ],
   },
   ...devMenu,
+  {
+    label: 'Donate',
+    click: () => {
+      main.openSecondaryWindow('donationWindow');
+    },
+  },
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
 if (process.platform === 'darwin' || process.platform === 'linux') {

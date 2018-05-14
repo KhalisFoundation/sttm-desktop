@@ -63,3 +63,54 @@ $vertical-rhythm: $base-font-size * $ratio;
     border-radius: $vertical-rhythm / 2;
   }
 }
+
+.donation-wrapper {
+  text-align: center;
+
+  .donation-values-group {
+    display: flex;
+    justify-content: space-around;
+    padding: $vertical-rhythm;
+    text-align: center;
+
+    label {
+      background: #333;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      padding: $vertical-rhythm;
+
+      &:hover {
+        background: #000;
+      }
+    }
+
+    input {
+      height: $base-font-size;
+      margin: 0 5px 2px 0;
+      vertical-align: middle;
+      width: $base-font-size;
+    }
+  }
+
+  .donation-text-input {
+    margin: $vertical-rhythm;
+
+    input {
+      border: 1px solid #555;
+      border-radius: 5px;
+      min-width: 300px;
+
+      &::before {
+        content: '$';
+      }
+    }
+  }
+
+  button {
+    border-radius: 5px;
+    font-size: $base-font-size * 1.5;
+    margin: $vertical-rhythm auto;
+    min-width: 300px;
+  }
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Donate</title>
+  <link rel="stylesheet" href="assets/css/bundle.css">
+</head>
+<body class="noselect">
+  <div id="donation-frame" class="markdown-frame center-text">
+    <h1>Donate</h1>
+    <div class="donation-wrapper" id="donate">
+      <p>Established in 2000, Khalis Foundation is a fast growing Sikhi portal on the net. 
+        With the grace of the Almighty Waheguroo, we have been able to add apps and services 
+        promoting education, tolerance, unity and the beautiful teachings of the Gurus. 
+        Sikh youth education, community awareness and outreach, high quality media libraries, 
+        children’s apps, gurbani apps–these are just SOME of the projects in the works by the 
+        sevadaars at Khalis Foundation.
+      </p>
+      <blockquote>"<i>Your Donation is Tax Deductible.</i>"</blockquote>
+      <blockquote>No Paypal Login Required!</blockquote>
+
+      <h2>Donation Information</h2>
+      <h3>How much would you like to donate?</h3>
+
+      <div class="donation-values-group">
+        <label for="donation-choice-1">
+          <input type="radio" class="donation-choice" id="donation-choice-1" name="donate" value="10" checked>
+          10 USD
+        </label>
+
+        <label for="donation-choice-2">
+          <input type="radio" class="donation-choice" id="donation-choice-2" name="donate" value="25">
+          25 USD
+        </label>
+
+        <label for="donation-choice-3">
+          <input type="radio" class="donation-choice" id="donation-choice-3" name="donate" value="50">
+          50 USD
+        </label>
+
+        <label for="donation-choice-4">
+          <input type="radio" class="donation-choice" id="donation-choice-4" name="donate" value="100">
+          100 USD
+        </label>
+      </div>
+
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+        <input type="hidden" name="business" value="techsupport@waheguroo.com">
+        <input type="hidden" name="cmd" value="_donations">
+        <input type="hidden" name="currency_code" value="USD">
+        <input type="hidden" name="a3" value="10">
+        <input type="hidden" name="p3" value="1">
+        <input type="hidden" name="t3" value="M">
+        <input type="hidden" name="src" value="1">
+        
+        <h3>Or choose your own amount</h3>
+        <div class="donation-text-input">
+          $ <input type="number" id="donation-text-input" name="amount" placeholder ="Donation amount in USD" value="10">
+        </div>
+
+        <p>
+          <i>Is this a recurring donation? By giving monthly, you will be ensuring that we are able to 
+          continually push out more apps and services and keep them updated.</i>
+        </p>
+
+        <label for="recurring-option">
+          <input type="checkbox" id="recurring-option" name="recurring" value="monthly">Send Each Month
+        </label>
+
+        <div class="donation-submit-input">
+          <button type="Submit" class="button" id="donate-now">Donate Now</button>
+        </div>
+      </form>
+      <p>Khalis Foundation is a registered 501c3 in the USA. EIN: 46-2938976.</p>
+    </div>
+  </div>
+  <div class="preloader"></div>
+
+  <script src="js/markdownToHTML.js"></script>
+  <script type="text/javascript" src="js/donate.js"></script>
+</body>
+</html>
