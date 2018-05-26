@@ -382,9 +382,9 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID) {
+  sendLine(shabadID, lineID, Gurmukhi, English) {
     global.webview.send('show-line', { shabadID, lineID });
-    global.platform.ipc.send('show-line', { shabadID, lineID });
+    global.platform.ipc.send('show-line', { shabadID, lineID, Gurmukhi, English });
   },
 
   sendText(text, isGurmukhi) {

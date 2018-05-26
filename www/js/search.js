@@ -321,7 +321,8 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID, item.Gurmukhi),
+              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
+                                                  item.Gurmukhi, item.English),
             },
             resultNode));
         this.$results.appendChild(result);
@@ -334,7 +335,7 @@ module.exports = {
     }
   },
 
-  clickResult(e, ShabadID, LineID, Gurmukhi) {
+  clickResult(e, ShabadID, LineID, Gurmukhi, English) {
     document.body.classList.remove('home');
     this.closeGurmukhiKB();
     const sessionItem = h(
@@ -362,7 +363,7 @@ module.exports = {
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
     // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, LineID);
+    global.controller.sendLine(ShabadID, LineID, Gurmukhi, English);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -407,7 +408,13 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
+    let mainGurmukhi;
+    let mainEnglish;
     rows.forEach((item) => {
+      if (parseInt(lineID, 10) === item.ID) {
+        mainGurmukhi = item.Gurmukhi;
+        mainEnglish = item.English;
+      }
       const shabadLine = h(
         'li',
         {},
@@ -415,7 +422,8 @@ module.exports = {
           `a#line${item.ID}.panktee${(parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : '')}`,
           {
             'data-line-id': item.ID,
-            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID, item.ID),
+            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID,
+                           item.ID, item.Gurmukhi, item.English),
           },
           [
             h('i.fa.fa-fw.fa-check'),
@@ -435,7 +443,7 @@ module.exports = {
     const curPankteeTop = this.$shabad.querySelector('.current').parentNode.offsetTop;
     this.$shabadContainer.scrollTop = curPankteeTop;
     // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, lineID);
+    global.controller.sendLine(ShabadID, lineID, mainGurmukhi, mainEnglish);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -482,7 +490,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID) {
+  clickShabad(e, ShabadID, LineID, Gurmukhi, English) {
     const lines = this.$shabad.querySelectorAll('a.panktee');
     if (e.target.classList.contains('fa-home')) {
       // Change main line
@@ -493,7 +501,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID);
+      global.controller.sendLine(ShabadID, LineID, Gurmukhi, English);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee

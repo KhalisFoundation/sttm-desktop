@@ -10,6 +10,7 @@ const store = new Store({
   defaults: defaultPrefs,
 });
 const appVersion = app.getVersion();
+const fs = require('fs');
 
 let mainWindow;
 let viewerWindow = false;
@@ -235,6 +236,20 @@ ipcMain.on('clear-apv', () => {
   }
 });
 
+function createBroadcastFiles(arg) {
+  // TODO get Path from the User
+  const gurbaniFile = '/tmp/sttm-Gurbani.txt';
+  const englishFile = '/tmp/sttm-English.txt';
+  try {
+    fs.writeFile(gurbaniFile, arg.Gurmukhi.trim());
+    fs.appendFile(gurbaniFile, '\n');
+    fs.writeFile(englishFile, arg.English.trim());
+    fs.appendFile(englishFile, '\n');
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 ipcMain.on('show-line', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
@@ -244,6 +259,8 @@ ipcMain.on('show-line', (event, arg) => {
       data: arg,
     });
   }
+  // if OBS is enabled
+  createBroadcastFiles(arg);
 });
 
 ipcMain.on('show-text', (event, arg) => {
