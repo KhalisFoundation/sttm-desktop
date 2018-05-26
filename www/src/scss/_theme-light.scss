@@ -1,4 +1,5 @@
-body.light-theme {
+body.light-theme,
+body.custom-theme {
   background-color: #fff;
 
   .gurbani {
@@ -36,7 +37,8 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme {
+.light-theme,
+.custom-theme {
   #header {
     a {
       color: $base-text;

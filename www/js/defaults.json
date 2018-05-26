@@ -4,6 +4,9 @@
       "theme": "light-theme",
       "layout": {
         "presenter-view": true
+      },
+      "custom-theme-options": {
+        "show-theme-editor": true
       }
     },
     "searchResults": {

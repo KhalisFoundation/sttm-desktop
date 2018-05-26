@@ -299,7 +299,7 @@ module.exports = {
   // eslint-disable-next-line no-unused-vars
   search(e) {
     const searchQuery = this.$search.value;
-    if (searchQuery.length > 1) {
+    if (searchQuery.length >= 1) {
       global.platform.search.search(searchQuery, this.searchType);
     } else {
       this.$results.innerHTML = '';
