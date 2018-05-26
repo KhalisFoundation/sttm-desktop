@@ -3,7 +3,7 @@
   "env": {
     "browser": true,
     "mocha": true,
-    "node": true,
+    "node": true
   },
   "settings": {
     "import/core-modules": "electron"
