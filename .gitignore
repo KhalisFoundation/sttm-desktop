@@ -9,3 +9,4 @@ data.db
 npm-debug.log*
 
 package-lock.json
+.idea/
