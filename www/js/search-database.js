@@ -3,6 +3,8 @@ LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
 
+const CONSTS = require('./constants.js');
+
 module.exports = {
   search(searchQuery, searchType) {
     let dbQuery = '';
@@ -11,8 +13,8 @@ module.exports = {
     const order = [];
     const limit = ' 0,20';
     switch (searchType) {
-      case 0: // First letter start
-      case 1: { // First letter anywhere
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
         searchCol = 'v.FirstLetterStr';
         for (let x = 0, len = searchQuery.length; x < len; x += 1) {
           let charCode = searchQuery.charCodeAt(x);
@@ -37,8 +39,8 @@ module.exports = {
         }
         break;
       }
-      case 2: // Full word (Gurmukhi)
-      case 3: { // Full word (English)
+      case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
+      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
         if (searchType === 2) {
           searchCol = 'v.Gurmukhi';
         } else {
@@ -49,10 +51,10 @@ module.exports = {
         condition = `${searchCol} LIKE '${dbQuery}'`;
         break;
       }
-      case 5: // Ang
+      case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.platform.search.currentMeta.source}'`;
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
         break;
       default:
         break;
