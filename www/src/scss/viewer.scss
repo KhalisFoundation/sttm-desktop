@@ -29,6 +29,13 @@ html {
   cursor: default;
 }
 
+body {
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 #viewer {
   margin: 0;
   overflow: auto;
@@ -57,6 +64,15 @@ html {
   &.active {
     opacity: 1;
   }
+}
+
+.overlay {
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
 
 .slide {
