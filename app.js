@@ -280,6 +280,12 @@ ipcMain.on('update-settings', () => {
   }
 });
 
+ipcMain.on('update-theme', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('update-theme');
+  }
+});
+
 exports.openSecondaryWindow = openSecondaryWindow;
 exports.appVersion = appVersion;
 exports.checkForUpdates = checkForUpdates;
