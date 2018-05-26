@@ -1,0 +1,59 @@
+[
+  {
+    "name":"Khalsa Gold",
+    "background-color": "#ffda39",
+    "gurbani-color": "#ffffff",
+    "gurbani-shadow": "0 0 4px rgba(140,81,5,1)",
+    "translation-color": "#4d2b00",
+    "transliteration-color": "#413b3d",
+    "teeka-color": "#723c03",
+    "background-image": "golden.png"
+  },
+  {
+    "name": "Baagi Blue",
+    "background-color": "#7db6c7",
+    "gurbani-color": "#ffffff",
+    "gurbani-shadow": "5px 5px 1px rgba(0,0,0,0.7)",
+    "translation-color": "#fbfbfb",
+    "transliteration-color": "#f4f4f9",
+    "teeka-color": "#a0d5fe",
+    "background-image": "dark-blue.png"
+  },
+  {
+    "name": "Khalsa Rush",
+    "background-color": "#fec43c",
+    "gurbani-color": "#071f77",
+    "translation-color": "#001060",
+    "transliteration-color": "#f7faf6",
+    "teeka-color": "#433e5d",
+    "background-image": "orange.png"
+  },
+  {
+    "name": "Moody Blue",
+    "background-color": "#38987b7",
+    "gurbani-color": "#fcfefe",
+    "translation-color": "#fde5ab",
+    "transliteration-color": "#f1f5f4",
+    "teeka-color": "#86a3ba",
+    "background-image": "blue.png"
+  },
+  {
+    "name": "A new day",
+    "background-color": "#7ccf3",
+    "gurbani-color": "#0e2654",
+    "gurbani-shadow": "2px 2px 2px rgba(255,255,255,0.7)",
+    "translation-color": "#003a8c",
+    "transliteration-color": "#80878a",
+    "teeka-color": "#033780",
+    "background-image": "clouds.png"
+  },
+  {
+    "name": "Black & Blue",
+    "background-color": "#05060b",
+    "gurbani-color": "#ffffff",
+    "translation-color": "#a3eafd",
+    "transliteration-color": "#ededef",
+    "teeka-color": "#7a7a7c",
+    "background-image": "black.png"
+  }
+]

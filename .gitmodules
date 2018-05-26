@@ -1,3 +1,0 @@
-[submodule "www"]
-	path = www/core
-	url = git@github.com:khalisfoundation/sttm-core.git

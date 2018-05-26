@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>SikhiToTheMax</title>
   <link rel="stylesheet" href="assets/css/bundle.css">
-  <link rel="stylesheet" href="core/css/font-awesome.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/font-awesome.min.css">
 </head>
 <body class="home controller desktop">
   <div id="titlebar" class="noselect">
@@ -51,9 +51,97 @@
   </div>
   <div id="app-frame">
     <webview id="main-viewer" src="viewer.html" nodeintegration></webview>
-    <div id="navigator" class="noselect"></div>
+    <div id="navigator" class="noselect">
+      <div id="options-ui">
+        <div class="options-page" id="custom-theme-page">
+          <header class="options-page-header">
+            <div class="options-header-text"> Theme Editor </div>
+            <div class="close-button-container" id="options-page-close"> </div>
+          </header>
+          <section class="block-list options-page-content">
+            <ul class="options-list" id="custom-theme-options">
+
+            </ul>
+          </section>
+          </div>
+        </div>
+      <div id="main-ui">
+        <div class="nav-page" id="search-page">
+          <div class="navigator-header">
+            <div class="preferences-open"> </div>
+            <span class="nav-header-text">Search</span>
+            <div id="shabad-menu"></div>
+          </div>
+          <div class="search-div"></div>
+          <section class="block-list">
+            <ul id="results" class="gurmukhi"></ul>
+          </section>
+        </div>
+        <div class="nav-page" id="session-page">
+          <div class="navigator-header">
+            <div class="preferences-open"> </div>
+            <span class="nav-header-text">History</span>
+          </div>
+          <section class="block-list">
+            <ul id="session" class="gurmukhi"></ul>
+          </section>
+        </div>
+        <div class="nav-page" id="shabad-page">
+          <div class="navigator-header">
+            <div class="preferences-open"> </div>
+            <div class="shabad-prev"> </div>
+            <span class="nav-header-text">Current Shabad</span>
+            <div class="shabad-next"> </div>
+            <div id="current-shabad-menu"></div>
+          </div>
+          <section class="block-list">
+            <ul id="shabad" class="gurmukhi"></ul>
+          </section>
+        </div>
+        <div class="takeover-page" id="menu-page">
+          <div class="navigator-header">
+            <div class="preferences-close"> </div>
+            <span class="nav-header-text">Settings</span>
+          </div>
+        </div>
+        <div class="takeover-page" id="custom-slides-page">
+          <div class="navigator-header">
+            <span class="nav-header-text">Custom Slides</span>
+            <div class="custom-slides-close"> </div>
+          </div>
+          <section class="block-list">
+            <ul id="list-of-custom-slides">
+
+            </ul>
+          </section>
+        </div>
+        <div class="takeover-page" id="shabad-menu-page">
+          <div class="navigator-header">
+            <span class="nav-header-text">Shabad Options</span>
+            <div class="shabad-menu-close"> </div>
+          </div>
+          <section class="block-list">
+            <ul id="list-of-shabad-options">
+
+            </ul>
+          </section>
+        </div>
+      </div>
+      <div id="footer">
+        <div class="menu-group">
+          <div class="menu-group-left"></div>
+          <!-- <div class="menu-group-right">
+            <ul class="menu-bar">
+              <li>
+                <a class="action" data-action="settings.openSettings"><span class="small"><i class="fa fa-fw fa-cog"></i></span><span class="medium">Settings</span></a>
+              </li>
+            </ul>
+          </div> -->
+        </div>
+      </div>
+    </div>
   </div>
-  <script src="core/js/vendor/mousetrap.min.js"></script>
+  <script src="assets/js/vendor/mousetrap.min.js"></script>
   <script src="js/desktop_index.js"></script>
 </body>
 </html>

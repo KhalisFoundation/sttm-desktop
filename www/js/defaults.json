@@ -4,6 +4,9 @@
       "theme": "light-theme",
       "layout": {
         "presenter-view": true
+      },
+      "custom-theme-options": {
+        "show-theme-editor": true
       }
     },
     "searchResults": {
@@ -22,6 +25,9 @@
         "translation": 5,
         "transliteration": 4,
         "teeka": 4
+      },
+      "autoplay-options": {
+        "autoplayTimer": 10
       },
       "display-options": {
         "larivaar": false,

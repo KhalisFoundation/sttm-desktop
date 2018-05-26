@@ -1,0 +1,14 @@
+{
+  "search": {
+    "label": "Search",
+    "icon": "search"
+  },
+  "session": {
+    "label": "History",
+    "icon": "history"
+  },
+  "shabad": {
+    "label": "Current Shabad",
+    "icon": "dot-circle-o"
+  }
+}

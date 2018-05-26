@@ -188,9 +188,15 @@ const winMenu = [
       },
       ...updateMenu,
       {
+        label: 'Guide...',
+        click: () => {
+          main.openSecondaryWindow('helpWindow');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
-          main.openChangelog();
+          main.openSecondaryWindow('changelogWindow');
         },
       },
     ],
@@ -207,12 +213,6 @@ const macMenu = [
         role: 'about',
       },
       ...updateMenu,
-      {
-        label: 'Changelog...',
-        click: () => {
-          main.openChangelog();
-        },
-      },
       {
         type: 'separator',
       },
@@ -257,6 +257,23 @@ const macMenu = [
     ],
   },
   ...menuTemplate,
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'Guide...',
+        click: () => {
+          main.openSecondaryWindow('helpWindow');
+        },
+      },
+      {
+        label: 'Changelog...',
+        click: () => {
+          main.openSecondaryWindow('changelogWindow');
+        },
+      },
+    ],
+  },
   ...devMenu,
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
@@ -409,5 +426,9 @@ module.exports = {
 
   'presenter-view': function presenterView() {
     updateViewerScale();
+  },
+
+  autoplay() {
+    global.core.search.checkAutoPlay();
   },
 };

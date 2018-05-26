@@ -8,7 +8,7 @@ const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
 
 const defaultPrefs = require('./defaults.json');
-const search = require('./search');
+const search = require('./search-database');
 const Store = require('./store');
 
 const { remote } = electron;
@@ -110,6 +110,11 @@ module.exports = {
   updateSettings() {
     global.webview.send('update-settings');
     global.platform.ipc.send('update-settings');
+  },
+
+  updateTheme() {
+    global.webview.send('update-theme');
+    global.platform.ipc.send('update-theme');
   },
 
   getAllPrefs(schema = store.data) {
