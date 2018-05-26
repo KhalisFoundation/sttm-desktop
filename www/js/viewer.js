@@ -301,7 +301,7 @@ function showLine(ShabadID, LineID) {
     global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni, v.Punjabi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
       (err, rows) => {
         createCards(rows, LineID)
-          .then(({ cards }) => createDeck(cards, LineID, ShabadID));
+          .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
       });
   }
 }
