@@ -23,10 +23,6 @@ const secondaryWindows = {
     obj: false,
     url: `file://${__dirname}/www/help.html`,
   },
-  donationWindow: {
-    obj: false,
-    url: `file://${__dirname}/www/donate.html`,
-  },
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
