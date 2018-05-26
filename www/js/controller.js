@@ -186,7 +186,7 @@ const winMenu = [
   {
     label: 'Donate',
     click: () => {
-      main.openSecondaryWindow('dontaionWindow');
+      electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
 ];
@@ -265,7 +265,7 @@ const macMenu = [
   {
     label: 'Donate',
     click: () => {
-      main.openSecondaryWindow('donationWindow');
+      electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
 ];
