@@ -27,7 +27,8 @@ $keyboard-height:128px;
   "update",
   "viewer",
   "window",
-  "akhandpaatt";
+  "akhandpaatt",
+  "noty";
 
 a {
   cursor: default;
@@ -152,13 +153,127 @@ a {
   }
 }
 
+.options-page {
+  background: #f0f0f0;
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.3);
+  height: 100vh;
+  left: -400px;
+  position: fixed;
+  top: 0;
+  transition: 1s all ease;
+  width: 300px;
+  z-index: 4;
+
+  .options-page-header {
+    background: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    position: relative;
+
+    .options-header-text {
+      text-align: center;
+    }
+
+    .close-button {
+      cursor: pointer;
+      display: block;
+      height: 46px;
+      line-height: 46px;
+      position: absolute;
+      right: 0;
+      text-align: center;
+      top: 0;
+      width: 46px;
+    }
+  }
+
+  .options-page-content {
+    margin-left: 0;
+    margin-right: 0;
+
+    .options-list {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      width: 100%;
+    }
+
+    header {
+      width: 100%;
+    }
+
+    li {
+      span {
+        cursor: pointer;
+      }
+
+      span:hover {
+        background: transparent;
+      }
+    }
+
+    button {
+      display: block;
+      margin: auto;
+      margin-top: 15px;
+    }
+  }
+}
+
+.custom-theme.show-theme-editor #custom-theme-page {
+  left: 0;
+}
+
+.theme-instance {
+  align-items: center;
+  background-color: #fff;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-bottom-width: 0;
+  border-radius: 5px;
+  border-top-width: 0;
+  cursor: pointer;
+  display: flex;
+  height: 75px;
+  justify-content: center;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(1px, 1px, 1px, 0.5);
+  text-transform: capitalize;
+  transition: 0.1s all ease;
+  width: 115px;
+
+  &:hover {
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin-top: 6px;
+  }
+
+  &:active {
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  span {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+}
+
+.win32 .options-page {
+  top: 30px;
+}
+
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
   #shabad-menu-page { @include calculateTop(0, 1); }
 
   #navigator.kb-active {
-    $height:calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
+    $height: calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
 
     .nav-page {
       &:nth-child(1) {

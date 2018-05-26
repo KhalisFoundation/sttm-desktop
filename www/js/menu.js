@@ -2,44 +2,63 @@ const h = require('hyperscript');
 const settings = require('./settings');
 const getJSON = require('get-json');
 
+const buttonFactory = ({
+  buttonId = '',
+  buttonIcon = 'fa-times',
+  buttonType = 'open',
+  pageToToggle,
+}) => {
+  let classList;
+  if (buttonType === 'open') {
+    classList = `#${buttonId}.active`;
+  } else {
+    classList = '.close-button';
+  }
+  return h(
+    `a${classList}.navigator-button`,
+    {
+      onclick: () => {
+        module.exports.toggleMenu(pageToToggle);
+      } },
+    h(`i.fa.${buttonIcon}`));
+};
+
+const goToShabadPage = (shabadId) => {
+  global.core.search.loadShabad(shabadId);
+  module.exports.toggleMenu('#shabad-menu-page');
+  document.querySelector('#shabad-pageLink').click();
+};
+
+/* Generate Toggle Buttons */
 const menuButton = h(
   'a.menu-button.navigator-button.active',
   h('i.fa.fa-bars'));
-const closeButton = h(
-  'a.close-button.navigator-button',
-  {
-    onclick: () => {
-      module.exports.toggleMenu('#menu-page');
-    } },
-  h('i.fa.fa-times'));
-const customSlidesButton = h(
-  'a#custom-slide-menu.navigator-button.active',
-  {
-    onclick: () => {
-      module.exports.toggleMenu('#custom-slides-page');
-    } },
-  h('i.fa.fa-clone'));
-const shabadMenuButton = h(
-  'a#shabad-menu.navigator-button.active',
-  {
-    onclick: () => {
-      module.exports.toggleMenu('#shabad-menu-page');
-    } },
-  h('i.fa.fa-briefcase'));
-const shabadMenuCloseButton = h(
-  'a.close-button.navigator-button',
-  {
-    onclick: () => {
-      module.exports.toggleMenu('#shabad-menu-page');
-    } },
-  h('i.fa.fa-times'));
-const customSlidesCloseButton = h(
-  'a.close-button.navigator-button',
-  {
-    onclick: () => {
-      module.exports.toggleMenu('#custom-slides-page');
-    } },
-  h('i.fa.fa-times'));
+const customSlidesButton = buttonFactory({
+  buttonType: 'open',
+  buttonIcon: 'fa-clone',
+  buttonId: 'custom-slides-menu',
+  pageToToggle: '#custom-slides-page',
+});
+const shabadMenuButton = buttonFactory({
+  buttonType: 'open',
+  buttonIcon: 'fa-archive',
+  buttonId: 'shabad-menu',
+  pageToToggle: '#shabad-menu-page',
+});
+const closeButton = buttonFactory({
+  buttonType: 'close',
+  pageToToggle: '#menu-page',
+});
+const shabadMenuCloseButton = buttonFactory({
+  buttonType: 'close',
+  pageToToggle: '#shabad-menu-page',
+});
+const customSlidesCloseButton = buttonFactory({
+  buttonType: 'close',
+  pageToToggle: '#custom-slides-page',
+});
+
+/* load Shabad buttons */
 const randomShabadButton = h(
   'li',
   h(
@@ -47,12 +66,7 @@ const randomShabadButton = h(
     {
       onclick: () => {
         global.platform.search.randomShabad()
-          .then((shabadId) => {
-            global.core.search.loadShabad(shabadId);
-            module.exports.toggleMenu('#shabad-menu-page');
-            // go to shabad page
-            document.querySelector('#shabad-pageLink').click();
-          });
+          .then(goToShabadPage);
       } },
     h('i.fa.fa-random.list-icon'),
     'Show Random Shabad'));
@@ -61,12 +75,8 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: () => {
-        global.core.search.loadShabad(2897);
-        module.exports.toggleMenu('#shabad-menu-page');
-        // go to shabad page
-        document.querySelector('#shabad-pageLink').click();
-      } },
+      onclick: () => { goToShabadPage(2897); },
+    },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
 const hukamnamaButton = h(
@@ -76,14 +86,13 @@ const hukamnamaButton = h(
     {
       onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
-          global.core.search.loadShabad(response.hukamnamainfo.shabadid[0]);
-          module.exports.toggleMenu('#shabad-menu-page');
-          // go to shabad page
-          document.querySelector('#shabad-pageLink').click();
+          goToShabadPage(response.hukamnamainfo.shabadid[0]);
         });
       } },
     h('i.fa.fa-gavel.list-icon'),
     'Hukamnama of the day'));
+
+/* load text buttons */
 const emptySlideButton = h(
   'li',
   h(
