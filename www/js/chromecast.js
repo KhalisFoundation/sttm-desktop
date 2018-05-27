@@ -49,7 +49,7 @@ const receiverFn = receivers =>
 
 require('electron-chromecast')(receiverFn);
 
-const applicationID = 'ECF05819';
+const applicationID = '3F64A19C';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
 let isCastInitialized = false;
