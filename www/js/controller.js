@@ -392,6 +392,16 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
+  if (global.platform.getUserPref('app.layout.presenter-view')) {
+    document.body.classList.add('presenter-view');
+    document.body.classList.remove('home');
+  }
+  document.body.classList.add('scale-viewer');
+  global.viewer = {
+    width: 800,
+    height: 600,
+  };
+  updateViewerScale();
   // menuCast.icon = './www/assets/img/ic_cast_black_connected.png';
 });
 global.platform.ipc.on('cast-session-stopped', () => {
