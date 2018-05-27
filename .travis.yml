@@ -11,8 +11,8 @@ git:
 language: node_js
 node_js: "8"
 cache:
-  yarn: true
   directories:
+  - node_modules
   - $HOME/.electron
 before_install:
 - if [ "$TRAVIS_BRANCH" = "release" ]; then openssl aes-256-cbc -K $encrypted_fec05b564c85_key -iv $encrypted_fec05b564c85_iv
