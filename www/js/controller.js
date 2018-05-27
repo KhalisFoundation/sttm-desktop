@@ -202,6 +202,12 @@ const winMenu = [
     ],
   },
   ...devMenu,
+  {
+    label: 'Donate',
+    click: () => {
+      electron.shell.openExternal('https://khalisfoundation.org/donate/');
+    },
+  },
 ];
 
 const macMenu = [
@@ -275,6 +281,12 @@ const macMenu = [
     ],
   },
   ...devMenu,
+  {
+    label: 'Donate',
+    click: () => {
+      electron.shell.openExternal('https://khalisfoundation.org/donate/');
+    },
+  },
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
 if (process.platform === 'darwin' || process.platform === 'linux') {
