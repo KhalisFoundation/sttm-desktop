@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const request = promisify(require('request'));
 
-const SYNC_API_URL = 'http://localhost:1337';
+const SYNC_API_URL = 'https://api.sikhitothemax.org';
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 
 module.exports = {

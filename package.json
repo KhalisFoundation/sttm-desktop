@@ -6,11 +6,9 @@
   "main": "app.js",
   "scripts": {
     "precommit": "npm test",
-    "test":
-      "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" --syntax scss",
+    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" --syntax scss",
     "test:app": "mocha",
-    "start":
-      "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
+    "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css",
     "pack:mac": "npm run build && build --mac",
     "pack:win": "npm run build && build --win --x64",
@@ -22,10 +20,8 @@
     "dist:mac": "npm run pack:mac && npm run upload:mac",
     "dist:win": "npm run pack:win && npm run upload:win",
     "dist:win32": "npm run pack:win32 && npm run upload:win32",
-    "build-css":
-      "node-sass --output-style compressed --include-path www/scss www/src/scss/styles.scss www/assets/css/bundle.css",
-    "watch-css":
-      "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css\"",
+    "build-css": "node-sass --output-style compressed --include-path www/scss www/src/scss/styles.scss www/assets/css/bundle.css",
+    "watch-css": "nodemon --watch www -e scss -x \"node-sass --output-style nested --source-map true --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css\"",
     "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
@@ -89,7 +85,9 @@
       "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map"
     ],
-    "extraResources": ["data.db"],
+    "extraResources": [
+      "data.db"
+    ],
     "directories": {
       "buildResources": "assets",
       "output": "builds"
@@ -106,7 +104,10 @@
     "mac": {
       "category": "public.app-category.reference",
       "icon": "assets/STTM3.icns",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "nsis": {
       "artifactName": "${productName}Setup-${version}.${ext}",
@@ -116,7 +117,9 @@
     "win": {
       "icon": "assets/STTME.ico",
       "publisherName": "Khalis Foundation",
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "linux": {
       "target": "deb",
