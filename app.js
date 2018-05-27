@@ -144,7 +144,7 @@ function createViewer(ipcData) {
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
@@ -161,11 +161,11 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('closed', () => {
       viewerWindow = false;
-      mainWindow.webContents.send('remove-presenter-view');
+      mainWindow.webContents.send('remove-external-display');
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
@@ -186,7 +186,7 @@ app.on('ready', () => {
   });
   mainWindow.webContents.on('did-finish-load', () => {
     if (checkForExternalDisplay()) {
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width: viewerWindowPos.w,
         height: viewerWindowPos.h,
       });
