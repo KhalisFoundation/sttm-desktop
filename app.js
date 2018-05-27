@@ -259,8 +259,9 @@ ipcMain.on('show-line', (event, arg) => {
       data: arg,
     });
   }
-  // if OBS is enabled
-  createBroadcastFiles(arg);
+  if (arg.live) {
+    createBroadcastFiles(arg);
+  }
 });
 
 ipcMain.on('show-text', (event, arg) => {

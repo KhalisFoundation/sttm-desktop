@@ -384,7 +384,11 @@ module.exports = {
 
   sendLine(shabadID, lineID, Gurmukhi, English) {
     global.webview.send('show-line', { shabadID, lineID });
-    global.platform.ipc.send('show-line', { shabadID, lineID, Gurmukhi, English });
+    const showLinePayload = { shabadID, lineID, Gurmukhi, English, live: false };
+    if (document.body.classList.contains('livefeed')) {
+      showLinePayload.live = true;
+    }
+    global.platform.ipc.send('show-line', showLinePayload);
   },
 
   sendText(text, isGurmukhi) {
