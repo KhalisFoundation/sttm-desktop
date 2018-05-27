@@ -1,18 +1,17 @@
 const { promisify } = require('util');
 const request = promisify(require('request'));
-const h = require('hyperscript');
 
 const SYNC_API_URL = 'http://localhost:1337';
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 
 module.exports = {
   $content: null,
+  $connectBox: null,
+  $shareBox: null,
   $connectBtn: null,
 
   init() {
-    this.$content = document.querySelector('#sync-page .block-list');
-    this.$connectBtn = this.$content.querySelector('.connect-btn');
-
+    // Inject socket.io script
     if (
       document.querySelector(`script[src="${SOCKET_SCRIPT_SOURCE}"]`) === null
     ) {
@@ -21,26 +20,33 @@ module.exports = {
       document.body.appendChild(script);
     }
 
-    Object.assign(this.$content.style, {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    });
+    this.$content = document.querySelector('#sync-page .block-list');
+    this.$connectBtn = this.$content.querySelector('.connect-btn');
+    this.$connectBox = this.$content.querySelector('.connect-box');
+    this.$shareBox = this.$content.querySelector('.share-box');
+    this.$shareBox.querySelector(
+      'input[name="code"]',
+    ).onclick = function onInputClick() {
+      this.select();
+    };
 
     this.$connectBtn.addEventListener('click', () => this.tryConnection());
   },
   async tryConnection() {
+    const previousText = this.$connectBtn.textContent;
+    this.$connectBtn.textContent = 'Loading...';
+
     const {
       body: { data, error },
     } = await request(`${SYNC_API_URL}/sync/begin`, {
       json: true,
     });
 
+    this.$connectBtn.textContent = previousText;
+
     if (error) {
-      // TODO: do something
-      this.$content.appendChild(
-        h('h1', "Couldn't establish connection with sync server"),
-      );
+      this.$connectBox.querySelector('.help-block').textContent =
+        "Couldn't establish connection with sync server";
     } else {
       const { namespaceString } = data;
 
@@ -52,56 +58,22 @@ module.exports = {
     }
   },
   onConnect(namespaceString) {
-    this.$connectBtn.classList.add('hidden');
-    this.$connectBtn.style.display = 'none';
-    window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
+    this.$connectBox.classList.add('hidden');
+    this.$shareBox.classList.remove('hidden');
+    this.$shareBox
+      .querySelector('input')
+      .setAttribute('value', namespaceString);
 
-    this.$content.appendChild(
-      h(
-        'div.share-box',
-        {
-          style: `
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-          `,
-        },
-        [
-          h(
-            'h1',
-            {
-              style: `
-                margin; 10px;
-                `,
-            },
-            'Ready to share!',
-          ),
-          h('input', {
-            readonly: true,
-            onclick() {
-              this.select();
-            },
-            value: namespaceString,
-          }),
-          h(
-            'button',
-            {
-              className: 'button',
-              onclick: () => this.onEnd(namespaceString),
-            },
-            'Stop sharing',
-          ),
-        ],
-      ),
-    );
+    this.$shareBox.querySelector('.end-btn').onclick = () =>
+      this.onEnd(namespaceString);
+
+    window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
   },
   async onEnd(namespaceString) {
     window.socket.disconnect();
     await request(`${SYNC_API_URL}/sync/end/${namespaceString}`);
     window.socket = undefined;
-    this.$connectBtn.classList.remove('hidden');
-    this.$connectBtn.style.display = 'block';
-    this.$content.querySelector('.share-box').remove();
+    this.$connectBox.classList.remove('hidden');
+    this.$shareBox.classList.add('hidden');
   },
 };

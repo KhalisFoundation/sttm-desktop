@@ -108,7 +108,19 @@
             <span class="nav-header-text">Synced Share</span>
           </div>
           <section class="block-list">
-            <button class="button connect-btn">Connect</button>
+            <div class="connect-box">
+              <div class="help-block">Give remote access to devices via unique code.</div>
+              <button class="button connect-btn">Start Sharing</button>
+            </div>
+            <div class="share-box hidden">
+              <div class="help-block">
+                Ask sangat to visit
+                <a href="https://sttm.co/sync" target="_blank">sttm.co/sync</a>
+                and enter the following code
+              </div>
+              <input name="code" readonly value="" />
+              <button class="button end-btn">Stop Sharing</button>
+            </div>
           </section>
         </div>
         <div class="takeover-page" id="menu-page">
