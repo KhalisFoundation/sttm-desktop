@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
     "electron-updater": "^2.21.0",
     "get-json": "^1.0.0",
@@ -66,7 +67,8 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "scroll": "^2.0.1",
-    "sqlite3": "^3.1.8"
+    "sqlite3": "^3.1.13",
+    "update": "^0.7.4"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",

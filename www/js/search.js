@@ -137,7 +137,7 @@ const sources = {
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', (e) => {
   const target = e.target;
-  if (!document.querySelector('.search-div').contains(target)) {
+  if (document.querySelector('.search-div') && !document.querySelector('.search-div').contains(target)) {
     module.exports.closeGurmukhiKB();
   }
 });
