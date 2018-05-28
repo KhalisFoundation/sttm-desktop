@@ -1,20 +1,21 @@
-body.light-theme {
-  background-color: #fff;
+body.moody-blue {
+  background-color: #38987b;
+  background-image: url("/assets/custom_backgrounds/blue.png");
 
   .gurbani {
-    color: #01579b;
+    color: #fcfefe;
   }
 
   .translation {
-    color: #4e4e4e;
+    color: #fde5ab;
   }
 
   .teeka {
-    color: #5a5a5a;
+    color: #86a3ba;
   }
 
   .transliteration {
-    color: #666;
+    color: #f1f5f4;
   }
 
   .logo {
@@ -36,7 +37,7 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme {
+.moody-blue {
   #header {
     a {
       color: $base-text;

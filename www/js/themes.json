@@ -1,5 +1,23 @@
 [
   {
+    "name":"Dark",
+    "background-color": "#000",
+    "gurbani-color": "#fff",
+    "translation-color": "#e2e2e2",
+    "transliteration-color": "#ababab",
+    "teeka-color": "#c6c6c6",
+    "key": "dark-theme"
+  },
+  {
+    "name":"Light",
+    "background-color": "#fff",
+    "gurbani-color": "#01579b",
+    "translation-color": "#4e4e4e",
+    "transliteration-color": "#666",
+    "teeka-color": "#5a5a5a",
+    "key": "light-theme"
+  },
+  {
     "name":"Khalsa Gold",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
@@ -7,7 +25,8 @@
     "translation-color": "#4d2b00",
     "transliteration-color": "#413b3d",
     "teeka-color": "#723c03",
-    "background-image": "golden.png"
+    "background-image": "golden.png",
+    "key": "khalsa-gold"
   },
   {
     "name": "Baagi Blue",
@@ -17,7 +36,8 @@
     "translation-color": "#fbfbfb",
     "transliteration-color": "#f4f4f9",
     "teeka-color": "#a0d5fe",
-    "background-image": "dark-blue.png"
+    "background-image": "dark-blue.png",
+    "key": "baagi-blue"
   },
   {
     "name": "Khalsa Rush",
@@ -26,7 +46,8 @@
     "translation-color": "#001060",
     "transliteration-color": "#f7faf6",
     "teeka-color": "#433e5d",
-    "background-image": "orange.png"
+    "background-image": "orange.png",
+    "key": "khalsa-rush"
   },
   {
     "name": "Moody Blue",
@@ -35,7 +56,8 @@
     "translation-color": "#fde5ab",
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#86a3ba",
-    "background-image": "blue.png"
+    "background-image": "blue.png",
+    "key": "moody-blue"
   },
   {
     "name": "A new day",
@@ -45,7 +67,8 @@
     "translation-color": "#003a8c",
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
-    "background-image": "clouds.png"
+    "background-image": "clouds.png",
+    "key": "a-new-day"
   },
   {
     "name": "Black & Blue",
@@ -54,6 +77,7 @@
     "translation-color": "#a3eafd",
     "transliteration-color": "#ededef",
     "teeka-color": "#7a7a7c",
-    "background-image": "black.png"
+    "background-image": "black.png",
+    "key": "black-blue"
   }
 ]
