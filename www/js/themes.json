@@ -5,14 +5,18 @@
     "gurbani-color": "#000000",
     "translation-color": "#353535",
     "transliteration-color": "#353535",
-    "teeka-color": "#4b4b4b"
+    "teeka-color": "#4b4b4b",
+    "type": "COLOR",
+    "key": "light-theme"
   }, {
     "name":"Dark",
     "background-color": "#000",
     "gurbani-color": "#c9e7ff",
     "translation-color": "#fff",
     "transliteration-color": "#fff",
-    "teeka-color": "#fff"
+    "teeka-color": "#fff",
+    "type": "COLOR",
+    "key": "dark-theme"
   }, {
     "name":"Khalsa Gold",
     "background-color": "#ffda39",
@@ -21,7 +25,9 @@
     "translation-color": "#4d2b00",
     "transliteration-color": "#413b3d",
     "teeka-color": "#723c03",
-    "background-image": "golden.jpg"
+    "background-image": "golden.jpg",
+    "type": "BACKGROUND",
+    "key": "khalsa-gold"
   },
   {
     "name": "Baagi Blue",
@@ -31,7 +37,9 @@
     "translation-color": "#fbfbfb",
     "transliteration-color": "#f4f4f9",
     "teeka-color": "#d3ecff",
-    "background-image": "dark-blue.jpg"
+    "background-image": "dark-blue.jpg",
+    "type": "BACKGROUND",
+    "key": "baagi-blue"
   },
   {
     "name": "Khalsa Rush",
@@ -40,7 +48,9 @@
     "translation-color": "#001060",
     "transliteration-color": "#f7faf6",
     "teeka-color": "#433e5d",
-    "background-image": "orange.jpg"
+    "background-image": "orange.jpg",
+    "type": "BACKGROUND",
+    "key": "khalsa-rush"
   },
   {
     "name": "Moody Blue",
@@ -49,7 +59,9 @@
     "translation-color": "#fde5ab",
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#d1dbe2",
-    "background-image": "blue.jpg"
+    "background-image": "blue.jpg",
+    "type": "BACKGROUND",
+    "key": "moody-blue"
   },
   {
     "name": "A New Day",
@@ -59,7 +71,9 @@
     "translation-color": "#003a8c",
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
-    "background-image": "clouds.jpg"
+    "background-image": "clouds.jpg",
+    "type": "BACKGROUND",
+    "key": "a-new-day"
   },
   {
     "name": "Black & Blue",
@@ -68,7 +82,9 @@
     "translation-color": "#a3eafd",
     "transliteration-color": "#ededef",
     "teeka-color": "#d4d4d4",
-    "background-image": "black.jpg"
+    "background-image": "black.jpg",
+    "type": "BACKGROUND",
+    "key": "black-blue"
   }
 
 ]

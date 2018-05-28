@@ -1,25 +1,26 @@
-body.dark-theme {
-  background-color: #000;
+body.moody-blue {
+  background-color: #38987b;
+  background-image: url("../../../assets/custom_backgrounds/blue.jpg");
 
   .gurbani {
-    color: #fff;
+    color: #fcfefe;
   }
 
   .translation {
-    color: #e2e2e2;
+    color: #fde5ab;
   }
 
   .teeka {
-    color: #c6c6c6;
+    color: #86a3ba;
   }
 
   .transliteration {
-    color: #ababab;
+    color: #f1f5f4;
   }
 
   .logo {
     path {
-      fill: #212121;
+      fill: #e0e0e0;
     }
   }
 
@@ -39,7 +40,7 @@ body.dark-theme {
     }
   }
 }
-//TODO: Consolidate to mixin for the dark themes
+
 $bg-main: #212121;
 $bg-alt: #3a3a3a;
 $bg-bright: #424242;
@@ -53,7 +54,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.dark-theme {
+.moody-blue {
   color: $text-base;
 
   #header {

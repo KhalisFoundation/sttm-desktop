@@ -1,20 +1,21 @@
-body.light-theme {
-  background-color: #fff;
+body.a-new-day {
+  background-color: #07ccf3;
+  background-image: url("../../../assets/custom_backgrounds/clouds.jpg");
 
   .gurbani {
-    color: #01579b;
+    color: #0e2654;
   }
 
   .translation {
-    color: #4e4e4e;
+    color: #003a8c;
   }
 
   .teeka {
-    color: #5a5a5a;
+    color: #033780;
   }
 
   .transliteration {
-    color: #666;
+    color: #80878a;
   }
 
   .logo {
@@ -29,15 +30,22 @@ body.light-theme {
     }
   }
 }
-//TODO: Consolidate to mixin for the light themes
+
 $statusbar-bg: #e0e0e0;
 $nav-bg: #f5f5f5;
 $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme,
-.custom-theme {
+.a-new-day {
+  .deck {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .deck .gurbani {
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.7));
+  }
+
   #header {
     a {
       color: $base-text;

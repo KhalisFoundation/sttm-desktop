@@ -3,13 +3,9 @@
     "title": "App Settings",
     "settings": {
       "theme": {
-        "title": "App Theme",
+        "title": "",
         "type": "radio",
-        "options": {
-          "light-theme": "Light Theme",
-          "dark-theme": "Dark Theme",
-          "custom-theme": "More Theme"
-        }
+        "options": {}
       },
       "custom-theme-options": {
         "title": "Themes Options",

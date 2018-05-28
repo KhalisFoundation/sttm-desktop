@@ -117,6 +117,11 @@ module.exports = {
     global.platform.ipc.send('update-theme');
   },
 
+  removeTheme() {
+    global.webview.send('remove-theme');
+    global.platform.ipc.send('remove-theme');
+  },
+
   getAllPrefs(schema = store.data) {
     return this.getPref('userPrefs', schema);
   },
