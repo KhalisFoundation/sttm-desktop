@@ -165,7 +165,6 @@ global.platform.ipc.on('update-theme', () => {
   if (userTheme) {
     applyTheme(userTheme.app.theme);
   }
-
 });
 
 function nextAng() {
@@ -224,7 +223,7 @@ function createCards(rows, LineID) {
           larivaar: taggedGurmukhi.join('<wbr>'),
           translation: row.English,
           teeka: row.Punjabi,
-          transliteration: row.Transliteration
+          transliteration: row.Transliteration,
         };
       });
       resolve({ cards, lines, shabad });
