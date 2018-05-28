@@ -43,16 +43,18 @@ const swatchFactory = themeInstance =>
     {
       style: {
         'background-color': themeInstance['background-color'],
-        'background-image': `${themeInstance['background-image'] ? `url(../assets/custom_backgrounds/${themeInstance['background-image']})` : 'none'}`,
+        'background-image': `url(../assets/custom_backgrounds/${themeInstance['background-image']})`,
       },
       onclick: () => {
         // const newTheme = themeInstance;
         // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
           document.body.classList.remove(global.platform.getUserPref('app.theme'));
+          global.core.platformMethod('removeTheme');
           global.platform.setUserPref('app.theme', themeInstance.key);
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
+          global.core.platformMethod('updateTheme');
         } catch (error) {
           new Noty({
             type: 'error',

@@ -13,22 +13,6 @@ const core = require('./js/index');
 
 let prefs = JSON.parse(window.localStorage.getItem('prefs'));
 
-if (window.localStorage.getItem('customTheme')) {
-  try {
-    const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
-    applyTheme(userTheme);
-  } catch (error) {
-    new Noty({
-      type: 'error',
-      text: `There is an error getting custom theme.
-      Try checking theme file for errors. If error persists,
-      report it at www.sttm.co`,
-      timeout: 5000,
-      modal: true,
-    }).show();
-  }
-}
-
 let isWebView = false;
 let apv = false;
 let $apv;
@@ -145,10 +129,10 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
-global.platform.ipc.on('update-theme', () => {
+global.platform.ipc.on('remove-theme', () => {
+  let userTheme;
   try {
-    const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
-    applyTheme(userTheme);
+    userTheme = JSON.parse(window.localStorage.getItem('prefs'));
   } catch (error) {
     new Noty({
       type: 'error',
@@ -159,6 +143,29 @@ global.platform.ipc.on('update-theme', () => {
       modal: true,
     }).show();
   }
+  if (userTheme) {
+    document.body.classList.remove(userTheme.app.theme);
+  }
+});
+
+global.platform.ipc.on('update-theme', () => {
+  let userTheme;
+  try {
+    userTheme = JSON.parse(window.localStorage.getItem('prefs'));
+  } catch (error) {
+    new Noty({
+      type: 'error',
+      text: `There is an error updating custom theme.
+      Try checking theme file for errors. If error persists,
+      report it at www.sttm.co`,
+      timeout: 5000,
+      modal: true,
+    }).show();
+  }
+  if (userTheme) {
+    applyTheme(userTheme.app.theme);
+  }
+
 });
 
 function nextAng() {
@@ -212,11 +219,13 @@ function createCards(rows, LineID) {
               h('h2.teeka', row.PunjabiUni),
               h('h2.transliteration', row.Transliteration),
             ]));
-        shabad[row.ID] = { gurmukhi: row.Gurmukhi,
+        shabad[row.ID] = {
+          gurmukhi: row.Gurmukhi,
           larivaar: taggedGurmukhi.join('<wbr>'),
           translation: row.English,
           teeka: row.Punjabi,
-          transliteration: row.Transliteration };
+          transliteration: row.Transliteration
+        };
       });
       resolve({ cards, lines, shabad });
     }

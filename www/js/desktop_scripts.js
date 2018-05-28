@@ -114,7 +114,10 @@ module.exports = {
 
   updateTheme() {
     global.webview.send('update-theme');
-    global.platform.ipc.send('update-theme');
+  },
+
+  removeTheme() {
+    global.webview.send('remove-theme');
   },
 
   getAllPrefs(schema = store.data) {

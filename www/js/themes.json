@@ -5,14 +5,16 @@
     "gurbani-color": "#000000",
     "translation-color": "#353535",
     "transliteration-color": "#353535",
-    "teeka-color": "#4b4b4b"
+    "teeka-color": "#4b4b4b",
+    "key": "light-theme"
   }, {
     "name":"Dark",
     "background-color": "#000",
     "gurbani-color": "#c9e7ff",
     "translation-color": "#fff",
     "transliteration-color": "#fff",
-    "teeka-color": "#fff"
+    "teeka-color": "#fff",
+    "key": "dark-theme"
   }, {
     "name":"Khalsa Gold",
     "background-color": "#ffda39",
@@ -63,7 +65,7 @@
     "translation-color": "#003a8c",
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
-    "background-image": "clouds.jpg"
+    "background-image": "clouds.jpg",
     "key": "a-new-day"
   },
   {

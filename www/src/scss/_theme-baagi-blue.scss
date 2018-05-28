@@ -1,5 +1,6 @@
 body.baagi-blue {
   background-color: #7db6c7;
+  background-image: url("../../../assets/custom_backgrounds/dark-blue.jpg");
 
   .gurbani {
     color: #fff;
@@ -28,81 +29,128 @@ body.baagi-blue {
       border-color: #333;
     }
   }
+
+  .panktee.search-result {
+    .translation {
+      color: #e2e2e2;
+    }
+
+    .transliteration {
+      color: #ababab;
+    }
+  }
 }
 
-$statusbar-bg: #e0e0e0;
-$nav-bg: #f5f5f5;
-$alt-bg: #fafafa;
-$dialog-bg: #fff;
-$base-text: #4e4e4e;
+$bg-main: #212121;
+$bg-alt: #3a3a3a;
+$bg-bright: #424242;
+$text-base: #bdbdbd;
+$text-bright: #e0e0e0;
+$text-dim: #9e9e9e;
+$border: #424242;
+$scrollbar: #999;
+$white: #fff;
+$accent: #4fc3f7;
+$highlight-bg: #37474f;
+$highlight-text: #cfd8dc;
 
 .baagi-blue {
-  .deck {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .deck .gurbani {
-    -webkit-filter: drop-shadow(5px 5px 1px rgba(0, 0, 0, 0.7));
-  }
+  color: $text-base;
 
   #header {
     a {
-      color: $base-text;
+      color: $text-base;
 
       &:hover,
       &.active {
-        background-color: $dialog-bg;
+        background-color: $bg-alt;
       }
     }
   }
 
   .navigator-header {
-    background-color: $statusbar-bg;
-    color: $base-text;
+    background-color: $bg-main;
+    color: $text-base;
   }
 
   #gurmukhi-keyboard {
-    background-color: $nav-bg;
+    background-color: $bg-main;
   }
 
   #gurmukhi-keyboard .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
   #gurmukhi-keyboard .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
-    background-color: $alt-bg;
+    background-color: $bg-alt;
   }
 
   #gurmukhi-keyboard button {
-    color: $base-text;
+    color: $text-base;
   }
 
-  .nav-page {
-    background-color: $nav-bg;
+  .nav-page,
+  .takeover-page {
+    background: $bg-alt;
 
-    a.panktee.current {
-      background-color: #c5deea !important;
-      color: $base-text !important;
+    h2 {
+      border-top: 1px $border solid;
+      color: $text-dim;
+    }
+
+    h2:first-child {
+      border-top: none;
     }
   }
 
-  .takeover-page {
-    background-color: $dialog-bg;
+  .nav-page {
+    a.panktee.current {
+      background-color: #37474f !important;
+      color: $text-base !important;
+    }
+  }
+
+  .switch > label {
+    background: $text-dim;
+  }
+
+  .switch > label::after {
+    background: $text-bright;
+    border-color: $text-dim;
+  }
+
+  .switch input:checked + label {
+    background: $accent;
+  }
+
+  .switch input:checked + label::after {
+    background: $white;
+    border-color: $accent;
   }
 
   #search-container {
     input {
-      color: $base-text;
+      color: $text-bright;
     }
 
     input:focus + div {
-      background: $dialog-bg;
+      background: rgba(255, 255, 255, 0.12);
     }
 
     > button {
-      color: $base-text;
+      color: $text-bright;
     }
   }
 
-  .panktee.search-result .gurmukhi {
-    color: $base-text;
+  #search-container:focus {
+    background: white;
+  }
+
+  #search-options select {
+    background-color: $bg-main;
+    border: $bg-main;
+    color: $text-bright;
+  }
+
+  .panktee {
+    color: $text-base;
   }
 
   .block-list {
@@ -110,28 +158,28 @@ $base-text: #4e4e4e;
       > a,
       > span,
       > label {
-        color: $base-text;
+        color: $text-base;
 
         &:hover {
-          background-color: $nav-bg;
+          background-color: $bg-bright;
         }
       }
     }
   }
 
   #footer {
-    background-color: $statusbar-bg;
+    background-color: $bg-main;
 
     a {
-      color: $base-text;
+      color: $text-base;
 
       &.active,
       &:hover {
-        background-color: $nav-bg;
+        background-color: $bg-alt;
       }
 
       &.active {
-        color: #0277bd;
+        color: $highlight-text;
       }
     }
   }
@@ -145,7 +193,7 @@ $base-text: #4e4e4e;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #bdbdbd;
+    background-color: $scrollbar;
     border-radius: 6px;
   }
 }
