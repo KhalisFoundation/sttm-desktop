@@ -1,20 +1,20 @@
-body.light-theme {
-  background-color: #fff;
+body.khalsa-rush {
+  background-color: #fec43c;
 
   .gurbani {
-    color: #01579b;
+    color: #071f77;
   }
 
   .translation {
-    color: #4e4e4e;
+    color: #001060;
   }
 
   .teeka {
-    color: #5a5a5a;
+    color: #433e5d;
   }
 
   .transliteration {
-    color: #666;
+    color: #f7faf6;
   }
 
   .logo {
@@ -36,7 +36,11 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme {
+.khalsa-rush {
+  .deck {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
   #header {
     a {
       color: $base-text;

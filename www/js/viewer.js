@@ -150,8 +150,6 @@ global.platform.ipc.on('update-theme', () => {
     const userTheme = JSON.parse(window.localStorage.getItem('customTheme'));
     applyTheme(userTheme);
   } catch (error) {
-    // if there's an error, empty the custom theme object
-    window.localStorage.setItem('customTheme', '');
     new Noty({
       type: 'error',
       text: `There is an error updating custom theme.

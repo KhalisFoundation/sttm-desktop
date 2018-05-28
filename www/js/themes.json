@@ -21,7 +21,8 @@
     "translation-color": "#4d2b00",
     "transliteration-color": "#413b3d",
     "teeka-color": "#723c03",
-    "background-image": "golden.jpg"
+    "background-image": "golden.jpg",
+    "key": "khalsa-gold"
   },
   {
     "name": "Baagi Blue",
@@ -31,7 +32,8 @@
     "translation-color": "#fbfbfb",
     "transliteration-color": "#f4f4f9",
     "teeka-color": "#d3ecff",
-    "background-image": "dark-blue.jpg"
+    "background-image": "dark-blue.jpg",
+    "key": "baagi-blue"
   },
   {
     "name": "Khalsa Rush",
@@ -40,7 +42,8 @@
     "translation-color": "#001060",
     "transliteration-color": "#f7faf6",
     "teeka-color": "#433e5d",
-    "background-image": "orange.jpg"
+    "background-image": "orange.jpg",
+    "key": "khalsa-rush"
   },
   {
     "name": "Moody Blue",
@@ -49,7 +52,8 @@
     "translation-color": "#fde5ab",
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#d1dbe2",
-    "background-image": "blue.jpg"
+    "background-image": "blue.jpg",
+    "key": "moody-blue"
   },
   {
     "name": "A New Day",
@@ -60,6 +64,7 @@
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
     "background-image": "clouds.jpg"
+    "key": "a-new-day"
   },
   {
     "name": "Black & Blue",
@@ -68,7 +73,8 @@
     "translation-color": "#a3eafd",
     "transliteration-color": "#ededef",
     "teeka-color": "#d4d4d4",
-    "background-image": "black.jpg"
+    "background-image": "black.jpg",
+    "key": "black-blue"
   }
 
 ]

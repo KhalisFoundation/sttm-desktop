@@ -1,20 +1,20 @@
-body.light-theme {
-  background-color: #fff;
+body.khalsa-gold {
+  background-color: #ffda39;
 
   .gurbani {
-    color: #01579b;
+    color: #fff;
   }
 
   .translation {
-    color: #4e4e4e;
+    color: #4d2b00;
   }
 
   .teeka {
-    color: #5a5a5a;
+    color: #723c03;
   }
 
   .transliteration {
-    color: #666;
+    color: #413b3d;
   }
 
   .logo {
@@ -36,7 +36,15 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme {
+.khalsa-gold {
+  .deck {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .deck .gurbani {
+    -webkit-filter: drop-shadow(0 0 4px rgba(140, 81, 5, 1));
+  }
+
   #header {
     a {
       color: $base-text;
