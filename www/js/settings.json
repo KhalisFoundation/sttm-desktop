@@ -8,14 +8,14 @@
         "options": {
           "light-theme": "Light Theme",
           "dark-theme": "Dark Theme",
-          "custom-theme": "Custom Theme"
+          "custom-theme": "More Theme"
         }
       },
       "custom-theme-options": {
-        "title": "Custom Theme Options",
+        "title": "Themes Options",
         "type": "switch",
         "options": {
-          "show-theme-editor": "Show Theme Editor"
+          "show-theme-editor": "Show Theme Picker"
         }
       },
       "layout": {
