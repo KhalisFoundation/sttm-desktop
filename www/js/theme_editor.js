@@ -43,7 +43,7 @@ const swatchFactory = themeInstance =>
     {
       style: {
         'background-color': themeInstance['background-color'],
-        'background-image': `${themeInstance['background-image'] ? `url(../assets/custom_backgrounds/${themeInstance['background-image']})` : 'none'}`,
+        'background-image': `url(../assets/custom_backgrounds/${themeInstance['background-image']})`,
       },
       onclick: () => {
         // const newTheme = themeInstance;
