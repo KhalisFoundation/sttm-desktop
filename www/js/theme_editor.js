@@ -114,9 +114,18 @@ module.exports = {
     const customThemeOptions = document.querySelector('#custom-theme-options');
     document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Custom Themes'));
+    customThemeOptions.appendChild(swatchHeaderFactory('Colors'));
     customThemes.forEach((themeInstance) => {
-      customThemeOptions.appendChild(swatchFactory(themeInstance));
+      if (themeInstance.type === 'COLOR') {
+        customThemeOptions.appendChild(swatchFactory(themeInstance));
+      }
+    });
+
+    customThemeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
+    customThemes.forEach((themeInstance) => {
+      if (themeInstance.type === 'BACKGROUND') {
+        customThemeOptions.appendChild(swatchFactory(themeInstance));
+      }
     });
 
     /* customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));
