@@ -1,23 +1,23 @@
 [
   {
-    "name":"Dark",
-    "background-color": "#000",
-    "gurbani-color": "#fff",
-    "translation-color": "#e2e2e2",
-    "transliteration-color": "#ababab",
-    "teeka-color": "#c6c6c6",
-    "key": "dark-theme"
-  },
-  {
     "name":"Light",
     "background-color": "#fff",
-    "gurbani-color": "#01579b",
-    "translation-color": "#4e4e4e",
-    "transliteration-color": "#666",
-    "teeka-color": "#5a5a5a",
+    "gurbani-color": "#000000",
+    "translation-color": "#353535",
+    "transliteration-color": "#353535",
+    "teeka-color": "#4b4b4b",
+    "type": "COLOR",
     "key": "light-theme"
-  },
-  {
+  }, {
+    "name":"Dark",
+    "background-color": "#000",
+    "gurbani-color": "#c9e7ff",
+    "translation-color": "#fff",
+    "transliteration-color": "#fff",
+    "teeka-color": "#fff",
+    "type": "COLOR",
+    "key": "dark-theme"
+  }, {
     "name":"Khalsa Gold",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
@@ -25,7 +25,8 @@
     "translation-color": "#4d2b00",
     "transliteration-color": "#413b3d",
     "teeka-color": "#723c03",
-    "background-image": "golden.png",
+    "background-image": "golden.jpg",
+    "type": "BACKGROUND",
     "key": "khalsa-gold"
   },
   {
@@ -35,8 +36,9 @@
     "gurbani-shadow": "5px 5px 1px rgba(0,0,0,0.7)",
     "translation-color": "#fbfbfb",
     "transliteration-color": "#f4f4f9",
-    "teeka-color": "#a0d5fe",
-    "background-image": "dark-blue.png",
+    "teeka-color": "#d3ecff",
+    "background-image": "dark-blue.jpg",
+    "type": "BACKGROUND",
     "key": "baagi-blue"
   },
   {
@@ -46,7 +48,8 @@
     "translation-color": "#001060",
     "transliteration-color": "#f7faf6",
     "teeka-color": "#433e5d",
-    "background-image": "orange.png",
+    "background-image": "orange.jpg",
+    "type": "BACKGROUND",
     "key": "khalsa-rush"
   },
   {
@@ -55,19 +58,21 @@
     "gurbani-color": "#fcfefe",
     "translation-color": "#fde5ab",
     "transliteration-color": "#f1f5f4",
-    "teeka-color": "#86a3ba",
-    "background-image": "blue.png",
+    "teeka-color": "#d1dbe2",
+    "background-image": "blue.jpg",
+    "type": "BACKGROUND",
     "key": "moody-blue"
   },
   {
-    "name": "A new day",
+    "name": "A New Day",
     "background-color": "#7ccf3",
     "gurbani-color": "#0e2654",
     "gurbani-shadow": "2px 2px 2px rgba(255,255,255,0.7)",
     "translation-color": "#003a8c",
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
-    "background-image": "clouds.png",
+    "background-image": "clouds.jpg",
+    "type": "BACKGROUND",
     "key": "a-new-day"
   },
   {
@@ -76,8 +81,10 @@
     "gurbani-color": "#ffffff",
     "translation-color": "#a3eafd",
     "transliteration-color": "#ededef",
-    "teeka-color": "#7a7a7c",
-    "background-image": "black.png",
+    "teeka-color": "#d4d4d4",
+    "background-image": "black.jpg",
+    "type": "BACKGROUND",
     "key": "black-blue"
   }
+
 ]

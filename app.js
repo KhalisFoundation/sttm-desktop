@@ -312,6 +312,12 @@ ipcMain.on('update-theme', () => {
   }
 });
 
+ipcMain.on('remove-theme', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('remove-theme');
+  }
+});
+
 exports.openSecondaryWindow = openSecondaryWindow;
 exports.appVersion = appVersion;
 exports.checkForUpdates = checkForUpdates;

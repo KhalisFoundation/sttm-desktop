@@ -3,19 +3,15 @@
     "title": "App Settings",
     "settings": {
       "theme": {
-        "title": "App Theme",
+        "title": "",
         "type": "radio",
-        "options": {
-          "light-theme": "Light Theme",
-          "dark-theme": "Dark Theme",
-          "custom-theme": "Custom Theme"
-        }
+        "options": {}
       },
       "custom-theme-options": {
-        "title": "Custom Theme Options",
+        "title": "Themes Options",
         "type": "switch",
         "options": {
-          "show-theme-editor": "Show Theme Editor"
+          "show-theme-editor": "Show Theme Picker"
         }
       },
       "layout": {

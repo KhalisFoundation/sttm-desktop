@@ -50,9 +50,11 @@ const swatchFactory = themeInstance =>
         // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
           document.body.classList.remove(global.platform.getUserPref('app.theme'));
+          global.core.platformMethod('removeTheme');
           global.platform.setUserPref('app.theme', themeInstance.key);
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
+          global.core.platformMethod('updateTheme');
         } catch (error) {
           new Noty({
             type: 'error',
@@ -112,9 +114,18 @@ module.exports = {
     const customThemeOptions = document.querySelector('#custom-theme-options');
     document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Custom Themes'));
+    customThemeOptions.appendChild(swatchHeaderFactory('Colours'));
     customThemes.forEach((themeInstance) => {
-      customThemeOptions.appendChild(swatchFactory(themeInstance));
+      if (themeInstance.type === 'COLOR') {
+        customThemeOptions.appendChild(swatchFactory(themeInstance));
+      }
+    });
+
+    customThemeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
+    customThemes.forEach((themeInstance) => {
+      if (themeInstance.type === 'BACKGROUND') {
+        customThemeOptions.appendChild(swatchFactory(themeInstance));
+      }
     });
 
     /* customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));

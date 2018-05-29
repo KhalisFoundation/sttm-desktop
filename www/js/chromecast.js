@@ -200,7 +200,7 @@ function stopApp() {
  * @param {string} message A message string
  */
 function sendMessage(message) {
-  if (session != null) {
+  if (session != null && session.status !== 'STOPPED') {
     session.sendMessage(namespace, message, onSuccess.bind(this, 'Message sent: ' + message),
       onError);
   } else {
