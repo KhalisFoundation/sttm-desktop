@@ -245,9 +245,9 @@ ipcMain.on('clear-apv', () => {
 });
 
 function createBroadcastFiles(arg) {
-  // TODO get Path from the User
-  const gurbaniFile = '/tmp/sttm-Gurbani.txt';
-  const englishFile = '/tmp/sttm-English.txt';
+  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
+  const englishFile = `${userDataPath}/sttm-English.txt`;
   try {
     fs.writeFile(gurbaniFile, arg.Gurmukhi.trim());
     fs.appendFile(gurbaniFile, '\n');
