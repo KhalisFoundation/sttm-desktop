@@ -254,6 +254,7 @@ function createBroadcastFiles(arg) {
     fs.writeFile(englishFile, arg.English.trim());
     fs.appendFile(englishFile, '\n');
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log(err);
   }
 }
