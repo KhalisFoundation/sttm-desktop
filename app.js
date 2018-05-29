@@ -245,7 +245,7 @@ ipcMain.on('clear-apv', () => {
 });
 
 function createBroadcastFiles(arg) {
-  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+  const userDataPath = electron.app.getPath('userData');
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
   try {
