@@ -1,6 +1,22 @@
 const h = require('hyperscript');
 const settings = require('./settings');
 const getJSON = require('get-json');
+const tingle = require('./vendor/tingle');
+const request = require('request');
+const moment = require('moment');
+const electron = require('electron');
+
+const modal = new tingle.Modal({
+  footer: true,
+  stickyFooter: false,
+  cssClass: ['notifications-modal'],
+  closeMethods: ['overlay', 'button', 'escape'],
+});
+
+const closeBtn = 'Close';
+modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+  modal.close();
+});
 
 const buttonFactory = ({
   buttonId = '',
@@ -27,6 +43,23 @@ const goToShabadPage = (shabadId) => {
   global.core.search.loadShabad(shabadId);
   module.exports.toggleMenu('#shabad-menu-page');
   document.querySelector('#shabad-pageLink').click();
+};
+
+// format the date default to "Month Day, Year"
+const formatDate = (dateString, format = 'LL') => moment(dateString).format(format);
+
+const createNotificationContent = (msgList) => {
+  let html = '<h1 class="model-title">What\'s New</h1>';
+
+  msgList.forEach((item) => {
+    html += '<div class="row">';
+    html += `<div class="date">${formatDate(item.Created)}</div>`;
+    html += `<div class="title">${item.Title}</div>`;
+    html += `<div class="content">${item.Content}</div>`;
+    html += '</div>';
+  });
+
+  return html;
 };
 
 /* Generate Toggle Buttons */
@@ -182,6 +215,42 @@ const announcementSlideButton = h(
         global.controller.sendText(announcementText, isGurmukhi);
       } },
     'Add Announcement'));
+const notificationButton = h(
+  'button.notificaitons.navigator-button.navigator-header',
+  {
+    onclick: () => {
+      request('http://api.sikhitothemax.org/messages/desktop/', (error, response) => {
+        if (response) {
+          let message;
+          try {
+            message = JSON.parse(response.body);
+          } catch (e) {
+            console.error(e);
+          }
+          if (message) {
+            const content = createNotificationContent(message);
+            // set content
+            modal.setContent(content);
+            // open modal
+            modal.open();
+            document.getElementById('notifications-icon').classList.remove('badge');
+          }
+        }
+      });
+    },
+  },
+  h('i#notifications-icon.fa.fa-bell'),
+);
+
+// On href clicks, open the link in actual browser
+document.body.addEventListener('click', (e) => {
+  const target = e.target;
+  const link = target.href;
+  if (target.href) {
+    e.preventDefault();
+    electron.shell.openExternal(link);
+  }
+});
 
 module.exports = {
   settings,
@@ -199,6 +268,7 @@ module.exports = {
 
 
     document.getElementById('shabad-menu').appendChild(shabadMenuButton);
+    document.getElementById('notifications').appendChild(notificationButton);
     document.querySelector('.shabad-menu-close').appendChild(shabadMenuCloseButton);
 
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');

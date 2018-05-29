@@ -48,6 +48,10 @@ function openSecondaryWindow(windowName) {
   });
 }
 
+function indicateNewNotifications() {
+  document.getElementById('notifications-icon').classList.add('badge');
+}
+
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
