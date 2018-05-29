@@ -1,5 +1,14 @@
 ## SikhiToTheMax Desktop App
 
+### 4.0.0-beta.1 - _180528_
+#### Added
+ * **Chromecast** - Cast to any Chromecast video receiver device
+ * **Backgrounds/Themes** - 6 new gorgeous backgrounds and themes to further lend to the tranquil environment
+ * **1-Letter Search** - Why wait? Start searching right when you start typing
+ * **Auto-play** - Automatically advance to the next line on a timer
+ * **Random Shabad** - Not looking for anything in particular but want to read Bani? Get a random Shabad
+ * **Donate button** - If you would like to show your appreciation with a monetary gift, please click the Donate button
+
 ### 3.3.1 - _180401_
 #### Added
  * Help Section - Get your most frequently asked questions answered in the help section
