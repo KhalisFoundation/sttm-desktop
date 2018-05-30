@@ -48,6 +48,19 @@ const goToShabadPage = (shabadId) => {
 // format the date default to "Month Day, Year"
 const formatDate = (dateString, format = 'LL') => moment(dateString).format(format);
 
+const stripScripts = (string) => {
+  const div = document.createElement('div');
+  div.innerHTML = string;
+  const scripts = div.getElementsByTagName('script');
+  let i = scripts.length;
+  while (i > 0) {
+    scripts[i].parentNode.removeChild(scripts[i]);
+    i -= 1;
+  }
+  return div.innerHTML;
+};
+
+
 const createNotificationContent = (msgList) => {
   let html = '<h1 class="model-title">What\'s New</h1>';
 
@@ -55,7 +68,7 @@ const createNotificationContent = (msgList) => {
     html += '<div class="row">';
     html += `<div class="date">${formatDate(item.Created)}</div>`;
     html += `<div class="title">${item.Title}</div>`;
-    html += `<div class="content">${item.Content}</div>`;
+    html += `<div class="content">${stripScripts(item.Content)}</div>`;
     html += '</div>';
   });
 
