@@ -60,6 +60,15 @@ const stripScripts = (string) => {
   return div.innerHTML;
 };
 
+const scriptTagCheckRegEx = /<[^>]*script/i;
+
+const parseContent = (contentString) => {
+  if (scriptTagCheckRegEx.test(contentString)) {
+    return stripScripts(contentString); // this might be overkill.
+  }
+  return contentString;
+};
+
 
 const createNotificationContent = (msgList) => {
   let html = '<h1 class="model-title">What\'s New</h1>';
@@ -68,7 +77,7 @@ const createNotificationContent = (msgList) => {
     html += '<div class="row">';
     html += `<div class="date">${formatDate(item.Created)}</div>`;
     html += `<div class="title">${item.Title}</div>`;
-    html += `<div class="content">${stripScripts(item.Content)}</div>`;
+    html += `<div class="content">${parseContent(item.Content)}</div>`;
     html += '</div>';
   });
 
