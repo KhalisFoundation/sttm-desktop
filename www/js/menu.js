@@ -225,6 +225,7 @@ const notificationButton = h(
           try {
             message = JSON.parse(response.body);
           } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(e);
           }
           if (message) {

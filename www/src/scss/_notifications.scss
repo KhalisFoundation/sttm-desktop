@@ -31,7 +31,7 @@
   }
 }
 
-.badge:after {
+.badge::after {
   background: red;
   border-radius: 50%;
   content: "";
