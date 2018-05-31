@@ -45,6 +45,12 @@ function windowAction(e) {
   }
 }
 
+function checkForNotifcations() {
+  const timeStamp = store.get('userPrefs.notification-timestamp');
+
+  global.core.menu.getNotifications(timeStamp);
+}
+
 module.exports = {
   ipc,
   search,
@@ -60,6 +66,7 @@ module.exports = {
       // Download the DB
       this.downloadLatestDB(true);
     }
+    checkForNotifcations();
   },
 
   downloadLatestDB(force = false) {
@@ -148,6 +155,10 @@ module.exports = {
 
   deletePref(key) {
     store.delete(key);
+  },
+
+  updateNotificationsTimestamp(time) {
+    this.setUserPref('notification-timestamp', time);
   },
 };
 

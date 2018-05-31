@@ -13,6 +13,8 @@ const modal = new tingle.Modal({
   closeMethods: ['overlay', 'button', 'escape'],
 });
 
+const API_ENDPOINT = 'http://api.sikhitothemax.org'; // TODO: move this to config file
+
 const closeBtn = 'Close';
 modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
   modal.close();
@@ -71,7 +73,7 @@ const parseContent = (contentString) => {
 
 
 const createNotificationContent = (msgList) => {
-  let html = '<h1 class="model-title">What\'s New</h1>';
+  let html = '<h1 class="model-title">What\'s New</h1> <div class="messages">';
 
   msgList.forEach((item) => {
     html += '<div class="row">';
@@ -80,8 +82,33 @@ const createNotificationContent = (msgList) => {
     html += `<div class="content">${parseContent(item.Content)}</div>`;
     html += '</div>';
   });
+  html += '</div>';
 
   return html;
+};
+
+const getNotifications = (timeStamp) => {
+  request(`${API_ENDPOINT}/messages/desktop/${(typeof timeStamp === 'string') ? timeStamp : ''}`, (error, response) => {
+    if (response) {
+      let message;
+      try {
+        message = JSON.parse(response.body);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+      if (message && message.length > 0) {
+        const time = moment().format('YYYY-MM-DD HH:mm:ss');
+        global.core.platformMethod('updateNotificationsTimestamp', time);
+        const content = createNotificationContent(message);
+        // set content
+        modal.setContent(content);
+        // open modal
+        modal.open();
+        document.getElementById('notifications-icon').classList.remove('badge');
+      }
+    }
+  });
 };
 
 /* Generate Toggle Buttons */
@@ -240,27 +267,7 @@ const announcementSlideButton = h(
 const notificationButton = h(
   'button.notificaitons.navigator-button.navigator-header',
   {
-    onclick: () => {
-      request('http://api.sikhitothemax.org/messages/desktop/', (error, response) => {
-        if (response) {
-          let message;
-          try {
-            message = JSON.parse(response.body);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
-          }
-          if (message) {
-            const content = createNotificationContent(message);
-            // set content
-            modal.setContent(content);
-            // open modal
-            modal.open();
-            document.getElementById('notifications-icon').classList.remove('badge');
-          }
-        }
-      });
-    },
+    onclick: getNotifications,
   },
   h('i#notifications-icon.fa.fa-bell'),
 );
@@ -306,6 +313,8 @@ module.exports = {
     $listOfShabadOptions.appendChild(anandKarajButton);
     settings.init();
   },
+
+  getNotifications,
 
   toggleMenu(pageSelector = '#menu-page') {
     document.querySelector(pageSelector).classList.toggle('active');

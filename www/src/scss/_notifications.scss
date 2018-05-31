@@ -2,16 +2,21 @@
   .tingle-modal-box__content {
     color: #000;
     height: 400px;
-    overflow-y: scroll;
     padding: 2rem 3rem;
 
     .model-title {
       padding-bottom: 1rem;
     }
 
+    .messages {
+      max-height: 315px;
+      overflow-y: scroll;
+    }
+
     .row {
       border-bottom: 1px solid #e8e8e8;
-      padding-top: 0.5rem;
+      //padding-bottom: 1rem;
+      padding-top: 1rem;
 
       .title {
         font-size: large;

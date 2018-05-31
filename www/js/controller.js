@@ -418,7 +418,6 @@ global.platform.ipc.on('cast-session-active', () => {
     document.body.classList.remove('home');
     updateViewerScale();
   }
-  // menuCast.icon = './www/assets/img/ic_cast_black_connected.png';
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
@@ -426,12 +425,8 @@ global.platform.ipc.on('cast-session-stopped', () => {
   if (!global.externalDisplay) {
     document.body.classList.remove('presenter-view', 'scale-viewer');
   }
-  // menuCast.icon = './www/assets/img/ic_cast_black.png';
 });
 
-/* global.platform.ipc.on('openSettings', () => {
-  settings.openSettings();
-}); */
 
 module.exports = {
   clearAPV() {
