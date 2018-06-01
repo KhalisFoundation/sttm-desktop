@@ -7,3 +7,4 @@ packaging/keys.json
 data.db
 *.provisionprofile
 npm-debug.log*
+.idea/

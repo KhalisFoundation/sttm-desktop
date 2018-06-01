@@ -1,5 +1,4 @@
-body.light-theme,
-body.custom-theme {
+body.light-theme {
   background-color: #fff;
 
   .gurbani {
@@ -30,15 +29,14 @@ body.custom-theme {
     }
   }
 }
-
+//TODO: Consolidate to mixin for the light themes
 $statusbar-bg: #e0e0e0;
 $nav-bg: #f5f5f5;
 $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.light-theme,
-.custom-theme {
+.light-theme {
   #header {
     a {
       color: $base-text;

@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "3.3.1",
+  "version": "4.0.0-beta.1",
   "description": "The SikhiToTheMax 3 desktop app",
   "main": "app.js",
   "scripts": {
@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
     "electron-updater": "^2.21.0",
     "express": "^4.15.2",
@@ -70,7 +71,8 @@
     "scroll": "^2.0.1",
     "socket.io": "^2.1.1",
     "sqlite3": "^3.1.8",
-    "tippy.js": "^2.5.2"
+    "tippy.js": "^2.5.2",
+    "update": "^0.7.4"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",

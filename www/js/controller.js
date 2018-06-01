@@ -110,6 +110,25 @@ const menuTemplate = [
       },
     ],
   },
+  {
+    label: 'Cast',
+    icon: './www/assets/img/ic_cast_black.png',
+    submenu: [
+      {
+        label: 'Search for Cast device',
+        click: () => {
+          global.webview.send('search-cast');
+        },
+      },
+      {
+        label: 'Stop Casting',
+        visible: false,
+        click: () => {
+          global.webview.send('stop-cast');
+        },
+      },
+    ],
+  },
 ];
 
 const devMenu = [];
@@ -184,7 +203,7 @@ const winMenu = [
   },
   ...devMenu,
   {
-    label: 'Donate',
+    label: 'Donate...',
     click: () => {
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
@@ -265,15 +284,15 @@ const macMenu = [
           main.openSecondaryWindow('changelogWindow');
         },
       },
+      {
+        label: 'Donate...',
+        click: () => {
+          electron.shell.openExternal('https://khalisfoundation.org/donate/');
+        },
+      },
     ],
   },
   ...devMenu,
-  {
-    label: 'Donate',
-    click: () => {
-      electron.shell.openExternal('https://khalisfoundation.org/donate/');
-    },
-  },
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
 if (process.platform === 'darwin' || process.platform === 'linux') {
@@ -300,6 +319,14 @@ $menuButton.addEventListener('click', () => {
 });
 
 function updateViewerScale() {
+  if (global.externalDisplay) {
+    global.viewer = global.externalDisplay;
+  } else {
+    global.viewer = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+  }
   const $fitInsideWindow = document.body.classList.contains('presenter-view') ? document.getElementById('navigator') : document.body;
   let scale = 1;
   let previewStyles = '';
@@ -345,26 +372,28 @@ function updateViewerScale() {
   }
 }
 
-global.platform.ipc.on('presenter-view', (e, args) => {
+global.platform.ipc.on('external-display', (e, args) => {
   if (global.platform.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view');
     document.body.classList.remove('home');
   }
   document.body.classList.add('scale-viewer');
-  global.viewer = {
+  global.externalDisplay = {
     width: args.width,
     height: args.height,
   };
   updateViewerScale();
 });
-global.platform.ipc.on('remove-scale-viewer', () => {
-  document.body.classList.remove('scale-viewer');
+global.platform.ipc.on('remove-external-display', () => {
+  delete global.externalDisplay;
+  document.body.classList.remove(['presenter-view', 'scale-viewer']);
 });
 window.onresize = () => {
   updateViewerScale();
 };
 
 const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuCast = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[3].submenu : menu.items[6].submenu);
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
@@ -381,13 +410,29 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[4].visible = false;
   menuUpdate.items[5].visible = true;
 });
-
 global.platform.ipc.on('send-scroll', (event, arg) => {
   global.webview.send('send-scroll', arg);
 });
-
 global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(arg.PageNo, arg.SourceID);
+});
+global.platform.ipc.on('cast-session-active', () => {
+  menuCast.items[0].visible = false;
+  menuCast.items[1].visible = true;
+  if (global.platform.getUserPref('app.layout.presenter-view')) {
+    document.body.classList.add('presenter-view', 'scale-viewer');
+    document.body.classList.remove('home');
+    updateViewerScale();
+  }
+  // menuCast.icon = './www/assets/img/ic_cast_black_connected.png';
+});
+global.platform.ipc.on('cast-session-stopped', () => {
+  menuCast.items[1].visible = false;
+  menuCast.items[0].visible = true;
+  if (!global.externalDisplay) {
+    document.body.classList.remove('presenter-view', 'scale-viewer');
+  }
+  // menuCast.icon = './www/assets/img/ic_cast_black.png';
 });
 
 /* global.platform.ipc.on('openSettings', () => {
@@ -400,9 +445,13 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID) {
+  sendLine(shabadID, lineID, Gurmukhi, English) {
     global.webview.send('show-line', { shabadID, lineID });
-    global.platform.ipc.send('show-line', { shabadID, lineID });
+    const showLinePayload = { shabadID, lineID, Gurmukhi, English, live: false };
+    if (document.body.classList.contains('livefeed')) {
+      showLinePayload.live = true;
+    }
+    global.platform.ipc.send('show-line', showLinePayload);
   },
 
   sendText(text, isGurmukhi) {

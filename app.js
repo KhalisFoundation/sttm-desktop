@@ -159,7 +159,7 @@ function createViewer(ipcData) {
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
@@ -176,11 +176,11 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('closed', () => {
       viewerWindow = false;
-      mainWindow.webContents.send('remove-presenter-view');
+      mainWindow.webContents.send('remove-external-display');
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
@@ -201,7 +201,7 @@ app.on('ready', () => {
   });
   mainWindow.webContents.on('did-finish-load', () => {
     if (checkForExternalDisplay()) {
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width: viewerWindowPos.w,
         height: viewerWindowPos.h,
       });
@@ -241,6 +241,14 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.on('cast-session-active', () => {
+  mainWindow.webContents.send('cast-session-active');
+});
+
+ipcMain.on('cast-session-stopped', () => {
+  mainWindow.webContents.send('cast-session-stopped');
+});
+
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
@@ -249,6 +257,21 @@ ipcMain.on('clear-apv', () => {
     viewerWindow.webContents.send('clear-apv');
   }
 });
+
+function createBroadcastFiles(arg) {
+  const userDataPath = electron.app.getPath('userData');
+  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
+  const englishFile = `${userDataPath}/sttm-English.txt`;
+  try {
+    fs.writeFile(gurbaniFile, arg.Gurmukhi.trim());
+    fs.appendFile(gurbaniFile, '\n');
+    fs.writeFile(englishFile, arg.English.trim());
+    fs.appendFile(englishFile, '\n');
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+  }
+}
 
 ipcMain.on('show-line', (event, arg) => {
   const overlayPrefs = JSON.parse(fs.readFileSync('www/obs/overlay.json', 'utf8'));
@@ -261,6 +284,9 @@ ipcMain.on('show-line', (event, arg) => {
       send: 'show-line',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 
@@ -308,6 +334,12 @@ ipcMain.on('update-settings', () => {
 ipcMain.on('update-theme', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-theme');
+  }
+});
+
+ipcMain.on('remove-theme', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('remove-theme');
   }
 });
 
