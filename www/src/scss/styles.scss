@@ -164,6 +164,7 @@ a {
   box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.3);
   height: 100vh;
   left: -400px;
+  overflow-y: auto;
   position: fixed;
   top: 0;
   transition: 1s all ease;
