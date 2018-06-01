@@ -189,6 +189,12 @@ const winMenu = [
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
+  {
+    label: 'Overlay',
+    click: () => {
+      main.openSecondaryWindow('overlayWindow');
+    },
+  },
 ];
 
 const macMenu = [
