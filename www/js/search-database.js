@@ -67,9 +67,10 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID) {
-    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (rows.length > 0) {
         global.core.search.printShabad(rows, ShabadID, LineID || rows[0].ID);
+        global.platform.ipc.send('send-shabad-obs', { rows, LineID });
       }
     });
   },

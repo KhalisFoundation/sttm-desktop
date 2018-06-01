@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overlay</title>
+  <link rel="stylesheet" href="obs.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
+  <script>
+    var socket = io();
+    var currentLineObj;
+    var currentShabad;
+    var overlayPrefs;
+
+    var writeLine = function(currentShabad, LineID) {
+      currentLineObj = currentShabad.find(x => x.ID === LineID);
+      document.querySelector('.o-gurbani').innerHTML = currentLineObj.Gurmukhi;
+      document.querySelector('.o-translation').innerHTML = currentLineObj.English;
+      document.querySelector('.o-teeka').innerHTML = currentLineObj.PunjabiUni;
+      document.querySelector('.o-transliteration').innerHTML = currentLineObj.Transliteration;
+      document.querySelectorAll('.content-bar').forEach((el) => {
+        el.style.color = overlayPrefs.overlayVars.textColor;
+        el.style.backgroundColor = overlayPrefs.overlayVars.bgColor;
+      });
+      switch (overlayPrefs.overlayVars.layout) {
+        case 'top':
+          topLayoutApply();
+          break;
+        case 'bottom':
+          bottomLayoutApply();
+          break;
+        case 'split':
+          splitLayoutApply();
+          break;
+      }
+    };
+
+    var topLayoutApply = function() {
+      document.querySelector('.o-gurbani').style.top = '0';
+      document.querySelector('.o-gurbani').style.bottom = 'auto';
+      document.querySelector('.o-teeka').style.display = 'none';
+      document.querySelector('.o-transliteration').style.display = 'none';
+      document.querySelector('.o-translation').style.top = '42px';
+      document.querySelector('.o-translation').style.bottom = 'auto';
+    };
+
+    var bottomLayoutApply = function() {
+      document.querySelector('.o-gurbani').style.top = 'auto';
+      document.querySelector('.o-gurbani').style.bottom = '36px';
+      document.querySelector('.o-translation').style.top = 'auto';
+      document.querySelector('.o-translation').style.bottom = '0';
+      document.querySelector('.o-teeka').style.display = 'none';
+      document.querySelector('.o-transliteration').style.display = 'none';
+    };
+
+    var splitLayoutApply = function() {
+      document.querySelector('.o-gurbani').style.top = '0';
+      document.querySelector('.o-gurbani').style.bottom = 'auto';
+      document.querySelector('.o-teeka').style.display = 'block';
+      document.querySelector('.o-teeka').style.top = '42px';
+      document.querySelector('.o-teeka').style.bottom = 'auto';
+      document.querySelector('.o-transliteration').style.display = 'block';
+      document.querySelector('.o-transliteration').style.top = 'auto';
+      document.querySelector('.o-transliteration').style.bottom = '36px';
+      document.querySelector('.o-translation').style.top = 'auto';
+      document.querySelector('.o-translation').style.bottom = '0';
+    };
+
+    socket.on('send-shabad', function(arg) {
+      currentShabad = arg.rows;
+      overlayPrefs = arg.overlayPrefs;
+      writeLine(currentShabad, arg.LineID);
+    });
+
+    socket.on('show-line', function(arg) {
+      writeLine(currentShabad, arg.lineID);
+    });
+  </script>
+</head>
+<body>
+    <section class="overlay-wrapper">
+      <div class="content-bar gurmukhi o-gurbani"> </div>
+      <div class="content-bar o-translation"> </div>
+      <div class="content-bar o-teeka"> </div>
+      <div class="content-bar o-transliteration"> </div>
+    </section>
+</body>
+</html>
