@@ -24,6 +24,16 @@ $keyboard-height:128px;
   "markdown",
   "theme-dark",
   "theme-light",
+  "theme-khalsa-gold",
+  "theme-baagi-blue",
+  "theme-khalsa-rush",
+  "theme-moody-blue",
+  "theme-a-new-day",
+  "theme-black-blue",
+  "theme-high-contrast",
+  "theme-low-light",
+  "theme-blue-darbar",
+  "theme-floral",
   "update",
   "viewer",
   "window",
@@ -154,6 +164,7 @@ a {
 }
 
 .options-page {
+  overflow-y: auto;
   background: #f0f0f0;
   box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.3);
   height: 100vh;
@@ -222,7 +233,7 @@ a {
   }
 }
 
-.custom-theme.show-theme-editor #custom-theme-page {
+.show-theme-editor #custom-theme-page {
   left: 0;
 }
 

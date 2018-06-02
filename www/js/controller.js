@@ -203,7 +203,7 @@ const winMenu = [
   },
   ...devMenu,
   {
-    label: 'Donate',
+    label: 'Donate...',
     click: () => {
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
@@ -278,15 +278,15 @@ const macMenu = [
           main.openSecondaryWindow('changelogWindow');
         },
       },
+      {
+        label: 'Donate...',
+        click: () => {
+          electron.shell.openExternal('https://khalisfoundation.org/donate/');
+        },
+      },
     ],
   },
   ...devMenu,
-  {
-    label: 'Donate',
-    click: () => {
-      electron.shell.openExternal('https://khalisfoundation.org/donate/');
-    },
-  },
 ];
 const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
 if (process.platform === 'darwin' || process.platform === 'linux') {
@@ -439,9 +439,13 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID) {
+  sendLine(shabadID, lineID, Gurmukhi, English) {
     global.webview.send('show-line', { shabadID, lineID });
-    global.platform.ipc.send('show-line', { shabadID, lineID });
+    const showLinePayload = { shabadID, lineID, Gurmukhi, English, live: false };
+    if (document.body.classList.contains('livefeed')) {
+      showLinePayload.live = true;
+    }
+    global.platform.ipc.send('show-line', showLinePayload);
   },
 
   sendText(text, isGurmukhi) {

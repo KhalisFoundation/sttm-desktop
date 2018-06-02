@@ -1,7 +1,7 @@
-body.dark-theme {
-  background-color: #000;
- 
- 
+body.black-blue {
+  background-color: #05060b;
+  background-image: url("../../../assets/custom_backgrounds/black.jpg");
+
   #ribbon1 {
     visibility: hidden;
   } 
@@ -10,25 +10,26 @@ body.dark-theme {
     visibility: hidden;
   }
 
+
   .gurbani {
     color: #fff;
   }
 
   .translation {
-    color: #e2e2e2;
+    color: #a3eafd;
   }
 
   .teeka {
-    color: #c6c6c6;
+    color: #7a7a7c;
   }
 
   .transliteration {
-    color: #ababab;
+    color: #ededef;
   }
 
   .logo {
     path {
-      fill: #212121;
+      fill: #e0e0e0;
     }
   }
 
@@ -48,7 +49,7 @@ body.dark-theme {
     }
   }
 }
-//TODO: Consolidate to mixin for the dark themes
+
 $bg-main: #212121;
 $bg-alt: #3a3a3a;
 $bg-bright: #424242;
@@ -62,7 +63,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.dark-theme {
+.black-blue {
   color: $text-base;
 
   #header {

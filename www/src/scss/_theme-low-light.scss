@@ -1,7 +1,7 @@
-body.dark-theme {
-  background-color: #000;
- 
- 
+body.low-light {
+  background-color: #000000;
+  
+  
   #ribbon1 {
     visibility: hidden;
   } 
@@ -11,19 +11,19 @@ body.dark-theme {
   }
 
   .gurbani {
-    color: #fff;
+    color: #98b1c5;
   }
 
   .translation {
-    color: #e2e2e2;
+    color: #b1b1b1;
   }
 
   .teeka {
-    color: #c6c6c6;
+    color: #b1b1b1;
   }
 
   .transliteration {
-    color: #ababab;
+    color: #b1b1b1;
   }
 
   .logo {
@@ -62,7 +62,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.dark-theme {
+.low-light {
   color: $text-base;
 
   #header {
