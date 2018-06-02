@@ -12,9 +12,6 @@ body.a-new-day {
     position: absolute;
   }
 
-
-
-
   .gurbani {
     color: #0e2654;
   }
@@ -107,6 +104,7 @@ $base-text: #4e4e4e;
     }
 
     input:focus+div {
+    input:focus + div {
       background: $dialog-bg;
     }
 

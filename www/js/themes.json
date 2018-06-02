@@ -127,6 +127,9 @@
     "teeka-color": "#000",
     "type": "SPECIAL",
     "key": "high-contrast"
+    "background-image": "black.jpg",
+    "type": "BACKGROUND",
+    "key": "black-blue"
   }
 
 ]

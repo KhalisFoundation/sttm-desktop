@@ -10,6 +10,7 @@ const store = new Store({
   defaults: defaultPrefs,
 });
 const appVersion = app.getVersion();
+const fs = require('fs');
 
 let mainWindow;
 let viewerWindow = false;
@@ -243,6 +244,21 @@ ipcMain.on('clear-apv', () => {
   }
 });
 
+function createBroadcastFiles(arg) {
+  const userDataPath = electron.app.getPath('userData');
+  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
+  const englishFile = `${userDataPath}/sttm-English.txt`;
+  try {
+    fs.writeFile(gurbaniFile, arg.Gurmukhi.trim());
+    fs.appendFile(gurbaniFile, '\n');
+    fs.writeFile(englishFile, arg.English.trim());
+    fs.appendFile(englishFile, '\n');
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+  }
+}
+
 ipcMain.on('show-line', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
@@ -251,6 +267,9 @@ ipcMain.on('show-line', (event, arg) => {
       send: 'show-line',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 
@@ -291,6 +310,12 @@ ipcMain.on('update-settings', () => {
 ipcMain.on('update-theme', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-theme');
+  }
+});
+
+ipcMain.on('remove-theme', () => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('remove-theme');
   }
 });
 
