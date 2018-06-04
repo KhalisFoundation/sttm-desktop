@@ -1,7 +1,7 @@
-body.moody-blue {
-  background-color: #38987b;
-  background-image: url("../../../assets/custom_backgrounds/blue.jpg");
-
+body.blue-darbar {
+  background-color: #7db6c7;
+  background-image: url("../../../assets/custom_backgrounds/blue-darbar.jpg");
+  
   #ribbon1 {
     visibility: hidden;
   } 
@@ -10,24 +10,20 @@ body.moody-blue {
     visibility: hidden;
   }
 
-#corner-designs{
-  visibility: hidden;
-}
-
   .gurbani {
-    color: #fcfefe;
+    color: #fff;
   }
 
   .translation {
-    color: #fde5ab;
+    color: #fbfbfb;
   }
 
   .teeka {
-    color: #86a3ba;
+    color: #a0d5fe;
   }
 
   .transliteration {
-    color: #f1f5f4;
+    color: #f4f4f9;
   }
 
   .logo {
@@ -66,7 +62,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.moody-blue {
+.blue-darbar {
   color: $text-base;
 
   #header {
