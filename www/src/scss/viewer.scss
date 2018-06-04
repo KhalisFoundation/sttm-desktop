@@ -46,15 +46,27 @@ body {
     font-family: $viewer-gurmukhi-font-family;
   }
 }
-#ribbon1 {
 
-  position: relative;
-} 
+.ribbon {
+  background-image: url("../../assets/img/custom_backgrounds/embellishes/floral.png");
+  height: 100px;
+  position: fixed;
+  visibility: hidden;
+  width: 100px;
+}
+
+#ribbon1 {
+  left: 25px;
+  top: 25px;
+  transform: rotate(90deg);
+}
 
 #ribbon2 {
-
-  position: relative;
+  bottom: 25px;
+  right: 25px;
+  transform: rotate(270deg);
 }
+
 .left-align {
   #viewer {
     text-align: left;
@@ -212,12 +224,13 @@ h2 {
     top: auto;
   }
 }
+
 #bgVideo {
+  bottom: 0;
+  min-height: 100%;
+  min-width: 100%;
   position: fixed;
   right: 0;
-  bottom: 0;
-  min-width: 100%; 
-  min-height: 100%;
 }
 
 @import

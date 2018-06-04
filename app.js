@@ -307,18 +307,6 @@ ipcMain.on('update-settings', () => {
   }
 });
 
-ipcMain.on('update-theme', () => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('update-theme');
-  }
-});
-
-ipcMain.on('remove-theme', () => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('remove-theme');
-  }
-});
-
 exports.openSecondaryWindow = openSecondaryWindow;
 exports.appVersion = appVersion;
 exports.checkForUpdates = checkForUpdates;
