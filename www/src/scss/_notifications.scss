@@ -1,0 +1,60 @@
+.notifications-modal {
+  .tingle-modal-box__content {
+    color: #000;
+    height: 400px;
+    padding: 2rem 3rem;
+
+    .model-title {
+      padding-bottom: 1rem;
+    }
+
+    .messages {
+      max-height: 315px;
+      overflow-y: scroll;
+    }
+
+    .row {
+      border-bottom: 1px solid #e8e8e8;
+      //padding-bottom: 1rem;
+      padding-top: 1rem;
+
+      .title {
+        font-size: large;
+        font-weight: bold;
+        padding-bottom: 1rem;
+        padding-top: 0.5rem;
+      }
+
+      .content {
+        padding-bottom: 1rem;
+
+        a {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.dark-theme {
+  .notifications-modal {
+    .tingle-modal-box__content {
+      color: #fff;
+
+      a:-webkit-any-link {
+        color: #e89f3c;
+      }
+    }
+  }
+}
+
+.badge::after {
+  background: red;
+  border-radius: 50%;
+  content: "";
+  height: 0.5rem;
+  position: absolute;
+  right: 3.2rem;
+  top: 0.5em;
+  width: 0.5rem;
+}
