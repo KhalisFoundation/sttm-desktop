@@ -87,28 +87,36 @@ const createNotificationContent = (msgList) => {
   return html;
 };
 
-const getNotifications = (timeStamp) => {
+const showNotificationsModal = (message) => {
+  if (message && message.length > 0) {
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    global.core.platformMethod('updateNotificationsTimestamp', time);
+    const content = createNotificationContent(message);
+    // set content
+    modal.setContent(content);
+    // open modal
+    modal.open();
+    document.getElementById('notifications-icon').classList.remove('badge');
+  }
+};
+
+const getNotifications = (timeStamp, callback) => {
   request(`${API_ENDPOINT}/messages/desktop/${(typeof timeStamp === 'string') ? timeStamp : ''}`, (error, response) => {
+    let message;
     if (response) {
-      let message;
       try {
         message = JSON.parse(response.body);
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
       }
-      if (message && message.length > 0) {
-        const time = moment().format('YYYY-MM-DD HH:mm:ss');
-        global.core.platformMethod('updateNotificationsTimestamp', time);
-        const content = createNotificationContent(message);
-        // set content
-        modal.setContent(content);
-        // open modal
-        modal.open();
-        document.getElementById('notifications-icon').classList.remove('badge');
-      }
     }
+    callback.apply(this, [message]);
   });
+};
+
+const notificationsBellClickHandler = () => {
+  getNotifications(null, showNotificationsModal);
 };
 
 /* Generate Toggle Buttons */
@@ -267,7 +275,7 @@ const announcementSlideButton = h(
 const notificationButton = h(
   'button.notificaitons.navigator-button.navigator-header',
   {
-    onclick: getNotifications,
+    onclick: notificationsBellClickHandler,
   },
   h('i#notifications-icon.fa.fa-bell'),
 );
@@ -315,6 +323,8 @@ module.exports = {
   },
 
   getNotifications,
+
+  showNotificationsModal,
 
   toggleMenu(pageSelector = '#menu-page') {
     document.querySelector(pageSelector).classList.toggle('active');

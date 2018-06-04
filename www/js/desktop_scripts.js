@@ -21,6 +21,8 @@ const store = new Store({
   defaults: defaultPrefs,
 });
 
+const POLLING_INTERVAL = (120 * 60000); // poll for new notifications every 2hrs.
+
 function windowAction(e) {
   const win = remote.getCurrentWindow();
   const el = e.currentTarget;
@@ -45,10 +47,20 @@ function windowAction(e) {
   }
 }
 
-function checkForNotifcations() {
-  const timeStamp = store.get('userPrefs.notification-timestamp');
+function addBadgeToNotification(msg) {
+  if (msg && msg.length > 0) {
+    document.getElementById('notifications-icon').classList.add('badge');
+  }
+}
 
-  global.core.menu.getNotifications(timeStamp);
+function checkForNotifcations() {
+  let timeStamp = store.get('userPrefs.notification-timestamp');
+  global.core.menu.getNotifications(timeStamp, global.core.menu.showNotificationsModal);
+
+  setInterval(() => {
+    timeStamp = store.get('userPrefs.notification-timestamp');
+    global.core.menu.getNotifications(timeStamp, addBadgeToNotification);
+  }, POLLING_INTERVAL);
 }
 
 module.exports = {
