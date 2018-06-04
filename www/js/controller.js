@@ -112,10 +112,9 @@ const menuTemplate = [
   },
   {
     label: 'Cast',
-    icon: './www/assets/img/ic_cast_black.png',
     submenu: [
       {
-        label: 'Search for Cast device',
+        label: 'Search for Google Cast device',
         click: () => {
           global.webview.send('search-cast');
         },
