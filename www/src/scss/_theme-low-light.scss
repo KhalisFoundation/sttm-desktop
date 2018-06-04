@@ -1,7 +1,7 @@
-body.moody-blue {
-  background-color: #38987b;
-  background-image: url("../../../assets/custom_backgrounds/blue.jpg");
-
+body.low-light {
+  background-color: #000000;
+  
+  
   #ribbon1 {
     visibility: hidden;
   } 
@@ -10,29 +10,25 @@ body.moody-blue {
     visibility: hidden;
   }
 
-#corner-designs{
-  visibility: hidden;
-}
-
   .gurbani {
-    color: #fcfefe;
+    color: #98b1c5;
   }
 
   .translation {
-    color: #fde5ab;
+    color: #b1b1b1;
   }
 
   .teeka {
-    color: #86a3ba;
+    color: #b1b1b1;
   }
 
   .transliteration {
-    color: #f1f5f4;
+    color: #b1b1b1;
   }
 
   .logo {
     path {
-      fill: #e0e0e0;
+      fill: #212121;
     }
   }
 
@@ -52,7 +48,7 @@ body.moody-blue {
     }
   }
 }
-
+//TODO: Consolidate to mixin for the dark themes
 $bg-main: #212121;
 $bg-alt: #3a3a3a;
 $bg-bright: #424242;
@@ -66,7 +62,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.moody-blue {
+.low-light {
   color: $text-base;
 
   #header {

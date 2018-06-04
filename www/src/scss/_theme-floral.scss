@@ -1,29 +1,44 @@
-body.khalsa-gold {
-  background-color: #ffda39;
-  background-image: url("../../../assets/custom_backgrounds/golden.jpg");
+body.floral {
+  background-color: #a4244e;
+  background-image: url("../../../assets/custom_backgrounds/floral-bg.jpg");
 
-  #ribbon1 {
-    visibility: hidden;
-  } 
+#ribbon1 {
+  visibility: visible;
+}
+ 
+#ribbon2 {
+  visibility: visible;
+}
 
-  #ribbon2 {
-    visibility: hidden;
-  }
+#ribbon1 img {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    transform: rotate(90deg);
+}  
+#ribbon2 img {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    transform: rotate(270deg);
+    
+}
+
 
   .gurbani {
-    color: #fff;
+    color: #460a1e;
   }
 
   .translation {
-    color: #4d2b00;
+    color: #821d3e;
   }
 
   .teeka {
-    color: #723c03;
+    color: #484848;
   }
 
   .transliteration {
-    color: #413b3d;
+    color: #a4244e;
   }
 
   .logo {
@@ -45,14 +60,12 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.khalsa-gold {
+.floral {
   .deck {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   }
 
-  .deck .gurbani {
-    -webkit-filter: drop-shadow(0 0 4px rgba(140, 81, 5, 1));
-  }
+
 
   #header {
     a {

@@ -114,7 +114,8 @@ module.exports = {
     const customThemeOptions = document.querySelector('#custom-theme-options');
     document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Colours'));
+    customThemeOptions.appendChild(swatchHeaderFactory('Colors'));
+
     customThemes.forEach((themeInstance) => {
       if (themeInstance.type === 'COLOR') {
         customThemeOptions.appendChild(swatchFactory(themeInstance));
@@ -126,6 +127,13 @@ module.exports = {
       if (themeInstance.type === 'BACKGROUND') {
         customThemeOptions.appendChild(swatchFactory(themeInstance));
       }
+    });
+    customThemeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
+    customThemes.forEach((themeInstance) => {
+      if (themeInstance.type === 'SPECIAL') {
+        customThemeOptions.appendChild(swatchFactory(themeInstance));
+      }
+
     });
 
     /* customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));

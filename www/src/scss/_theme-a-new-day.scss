@@ -1,6 +1,16 @@
 body.a-new-day {
   background-color: #07ccf3;
   background-image: url("../../../assets/custom_backgrounds/clouds.jpg");
+ 
+  #ribbon1 {
+    visibility: hidden;
+    position: absolute;
+  } 
+
+  #ribbon2 {
+    visibility: hidden;
+    position: absolute;
+  }
 
   .gurbani {
     color: #0e2654;
@@ -93,6 +103,7 @@ $base-text: #4e4e4e;
       color: $base-text;
     }
 
+    input:focus+div {
     input:focus + div {
       background: $dialog-bg;
     }
