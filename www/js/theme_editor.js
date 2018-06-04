@@ -112,7 +112,7 @@ module.exports = {
     const customThemeOptions = document.querySelector('#custom-theme-options');
     document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Colors'));
+    customThemeOptions.appendChild(swatchHeaderFactory('Colours'));
 
     customThemes.forEach((themeInstance) => {
       if (themeInstance.type === 'COLOR') {
