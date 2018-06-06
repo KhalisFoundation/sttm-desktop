@@ -99,6 +99,12 @@ const menuTemplate = [
     role: 'window',
     submenu: [
       {
+        label: 'Overlay',
+        click: () => {
+          main.openSecondaryWindow('overlayWindow');
+        },
+      },
+      {
         label: 'Minimize',
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize',
