@@ -109,16 +109,6 @@
     "key": "blue-darbar"
   },
   {
-    "name":"Low Light",
-    "background-color": "#000",
-    "gurbani-color": "#98b1c5",
-    "translation-color": "#b1b1b1",
-    "transliteration-color": "#b1b1b1",
-    "teeka-color": "#b1b1b1",
-    "type": "SPECIAL",
-    "key": "low-light"
-  },
-  {
     "name": "High Contrast",
     "background-color": "#fff",
     "gurbani-color": "#000",
@@ -127,5 +117,15 @@
     "teeka-color": "#000",
     "type": "SPECIAL",
     "key": "high-contrast"
+  },
+  {
+    "name":"Low Light",
+    "background-color": "#000",
+    "gurbani-color": "#98b1c5",
+    "translation-color": "#b1b1b1",
+    "transliteration-color": "#b1b1b1",
+    "teeka-color": "#b1b1b1",
+    "type": "SPECIAL",
+    "key": "low-light"
   }
 ]
