@@ -21,7 +21,9 @@ const receiverFn = receivers =>
     });
     let numReceivers = 0;
     receivers.forEach((receiver) => {
-      if (receiver.service_fullname.includes('Chromecast')) {
+      const fullName = receiver.service_fullname;
+      const blacklist = ['Chromecast-Audio', 'Google-Home', 'Sound-Bar', 'Google-Cast-Group'];
+      if (!(new RegExp(blacklist.join('|')).test(fullName))) {
         numReceivers += 1;
         // add cast button
         modal.addCastBtn(receiver.friendlyName, 'tingle-btn tingle-btn--primary', `${receiver.ipAddress}_${receiver.port}_${trigID}`, (e) => {
