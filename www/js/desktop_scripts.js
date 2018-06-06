@@ -14,7 +14,7 @@ const Store = require('./store');
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbPath = path.resolve(userDataPath, 'data.db');
+const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 
 const store = new Store({
   configName: 'user-preferences',
@@ -87,12 +87,12 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request('https://khajana.org/data.md5', (error, response, newestDBHash) => {
+        request('https://banidb.com/databases/sttmdesktop.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = module.exports.getPref('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbZip = path.resolve(userDataPath, 'data.zip');
-              progress(request('https://khajana.org/data.zip'))
+              const dbZip = path.resolve(userDataPath, 'sttmdesktop.zip');
+              progress(request('https://banidb.com/databases/sttmdesktop.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
@@ -100,10 +100,22 @@ module.exports = {
                 })
                 .on('end', () => {
                   const zip = new AdmZip(dbZip);
-                  zip.extractEntryTo('data.db', userDataPath, true, true);
+                  zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
                   module.exports.initDB();
                   module.exports.setPref('curDBHash', newestDBHash);
                   fs.unlinkSync(dbZip);
+                  // Delete pre-4.0 DB
+                  const oldDB = path.resolve(userDataPath, 'data.db');
+                  fs.access(oldDB, (err) => {
+                    if (!err) {
+                      fs.unlink(oldDB, (err1) => {
+                        if (err1) {
+                          // eslint-disable-next-line no-console
+                          console.log(`Could not delete old database: ${err1}`);
+                        }
+                      });
+                    }
+                  });
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(-1);
                 })
