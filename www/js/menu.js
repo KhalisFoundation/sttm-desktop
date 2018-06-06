@@ -176,7 +176,7 @@ const hukamnamaButton = h(
     {
       onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
-          goToShabadPage(response.hukamnamainfo.shabadid[0]);
+          goToShabadPage(response.shabadinfo.id);
         });
       } },
     h('i.fa.fa-gavel.list-icon'),
