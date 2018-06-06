@@ -3,6 +3,17 @@ const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
+const express = require('express');
+const fs = require('fs');
+
+const expressApp = express();
+
+const http = require('http').Server(expressApp);
+const io = require('socket.io')(http);
+
+expressApp.use(express.static('www/obs'));
+
+http.listen(1397);
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 const store = new Store({
@@ -10,7 +21,6 @@ const store = new Store({
   defaults: defaultPrefs,
 });
 const appVersion = app.getVersion();
-const fs = require('fs');
 
 let mainWindow;
 let viewerWindow = false;
@@ -23,6 +33,10 @@ const secondaryWindows = {
   helpWindow: {
     obj: false,
     url: `file://${__dirname}/www/help.html`,
+  },
+  overlayWindow: {
+    obj: false,
+    url: `file://${__dirname}/www/overlay.html`,
   },
 };
 let manualUpdate = false;
@@ -132,7 +146,7 @@ function createViewer(ipcData) {
   if (isExternal) {
     viewerWindow = new BrowserWindow({
       width: 800,
-      height: 600,
+      height: 400,
       x: viewerWindowPos.x,
       y: viewerWindowPos.y,
       autoHideMenuBar: true,
@@ -268,6 +282,9 @@ function createBroadcastFiles(arg) {
 }
 
 ipcMain.on('show-line', (event, arg) => {
+  const overlayPrefs = JSON.parse(fs.readFileSync('www/obs/overlay.json', 'utf8'));
+  const payload = Object.assign(arg, overlayPrefs);
+  io.emit('show-line', payload);
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
@@ -280,6 +297,13 @@ ipcMain.on('show-line', (event, arg) => {
     createBroadcastFiles(arg);
   }
 });
+
+ipcMain.on('send-shabad-obs', (event, arg) => {
+  const overlayPrefs = JSON.parse(fs.readFileSync('www/obs/overlay.json', 'utf8'));
+  const payload = Object.assign(arg, overlayPrefs);
+  io.emit('send-shabad', payload);
+});
+
 
 ipcMain.on('show-text', (event, arg) => {
   if (viewerWindow) {
