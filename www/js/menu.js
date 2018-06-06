@@ -180,7 +180,7 @@ const hukamnamaButton = h(
         });
       } },
     h('i.fa.fa-gavel.list-icon'),
-    'Hukamnama of the day'));
+    'Daily Hukamnama'));
 
 /* load text buttons */
 const emptySlideButton = h(
