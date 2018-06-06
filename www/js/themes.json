@@ -87,17 +87,6 @@
     "key": "black-blue"
   },
   {
-    "name": "Darbar Blue",
-    "background-color": "#05060b",
-    "gurbani-color": "#ffffff",
-    "translation-color": "#a3eafd",
-    "transliteration-color": "#ededef",
-    "teeka-color": "#d4d4d4",
-    "background-image": "thumbnails/blue-darbar.jpg",
-    "type": "BACKGROUND",
-    "key": "blue-darbar"
-  },
-  {
     "name": "floral",
     "background-color": "#ffd3e0",
     "gurbani-color": "#440a1d",
@@ -107,6 +96,17 @@
     "background-image": "thumbnails/floral-bg.jpg",
     "type": "BACKGROUND",
     "key": "floral"
+  },
+  {
+    "name": "Darbar Blue",
+    "background-color": "#05060b",
+    "gurbani-color": "#ffffff",
+    "translation-color": "#a3eafd",
+    "transliteration-color": "#ededef",
+    "teeka-color": "#d4d4d4",
+    "background-image": "thumbnails/blue-darbar.jpg",
+    "type": "BACKGROUND",
+    "key": "blue-darbar"
   },
   {
     "name":"Low Light",
