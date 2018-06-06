@@ -135,7 +135,6 @@ function createViewer(ipcData) {
       height: 600,
       x: viewerWindowPos.x,
       y: viewerWindowPos.y,
-      fullscreen: true,
       autoHideMenuBar: true,
       show: false,
       titleBarStyle: 'hidden',
@@ -150,6 +149,7 @@ function createViewer(ipcData) {
         height,
       });
       mainWindow.focus();
+      viewerWindow.setFullScreen(true);
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -175,7 +175,8 @@ function createViewer(ipcData) {
 }
 
 app.on('ready', () => {
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+  const screens = electron.screen;
+  const { width, height } = screens.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
@@ -213,6 +214,13 @@ app.on('ready', () => {
     const changelogWindow = secondaryWindows.changelogWindow.obj;
     if (changelogWindow && !changelogWindow.isDestroyed()) {
       changelogWindow.close();
+    }
+  });
+
+  // When a display is connected, add a viewer window if it does not already exit
+  screens.on('display-added', () => {
+    if (!viewerWindow) {
+      createViewer();
     }
   });
 });
