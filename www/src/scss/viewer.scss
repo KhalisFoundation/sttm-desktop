@@ -47,6 +47,26 @@ body {
   }
 }
 
+.ribbon {
+  background-image: url("../../assets/img/custom_backgrounds/embellishes/floral.png");
+  height: 100px;
+  position: fixed;
+  visibility: hidden;
+  width: 100px;
+}
+
+#ribbon1 {
+  left: 25px;
+  top: 25px;
+  transform: rotate(90deg);
+}
+
+#ribbon2 {
+  bottom: 25px;
+  right: 25px;
+  transform: rotate(270deg);
+}
+
 .left-align {
   #viewer {
     text-align: left;
@@ -180,7 +200,7 @@ h2 {
 .logo {
   display: none;
   height: 20%;
-  left: 50%;
+  left: 5%;
   position: fixed;
   top: 20%;
   transform: translateX(-50%);
@@ -200,7 +220,7 @@ h2 {
   #viewer-logo {
     bottom: 20px;
     display: block;
-    height: 5.5%;
+    height: 3.5%;
     top: auto;
   }
 }

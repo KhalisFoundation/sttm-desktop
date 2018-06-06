@@ -1,21 +1,26 @@
-body.a-new-day {
-  background-color: #07ccf3;
-  background-image: url("../../assets/img/custom_backgrounds/clouds.jpg");
+body.floral {
+  background-color: #a4244e;
+  background-image: url("../../assets/img/custom_backgrounds/floral-bg.jpg");
+
+  #ribbon1,
+  #ribbon2 {
+    visibility: visible;
+  }
 
   .gurbani {
-    color: #0e2654;
+    color: #460a1e;
   }
 
   .translation {
-    color: #003a8c;
+    color: #821d3e;
   }
 
   .teeka {
-    color: #033780;
+    color: #484848;
   }
 
   .transliteration {
-    color: #80878a;
+    color: #a4244e;
   }
 
   .logo {
@@ -37,13 +42,9 @@ $alt-bg: #fafafa;
 $dialog-bg: #fff;
 $base-text: #4e4e4e;
 
-.a-new-day {
+.floral {
   .deck {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .deck .gurbani {
-    -webkit-filter: drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.7));
   }
 
   #header {

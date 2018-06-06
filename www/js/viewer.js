@@ -7,7 +7,6 @@
 */
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
-const Noty = require('noty');
 const scroll = require('scroll');
 const core = require('./js/index');
 
@@ -124,47 +123,14 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 });
 
 global.platform.ipc.on('update-settings', () => {
+  const oldTheme = prefs.app.theme;
   prefs = JSON.parse(window.localStorage.getItem('prefs'));
+  if (prefs.app.theme !== oldTheme) {
+    $body.classList.remove(oldTheme);
+    $body.classList.add(prefs.app.theme);
+  }
   core.menu.settings.applySettings(prefs);
   castToReceiver();
-});
-
-global.platform.ipc.on('remove-theme', () => {
-  let userTheme;
-  try {
-    userTheme = JSON.parse(window.localStorage.getItem('prefs'));
-  } catch (error) {
-    new Noty({
-      type: 'error',
-      text: `There is an error updating custom theme.
-      Try checking theme file for errors. If error persists,
-      report it at www.sttm.co`,
-      timeout: 5000,
-      modal: true,
-    }).show();
-  }
-  if (userTheme) {
-    document.body.classList.remove(userTheme.app.theme);
-  }
-});
-
-global.platform.ipc.on('update-theme', () => {
-  let userTheme;
-  try {
-    userTheme = JSON.parse(window.localStorage.getItem('prefs'));
-  } catch (error) {
-    new Noty({
-      type: 'error',
-      text: `There is an error updating custom theme.
-      Try checking theme file for errors. If error persists,
-      report it at www.sttm.co`,
-      timeout: 5000,
-      modal: true,
-    }).show();
-  }
-  if (userTheme) {
-    applyTheme(userTheme.app.theme);
-  }
 });
 
 function nextAng() {
@@ -321,26 +287,4 @@ function showText(text, isGurmukhi = false) {
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
   castText(text, isGurmukhi);
-}
-
-function applyTheme(theme) {
-  let css = `
-    body.custom-theme {
-      background-color: ${theme['background-color']};
-      background-image: url(../assets/custom_backgrounds/${theme['background-image']});
-    }
-    .deck {
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    }
-    .deck .gurbani {
-      -webkit-filter: drop-shadow(${theme['gurbani-shadow']});
-    }`;
-  Object.keys(theme).forEach((themeParam) => {
-    const elementClass = themeParam.split('-')[0];
-    css += `body.custom-theme .${elementClass} { color: ${theme[themeParam]}}`;
-  });
-  const style = document.querySelector('style') || document.createElement('style');
-  style.type = 'text/css';
-  style.innerHTML = css;
-  document.head.appendChild(style);
 }

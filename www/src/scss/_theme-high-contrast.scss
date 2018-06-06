@@ -1,26 +1,25 @@
-body.baagi-blue {
-  background-color: #7db6c7;
-  background-image: url("../../assets/img/custom_backgrounds/dark-blue.jpg");
+body.high-contrast {
+  background-color: #fff;
 
   .gurbani {
-    color: #fff;
+    color: #000;
   }
 
   .translation {
-    color: #fbfbfb;
+    color: #000;
   }
 
   .teeka {
-    color: #a0d5fe;
+    color: #000;
   }
 
   .transliteration {
-    color: #f4f4f9;
+    color: #000;
   }
 
   .logo {
     path {
-      fill: #e0e0e0;
+      fill: #212121;
     }
   }
 
@@ -40,7 +39,7 @@ body.baagi-blue {
     }
   }
 }
-
+//TODO: Consolidate to mixin for the dark themes
 $bg-main: #212121;
 $bg-alt: #3a3a3a;
 $bg-bright: #424242;
@@ -54,7 +53,7 @@ $accent: #4fc3f7;
 $highlight-bg: #37474f;
 $highlight-text: #cfd8dc;
 
-.baagi-blue {
+.high-contrast {
   color: $text-base;
 
   #header {
