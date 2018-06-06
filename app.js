@@ -149,7 +149,7 @@ function createViewer(ipcData) {
         height,
       });
       mainWindow.focus();
-      viewerWindow.setSimpleFullScreen(true);
+      viewerWindow.setFullScreen(true);
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
