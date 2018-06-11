@@ -4,6 +4,8 @@ const pageNavJSON = require('./footer-left.json');
 // HTMLElement builder
 const h = require('hyperscript');
 
+const { store } = require('electron').remote.require('./app');
+
 const CONSTS = require('./constants.js');
 
 // the non-character keys that will register as a keypress when searching
@@ -152,7 +154,7 @@ module.exports = {
   currentMeta,
 
   init() {
-    this.searchType = parseInt(global.platform.getPref('searchOptions.searchType'), 10);
+    this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
     searchOptions.querySelector('#search-type').value = this.searchType;
 
     document.querySelector('.search-div').appendChild(searchInputs);
@@ -204,7 +206,7 @@ module.exports = {
   // eslint-disable-next-line no-unused-vars
   focusSearch(e) {
     // open the Gurmukhi keyboard if it was previously open
-    if (global.platform.getPref('gurmukhiKB')) {
+    if (store.get('gurmukhiKB')) {
       this.openGurmukhiKB();
     }
   },
@@ -226,7 +228,7 @@ module.exports = {
   changeSearchType(value) {
     this.searchType = value;
     this.search();
-    global.platform.setPref('searchOptions.searchType', this.searchType);
+    store.set('searchOptions.searchType', this.searchType);
     if (value >= 3) {
       this.$search.classList.add('roman');
       this.$search.classList.remove('gurmukhi');
@@ -248,12 +250,12 @@ module.exports = {
 
   // eslint-disable-next-line no-unused-vars
   toggleGurmukhiKB(e) {
-    const gurmukhiKBPref = global.platform.getPref('gurmukhiKB');
+    const gurmukhiKBPref = store.get('gurmukhiKB');
     // no need to set a preference if user is just re-opening after KB was auto-closed
     if (!this.$navigator.classList.contains('kb-active') && gurmukhiKBPref) {
       this.openGurmukhiKB();
     } else {
-      global.platform.setPref('gurmukhiKB', !gurmukhiKBPref);
+      store.set('gurmukhiKB', !gurmukhiKBPref);
       // Focus search
       // This will also auto-show they KB if that's what the new pref is
       this.$search.focus();

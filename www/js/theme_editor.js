@@ -3,6 +3,8 @@ const h = require('hyperscript');
 const Noty = require('noty');
 const customThemes = require('./themes.json');
 
+const { store } = require('electron').remote.require('./app');
+
 // const imagesPath = 'assets/custom_backgrounds';
 
 const defaultTheme = customThemes[0];
@@ -49,8 +51,8 @@ const swatchFactory = themeInstance =>
         // const newTheme = themeInstance;
         // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
-          document.body.classList.remove(global.platform.getUserPref('app.theme'));
-          global.platform.setUserPref('app.theme', themeInstance.key);
+          document.body.classList.remove(store.getUserPref('app.theme'));
+          store.setUserPref('app.theme', themeInstance.key);
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
         } catch (error) {

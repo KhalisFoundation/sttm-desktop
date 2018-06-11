@@ -282,7 +282,7 @@ function createBroadcastFiles(arg) {
 }
 
 ipcMain.on('show-line', (event, arg) => {
-  const overlayPrefs = JSON.parse(fs.readFileSync('www/obs/overlay.json', 'utf8'));
+  const overlayPrefs = store.get('obs');
   const payload = Object.assign(arg, overlayPrefs);
   io.emit('show-line', payload);
   if (viewerWindow) {
@@ -299,7 +299,7 @@ ipcMain.on('show-line', (event, arg) => {
 });
 
 ipcMain.on('send-shabad-obs', (event, arg) => {
-  const overlayPrefs = JSON.parse(fs.readFileSync('www/obs/overlay.json', 'utf8'));
+  const overlayPrefs = store.get('obs');
   const payload = Object.assign(arg, overlayPrefs);
   io.emit('send-shabad', payload);
 });
@@ -339,7 +339,10 @@ ipcMain.on('update-settings', () => {
   }
 });
 
-exports.openSecondaryWindow = openSecondaryWindow;
-exports.appVersion = appVersion;
-exports.checkForUpdates = checkForUpdates;
-exports.autoUpdater = autoUpdater;
+module.exports = {
+  openSecondaryWindow,
+  appVersion,
+  checkForUpdates,
+  autoUpdater,
+  store,
+};

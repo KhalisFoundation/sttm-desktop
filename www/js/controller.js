@@ -5,6 +5,7 @@ const remote = electron.remote;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
+const { store } = main;
 
 global.webview = document.querySelector('webview');
 
@@ -378,7 +379,7 @@ function updateViewerScale() {
 }
 
 global.platform.ipc.on('external-display', (e, args) => {
-  if (global.platform.getUserPref('app.layout.presenter-view')) {
+  if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view');
     document.body.classList.remove('home');
   }
@@ -424,7 +425,7 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
-  if (global.platform.getUserPref('app.layout.presenter-view')) {
+  if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view', 'scale-viewer');
     document.body.classList.remove('home');
     updateViewerScale();

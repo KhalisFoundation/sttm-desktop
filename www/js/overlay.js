@@ -1,6 +1,7 @@
 const interact = require('interactjs');
 const h = require('hyperscript');
-const fs = require('fs');
+
+const { store } = require('electron').remote.require('./app');
 
 const overlayVars = {};
 
@@ -157,7 +158,7 @@ const exportButton = h(
   'div.input-wrap',
   {
     onclick: () => {
-      const exportData = {
+      store.set('obs', {
         overlayPrefs: {
           overlayVars,
           gurbani: getJSONfromClientRect(document.querySelector('.o-gurbani').getBoundingClientRect()),
@@ -165,9 +166,6 @@ const exportButton = h(
           translation: getJSONfromClientRect(document.querySelector('.o-translation').getBoundingClientRect()),
           transliteration: getJSONfromClientRect(document.querySelector('.o-transliteration').getBoundingClientRect()),
         },
-      };
-      fs.writeFile('www/obs/overlay.json', JSON.stringify(exportData), (err) => {
-        if (err) throw err;
       });
     },
   },
