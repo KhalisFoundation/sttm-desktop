@@ -8,16 +8,13 @@
 
   <script>
     var socket = io();
-    var currentLineObj;
-    var currentShabad;
     var overlayPrefs;
 
-    var writeLine = function(currentShabad, LineID) {
-      currentLineObj = currentShabad.find(x => x.ID === LineID);
-      document.querySelector('.o-gurbani').innerHTML = currentLineObj.Gurmukhi;
-      document.querySelector('.o-translation').innerHTML = currentLineObj.English;
-      document.querySelector('.o-teeka').innerHTML = currentLineObj.PunjabiUni;
-      document.querySelector('.o-transliteration').innerHTML = currentLineObj.Transliteration;
+    var writeLine = function(Line) {
+      document.querySelector('.o-gurbani').innerHTML = Line.Gurmukhi;
+      document.querySelector('.o-translation').innerHTML = Line.English;
+      document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
+      document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
       document.querySelectorAll('.content-bar').forEach((el) => {
         el.style.color = overlayPrefs.overlayVars.textColor;
         el.style.backgroundColor = overlayPrefs.overlayVars.bgColor;
@@ -66,14 +63,9 @@
       document.querySelector('.o-translation').style.bottom = '0';
     };
 
-    socket.on('send-shabad', function(arg) {
-      currentShabad = arg.rows;
-      overlayPrefs = arg.overlayPrefs;
-      writeLine(currentShabad, arg.LineID);
-    });
-
-    socket.on('show-line', function(arg) {
-      writeLine(currentShabad, arg.lineID);
+    socket.on('show-line', function(request) {
+      overlayPrefs = request.overlayPrefs;
+      writeLine(request.Line);
     });
   </script>
 </head>
