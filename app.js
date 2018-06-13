@@ -271,9 +271,9 @@ function createBroadcastFiles(arg) {
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
   try {
-    fs.writeFile(gurbaniFile, arg.Gurmukhi.trim());
+    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim());
     fs.appendFile(gurbaniFile, '\n');
-    fs.writeFile(englishFile, arg.English.trim());
+    fs.writeFile(englishFile, arg.Line.English.trim());
     fs.appendFile(englishFile, '\n');
   } catch (err) {
     // eslint-disable-next-line no-console
