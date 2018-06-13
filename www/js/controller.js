@@ -446,9 +446,9 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID, Gurmukhi, English) {
+  sendLine(shabadID, lineID, Line) {
     global.webview.send('show-line', { shabadID, lineID });
-    const showLinePayload = { shabadID, lineID, Gurmukhi, English, live: false };
+    const showLinePayload = { shabadID, lineID, Line, live: false };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }

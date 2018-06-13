@@ -298,13 +298,6 @@ ipcMain.on('show-line', (event, arg) => {
   }
 });
 
-ipcMain.on('send-shabad-obs', (event, arg) => {
-  const overlayPrefs = store.get('obs');
-  const payload = Object.assign(arg, overlayPrefs);
-  io.emit('send-shabad', payload);
-});
-
-
 ipcMain.on('show-text', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
