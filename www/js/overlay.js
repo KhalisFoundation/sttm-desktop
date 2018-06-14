@@ -1,64 +1,12 @@
-const interact = require('interactjs');
 const h = require('hyperscript');
+const ip = require('ip');
+const copy = require('copy-to-clipboard');
 
+const host = ip.address();
+const url = `http://${host}:1397/obs.html`;
 const { store } = require('electron').remote.require('./app');
 
 const overlayVars = {};
-
-function dragMoveListener(event) {
-  const target = event.target;
-  const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-  const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-  // translate the element
-  target.style.transform = `translate(${x}px, ${y}px)`;
-
-  // update the posiion attributes
-  target.setAttribute('data-x', x);
-  target.setAttribute('data-y', y);
-}
-
-const defaulutResizeObject = {
-  // resize from all edges and corners
-  edges: { left: true, right: true, bottom: true, top: true },
-
-  margin: 10,
-
-  // keep the edges inside the parent
-  restrictEdges: {
-    outer: 'parent',
-    endOnly: true,
-  },
-
-  inertia: true,
-};
-
-interact('.content-bar').draggable({
-  inertia: true,
-  restrict: {
-    restriction: 'parent',
-    endOnly: true,
-    elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
-  },
-  onmove: dragMoveListener,
-}).resizable(defaulutResizeObject).on('resizemove', (event) => {
-  const target = event.target;
-  let x = (parseFloat(target.getAttribute('data-x')) || 0);
-  let y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-  // update the element's style
-  target.style.width = `${event.rect.width}px`;
-  target.style.height = `${event.rect.height}px`;
-  // translate when resizing from top or left edges
-  x += event.deltaRect.left;
-  y += event.deltaRect.top;
-
-  target.style.transform = `translate(${x}px, ${y}px)`;
-
-  target.setAttribute('data-x', x);
-  target.setAttribute('data-y', y);
-});
-
 
 const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
   `div.${inputName}.input-wrap`,
@@ -75,19 +23,22 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
     label,
   ),
 );
+function updateContentBarColor(color, prop) {
+  document.querySelectorAll('.content-bar').forEach((el) => {
+    el.style[prop] = color; // eslint-disable-line no-param-reassign
+  });
+}
 
 const changeColor = (e) => {
-  document.querySelectorAll('.content-bar').forEach((el) => {
-    el.style.color = e.target.value; // eslint-disable-line no-param-reassign
-    overlayVars.textColor = e.target.value;
-  });
+  const color = e.target.value;
+  updateContentBarColor(color, 'color');
+  overlayVars.textColor = color;
 };
 
 const changeBg = (e) => {
-  document.querySelectorAll('.content-bar').forEach((el) => {
-    el.style.backgroundColor = e.target.value; // eslint-disable-line no-param-reassign
-    overlayVars.bgColor = e.target.value;
-  });
+  const color = e.target.value;
+  updateContentBarColor(color, 'backgroundColor');
+  overlayVars.bgColor = color;
 };
 
 const topLayoutApply = () => {
@@ -179,6 +130,24 @@ const exportButton = h(
   ),
 );
 
+const copyURLButton = h(
+  'div.input-wrap',
+  {
+    title: `${url}`,
+    onclick: () => {
+      copy(url);
+    },
+  },
+  h(
+    'div.export-btn',
+    h('i.fa.fa-files-o.cp-icon'),
+  ),
+  h(
+    'div.setting-label',
+    'Copy URL',
+  ),
+);
+
 const topLayoutBtn = layoutButtonFactory('top', topLayoutApply);
 const bottomLayoutBtn = layoutButtonFactory('bottom', bottomLayoutApply);
 const topBottomLayoutBtn = layoutButtonFactory('top-bottom', splitLayoutApply);
@@ -195,3 +164,23 @@ controlPanel.append(topLayoutBtn);
 controlPanel.append(topBottomLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(exportButton);
+controlPanel.append(copyURLButton);
+
+// apply the saved preferences when a new overlay window is opened.
+const overlayPrefs = store.get('obs').overlayPrefs;
+
+switch (overlayPrefs.overlayVars.layout) {
+  case 'top':
+    topLayoutApply();
+    break;
+  case 'bottom':
+    bottomLayoutApply();
+    break;
+  case 'split':
+    splitLayoutApply();
+    break;
+  default :
+    break;
+}
+updateContentBarColor(overlayPrefs.overlayVars.bgColor, 'backgroundColor');
+updateContentBarColor(overlayPrefs.overlayVars.textColor, 'color');

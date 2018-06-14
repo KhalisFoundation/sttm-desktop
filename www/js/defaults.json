@@ -44,7 +44,8 @@
     "overlayPrefs": {
       "overlayVars": {
         "layout": "split",
-        "bgColor": "#800080"
+        "bgColor": "#800080",
+        "textColor": "#EAC445"
       },
       "gurbani": {
         "bottom": 156,
