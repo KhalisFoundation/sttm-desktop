@@ -13,7 +13,7 @@ const io = require('socket.io')(http);
 
 expressApp.use(express.static('www/obs'));
 
-http.listen(1397);
+http.listen(1397); // TODO: move to config file
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 const store = new Store({

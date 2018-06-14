@@ -1,5 +1,9 @@
 const h = require('hyperscript');
+const ip = require('ip');
+const copy = require('copy-to-clipboard');
 
+const host = ip.address();
+const url = `http://${host}:1397/obs.html`;
 const { store } = require('electron').remote.require('./app');
 
 const overlayVars = {};
@@ -126,6 +130,24 @@ const exportButton = h(
   ),
 );
 
+const copyURLButton = h(
+  'div.input-wrap',
+  {
+    title: `${url}`,
+    onclick: () => {
+      copy(url);
+    },
+  },
+  h(
+    'div.export-btn',
+    h('i.fa.fa-files-o.cp-icon'),
+  ),
+  h(
+    'div.setting-label',
+    'Copy URL',
+  ),
+);
+
 const topLayoutBtn = layoutButtonFactory('top', topLayoutApply);
 const bottomLayoutBtn = layoutButtonFactory('bottom', bottomLayoutApply);
 const topBottomLayoutBtn = layoutButtonFactory('top-bottom', splitLayoutApply);
@@ -142,6 +164,7 @@ controlPanel.append(topLayoutBtn);
 controlPanel.append(topBottomLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(exportButton);
+controlPanel.append(copyURLButton);
 
 // apply the saved preferences when a new overlay window is opened.
 const overlayPrefs = store.get('obs').overlayPrefs;
