@@ -400,6 +400,8 @@ window.onresize = () => {
 
 const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 const menuCast = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[3].submenu : menu.items[6].submenu);
+const apvSwitch = document.getElementById('setting-slide-layout-display-options-akhandpaatt');
+
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
   menuUpdate.items[3].visible = true;
@@ -430,6 +432,12 @@ global.platform.ipc.on('cast-session-active', () => {
     document.body.classList.remove('home');
     updateViewerScale();
   }
+
+  store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
+  document.body.classList.remove('akhandpaatt');
+  global.core.platformMethod('updateSettings');
+  apvSwitch.checked = false;
+  apvSwitch.disabled = true;
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
@@ -437,6 +445,8 @@ global.platform.ipc.on('cast-session-stopped', () => {
   if (!global.externalDisplay) {
     document.body.classList.remove('presenter-view', 'scale-viewer');
   }
+
+  apvSwitch.disabled = false;
 });
 
 
