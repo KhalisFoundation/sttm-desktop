@@ -5,13 +5,14 @@ const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 
 const expressApp = express();
 
 const http = require('http').Server(expressApp);
 const io = require('socket.io')(http);
 
-expressApp.use(express.static('www/obs'));
+expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
 http.listen(1397); // TODO: move to config file
 

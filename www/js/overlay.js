@@ -3,7 +3,7 @@ const ip = require('ip');
 const copy = require('copy-to-clipboard');
 
 const host = ip.address();
-const url = `http://${host}:1397/obs.html`;
+const url = `http://${host}:1397/`;
 const { store } = require('electron').remote.require('./app');
 
 const overlayVars = store.get('obs').overlayPrefs.overlayVars;
