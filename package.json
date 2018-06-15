@@ -125,5 +125,9 @@
       "target": "deb",
       "icon": "assets"
     }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

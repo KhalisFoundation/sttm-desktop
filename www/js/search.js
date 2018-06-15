@@ -1,3 +1,5 @@
+/* eslint-disable arrow-parens */
+
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
@@ -8,7 +10,7 @@ const CONSTS = require('./constants.js');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
-  8,  // Backspace
+  8, // Backspace
   32, // Spacebar
   46, // Delete
 ];
@@ -21,14 +23,12 @@ let autoplaytimer;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
-  h(
-    'input#search.gurmukhi',
-    {
-      disabled: 'disabled',
-      type: 'search',
-      onfocus: e => module.exports.focusSearch(e),
-      onkeyup: e => module.exports.typeSearch(e),
-    }),
+  h('input#search.gurmukhi', {
+    disabled: 'disabled',
+    type: 'search',
+    onfocus: e => module.exports.focusSearch(e),
+    onkeyup: e => module.exports.typeSearch(e),
+  }),
   h('div#search-bg'),
   h(
     'button#search-options-toggle',
@@ -36,92 +36,122 @@ const searchInputs = h('div#search-container', [
       type: 'button',
       onclick: e => module.exports.toggleSearchOptions(e),
     },
-    h('i.fa.fa-cog')),
+    h('i.fa.fa-cog'),
+  ),
   h(
     'button#gurmukhi-keyboard-toggle',
     {
       type: 'button',
       onclick: e => module.exports.toggleGurmukhiKB(e),
     },
-    h('i.fa.fa-keyboard-o')),
+    h('i.fa.fa-keyboard-o'),
+  ),
   h('div#db-download-progress'),
 ]);
 
 // build the Gurmukhi keyboard and append to HTML
-Object.keys(keyboardLayout).forEach((i) => {
+Object.keys(keyboardLayout).forEach(i => {
   const klPage = keyboardLayout[i];
   const page = [];
 
-  Object.keys(klPage).forEach((j) => {
+  Object.keys(klPage).forEach(j => {
     const klRow = klPage[j];
     const row = [];
 
-    Object.keys(klRow).forEach((k) => {
+    Object.keys(klRow).forEach(k => {
       const klRowSet = klRow[k];
       const rowSet = [];
 
-      Object.keys(klRowSet).forEach((l) => {
+      Object.keys(klRowSet).forEach(l => {
         const klButton = klRowSet[l];
         if (typeof klButton === 'object') {
-          rowSet.push(h(
-            'button',
-            {
-              type: 'button',
-              onclick: e => module.exports.clickKBButton(e, klButton.action),
-            },
-            (klButton.icon ? h(klButton.icon) : klButton.char)));
+          rowSet.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                onclick: e => module.exports.clickKBButton(e, klButton.action),
+              },
+              klButton.icon ? h(klButton.icon) : klButton.char,
+            ),
+          );
         } else {
-          rowSet.push(h(
-            'button',
-            {
-              type: 'button',
-              onclick: e => module.exports.clickKBButton(e),
-            },
-            klButton));
+          rowSet.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                onclick: e => module.exports.clickKBButton(e),
+              },
+              klButton,
+            ),
+          );
         }
       });
       row.push(h('div.keyboard-row-set', rowSet));
     });
     page.push(h('div.keyboard-row', row));
   });
-  kbPages.push(h(`div#gurmukhi-keyboard-page-${parseInt(i, 10) + 1}.page${(parseInt(i, 10) === 0 ? '.active' : '')}`, page));
+  kbPages.push(
+    h(
+      `div#gurmukhi-keyboard-page-${parseInt(i, 10) + 1}.page${
+        parseInt(i, 10) === 0 ? '.active' : ''
+      }`,
+      page,
+    ),
+  );
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
 const searchTypes = Object.values(CONSTS.SEARCH_TYPE_TEXTS);
 
-const searchTypeOptions = searchTypes.map((string, value) => h('option', { value }, string));
+const searchTypeOptions = searchTypes.map((string, value) =>
+  h('option', { value }, string),
+);
 
 const shabadNavFwd = h(
   'div#shabad-next.navigator-button',
   {
     onclick: () => module.exports.loadAdjacentShabad(),
   },
-h('i.fa.fa-arrow-circle-o-right'));
+  h('i.fa.fa-arrow-circle-o-right'),
+);
 
 const shabadNavBack = h(
   'div#shabad-prev.navigator-button',
   {
     onclick: () => module.exports.loadAdjacentShabad(false),
   },
-h('i.fa.fa-arrow-circle-o-left'));
+  h('i.fa.fa-arrow-circle-o-left'),
+);
 
-const searchOptions = h('div#search-options',
-  h('select#search-type',
+const searchOptions = h(
+  'div#search-options',
+  h(
+    'select#search-type',
     {
       onchange() {
         module.exports.changeSearchType(parseInt(this.value, 10));
       },
     },
-    searchTypeOptions));
+    searchTypeOptions,
+  ),
+);
 
 const navPageLinks = [];
-Object.keys(pageNavJSON).forEach((id) => {
-  navPageLinks.push(h('li',
-    h(`a#${id}-pageLink`,
-      {
-        onclick: () => module.exports.navPage(id) },
-      h(`i.fa.fa-${pageNavJSON[id].icon}`))));
+Object.keys(pageNavJSON).forEach(id => {
+  navPageLinks.push(
+    h(
+      'li',
+      h(
+        `a#${id}-pageLink`,
+        {
+          onclick: () => module.exports.navPage(id),
+        },
+        h(`i.fa.fa-${pageNavJSON[id].icon}`),
+      ),
+    ),
+  );
 });
 const footerNav = h('ul.menu-bar', navPageLinks);
 
@@ -135,9 +165,12 @@ const sources = {
 };
 
 // Close the KB if anywhere is clicked besides anything in .search-div
-document.body.addEventListener('click', (e) => {
+document.body.addEventListener('click', e => {
   const target = e.target;
-  if (document.querySelector('.search-div') && !document.querySelector('.search-div').contains(target)) {
+  if (
+    document.querySelector('.search-div') &&
+    !document.querySelector('.search-div').contains(target)
+  ) {
     module.exports.closeGurmukhiKB();
   }
 });
@@ -152,7 +185,10 @@ module.exports = {
   currentMeta,
 
   init() {
-    this.searchType = parseInt(global.platform.getPref('searchOptions.searchType'), 10);
+    this.searchType = parseInt(
+      global.platform.getPref('searchOptions.searchType'),
+      10,
+    );
     searchOptions.querySelector('#search-type').value = this.searchType;
 
     document.querySelector('.search-div').appendChild(searchInputs);
@@ -168,13 +204,17 @@ module.exports = {
     this.$dbDownloadProgress = document.getElementById('db-download-progress');
     this.$results = document.getElementById('results');
     this.$session = document.getElementById('session');
-    this.$sessionContainer = document.querySelector('#session-page .block-list');
+    this.$sessionContainer = document.querySelector(
+      '#session-page .block-list',
+    );
     this.$shabad = document.getElementById('shabad');
     this.$shabadContainer = document.querySelector('#shabad-page .block-list');
     this.$gurmukhiKB = document.getElementById('gurmukhi-keyboard');
     this.$kbPages = this.$gurmukhiKB.querySelectorAll('.page');
     this.$navPages = document.querySelectorAll('.nav-page');
-    this.$navPageLinks = document.querySelectorAll('#footer .menu-group-left a');
+    this.$navPageLinks = document.querySelectorAll(
+      '#footer .menu-group-left a',
+    );
 
     this.navPage('search');
   },
@@ -211,7 +251,11 @@ module.exports = {
 
   typeSearch(e) {
     // if a key is pressed in the Gurmukhi KB or is one of the allowed keys
-    if (e === 'gKB' || (e.which <= 90 && e.which >= 48) || allowedKeys.indexOf(e.which) > -1) {
+    if (
+      e === 'gKB' ||
+      (e.which <= 90 && e.which >= 48) ||
+      allowedKeys.indexOf(e.which) > -1
+    ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
       newSearchTimeout = setTimeout(() => this.search(), 100);
@@ -234,7 +278,10 @@ module.exports = {
       this.$search.classList.remove('roman');
       this.$search.classList.add('gurmukhi');
     }
-    document.body.classList.remove('searchResults_translationEnglish', 'searchResults_transliteration');
+    document.body.classList.remove(
+      'searchResults_translationEnglish',
+      'searchResults_transliteration',
+    );
     switch (value) {
       case 3:
         document.body.classList.add('searchResults_translationEnglish');
@@ -242,7 +289,9 @@ module.exports = {
       default:
         break;
     }
-    this.$search.placeholder = this.$searchType.options[this.$searchType.selectedIndex].label;
+    this.$search.placeholder = this.$searchType.options[
+      this.$searchType.selectedIndex
+    ].label;
     this.$search.focus();
   },
 
@@ -276,15 +325,20 @@ module.exports = {
     const button = e.currentTarget;
     if (action) {
       if (action === 'bksp') {
-        this.$search.value = this.$search.value.substring(0, this.$search.value.length - 1);
+        this.$search.value = this.$search.value.substring(
+          0,
+          this.$search.value.length - 1,
+        );
         this.typeSearch('gKB');
       } else if (action === 'close') {
         this.toggleGurmukhiKB();
       } else if (action.includes('page')) {
-        Array.from(this.$kbPages).forEach((el) => {
+        Array.from(this.$kbPages).forEach(el => {
           el.classList.remove('active');
         });
-        document.getElementById(`gurmukhi-keyboard-${action}`).classList.add('active');
+        document
+          .getElementById(`gurmukhi-keyboard-${action}`)
+          .classList.add('active');
       }
     } else {
       // some buttons may have a different value than what is displayed on the key,
@@ -311,29 +365,42 @@ module.exports = {
   printResults(rows) {
     if (rows.length > 0) {
       this.$results.innerHTML = '';
-      rows.forEach((item) => {
+      rows.forEach(item => {
         const resultNode = [];
         resultNode.push(h('span.gurmukhi', item.Gurmukhi));
         resultNode.push(h('span.transliteration.roman', item.Transliteration));
         resultNode.push(h('span.translation.english.roman', item.English));
-        resultNode.push(h('span.meta.roman', `${sources[item.SourceID]} - ${item.PageNo} - ${item.RaagEnglish} - ${item.WriterEnglish}`));
+        resultNode.push(
+          h(
+            'span.meta.roman',
+            `${sources[item.SourceID]} - ${item.PageNo} - ${
+              item.RaagEnglish
+            } - ${item.WriterEnglish}`,
+          ),
+        );
         const result = h(
           'li',
           {},
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
-                                                  item.Gurmukhi, item.English),
+              onclick: ev =>
+                this.clickResult(
+                  ev,
+                  item.ShabadID,
+                  item.ID,
+                  item.Gurmukhi,
+                  item.English,
+                ),
             },
-            resultNode));
+            resultNode,
+          ),
+        );
         this.$results.appendChild(result);
       });
     } else {
       this.$results.innerHTML = '';
-      this.$results.appendChild(h(
-        'li.roman',
-        h('span', 'No results')));
+      this.$results.appendChild(h('li.roman', h('span', 'No results')));
     }
   },
 
@@ -348,7 +415,9 @@ module.exports = {
         {
           onclick: ev => this.clickSession(ev, ShabadID, LineID),
         },
-        Gurmukhi));
+        Gurmukhi,
+      ),
+    );
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -376,13 +445,17 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
+    if (window.socket !== undefined) {
+      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+    }
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv) {
-      global.platform.search.getAng(ShabadID)
-        .then((ang) => {
+      global.platform.search
+        .getAng(ShabadID)
+        .then(ang => {
           currentMeta = ang;
           return global.platform.search.loadAng(ang.PageNo, ang.SourceID);
         })
@@ -393,7 +466,8 @@ module.exports = {
   },
 
   loadAng(PageNo, SourceID) {
-    global.platform.search.loadAng(PageNo, SourceID)
+    global.platform.search
+      .loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
   },
 
@@ -405,14 +479,18 @@ module.exports = {
     // Load the same shabad if on first or last shabad
     const PreviousVerseID = FirstLine === 1 ? FirstLine : FirstLine - 1;
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
-    global.platform.search.loadAdjacentShabad(PreviousVerseID, NextVerseID, Forward);
+    global.platform.search.loadAdjacentShabad(
+      PreviousVerseID,
+      NextVerseID,
+      Forward,
+    );
   },
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
     let mainGurmukhi;
     let mainEnglish;
-    rows.forEach((item) => {
+    rows.forEach(item => {
       if (parseInt(lineID, 10) === item.ID) {
         mainGurmukhi = item.Gurmukhi;
         mainEnglish = item.English;
@@ -421,18 +499,28 @@ module.exports = {
         'li',
         {},
         h(
-          `a#line${item.ID}.panktee${(parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : '')}`,
+          `a#line${item.ID}.panktee${
+            parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
+          }`,
           {
             'data-line-id': item.ID,
-            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID,
-                           item.ID, item.Gurmukhi, item.English),
+            onclick: e =>
+              this.clickShabad(
+                e,
+                item.ShabadID || ShabadID,
+                item.ID,
+                item.Gurmukhi,
+                item.English,
+              ),
           },
           [
             h('i.fa.fa-fw.fa-check'),
             h('i.fa.fa-fw.fa-home'),
             ' ',
             item.Gurmukhi,
-          ]));
+          ],
+        ),
+      );
       // write the Panktee to the controller
       this.$shabad.appendChild(shabadLine);
       // append the currentShabad array
@@ -442,7 +530,8 @@ module.exports = {
       }
     });
     // scroll the Shabad controller to the current Panktee
-    const curPankteeTop = this.$shabad.querySelector('.current').parentNode.offsetTop;
+    const curPankteeTop = this.$shabad.querySelector('.current').parentNode
+      .offsetTop;
     this.$shabadContainer.scrollTop = curPankteeTop;
     // send the line to app.js, which will send it to the viewer window
     global.controller.sendLine(ShabadID, lineID, mainGurmukhi, mainEnglish);
@@ -484,8 +573,13 @@ module.exports = {
       document.body.querySelector('#shabad .panktee.current').click();
     }
     const bodyClassList = document.body.classList;
-    const delay = [...bodyClassList].find(value => /^autoplayTimer-/.test(value)).replace('autoplayTimer-', '');
-    if (bodyClassList.contains('autoplay') && LineID !== currentShabad[currentShabad.length - 1]) {
+    const delay = [...bodyClassList]
+      .find(value => /^autoplayTimer-/.test(value))
+      .replace('autoplayTimer-', '');
+    if (
+      bodyClassList.contains('autoplay') &&
+      LineID !== currentShabad[currentShabad.length - 1]
+    ) {
       autoplaytimer = setTimeout(() => {
         document.getElementById(`line${LineID + 1}`).click();
       }, delay * 1000);
@@ -493,6 +587,9 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Gurmukhi, English) {
+    if (window.socket !== undefined) {
+      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+    }
     const lines = this.$shabad.querySelectorAll('a.panktee');
     if (e.target.classList.contains('fa-home')) {
       // Change main line
@@ -513,10 +610,10 @@ module.exports = {
   },
 
   navPage(page) {
-    this.$navPages.forEach(($navPage) => {
+    this.$navPages.forEach($navPage => {
       $navPage.classList.remove('active');
     });
-    this.$navPageLinks.forEach(($navPageLink) => {
+    this.$navPageLinks.forEach($navPageLink => {
       $navPageLink.classList.remove('active');
     });
     document.querySelector(`#${page}-page`).classList.add('active');
