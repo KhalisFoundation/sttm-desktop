@@ -2,6 +2,7 @@
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
+const shareSync = require('./share-sync');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -24,21 +25,24 @@ function highlightLine(newLine) {
     search.$shabadContainer.scrollTop = curPankteeTop;
   }
   if (containerTop + containerHeight < curPankteeTop + curPankteeHeight) {
-    search.$shabadContainer.scrollTop = (curPankteeTop - containerHeight) + curPankteeHeight;
+    search.$shabadContainer.scrollTop =
+      curPankteeTop - containerHeight + curPankteeHeight;
   }
 }
 
 function spaceBar(e) {
-  const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
-  const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
+  const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset
+    .lineId;
+  const currentLineId = search.$shabad.querySelector('a.panktee.current')
+    .dataset.lineId;
 
   let newLineId = mainLineID;
 
   if (mainLineID === currentLineId) {
     let done = false;
-    search.$shabad.querySelectorAll('a.panktee').forEach((item) => {
+    search.$shabad.querySelectorAll('a.panktee').forEach(item => {
       if (!item.classList.contains(['seen_check']) && !done) {
-        newLineId = (item.dataset.lineId);
+        newLineId = item.dataset.lineId;
         done = true;
       }
     });
@@ -59,7 +63,7 @@ function prevLine() {
 function nextLine() {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
-  if (pos < (search.currentShabad.length - 1)) {
+  if (pos < search.currentShabad.length - 1) {
     highlightLine(search.currentShabad[pos + 1]);
   }
 }
@@ -92,8 +96,11 @@ function platformMethod(method, args) {
 module.exports = {
   menu,
   search,
+  shareSync,
   platformMethod,
   themeEditor,
-  'custom-theme': () => { themeEditor.init(); },
+  'custom-theme': () => {
+    themeEditor.init();
+  },
   akhandpaatt: search.akhandPaatt,
 };

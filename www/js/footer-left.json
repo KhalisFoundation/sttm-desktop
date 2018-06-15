@@ -10,5 +10,9 @@
   "shabad": {
     "label": "Current Shabad",
     "icon": "dot-circle-o"
+  },
+  "sync": {
+    "label": "Sync",
+    "icon": "group"
   }
 }

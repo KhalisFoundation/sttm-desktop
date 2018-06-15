@@ -3,7 +3,11 @@
   "env": {
     "browser": true,
     "mocha": true,
-    "node": true,
+    "node": true
+  },
+  "rules": {
+    "no-mixed-operators": "off",
+    "arrow-parens": ["warn", "as-needed"]
   },
   "settings": {
     "import/core-modules": "electron"
