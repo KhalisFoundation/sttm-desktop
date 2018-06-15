@@ -6,7 +6,28 @@ const host = ip.address();
 const url = `http://${host}:1397/obs.html`;
 const { store } = require('electron').remote.require('./app');
 
-const overlayVars = {};
+const overlayVars = store.get('obs').overlayPrefs.overlayVars;
+
+const getJSONfromClientRect = clientRect => ({
+  bottom: clientRect.bottom,
+  height: clientRect.height,
+  left: clientRect.left,
+  right: clientRect.right,
+  top: clientRect.top,
+  width: clientRect.width,
+});
+
+const savePrefs = () => {
+  store.set('obs', {
+    overlayPrefs: {
+      overlayVars,
+      gurbani: getJSONfromClientRect(document.querySelector('.o-gurbani').getBoundingClientRect()),
+      teeka: getJSONfromClientRect(document.querySelector('.o-teeka').getBoundingClientRect()),
+      translation: getJSONfromClientRect(document.querySelector('.o-translation').getBoundingClientRect()),
+      transliteration: getJSONfromClientRect(document.querySelector('.o-transliteration').getBoundingClientRect()),
+    },
+  });
+};
 
 const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
   `div.${inputName}.input-wrap`,
@@ -33,12 +54,14 @@ const changeColor = (e) => {
   const color = e.target.value;
   updateContentBarColor(color, 'color');
   overlayVars.textColor = color;
+  savePrefs();
 };
 
 const changeBg = (e) => {
   const color = e.target.value;
   updateContentBarColor(color, 'backgroundColor');
   overlayVars.bgColor = color;
+  savePrefs();
 };
 
 const topLayoutApply = () => {
@@ -91,42 +114,9 @@ const layoutButtonFactory = (layoutName, layoutFunc) => h(
           bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
         });
         layoutFunc();
+        savePrefs();
       },
     },
-  ),
-);
-
-const getJSONfromClientRect = clientRect => ({
-  bottom: clientRect.bottom,
-  height: clientRect.height,
-  left: clientRect.left,
-  right: clientRect.right,
-  top: clientRect.top,
-  width: clientRect.width,
-});
-
-const exportButton = h(
-  'div.input-wrap',
-  {
-    onclick: () => {
-      store.set('obs', {
-        overlayPrefs: {
-          overlayVars,
-          gurbani: getJSONfromClientRect(document.querySelector('.o-gurbani').getBoundingClientRect()),
-          teeka: getJSONfromClientRect(document.querySelector('.o-teeka').getBoundingClientRect()),
-          translation: getJSONfromClientRect(document.querySelector('.o-translation').getBoundingClientRect()),
-          transliteration: getJSONfromClientRect(document.querySelector('.o-transliteration').getBoundingClientRect()),
-        },
-      });
-    },
-  },
-  h(
-    'div.export-btn',
-    h('i.fa.fa-save.cp-icon'),
-  ),
-  h(
-    'div.setting-label',
-    'Save',
   ),
 );
 
@@ -151,9 +141,8 @@ const copyURLButton = h(
 const topLayoutBtn = layoutButtonFactory('top', topLayoutApply);
 const bottomLayoutBtn = layoutButtonFactory('bottom', bottomLayoutApply);
 const topBottomLayoutBtn = layoutButtonFactory('top-bottom', splitLayoutApply);
-
-const textColor = colorInputFactory('toggle-text', 'Text', '#f1c40f', changeColor);
-const backgroundColor = colorInputFactory('background', 'BG', '#2c3e50', changeBg);
+const textColor = colorInputFactory('toggle-text', 'Text', overlayVars.textColor, changeColor);
+const backgroundColor = colorInputFactory('background', 'BG', overlayVars.bgColor, changeBg);
 
 const controlPanel = document.querySelector('.control-panel');
 controlPanel.append(textColor);
@@ -163,13 +152,10 @@ controlPanel.append(bottomLayoutBtn);
 controlPanel.append(topLayoutBtn);
 controlPanel.append(topBottomLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
-controlPanel.append(exportButton);
 controlPanel.append(copyURLButton);
 
 // apply the saved preferences when a new overlay window is opened.
-const overlayPrefs = store.get('obs').overlayPrefs;
-
-switch (overlayPrefs.overlayVars.layout) {
+switch (overlayVars.layout) {
   case 'top':
     topLayoutApply();
     break;
@@ -182,5 +168,5 @@ switch (overlayPrefs.overlayVars.layout) {
   default :
     break;
 }
-updateContentBarColor(overlayPrefs.overlayVars.bgColor, 'backgroundColor');
-updateContentBarColor(overlayPrefs.overlayVars.textColor, 'color');
+updateContentBarColor(overlayVars.bgColor, 'backgroundColor');
+updateContentBarColor(overlayVars.textColor, 'color');
