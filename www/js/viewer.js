@@ -9,8 +9,10 @@ global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
 const core = require('./js/index');
+const { store } = require('electron').remote.require('./app');
+const themes = require('./js/themes.json');
 
-let prefs = JSON.parse(window.localStorage.getItem('prefs'));
+let prefs = store.get('userPrefs');
 
 let isWebView = false;
 let apv = false;
@@ -49,7 +51,7 @@ function hideDecks() {
 }
 
 function castToReceiver() {
-  castCur.prefs = JSON.parse(window.localStorage.getItem('prefs'));
+  castCur.prefs = store.get('userPrefs');
   sendMessage(JSON.stringify(castCur));
 }
 
@@ -123,12 +125,11 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 });
 
 global.platform.ipc.on('update-settings', () => {
-  const oldTheme = prefs.app.theme;
-  prefs = JSON.parse(window.localStorage.getItem('prefs'));
-  if (prefs.app.theme !== oldTheme) {
-    $body.classList.remove(oldTheme);
-    $body.classList.add(prefs.app.theme);
-  }
+  prefs = store.get('userPrefs');
+  const themeKeys = themes.map(item => item.key);
+
+  $body.classList.remove(...themeKeys);
+  $body.classList.add(prefs.app.theme);
   core.menu.settings.applySettings(prefs);
   castToReceiver();
 });

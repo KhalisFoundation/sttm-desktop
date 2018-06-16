@@ -2,7 +2,9 @@ const h = require('hyperscript');
 const ldGet = require('lodash.get');
 const settings = require('./settings.json');
 
-const defaultPrefs = global.platform.getDefaults().userPrefs;
+const { store } = require('electron').remote.require('./app');
+
+const defaultPrefs = store.getDefaults().userPrefs;
 
 function updateMultipleChoiceSetting(key, val) {
   Object.keys(ldGet(settings, key)).forEach((optionToRemove) => {
@@ -48,7 +50,7 @@ function createSettingsPage(userPrefs) {
               name: `setting-${catKey}-${settingKey}`,
               onclick: (e) => {
                 const newVal = e.target.checked;
-                global.platform.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+                store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
                 updateCheckboxSetting(option);
               },
               type: 'checkbox',
@@ -77,7 +79,7 @@ function createSettingsPage(userPrefs) {
             const radioListAttrs = {
               name: `setting-${catKey}-${settingKey}`,
               onclick: () => {
-                global.platform.setUserPref(`${catKey}.${settingKey}`, option);
+                store.setUserPref(`${catKey}.${settingKey}`, option);
                 updateMultipleChoiceSetting(`${catKey}.settings.${settingKey}.options`, option);
               },
               type: 'radio',
@@ -111,7 +113,7 @@ function createSettingsPage(userPrefs) {
               oninput: (e) => {
                 const newVal = e.target.value;
                 e.target.dataset.value = newVal;
-                global.platform.setUserPref(`${catKey}.${settingKey}.${optionKey}`, newVal);
+                store.setUserPref(`${catKey}.${settingKey}.${optionKey}`, newVal);
                 updateRangeSetting(`${catKey}.settings.${settingKey}.options.${optionKey}`, newVal);
               },
               step: option.step,
@@ -144,7 +146,7 @@ function createSettingsPage(userPrefs) {
               name: `setting-${catKey}-${settingKey}`,
               onclick: (e) => {
                 const newVal = e.target.checked;
-                global.platform.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+                store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
                 updateCheckboxSetting(option);
                 if (typeof global.controller[option] === 'function') {
                   global.controller[option](newVal);
@@ -187,14 +189,14 @@ function createSettingsPage(userPrefs) {
 
 module.exports = {
   init() {
-    const userPrefs = global.platform.getAllPrefs();
+    const userPrefs = store.getAllPrefs();
     this.settingsPage = createSettingsPage(userPrefs);
     document.querySelector('#menu-page').appendChild(this.settingsPage);
     this.applySettings();
   },
 
   applySettings(prefs = false) {
-    const newUserPrefs = prefs || global.platform.getAllPrefs();
+    const newUserPrefs = prefs || store.getAllPrefs();
     Object.keys(settings).forEach((catKey) => {
       const cat = settings[catKey];
       Object.keys(cat.settings).forEach((settingKey) => {

@@ -6,6 +6,8 @@ const pageNavJSON = require('./footer-left.json');
 // HTMLElement builder
 const h = require('hyperscript');
 
+const { store } = require('electron').remote.require('./app');
+
 const CONSTS = require('./constants.js');
 
 // the non-character keys that will register as a keypress when searching
@@ -185,10 +187,7 @@ module.exports = {
   currentMeta,
 
   init() {
-    this.searchType = parseInt(
-      global.platform.getPref('searchOptions.searchType'),
-      10,
-    );
+    this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
     searchOptions.querySelector('#search-type').value = this.searchType;
 
     document.querySelector('.search-div').appendChild(searchInputs);
@@ -244,7 +243,7 @@ module.exports = {
   // eslint-disable-next-line no-unused-vars
   focusSearch(e) {
     // open the Gurmukhi keyboard if it was previously open
-    if (global.platform.getPref('gurmukhiKB')) {
+    if (store.get('gurmukhiKB')) {
       this.openGurmukhiKB();
     }
   },
@@ -270,7 +269,7 @@ module.exports = {
   changeSearchType(value) {
     this.searchType = value;
     this.search();
-    global.platform.setPref('searchOptions.searchType', this.searchType);
+    store.set('searchOptions.searchType', this.searchType);
     if (value >= 3) {
       this.$search.classList.add('roman');
       this.$search.classList.remove('gurmukhi');
@@ -297,12 +296,12 @@ module.exports = {
 
   // eslint-disable-next-line no-unused-vars
   toggleGurmukhiKB(e) {
-    const gurmukhiKBPref = global.platform.getPref('gurmukhiKB');
+    const gurmukhiKBPref = store.get('gurmukhiKB');
     // no need to set a preference if user is just re-opening after KB was auto-closed
     if (!this.$navigator.classList.contains('kb-active') && gurmukhiKBPref) {
       this.openGurmukhiKB();
     } else {
-      global.platform.setPref('gurmukhiKB', !gurmukhiKBPref);
+      store.set('gurmukhiKB', !gurmukhiKBPref);
       // Focus search
       // This will also auto-show they KB if that's what the new pref is
       this.$search.focus();
@@ -384,14 +383,8 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev =>
-                this.clickResult(
-                  ev,
-                  item.ShabadID,
-                  item.ID,
-                  item.Gurmukhi,
-                  item.English,
-                ),
+              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
+                                                  item),
             },
             resultNode,
           ),
@@ -404,7 +397,7 @@ module.exports = {
     }
   },
 
-  clickResult(e, ShabadID, LineID, Gurmukhi, English) {
+  clickResult(e, ShabadID, LineID, Line) {
     document.body.classList.remove('home');
     this.closeGurmukhiKB();
     const sessionItem = h(
@@ -415,9 +408,7 @@ module.exports = {
         {
           onclick: ev => this.clickSession(ev, ShabadID, LineID),
         },
-        Gurmukhi,
-      ),
-    );
+        Line.Gurmukhi));
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -434,7 +425,7 @@ module.exports = {
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
     // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, LineID, Gurmukhi, English);
+    global.controller.sendLine(ShabadID, LineID, Line);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -490,12 +481,10 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
-    let mainGurmukhi;
-    let mainEnglish;
-    rows.forEach(item => {
+    let mainLine;
+    rows.forEach((item) => {
       if (parseInt(lineID, 10) === item.ID) {
-        mainGurmukhi = item.Gurmukhi;
-        mainEnglish = item.English;
+        mainLine = item;
       }
       const shabadLine = h(
         'li',
@@ -506,14 +495,8 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
-            onclick: e =>
-              this.clickShabad(
-                e,
-                item.ShabadID || ShabadID,
-                item.ID,
-                item.Gurmukhi,
-                item.English,
-              ),
+            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID,
+                           item.ID, item),
           },
           [
             h('i.fa.fa-fw.fa-check'),
@@ -535,8 +518,8 @@ module.exports = {
     const curPankteeTop = this.$shabad.querySelector('.current').parentNode
       .offsetTop;
     this.$shabadContainer.scrollTop = curPankteeTop;
-    // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, lineID, mainGurmukhi, mainEnglish);
+    // send the line to app.js, which will send it to the viewer window as well as obs file
+    global.controller.sendLine(ShabadID, lineID, mainLine);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -588,7 +571,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID, Gurmukhi, English) {
+  clickShabad(e, ShabadID, LineID, Line) {
     /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
@@ -604,7 +587,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID, Gurmukhi, English);
+      global.controller.sendLine(ShabadID, LineID, Line);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
