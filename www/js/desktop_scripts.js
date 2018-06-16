@@ -7,19 +7,14 @@ const request = require('request');
 const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
 
-const defaultPrefs = require('./defaults.json');
 const search = require('./search-database');
-const Store = require('./store');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 
-const store = new Store({
-  configName: 'user-preferences',
-  defaults: defaultPrefs,
-});
+const { store } = remote.require('./app');
 
 const POLLING_INTERVAL = (120 * 60000); // poll for new notifications every 2hrs.
 
@@ -89,7 +84,7 @@ module.exports = {
       if (online) {
         request('https://banidb.com/databases/sttmdesktop.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
-            const curDBHash = module.exports.getPref('curDBHash');
+            const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
               const dbZip = path.resolve(userDataPath, 'sttmdesktop.zip');
               progress(request('https://banidb.com/databases/sttmdesktop.zip'))
@@ -102,7 +97,7 @@ module.exports = {
                   const zip = new AdmZip(dbZip);
                   zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
                   module.exports.initDB();
-                  module.exports.setPref('curDBHash', newestDBHash);
+                  store.set('curDBHash', newestDBHash);
                   fs.unlinkSync(dbZip);
                   // Delete pre-4.0 DB
                   const oldDB = path.resolve(userDataPath, 'data.db');
@@ -143,36 +138,8 @@ module.exports = {
     global.platform.ipc.send('update-settings');
   },
 
-  getAllPrefs(schema = store.data) {
-    return this.getPref('userPrefs', schema);
-  },
-
-  getDefaults() {
-    return store.getDefaults();
-  },
-
-  getUserPref(key) {
-    return this.getPref(`userPrefs.${key}`);
-  },
-
-  getPref(key, schema = store.data) {
-    return store.get(key, schema);
-  },
-
-  setUserPref(key, val) {
-    this.setPref(`userPrefs.${key}`, val);
-  },
-
-  setPref(key, val) {
-    store.set(key, val);
-  },
-
-  deletePref(key) {
-    store.delete(key);
-  },
-
   updateNotificationsTimestamp(time) {
-    this.setUserPref('notification-timestamp', time);
+    store.setUserPref('notification-timestamp', time);
   },
 };
 

@@ -1,11 +1,13 @@
 const h = require('hyperscript');
 // const fs = require('fs');
 const Noty = require('noty');
-const customThemes = require('./themes.json');
+const themes = require('./themes.json');
+
+const { store } = require('electron').remote.require('./app');
 
 // const imagesPath = 'assets/custom_backgrounds';
 
-const defaultTheme = customThemes[0];
+const defaultTheme = themes[0];
 
 /* defaultTheme.bgImage = '';
 const getCurrentTheme = () => {
@@ -49,8 +51,8 @@ const swatchFactory = themeInstance =>
         // const newTheme = themeInstance;
         // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
-          document.body.classList.remove(global.platform.getUserPref('app.theme'));
-          global.platform.setUserPref('app.theme', themeInstance.key);
+          document.body.classList.remove(store.getUserPref('app.theme'));
+          store.setUserPref('app.theme', themeInstance.key);
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
         } catch (error) {
@@ -109,27 +111,27 @@ const swatchHeaderFactory = headerText => h('header.options-header', headerText)
 module.exports = {
   defaultTheme,
   init() {
-    const customThemeOptions = document.querySelector('#custom-theme-options');
+    const themeOptions = document.querySelector('#custom-theme-options');
     document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Colours'));
+    themeOptions.appendChild(swatchHeaderFactory('Colours'));
 
-    customThemes.forEach((themeInstance) => {
+    themes.forEach((themeInstance) => {
       if (themeInstance.type === 'COLOR') {
-        customThemeOptions.appendChild(swatchFactory(themeInstance));
+        themeOptions.appendChild(swatchFactory(themeInstance));
       }
     });
 
-    customThemeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
-    customThemes.forEach((themeInstance) => {
+    themeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
+    themes.forEach((themeInstance) => {
       if (themeInstance.type === 'BACKGROUND') {
-        customThemeOptions.appendChild(swatchFactory(themeInstance));
+        themeOptions.appendChild(swatchFactory(themeInstance));
       }
     });
-    customThemeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
-    customThemes.forEach((themeInstance) => {
+    themeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
+    themes.forEach((themeInstance) => {
       if (themeInstance.type === 'SPECIAL') {
-        customThemeOptions.appendChild(swatchFactory(themeInstance));
+        themeOptions.appendChild(swatchFactory(themeInstance));
       }
     });
 

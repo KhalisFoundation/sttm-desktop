@@ -39,5 +39,46 @@
   "changelog-seen": "0.0.0",
   "searchOptions": {
     "searchType": 0
+  },
+  "obs": {
+    "overlayPrefs": {
+      "overlayVars": {
+        "layout": "split",
+        "bgColor": "#2c3e50",
+        "textColor": "#EAC445"
+      },
+      "gurbani": {
+        "bottom": 156,
+        "height": 42,
+        "left": 280,
+        "right": 1080,
+        "top": 114,
+        "width": 800
+      },
+      "teeka": {
+        "bottom": 192,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 156,
+        "width": 800
+      },
+      "translation": {
+        "bottom": 564,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 528,
+        "width": 800
+      },
+      "transliteration": {
+        "bottom": 528,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 492,
+        "width": 800
+      }
+    }
   }
 }
