@@ -445,9 +445,11 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
+    /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
     }
+    */
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
@@ -587,9 +589,11 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Gurmukhi, English) {
+    /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
     }
+    */
     const lines = this.$shabad.querySelectorAll('a.panktee');
     if (e.target.classList.contains('fa-home')) {
       // Change main line
