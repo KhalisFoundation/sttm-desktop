@@ -100,12 +100,6 @@ const menuTemplate = [
     role: 'window',
     submenu: [
       {
-        label: 'Overlay',
-        click: () => {
-          main.openSecondaryWindow('overlayWindow');
-        },
-      },
-      {
         label: 'Minimize',
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize',
@@ -215,7 +209,7 @@ const winMenu = [
     },
   },
   {
-    label: 'Overlay',
+    label: 'Bani Overlay',
     click: () => {
       main.openSecondaryWindow('overlayWindow');
     },
@@ -294,6 +288,12 @@ const macMenu = [
         label: 'Donate...',
         click: () => {
           electron.shell.openExternal('https://khalisfoundation.org/donate/');
+        },
+      },
+      {
+        label: 'Bani Overlay',
+        click: () => {
+          main.openSecondaryWindow('overlayWindow');
         },
       },
     ],
