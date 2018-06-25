@@ -1,8 +1,8 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "4.0.0-beta.2",
-  "description": "The SikhiToTheMax 3 desktop app",
+  "version": "4.0.0",
+  "description": "The SikhiToTheMax 4 desktop app",
   "main": "app.js",
   "scripts": {
     "precommit": "npm test",

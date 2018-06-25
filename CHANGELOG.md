@@ -1,13 +1,16 @@
 ## SikhiToTheMax Desktop App
 
-### 4.0.0-beta.1 - _180528_
+### 4.0.0 - _180625_
 #### Added
  * **Chromecast** - Cast to any Chromecast video receiver device
  * **Backgrounds/Themes** - 6 new gorgeous backgrounds and themes to further lend to the tranquil environment
  * **1-Letter Search** - Why wait? Start searching right when you start typing
  * **Auto-play** - Automatically advance to the next line on a timer
  * **Random Shabad** - Not looking for anything in particular but want to read Bani? Get a random Shabad
+ * **Daily Hukamnama** - Get the daily Hukamnama from Sri Darbar Sahib, Amritsar
+ * **Anand Karaj** - Present all of the 4 Laavs for the Sikh Wedding Ceremony
  * **Donate button** - If you would like to show your appreciation with a monetary gift, please click the Donate button
+ * **Updates** - Get updated on the latest SikhiToTheMax news
 
 ### 3.3.1 - _180401_
 #### Added
