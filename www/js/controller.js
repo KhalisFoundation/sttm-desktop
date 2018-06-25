@@ -100,7 +100,7 @@ const menuTemplate = [
     role: 'window',
     submenu: [
       {
-        label: 'Overlay',
+        label: 'Bani Overlay',
         click: () => {
           main.openSecondaryWindow('overlayWindow');
         },
@@ -215,7 +215,7 @@ const winMenu = [
     },
   },
   {
-    label: 'Overlay',
+    label: 'Bani Overlay',
     click: () => {
       main.openSecondaryWindow('overlayWindow');
     },
