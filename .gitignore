@@ -1,9 +1,11 @@
 node_modules
 builds
-www/assets/css
+www/assets/css/*.css
+www/obs/bundle.css
 **/*.map
 packaging/aws.json
 packaging/keys.json
 data.db
 *.provisionprofile
 npm-debug.log*
+.idea/

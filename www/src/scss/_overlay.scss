@@ -1,0 +1,189 @@
+.canvas {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  margin-left: 80px;
+}
+
+.overlay-wrapper {
+  background-image: url('../../../assets/maharaj.jpg');
+  background-position: center center;
+  background-size: cover;
+  border-radius: 15px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+  height: 450px;
+  margin: auto;
+  overflow: hidden;
+  position: relative;
+  width: 800px;
+}
+
+.content-bar {
+  background: rgba(44, 62, 80, 0.9);
+  border: 1px dashed transparent;
+  color: rgba(241, 196, 15, 1);
+  font-size: 16px;
+  left: 0;
+  line-height: 1.5;
+  margin: auto;
+  min-height: 24px;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.control-panel {
+  background: #eee;
+  height: 100vh;
+  left: 0;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  width: 80px;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch {
+  border: none;
+  border-radius: 100px;
+}
+
+input[type='color'] {
+  padding: 0;
+}
+
+.input-wrap {
+  margin-bottom: 10px;
+  text-align: center;
+  width: 60px;
+}
+
+.setting-label {
+  color: #333;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-top: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.color-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid white;
+  border-radius: 100px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  height: 30px;
+  margin-bottom: 3px;
+  text-align: center;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+  transition: 0.3s transform ease;
+  width: 30px;
+
+  &:hover {
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    border: 1px solid white;
+  }
+}
+
+.separator {
+  border-bottom: 1px solid #ccc;
+  height: 10px;
+  margin-bottom: 10px;
+}
+
+.layout-btn {
+  @extend .color-input;
+
+  background: #ddd;
+  border-radius: 25%;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  overflow: hidden;
+
+  .layout-bar {
+    background: rgba(44, 62, 80, 0.9);
+    height: 3px;
+    width: 100%;
+  }
+}
+
+.cp-icon {
+  margin-top: 5px;
+}
+
+.export-btn {
+  @extend .color-input;
+
+  background: #ddd;
+  margin: auto;
+}
+
+.layout-btn.top-bottom {
+  position: relative;
+
+  .layout-bar {
+    position: absolute;
+  }
+
+  .layout-bar-1 { top: 0; }
+
+  .layout-bar-2 { top: 3px; }
+
+  .layout-bar-3 { bottom: 0; }
+
+  .layout-bar-4 { bottom: 3px; }
+}
+
+.layout-btn.bottom {
+  position: relative;
+
+  .layout-bar {
+    position: absolute;
+  }
+
+  .layout-bar-1 { bottom: 0; }
+
+  .layout-bar-2 { bottom: 3px; }
+
+  .layout-bar-3 { bottom: 6px; }
+
+  .layout-bar-4 { bottom: 9px; }
+}
+
+.cp-title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  line-height: 24px;
+  text-transform: uppercase;
+}
+
+.o-gurbani {
+  bottom: 36px;
+  font-family: "gurbaniakharthick";
+  font-size: 20px;
+  line-height: 1.5;
+  position: absolute;
+  text-align: center;
+}
+
+.o-translation {
+  bottom: 0;
+}
+
+.o-transliteration,
+.o-teeka {
+  display: none;
+}

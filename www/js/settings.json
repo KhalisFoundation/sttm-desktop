@@ -1,0 +1,94 @@
+{
+  "app": {
+    "title": "App Settings",
+    "settings": {
+      "theme": {
+        "title": "",
+        "type": "radio",
+        "options": {}
+      },
+      "custom-theme-options": {
+        "title": "Themes Options",
+        "type": "switch",
+        "options": {
+          "show-theme-editor": "Show Theme Picker"
+        }
+      },
+      "layout": {
+        "title": "App Layout",
+        "type": "switch",
+        "options": {
+          "presenter-view": "Presenter View"
+        }
+      }
+    }
+  },
+  "slide-layout": {
+    "title": "Slide Layout",
+    "settings": {
+      "fields": {
+        "title": "Fields to Display",
+        "type": "checkbox",
+        "options": {
+          "display-translation": "English Translation",
+          "display-teeka": "Punjabi Teeka",
+          "display-transliteration": "Transliteration",
+          "display-next-line": "Next Line"
+        }
+      },
+      "font-sizes": {
+        "title": "Font Sizes",
+        "type": "range",
+        "options": {
+          "gurbani": {
+            "title": "Gurbani",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "translation": {
+            "title": "English Translation",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "teeka": {
+            "title": "Punjabi Teeka",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "transliteration": {
+            "title": "Transliteration",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
+        }
+      },
+      "display-options": {
+        "title": "Display Options",
+        "type": "switch",
+        "options": {
+          "akhandpaatt": "Akhand Paatth View (Beta)",
+          "larivaar": "Larivaar",
+          "left-align": "Left-Align",
+          "autoplay": "Auto Play",
+          "livefeed": "Live Feed Text Files"
+        }
+      },
+      "autoplay-options": {
+        "title": "Autoplay Options",
+        "type": "range",
+        "options": {
+          "autoplayTimer": {
+            "title": "Delay (Seconds)",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
+        }
+      }
+    }
+  }
+}

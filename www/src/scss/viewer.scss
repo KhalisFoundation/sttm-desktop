@@ -5,14 +5,14 @@ $viewer-padding: 30px;
   font-family: $viewer-gurmukhi-font-family;
   font-style: normal;
   font-weight: normal;
-  src: url('../../core/fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
+  src: url('../fonts/gurbaniakharthicktrue-webfont.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'AnmolUniBaniTrue';
   font-style: normal;
   font-weight: normal;
-  src: url('../../core/fonts/AnmolUniBaniTrue.ttf') format('truetype');
+  src: url('../fonts/AnmolUniBaniTrue.ttf') format('truetype');
 }
 
 * {
@@ -29,6 +29,13 @@ html {
   cursor: default;
 }
 
+body {
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 #viewer {
   margin: 0;
   overflow: auto;
@@ -38,6 +45,26 @@ html {
   .gurmukhi {
     font-family: $viewer-gurmukhi-font-family;
   }
+}
+
+.ribbon {
+  background-image: url("../../assets/img/custom_backgrounds/embellishes/floral.png");
+  height: 100px;
+  position: fixed;
+  visibility: hidden;
+  width: 100px;
+}
+
+#ribbon1 {
+  left: 25px;
+  top: 25px;
+  transform: rotate(90deg);
+}
+
+#ribbon2 {
+  bottom: 25px;
+  right: 25px;
+  transform: rotate(270deg);
 }
 
 .left-align {
@@ -57,6 +84,15 @@ html {
   &.active {
     opacity: 1;
   }
+}
+
+.overlay {
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
 
 .slide {
@@ -164,7 +200,7 @@ h2 {
 .logo {
   display: none;
   height: 20%;
-  left: 50%;
+  left: 5%;
   position: fixed;
   top: 20%;
   transform: translateX(-50%);
@@ -184,7 +220,7 @@ h2 {
   #viewer-logo {
     bottom: 20px;
     display: block;
-    height: 5.5%;
+    height: 3.5%;
     top: auto;
   }
 }
