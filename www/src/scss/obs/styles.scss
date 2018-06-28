@@ -1,0 +1,68 @@
+@font-face {
+  font-family: 'gurbaniakhar';
+  font-style: normal;
+  font-weight: normal;
+  src: url('gurbaniakhartrue-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'gurbaniakhar';
+  font-style: normal;
+  font-weight: bold;
+  src: url('gurbaniakharheavytrue-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'gurbaniakharthick';
+  font-style: normal;
+  font-weight: normal;
+  src: url('gurbaniakharthicktrue-webfont.ttf') format('truetype');
+}
+
+* {
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.overlay-wrapper {
+  height: 100vh;
+  width: 100%;
+}
+
+.gurmukhi {
+  font-family: 'gurbaniakhar';
+}
+
+.content-bar {
+  background: rgba(44, 62, 80, 0.9);
+  border: 1px dashed transparent;
+  color: rgba(241, 196, 15, 1);
+  font-size: 16px;
+  left: 0;
+  line-height: 1.5;
+  margin: auto;
+  min-height: 24px;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.o-gurbani {
+  bottom: 36px;
+  font-family: 'gurbaniakharthick';
+  font-size: 20px;
+  line-height: 1.5;
+  position: absolute;
+  text-align: center;
+}
+
+.o-translation {
+  bottom: 0;
+}
+
+.o-transliteration,
+.o-teeka {
+  display: none;
+}

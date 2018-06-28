@@ -3,6 +3,18 @@ const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+
+const expressApp = express();
+
+const http = require('http').Server(expressApp);
+const io = require('socket.io')(http);
+
+expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
+
+http.listen(1397); // TODO: move to config file
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 const store = new Store({
@@ -22,6 +34,10 @@ const secondaryWindows = {
   helpWindow: {
     obj: false,
     url: `file://${__dirname}/www/help.html`,
+  },
+  overlayWindow: {
+    obj: false,
+    url: `file://${__dirname}/www/overlay.html`,
   },
 };
 let manualUpdate = false;
@@ -131,10 +147,9 @@ function createViewer(ipcData) {
   if (isExternal) {
     viewerWindow = new BrowserWindow({
       width: 800,
-      height: 600,
+      height: 400,
       x: viewerWindowPos.x,
       y: viewerWindowPos.y,
-      fullscreen: true,
       autoHideMenuBar: true,
       show: false,
       titleBarStyle: 'hidden',
@@ -144,11 +159,12 @@ function createViewer(ipcData) {
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
       mainWindow.focus();
+      viewerWindow.setFullScreen(true);
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -161,11 +177,11 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('closed', () => {
       viewerWindow = false;
-      mainWindow.webContents.send('remove-presenter-view');
+      mainWindow.webContents.send('remove-external-display');
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width,
         height,
       });
@@ -174,7 +190,8 @@ function createViewer(ipcData) {
 }
 
 app.on('ready', () => {
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+  const screens = electron.screen;
+  const { width, height } = screens.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
@@ -186,7 +203,7 @@ app.on('ready', () => {
   });
   mainWindow.webContents.on('did-finish-load', () => {
     if (checkForExternalDisplay()) {
-      mainWindow.webContents.send('presenter-view', {
+      mainWindow.webContents.send('external-display', {
         width: viewerWindowPos.w,
         height: viewerWindowPos.h,
       });
@@ -214,6 +231,13 @@ app.on('ready', () => {
       changelogWindow.close();
     }
   });
+
+  // When a display is connected, add a viewer window if it does not already exit
+  screens.on('display-added', () => {
+    if (!viewerWindow) {
+      createViewer();
+    }
+  });
 });
 
 
@@ -226,6 +250,14 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.on('cast-session-active', () => {
+  mainWindow.webContents.send('cast-session-active');
+});
+
+ipcMain.on('cast-session-stopped', () => {
+  mainWindow.webContents.send('cast-session-stopped');
+});
+
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
@@ -235,7 +267,25 @@ ipcMain.on('clear-apv', () => {
   }
 });
 
+function createBroadcastFiles(arg) {
+  const userDataPath = electron.app.getPath('userData');
+  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
+  const englishFile = `${userDataPath}/sttm-English.txt`;
+  try {
+    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim());
+    fs.appendFile(gurbaniFile, '\n');
+    fs.writeFile(englishFile, arg.Line.English.trim());
+    fs.appendFile(englishFile, '\n');
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+  }
+}
+
 ipcMain.on('show-line', (event, arg) => {
+  const overlayPrefs = store.get('obs');
+  const payload = Object.assign(arg, overlayPrefs);
+  io.emit('show-line', payload);
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
@@ -243,6 +293,9 @@ ipcMain.on('show-line', (event, arg) => {
       send: 'show-line',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 
@@ -280,7 +333,10 @@ ipcMain.on('update-settings', () => {
   }
 });
 
-exports.openSecondaryWindow = openSecondaryWindow;
-exports.appVersion = appVersion;
-exports.checkForUpdates = checkForUpdates;
-exports.autoUpdater = autoUpdater;
+module.exports = {
+  openSecondaryWindow,
+  appVersion,
+  checkForUpdates,
+  autoUpdater,
+  store,
+};

@@ -7,19 +7,16 @@ const request = require('request');
 const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
 
-const defaultPrefs = require('./defaults.json');
-const search = require('./search');
-const Store = require('./store');
+const search = require('./search-database');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbPath = path.resolve(userDataPath, 'data.db');
+const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 
-const store = new Store({
-  configName: 'user-preferences',
-  defaults: defaultPrefs,
-});
+const { store } = remote.require('./app');
+
+const POLLING_INTERVAL = (120 * 60000); // poll for new notifications every 2hrs.
 
 function windowAction(e) {
   const win = remote.getCurrentWindow();
@@ -45,6 +42,22 @@ function windowAction(e) {
   }
 }
 
+function addBadgeToNotification(msg) {
+  if (msg && msg.length > 0) {
+    document.getElementById('notifications-icon').classList.add('badge');
+  }
+}
+
+function checkForNotifcations() {
+  let timeStamp = store.get('userPrefs.notification-timestamp');
+  global.core.menu.getNotifications(timeStamp, global.core.menu.showNotificationsModal);
+
+  setInterval(() => {
+    timeStamp = store.get('userPrefs.notification-timestamp');
+    global.core.menu.getNotifications(timeStamp, addBadgeToNotification);
+  }, POLLING_INTERVAL);
+}
+
 module.exports = {
   ipc,
   search,
@@ -60,6 +73,7 @@ module.exports = {
       // Download the DB
       this.downloadLatestDB(true);
     }
+    checkForNotifcations();
   },
 
   downloadLatestDB(force = false) {
@@ -68,12 +82,12 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request('https://khajana.org/data.md5', (error, response, newestDBHash) => {
+        request('https://banidb.com/databases/sttmdesktop.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
-            const curDBHash = module.exports.getPref('curDBHash');
+            const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbZip = path.resolve(userDataPath, 'data.zip');
-              progress(request('https://khajana.org/data.zip'))
+              const dbZip = path.resolve(userDataPath, 'sttmdesktop.zip');
+              progress(request('https://banidb.com/databases/sttmdesktop.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
@@ -81,10 +95,22 @@ module.exports = {
                 })
                 .on('end', () => {
                   const zip = new AdmZip(dbZip);
-                  zip.extractEntryTo('data.db', userDataPath, true, true);
+                  zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
                   module.exports.initDB();
-                  module.exports.setPref('curDBHash', newestDBHash);
+                  store.set('curDBHash', newestDBHash);
                   fs.unlinkSync(dbZip);
+                  // Delete pre-4.0 DB
+                  const oldDB = path.resolve(userDataPath, 'data.db');
+                  fs.access(oldDB, (err) => {
+                    if (!err) {
+                      fs.unlink(oldDB, (err1) => {
+                        if (err1) {
+                          // eslint-disable-next-line no-console
+                          console.log(`Could not delete old database: ${err1}`);
+                        }
+                      });
+                    }
+                  });
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(-1);
                 })
@@ -112,32 +138,8 @@ module.exports = {
     global.platform.ipc.send('update-settings');
   },
 
-  getAllPrefs(schema = store.data) {
-    return this.getPref('userPrefs', schema);
-  },
-
-  getDefaults() {
-    return store.getDefaults();
-  },
-
-  getUserPref(key) {
-    return this.getPref(`userPrefs.${key}`);
-  },
-
-  getPref(key, schema = store.data) {
-    return store.get(key, schema);
-  },
-
-  setUserPref(key, val) {
-    this.setPref(`userPrefs.${key}`, val);
-  },
-
-  setPref(key, val) {
-    store.set(key, val);
-  },
-
-  deletePref(key) {
-    store.delete(key);
+  updateNotificationsTimestamp(time) {
+    store.setUserPref('notification-timestamp', time);
   },
 };
 

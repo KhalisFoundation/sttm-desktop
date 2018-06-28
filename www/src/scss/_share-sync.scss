@@ -1,0 +1,42 @@
+$sttm-orange: #f39c1d;
+
+#sync-page {
+  .block-list {
+    align-items: cgtenter;
+    display: flex;
+    justify-content: center;
+  }
+
+  .connect-box,
+  .share-box {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .help-block {
+      margin: 10px;
+      text-align: center;
+    }
+
+    a {
+      color: $sttm-orange;
+    }
+
+    .button {
+      margin: 10px;
+    }
+
+    input {
+      text-align: center;
+
+      &[value=''] {
+        display: none;
+      }
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+}

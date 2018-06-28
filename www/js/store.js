@@ -76,6 +76,18 @@ class Store {
       localStorage.setItem('prefs', JSON.stringify(this.combined.userPrefs));
     }
   }
+
+  getAllPrefs() {
+    return this.get('userPrefs');
+  }
+
+  getUserPref(key) {
+    return this.get(`userPrefs.${key}`);
+  }
+
+  setUserPref(key, val) {
+    this.set(`userPrefs.${key}`, val);
+  }
 }
 
 // expose the class
