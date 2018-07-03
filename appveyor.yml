@@ -12,7 +12,7 @@ environment:
       secure: YnpSJBnaHBEg7du/NqieQRj7Dyp87cH+l8dxFpoaGtPFBhh9t/Lnq9pjMghP1Qf8
   matrix:
     - nodejs_version: 8
-image: Visual Studio 2015
+image: Visual Studio 2017
 install:
   - ps: $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
   - ps: $fileContent += $env:priv_key.Replace(' ', "`n")
@@ -20,9 +20,6 @@ install:
   - ps: Set-Content packaging\id_rsa $fileContent
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
-  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/master/assets/bonjoursdksetup.exe
-  - bonjoursdksetup.exe /quiet
-  - del bonjoursdksetup.exe
   - npm install -g npm@latest
   - set PATH=%APPDATA%\npm;%PATH%
   - npm ci
