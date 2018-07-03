@@ -19,6 +19,9 @@ install:
   - ps: Set-Content packaging\id_rsa $fileContent
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
+  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/master/assets/bonjoursdksetup.exe
+  - bonjoursdksetup.exe /quiet
+  - del bonjoursdksetup.exe
   - npm install -g npm@latest
   - set PATH=%APPDATA%\npm;%PATH%
   - npm ci
