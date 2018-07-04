@@ -1,6 +1,6 @@
 ## SikhiToTheMax Desktop App
 
-### 4.0.3 - _180704_
+### 4.0.5 - _180704_
 #### Added
  * **Chromecast** - Cast to any Chromecast video receiver device
  * **Backgrounds/Themes** - 6 new gorgeous backgrounds and themes to further lend to the tranquil environment
