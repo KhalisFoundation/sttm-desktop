@@ -124,7 +124,6 @@
     },
     "win": {
       "icon": "assets/STTME.ico",
-      "publisherName": "Khalis Foundation",
       "target": [
         "nsis"
       ]
