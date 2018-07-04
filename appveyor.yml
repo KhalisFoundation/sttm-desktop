@@ -19,10 +19,10 @@ install:
   - ps: Set-Content packaging\id_rsa $fileContent
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
-  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/appveyor/assets/Bonjour64.msi?raw=true
+  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/master/assets/Bonjour64.msi?raw=true
   - msiexec /i Bonjour64.msi /qn
   - del Bonjour64.msi
-  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/appveyor/assets/bonjoursdksetup.exe?raw=true
+  - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/master/assets/bonjoursdksetup.exe?raw=true
   - bonjoursdksetup.exe /quiet
   - del bonjoursdksetup.exe
   - npm install -g npm@latest
