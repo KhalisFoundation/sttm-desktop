@@ -4,7 +4,6 @@ branches:
     - release
 skip_non_tags: true
 cache:
-  - node_modules
   - '%USERPROFILE%\.electron'
 environment:
   BONJOUR_SDK_HOME: 'C:\\Program Files\\Bonjour SDK'
