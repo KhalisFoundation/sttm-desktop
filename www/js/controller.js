@@ -1,5 +1,6 @@
 /* global Mousetrap */
 const electron = require('electron');
+const Noty = require('noty');
 
 const remote = electron.remote;
 const app = remote.app;
@@ -476,6 +477,19 @@ module.exports = {
 
   'presenter-view': function presenterView() {
     updateViewerScale();
+  },
+
+  livefeed() {
+    if (document.body.classList.contains('livefeed')) {
+      const userDataPath = app.getPath('userData');
+      new Noty({
+        type: 'info',
+        text: `<h3> Live Feed is on now. </h3> You can find files <code> sttm-Gurbani.txt </code> and <code> sttm-English.txt </code> in <code> ${userDataPath} </code> `,
+        closeWith: ['click', 'button'],
+        timeout: 7000,
+        layout: 'topRight',
+      }).show();
+    }
   },
 
   autoplay() {
