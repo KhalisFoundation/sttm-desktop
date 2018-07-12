@@ -23,17 +23,16 @@ module.exports = {
           }
           dbQuery += `,${charCode}`;
         }
-        // Add trailing wildcard
-        dbQuery += '%';
         if (searchType === 1) {
           dbQuery = `%${dbQuery}`;
         }
         // Replace kh with kh pair bindi
         let bindiQuery = '';
         if (dbQuery.includes('075')) {
-          bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
+          const replaced = dbQuery.replace(/075/g, '094');
+          bindiQuery = `OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        condition = `(${searchCol} > '${dbQuery}' AND ${searchCol} < '${dbQuery},z') ${bindiQuery}`;
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
