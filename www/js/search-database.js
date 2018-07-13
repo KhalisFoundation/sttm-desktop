@@ -23,16 +23,27 @@ module.exports = {
           }
           dbQuery += `,${charCode}`;
         }
-        if (searchType === 1) {
-          dbQuery = `%${dbQuery}`;
-        }
+
         // Replace kh with kh pair bindi
-        let bindiQuery = '';
+        let replaced = '';
         if (dbQuery.includes('075')) {
-          const replaced = dbQuery.replace(/075/g, '094');
-          bindiQuery = `OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
+          replaced = dbQuery.replace(/075/g, '094');
         }
-        condition = `(${searchCol} > '${dbQuery}' AND ${searchCol} < '${dbQuery},z') ${bindiQuery}`;
+
+        // Use LIKE if anywhere, otherwise use operators
+        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) {
+          condition = `${searchCol} LIKE '%${dbQuery}%'`;
+          if (replaced) {
+            condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
+          }
+        } else {
+          condition = `(${searchCol} > '${dbQuery}' AND ${searchCol} < '${dbQuery},z')`;
+          if (replaced) {
+            condition += ` OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
+          }
+        }
+
+        // Give preference to shorter lines if searching for 1 or 2 words
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
