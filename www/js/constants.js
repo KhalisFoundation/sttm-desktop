@@ -16,12 +16,13 @@ const SEARCH_TYPE_TEXTS = {
 
 const SOURCE_TEXTS = {
   all: 'All sources',
-  G: 'Guru Granth Sahib',
+  G: 'Guru Granth Sahib Ji',
   D: 'Dasam Granth Sahib',
-  B: 'Vaaran',
-  N: 'Gazals',
+  B: 'Bhai Gurdas Ji Vaaran',
+  N: 'Bhai Nand Lal Ji Vaaran',
   A: 'Amrit Keertan',
-  S: 'Vaaran',
+  S: 'Bhai Gurdas Singh Ji Vaaran',
+  R: 'Rehatnamas & Panthic sources',
 };
 
 module.exports = {
