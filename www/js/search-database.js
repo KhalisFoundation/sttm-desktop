@@ -6,7 +6,7 @@ LEFT JOIN Raag r USING(RaagID)`;
 const CONSTS = require('./constants.js');
 
 module.exports = {
-  search(searchQuery, searchType) {
+  search(searchQuery, searchType, searchSource) {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
@@ -33,7 +33,12 @@ module.exports = {
         if (dbQuery.includes('075')) {
           bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        if (searchSource === 'all') {
+          condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        } else {
+          condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}  AND v.SourceID = '${searchSource}'`;
+        }
+
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
@@ -48,7 +53,11 @@ module.exports = {
         }
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
-        condition = `${searchCol} LIKE '${dbQuery}'`;
+        if (searchSource === 'all') {
+          condition = `${searchCol} LIKE '${dbQuery}'`;
+        } else {
+          condition = `${searchCol} LIKE '${dbQuery}' AND v.SourceID = '${searchSource}'`;
+        }
         break;
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang

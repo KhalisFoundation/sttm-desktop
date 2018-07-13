@@ -14,7 +14,18 @@ const SEARCH_TYPE_TEXTS = {
   [SEARCH_TYPES.ANG]: 'Ang Search',
 };
 
+const SOURCE_TEXTS = {
+  all: 'All sources',
+  G: 'Guru Granth Sahib',
+  D: 'Dasam Granth Sahib',
+  B: 'Vaaran',
+  N: 'Gazals',
+  A: 'Amrit Keertan',
+  S: 'Vaaran',
+};
+
 module.exports = {
   SEARCH_TYPES,
   SEARCH_TYPE_TEXTS,
+  SOURCE_TEXTS,
 };

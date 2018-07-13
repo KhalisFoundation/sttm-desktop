@@ -125,6 +125,10 @@
     padding: 0.5rem;
     padding-right: 1.5rem;
     width: 100%;
+
+    &:disabled {
+      background-color: #eee;
+    }
   }
 }
 
@@ -134,7 +138,7 @@
   }
 
   #search-options {
-    height: 40px;
+    height: 80px;
   }
 }
 
