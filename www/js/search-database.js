@@ -1,3 +1,13 @@
+const electron = require('electron');
+const path = require('path');
+const Realm = require('realm');
+
+const realmDB = require('./realm-db');
+
+const { remote } = electron;
+const userDataPath = remote.app.getPath('userData');
+const realmPath = path.resolve(userDataPath, 'sttmdesktop.realm');
+
 const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
@@ -11,11 +21,10 @@ module.exports = {
     let searchCol = '';
     let condition = '';
     const order = [];
-    const limit = ' 0,20';
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
-        searchCol = 'v.FirstLetterStr';
+        searchCol = 'FirstLetterStr';
         for (let x = 0, len = searchQuery.length; x < len; x += 1) {
           let charCode = searchQuery.charCodeAt(x);
           if (charCode < 100) {
@@ -24,16 +33,15 @@ module.exports = {
           dbQuery += `,${charCode}`;
         }
         // Add trailing wildcard
-        dbQuery += '%';
-        if (searchType === 1) {
+        /* if (searchType === 1) {
           dbQuery = `%${dbQuery}`;
-        }
+        } */
         // Replace kh with kh pair bindi
         let bindiQuery = '';
         if (dbQuery.includes('075')) {
-          bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
+          bindiQuery = `OR ${searchCol} CONTAINS '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
+        condition = `${searchCol} CONTAINS '${dbQuery}' ${bindiQuery}`;
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
@@ -60,10 +68,20 @@ module.exports = {
         break;
     }
     order.push('s.ShabadID');
-    const query = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order.join()} LIMIT ${limit}`;
-    this.db.all(query, (err, rows) => {
+    console.time('query');
+    Realm.open({
+      path: realmPath,
+      schema: [realmDB.VerseSchema],
+    })
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered(condition);
+        global.core.search.printResults(rows.slice(0, 20));
+        console.timeEnd('query');
+      });
+/*     this.db.all(query, (err, rows) => {
       global.core.search.printResults(rows);
-    });
+      console.timeEnd('query');
+    }); */
   },
 
   loadShabad(ShabadID, LineID) {

@@ -6,13 +6,16 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 const sqlite3 = require('sqlite3').verbose();
+const Realm = require('realm');
 
 const search = require('./search-database');
+const realmDB = require('./realm-db');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
+const realmPath = path.resolve(userDataPath, 'sttmdesktop.realm');
 
 const { store } = remote.require('./app');
 
@@ -131,6 +134,52 @@ module.exports = {
     if (global.core) {
       global.core.search.initSearch();
     }
+    /* db.all('SELECT * FROM Verse', (err, rows) => {
+      this.writeRealm(rows);
+    }); */
+  },
+
+  writeRealm(rows) {
+    Realm.open({
+      path: realmPath,
+      schema: [realmDB.VerseSchema],
+    }).then((realm) => {
+      realm.write(() => {
+        console.log(rows.length);
+        let x = 1;
+        rows.forEach((row) => {
+          realm.create('Verse', {
+            ID: row.ID,
+            English: row.English,
+            Gurmukhi: row.Gurmukhi,
+            GurmukhiBisram: row.GurmukhiBisram,
+            GurmukhiUni: row.GurmukhiUni,
+            WriterID: row.WriterID,
+            Punjabi: row.Punjabi,
+            PunjabiUni: row.PunjabiUni,
+            Spanish: row.Spanish,
+            RaagID: row.RaagID,
+            PageNo: row.PageNo,
+            LineNo: row.LineNo,
+            SourceID: row.SourceID,
+            FirstLetterStr: row.FirstLetterStr,
+            MainLetters: row.MainLetters,
+            Bisram: row.Bisram,
+            igurbani_bisram1: row.igurbani_bisram1,
+            igurbani_bisram2: row.igurbani_bisram2,
+            FirstLetterEng: row.FirstLetterEng,
+            Transliteration: row.Transliteration,
+            Updated: row.Updated,
+            FirstLetterLen: row.FirstLetterLen,
+          });
+          if (x % 1000 === 0) {
+            console.log(x);
+          }
+          x += 1;
+        });
+      });
+      realm.close();
+    });
   },
 
   updateSettings() {
