@@ -23,22 +23,31 @@ module.exports = {
           }
           dbQuery += `,${charCode}`;
         }
-        // Add trailing wildcard
-        dbQuery += '%';
-        if (searchType === 1) {
-          dbQuery = `%${dbQuery}`;
-        }
+
         // Replace kh with kh pair bindi
-        let bindiQuery = '';
+        let replaced = '';
         if (dbQuery.includes('075')) {
-          bindiQuery = `OR ${searchCol} LIKE '${dbQuery.replace(/075/g, '094')}'`;
-        }
-        if (searchSource === 'all') {
-          condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}`;
-        } else {
-          condition = `${searchCol} LIKE '${dbQuery}' ${bindiQuery}  AND v.SourceID = '${searchSource}'`;
+          replaced = dbQuery.replace(/075/g, '094');
         }
 
+        // Use LIKE if anywhere, otherwise use operators
+        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) {
+          condition = `${searchCol} LIKE '%${dbQuery}%'`;
+          if (replaced) {
+            condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
+          }
+        } else {
+          condition = `(${searchCol} > '${dbQuery}' AND ${searchCol} < '${dbQuery},z')`;
+          if (replaced) {
+            condition += ` OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
+          }
+        }
+        if (searchSource !== 'all') {
+          condition += `  AND v.SourceID = '${searchSource}'`;
+        }
+
+
+        // Give preference to shorter lines if searching for 1 or 2 words
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
@@ -53,10 +62,9 @@ module.exports = {
         }
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
-        if (searchSource === 'all') {
-          condition = `${searchCol} LIKE '${dbQuery}'`;
-        } else {
-          condition = `${searchCol} LIKE '${dbQuery}' AND v.SourceID = '${searchSource}'`;
+        condition = `${searchCol} LIKE '${dbQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND v.SourceID = '${searchSource}'`;
         }
         break;
       }
