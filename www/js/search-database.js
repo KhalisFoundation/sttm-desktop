@@ -1,12 +1,5 @@
-const electron = require('electron');
-const path = require('path');
 const Realm = require('realm');
-
 const realmDB = require('./realm-db');
-
-const { remote } = electron;
-const userDataPath = remote.app.getPath('userData');
-const realmPath = path.resolve(userDataPath, 'sttmdesktop.realm');
 
 const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
@@ -16,6 +9,7 @@ LEFT JOIN Raag r USING(RaagID)`;
 const CONSTS = require('./constants.js');
 
 module.exports = {
+  allColumns,
   search(searchQuery, searchType) {
     let dbQuery = '';
     let searchCol = '';
@@ -69,10 +63,7 @@ module.exports = {
     }
     order.push('s.ShabadID');
     console.time('query');
-    Realm.open({
-      path: realmPath,
-      schema: [realmDB.VerseSchema],
-    })
+    Realm.open(realmDB.realmVerseSchema)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition);
         global.core.search.printResults(rows.slice(0, 20));

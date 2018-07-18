@@ -57,6 +57,8 @@
   "dependencies": {
     "adm-zip": "^0.4.7",
     "copy-to-clipboard": "^3.0.8",
+    "decompress": "^4.2.0",
+    "decompress-bzip2": "^4.0.0",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
     "electron-updater": "^2.21.0",
