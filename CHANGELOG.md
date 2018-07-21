@@ -1,5 +1,9 @@
 ## SikhiToTheMax Desktop App
 
+### 4.0.6 - _180718_
+#### Improved
+ * **Search speed** - _First Letter Start (Gurmukhi)_ search has gotten a huge performance boost, nearing instant from the time you type a letter to when results are shown
+
 ### 4.0.5 - _180704_
 #### Added
  * **Chromecast** - Cast to any Chromecast video receiver device
