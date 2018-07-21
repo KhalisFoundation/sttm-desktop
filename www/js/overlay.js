@@ -178,19 +178,19 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) => h(
     'span.export-btn',
     {
       onclick: () => {
-        increaseFunc();
+        decreaseFunc();
       },
     },
-    h('i.fa.fa-plus-circle.cp-icon'),
+    h('i.fa.fa-minus-circle.cp-icon'),
   ),
   h(
     'span.export-btn',
     {
       onclick: () => {
-        decreaseFunc();
+        increaseFunc();
       },
     },
-    h('i.fa.fa-minus-circle.cp-icon'),
+    h('i.fa.fa-plus-circle.cp-icon'),
   ),
 );
 
