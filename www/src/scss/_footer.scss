@@ -1,5 +1,7 @@
 #footer {
   height: 40px;
+  position: relative;
+  z-index: 20;
 
   .menu-group > .menu-group-left,
   .menu-group > .menu-group-right {

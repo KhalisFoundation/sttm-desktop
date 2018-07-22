@@ -31,7 +31,7 @@ const searchInputs = h('div#search-container', [
     onfocus: e => module.exports.focusSearch(e),
     onkeyup: e => module.exports.typeSearch(e),
   }),
-  h('div#search-bg'),
+  /*
   h(
     'button#search-options-toggle',
     {
@@ -39,7 +39,16 @@ const searchInputs = h('div#search-container', [
       onclick: e => module.exports.toggleSearchOptions(e),
     },
     h('i.fa.fa-cog'),
-  ),
+  ),  */
+  h('span', 'Skip to Ang'),
+  h('input#ang-input.gurmukhi', {
+    type: 'number',
+    placeholder: '123',
+    min: 1,
+    max: 1430,
+    onfocus: e => module.exports.focusSearch(e),
+    onkeyup: e => module.exports.searchByAng(e),
+  }),
   h(
     'button#gurmukhi-keyboard-toggle',
     {
@@ -48,6 +57,7 @@ const searchInputs = h('div#search-container', [
     },
     h('i.fa.fa-keyboard-o'),
   ),
+  h('div#search-bg'),
   h('div#db-download-progress'),
 ]);
 
@@ -105,12 +115,76 @@ Object.keys(keyboardLayout).forEach(i => {
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
-const searchTypes = Object.values(CONSTS.SEARCH_TYPE_TEXTS);
+const gurmukhiSearchText = CONSTS.GURMUKHI_SEARCH_TEXTS;
+const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
+const englishSearchText = CONSTS.ENGLISH_SEARCH_TEXTS;
+const englishSearchTypes = Object.keys(englishSearchText);
+
 const sourceTexts = CONSTS.SOURCE_TEXTS;
 const sourceKeys = Object.keys(sourceTexts);
 
-const searchTypeOptions = searchTypes.map((string, value) =>
-  h('option', { value }, string),
+const allGurmukhiInputs = gurmukhiSearchTypes.map((value) =>
+  h('span',
+  h('input', {
+    name: 'search-type',
+    type: 'radio',
+    value,
+    id: `gurmukhi-${value}`,
+    onclick() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  }),
+  h('label', { htmlFor: `gurmukhi-${value}` }, gurmukhiSearchText[value]),
+  ),
+);
+
+const allEnglishInputs = englishSearchTypes.map((value) =>
+  h('span',
+  h('input', {
+    name: 'search-type',
+    type: 'radio',
+    value,
+    id: `english-${value}`,
+    onclick() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  }),
+  h('label', { htmlFor: `english-${value}` }, englishSearchText[value]),
+  ),
+);
+
+const gurmukhiInputs = h(
+  'div',
+  allGurmukhiInputs,
+);
+
+const englishInputs = h(
+  'div',
+  allEnglishInputs,
+);
+
+const searchLanguage = h(
+  'div#language-selector',
+  h('input', {
+    type: 'radio',
+    value: 'gr',
+    id: 'gurmukhi-language',
+    name: 'search-language',
+    onclick() {
+      module.exports.changeSearchLanguage(this.value);
+    },
+  }),
+  h('label', { htmlFor: 'gurmukhi-language' }, 'Gurmukhi'),
+  h('input', {
+    type: 'radio',
+    value: 'en',
+    id: 'english-language',
+    name: 'search-language',
+    onclick() {
+      module.exports.changeSearchLanguage(this.value);
+    },
+  }),
+  h('label', { htmlFor: 'english-language' }, 'English'),
 );
 
 const sourceOptions = sourceKeys.map((key) =>
@@ -135,15 +209,7 @@ const shabadNavBack = h(
 
 const searchOptions = h(
   'div#search-options',
-  h(
-    'select#search-type',
-    {
-      onchange() {
-        module.exports.changeSearchType(parseInt(this.value, 10));
-      },
-    },
-    searchTypeOptions,
-  ),
+  h('span.filterText', 'Filter by'),
   h(
     'select#search-source',
     {
@@ -153,6 +219,9 @@ const searchOptions = h(
     },
     sourceOptions,
   ),
+  h(
+    'label.filterText', { htmlFor: 'search-source' },
+    'Scripture'),
 );
 
 const navPageLinks = [];
@@ -170,6 +239,7 @@ Object.keys(pageNavJSON).forEach(id => {
     ),
   );
 });
+
 const footerNav = h('ul.menu-bar', navPageLinks);
 
 const sources = {
@@ -203,7 +273,16 @@ module.exports = {
 
   init() {
     this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
-    searchOptions.querySelector('#search-type').value = this.searchType;
+
+    if (this.searchType <= 2) {
+      gurmukhiInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
+    } else {
+      englishInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
+    }
+
+    this.searchLanguage = store.get('searchOptions.searchLanguage');
+    searchLanguage.querySelector(`input[value=${this.searchLanguage}]`).checked = true;
+    this.changeSearchLanguage(this.searchLanguage);
 
     this.searchSource = store.get('searchOptions.searchSource');
     searchOptions.querySelector('#search-source').value = this.searchSource;
@@ -211,12 +290,14 @@ module.exports = {
     document.querySelector('.search-div').appendChild(searchInputs);
     document.querySelector('.search-div').appendChild(keyboard);
     document.querySelector('.search-div').appendChild(searchOptions);
+    document.querySelector('#search-page .navigator-header').appendChild(searchLanguage);
     document.querySelector('.shabad-next').appendChild(shabadNavFwd);
     document.querySelector('.shabad-prev').appendChild(shabadNavBack);
     document.querySelector('#footer .menu-group-left').appendChild(footerNav);
     this.$navigator = document.getElementById('navigator');
     this.$searchPage = document.getElementById('search-page');
     this.$search = document.getElementById('search');
+    this.$angSearch = document.getElementById('ang-input');
     this.$searchType = document.getElementById('search-type');
     this.$searchSource = document.getElementById('search-source');
     this.$dbDownloadProgress = document.getElementById('db-download-progress');
@@ -268,7 +349,7 @@ module.exports = {
     }
   },
 
-  typeSearch(e) {
+  typeSearch(e, type) {
     // if a key is pressed in the Gurmukhi KB or is one of the allowed keys
     if (
       e === 'gKB' ||
@@ -277,7 +358,7 @@ module.exports = {
     ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
-      newSearchTimeout = setTimeout(() => this.search(), 100);
+      newSearchTimeout = setTimeout(() => this.search(type), 100);
     }
   },
 
@@ -297,12 +378,7 @@ module.exports = {
       this.$search.classList.remove('roman');
       this.$search.classList.add('gurmukhi');
     }
-    if (value === 4) {
-      this.$searchSource.value = 'G';
-      this.$searchSource.disabled = true;
-    } else {
-      this.$searchSource.disabled = false;
-    }
+
     document.body.classList.remove(
       'searchResults_translationEnglish',
       'searchResults_transliteration',
@@ -314,16 +390,38 @@ module.exports = {
       default:
         break;
     }
+    /*
     this.$search.placeholder = this.$searchType.options[
       this.$searchType.selectedIndex
     ].label;
-    this.$search.focus();
+    this.$search.focus(); */
+    this.$search.placeholder = gurmukhiSearchText[value] || englishSearchText[value];
+  },
+
+  searchByAng(value) {
+    this.typeSearch(value, 4);
   },
 
   changeSearchSource(value) {
     this.searchSource = value;
     this.search();
     store.set('searchOptions.searchSource', this.searchSource);
+  },
+
+  changeSearchLanguage(value) {
+    document.getElementById('search-type').innerHTML = '';
+    if (value === 'gr') {
+      document.getElementById('search-type').appendChild(gurmukhiInputs);
+    } else if (value === 'en') {
+      document.getElementById('search-type').appendChild(englishInputs);
+    }
+    store.set('searchOptions.searchLanguage', value);
+    const checkedInputs = document.querySelector("input[name='search-type']:checked");
+    if (checkedInputs) {
+      checkedInputs.click();
+    } else {
+      document.querySelector("input[name='search-type']").click();
+    }
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -383,9 +481,16 @@ module.exports = {
 
   // eslint-disable-next-line no-unused-vars
   search(e) {
-    const searchQuery = this.$search.value;
+    let searchType = this.searchType;
+    let searchQuery;
+    if (e === 4) {
+      searchQuery = this.$angSearch.value;
+      searchType = e;
+    } else {
+      searchQuery = this.$search.value;
+    }
     if (searchQuery.length >= 1) {
-      global.platform.search.search(searchQuery, this.searchType, this.searchSource);
+      global.platform.search.search(searchQuery, searchType, this.searchSource);
     } else {
       this.$results.innerHTML = '';
     }

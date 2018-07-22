@@ -82,6 +82,17 @@ $base-text: #4e4e4e;
   #search-container {
     input {
       color: $base-text;
+
+      &[type='number'] {
+        background-color: #333;
+        color: #fff;
+
+        &::-webkit-input-placeholder {
+          color: #fff;
+
+          @extend .gurmukhi;
+        }
+      }
     }
 
     input:focus + div {
