@@ -44,22 +44,23 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
     label,
   ),
 );
-function updateContentBarColor(color, prop) {
+
+function updateContentBar(value, prop) {
   document.querySelectorAll('.content-bar').forEach((el) => {
-    el.style[prop] = color; // eslint-disable-line no-param-reassign
+    el.style[prop] = value; // eslint-disable-line no-param-reassign
   });
 }
 
 const changeColor = (e) => {
   const color = e.target.value;
-  updateContentBarColor(color, 'color');
+  updateContentBar(color, 'color');
   overlayVars.textColor = color;
   savePrefs();
 };
 
 const changeBg = (e) => {
   const color = e.target.value;
-  updateContentBarColor(color, 'backgroundColor');
+  updateContentBar(color, 'backgroundColor');
   overlayVars.bgColor = color;
   savePrefs();
 };
@@ -70,14 +71,14 @@ const topLayoutApply = () => {
   document.querySelector('.o-gurbani').style.bottom = 'auto';
   document.querySelector('.o-teeka').style.display = 'none';
   document.querySelector('.o-transliteration').style.display = 'none';
-  document.querySelector('.o-translation').style.top = '42px';
+  document.querySelector('.o-translation').style.top = overlayVars.height;
   document.querySelector('.o-translation').style.bottom = 'auto';
 };
 
 const bottomLayoutApply = () => {
   overlayVars.layout = 'bottom';
   document.querySelector('.o-gurbani').style.top = 'auto';
-  document.querySelector('.o-gurbani').style.bottom = '36px';
+  document.querySelector('.o-gurbani').style.bottom = overlayVars.height;
   document.querySelector('.o-translation').style.top = 'auto';
   document.querySelector('.o-translation').style.bottom = '0';
   document.querySelector('.o-teeka').style.display = 'none';
@@ -89,13 +90,64 @@ const splitLayoutApply = () => {
   document.querySelector('.o-gurbani').style.top = '0';
   document.querySelector('.o-gurbani').style.bottom = 'auto';
   document.querySelector('.o-teeka').style.display = 'block';
-  document.querySelector('.o-teeka').style.top = '42px';
+  document.querySelector('.o-teeka').style.top = overlayVars.height;
   document.querySelector('.o-teeka').style.bottom = 'auto';
   document.querySelector('.o-transliteration').style.display = 'block';
   document.querySelector('.o-transliteration').style.top = 'auto';
-  document.querySelector('.o-transliteration').style.bottom = '36px';
+  document.querySelector('.o-transliteration').style.bottom = overlayVars.height;
   document.querySelector('.o-translation').style.top = 'auto';
   document.querySelector('.o-translation').style.bottom = '0';
+};
+
+const updateSize = (newSize, prop) => {
+  updateContentBar(newSize, prop);
+  overlayVars[prop] = newSize;
+
+  switch (overlayVars.layout) {
+    case 'top':
+      topLayoutApply();
+      break;
+    case 'bottom':
+      bottomLayoutApply();
+      break;
+    case 'split':
+      splitLayoutApply();
+      break;
+    default :
+      break;
+  }
+};
+
+const getSize = (prop) => {
+  const bars = document.querySelectorAll('.content-bar');
+
+  return parseInt(bars[0].style[prop], 10);
+};
+
+const increaseBarSize = () => {
+  const size = getSize('height');
+  const newSize = size < 100 ? size + 2 : 100;
+
+  updateSize(`${newSize}px`, 'height');
+};
+const decreaseBarSize = () => {
+  const size = getSize('height');
+  const newSize = size > 33 ? size - 2 : 33;
+
+  updateSize(`${newSize}px`, 'height');
+};
+
+const increasefontSize = () => {
+  const size = getSize('fontSize');
+  const newSize = size < 25 ? size + 1 : 25;
+
+  updateSize(`${newSize}px`, 'fontSize');
+};
+const decreasefontSize = () => {
+  const size = getSize('fontSize');
+  const newSize = size > 5 ? size - 1 : 5;
+
+  updateSize(`${newSize}px`, 'fontSize');
 };
 
 const separator = h('div.separator');
@@ -120,6 +172,29 @@ const layoutButtonFactory = (layoutName, layoutFunc) => h(
   ),
 );
 
+const resizeButtonFactory = (increaseFunc, decreaseFunc) => h(
+  'div.input-wrap.resize-btn',
+  h(
+    'span.export-btn',
+    {
+      onclick: () => {
+        decreaseFunc();
+      },
+    },
+    h('i.fa.fa-minus-circle.cp-icon'),
+  ),
+  h(
+    'span.export-btn',
+    {
+      onclick: () => {
+        increaseFunc();
+      },
+    },
+    h('i.fa.fa-plus-circle.cp-icon'),
+  ),
+);
+
+
 const copyURLButton = h(
   'div.input-wrap',
   {
@@ -143,10 +218,14 @@ const bottomLayoutBtn = layoutButtonFactory('bottom', bottomLayoutApply);
 const topBottomLayoutBtn = layoutButtonFactory('top-bottom', splitLayoutApply);
 const textColor = colorInputFactory('toggle-text', 'Text', overlayVars.textColor, changeColor);
 const backgroundColor = colorInputFactory('background', 'BG', overlayVars.bgColor, changeBg);
+const changeBarSizeButton = resizeButtonFactory(increaseBarSize, decreaseBarSize);
+const changefontSizeButton = resizeButtonFactory(increasefontSize, decreasefontSize);
 
 const controlPanel = document.querySelector('.control-panel');
 controlPanel.append(textColor);
+controlPanel.append(changefontSizeButton);
 controlPanel.append(backgroundColor);
+controlPanel.append(changeBarSizeButton);
 controlPanel.append(separator);
 controlPanel.append(bottomLayoutBtn);
 controlPanel.append(topLayoutBtn);
@@ -168,5 +247,8 @@ switch (overlayVars.layout) {
   default :
     break;
 }
-updateContentBarColor(overlayVars.bgColor, 'backgroundColor');
-updateContentBarColor(overlayVars.textColor, 'color');
+updateContentBar(overlayVars.bgColor, 'backgroundColor');
+updateContentBar(overlayVars.textColor, 'color');
+updateSize(overlayVars.height, 'height');
+updateSize(overlayVars.fontSize, 'fontSize');
+

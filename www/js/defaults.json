@@ -45,7 +45,9 @@
       "overlayVars": {
         "layout": "split",
         "bgColor": "#2c3e50",
-        "textColor": "#EAC445"
+        "textColor": "#EAC445",
+        "height": "25px",
+        "fontSize": "20px"
       },
       "gurbani": {
         "bottom": 156,

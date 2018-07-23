@@ -18,6 +18,8 @@
       document.querySelectorAll('.content-bar').forEach((el) => {
         el.style.color = overlayPrefs.overlayVars.textColor;
         el.style.backgroundColor = overlayPrefs.overlayVars.bgColor;
+        el.style.height = overlayPrefs.overlayVars.height;
+        el.style.fontSize = overlayPrefs.overlayVars.fontSize;
       });
       switch (overlayPrefs.overlayVars.layout) {
         case 'top':
@@ -37,13 +39,13 @@
       document.querySelector('.o-gurbani').style.bottom = 'auto';
       document.querySelector('.o-teeka').style.display = 'none';
       document.querySelector('.o-transliteration').style.display = 'none';
-      document.querySelector('.o-translation').style.top = '42px';
+      document.querySelector('.o-translation').style.top =  overlayPrefs.overlayVars.height;
       document.querySelector('.o-translation').style.bottom = 'auto';
     };
 
     var bottomLayoutApply = function() {
       document.querySelector('.o-gurbani').style.top = 'auto';
-      document.querySelector('.o-gurbani').style.bottom = '36px';
+      document.querySelector('.o-gurbani').style.bottom =  overlayPrefs.overlayVars.height;
       document.querySelector('.o-translation').style.top = 'auto';
       document.querySelector('.o-translation').style.bottom = '0';
       document.querySelector('.o-teeka').style.display = 'none';
@@ -54,11 +56,11 @@
       document.querySelector('.o-gurbani').style.top = '0';
       document.querySelector('.o-gurbani').style.bottom = 'auto';
       document.querySelector('.o-teeka').style.display = 'block';
-      document.querySelector('.o-teeka').style.top = '42px';
+      document.querySelector('.o-teeka').style.top = overlayPrefs.overlayVars.height;
       document.querySelector('.o-teeka').style.bottom = 'auto';
       document.querySelector('.o-transliteration').style.display = 'block';
       document.querySelector('.o-transliteration').style.top = 'auto';
-      document.querySelector('.o-transliteration').style.bottom = '36px';
+      document.querySelector('.o-transliteration').style.bottom = overlayPrefs.overlayVars.height;
       document.querySelector('.o-translation').style.top = 'auto';
       document.querySelector('.o-translation').style.bottom = '0';
     };

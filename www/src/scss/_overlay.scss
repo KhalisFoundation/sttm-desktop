@@ -23,11 +23,9 @@
   background: rgba(44, 62, 80, 0.9);
   border: 1px dashed transparent;
   color: rgba(241, 196, 15, 1);
-  font-size: 16px;
   left: 0;
   line-height: 1.5;
   margin: auto;
-  min-height: 24px;
   padding: 5px;
   position: absolute;
   text-align: center;
@@ -131,6 +129,17 @@ input[type='color'] {
   margin: auto;
 }
 
+.resize-btn {
+  display: flex;
+}
+
+.size-btn {
+  @extend .color-input;
+
+  background: #ddd;
+  margin: auto;
+}
+
 .layout-btn.top-bottom {
   position: relative;
 
@@ -173,7 +182,6 @@ input[type='color'] {
 .o-gurbani {
   bottom: 36px;
   font-family: "gurbaniakharthick";
-  font-size: 20px;
   line-height: 1.5;
   position: absolute;
   text-align: center;
