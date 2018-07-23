@@ -235,4 +235,20 @@ module.exports = {
       });
     });
   },
+  changeFontSize(iconType, operation) {
+    const range = settings['slide-layout'].settings['font-sizes'].options[iconType];
+    const existingSize = parseInt(store.getUserPref(`slide-layout.font-sizes.${iconType}`), 10);
+    document.body.classList.remove(`${iconType}-${existingSize}`);
+
+    let newSize;
+
+    if (operation === 'plus' && existingSize < range.max) {
+      newSize = existingSize + range.step;
+    } else if (operation === 'minus' && existingSize < range.max) {
+      newSize = existingSize - range.step;
+    }
+    document.body.classList.add(`${iconType}-${newSize}`);
+    store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
+    global.platform.updateSettings();
+  },
 };

@@ -134,8 +134,8 @@ module.exports = {
   },
 
   updateSettings() {
-    global.webview.send('update-settings');
-    global.platform.ipc.send('update-settings');
+    if (global.webview) global.webview.send('update-settings');
+    if (global.platform) global.platform.ipc.send('update-settings');
   },
 
   updateNotificationsTimestamp(time) {

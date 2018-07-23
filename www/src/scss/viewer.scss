@@ -177,7 +177,6 @@ h2 {
 .teeka {
   height: 0;
   opacity: 0;
-  overflow: hidden;
 }
 
 .display-translation .translation,
@@ -222,6 +221,80 @@ h2 {
     display: block;
     height: 3.5%;
     top: auto;
+  }
+
+  .viewer-buttons {
+    align-content: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-around;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 150px;
+
+    i {
+      font-size: 3vh;
+      padding: 0 20px;
+    }
+  }
+}
+
+.viewer-controls {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: space-around;
+  left: 0;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  transition: 0.3s margin ease;
+  width: 18vh;
+  z-index: 20;
+}
+
+#viewer:hover {
+  .viewer-controls {
+    opacity: 1;
+  }
+}
+
+.iconset {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 15vh;
+
+  span {
+    align-items: center;
+    background-color: #333;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+
+    i {
+      color: #fff;
+    }
+  }
+
+  .plus {
+    font-size: 3vh;
+    height: 7vh;
+    width: 7vh;
+  }
+
+  .minus {
+    font-size: 2vh;
+    height: 6vh;
+    width: 6vh;
   }
 }
 

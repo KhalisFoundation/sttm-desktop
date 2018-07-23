@@ -95,7 +95,6 @@ const showNotificationsModal = (message) => {
     modal.setContent(content);
     // open modal
     modal.open();
-    document.getElementById('notifications-icon').classList.remove('badge');
   }
 };
 

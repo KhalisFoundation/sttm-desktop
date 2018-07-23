@@ -7,13 +7,6 @@
         "type": "radio",
         "options": {}
       },
-      "custom-theme-options": {
-        "title": "Themes Options",
-        "type": "switch",
-        "options": {
-          "show-theme-editor": "Show Theme Picker"
-        }
-      },
       "layout": {
         "title": "App Layout",
         "type": "switch",

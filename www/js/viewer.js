@@ -56,13 +56,20 @@ function castToReceiver() {
 }
 
 function castShabadLine(lineID) {
+  document.querySelector('.viewer-controls').innerHTML = '';
   castCur = decks[currentShabad][lineID];
   let nextLine = '';
   if (decks[currentShabad][lineID + 1]) {
     nextLine = decks[currentShabad][lineID + 1].gurmukhi;
   }
-  castCur.nextLine = nextLine;
   castToReceiver();
+
+  castCur.nextLine = nextLine;
+  const activeSlide = document.querySelector('.slide.active').children;
+  Array.prototype.forEach.call(activeSlide, (element => {
+    const icons = iconsetHtml(`plusminus-${element.classList[0]}`, element.innerHTML);
+    if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+  }));
 }
 
 function castText(text, isGurmukhi) {
@@ -157,6 +164,23 @@ function createAPVContainer() {
   }
 }
 
+const iconsetHtml = (classname, content) => {
+  let icons;
+  const iconType = classname.split('-')[1];
+  if (content) {
+    icons = h(
+    `span.${classname}.iconset`, [
+      h('span.minus', {
+        onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+      }, h('i', 'A')),
+      h('span.plus', {
+        onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+      }, h('i', 'A')),
+    ]);
+  }
+  return icons;
+};
+
 function createCards(rows, LineID) {
   return new Promise((resolve) => {
     if (rows.length > 0) {
@@ -175,7 +199,9 @@ function createCards(rows, LineID) {
           }
         });
         const gurmukhiContainer = document.createElement('div');
-        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+
+        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
+                                       <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
         cards.push(
           h(
             `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,

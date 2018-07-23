@@ -422,6 +422,9 @@ module.exports = {
     } else {
       document.querySelector("input[name='search-type']").click();
     }
+    const header = document.querySelector('#search-page .navigator-header');
+    const headerHeight = parseInt(window.getComputedStyle(header).height, 10);
+    document.querySelector('#search-page .block-list').style.height = `calc(100% - ${76 + headerHeight}px)`;
   },
 
   // eslint-disable-next-line no-unused-vars
