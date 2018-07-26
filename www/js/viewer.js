@@ -65,9 +65,9 @@ function castShabadLine(lineID) {
   castToReceiver();
 
   castCur.nextLine = nextLine;
-  const activeSlide = document.querySelector('.slide.active').children;
+  const activeSlide = document.querySelector('.deck.active .slide.active').children;
   Array.prototype.forEach.call(activeSlide, (element => {
-    const icons = iconsetHtml(`plusminus-${element.classList[0]}`, element.innerHTML);
+    const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
     if (icons) document.querySelector('.viewer-controls').appendChild(icons);
   }));
 }
@@ -170,12 +170,16 @@ const iconsetHtml = (classname, content) => {
   if (content) {
     icons = h(
     `span.${classname}.iconset`, [
-      h('span.minus', {
+      h('p.tagline', iconType),
+      h('span.visibility', {
+        onclick: e => core.menu.settings.showHide(e, iconType),
+      }, h('i.fa.fa-eye')),
+      h('span.minus.size', {
         onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
-      }, h('i', 'A')),
-      h('span.plus', {
+      }, h('i.fa.fa-minus-circle')),
+      h('span.plus.size', {
         onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
-      }, h('i', 'A')),
+      }, h('i.fa.fa-plus-circle')),
     ]);
   }
   return icons;
@@ -226,7 +230,11 @@ function createCards(rows, LineID) {
 
 function createDeck(cards, curSlide, shabad, ShabadID) {
   hideDecks();
-  $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+  if (document.querySelector('.vc-open')) {
+    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));
+  } else {
+    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+  }
   smoothScroll(curSlide);
   currentShabad = parseInt(ShabadID, 10);
   decks[ShabadID] = shabad;
@@ -315,3 +323,15 @@ function showText(text, isGurmukhi = false) {
   $message.appendChild(h('div.slide.active', textNode));
   castText(text, isGurmukhi);
 }
+
+function toggleSideMenu() {
+  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach(el => {
+    el.classList.toggle('vc-icon-hidden');
+  });
+  Array.from(document.querySelectorAll('.deck')).forEach(el => {
+    el.classList.toggle('vc-open');
+  });
+  document.querySelector('.viewer-controls').classList.toggle('viewer-controls-open');
+}
+
+document.querySelector('.vc-toggle-icon').onclick = toggleSideMenu;

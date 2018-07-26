@@ -251,4 +251,13 @@ module.exports = {
     store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
     global.platform.updateSettings();
   },
+  showHide(e, type) {
+    const catKey = 'slide-layout';
+    const settingKey = 'fields';
+    const option = `display-${type}`;
+    document.body.classList.toggle(option);
+    const newVal = document.body.classList.contains(option);
+    store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+    global.platform.updateSettings();
+  },
 };

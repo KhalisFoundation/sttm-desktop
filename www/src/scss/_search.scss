@@ -75,10 +75,7 @@
   border-radius: 2px;
   display: none;
   font-size: 0;
-  left: 0;
   overflow: hidden;
-  position: absolute;
-  top: calc(-128px - 40px);
   width: calc(100% + 2px);
   z-index: 2;
 
@@ -110,6 +107,8 @@
 }
 
 #navigator.kb-active {
+  height: calc(300px + 128px);
+
   #gurmukhi-keyboard {
     display: block;
   }
@@ -120,13 +119,14 @@
 }
 
 #search-options {
+  display: none;
   height: 36px;
   overflow: hidden;
   padding-right: 12px;
   text-align: right;
   transition: height 250ms linear;
 
-  .filterText {
+  .filter-text {
     font-style: italic;
   }
 
@@ -157,16 +157,6 @@
   }
 }
 
-.search-options-open {
-  #search-options-toggle i {
-    transform: rotate(90deg);
-  }
-
-  #search-options {
-    height: 80px;
-  }
-}
-
 button {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -180,6 +170,7 @@ button {
 #search-page {
   #language-selector {
     flex-grow: 1;
+    text-align: left;
   }
 
   .navigator-header {
@@ -189,15 +180,9 @@ button {
   }
 
   .block-list {
-    height: calc(100% - 116px);
+    height: calc(100% - 156px);
     transition: height $transition-time $transition-easing;
     z-index: 5;
-  }
-
-  &.search-options-open {
-    .block-list {
-      height: calc(100% - 80px);
-    }
   }
 }
 

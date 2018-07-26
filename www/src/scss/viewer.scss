@@ -83,6 +83,11 @@ body {
 
   &.active {
     opacity: 1;
+
+    &.vc-open {
+      right: #{$viewer-padding};
+      width: calc(100% - #{$viewer-padding} * 2 - 28vh);
+    }
   }
 }
 
@@ -186,6 +191,20 @@ h2 {
   opacity: 1;
 }
 
+.icons-translation .size,
+.icons-transliteration .size,
+.icons-teeka .size {
+  color: #d4d4d4;
+  z-index: -1;
+}
+
+.display-translation .icons-translation .size,
+.display-transliteration .icons-transliteration .size,
+.display-teeka .icons-teeka .size {
+  color: #333;
+  z-index: 20;
+}
+
 /* ***** FONT SIZES ***** */
 @for $i from 1 through 20 {
   .gurbani-#{$i} .gurbani,
@@ -222,25 +241,26 @@ h2 {
     height: 3.5%;
     top: auto;
   }
+}
 
-  .viewer-buttons {
-    align-content: center;
-    background-color: rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: space-around;
-    position: absolute;
-    right: 0;
-    text-align: center;
-    top: 0;
-    width: 150px;
+.vc-toggle-icon {
+  cursor: pointer;
+  display: none;
+  font-size: 5vh;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: 28vh;
+  z-index: 50;
 
-    i {
-      font-size: 3vh;
-      padding: 0 20px;
-    }
+  .vc-icon-hidden {
+    display: none;
   }
+}
+
+.presenter-view .vc-toggle-icon {
+  display: initial;
 }
 
 .viewer-controls {
@@ -248,53 +268,56 @@ h2 {
   background-color: rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 0;
   justify-content: space-around;
   left: 0;
-  opacity: 0;
   overflow: hidden;
   position: absolute;
   top: 0;
-  transition: 0.3s margin ease;
-  width: 18vh;
+  transition: all $transition-time $transition-easing;
+  width: 28vh;
   z-index: 20;
 }
 
-#viewer:hover {
-  .viewer-controls {
-    opacity: 1;
-  }
+.viewer-controls-open {
+  height: 100vh;
 }
 
 .iconset {
   align-items: center;
   display: flex;
-  justify-content: space-between;
-  width: 15vh;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 100%;
+
+  p {
+    color: #4e4e4e;
+    flex-basis: 100%;
+    font-size: 4vh;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
 
   span {
     align-items: center;
-    background-color: #333;
+    border: 4px solid #ccc;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     justify-content: center;
-
-    i {
-      color: #fff;
-    }
+    padding: 12px;
   }
 
-  .plus {
-    font-size: 3vh;
+  .plus,
+  .minus,
+  .visibility {
+    font-size: 5vh;
     height: 7vh;
     width: 7vh;
   }
 
-  .minus {
-    font-size: 2vh;
-    height: 6vh;
-    width: 6vh;
+  &.icons-gurbani .visibility {
+    display: none;
   }
 }
 

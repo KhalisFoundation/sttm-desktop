@@ -31,16 +31,7 @@ const searchInputs = h('div#search-container', [
     onfocus: e => module.exports.focusSearch(e),
     onkeyup: e => module.exports.typeSearch(e),
   }),
-  /*
-  h(
-    'button#search-options-toggle',
-    {
-      type: 'button',
-      onclick: e => module.exports.toggleSearchOptions(e),
-    },
-    h('i.fa.fa-cog'),
-  ),  */
-  h('span', 'Skip to Ang'),
+  h('span', 'Ang'),
   h('input#ang-input.gurmukhi', {
     type: 'number',
     placeholder: '123',
@@ -209,7 +200,9 @@ const shabadNavBack = h(
 
 const searchOptions = h(
   'div#search-options',
-  h('span.filterText', 'Filter by'),
+  h('span.filter-text',
+    h('i.fa.fa-sliders'),
+  ),
   h(
     'select#search-source',
     {
@@ -220,7 +213,7 @@ const searchOptions = h(
     sourceOptions,
   ),
   h(
-    'label.filterText', { htmlFor: 'search-source' },
+    'label.filter-text', { htmlFor: 'search-source' },
     'Scripture'),
 );
 
@@ -256,7 +249,8 @@ document.body.addEventListener('click', e => {
   const target = e.target;
   if (
     document.querySelector('.search-div') &&
-    !document.querySelector('.search-div').contains(target)
+    !document.querySelector('.search-div').contains(target) &&
+    !document.querySelector('#search-page .navigator-header').contains(target)
   ) {
     module.exports.closeGurmukhiKB();
   }
@@ -362,11 +356,6 @@ module.exports = {
     }
   },
 
-  // eslint-disable-next-line
-  toggleSearchOptions(e) {
-    this.$searchPage.classList.toggle('search-options-open');
-  },
-
   changeSearchType(value) {
     this.searchType = value;
     this.search();
@@ -390,12 +379,8 @@ module.exports = {
       default:
         break;
     }
-    /*
-    this.$search.placeholder = this.$searchType.options[
-      this.$searchType.selectedIndex
-    ].label;
-    this.$search.focus(); */
     this.$search.placeholder = gurmukhiSearchText[value] || englishSearchText[value];
+    this.$search.focus();
   },
 
   searchByAng(value) {
@@ -416,15 +401,13 @@ module.exports = {
       document.getElementById('search-type').appendChild(englishInputs);
     }
     store.set('searchOptions.searchLanguage', value);
-    const checkedInputs = document.querySelector("input[name='search-type']:checked");
-    if (checkedInputs) {
-      checkedInputs.click();
+
+    const checkedInput = document.querySelector("input[name='search-type']:checked");
+    if (checkedInput) {
+      checkedInput.click();
     } else {
       document.querySelector("input[name='search-type']").click();
     }
-    const header = document.querySelector('#search-page .navigator-header');
-    const headerHeight = parseInt(window.getComputedStyle(header).height, 10);
-    document.querySelector('#search-page .block-list').style.height = `calc(100% - ${76 + headerHeight}px)`;
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -496,6 +479,7 @@ module.exports = {
       global.platform.search.search(searchQuery, searchType, this.searchSource);
     } else {
       this.$results.innerHTML = '';
+      document.getElementById('search-options').style.display = 'none';
     }
   },
 
@@ -531,9 +515,11 @@ module.exports = {
         );
         this.$results.appendChild(result);
       });
+      document.getElementById('search-options').style.display = 'block';
     } else {
       this.$results.innerHTML = '';
       this.$results.appendChild(h('li.roman', h('span', 'No results')));
+      document.getElementById('search-options').style.display = 'none';
     }
   },
 
