@@ -7,7 +7,6 @@
   "scripts": {
     "precommit": "npm test",
     "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ www/js www/core/js && stylelint \"www/src/scss/*.scss\" --syntax scss --fix",
-    "test:app": "mocha",
     "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css",
     "pack:mac": "npm run build && build --mac",
@@ -44,7 +43,6 @@
     "eslint-plugin-import": "^2.2.0",
     "htmlhint": "^0.9.13",
     "husky": "^0.13.3",
-    "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "nodemon": "^1.11.0",
     "npm-run-all": "^4.1.3",
