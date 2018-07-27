@@ -395,10 +395,13 @@ module.exports = {
 
   changeSearchLanguage(value) {
     document.getElementById('search-type').innerHTML = '';
+    const searchBlock = document.querySelector('#search-page .block-list');
     if (value === 'gr') {
       document.getElementById('search-type').appendChild(gurmukhiInputs);
+      searchBlock.classList.add('language-gr');
     } else if (value === 'en') {
       document.getElementById('search-type').appendChild(englishInputs);
+      searchBlock.classList.remove('language-gr');
     }
     store.set('searchOptions.searchLanguage', value);
 
