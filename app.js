@@ -331,6 +331,7 @@ ipcMain.on('update-settings', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-settings');
   }
+  mainWindow.webContents.send('sync-settings');
 });
 
 module.exports = {

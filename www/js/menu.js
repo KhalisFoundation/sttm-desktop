@@ -121,12 +121,6 @@ const notificationsBellClickHandler = () => {
 const menuButton = h(
   'a.menu-button.navigator-button.active',
   h('i.fa.fa-bars'));
-const customSlidesButton = buttonFactory({
-  buttonType: 'open',
-  buttonIcon: 'fa-clone',
-  buttonId: 'custom-slides-menu',
-  pageToToggle: '#custom-slides-page',
-});
 const closeButton = buttonFactory({
   buttonType: 'close',
   pageToToggle: '#menu-page',
@@ -286,8 +280,6 @@ module.exports = {
       $menuToggle.addEventListener('click', () => { module.exports.toggleMenu('#menu-page'); });
     });
     document.querySelector('.preferences-close').appendChild(closeButton);
-
-    document.getElementById('current-shabad-menu').appendChild(customSlidesButton);
 
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
     $listOfCustomSlides.appendChild(emptySlideButton);

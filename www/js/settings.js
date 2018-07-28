@@ -30,6 +30,10 @@ function updateRangeSetting(key, val) {
 }
 
 function createSettingsPage(userPrefs) {
+  if (document.getElementById('settings')) {
+    document.getElementById('settings').remove();
+  }
+
   const settingsPage = h('div#settings');
   Object.keys(settings).forEach((catKey) => {
     const cat = settings[catKey];
@@ -244,7 +248,7 @@ module.exports = {
 
     if (operation === 'plus' && existingSize < range.max) {
       newSize = existingSize + range.step;
-    } else if (operation === 'minus' && existingSize < range.max) {
+    } else if (operation === 'minus' && existingSize > range.min) {
       newSize = existingSize - range.step;
     }
     document.body.classList.add(`${iconType}-${newSize}`);

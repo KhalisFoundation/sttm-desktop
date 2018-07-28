@@ -194,15 +194,23 @@ h2 {
 .icons-translation .size,
 .icons-transliteration .size,
 .icons-teeka .size {
-  color: #d4d4d4;
+  opacity: 0.4;
   z-index: -1;
 }
 
-.display-translation .icons-translation .size,
-.display-transliteration .icons-transliteration .size,
-.display-teeka .icons-teeka .size {
-  color: #333;
-  z-index: 20;
+.display-translation .icons-translation,
+.display-transliteration .icons-transliteration,
+.display-teeka .icons-teeka {
+  .size {
+    opacity: 1;
+    z-index: 20;
+  }
+
+  .visibility i {
+    &::before {
+      content: "\f06e";
+    }
+  }
 }
 
 /* ***** FONT SIZES ***** */
@@ -244,10 +252,14 @@ h2 {
 }
 
 .vc-toggle-icon {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: none;
   font-size: 5vh;
-  left: 0;
+  justify-content: space-around;
+  left: -28vh;
+  padding-bottom: 12px;
   position: absolute;
   text-align: center;
   top: 0;
@@ -257,10 +269,12 @@ h2 {
   .vc-icon-hidden {
     display: none;
   }
-}
 
-.presenter-view .vc-toggle-icon {
-  display: initial;
+  .vc-label {
+    color: #4e4e4e;
+    font-size: 3vh;
+    font-weight: bold;
+  }
 }
 
 .viewer-controls {
@@ -293,7 +307,7 @@ h2 {
   p {
     color: #4e4e4e;
     flex-basis: 100%;
-    font-size: 4vh;
+    font-size: 3vh;
     font-weight: bold;
     text-transform: capitalize;
   }
@@ -308,16 +322,31 @@ h2 {
     padding: 12px;
   }
 
-  .plus,
-  .minus,
-  .visibility {
-    font-size: 5vh;
-    height: 7vh;
-    width: 7vh;
+  span {
+    font-size: 4vh;
+    height: 6vh;
+    width: 6vh;
   }
 
   &.icons-gurbani .visibility {
     display: none;
+  }
+}
+
+.webview .vc-toggle-icon {
+  display: flex;
+}
+
+.presenter-view.webview .viewer-controls .iconset {
+  p {
+    font-size: 4vh;
+    font-weight: bold;
+  }
+
+  span {
+    font-size: 5vh;
+    height: 7vh;
+    width: 7vh;
   }
 }
 

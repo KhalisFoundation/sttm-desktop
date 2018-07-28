@@ -173,7 +173,7 @@ const iconsetHtml = (classname, content) => {
       h('p.tagline', iconType),
       h('span.visibility', {
         onclick: e => core.menu.settings.showHide(e, iconType),
-      }, h('i.fa.fa-eye')),
+      }, h('i.fa.fa-eye-slash')),
       h('span.minus.size', {
         onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
       }, h('i.fa.fa-minus-circle')),
@@ -229,6 +229,7 @@ function createCards(rows, LineID) {
 }
 
 function createDeck(cards, curSlide, shabad, ShabadID) {
+  document.querySelector('.vc-toggle-icon').style.left = '0';
   hideDecks();
   if (document.querySelector('.vc-open')) {
     $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));
