@@ -26,8 +26,6 @@ op.find(
   },
   (err, port) => {
     if (err) {
-      // console.log(err);
-      // console.log(port);
       dialog.showErrorBox('Overlay Error', 'No free ports available. Close other applications and Reboot the machine');
       app.exit(-1);
       return;
