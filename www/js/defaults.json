@@ -40,7 +40,7 @@
   "searchOptions": {
     "searchLanguage":"gr",
     "searchType": 0,
-    "searchSource":"all"
+    "searchSource": "all"
   },
   "obs": {
     "overlayPrefs": {

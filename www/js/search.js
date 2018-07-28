@@ -367,7 +367,6 @@ module.exports = {
       this.$search.classList.remove('roman');
       this.$search.classList.add('gurmukhi');
     }
-
     document.body.classList.remove(
       'searchResults_translationEnglish',
       'searchResults_transliteration',
