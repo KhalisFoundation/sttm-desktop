@@ -38,7 +38,7 @@ const searchInputs = h('div#search-container', [
     min: 1,
     max: 1430,
     onfocus: e => module.exports.focusSearch(e),
-    onkeyup: e => module.exports.searchByAng(e),
+    oninput: e => module.exports.searchByAng(e),
   }),
   h(
     'button#gurmukhi-keyboard-toggle',
@@ -343,7 +343,7 @@ module.exports = {
     }
   },
 
-  typeSearch(e, type) {
+  typeSearch(e) {
     // if a key is pressed in the Gurmukhi KB or is one of the allowed keys
     if (
       e === 'gKB' ||
@@ -352,7 +352,8 @@ module.exports = {
     ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
-      newSearchTimeout = setTimeout(() => this.search(type), 100);
+      newSearchTimeout = setTimeout(() => this.search(e), 100);
+      this.$angSearch.value = '';
     }
   },
 
@@ -382,8 +383,9 @@ module.exports = {
     this.$search.focus();
   },
 
-  searchByAng(value) {
-    this.typeSearch(value, 4);
+  searchByAng() {
+    this.search(4);
+    this.$search.value = '';
   },
 
   changeSearchSource(value) {
@@ -404,11 +406,13 @@ module.exports = {
     }
     store.set('searchOptions.searchLanguage', value);
 
-    const checkedInput = document.querySelector("input[name='search-type']:checked");
-    if (checkedInput) {
-      checkedInput.click();
-    } else {
-      document.querySelector("input[name='search-type']").click();
+    if (this.$search) {
+      const checkedInput = document.querySelector("input[name='search-type']:checked");
+      if (checkedInput) {
+        checkedInput.click();
+      } else {
+        document.querySelector("input[name='search-type']").click();
+      }
     }
   },
 
@@ -467,7 +471,6 @@ module.exports = {
     }
   },
 
-  // eslint-disable-next-line no-unused-vars
   search(e) {
     let searchType = this.searchType;
     let searchQuery;
@@ -682,7 +685,7 @@ module.exports = {
 
   checkAutoPlay(LineID = null) {
     clearTimeout(autoplaytimer);
-    if (!LineID) {
+    if (LineID === null && document.body.querySelector('#shabad li')) {
       document.body.querySelector('#shabad .panktee.current').click();
     }
     const bodyClassList = document.body.classList;
@@ -691,7 +694,8 @@ module.exports = {
       .replace('autoplayTimer-', '');
     if (
       bodyClassList.contains('autoplay') &&
-      LineID !== currentShabad[currentShabad.length - 1]
+      LineID !== currentShabad[currentShabad.length - 1] &&
+      LineID !== null
     ) {
       autoplaytimer = setTimeout(() => {
         document.getElementById(`line${LineID + 1}`).click();
