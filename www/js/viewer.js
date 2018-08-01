@@ -123,6 +123,7 @@ global.platform.ipc.on('show-ang', (event, data) => {
 });
 
 global.platform.ipc.on('show-text', (event, data) => {
+  document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
 });
 
