@@ -3,7 +3,12 @@ const ip = require('ip');
 const copy = require('copy-to-clipboard');
 
 const host = ip.address();
-const url = `http://${host}:1397/`;
+
+const remote = require('electron').remote;
+
+const overlayPort = remote.getGlobal('overlayPort');
+const url = `http://${host}:${overlayPort}/`;
+
 const { store } = require('electron').remote.require('./app');
 
 const overlayVars = store.get('obs').overlayPrefs.overlayVars;

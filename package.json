@@ -75,7 +75,8 @@
     "socket.io": "^2.1.1",
     "sqlite3": "^3.1.8",
     "tippy.js": "^2.5.2",
-    "update": "^0.7.4"
+    "update": "^0.7.4",
+    "openport": "0.0.5"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
