@@ -106,9 +106,16 @@ Object.keys(keyboardLayout).forEach(i => {
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
 const searchTypes = Object.values(CONSTS.SEARCH_TYPE_TEXTS);
+const sourceTexts = CONSTS.SOURCE_TEXTS;
+const sourceKeys = Object.keys(sourceTexts);
+const sourceTypes = CONSTS.SOURCE_TYPES;
 
 const searchTypeOptions = searchTypes.map((string, value) =>
   h('option', { value }, string),
+);
+
+const sourceOptions = sourceKeys.map((key) =>
+  h('option', { value: key }, sourceTexts[key]),
 );
 
 const shabadNavFwd = h(
@@ -137,6 +144,15 @@ const searchOptions = h(
       },
     },
     searchTypeOptions,
+  ),
+  h(
+    'select#search-source',
+    {
+      onchange() {
+        module.exports.changeSearchSource(this.value);
+      },
+    },
+    sourceOptions,
   ),
 );
 
@@ -190,6 +206,9 @@ module.exports = {
     this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
     searchOptions.querySelector('#search-type').value = this.searchType;
 
+    this.searchSource = store.get('searchOptions.searchSource');
+    searchOptions.querySelector('#search-source').value = this.searchSource;
+
     document.querySelector('.search-div').appendChild(searchInputs);
     document.querySelector('.search-div').appendChild(keyboard);
     document.querySelector('.search-div').appendChild(searchOptions);
@@ -200,6 +219,7 @@ module.exports = {
     this.$searchPage = document.getElementById('search-page');
     this.$search = document.getElementById('search');
     this.$searchType = document.getElementById('search-type');
+    this.$searchSource = document.getElementById('search-source');
     this.$dbDownloadProgress = document.getElementById('db-download-progress');
     this.$results = document.getElementById('results');
     this.$session = document.getElementById('session');
@@ -233,6 +253,7 @@ module.exports = {
     this.$search.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
+    this.changeSearchSource(this.searchSource);
   },
 
   updateDLProgress(state) {
@@ -277,6 +298,12 @@ module.exports = {
       this.$search.classList.remove('roman');
       this.$search.classList.add('gurmukhi');
     }
+    if (value === 4) {
+      this.$searchSource.value = sourceTypes.GURU_GRANTH_SAHIB;
+      this.$searchSource.disabled = true;
+    } else {
+      this.$searchSource.disabled = false;
+    }
     document.body.classList.remove(
       'searchResults_translationEnglish',
       'searchResults_transliteration',
@@ -292,6 +319,12 @@ module.exports = {
       this.$searchType.selectedIndex
     ].label;
     this.$search.focus();
+  },
+
+  changeSearchSource(value) {
+    this.searchSource = value;
+    this.search();
+    store.set('searchOptions.searchSource', this.searchSource);
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -353,7 +386,7 @@ module.exports = {
   search(e) {
     const searchQuery = this.$search.value;
     if (searchQuery.length >= 1) {
-      global.platform.search.search(searchQuery, this.searchType);
+      global.platform.search.search(searchQuery, this.searchType, this.searchSource);
     } else {
       this.$results.innerHTML = '';
     }

@@ -38,7 +38,8 @@
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
   "searchOptions": {
-    "searchType": 0
+    "searchType": 0,
+    "searchSource": "all"
   },
   "obs": {
     "overlayPrefs": {
