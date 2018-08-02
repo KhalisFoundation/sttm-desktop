@@ -63,7 +63,7 @@ input[type='color'] {
 
 .setting-label {
   color: #333;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
   margin-top: 5px;
@@ -131,6 +131,7 @@ input[type='color'] {
 
 .resize-btn {
   display: flex;
+  margin-top: 10px;
 }
 
 .size-btn {

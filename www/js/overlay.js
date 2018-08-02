@@ -50,22 +50,41 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
   ),
 );
 
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+}
+
 function updateContentBar(value, prop) {
   document.querySelectorAll('.content-bar').forEach((el) => {
     el.style[prop] = value; // eslint-disable-line no-param-reassign
   });
 }
 
+function updateGurbaniBar(value, prop) {
+  document.querySelector('.o-gurbani').style[prop] = value;
+}
+
 const changeColor = (e) => {
   const color = e.target.value;
   updateContentBar(color, 'color');
+  updateGurbaniBar(overlayVars.gurbaniTextColor, 'color');
   overlayVars.textColor = color;
+  savePrefs();
+};
+
+const changeGurbaniColor = (e) => {
+  const color = e.target.value;
+  updateGurbaniBar(color, 'color');
+  overlayVars.gurbaniTextColor = color;
   savePrefs();
 };
 
 const changeBg = (e) => {
   const color = e.target.value;
-  updateContentBar(color, 'backgroundColor');
+
+  updateContentBar(`rgba(${hexToRgb(color)}, ${overlayVars.bgOpacity})`, 'backgroundColor');
   overlayVars.bgColor = color;
   savePrefs();
 };
@@ -76,14 +95,14 @@ const topLayoutApply = () => {
   document.querySelector('.o-gurbani').style.bottom = 'auto';
   document.querySelector('.o-teeka').style.display = 'none';
   document.querySelector('.o-transliteration').style.display = 'none';
-  document.querySelector('.o-translation').style.top = overlayVars.height;
+  document.querySelector('.o-translation').style.top = `${overlayVars.height}px`;
   document.querySelector('.o-translation').style.bottom = 'auto';
 };
 
 const bottomLayoutApply = () => {
   overlayVars.layout = 'bottom';
   document.querySelector('.o-gurbani').style.top = 'auto';
-  document.querySelector('.o-gurbani').style.bottom = overlayVars.height;
+  document.querySelector('.o-gurbani').style.bottom = `${overlayVars.height}px`;
   document.querySelector('.o-translation').style.top = 'auto';
   document.querySelector('.o-translation').style.bottom = '0';
   document.querySelector('.o-teeka').style.display = 'none';
@@ -95,19 +114,16 @@ const splitLayoutApply = () => {
   document.querySelector('.o-gurbani').style.top = '0';
   document.querySelector('.o-gurbani').style.bottom = 'auto';
   document.querySelector('.o-teeka').style.display = 'block';
-  document.querySelector('.o-teeka').style.top = overlayVars.height;
+  document.querySelector('.o-teeka').style.top = `${overlayVars.height}px`;
   document.querySelector('.o-teeka').style.bottom = 'auto';
   document.querySelector('.o-transliteration').style.display = 'block';
   document.querySelector('.o-transliteration').style.top = 'auto';
-  document.querySelector('.o-transliteration').style.bottom = overlayVars.height;
+  document.querySelector('.o-transliteration').style.bottom = `${overlayVars.height}px`;
   document.querySelector('.o-translation').style.top = 'auto';
   document.querySelector('.o-translation').style.bottom = '0';
 };
 
-const updateSize = (newSize, prop) => {
-  updateContentBar(newSize, prop);
-  overlayVars[prop] = newSize;
-
+function applyLayout() {
   switch (overlayVars.layout) {
     case 'top':
       topLayoutApply();
@@ -121,38 +137,84 @@ const updateSize = (newSize, prop) => {
     default :
       break;
   }
+}
+
+const updateSize = (newSize, prop) => {
+  updateContentBar(newSize, prop);
+  applyLayout();
 };
-
-const getSize = (prop) => {
-  const bars = document.querySelectorAll('.content-bar');
-
-  return parseInt(bars[0].style[prop], 10);
+const updateGurbaniSize = (newSize, prop) => {
+  document.querySelector('.o-gurbani').style[prop] = newSize;
 };
 
 const increaseBarSize = () => {
-  const size = getSize('height');
+  const size = overlayVars.height;
   const newSize = size < 100 ? size + 2 : 100;
 
+  overlayVars.height = newSize;
+  savePrefs();
   updateSize(`${newSize}px`, 'height');
 };
 const decreaseBarSize = () => {
-  const size = getSize('height');
+  const size = overlayVars.height;
   const newSize = size > 33 ? size - 2 : 33;
 
+  overlayVars.height = newSize;
+  savePrefs();
   updateSize(`${newSize}px`, 'height');
 };
 
 const increasefontSize = () => {
-  const size = getSize('fontSize');
+  const size = overlayVars.fontSize;
+  const gurbaniSize = overlayVars.gurbaniFontSize;
   const newSize = size < 25 ? size + 1 : 25;
-
   updateSize(`${newSize}px`, 'fontSize');
+  updateGurbaniSize(`${gurbaniSize}px`, 'fontSize');
+  overlayVars.fontSize = newSize;
+  savePrefs();
 };
 const decreasefontSize = () => {
-  const size = getSize('fontSize');
+  const size = overlayVars.fontSize;
+  const gurbaniSize = overlayVars.gurbaniFontSize;
   const newSize = size > 5 ? size - 1 : 5;
 
   updateSize(`${newSize}px`, 'fontSize');
+  updateGurbaniSize(`${gurbaniSize}px`, 'fontSize');
+  overlayVars.fontSize = newSize;
+  savePrefs();
+};
+
+const increaseGurbanifontSize = () => {
+  const size = overlayVars.gurbaniFontSize;
+  const newSize = size < 30 ? size + 1 : 30;
+  updateGurbaniSize(`${newSize}px`, 'fontSize');
+  overlayVars.gurbaniFontSize = newSize;
+  savePrefs();
+};
+const decreaseGurbanifontSize = () => {
+  const size = overlayVars.gurbaniFontSize;
+  const newSize = size > 5 ? size - 1 : 5;
+
+  updateGurbaniSize(`${newSize}px`, 'fontSize');
+  overlayVars.gurbaniFontSize = newSize;
+  savePrefs();
+};
+
+const increaseOpacity = () => {
+  const opacity = overlayVars.bgOpacity;
+  const newSize = opacity > 0.9 ? 1 : opacity + 0.1;
+
+  updateContentBar(`rgba(${hexToRgb(overlayVars.bgColor)}, ${newSize})`, 'backgroundColor');
+  overlayVars.bgOpacity = newSize;
+  savePrefs();
+};
+const decreaseOpacity = () => {
+  const opacity = overlayVars.bgOpacity;
+  const newSize = opacity < 0.1 ? 0 : opacity - 0.1;
+
+  updateContentBar(`rgba(${hexToRgb(overlayVars.bgColor)}, ${newSize})`, 'backgroundColor');
+  overlayVars.bgOpacity = newSize;
+  savePrefs();
 };
 
 const separator = h('div.separator');
@@ -221,17 +283,34 @@ const copyURLButton = h(
 const topLayoutBtn = layoutButtonFactory('top', topLayoutApply);
 const bottomLayoutBtn = layoutButtonFactory('bottom', bottomLayoutApply);
 const topBottomLayoutBtn = layoutButtonFactory('top-bottom', splitLayoutApply);
+const gurbaniColor = colorInputFactory('toggle-text', 'Gurbani', overlayVars.gurbaniTextColor, changeGurbaniColor);
 const textColor = colorInputFactory('toggle-text', 'Text', overlayVars.textColor, changeColor);
 const backgroundColor = colorInputFactory('background', 'BG', overlayVars.bgColor, changeBg);
 const changeBarSizeButton = resizeButtonFactory(increaseBarSize, decreaseBarSize);
 const changefontSizeButton = resizeButtonFactory(increasefontSize, decreasefontSize);
+const changeGurbanifontSizeButton = resizeButtonFactory(
+  increaseGurbanifontSize, decreaseGurbanifontSize,
+);
+const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
 const controlPanel = document.querySelector('.control-panel');
+controlPanel.append(gurbaniColor);
+controlPanel.append(changeGurbanifontSizeButton);
 controlPanel.append(textColor);
 controlPanel.append(changefontSizeButton);
+controlPanel.append(separator);
 controlPanel.append(backgroundColor);
 controlPanel.append(changeBarSizeButton);
-controlPanel.append(separator);
+controlPanel.append(h(
+  'div.setting-label',
+  'Size',
+));
+controlPanel.append(changeOpacityButton);
+controlPanel.append(h(
+  'div.setting-label',
+  'Opacity',
+));
+controlPanel.append(separator.cloneNode(true));
 controlPanel.append(bottomLayoutBtn);
 controlPanel.append(topLayoutBtn);
 controlPanel.append(topBottomLayoutBtn);
@@ -239,21 +318,11 @@ controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 
 // apply the saved preferences when a new overlay window is opened.
-switch (overlayVars.layout) {
-  case 'top':
-    topLayoutApply();
-    break;
-  case 'bottom':
-    bottomLayoutApply();
-    break;
-  case 'split':
-    splitLayoutApply();
-    break;
-  default :
-    break;
-}
-updateContentBar(overlayVars.bgColor, 'backgroundColor');
+applyLayout();
+updateContentBar(`rgba(${hexToRgb(overlayVars.bgColor)}, ${overlayVars.bgOpacity})`, 'backgroundColor');
 updateContentBar(overlayVars.textColor, 'color');
-updateSize(overlayVars.height, 'height');
-updateSize(overlayVars.fontSize, 'fontSize');
+updateGurbaniBar(overlayVars.gurbaniTextColor, 'color');
+updateSize(`${overlayVars.height}px`, 'height');
+updateSize(`${overlayVars.fontSize}px`, 'fontSize');
+updateGurbaniBar(`${overlayVars.gurbaniFontSize}px`, 'fontSize');
 
