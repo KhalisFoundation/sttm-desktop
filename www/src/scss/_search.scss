@@ -180,6 +180,10 @@ button {
   #language-selector {
     flex-grow: 1;
     text-align: left;
+
+    label {
+      margin-right: 5px;
+    }
   }
 
   .navigator-header {
@@ -195,6 +199,12 @@ button {
 
     &.language-gr {
       height: calc(100% - 116px - 40px);
+    }
+
+    @media screen and (max-width: 950px) {
+      &.language-gr {
+        height: calc(100% - 116px - 80px);
+      }
     }
   }
 }
