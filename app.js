@@ -14,9 +14,27 @@ const io = require('socket.io')(http);
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-http.listen(1397); // TODO: move to config file
-
 const { app, BrowserWindow, dialog, ipcMain } = electron;
+
+const op = require('openport');
+
+op.find(
+  {
+    // Re: http://www.sikhiwiki.org/index.php/Gurgadi
+    ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
+    count: 1,
+  },
+  (err, port) => {
+    if (err) {
+      dialog.showErrorBox('Overlay Error', 'No free ports available. Close other applications and Reboot the machine');
+      app.exit(-1);
+      return;
+    }
+    global.overlayPort = port;
+    // console.log(`Overlay Port No ${port}`);
+    http.listen(port);
+  });
+
 const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
@@ -101,7 +119,7 @@ autoUpdater.on('update-downloaded', () => {
     message: 'Update available.',
     detail: 'Update downloaded and ready to install',
     cancelId: 0,
-  }, (response) => {
+  }, response => {
     if (response === 1) {
       autoUpdater.quitAndInstall();
     }
@@ -126,7 +144,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach((i) => {
+  Object.keys(displays).forEach(i => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
