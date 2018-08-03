@@ -134,8 +134,8 @@ module.exports = {
   },
 
   updateSettings() {
-    global.webview.send('update-settings');
-    global.platform.ipc.send('update-settings');
+    if (global.webview) global.webview.send('update-settings');
+    if (global.platform) global.platform.ipc.send('update-settings');
   },
 
   updateNotificationsTimestamp(time) {
@@ -147,3 +147,19 @@ const $titleButtons = document.querySelectorAll('#titlebar .controls a');
 Array.from($titleButtons).forEach((el) => {
   el.addEventListener('click', e => windowAction(e));
 });
+
+function showTabContent(event) {
+  const clickedTab = event.currentTarget.id;
+  document.querySelector('.nav-header-tab.active').classList.remove('active');
+  document.getElementById(clickedTab).classList.add('active');
+
+  const tabContent = document.getElementById(`${clickedTab}-content`);
+  document.querySelector('.tab-content.active').classList.remove('active');
+  tabContent.classList.add('active');
+}
+
+const allTabs = document.getElementsByClassName('nav-header-tab');
+
+Array.prototype.forEach.call(allTabs, (element => {
+  element.addEventListener('click', showTabContent);
+}));

@@ -55,26 +55,12 @@
   <div id="app-frame">
     <webview id="main-viewer" src="viewer.html" nodeintegration></webview>
     <div id="navigator" class="noselect">
-      <div id="options-ui">
-        <div class="options-page" id="custom-theme-page">
-          <header class="options-page-header">
-            <div class="options-header-text"> Theme Picker </div>
-            <div class="close-button-container" id="options-page-close"> </div>
-          </header>
-          <section class="block-list options-page-content">
-            <ul class="options-list" id="custom-theme-options">
-
-            </ul>
-          </section>
-        </div>
-      </div>
       <div id="main-ui">
         <div class="nav-page" id="search-page">
           <div class="navigator-header">
             <div class="preferences-open"> </div>
             <span class="nav-header-text">Search</span>
-            <div id="notifications"></div>
-            <div id="shabad-menu"></div>
+            <div id="search-type"></div>
           </div>
           <div class="search-div"></div>
           <section class="block-list">
@@ -82,20 +68,45 @@
           </section>
         </div>
         <div class="nav-page" id="session-page">
-          <div class="navigator-header">
+          <div class="navigator-header navigator-header-tabs">
             <div class="preferences-open"> </div>
-            <span class="nav-header-text">History</span>
+            <span class="nav-header-tab nav-header-text active" id="history-tab">
+              <i class="fa fa-clock-o"></i> History
+            </span>
+            <span class="nav-header-tab nav-header-text" id="themes-tab">
+              <i class="fa fa-paint-brush"></i> Themes
+            </span>
+            <span class="nav-header-tab nav-header-text" id="insert-tab">
+              <i class="fa fa-desktop"></i> Insert
+            </span>
+            <span class="nav-header-tab nav-header-text" id="other-tab">
+                <i class="fa fa-ellipsis-h"></i> Other
+              </span>
           </div>
           <section class="block-list">
-            <ul id="session" class="gurmukhi"></ul>
+            <div class="tab-content active" id="history-tab-content">
+              <ul id="session" class="gurmukhi"></ul>
+            </div>
+            <div class="tab-content" id ="themes-tab-content">
+              <ul class="options-list" id="custom-theme-options">
+              </ul>
+            </div>
+            <div class="tab-content" id ="insert-tab-content">
+              <ul id="list-of-custom-slides"></ul>
+            </div>
+            <div class="tab-content" id ="other-tab-content">
+                <ul id="list-of-shabad-options"></ul>
+            </div>
           </section>
         </div>
         <div class="nav-page" id="shabad-page">
           <div class="navigator-header">
             <div class="preferences-open"> </div>
-            <div class="shabad-prev"> </div>
-            <span class="nav-header-text">Current Shabad</span>
-            <div class="shabad-next"> </div>
+            <div class="current-shabad-header">
+              <div class="shabad-prev"> </div>
+              <span class="nav-header-text">Current Shabad</span>
+              <div class="shabad-next"> </div>
+            </div>
             <div id="current-shabad-menu"></div>
           </div>
           <section class="block-list">
@@ -128,28 +139,6 @@
             <div class="preferences-close"> </div>
             <span class="nav-header-text">Settings</span>
           </div>
-        </div>
-        <div class="takeover-page" id="custom-slides-page">
-          <div class="navigator-header">
-            <span class="nav-header-text">Custom Slides</span>
-            <div class="custom-slides-close"> </div>
-          </div>
-          <section class="block-list">
-            <ul id="list-of-custom-slides">
-
-            </ul>
-          </section>
-        </div>
-        <div class="takeover-page" id="shabad-menu-page">
-          <div class="navigator-header">
-            <span class="nav-header-text">Shabad Options</span>
-            <div class="shabad-menu-close"> </div>
-          </div>
-          <section class="block-list">
-            <ul id="list-of-shabad-options">
-
-            </ul>
-          </section>
         </div>
       </div>
       <div id="footer">

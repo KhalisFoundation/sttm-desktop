@@ -58,7 +58,7 @@ a {
 #navigator {
   bottom: 0;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-  height: 260px;
+  height: 300px;
   position: fixed;
   right: 0;
   width: 425px;
@@ -139,13 +139,13 @@ a {
   #navigator.kb-active {
     $height:calc(50% - calc(#{$presenter-pane-gap} * 3) - calc(#{$keyboard-height} / 2));
 
-    .nav-page {
+    /* .nav-page {
       &:nth-child(1) {
         height: $height;
       }
 
       &:nth-child(1) { @include calculateTop(0,0,$keyboard-height); }
-    }
+    } */
   }
 
   #footer {
@@ -287,12 +287,12 @@ a {
   #navigator.kb-active {
     $height: calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
 
-    .nav-page {
+    /* .nav-page {
       &:nth-child(1) {
         height: $height;
       }
 
       &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
-    }
+    } */
   }
 }

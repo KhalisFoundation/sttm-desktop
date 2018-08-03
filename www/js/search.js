@@ -31,15 +31,15 @@ const searchInputs = h('div#search-container', [
     onfocus: e => module.exports.focusSearch(e),
     onkeyup: e => module.exports.typeSearch(e),
   }),
-  h('div#search-bg'),
-  h(
-    'button#search-options-toggle',
-    {
-      type: 'button',
-      onclick: e => module.exports.toggleSearchOptions(e),
-    },
-    h('i.fa.fa-cog'),
-  ),
+  h('span', 'Ang'),
+  h('input#ang-input.gurmukhi', {
+    type: 'number',
+    placeholder: '123',
+    min: 1,
+    max: 1430,
+    onfocus: e => module.exports.focusSearch(e),
+    oninput: e => module.exports.searchByAng(e),
+  }),
   h(
     'button#gurmukhi-keyboard-toggle',
     {
@@ -48,6 +48,7 @@ const searchInputs = h('div#search-container', [
     },
     h('i.fa.fa-keyboard-o'),
   ),
+  h('div#search-bg'),
   h('div#db-download-progress'),
 ]);
 
@@ -105,10 +106,80 @@ Object.keys(keyboardLayout).forEach(i => {
 });
 const keyboard = h('div#gurmukhi-keyboard.gurmukhi', kbPages);
 
-const searchTypes = Object.values(CONSTS.SEARCH_TYPE_TEXTS);
+const gurmukhiSearchText = CONSTS.GURMUKHI_SEARCH_TEXTS;
+const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
+const englishSearchText = CONSTS.ENGLISH_SEARCH_TEXTS;
+const englishSearchTypes = Object.keys(englishSearchText);
 
-const searchTypeOptions = searchTypes.map((string, value) =>
-  h('option', { value }, string),
+const sourceTexts = CONSTS.SOURCE_TEXTS;
+const sourceKeys = Object.keys(sourceTexts);
+
+const allGurmukhiInputs = gurmukhiSearchTypes.map((value) =>
+  h('span',
+  h('input', {
+    name: 'search-type',
+    type: 'radio',
+    value,
+    id: `gurmukhi-${value}`,
+    onclick() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  }),
+  h('label', { htmlFor: `gurmukhi-${value}` }, gurmukhiSearchText[value]),
+  ),
+);
+
+const allEnglishInputs = englishSearchTypes.map((value) =>
+  h('span',
+  h('input', {
+    name: 'search-type',
+    type: 'radio',
+    value,
+    id: `english-${value}`,
+    onclick() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  }),
+  h('label', { htmlFor: `english-${value}` }, englishSearchText[value]),
+  ),
+);
+
+const gurmukhiInputs = h(
+  'div',
+  allGurmukhiInputs,
+);
+
+const englishInputs = h(
+  'div',
+  allEnglishInputs,
+);
+
+const searchLanguage = h(
+  'div#language-selector',
+  h('input', {
+    type: 'radio',
+    value: 'gr',
+    id: 'gurmukhi-language',
+    name: 'search-language',
+    onclick() {
+      module.exports.changeSearchLanguage(this.value);
+    },
+  }),
+  h('label', { htmlFor: 'gurmukhi-language' }, 'Gurmukhi'),
+  h('input', {
+    type: 'radio',
+    value: 'en',
+    id: 'english-language',
+    name: 'search-language',
+    onclick() {
+      module.exports.changeSearchLanguage(this.value);
+    },
+  }),
+  h('label', { htmlFor: 'english-language' }, 'English'),
+);
+
+const sourceOptions = sourceKeys.map((key) =>
+  h('option', { value: key }, sourceTexts[key]),
 );
 
 const shabadNavFwd = h(
@@ -129,15 +200,21 @@ const shabadNavBack = h(
 
 const searchOptions = h(
   'div#search-options',
+  h('span.filter-text',
+    h('i.fa.fa-sliders'),
+  ),
   h(
-    'select#search-type',
+    'select#search-source',
     {
       onchange() {
-        module.exports.changeSearchType(parseInt(this.value, 10));
+        module.exports.changeSearchSource(this.value);
       },
     },
-    searchTypeOptions,
+    sourceOptions,
   ),
+  h(
+    'label.filter-text', { htmlFor: 'search-source' },
+    'Scripture'),
 );
 
 const navPageLinks = [];
@@ -155,6 +232,7 @@ Object.keys(pageNavJSON).forEach(id => {
     ),
   );
 });
+
 const footerNav = h('ul.menu-bar', navPageLinks);
 
 const sources = {
@@ -171,7 +249,8 @@ document.body.addEventListener('click', e => {
   const target = e.target;
   if (
     document.querySelector('.search-div') &&
-    !document.querySelector('.search-div').contains(target)
+    !document.querySelector('.search-div').contains(target) &&
+    !document.querySelector('#search-page .navigator-header').contains(target)
   ) {
     module.exports.closeGurmukhiKB();
   }
@@ -188,18 +267,33 @@ module.exports = {
 
   init() {
     this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
-    searchOptions.querySelector('#search-type').value = this.searchType;
+
+    if (this.searchType <= 2) {
+      gurmukhiInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
+    } else {
+      englishInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
+    }
+
+    this.searchLanguage = store.get('searchOptions.searchLanguage');
+    searchLanguage.querySelector(`input[value=${this.searchLanguage}]`).checked = true;
+    this.changeSearchLanguage(this.searchLanguage);
+
+    this.searchSource = store.get('searchOptions.searchSource');
+    searchOptions.querySelector('#search-source').value = this.searchSource;
 
     document.querySelector('.search-div').appendChild(searchInputs);
     document.querySelector('.search-div').appendChild(keyboard);
     document.querySelector('.search-div').appendChild(searchOptions);
+    document.querySelector('#search-page .navigator-header').appendChild(searchLanguage);
     document.querySelector('.shabad-next').appendChild(shabadNavFwd);
     document.querySelector('.shabad-prev').appendChild(shabadNavBack);
     document.querySelector('#footer .menu-group-left').appendChild(footerNav);
     this.$navigator = document.getElementById('navigator');
     this.$searchPage = document.getElementById('search-page');
     this.$search = document.getElementById('search');
+    this.$angSearch = document.getElementById('ang-input');
     this.$searchType = document.getElementById('search-type');
+    this.$searchSource = document.getElementById('search-source');
     this.$dbDownloadProgress = document.getElementById('db-download-progress');
     this.$results = document.getElementById('results');
     this.$session = document.getElementById('session');
@@ -233,6 +327,7 @@ module.exports = {
     this.$search.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
+    this.changeSearchSource(this.searchSource);
   },
 
   updateDLProgress(state) {
@@ -257,13 +352,9 @@ module.exports = {
     ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
-      newSearchTimeout = setTimeout(() => this.search(), 100);
+      newSearchTimeout = setTimeout(() => this.search(e), 100);
+      this.$angSearch.value = '';
     }
-  },
-
-  // eslint-disable-next-line
-  toggleSearchOptions(e) {
-    this.$searchPage.classList.toggle('search-options-open');
   },
 
   changeSearchType(value) {
@@ -288,10 +379,41 @@ module.exports = {
       default:
         break;
     }
-    this.$search.placeholder = this.$searchType.options[
-      this.$searchType.selectedIndex
-    ].label;
+    this.$search.placeholder = gurmukhiSearchText[value] || englishSearchText[value];
     this.$search.focus();
+  },
+
+  searchByAng() {
+    this.search(4);
+    this.$search.value = '';
+  },
+
+  changeSearchSource(value) {
+    this.searchSource = value;
+    this.search();
+    store.set('searchOptions.searchSource', this.searchSource);
+  },
+
+  changeSearchLanguage(value) {
+    document.getElementById('search-type').innerHTML = '';
+    const searchBlock = document.querySelector('#search-page .block-list');
+    if (value === 'gr') {
+      document.getElementById('search-type').appendChild(gurmukhiInputs);
+      searchBlock.classList.add('language-gr');
+    } else if (value === 'en') {
+      document.getElementById('search-type').appendChild(englishInputs);
+      searchBlock.classList.remove('language-gr');
+    }
+    store.set('searchOptions.searchLanguage', value);
+
+    if (this.$search) {
+      const checkedInput = document.querySelector("input[name='search-type']:checked");
+      if (checkedInput) {
+        checkedInput.click();
+      } else {
+        document.querySelector("input[name='search-type']").click();
+      }
+    }
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -349,13 +471,20 @@ module.exports = {
     }
   },
 
-  // eslint-disable-next-line no-unused-vars
   search(e) {
-    const searchQuery = this.$search.value;
+    let searchType = this.searchType;
+    let searchQuery;
+    if (e === 4) {
+      searchQuery = this.$angSearch.value;
+      searchType = e;
+    } else {
+      searchQuery = this.$search.value;
+    }
     if (searchQuery.length >= 1) {
-      global.platform.search.search(searchQuery, this.searchType);
+      global.platform.search.search(searchQuery, searchType, this.searchSource);
     } else {
       this.$results.innerHTML = '';
+      document.getElementById('search-options').style.display = 'none';
     }
   },
 
@@ -391,9 +520,11 @@ module.exports = {
         );
         this.$results.appendChild(result);
       });
+      document.getElementById('search-options').style.display = 'block';
     } else {
       this.$results.innerHTML = '';
       this.$results.appendChild(h('li.roman', h('span', 'No results')));
+      document.getElementById('search-options').style.display = 'none';
     }
   },
 
@@ -554,7 +685,7 @@ module.exports = {
 
   checkAutoPlay(LineID = null) {
     clearTimeout(autoplaytimer);
-    if (!LineID) {
+    if (LineID === null && document.body.querySelector('#shabad li')) {
       document.body.querySelector('#shabad .panktee.current').click();
     }
     const bodyClassList = document.body.classList;
@@ -563,7 +694,8 @@ module.exports = {
       .replace('autoplayTimer-', '');
     if (
       bodyClassList.contains('autoplay') &&
-      LineID !== currentShabad[currentShabad.length - 1]
+      LineID !== currentShabad[currentShabad.length - 1] &&
+      LineID !== null
     ) {
       autoplaytimer = setTimeout(() => {
         document.getElementById(`line${LineID + 1}`).click();

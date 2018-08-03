@@ -127,6 +127,15 @@ $highlight-text: #cfd8dc;
   #search-container {
     input {
       color: $text-bright;
+
+      &[type='number'] {
+        background-color: #fff;
+        color: #333;
+
+        &::-webkit-input-placeholder {
+          color: #333;
+        }
+      }
     }
 
     input:focus + div {

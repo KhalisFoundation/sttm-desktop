@@ -6,7 +6,7 @@ LEFT JOIN Raag r USING(RaagID)`;
 const CONSTS = require('./constants.js');
 
 module.exports = {
-  search(searchQuery, searchType) {
+  search(searchQuery, searchType, searchSource) {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
@@ -42,6 +42,10 @@ module.exports = {
             condition += ` OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
           }
         }
+        if (searchSource !== 'all') {
+          condition += `  AND v.SourceID = '${searchSource}'`;
+        }
+
 
         // Give preference to shorter lines if searching for 1 or 2 words
         if (searchQuery.length < 3) {
@@ -59,6 +63,9 @@ module.exports = {
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
         condition = `${searchCol} LIKE '${dbQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND v.SourceID = '${searchSource}'`;
+        }
         break;
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang

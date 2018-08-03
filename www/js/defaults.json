@@ -38,7 +38,9 @@
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
   "searchOptions": {
-    "searchType": 0
+    "searchLanguage":"gr",
+    "searchType": 0,
+    "searchSource": "all"
   },
   "obs": {
     "overlayPrefs": {

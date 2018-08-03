@@ -14,17 +14,37 @@
   }
 }
 
+#search-type {
+  flex-grow: 1;
+  order: 1;
+  text-align: left;
+  span {
+    display: inline-block;
+  }
+}
+
 .navigator-header {
   align-items: center;
   display: flex;
   height: 40px;
-  justify-content: space-between;
   line-height: 40px;
   text-align: center;
 
   .nav-header-text {
-    flex-grow: 1;
     padding: 0 10px;
+  }
+
+  .nav-header-tab {
+    cursor: pointer;
+    height: 100%;
+    opacity: 0.5;
+    padding: 0 10px;
+
+    @extend .nav-header-text;
+
+    &.active {
+      opacity: 1;
+    }
   }
 
   .navigator-button {
@@ -37,5 +57,19 @@
     &.close-button { background: white; }
 
     &.hide { display: none; }
+  }
+
+  .current-shabad-header {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+}
+
+.tab-content {
+  display: none;
+
+  &.active {
+    display: block;
   }
 }
