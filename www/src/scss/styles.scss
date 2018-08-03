@@ -64,6 +64,10 @@ a {
   width: 470px;
 }
 
+.darwin #navigator {
+  width: 500px;
+}
+
 .controller.scale-viewer.presenter-view {
   #navigator {
     bottom: $presenter-pane-gap;
