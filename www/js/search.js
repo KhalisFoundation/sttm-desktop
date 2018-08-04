@@ -165,7 +165,10 @@ const searchLanguage = h(
       module.exports.changeSearchLanguage(this.value);
     },
   }),
-  h('label', { htmlFor: 'gurmukhi-language' }, 'Gurmukhi'),
+  h('label', {
+    htmlFor: 'gurmukhi-language',
+    className: 'gurmukhi',
+  }, 'aAe'),
   h('input', {
     type: 'radio',
     value: 'en',
@@ -175,7 +178,7 @@ const searchLanguage = h(
       module.exports.changeSearchLanguage(this.value);
     },
   }),
-  h('label', { htmlFor: 'english-language' }, 'English'),
+  h('label', { htmlFor: 'english-language' }, 'ABC'),
 );
 
 const sourceOptions = sourceKeys.map((key) =>
@@ -379,7 +382,14 @@ module.exports = {
       default:
         break;
     }
-    this.$search.placeholder = gurmukhiSearchText[value] || englishSearchText[value];
+    const currentSearchType = gurmukhiSearchText[value] || englishSearchText[value];
+    if (currentSearchType === 'FLS') {
+      this.$search.placeholder = 'First Letter (Start)';
+    } else if (currentSearchType === 'FLA') {
+      this.$search.placeholder = 'First Letter (Anywhere)';
+    } else {
+      this.$search.placeholder = currentSearchType;
+    }
     this.$search.focus();
   },
 

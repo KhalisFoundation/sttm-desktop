@@ -196,16 +196,6 @@ button {
     height: calc(100% - 116px);
     transition: height $transition-time $transition-easing;
     z-index: 5;
-
-    &.language-gr {
-      height: calc(100% - 116px - 40px);
-    }
-
-    @media screen and (max-width: 950px) {
-      &.language-gr {
-        height: calc(100% - 116px - 80px);
-      }
-    }
   }
 }
 
