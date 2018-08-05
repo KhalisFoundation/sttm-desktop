@@ -114,44 +114,32 @@ const englishSearchTypes = Object.keys(englishSearchText);
 const sourceTexts = CONSTS.SOURCE_TEXTS;
 const sourceKeys = Object.keys(sourceTexts);
 
-const allGurmukhiInputs = gurmukhiSearchTypes.map((value) =>
-  h('span',
-  h('input', {
-    name: 'search-type',
-    type: 'radio',
-    value,
-    id: `gurmukhi-${value}`,
-    onclick() {
-      module.exports.changeSearchType(parseInt(this.value, 10));
-    },
-  }),
-  h('label', { htmlFor: `gurmukhi-${value}` }, gurmukhiSearchText[value]),
-  ),
+const gurmukhiSearchOptions = gurmukhiSearchTypes.map((value) =>
+  h('option', { value }, gurmukhiSearchText[value]),
 );
 
-const allEnglishInputs = englishSearchTypes.map((value) =>
-  h('span',
-  h('input', {
-    name: 'search-type',
-    type: 'radio',
-    value,
-    id: `english-${value}`,
-    onclick() {
-      module.exports.changeSearchType(parseInt(this.value, 10));
-    },
-  }),
-  h('label', { htmlFor: `english-${value}` }, englishSearchText[value]),
-  ),
+const englishSearchOptions = englishSearchTypes.map((value) =>
+  h('option', { value }, englishSearchText[value]),
 );
 
 const gurmukhiInputs = h(
-  'div',
-  allGurmukhiInputs,
+  'select',
+  {
+    onchange() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  },
+  gurmukhiSearchOptions,
 );
 
 const englishInputs = h(
-  'div',
-  allEnglishInputs,
+  'select',
+  {
+    onchange() {
+      module.exports.changeSearchType(parseInt(this.value, 10));
+    },
+  },
+  englishSearchOptions,
 );
 
 const searchLanguage = h(
@@ -269,18 +257,6 @@ module.exports = {
   currentMeta,
 
   init() {
-    this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
-
-    if (this.searchType <= 2) {
-      gurmukhiInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
-    } else {
-      englishInputs.querySelector(`input[value='${this.searchType}'`).checked = true;
-    }
-
-    this.searchLanguage = store.get('searchOptions.searchLanguage');
-    searchLanguage.querySelector(`input[value=${this.searchLanguage}]`).checked = true;
-    this.changeSearchLanguage(this.searchLanguage);
-
     this.searchSource = store.get('searchOptions.searchSource');
     searchOptions.querySelector('#search-source').value = this.searchSource;
 
@@ -313,6 +289,17 @@ module.exports = {
     );
 
     this.navPage('search');
+    this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
+
+    if (this.searchType <= 2) {
+      gurmukhiInputs.value = this.searchType;
+    } else {
+      englishInputs.value = this.searchType;
+    }
+
+    this.searchLanguage = store.get('searchOptions.searchLanguage');
+    searchLanguage.querySelector(`input[value=${this.searchLanguage}]`).checked = true;
+    this.changeSearchLanguage(this.searchLanguage);
   },
 
   offline(seconds) {
@@ -406,24 +393,14 @@ module.exports = {
 
   changeSearchLanguage(value) {
     document.getElementById('search-type').innerHTML = '';
-    const searchBlock = document.querySelector('#search-page .block-list');
     if (value === 'gr') {
       document.getElementById('search-type').appendChild(gurmukhiInputs);
-      searchBlock.classList.add('language-gr');
+      this.changeSearchType(parseInt(gurmukhiInputs.value, 10));
     } else if (value === 'en') {
       document.getElementById('search-type').appendChild(englishInputs);
-      searchBlock.classList.remove('language-gr');
+      this.changeSearchType(parseInt(englishInputs.value, 10));
     }
     store.set('searchOptions.searchLanguage', value);
-
-    if (this.$search) {
-      const checkedInput = document.querySelector("input[name='search-type']:checked");
-      if (checkedInput) {
-        checkedInput.click();
-      } else {
-        document.querySelector("input[name='search-type']").click();
-      }
-    }
   },
 
   // eslint-disable-next-line no-unused-vars

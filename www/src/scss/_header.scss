@@ -14,10 +14,34 @@
   }
 }
 
+#search-page {
+  .toggle-minimize {
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 10px;
+    order: 2;
+
+    .disabled {
+      display: none;
+    }
+  }
+}
+
+.presenter-view #search-page {
+  .toggle-minimize {
+    display: none;
+  }
+}
+
 #search-type {
   flex-grow: 1;
+  margin: 0 10px;
   order: 1;
   text-align: left;
+
+  select {
+    width: 100%;
+  }
 
   span {
     display: inline-block;

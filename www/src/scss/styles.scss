@@ -61,7 +61,12 @@ a {
   height: 300px;
   position: fixed;
   right: 0;
+  transition: all $transition-time $transition-easing;
   width: 470px;
+
+  &.minimized {
+    height: 40px;
+  }
 }
 
 .darwin #navigator {
