@@ -14,19 +14,6 @@
   }
 }
 
-#search-page {
-  .toggle-minimize {
-    cursor: pointer;
-    font-size: 12px;
-    margin: 0 10px;
-    order: 2;
-
-    .disabled {
-      display: none;
-    }
-  }
-}
-
 .presenter-view #search-page {
   .toggle-minimize {
     display: none;
@@ -89,6 +76,24 @@
     display: flex;
     flex-grow: 1;
     justify-content: space-between;
+  }
+
+  .toggle-minimize {
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 10px;
+    order: 2;
+    text-align: right;
+
+    .disabled {
+      display: none;
+    }
+  }
+}
+
+#session-page {
+  .toggle-minimize {
+    flex-grow: 1;
   }
 }
 
