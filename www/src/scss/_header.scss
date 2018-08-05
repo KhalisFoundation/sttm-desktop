@@ -14,7 +14,7 @@
   }
 }
 
-.presenter-view #search-page {
+.presenter-view.scale-viewer .navigator-header {
   .toggle-minimize {
     display: none;
   }
@@ -91,7 +91,8 @@
   }
 }
 
-#session-page {
+#session-page,
+#menu-page {
   .toggle-minimize {
     flex-grow: 1;
   }
