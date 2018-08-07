@@ -163,3 +163,17 @@ const allTabs = document.getElementsByClassName('nav-header-tab');
 Array.prototype.forEach.call(allTabs, (element => {
   element.addEventListener('click', showTabContent);
 }));
+
+const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
+const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
+
+if ($minimize) {
+  Array.prototype.forEach.call($minimize, (minimize => {
+    minimize.addEventListener('click', () => {
+      Array.prototype.forEach.call($minimizeIcons, (element => {
+        element.classList.toggle('disabled');
+      }));
+      document.getElementById('navigator').classList.toggle('minimized');
+    });
+  }));
+}

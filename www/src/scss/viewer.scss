@@ -258,8 +258,9 @@ h2 {
   display: none;
   font-size: 5vh;
   justify-content: space-around;
-  left: -28vh;
-  padding-bottom: 12px;
+  left: -30vh;
+  padding-bottom: 6px;
+  padding-top: 12px;
   position: absolute;
   text-align: center;
   top: 0;
@@ -290,6 +291,10 @@ h2 {
   transition: all $transition-time $transition-easing;
   width: 28vh;
   z-index: 20;
+
+  .icons-gurbani {
+    margin-top: 16px;
+  }
 }
 
 .viewer-controls-open {
@@ -335,16 +340,26 @@ h2 {
   display: flex;
 }
 
-.presenter-view.webview .viewer-controls .iconset {
-  p {
-    font-size: 4vh;
-    font-weight: bold;
+.presenter-view.webview {
+  .viewer-controls {
+    width: 30vh;
+
+    .iconset {
+      p {
+        font-size: 4vh;
+        font-weight: bold;
+      }
+
+      span {
+        font-size: 5vh;
+        height: 7vh;
+        width: 7vh;
+      }
+    }
   }
 
-  span {
-    font-size: 5vh;
-    height: 7vh;
-    width: 7vh;
+  .vc-toggle-icon {
+    width: 30vh;
   }
 }
 

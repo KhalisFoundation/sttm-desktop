@@ -14,12 +14,25 @@
   }
 }
 
+.presenter-view.scale-viewer {
+  .toggle-minimize {
+    display: none;
+  }
+}
+
 #search-type {
   flex-grow: 1;
+  margin: 0 10px;
   order: 1;
   text-align: left;
+
+  select {
+    width: 100%;
+  }
+
   span {
     display: inline-block;
+    margin-right: 5px;
   }
 }
 
@@ -63,6 +76,25 @@
     display: flex;
     flex-grow: 1;
     justify-content: space-between;
+  }
+
+  .toggle-minimize {
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 10px;
+    order: 2;
+    text-align: right;
+
+    .disabled {
+      display: none;
+    }
+  }
+}
+
+#session-page,
+#menu-page {
+  .toggle-minimize {
+    flex-grow: 1;
   }
 }
 

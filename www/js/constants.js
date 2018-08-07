@@ -8,7 +8,7 @@ const SEARCH_TYPES = {
 
 const GURMUKHI_SEARCH_TEXTS = {
   [SEARCH_TYPES.FIRST_LETTERS]: 'First Letter (Start)',
-  [SEARCH_TYPES.FIRST_LETTERS_ANYWHERE]: 'First Anywhere (Start)',
+  [SEARCH_TYPES.FIRST_LETTERS_ANYWHERE]: 'First Letter (Anywhere)',
   [SEARCH_TYPES.GURMUKHI_WORD]: 'Full Word(s)',
 };
 
