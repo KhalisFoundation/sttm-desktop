@@ -61,7 +61,7 @@ a {
   height: 300px;
   position: fixed;
   right: 0;
-  transition: all $transition-time $transition-easing;
+  transition: height $transition-time $transition-easing;
   width: 470px;
 
   &.minimized {
@@ -71,6 +71,10 @@ a {
 
 .darwin #navigator {
   width: 500px;
+}
+
+.presenter-view.scale-viewer #navigator {
+  transition: none;
 }
 
 .controller.scale-viewer.presenter-view {
