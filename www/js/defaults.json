@@ -30,6 +30,8 @@
         "autoplayTimer": 10
       },
       "display-options": {
+        "disable-akhandpaatt": false,
+        "akhandpaatt": false,
         "larivaar": false,
         "left-align": false
       }

@@ -146,6 +146,12 @@ function createSettingsPage(userPrefs) {
           const switchList = h('ul');
           Object.keys(setting.options).forEach((option) => {
             const optionId = `setting-${catKey}-${settingKey}-${option}`;
+            let disabled = false;
+
+            if (option === 'akhandpaatt') {
+              disabled = store.get('userPrefs.slide-layout.display-options.disable-akhandpaatt');
+            }
+
             const switchListAttrs = {
               name: `setting-${catKey}-${settingKey}`,
               onclick: (e) => {
@@ -161,6 +167,7 @@ function createSettingsPage(userPrefs) {
               },
               type: 'checkbox',
               value: option,
+              disabled,
             };
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;

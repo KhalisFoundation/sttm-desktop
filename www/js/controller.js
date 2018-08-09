@@ -400,7 +400,6 @@ window.onresize = () => {
 
 const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 const menuCast = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[3].submenu : menu.items[6].submenu);
-const apvSwitch = document.getElementById('setting-slide-layout-display-options-akhandpaatt');
 
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
@@ -427,6 +426,7 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
+
   if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view', 'scale-viewer');
     document.body.classList.remove('home');
@@ -434,10 +434,9 @@ global.platform.ipc.on('cast-session-active', () => {
   }
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
+  store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
   document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
-  apvSwitch.checked = false;
-  apvSwitch.disabled = true;
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
@@ -445,8 +444,7 @@ global.platform.ipc.on('cast-session-stopped', () => {
   if (!global.externalDisplay) {
     document.body.classList.remove('presenter-view', 'scale-viewer');
   }
-
-  apvSwitch.disabled = false;
+  store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
 
 
