@@ -62,9 +62,9 @@ function castShabadLine(lineID) {
   if (decks[currentShabad][lineID + 1]) {
     nextLine = decks[currentShabad][lineID + 1].gurmukhi;
   }
+  castCur.nextLine = nextLine;
   castToReceiver();
 
-  castCur.nextLine = nextLine;
   const activeSlide = document.querySelector('.deck.active .slide.active').children;
   Array.prototype.forEach.call(activeSlide, (element => {
     const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
