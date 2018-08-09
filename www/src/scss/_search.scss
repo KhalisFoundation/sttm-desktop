@@ -173,6 +173,7 @@ button {
 }
 
 #search-page {
+  overflow: hidden;
   #language-selector {
     flex-grow: 1;
     text-align: left;
