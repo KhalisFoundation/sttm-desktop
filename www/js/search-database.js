@@ -10,6 +10,8 @@ module.exports = {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    // default source for ang search to GURU_GRANTH_SAHIB
+    let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
     const limit = ' 0,20';
     switch (searchType) {
@@ -71,7 +73,19 @@ module.exports = {
       case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
+        condition = `${searchCol} = ${dbQuery}`;
+
+        switch (global.core.search.currentMeta.source) {
+          case CONSTS.SOURCE_TYPES.DASAM_GRANTH:
+          case CONSTS.SOURCE_TYPES.GURDAS_VAARAN:
+          case CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB:
+          case CONSTS.SOURCE_TYPES.NAND_LAL_VAARAN:
+            angSearchSourceId = global.core.search.currentMeta.source;
+            break;
+          default:
+            break;
+        }
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
         break;
       default:
         break;

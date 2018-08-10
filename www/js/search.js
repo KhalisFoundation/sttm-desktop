@@ -342,7 +342,10 @@ module.exports = {
     ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
-      newSearchTimeout = setTimeout(() => this.search(e), 100);
+      newSearchTimeout = setTimeout(() => {
+        this.searchType = store.get('searchOptions.searchType');
+        this.search(e);
+      }, 100);
       this.$angSearch.value = '';
     }
   },
@@ -381,14 +384,16 @@ module.exports = {
   },
 
   searchByAng() {
-    this.search(4);
+    this.searchType = 4;
+    this.search();
     this.$search.value = '';
   },
 
   changeSearchSource(value) {
     this.searchSource = value;
-    this.search();
+    currentMeta.source = value === 'all' ? null : value;
     store.set('searchOptions.searchSource', this.searchSource);
+    this.search();
   },
 
   changeSearchLanguage(value) {
@@ -458,12 +463,11 @@ module.exports = {
     }
   },
 
-  search(e) {
-    let searchType = this.searchType;
+  search() {
+    const searchType = this.searchType;
     let searchQuery;
-    if (e === 4) {
+    if (searchType === 4) {
       searchQuery = this.$angSearch.value;
-      searchType = e;
     } else {
       searchQuery = this.$search.value;
     }
@@ -471,7 +475,6 @@ module.exports = {
       global.platform.search.search(searchQuery, searchType, this.searchSource);
     } else {
       this.$results.innerHTML = '';
-      document.getElementById('search-options').style.display = 'none';
     }
   },
 
@@ -511,7 +514,6 @@ module.exports = {
     } else {
       this.$results.innerHTML = '';
       this.$results.appendChild(h('li.roman', h('span', 'No results')));
-      document.getElementById('search-options').style.display = 'none';
     }
   },
 
