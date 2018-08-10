@@ -60,6 +60,19 @@
     }
   }
 
+  .more-tabs {
+    background-color: transparent;
+    border: none;
+    color: inherit;
+
+    option {
+      background-color: inherit;
+      color: inherit;
+    }
+
+    @extend .nav-header-tab;
+  }
+
   .navigator-button {
     cursor: pointer;
     display: block;

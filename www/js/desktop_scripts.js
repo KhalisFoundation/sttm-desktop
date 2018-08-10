@@ -148,21 +148,33 @@ Array.from($titleButtons).forEach((el) => {
   el.addEventListener('click', e => windowAction(e));
 });
 
-function showTabContent(event) {
-  const clickedTab = event.currentTarget.id;
-  document.querySelector('.nav-header-tab.active').classList.remove('active');
-  document.getElementById(clickedTab).classList.add('active');
+const allTabs = document.getElementsByClassName('nav-header-tab');
+const moreTabs = document.querySelector('.more-tabs');
 
+function showTabContent(clickedTab) {
+  if (moreTabs.classList.contains('active')) {
+    moreTabs.classList.remove('active');
+  } else {
+    document.querySelector('.nav-header-tab.active').classList.remove('active');
+  }
   const tabContent = document.getElementById(`${clickedTab}-content`);
   document.querySelector('.tab-content.active').classList.remove('active');
   tabContent.classList.add('active');
 }
 
-const allTabs = document.getElementsByClassName('nav-header-tab');
-
 Array.prototype.forEach.call(allTabs, (element => {
-  element.addEventListener('click', showTabContent);
+  element.addEventListener('click', () => {
+    const clickedTab = event.currentTarget.id;
+    showTabContent(clickedTab);
+    document.getElementById(clickedTab).classList.add('active');
+  });
 }));
+
+moreTabs.addEventListener('click', () => {
+  const tab = moreTabs.value;
+  showTabContent(tab);
+  moreTabs.classList.add('active');
+});
 
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
