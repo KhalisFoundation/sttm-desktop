@@ -66,8 +66,8 @@
     color: inherit;
 
     option {
-      background-color: inherit;
-      color: inherit;
+      background-color: initial;
+      color: initial;
     }
 
     @extend .nav-header-tab;
@@ -116,5 +116,11 @@
 
   &.active {
     display: block;
+  }
+}
+
+.presenter-view.scale-viewer .more-tabs {
+  @media screen and (max-width: 850px) {
+    width: 0;
   }
 }

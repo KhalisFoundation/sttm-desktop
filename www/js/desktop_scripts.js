@@ -170,11 +170,13 @@ Array.prototype.forEach.call(allTabs, (element => {
   });
 }));
 
-moreTabs.addEventListener('click', () => {
-  const tab = moreTabs.value;
-  showTabContent(tab);
-  moreTabs.classList.add('active');
-});
+if (moreTabs) {
+  moreTabs.addEventListener('click', () => {
+    const tab = moreTabs.value;
+    showTabContent(tab);
+    moreTabs.classList.add('active');
+  });
+}
 
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
