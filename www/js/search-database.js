@@ -79,7 +79,7 @@ module.exports = {
           case CONSTS.SOURCE_TYPES.DASAM_GRANTH:
           case CONSTS.SOURCE_TYPES.GURDAS_VAARAN:
           case CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB:
-          case CONSTS.SOURCE_TYPES.NAND_LAL_VAARAN:
+          case CONSTS.SOURCE_TYPES.GURDAS_JI_VAARAN:
             angSearchSourceId = global.core.search.currentMeta.source;
             break;
           default:

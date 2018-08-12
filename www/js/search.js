@@ -482,6 +482,7 @@ module.exports = {
 
   printResults(rows) {
     if (rows.length > 0) {
+      document.getElementById('search-options').style.display = 'block';
       this.$results.innerHTML = '';
       rows.forEach(item => {
         const resultNode = [];
@@ -514,6 +515,9 @@ module.exports = {
     } else {
       this.$results.innerHTML = '';
       this.$results.appendChild(h('li.roman', h('span', 'No results')));
+      if (this.searchSource === CONSTS.SOURCE_TYPES.ALL_SOURCES) {
+        document.getElementById('search-options').style.display = 'none';
+      }
     }
   },
 
