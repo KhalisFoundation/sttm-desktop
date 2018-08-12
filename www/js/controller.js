@@ -378,12 +378,20 @@ function updateViewerScale() {
   }
 }
 
-global.platform.ipc.on('external-display', (e, args) => {
+function checkPresenterView() {
   if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view');
     document.body.classList.remove('home');
+    document.body.classList.add('scale-viewer');
   }
-  document.body.classList.add('scale-viewer');
+}
+
+global.platform.ipc.on('presenter-view', () => {
+  checkPresenterView();
+  updateViewerScale();
+});
+
+global.platform.ipc.on('external-display', (e, args) => {
   global.externalDisplay = {
     width: args.width,
     height: args.height,
@@ -473,6 +481,7 @@ module.exports = {
   },
 
   'presenter-view': function presenterView() {
+    checkPresenterView();
     updateViewerScale();
   },
 
