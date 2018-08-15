@@ -76,13 +76,10 @@ module.exports = {
         condition = `${searchCol} = ${dbQuery}`;
 
         switch (global.core.search.currentMeta.source) {
-          case CONSTS.SOURCE_TYPES.DASAM_GRANTH:
-          case CONSTS.SOURCE_TYPES.GURDAS_VAARAN:
-          case CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB:
-          case CONSTS.SOURCE_TYPES.GURDAS_JI_VAARAN:
-            angSearchSourceId = global.core.search.currentMeta.source;
+          case null:
             break;
           default:
+            angSearchSourceId = global.core.search.currentMeta.source;
             break;
         }
         condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
