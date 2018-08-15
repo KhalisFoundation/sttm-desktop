@@ -211,6 +211,7 @@ function createViewer(ipcData) {
       });
     });
   }
+  mainWindow.webContents.send('presenter-view');
 }
 
 app.on('ready', () => {
