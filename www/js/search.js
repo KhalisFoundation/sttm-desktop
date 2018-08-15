@@ -191,9 +191,7 @@ const shabadNavBack = h(
 
 const searchOptions = h(
   'div#search-options',
-  h('span.filter-text',
-    h('i.fa.fa-sliders'),
-  ),
+  h('span.filter-text'),
   h(
     'select#search-source',
     {
