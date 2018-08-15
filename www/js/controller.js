@@ -435,11 +435,9 @@ global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
 
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.add('presenter-view', 'scale-viewer');
-    document.body.classList.remove('home');
-    updateViewerScale();
-  }
+  store.setUserPref('app.layout.presenter-view', true);
+  checkPresenterView();
+  updateViewerScale();
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
@@ -449,8 +447,10 @@ global.platform.ipc.on('cast-session-active', () => {
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
-  if (!global.externalDisplay) {
+  if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.remove('presenter-view', 'scale-viewer');
+    store.setUserPref('app.layout.presenter-view', false);
+    global.core.platformMethod('updateSettings');
   }
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
