@@ -92,10 +92,10 @@ ul {
   .announcement-text {
     border-radius: 10px;
     display: inline-block;
-    min-height: 80px;
+    margin: 0 20px 10px;
+    min-height: 40px;
     outline: none;
     padding: 10px;
-    width: 100%;
   }
 
   select {
@@ -103,8 +103,9 @@ ul {
   }
 
   .announcement-slide-btn {
+    align-self: center;
     display: block;
-    width: 100%;
+    width: 200px;
   }
 }
 

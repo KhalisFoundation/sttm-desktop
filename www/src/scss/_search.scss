@@ -150,7 +150,7 @@
     font-size: 1rem;
     height: 40px;
     line-height: normal;
-    margin: 0 5px;
+    margin: 0;
     padding: 0.5rem;
     padding-right: 1.5rem;
     width: 0;
@@ -173,6 +173,7 @@ button {
 
 #search-page {
   overflow: hidden;
+
   #language-selector {
     flex-grow: 1;
     text-align: left;
