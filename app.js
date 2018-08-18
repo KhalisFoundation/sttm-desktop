@@ -324,6 +324,25 @@ ipcMain.on('show-line', (event, arg) => {
   }
 });
 
+ipcMain.on('show-empty-slide', () => {
+  const overlayPrefs = store.get('obs');
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  const payload = Object.assign(emptyLine, overlayPrefs);
+
+  io.emit('show-line', payload);
+
+  if (overlayPrefs.live) {
+    createBroadcastFiles(emptyLine);
+  }
+});
+
 ipcMain.on('show-text', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
