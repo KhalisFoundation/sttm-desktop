@@ -211,6 +211,7 @@ function createViewer(ipcData) {
       });
     });
   }
+  mainWindow.webContents.send('presenter-view');
 }
 
 app.on('ready', () => {
@@ -320,6 +321,25 @@ ipcMain.on('show-line', (event, arg) => {
   }
   if (arg.live) {
     createBroadcastFiles(arg);
+  }
+});
+
+ipcMain.on('show-empty-slide', () => {
+  const overlayPrefs = store.get('obs');
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  const payload = Object.assign(emptyLine, overlayPrefs);
+
+  io.emit('show-line', payload);
+
+  if (overlayPrefs.live) {
+    createBroadcastFiles(emptyLine);
   }
 });
 

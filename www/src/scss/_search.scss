@@ -124,11 +124,10 @@
 }
 
 #search-options {
-  display: none;
   height: 36px;
   overflow: hidden;
   padding-right: 12px;
-  text-align: right;
+  text-align: left;
   transition: height 250ms linear;
 
   .filter-text {
@@ -151,7 +150,7 @@
     font-size: 1rem;
     height: 40px;
     line-height: normal;
-    margin: 0 5px;
+    margin: 0;
     padding: 0.5rem;
     padding-right: 1.5rem;
     width: 0;
@@ -174,6 +173,7 @@ button {
 
 #search-page {
   overflow: hidden;
+
   #language-selector {
     flex-grow: 1;
     text-align: left;

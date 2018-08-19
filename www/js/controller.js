@@ -378,12 +378,20 @@ function updateViewerScale() {
   }
 }
 
-global.platform.ipc.on('external-display', (e, args) => {
+function checkPresenterView() {
   if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.add('presenter-view');
     document.body.classList.remove('home');
+    document.body.classList.add('scale-viewer');
   }
-  document.body.classList.add('scale-viewer');
+}
+
+global.platform.ipc.on('presenter-view', () => {
+  checkPresenterView();
+  updateViewerScale();
+});
+
+global.platform.ipc.on('external-display', (e, args) => {
   global.externalDisplay = {
     width: args.width,
     height: args.height,
@@ -427,11 +435,9 @@ global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
 
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.add('presenter-view', 'scale-viewer');
-    document.body.classList.remove('home');
-    updateViewerScale();
-  }
+  store.setUserPref('app.layout.presenter-view', true);
+  checkPresenterView();
+  updateViewerScale();
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
@@ -441,8 +447,10 @@ global.platform.ipc.on('cast-session-active', () => {
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
-  if (!global.externalDisplay) {
+  if (store.getUserPref('app.layout.presenter-view')) {
     document.body.classList.remove('presenter-view', 'scale-viewer');
+    store.setUserPref('app.layout.presenter-view', false);
+    global.core.platformMethod('updateSettings');
   }
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
@@ -465,7 +473,9 @@ module.exports = {
 
   sendText(text, isGurmukhi) {
     global.webview.send('show-text', { text, isGurmukhi });
+    global.webview.send('show-empty-slide');
     global.platform.ipc.send('show-text', { text, isGurmukhi });
+    global.platform.ipc.send('show-empty-slide');
   },
 
   sendScroll(pos) {
@@ -473,6 +483,7 @@ module.exports = {
   },
 
   'presenter-view': function presenterView() {
+    checkPresenterView();
     updateViewerScale();
   },
 
