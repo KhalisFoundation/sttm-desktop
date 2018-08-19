@@ -63,22 +63,28 @@ const viewerWindowPos = {};
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
-  window.obj = new BrowserWindow({
-    width: 725,
-    height: 800,
-    show: false,
-  });
-  window.obj.webContents.on('did-finish-load', () => {
-    window.obj.show();
-  });
-  window.obj.loadURL(window.url);
+  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
 
-  window.obj.on('close', () => {
-    window.obj = false;
-    if (window.onClose) {
-      window.onClose();
-    }
-  });
+  if (openWindow.length > 0) {
+    openWindow[0].show();
+  } else {
+    window.obj = new BrowserWindow({
+      width: 725,
+      height: 800,
+      show: false,
+    });
+    window.obj.webContents.on('did-finish-load', () => {
+      window.obj.show();
+    });
+    window.obj.loadURL(window.url);
+
+    window.obj.on('close', () => {
+      window.obj = false;
+      if (window.onClose) {
+        window.onClose();
+      }
+    });
+  }
 }
 
 autoUpdater.logger = log;
