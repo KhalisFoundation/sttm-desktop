@@ -163,7 +163,7 @@ function showTabContent(clickedTab) {
 }
 
 Array.prototype.forEach.call(allTabs, (element => {
-  element.addEventListener('click', () => {
+  element.addEventListener('click', event => {
     const clickedTab = event.currentTarget.id;
     showTabContent(clickedTab);
     document.getElementById(clickedTab).classList.add('active');
