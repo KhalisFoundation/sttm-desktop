@@ -197,13 +197,14 @@ const searchOptions = h(
     {
       onchange() {
         module.exports.changeSearchSource(this.value);
+        document.getElementById('source-selection').innerText = CONSTS.SOURCE_TEXTS[this.value];
       },
     },
     sourceOptions,
   ),
   h(
-    'label.filter-text', { htmlFor: 'search-source' },
-    'Scripture'),
+    'label.filter-text#source-selection', { htmlFor: 'search-source' },
+    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')]),
 );
 
 const navPageLinks = [];
