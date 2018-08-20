@@ -80,6 +80,7 @@
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
+    "copyright":"Copyright © 2018 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",
