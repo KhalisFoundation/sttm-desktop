@@ -75,7 +75,8 @@ $highlight-text: #cfd8dc;
     }
   }
 
-  .navigator-header {
+  .navigator-header,
+  .more-tabs .nav-header-tab {
     background-color: $bg-main;
     color: $text-base;
   }

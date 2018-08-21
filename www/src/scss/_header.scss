@@ -60,17 +60,27 @@
     }
   }
 
-  .more-tabs {
-    background-color: transparent;
-    border: none;
-    color: inherit;
+  .more-tabs.listview {
+    overflow: inherit;
+    z-index: 20;
 
-    option {
-      background-color: initial;
-      color: initial;
+    .nav-header-tab {
+      opacity: 1;
     }
+  }
 
-    @extend .nav-header-tab;
+  .more-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-right: 6px;
+    position: relative;
+
+    .more-icon {
+      position: absolute;
+      right: 0;
+    }
   }
 
   .navigator-button {
@@ -119,8 +129,8 @@
   }
 }
 
-.presenter-view.scale-viewer .more-tabs {
-  @media screen and (max-width: 850px) {
-    width: 0;
+.presenter-view.scale-viewer .nav-header-tab {
+  @media screen and (max-width: 900px) {
+    font-size: 14px;
   }
 }

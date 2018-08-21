@@ -58,7 +58,8 @@ $base-text: #4e4e4e;
     }
   }
 
-  .navigator-header {
+  .navigator-header,
+  .more-tabs .nav-header-tab {
     background-color: $statusbar-bg;
     color: $base-text;
   }
