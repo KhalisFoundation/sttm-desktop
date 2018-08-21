@@ -62,6 +62,21 @@ ul {
   position: relative;
 }
 
+.minimized {
+  #main-ui {
+    height: calc(100%); //Full-height minus header, search, and footer
+    position: relative;
+  }
+
+  #search-type {
+    visibility: hidden;
+  }
+
+  #language-selector {
+    visibility: hidden;
+  }
+}
+
 .nav-page,
 .takeover-page {
   display: none;
