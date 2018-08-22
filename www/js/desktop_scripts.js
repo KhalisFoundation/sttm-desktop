@@ -148,21 +148,43 @@ Array.from($titleButtons).forEach((el) => {
   el.addEventListener('click', e => windowAction(e));
 });
 
-function showTabContent(event) {
-  const clickedTab = event.currentTarget.id;
-  document.querySelector('.nav-header-tab.active').classList.remove('active');
-  document.getElementById(clickedTab).classList.add('active');
+const allTabs = document.getElementsByClassName('nav-header-tab');
+const moreTabs = document.querySelector('.more-tabs');
+const sessionPage = document.querySelector('#session-page .block-list');
 
+function showTabContent(clickedTab) {
+  document.querySelector('.nav-header-tab.active').classList.remove('active');
   const tabContent = document.getElementById(`${clickedTab}-content`);
   document.querySelector('.tab-content.active').classList.remove('active');
   tabContent.classList.add('active');
 }
 
-const allTabs = document.getElementsByClassName('nav-header-tab');
-
 Array.prototype.forEach.call(allTabs, (element => {
-  element.addEventListener('click', showTabContent);
+  element.addEventListener('click', event => {
+    const clickedTab = event.currentTarget;
+    const clickedTabId = event.currentTarget.id;
+    const tabParent = event.currentTarget.parentElement;
+    if (tabParent.classList.contains('more-tabs')) {
+      moreTabs.insertBefore(clickedTab, moreTabs.firstChild);
+    } else {
+      moreTabs.classList.remove('listview');
+    }
+    showTabContent(clickedTabId);
+    document.getElementById(clickedTabId).classList.add('active');
+  });
 }));
+
+if (moreTabs) {
+  moreTabs.addEventListener('click', () => {
+    moreTabs.classList.toggle('listview');
+  });
+}
+
+if (sessionPage) {
+  sessionPage.addEventListener('click', () => {
+    moreTabs.classList.remove('listview');
+  });
+}
 
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');

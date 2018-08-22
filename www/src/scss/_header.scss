@@ -60,6 +60,29 @@
     }
   }
 
+  .more-tabs.listview {
+    overflow: inherit;
+    z-index: 20;
+
+    .nav-header-tab {
+      opacity: 1;
+    }
+  }
+
+  .more-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-right: 6px;
+    position: relative;
+
+    .more-icon {
+      position: absolute;
+      right: 0;
+    }
+  }
+
   .navigator-button {
     cursor: pointer;
     display: block;
@@ -103,5 +126,11 @@
 
   &.active {
     display: block;
+  }
+}
+
+.presenter-view.scale-viewer .nav-header-tab {
+  @media screen and (max-width: 900px) {
+    font-size: 14px;
   }
 }
