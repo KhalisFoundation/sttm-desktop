@@ -407,7 +407,7 @@ window.onresize = () => {
 };
 
 const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
-const menuCast = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[3].submenu : menu.items[6].submenu);
+const menuCast = menu.items[3].submenu;
 
 global.platform.ipc.on('checking-for-update', () => {
   menuUpdate.items[2].visible = false;
