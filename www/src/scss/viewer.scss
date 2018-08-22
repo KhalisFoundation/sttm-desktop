@@ -180,6 +180,7 @@ h2 {
 .translation,
 .transliteration,
 .teeka {
+  display: none;
   height: 0;
   opacity: 0;
 }
@@ -187,6 +188,7 @@ h2 {
 .display-translation .translation,
 .display-transliteration .transliteration,
 .display-teeka .teeka {
+  display: block;
   height: auto;
   opacity: 1;
 }
