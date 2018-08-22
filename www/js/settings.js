@@ -29,6 +29,49 @@ function updateRangeSetting(key, val) {
   global.core.platformMethod('updateSettings');
 }
 
+function addDisplayTab() {
+  document.getElementById('display-tab-content').innerHTML = '';
+  const catKey = 'slide-layout';
+  const settingKey = 'display-options';
+  const userPrefs = store.getAllPrefs();
+  const setting = settings[catKey].settings[settingKey];
+  const switchList = h('ul');
+  Object.keys(setting.options).forEach((option) => {
+    const optionId = `setting-${catKey}-${settingKey}-${option}`;
+    const switchListAttrs = {
+      name: `setting-${catKey}-${settingKey}`,
+      onclick: (e) => {
+        const newVal = e.target.checked;
+        store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+        updateCheckboxSetting(option);
+        if (typeof global.controller[option] === 'function') {
+          global.controller[option](newVal);
+        }
+        if (typeof global.core[option] === 'function') {
+          global.core[option](newVal);
+        }
+      },
+      type: 'checkbox',
+      value: option,
+    };
+    if (userPrefs[catKey][settingKey][option]) {
+      switchListAttrs.checked = true;
+    }
+    switchList.appendChild(
+      h('li',
+        [
+          h('span', setting.options[option]),
+          h('div.switch',
+            [
+              h(`input#${optionId}`,
+                switchListAttrs),
+              h('label',
+                {
+                  htmlFor: optionId })])]));
+  });
+  document.getElementById('display-tab-content').appendChild(switchList);
+}
+
 function createSettingsPage(userPrefs) {
   if (document.getElementById('settings')) {
     document.getElementById('settings').remove();
@@ -203,6 +246,7 @@ module.exports = {
     const userPrefs = store.getAllPrefs();
     this.settingsPage = createSettingsPage(userPrefs);
     document.querySelector('#menu-page').appendChild(this.settingsPage);
+    addDisplayTab();
     this.applySettings();
   },
 
