@@ -523,7 +523,6 @@ module.exports = {
   },
 
   clickResult(e, ShabadID, LineID, Line) {
-    console.log('welp');
     document.body.classList.remove('home');
     this.closeGurmukhiKB();
     const sessionItem = h(
