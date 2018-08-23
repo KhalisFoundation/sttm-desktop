@@ -3,6 +3,8 @@
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
+const debounce = require('lodash.debounce');
+
 // HTMLElement builder
 const h = require('hyperscript');
 
@@ -502,8 +504,8 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
-                                                  item),
+              onclick: debounce(ev => this.clickResult(ev, item.ShabadID, item.ID,
+                                                  item), 500),
             },
             resultNode,
           ),
@@ -521,6 +523,7 @@ module.exports = {
   },
 
   clickResult(e, ShabadID, LineID, Line) {
+    console.log('welp');
     document.body.classList.remove('home');
     this.closeGurmukhiKB();
     const sessionItem = h(
