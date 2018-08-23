@@ -144,7 +144,7 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: debounce(() => { goToShabadPage(2897); }, 500),
+      onclick: debounce(() => { goToShabadPage(2897); }, 500, { leading: true }),
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
@@ -166,7 +166,7 @@ const hukamnamaButton = h(
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
           goToShabadPage(response.shabadinfo.id);
         });
-      }, 500) },
+      }, 500, { leading: true }) },
     h('i.fa.fa-gavel.list-icon'),
     'Daily Hukamnama'));
 

@@ -505,7 +505,7 @@ module.exports = {
             'a.panktee.search-result',
             {
               onclick: debounce(ev => this.clickResult(ev, item.ShabadID, item.ID,
-                                                  item), 500),
+                                                  item), 500, { leading: true }),
             },
             resultNode,
           ),
