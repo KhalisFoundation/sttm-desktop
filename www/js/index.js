@@ -3,6 +3,7 @@ const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
+const settings = require('../js/settings');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -92,6 +93,10 @@ function platformMethod(method, args) {
     global.platform[method](args);
   }
 }
+
+global.platform.ipc.on('sync-settings', () => {
+  settings.init();
+});
 
 module.exports = {
   menu,

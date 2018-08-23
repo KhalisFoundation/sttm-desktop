@@ -43,7 +43,6 @@ const buttonFactory = ({
 
 const goToShabadPage = (shabadId) => {
   global.core.search.loadShabad(shabadId);
-  module.exports.toggleMenu('#shabad-menu-page');
   document.querySelector('#shabad-pageLink').click();
 };
 
@@ -96,7 +95,6 @@ const showNotificationsModal = (message) => {
     modal.setContent(content);
     // open modal
     modal.open();
-    document.getElementById('notifications-icon').classList.remove('badge');
   }
 };
 
@@ -123,29 +121,9 @@ const notificationsBellClickHandler = () => {
 const menuButton = h(
   'a.menu-button.navigator-button.active',
   h('i.fa.fa-bars'));
-const customSlidesButton = buttonFactory({
-  buttonType: 'open',
-  buttonIcon: 'fa-clone',
-  buttonId: 'custom-slides-menu',
-  pageToToggle: '#custom-slides-page',
-});
-const shabadMenuButton = buttonFactory({
-  buttonType: 'open',
-  buttonIcon: 'fa-archive',
-  buttonId: 'shabad-menu',
-  pageToToggle: '#shabad-menu-page',
-});
 const closeButton = buttonFactory({
   buttonType: 'close',
   pageToToggle: '#menu-page',
-});
-const shabadMenuCloseButton = buttonFactory({
-  buttonType: 'close',
-  pageToToggle: '#shabad-menu-page',
-});
-const customSlidesCloseButton = buttonFactory({
-  buttonType: 'close',
-  pageToToggle: '#custom-slides-page',
 });
 
 /* load Shabad buttons */
@@ -169,6 +147,15 @@ const anandKarajButton = h(
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
+const notificationButton = h(
+  'li',
+  h(
+    'a.notification-button',
+    {
+      onclick: notificationsBellClickHandler,
+    },
+    h('i.fa.fa-bell.list-icon'),
+    "What's New"));
 const hukamnamaButton = h(
   'li',
   h(
@@ -272,13 +259,6 @@ const announcementSlideButton = h(
         global.controller.sendText(announcementText, isGurmukhi);
       } },
     'Add Announcement'));
-const notificationButton = h(
-  'button.notificaitons.navigator-button.navigator-header',
-  {
-    onclick: notificationsBellClickHandler,
-  },
-  h('i#notifications-icon.fa.fa-bell'),
-);
 
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', (e) => {
@@ -301,14 +281,6 @@ module.exports = {
     });
     document.querySelector('.preferences-close').appendChild(closeButton);
 
-    document.getElementById('current-shabad-menu').appendChild(customSlidesButton);
-    document.querySelector('.custom-slides-close').appendChild(customSlidesCloseButton);
-
-
-    document.getElementById('shabad-menu').appendChild(shabadMenuButton);
-    document.getElementById('notifications').appendChild(notificationButton);
-    document.querySelector('.shabad-menu-close').appendChild(shabadMenuCloseButton);
-
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
     $listOfCustomSlides.appendChild(emptySlideButton);
     $listOfCustomSlides.appendChild(waheguruSlideButton);
@@ -319,6 +291,7 @@ module.exports = {
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(anandKarajButton);
+    $listOfShabadOptions.appendChild(notificationButton);
     settings.init();
   },
 

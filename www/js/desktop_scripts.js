@@ -170,8 +170,8 @@ module.exports = {
   },
 
   updateSettings() {
-    global.webview.send('update-settings');
-    global.platform.ipc.send('update-settings');
+    if (global.webview) global.webview.send('update-settings');
+    if (global.platform) global.platform.ipc.send('update-settings');
   },
 
   updateNotificationsTimestamp(time) {
@@ -183,3 +183,55 @@ const $titleButtons = document.querySelectorAll('#titlebar .controls a');
 Array.from($titleButtons).forEach((el) => {
   el.addEventListener('click', e => windowAction(e));
 });
+
+const allTabs = document.getElementsByClassName('nav-header-tab');
+const moreTabs = document.querySelector('.more-tabs');
+const sessionPage = document.querySelector('#session-page .block-list');
+
+function showTabContent(clickedTab) {
+  document.querySelector('.nav-header-tab.active').classList.remove('active');
+  const tabContent = document.getElementById(`${clickedTab}-content`);
+  document.querySelector('.tab-content.active').classList.remove('active');
+  tabContent.classList.add('active');
+}
+
+Array.prototype.forEach.call(allTabs, ((element) => {
+  element.addEventListener('click', (event) => {
+    const clickedTab = event.currentTarget;
+    const clickedTabId = event.currentTarget.id;
+    const tabParent = event.currentTarget.parentElement;
+    if (tabParent.classList.contains('more-tabs')) {
+      moreTabs.insertBefore(clickedTab, moreTabs.firstChild);
+    } else {
+      moreTabs.classList.remove('listview');
+    }
+    showTabContent(clickedTabId);
+    document.getElementById(clickedTabId).classList.add('active');
+  });
+}));
+
+if (moreTabs) {
+  moreTabs.addEventListener('click', () => {
+    moreTabs.classList.toggle('listview');
+  });
+}
+
+if (sessionPage) {
+  sessionPage.addEventListener('click', () => {
+    moreTabs.classList.remove('listview');
+  });
+}
+
+const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
+const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
+
+if ($minimize) {
+  Array.prototype.forEach.call($minimize, ((minimize) => {
+    minimize.addEventListener('click', () => {
+      Array.prototype.forEach.call($minimizeIcons, ((element) => {
+        element.classList.toggle('disabled');
+      }));
+      document.getElementById('navigator').classList.toggle('minimized');
+    });
+  }));
+}

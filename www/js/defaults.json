@@ -30,6 +30,8 @@
         "autoplayTimer": 10
       },
       "display-options": {
+        "disable-akhandpaatt": false,
+        "akhandpaatt": false,
         "larivaar": false,
         "left-align": false
       }
@@ -38,14 +40,22 @@
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
   "searchOptions": {
-    "searchType": 0
+    "searchLanguage":"gr",
+    "searchType": 0,
+    "searchSource": "all"
   },
   "obs": {
     "overlayPrefs": {
       "overlayVars": {
         "layout": "split",
         "bgColor": "#2c3e50",
-        "textColor": "#EAC445"
+        "bgOpacity": 1,
+        "textColor": "#EAC445",
+        "height": 30,
+        "fontSize": 12,
+        "gurbaniFontSize": 15,
+        "gurbaniTextColor": "#EAC445",
+        "showLogo": true
       },
       "gurbani": {
         "bottom": 156,

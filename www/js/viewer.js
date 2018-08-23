@@ -56,6 +56,7 @@ function castToReceiver() {
 }
 
 function castShabadLine(lineID) {
+  document.querySelector('.viewer-controls').innerHTML = '';
   castCur = decks[currentShabad][lineID];
   let nextLine = '';
   if (decks[currentShabad][lineID + 1]) {
@@ -63,6 +64,12 @@ function castShabadLine(lineID) {
   }
   castCur.nextLine = nextLine;
   castToReceiver();
+
+  const activeSlide = document.querySelector('.deck.active .slide.active').children;
+  Array.prototype.forEach.call(activeSlide, ((element) => {
+    const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+    if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+  }));
 }
 
 function castText(text, isGurmukhi) {
@@ -116,6 +123,7 @@ global.platform.ipc.on('show-ang', (event, data) => {
 });
 
 global.platform.ipc.on('show-text', (event, data) => {
+  document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
 });
 
@@ -157,6 +165,27 @@ function createAPVContainer() {
   }
 }
 
+const iconsetHtml = (classname, content) => {
+  let icons;
+  const iconType = classname.split('-')[1];
+  if (content) {
+    icons = h(
+    `span.${classname}.iconset`, [
+      h('p.tagline', iconType),
+      h('span.visibility', {
+        onclick: e => core.menu.settings.showHide(e, iconType),
+      }, h('i.fa.fa-eye-slash')),
+      h('span.minus.size', {
+        onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+      }, h('i.fa.fa-minus-circle')),
+      h('span.plus.size', {
+        onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+      }, h('i.fa.fa-plus-circle')),
+    ]);
+  }
+  return icons;
+};
+
 function createCards(rows, LineID) {
   return new Promise((resolve) => {
     if (rows.length > 0) {
@@ -175,7 +204,9 @@ function createCards(rows, LineID) {
           }
         });
         const gurmukhiContainer = document.createElement('div');
-        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span><span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+
+        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
+                                       <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
         cards.push(
           h(
             `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
@@ -199,8 +230,13 @@ function createCards(rows, LineID) {
 }
 
 function createDeck(cards, curSlide, shabad, ShabadID) {
+  document.querySelector('.vc-toggle-icon').style.left = '0';
   hideDecks();
-  $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+  if (document.querySelector('.vc-open')) {
+    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));
+  } else {
+    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+  }
   smoothScroll(curSlide);
   currentShabad = parseInt(ShabadID, 10);
   decks[ShabadID] = shabad;
@@ -289,3 +325,15 @@ function showText(text, isGurmukhi = false) {
   $message.appendChild(h('div.slide.active', textNode));
   castText(text, isGurmukhi);
 }
+
+function toggleSideMenu() {
+  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach((el) => {
+    el.classList.toggle('vc-icon-hidden');
+  });
+  Array.from(document.querySelectorAll('.deck')).forEach((el) => {
+    el.classList.toggle('vc-open');
+  });
+  document.querySelector('.viewer-controls').classList.toggle('viewer-controls-open');
+}
+
+document.querySelector('.vc-toggle-icon').onclick = toggleSideMenu;

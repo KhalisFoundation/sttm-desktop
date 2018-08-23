@@ -9,11 +9,12 @@ LEFT JOIN Raag r USING(RaagID)`;
 const CONSTS = require('./constants.js');
 
 module.exports = {
-  allColumns,
-  search(searchQuery, searchType) {
+  search(searchQuery, searchType, searchSource) {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    // default source for ang search to GURU_GRANTH_SAHIB
+    let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
@@ -26,16 +27,13 @@ module.exports = {
           }
           dbQuery += `,${charCode}`;
         }
-        // Add trailing wildcard
-        /* if (searchType === 1) {
-          dbQuery = `%${dbQuery}`;
-        } */
+
         // Replace kh with kh pair bindi
-        let bindiQuery = '';
+        let replaced = '';
         if (dbQuery.includes('075')) {
-          bindiQuery = `OR ${searchCol} CONTAINS '${dbQuery.replace(/075/g, '094')}'`;
+          replaced = `OR ${searchCol} CONTAINS '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} CONTAINS '${dbQuery}' ${bindiQuery}`;
+        condition = `${searchCol} CONTAINS '${dbQuery}' ${replaced}`;
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
         }
@@ -51,12 +49,24 @@ module.exports = {
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
         condition = `${searchCol} LIKE '${dbQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND v.SourceID = '${searchSource}'`;
+        }
         break;
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
+        condition = `${searchCol} = ${dbQuery}`;
+
+        switch (global.core.search.currentMeta.source) {
+          case null:
+            break;
+          default:
+            angSearchSourceId = global.core.search.currentMeta.source;
+            break;
+        }
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
         break;
       default:
         break;

@@ -29,7 +29,54 @@ function updateRangeSetting(key, val) {
   global.core.platformMethod('updateSettings');
 }
 
+function addDisplayTab() {
+  document.getElementById('display-tab-content').innerHTML = '';
+  const catKey = 'slide-layout';
+  const settingKey = 'display-options';
+  const userPrefs = store.getAllPrefs();
+  const setting = settings[catKey].settings[settingKey];
+  const switchList = h('ul');
+  Object.keys(setting.options).forEach((option) => {
+    const optionId = `setting-${catKey}-${settingKey}-${option}`;
+    const switchListAttrs = {
+      name: `setting-${catKey}-${settingKey}`,
+      onclick: (e) => {
+        const newVal = e.target.checked;
+        store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+        updateCheckboxSetting(option);
+        if (typeof global.controller[option] === 'function') {
+          global.controller[option](newVal);
+        }
+        if (typeof global.core[option] === 'function') {
+          global.core[option](newVal);
+        }
+      },
+      type: 'checkbox',
+      value: option,
+    };
+    if (userPrefs[catKey][settingKey][option]) {
+      switchListAttrs.checked = true;
+    }
+    switchList.appendChild(
+      h('li',
+        [
+          h('span', setting.options[option]),
+          h('div.switch',
+            [
+              h(`input#${optionId}`,
+                switchListAttrs),
+              h('label',
+                {
+                  htmlFor: optionId })])]));
+  });
+  document.getElementById('display-tab-content').appendChild(switchList);
+}
+
 function createSettingsPage(userPrefs) {
+  if (document.getElementById('settings')) {
+    document.getElementById('settings').remove();
+  }
+
   const settingsPage = h('div#settings');
   Object.keys(settings).forEach((catKey) => {
     const cat = settings[catKey];
@@ -142,6 +189,12 @@ function createSettingsPage(userPrefs) {
           const switchList = h('ul');
           Object.keys(setting.options).forEach((option) => {
             const optionId = `setting-${catKey}-${settingKey}-${option}`;
+            let disabled = false;
+
+            if (option === 'akhandpaatt') {
+              disabled = store.get('userPrefs.slide-layout.display-options.disable-akhandpaatt');
+            }
+
             const switchListAttrs = {
               name: `setting-${catKey}-${settingKey}`,
               onclick: (e) => {
@@ -157,6 +210,7 @@ function createSettingsPage(userPrefs) {
               },
               type: 'checkbox',
               value: option,
+              disabled,
             };
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;
@@ -192,6 +246,7 @@ module.exports = {
     const userPrefs = store.getAllPrefs();
     this.settingsPage = createSettingsPage(userPrefs);
     document.querySelector('#menu-page').appendChild(this.settingsPage);
+    addDisplayTab();
     this.applySettings();
   },
 
@@ -234,5 +289,30 @@ module.exports = {
         }
       });
     });
+  },
+  changeFontSize(iconType, operation) {
+    const range = settings['slide-layout'].settings['font-sizes'].options[iconType];
+    const existingSize = parseInt(store.getUserPref(`slide-layout.font-sizes.${iconType}`), 10);
+    document.body.classList.remove(`${iconType}-${existingSize}`);
+
+    let newSize;
+
+    if (operation === 'plus' && existingSize < range.max) {
+      newSize = existingSize + range.step;
+    } else if (operation === 'minus' && existingSize > range.min) {
+      newSize = existingSize - range.step;
+    }
+    document.body.classList.add(`${iconType}-${newSize}`);
+    store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
+    global.platform.updateSettings();
+  },
+  showHide(e, type) {
+    const catKey = 'slide-layout';
+    const settingKey = 'fields';
+    const option = `display-${type}`;
+    document.body.classList.toggle(option);
+    const newVal = document.body.classList.contains(option);
+    store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
+    global.platform.updateSettings();
   },
 };

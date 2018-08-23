@@ -30,15 +30,6 @@ const getCurrentTheme = () => {
   return defaultTheme;
 }; */
 
-const closeCustomTheme = h(
-  'a.close-button',
-  {
-    onclick: () => {
-      document.querySelector('#setting-app-custom-theme-options-show-theme-editor').click();
-    },
-  },
-  h('i.fa.fa-times'));
-
 const swatchFactory = themeInstance =>
   h(
     'li.theme-instance',
@@ -112,7 +103,6 @@ module.exports = {
   defaultTheme,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
-    document.querySelector('#options-page-close').appendChild(closeCustomTheme);
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
 
