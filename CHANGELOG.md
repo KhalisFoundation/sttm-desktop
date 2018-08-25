@@ -3,7 +3,7 @@
 ### 4.1.0 - _180824_
 
 #### Improved
-  * **User Interface** - Wow! What is this new beautiful software that let's me present Gurbani and looks amazing? Actually, it's the same SikhiToTheMax, but Guru Sahib has done Kirpa on Sevadars to deliver a new version that is much more intuitive. It's the first step in a brand new experience that is coming. In this iteration, controls are closer to where you need them.
+  * **User Interface** - Wow! What is this beautiful new software that lets me present Gurbani and looks amazing? Actually, it's the same SikhiToTheMax, but Guru Sahib has done Kirpa on Sevadars to deliver a new version that is much more intuitive. It's the first step in a brand new experience that is coming. In this iteration, controls are closer to where you need them.
   * **Search by Ang** - Searching by Ang or page number has its own dedicated field
   * Bug Fixes
   * Style Fixes
