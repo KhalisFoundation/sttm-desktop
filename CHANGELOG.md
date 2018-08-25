@@ -1,5 +1,18 @@
 ## SikhiToTheMax Desktop App
 
+### 4.1.0 - _180824_
+
+#### Improved
+  * **User Interface** - Revamped presenter view and brought some controls closer to where you need them
+  * **Search by Ang** - Easier to search by ang
+  * Bug Fixes
+  * Style Fixes
+  
+#### Added
+  * **Scripture Filtering** - Narrow down your search to different scriptures
+  * **Single Screen Presenter View** - Get the benefits of presenter view without having to connect a second screen
+  * **Bani Overlay** - Overlay Editor now provides a way to adjust the background size and opacity and the text size. Gurbani can also be coloured separately from the other text
+
 ### 4.0.6 - _180718_
 #### Improved
  * **Search speed** - _First Letter Start (Gurmukhi)_ search has gotten a huge performance boost, nearing instant from the time you type a letter to when results are shown
