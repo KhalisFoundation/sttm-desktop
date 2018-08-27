@@ -67,7 +67,8 @@ $highlight-text: #cfd8dc;
     }
   }
 
-  .navigator-header {
+  .navigator-header,
+  .more-tabs .nav-header-tab {
     background-color: $bg-main;
     color: $text-base;
   }
@@ -143,9 +144,12 @@ $highlight-text: #cfd8dc;
   }
 
   #search-options select {
-    background-color: $bg-main;
     border: $bg-main;
     color: $text-bright;
+
+    option {
+      background-color: $bg-main;
+    }
   }
 
   .panktee {

@@ -14,9 +14,27 @@ const io = require('socket.io')(http);
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-http.listen(1397); // TODO: move to config file
-
 const { app, BrowserWindow, dialog, ipcMain } = electron;
+
+const op = require('openport');
+
+op.find(
+  {
+    // Re: http://www.sikhiwiki.org/index.php/Gurgadi
+    ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
+    count: 1,
+  },
+  (err, port) => {
+    if (err) {
+      dialog.showErrorBox('Overlay Error', 'No free ports available. Close other applications and Reboot the machine');
+      app.exit(-1);
+      return;
+    }
+    global.overlayPort = port;
+    // console.log(`Overlay Port No ${port}`);
+    http.listen(port);
+  });
+
 const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
@@ -45,22 +63,28 @@ const viewerWindowPos = {};
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
-  window.obj = new BrowserWindow({
-    width: 725,
-    height: 800,
-    show: false,
-  });
-  window.obj.webContents.on('did-finish-load', () => {
-    window.obj.show();
-  });
-  window.obj.loadURL(window.url);
+  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
 
-  window.obj.on('close', () => {
-    window.obj = false;
-    if (window.onClose) {
-      window.onClose();
-    }
-  });
+  if (openWindow.length > 0) {
+    openWindow[0].show();
+  } else {
+    window.obj = new BrowserWindow({
+      width: 725,
+      height: 800,
+      show: false,
+    });
+    window.obj.webContents.on('did-finish-load', () => {
+      window.obj.show();
+    });
+    window.obj.loadURL(window.url);
+
+    window.obj.on('close', () => {
+      window.obj = false;
+      if (window.onClose) {
+        window.onClose();
+      }
+    });
+  }
 }
 
 autoUpdater.logger = log;
@@ -101,7 +125,7 @@ autoUpdater.on('update-downloaded', () => {
     message: 'Update available.',
     detail: 'Update downloaded and ready to install',
     cancelId: 0,
-  }, (response) => {
+  }, response => {
     if (response === 1) {
       autoUpdater.quitAndInstall();
     }
@@ -126,7 +150,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach((i) => {
+  Object.keys(displays).forEach(i => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -187,6 +211,7 @@ function createViewer(ipcData) {
       });
     });
   }
+  mainWindow.webContents.send('presenter-view');
 }
 
 app.on('ready', () => {
@@ -299,6 +324,25 @@ ipcMain.on('show-line', (event, arg) => {
   }
 });
 
+ipcMain.on('show-empty-slide', () => {
+  const overlayPrefs = store.get('obs');
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  const payload = Object.assign(emptyLine, overlayPrefs);
+
+  io.emit('show-line', payload);
+
+  if (overlayPrefs.live) {
+    createBroadcastFiles(emptyLine);
+  }
+});
+
 ipcMain.on('show-text', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
@@ -331,6 +375,7 @@ ipcMain.on('update-settings', () => {
   if (viewerWindow) {
     viewerWindow.webContents.send('update-settings');
   }
+  mainWindow.webContents.send('sync-settings');
 });
 
 module.exports = {

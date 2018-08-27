@@ -39,6 +39,14 @@ body.high-contrast {
     }
   }
 }
+
+.high-contrast {
+  .vc-toggle-icon,
+  .viewer-controls {
+    color: #333;
+  }
+}
+
 //TODO: Consolidate to mixin for the dark themes
 $bg-main: #212121;
 $bg-alt: #3a3a3a;
@@ -67,7 +75,8 @@ $highlight-text: #cfd8dc;
     }
   }
 
-  .navigator-header {
+  .navigator-header,
+  .more-tabs .nav-header-tab {
     background-color: $bg-main;
     color: $text-base;
   }
@@ -143,9 +152,12 @@ $highlight-text: #cfd8dc;
   }
 
   #search-options select {
-    background-color: $bg-main;
     border: $bg-main;
     color: $text-bright;
+
+    option {
+      background-color: $bg-main;
+    }
   }
 
   .panktee {

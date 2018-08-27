@@ -14,17 +14,73 @@
   }
 }
 
+.presenter-view.scale-viewer {
+  .toggle-minimize {
+    display: none;
+  }
+}
+
+#search-type {
+  flex-grow: 1;
+  margin: 0 10px;
+  order: 1;
+  text-align: left;
+
+  select {
+    width: 100%;
+  }
+
+  span {
+    display: inline-block;
+    margin-right: 5px;
+  }
+}
+
 .navigator-header {
   align-items: center;
   display: flex;
   height: 40px;
-  justify-content: space-between;
   line-height: 40px;
   text-align: center;
 
   .nav-header-text {
-    flex-grow: 1;
     padding: 0 10px;
+  }
+
+  .nav-header-tab {
+    cursor: pointer;
+    height: 100%;
+    opacity: 0.5;
+    padding: 0 10px;
+
+    @extend .nav-header-text;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  .more-tabs.listview {
+    overflow: inherit;
+    z-index: 20;
+
+    .nav-header-tab {
+      opacity: 1;
+    }
+  }
+
+  .more-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-right: 6px;
+    position: relative;
+
+    .more-icon {
+      position: absolute;
+      right: 0;
+    }
   }
 
   .navigator-button {
@@ -37,5 +93,44 @@
     &.close-button { background: white; }
 
     &.hide { display: none; }
+  }
+
+  .current-shabad-header {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+
+  .toggle-minimize {
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 10px;
+    order: 2;
+    text-align: right;
+
+    .disabled {
+      display: none;
+    }
+  }
+}
+
+#session-page,
+#menu-page {
+  .toggle-minimize {
+    flex-grow: 1;
+  }
+}
+
+.tab-content {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.presenter-view.scale-viewer .nav-header-tab {
+  @media screen and (max-width: 900px) {
+    font-size: 14px;
   }
 }

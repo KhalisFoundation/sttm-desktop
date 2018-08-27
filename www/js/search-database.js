@@ -6,10 +6,12 @@ LEFT JOIN Raag r USING(RaagID)`;
 const CONSTS = require('./constants.js');
 
 module.exports = {
-  search(searchQuery, searchType) {
+  search(searchQuery, searchType, searchSource) {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    // default source for ang search to GURU_GRANTH_SAHIB
+    let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
     const limit = ' 0,20';
     switch (searchType) {
@@ -42,6 +44,10 @@ module.exports = {
             condition += ` OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
           }
         }
+        if (searchSource !== 'all') {
+          condition += `  AND v.SourceID = '${searchSource}'`;
+        }
+
 
         // Give preference to shorter lines if searching for 1 or 2 words
         if (searchQuery.length < 3) {
@@ -59,12 +65,24 @@ module.exports = {
         const words = searchQuery.split(' ');
         dbQuery = `%${words.join(' %')}%`;
         condition = `${searchCol} LIKE '${dbQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND v.SourceID = '${searchSource}'`;
+        }
         break;
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
         dbQuery = parseInt(searchQuery, 10);
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${global.core.search.currentMeta.source || 'G'}'`;
+        condition = `${searchCol} = ${dbQuery}`;
+
+        switch (global.core.search.currentMeta.source) {
+          case null:
+            break;
+          default:
+            angSearchSourceId = global.core.search.currentMeta.source;
+            break;
+        }
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
         break;
       default:
         break;
