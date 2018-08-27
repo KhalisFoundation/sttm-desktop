@@ -42,13 +42,12 @@ module.exports = {
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
       case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
         if (searchType === 2) {
-          searchCol = 'v.Gurmukhi';
+          searchCol = 'Gurmukhi';
         } else {
-          searchCol = 'v.English';
+          searchCol = 'English';
         }
-        const words = searchQuery.split(' ');
-        dbQuery = `%${words.join(' %')}%`;
-        condition = `${searchCol} LIKE '${dbQuery}'`;
+        const words = searchQuery.split(' ').map(word => `${searchCol} CONTAINS ${word}`);
+        condition = words.join(' AND ');
         if (searchSource !== 'all') {
           condition += ` AND v.SourceID = '${searchSource}'`;
         }
@@ -71,7 +70,8 @@ module.exports = {
       default:
         break;
     }
-    order.push('s.ShabadID');
+    order.push('Shabads');
+    condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
     console.time('query');
     Realm.open(realmDB.realmVerseSchema)
       .then((realm) => {
@@ -79,10 +79,6 @@ module.exports = {
         global.core.search.printResults(rows.slice(0, 20));
         console.timeEnd('query');
       });
-/*     this.db.all(query, (err, rows) => {
-      global.core.search.printResults(rows);
-      console.timeEnd('query');
-    }); */
   },
 
   loadShabad(ShabadID, LineID) {
