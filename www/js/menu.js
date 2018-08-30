@@ -5,7 +5,6 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
-const debounce = require('lodash.debounce');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -144,7 +143,7 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: debounce(() => { goToShabadPage(2897); }, 500, { leading: true }),
+      onclick: () => { goToShabadPage(2897); },
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
@@ -162,11 +161,12 @@ const hukamnamaButton = h(
   h(
     'a.hukamnama-button',
     {
-      onclick: debounce(() => {
+      onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
           goToShabadPage(response.shabadinfo.id);
         });
-      }, 500, { leading: true }) },
+      },
+    },
     h('i.fa.fa-gavel.list-icon'),
     'Daily Hukamnama'));
 
