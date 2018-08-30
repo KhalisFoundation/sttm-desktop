@@ -521,7 +521,7 @@ module.exports = {
     }
   },
 
-  async clickResult(e, ShabadID, LineID, Line) {
+  clickResult(e, ShabadID, LineID, Line) {
     document.body.classList.remove('home');
     this.closeGurmukhiKB();
     const sessionItem = h(
@@ -553,7 +553,7 @@ module.exports = {
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
-    await this.loadShabad(ShabadID, LineID, apv);
+    this.loadShabad(ShabadID, LineID, apv);
     // scroll the session block to the top to see the highlighted line
     this.$sessionContainer.scrollTop = 0;
     this.navPage('shabad');
