@@ -23,7 +23,11 @@ module.exports = {
           if (charCode < 100) {
             charCode = `0${charCode}`;
           }
-          dbQuery += `,${charCode}`;
+          if (charCode === '042') {
+            dbQuery += ',___';
+          } else {
+            dbQuery += `,${charCode}`;
+          }
         }
 
         // Replace kh with kh pair bindi
