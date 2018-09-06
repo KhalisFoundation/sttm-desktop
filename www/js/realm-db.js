@@ -29,13 +29,9 @@ const ShabadSchema = {
 
 const SourceSchema = {
   name: 'Source',
-  primaryKey: 'UniqueID',
+  primaryKey: 'SourceID',
   properties: {
-    UniqueID: 'int',
-    SourceID: {
-      type: 'string',
-      indexed: true,
-    },
+    SourceID: 'string',
     SourceGurmukhi: 'string?',
     SourceUnicode: 'string?',
     SourceEnglish: 'string?',
@@ -61,7 +57,7 @@ const VerseSchema = {
       indexed: true,
     },
     LineNo: 'int?',
-    SourceID: 'Source',
+    Source: 'Source',
     FirstLetterStr: {
       type: 'string?',
       indexed: true,
