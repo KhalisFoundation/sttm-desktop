@@ -118,7 +118,7 @@ autoUpdater.on('update-downloaded', () => {
     type: 'info',
     buttons: [
       'Dismiss',
-      'Install & Restart',
+      'Install and Restart',
     ],
     defaultId: 1,
     title: 'Update available.',

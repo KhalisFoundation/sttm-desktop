@@ -3,7 +3,6 @@
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
-const debounce = require('lodash.debounce');
 
 // HTMLElement builder
 const h = require('hyperscript');
@@ -504,8 +503,8 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: debounce(ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
-                                                  item), 500, { leading: true }),
+              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
+                                                  item),
             },
             resultNode,
           ),
@@ -605,6 +604,13 @@ module.exports = {
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
     let mainLine;
+    const shabad = this.$shabad;
+
+    // remove currently printed shabad.
+    while (shabad.firstChild) {
+      shabad.removeChild(shabad.firstChild);
+    }
+
     rows.forEach((item) => {
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
@@ -630,7 +636,7 @@ module.exports = {
         ),
       );
       // write the Panktee to the controller
-      this.$shabad.appendChild(shabadLine);
+      shabad.appendChild(shabadLine);
       // append the currentShabad array
       currentShabad.push(item.ID);
       if (lineID === item.ID) {
@@ -638,7 +644,7 @@ module.exports = {
       }
     });
     // scroll the Shabad controller to the current Panktee
-    const curPankteeTop = this.$shabad.querySelector('.current').parentNode
+    const curPankteeTop = shabad.querySelector('.current').parentNode
       .offsetTop;
     this.$shabadContainer.scrollTop = curPankteeTop;
     // send the line to app.js, which will send it to the viewer window as well as obs file
