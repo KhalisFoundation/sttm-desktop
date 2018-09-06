@@ -82,7 +82,7 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request('https://banidb.com/databases/sttmdesktop-realm.md5', (error, response, newestDBHash) => {
+        request('https://banidb.com/databases/sttmdesktop.realm.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
