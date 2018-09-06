@@ -101,6 +101,7 @@ module.exports = {
                       ],
                     })
                     .then(() => {
+                      fs.chmodSync(dbPath, '755');
                       module.exports.initDB();
                       store.set('curDBHash', newestDBHash);
                       fs.unlinkSync(dbCompressed);
