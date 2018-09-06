@@ -129,26 +129,24 @@ module.exports = {
     });
   },
 
-  loadAdjacentShabad(previousVerseID, nextVerseID, Forward) {
-    global.platform.db.all(`
-    SELECT
-      'previous' as navigation, ShabadID
-    FROM
-      Shabad
-    WHERE
-      VerseID='${previousVerseID}'
-    UNION
-    SELECT
-      'next' as navigation, ShabadID
-    FROM
-      Shabad
-    WHERE
-      VerseID='${nextVerseID}'`,
-    (err, adjacentShabads) => {
-      if (adjacentShabads.length > 0) {
-        const ShabadID = Forward ? adjacentShabads[0].ShabadID : adjacentShabads[1].ShabadID;
-        this.loadShabad(ShabadID, null);
-      }
+/**
+ * Retrieve Shabad for Verse
+ *
+ * @since 4.2.0
+ * @param {number} VerseID Verse to search
+ * @returns {number} Returns ShabadID as a Promise
+ * @example
+ *
+ * getShabad(1);
+ * // => 1
+ */
+  getShabad(VerseID) {
+    return new Promise((resolve) => {
+      Realm.open(realmDB.realmVerseSchema)
+        .then((realm) => {
+          const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
+          resolve(shabad.Shabads[0].ShabadID);
+        });
     });
   },
 

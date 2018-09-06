@@ -504,7 +504,7 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: debounce(ev => this.clickResult(ev, item.ShabadID, item.ID,
+              onclick: debounce(ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
                                                   item), 500, { leading: true }),
             },
             resultNode,
@@ -597,11 +597,9 @@ module.exports = {
     // Load the same shabad if on first or last shabad
     const PreviousVerseID = FirstLine === 1 ? FirstLine : FirstLine - 1;
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
-    global.platform.search.loadAdjacentShabad(
-      PreviousVerseID,
-      NextVerseID,
-      Forward,
-    );
+    const adjacentVerseID = Forward ? NextVerseID : PreviousVerseID;
+    global.platform.search.getShabad(adjacentVerseID)
+      .then(global.platform.search.loadShabad);
   },
 
   printShabad(rows, ShabadID, LineID) {
