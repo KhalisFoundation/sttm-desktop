@@ -39,12 +39,14 @@ module.exports = {
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
       case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
+        let caseInsensitive = false;
         if (searchType === 2) {
           searchCol = 'Gurmukhi';
         } else {
           searchCol = 'English';
+          caseInsensitive = true;
         }
-        const words = saniQuery.split(' ').map(word => `(${searchCol} CONTAINS[c] ' ${word}' OR ${searchCol} BEGINSWITH[c] '${word}')`);
+        const words = saniQuery.split(' ').map(word => `(${searchCol} CONTAINS${caseInsensitive ? '[c]' : ''} ' ${word}' OR ${searchCol} BEGINSWITH${caseInsensitive ? '[c]' : ''} '${word}')`);
         condition = words.join(' AND ');
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
