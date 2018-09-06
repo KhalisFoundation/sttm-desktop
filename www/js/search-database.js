@@ -1,11 +1,6 @@
 const Realm = require('realm');
 const realmDB = require('./realm-db');
 
-const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
-LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
-LEFT JOIN Writer w USING(WriterID)
-LEFT JOIN Raag r USING(RaagID)`;
-
 const CONSTS = require('./constants.js');
 
 module.exports = {
@@ -13,6 +8,8 @@ module.exports = {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    // Sanitize query
+    const saniQuery = searchQuery.trim().replace("'", "\\'");
     // default source for ang search to GURU_GRANTH_SAHIB
     let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
@@ -20,8 +17,9 @@ module.exports = {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
         searchCol = 'FirstLetterStr';
-        for (let x = 0, len = searchQuery.length; x < len; x += 1) {
-          let charCode = searchQuery.charCodeAt(x);
+        const operator = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? 'BEGINSWITH' : 'CONTAINS';
+        for (let x = 0, len = saniQuery.length; x < len; x += 1) {
+          let charCode = saniQuery.charCodeAt(x);
           if (charCode < 100) {
             charCode = `0${charCode}`;
           }
@@ -31,11 +29,11 @@ module.exports = {
         // Replace kh with kh pair bindi
         let replaced = '';
         if (dbQuery.includes('075')) {
-          replaced = `OR ${searchCol} CONTAINS '${dbQuery.replace(/075/g, '094')}'`;
+          replaced = `OR ${searchCol} ${operator} '${dbQuery.replace(/075/g, '094')}'`;
         }
-        condition = `${searchCol} CONTAINS '${dbQuery}' ${replaced}`;
-        if (searchQuery.length < 3) {
-          order.push('v.FirstLetterLen');
+        condition = `${searchCol} ${operator} '${dbQuery}' ${replaced}`;
+        if (saniQuery.length < 3) {
+          order.push('FirstLetterLen');
         }
         break;
       }
@@ -46,16 +44,16 @@ module.exports = {
         } else {
           searchCol = 'English';
         }
-        const words = searchQuery.split(' ').map(word => `${searchCol} CONTAINS ${word}`);
+        const words = saniQuery.split(' ').map(word => `(${searchCol} CONTAINS[c] ' ${word}' OR ${searchCol} BEGINSWITH[c] '${word}')`);
         condition = words.join(' AND ');
         if (searchSource !== 'all') {
-          condition += ` AND v.SourceID = '${searchSource}'`;
+          condition += ` AND SourceID = '${searchSource}'`;
         }
         break;
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
-        dbQuery = parseInt(searchQuery, 10);
+        dbQuery = parseInt(saniQuery, 10);
         condition = `${searchCol} = ${dbQuery}`;
 
         switch (global.core.search.currentMeta.source) {
@@ -65,7 +63,7 @@ module.exports = {
             angSearchSourceId = global.core.search.currentMeta.source;
             break;
         }
-        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
+        condition = `${searchCol} = ${dbQuery} AND SourceID = '${angSearchSourceId}'`;
         break;
       default:
         break;
@@ -82,7 +80,9 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID) {
-    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
       if (rows.length > 0) {
         global.core.search.printShabad(rows, ShabadID, LineID || rows[0].ID);
       }
@@ -91,12 +91,13 @@ module.exports = {
 
   getAng(ShabadID) {
     return new Promise((resolve) => {
-      const query = `SELECT ${allColumns} WHERE s.ShabadID = ?`;
-      global.platform.db.get(query, [ShabadID],
-      (err, row) => {
+      Realm.open(realmDB.realmVerseSchema)
+        .then((realm) => {
+          const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
+          const { PageNo, SourceID } = row;
         resolve({
-          PageNo: row.PageNo,
-          SourceID: row.SourceID,
+            PageNo,
+            SourceID,
         });
       });
     });
@@ -116,8 +117,9 @@ module.exports = {
  */
   loadAng(PageNo, SourceID = 'G') {
     return new Promise((resolve, reject) => {
-      global.platform.db.all(`SELECT ${allColumns} WHERE PageNo = ${PageNo} AND SourceID = '${SourceID}'`,
-      (err, rows) => {
+      Realm.open(realmDB.realmVerseSchema)
+        .then((realm) => {
+          const rows = realm.objects('Verse').filtered('PageNo = $0 AND SourceID = $1', PageNo, SourceID);
         if (rows.length > 0) {
           resolve(rows);
         } else {
