@@ -163,10 +163,11 @@ module.exports = {
  */
   randomShabad(SourceID = 'G') {
     return new Promise((resolve) => {
-      global.platform.db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
-      [SourceID],
-      (err, row) => {
-        resolve(row.ShabadID);
+      Realm.open(realmDB.realmVerseSchema)
+        .then((realm) => {
+          const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
+          const row = rows[Math.floor(Math.random() * rows.length)];
+          resolve(row.Shabads[0].ShabadID);
       });
     });
   },
