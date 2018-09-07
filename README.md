@@ -18,7 +18,7 @@ SikhiToTheMax Desktop App
 
 Create the app package for your system:
 
- * **macOS** - Run `npm run pack:osx`
+ * **macOS** - Run `npm run pack:mac`
  * **Windows 64-bit** - Run `npm run pack:win`
  * **Windows 32-bit** - Run `npm run pack:win32`
  * **Linux/Ubuntu 64-bit** - Run `npm run pack:linux`
