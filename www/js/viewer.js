@@ -7,6 +7,8 @@
 */
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
+const Realm = require('realm');
+const realmDB = require('./js/realm-db');
 const scroll = require('scroll');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
@@ -307,8 +309,9 @@ function showLine(ShabadID, LineID) {
     smoothScroll(line);
     castShabadLine(LineID);
   } else {
-    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni, v.Punjabi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
-      (err, rows) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID = $0', newShabadID);
         createCards(rows, LineID)
           .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
       });

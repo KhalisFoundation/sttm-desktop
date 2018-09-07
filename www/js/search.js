@@ -503,7 +503,7 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
+              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
                                                   item),
             },
             resultNode,
