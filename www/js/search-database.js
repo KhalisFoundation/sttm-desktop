@@ -1,7 +1,7 @@
 const Realm = require('realm');
-const realmDB = require('./realm-db');
 
-const CONSTS = require('./constants.js');
+const realmDB = require('./realm-db');
+const CONSTS = require('./constants');
 
 module.exports = {
   search(searchQuery, searchType, searchSource) {
