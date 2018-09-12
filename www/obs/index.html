@@ -79,7 +79,6 @@
     };
 
     socket.on('show-line', function(request) {
-      console.log(request);
       overlayPrefs = request.overlayPrefs;
       writeLine(request.Line);
     });
