@@ -167,7 +167,7 @@ const decreaseBarSize = () => {
 const increasefontSize = () => {
   const size = overlayVars.fontSize;
   const gurbaniSize = overlayVars.gurbaniFontSize;
-  const newSize = size < 25 ? size + 1 : 25;
+  const newSize = size < 40 ? size + 1 : 40;
   updateSize(`${newSize}px`, 'fontSize');
   updateGurbaniSize(`${gurbaniSize}px`, 'fontSize');
   overlayVars.fontSize = newSize;
@@ -186,7 +186,7 @@ const decreasefontSize = () => {
 
 const increaseGurbanifontSize = () => {
   const size = overlayVars.gurbaniFontSize;
-  const newSize = size < 30 ? size + 1 : 30;
+  const newSize = size < 60 ? size + 1 : 60;
   updateGurbaniSize(`${newSize}px`, 'fontSize');
   overlayVars.gurbaniFontSize = newSize;
   savePrefs();
