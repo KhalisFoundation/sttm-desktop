@@ -1,10 +1,9 @@
 const Realm = require('realm');
-
 const realmDB = require('./realm-db');
 const CONSTS = require('./constants');
 
-module.exports = {
-  search(searchQuery, searchType, searchSource) {
+const query = (searchQuery, searchType, searchSource) => (
+  new Promise((resolve, reject) => {
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
@@ -13,6 +12,7 @@ module.exports = {
     // default source for ang search to GURU_GRANTH_SAHIB
     let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
+    let howManyRows = 20;
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
@@ -55,6 +55,7 @@ module.exports = {
       }
       case CONSTS.SEARCH_TYPES.ANG: // Ang
         searchCol = 'PageNo';
+        howManyRows = 1000;
         dbQuery = parseInt(saniQuery, 10);
         condition = `${searchCol} = ${dbQuery}`;
 
@@ -75,33 +76,38 @@ module.exports = {
     Realm.open(realmDB.realmVerseSchema)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition);
-        global.core.search.printResults(rows.slice(0, 20));
-      });
-  },
+        resolve(rows.slice(0, howManyRows));
+      })
+      .catch(reject);
+  })
+);
 
-  loadShabad(ShabadID, LineID) {
+const loadShabad = ShabadID => (
+  new Promise((resolve, reject) => {
     Realm.open(realmDB.realmVerseSchema)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
         if (rows.length > 0) {
-          global.core.search.printShabad(rows, ShabadID, LineID || rows[0].ID);
+          resolve(rows);
         }
-      });
-  },
+      })
+      .catch(reject);
+  })
+);
 
-  getAng(ShabadID) {
-    return new Promise((resolve) => {
-      Realm.open(realmDB.realmVerseSchema)
-        .then((realm) => {
-          const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
-          const { PageNo, SourceID } = row;
-          resolve({
-            PageNo,
-            SourceID,
-          });
+const getAng = ShabadID => (
+  new Promise((resolve) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
+        const { PageNo, SourceID } = row;
+        resolve({
+          PageNo,
+          SourceID,
         });
-    });
-  },
+      });
+  })
+);
 
 /**
  * Retrieve all lines from a page
@@ -115,19 +121,19 @@ module.exports = {
  * loadAng(1);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-  loadAng(PageNo, SourceID = 'G') {
-    return new Promise((resolve, reject) => {
-      Realm.open(realmDB.realmVerseSchema)
-        .then((realm) => {
-          const rows = realm.objects('Verse').filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
-          if (rows.length > 0) {
-            resolve(rows);
-          } else {
-            reject();
-          }
-        });
-    });
-  },
+const loadAng = (PageNo, SourceID = 'G') => (
+  new Promise((resolve, reject) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
+        if (rows.length > 0) {
+          resolve(rows);
+        } else {
+          reject();
+        }
+      });
+  })
+);
 
 /**
  * Retrieve Shabad for Verse
@@ -140,15 +146,15 @@ module.exports = {
  * getShabad(1);
  * // => 1
  */
-  getShabad(VerseID) {
-    return new Promise((resolve) => {
-      Realm.open(realmDB.realmVerseSchema)
-        .then((realm) => {
-          const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
-          resolve(shabad.Shabads[0].ShabadID);
-        });
-    });
-  },
+const getShabad = VerseID => (
+  new Promise((resolve) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
+        resolve(shabad.Shabads[0].ShabadID);
+      });
+  })
+);
 
 /**
  * Retrieve a random Shabad from a source
@@ -161,14 +167,24 @@ module.exports = {
  * randomShabad();
  * // => 13
  */
-  randomShabad(SourceID = 'G') {
-    return new Promise((resolve) => {
-      Realm.open(realmDB.realmVerseSchema)
-        .then((realm) => {
-          const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
-          const row = rows[Math.floor(Math.random() * rows.length)];
-          resolve(row.Shabads[0].ShabadID);
-        });
-    });
-  },
+const randomShabad = (SourceID = 'G') => (
+  new Promise((resolve) => {
+    Realm.open(realmDB.realmVerseSchema)
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
+        const row = rows[Math.floor(Math.random() * rows.length)];
+        resolve(row.Shabads[0].ShabadID);
+      });
+  })
+);
+
+// Re-export CONSTS for use in other areas
+module.exports = {
+  CONSTS,
+  query,
+  loadShabad,
+  getAng,
+  loadAng,
+  getShabad,
+  randomShabad,
 };
