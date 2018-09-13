@@ -178,6 +178,7 @@ const randomShabad = (SourceID = 'G') => (
   })
 );
 
+// Re-export CONSTS for use in other areas
 module.exports = {
   CONSTS,
   query,
