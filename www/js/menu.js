@@ -166,7 +166,8 @@ const hukamnamaButton = h(
       onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
           if (!error) {
-            goToShabadPage(response.shabadinfo.id);
+            const hukamShabadID = parseInt(response.shabadinfo.id, 10);
+            goToShabadPage(hukamShabadID);
           }
         });
       },
