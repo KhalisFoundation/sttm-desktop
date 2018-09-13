@@ -1,3 +1,5 @@
+const { randomShabad } = require('./banidb');
+
 const h = require('hyperscript');
 const settings = require('./settings');
 const getJSON = require('get-json');
@@ -133,7 +135,7 @@ const randomShabadButton = h(
     'a.random-shabad-button',
     {
       onclick: () => {
-        global.platform.search.randomShabad()
+        randomShabad()
           .then(goToShabadPage);
       } },
     h('i.fa.fa-random.list-icon'),
@@ -163,7 +165,9 @@ const hukamnamaButton = h(
     {
       onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
-          goToShabadPage(response.shabadinfo.id);
+          if (!error) {
+            goToShabadPage(response.shabadinfo.id);
+          }
         });
       },
     },

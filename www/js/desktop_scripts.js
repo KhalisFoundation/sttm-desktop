@@ -7,8 +7,6 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 
-const search = require('./search-database');
-
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
@@ -60,7 +58,6 @@ function checkForNotifcations() {
 
 module.exports = {
   ipc,
-  search,
   store,
 
   init() {
