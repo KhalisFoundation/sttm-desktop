@@ -464,7 +464,7 @@ module.exports = {
 
   sendLine(shabadID, lineID, Line) {
     global.webview.send('show-line', { shabadID, lineID });
-    const showLinePayload = { shabadID, lineID, Line, live: false };
+    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar') };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
