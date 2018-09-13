@@ -2,6 +2,18 @@ const Realm = require('realm');
 const realmDB = require('./realm-db');
 const CONSTS = require('./constants');
 
+/**
+ * Retrieve lines matching queries
+ *
+ * @param {string} searchQuery The string for which to search
+ * @param {number} searchType The type of search to execute
+ * @param {string} searchSource The one-letter SourceID (or 'all')
+ * @returns {array} Returns array of objects for each line
+ * @example
+ *
+ * search('jggsspp', 0, 'all');
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
 const query = (searchQuery, searchType, searchSource) => (
   new Promise((resolve, reject) => {
     let dbQuery = '';
@@ -82,6 +94,16 @@ const query = (searchQuery, searchType, searchSource) => (
   })
 );
 
+/**
+ * Retrieve all lines from a Shabad
+ *
+ * @param {number} ShabadID The specific Shabad to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadShabad(2776);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
 const loadShabad = ShabadID => (
   new Promise((resolve, reject) => {
     Realm.open(realmDB.realmVerseSchema)
@@ -95,6 +117,16 @@ const loadShabad = ShabadID => (
   })
 );
 
+/**
+ * Retrieve the Ang number and source for any given ShabadID
+ *
+ * @param {number} ShabadID The ShabadID for which to search
+ * @returns {object} Returns the PageNo and SourceID on which the ShabadID starts
+ * @example
+ *
+ * getAng(2776);
+ * // => { PageNo: 726, SourceID: 'G' }
+ */
 const getAng = ShabadID => (
   new Promise((resolve) => {
     Realm.open(realmDB.realmVerseSchema)
