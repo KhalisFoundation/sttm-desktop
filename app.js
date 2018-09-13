@@ -344,6 +344,19 @@ ipcMain.on('show-empty-slide', () => {
 });
 
 ipcMain.on('show-text', (event, arg) => {
+  const overlayPrefs = store.get('obs');
+  const textLine = {
+    Line: {
+      Gurmukhi: arg.isGurmukhi ? arg.text : '',
+      English: !arg.isGurmukhi ? arg.text : '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  const payload = Object.assign(textLine, overlayPrefs);
+
+  io.emit('show-line', payload);
+
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
   } else {
@@ -351,6 +364,9 @@ ipcMain.on('show-text', (event, arg) => {
       send: 'show-text',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 

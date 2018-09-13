@@ -14,11 +14,15 @@
 
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
     }
-    var writeLine = function(Line) {
-      document.querySelector('.o-gurbani').innerHTML = Line.Gurmukhi;
+    var writeLine = function(Line, larivaar) {
+      document.querySelector('.o-gurbani').innerHTML = larivaar ? Line.Gurmukhi.replace(/ /g, '') : Line.Gurmukhi;
       document.querySelector('.o-translation').innerHTML = Line.English;
       document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
       document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
+      applyOverlayPrefs();
+    };
+
+    var applyOverlayPrefs = function() {
       document.querySelectorAll('.content-bar').forEach((el) => {
         el.style.color = overlayPrefs.overlayVars.textColor;
         el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${overlayPrefs.overlayVars.bgOpacity})`;
@@ -39,7 +43,6 @@
           splitLayoutApply();
           break;
       }
-
     };
 
     var topLayoutApply = function() {
@@ -77,7 +80,7 @@
 
     socket.on('show-line', function(request) {
       overlayPrefs = request.overlayPrefs;
-      writeLine(request.Line);
+      writeLine(request.Line, request.larivaar);
     });
   </script>
 </head>
