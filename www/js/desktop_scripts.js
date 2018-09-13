@@ -103,7 +103,7 @@ module.exports = {
                       store.set('curDBHash', newestDBHash);
                       fs.unlinkSync(dbCompressed);
 
-                      // Delete pre-5.0 DB
+                      // Delete pre-realm DB
                       const oldDBs = ['data.db', 'sttmdesktop.db'];
                       oldDBs.forEach((oldDB) => {
                         const oldDBPath = path.resolve(userDataPath, oldDB);
