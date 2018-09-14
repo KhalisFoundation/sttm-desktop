@@ -1,4 +1,5 @@
 /* eslint-disable arrow-parens */
+const { CONSTS, query, getAng, loadAng, getShabad, loadShabad } = require('./banidb');
 
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
@@ -8,8 +9,6 @@ const pageNavJSON = require('./footer-left.json');
 const h = require('hyperscript');
 
 const { store } = require('electron').remote.require('./app');
-
-const CONSTS = require('./constants.js');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
@@ -472,7 +471,8 @@ module.exports = {
       searchQuery = this.$search.value;
     }
     if (searchQuery.length >= 1) {
-      global.platform.search.search(searchQuery, searchType, this.searchSource);
+      query(searchQuery, searchType, this.searchSource)
+        .then(rows => this.printResults(rows));
     } else {
       this.$results.innerHTML = '';
     }
@@ -503,7 +503,7 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.ShabadID, item.ID,
+              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
                                                   item),
             },
             resultNode,
@@ -570,21 +570,20 @@ module.exports = {
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv) {
-      global.platform.search
-        .getAng(ShabadID)
+      getAng(ShabadID)
         .then(ang => {
           currentMeta = ang;
-          return global.platform.search.loadAng(ang.PageNo, ang.SourceID);
+          return loadAng(ang.PageNo, ang.SourceID);
         })
         .then(rows => this.printShabad(rows, ShabadID, LineID));
     } else {
-      global.platform.search.loadShabad(ShabadID, LineID);
+      loadShabad(ShabadID, LineID)
+        .then(rows => this.printShabad(rows, ShabadID, LineID));
     }
   },
 
   loadAng(PageNo, SourceID) {
-    global.platform.search
-      .loadAng(PageNo, SourceID)
+    loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
   },
 
@@ -596,11 +595,16 @@ module.exports = {
     // Load the same shabad if on first or last shabad
     const PreviousVerseID = FirstLine === 1 ? FirstLine : FirstLine - 1;
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
-    global.platform.search.loadAdjacentShabad(
-      PreviousVerseID,
-      NextVerseID,
-      Forward,
-    );
+    const adjacentVerseID = Forward ? NextVerseID : PreviousVerseID;
+    let adjacentShabadID;
+    getShabad(adjacentVerseID)
+      .then(ShabadID => {
+        adjacentShabadID = ShabadID;
+        return loadShabad(ShabadID);
+      })
+      .then((rows) => {
+        this.printShabad(rows, adjacentShabadID);
+      });
   },
 
   printShabad(rows, ShabadID, LineID) {
