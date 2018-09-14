@@ -47,6 +47,9 @@ const query = (searchQuery, searchType, searchSource) => (
         if (saniQuery.length < 3) {
           order.push('FirstLetterLen');
         }
+        if (searchSource !== 'all') {
+          condition += ` AND Source.SourceID = '${searchSource}'`;
+        }
         break;
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
