@@ -609,12 +609,16 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
+    const shabadID = ShabadID || rows[0].Shabads[0].ShabadID;
     let mainLine;
     const shabad = this.$shabad;
+    const apv = document.body.classList.contains('akhandpaatt');
 
-    // remove currently printed shabad.
-    while (shabad.firstChild) {
-      shabad.removeChild(shabad.firstChild);
+    // remove currently printed shabad if not in apv mode.
+    if (!apv) {
+      while (shabad.firstChild) {
+        shabad.removeChild(shabad.firstChild);
+      }
     }
 
     rows.forEach((item) => {
@@ -630,7 +634,7 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
-            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID,
+            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
                            item.ID, item),
           },
           [
@@ -654,7 +658,7 @@ module.exports = {
       .offsetTop;
     this.$shabadContainer.scrollTop = curPankteeTop;
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(ShabadID, lineID, mainLine);
+    global.controller.sendLine(shabadID, lineID, mainLine);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');

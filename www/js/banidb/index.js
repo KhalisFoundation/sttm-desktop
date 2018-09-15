@@ -135,10 +135,10 @@ const getAng = ShabadID => (
     Realm.open(realmDB.realmVerseSchema)
       .then((realm) => {
         const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
-        const { PageNo, SourceID } = row;
+        const { PageNo, Source } = row;
         resolve({
           PageNo,
-          SourceID,
+          SourceID: Source.SourceID,
         });
       });
   })
