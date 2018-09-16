@@ -1,18 +1,16 @@
 const electron = require('electron');
-const AdmZip = require('adm-zip');
+const decompress = require('decompress');
+const decompressBzip2 = require('decompress-bzip2');
 const fs = require('fs');
 const isOnline = require('is-online');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
-const sqlite3 = require('sqlite3').verbose();
-
-const search = require('./search-database');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
+const dbPath = path.resolve(userDataPath, 'sttmdesktop.realm');
 
 const { store } = remote.require('./app');
 
@@ -60,7 +58,6 @@ function checkForNotifcations() {
 
 module.exports = {
   ipc,
-  search,
   store,
 
   init() {
@@ -82,39 +79,50 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request('https://banidb.com/databases/sttmdesktop.md5', (error, response, newestDBHash) => {
+        request('https://banidb.com/databases/sttmdesktop.realm.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbZip = path.resolve(userDataPath, 'sttmdesktop.zip');
-              progress(request('https://banidb.com/databases/sttmdesktop.zip'))
+              const dbCompressed = path.resolve(userDataPath, 'sttmdesktop.realm.bz2');
+              progress(request('https://banidb.com/databases/sttmdesktop.realm.bz2'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
                   global.core.search.updateDLProgress(state);
                 })
                 .on('end', () => {
-                  const zip = new AdmZip(dbZip);
-                  zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
-                  module.exports.initDB();
-                  store.set('curDBHash', newestDBHash);
-                  fs.unlinkSync(dbZip);
-                  // Delete pre-4.0 DB
-                  const oldDB = path.resolve(userDataPath, 'data.db');
-                  fs.access(oldDB, (err) => {
-                    if (!err) {
-                      fs.unlink(oldDB, (err1) => {
-                        if (err1) {
-                          // eslint-disable-next-line no-console
-                          console.log(`Could not delete old database: ${err1}`);
-                        }
+                  decompress(dbCompressed, userDataPath,
+                    {
+                      plugins: [
+                        decompressBzip2({ path: 'sttmdesktop.realm' }),
+                      ],
+                    })
+                    .then(() => {
+                      fs.chmodSync(dbPath, '755');
+                      module.exports.initDB();
+                      store.set('curDBHash', newestDBHash);
+                      fs.unlinkSync(dbCompressed);
+
+                      // Delete pre-realm DB
+                      const oldDBs = ['data.db', 'sttmdesktop.db'];
+                      oldDBs.forEach((oldDB) => {
+                        const oldDBPath = path.resolve(userDataPath, oldDB);
+                        fs.access(oldDBPath, (err) => {
+                          if (!err) {
+                            fs.unlink(oldDBPath, (err1) => {
+                              if (err1) {
+                                // eslint-disable-next-line no-console
+                                console.log(`Could not delete old database ${oldDB}: ${err1}`);
+                              }
+                            });
+                          }
+                        });
                       });
-                    }
-                  });
-                  const win = remote.getCurrentWindow();
-                  win.setProgressBar(-1);
+                      const win = remote.getCurrentWindow();
+                      win.setProgressBar(-1);
+                    });
                 })
-                .pipe(fs.createWriteStream(dbZip));
+                .pipe(fs.createWriteStream(dbCompressed));
             }
           }
         });
@@ -125,9 +133,6 @@ module.exports = {
   },
 
   initDB() {
-    const db = new sqlite3.Database(dbPath);
-    this.db = db;
-    search.db = db;
     if (global.core) {
       global.core.search.initSearch();
     }
@@ -159,8 +164,8 @@ function showTabContent(clickedTab) {
   tabContent.classList.add('active');
 }
 
-Array.prototype.forEach.call(allTabs, (element => {
-  element.addEventListener('click', event => {
+Array.prototype.forEach.call(allTabs, ((element) => {
+  element.addEventListener('click', (event) => {
     const clickedTab = event.currentTarget;
     const clickedTabId = event.currentTarget.id;
     const tabParent = event.currentTarget.parentElement;
@@ -190,9 +195,9 @@ const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize'
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
 
 if ($minimize) {
-  Array.prototype.forEach.call($minimize, (minimize => {
+  Array.prototype.forEach.call($minimize, ((minimize) => {
     minimize.addEventListener('click', () => {
-      Array.prototype.forEach.call($minimizeIcons, (element => {
+      Array.prototype.forEach.call($minimizeIcons, ((element) => {
         element.classList.toggle('disabled');
       }));
       document.getElementById('navigator').classList.toggle('minimized');

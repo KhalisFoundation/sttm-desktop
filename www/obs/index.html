@@ -14,11 +14,15 @@
 
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
     }
-    var writeLine = function(Line) {
-      document.querySelector('.o-gurbani').innerHTML = Line.Gurmukhi;
+    var writeLine = function(Line, larivaar) {
+      document.querySelector('.o-gurbani').innerHTML = larivaar ? Line.Gurmukhi.replace(/ /g, '') : Line.Gurmukhi;
       document.querySelector('.o-translation').innerHTML = Line.English;
       document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
       document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
+      applyOverlayPrefs();
+    };
+
+    var applyOverlayPrefs = function() {
       document.querySelectorAll('.content-bar').forEach((el) => {
         el.style.color = overlayPrefs.overlayVars.textColor;
         el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${overlayPrefs.overlayVars.bgOpacity})`;
@@ -39,7 +43,6 @@
           splitLayoutApply();
           break;
       }
-
     };
 
     var topLayoutApply = function() {
@@ -47,14 +50,14 @@
       document.querySelector('.o-gurbani').style.bottom = 'auto';
       document.querySelector('.o-teeka').style.display = 'none';
       document.querySelector('.o-transliteration').style.display = 'none';
-      document.querySelector('.o-translation').style.top =  `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-translation').style.top =  `${overlayPrefs.overlayVars.height + 22}px`;
       document.querySelector('.o-translation').style.bottom = 'auto';
     };
 
     var bottomLayoutApply = function() {
 
       document.querySelector('.o-gurbani').style.top = 'auto';
-      document.querySelector('.o-gurbani').style.bottom =  `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-gurbani').style.bottom =  `${overlayPrefs.overlayVars.height + 22}px`;
       document.querySelector('.o-translation').style.top = 'auto';
       document.querySelector('.o-translation').style.bottom = '0';
       document.querySelector('.o-teeka').style.display = 'none';
@@ -66,18 +69,18 @@
       document.querySelector('.o-gurbani').style.top = '0';
       document.querySelector('.o-gurbani').style.bottom = 'auto';
       document.querySelector('.o-teeka').style.display = 'block';
-      document.querySelector('.o-teeka').style.top = `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-teeka').style.top = `${overlayPrefs.overlayVars.height + 22}px`;
       document.querySelector('.o-teeka').style.bottom = 'auto';
       document.querySelector('.o-transliteration').style.display = 'block';
       document.querySelector('.o-transliteration').style.top = 'auto';
-      document.querySelector('.o-transliteration').style.bottom = `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-transliteration').style.bottom = `${overlayPrefs.overlayVars.height + 22}px`;
       document.querySelector('.o-translation').style.top = 'auto';
       document.querySelector('.o-translation').style.bottom = '0';
     };
 
     socket.on('show-line', function(request) {
       overlayPrefs = request.overlayPrefs;
-      writeLine(request.Line);
+      writeLine(request.Line, request.larivaar);
     });
   </script>
 </head>

@@ -125,7 +125,7 @@ autoUpdater.on('update-downloaded', () => {
     message: 'Update available.',
     detail: 'Update downloaded and ready to install',
     cancelId: 0,
-  }, response => {
+  }, (response) => {
     if (response === 1) {
       autoUpdater.quitAndInstall();
     }
@@ -150,7 +150,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach(i => {
+  Object.keys(displays).forEach((i) => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -344,6 +344,19 @@ ipcMain.on('show-empty-slide', () => {
 });
 
 ipcMain.on('show-text', (event, arg) => {
+  const overlayPrefs = store.get('obs');
+  const textLine = {
+    Line: {
+      Gurmukhi: arg.isGurmukhi ? arg.text : '',
+      English: !arg.isGurmukhi ? arg.text : '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  const payload = Object.assign(textLine, overlayPrefs);
+
+  io.emit('show-line', payload);
+
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
   } else {
@@ -351,6 +364,9 @@ ipcMain.on('show-text', (event, arg) => {
       send: 'show-text',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 
