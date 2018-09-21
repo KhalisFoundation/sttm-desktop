@@ -54,6 +54,10 @@ function addDisplayTab() {
       type: 'checkbox',
       value: option,
     };
+    if (option === 'akhandpaatt') {
+      switchListAttrs.disabled = store.get('userPrefs.slide-layout.display-options.disable-akhandpaatt');
+      switchListAttrs.title = 'Disabled during casting';
+    }
     if (userPrefs[catKey][settingKey][option]) {
       switchListAttrs.checked = true;
     }

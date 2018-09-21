@@ -7,6 +7,7 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
+const { store } = require('electron').remote.require('./app');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -298,6 +299,9 @@ module.exports = {
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(anandKarajButton);
     $listOfShabadOptions.appendChild(notificationButton);
+
+    // when the app is reloaded, enable the control for akhandpaatt
+    store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
     settings.init();
   },
 
