@@ -307,10 +307,30 @@ function createBroadcastFiles(arg) {
   }
 }
 
-ipcMain.on('show-line', (event, arg) => {
+let lastLine;
+const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
-  const payload = Object.assign(arg, overlayPrefs);
-  io.emit('show-line', payload);
+  const payload = Object.assign(line, overlayPrefs);
+  socket.emit('show-line', payload);
+};
+
+const updateOverlayVars = () => {
+  const overlayPrefs = store.get('obs');
+  io.emit('update-prefs', overlayPrefs);
+};
+
+ipcMain.on('update-overlay-vars', updateOverlayVars);
+
+io.on('connection', (socket) => {
+  updateOverlayVars();
+  if (lastLine) {
+    showLine(lastLine, socket);
+  }
+});
+
+ipcMain.on('show-line', (event, arg) => {
+  lastLine = arg;
+  showLine(arg);
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
@@ -325,7 +345,6 @@ ipcMain.on('show-line', (event, arg) => {
 });
 
 ipcMain.on('show-empty-slide', () => {
-  const overlayPrefs = store.get('obs');
   const emptyLine = {
     Line: {
       Gurmukhi: '',
@@ -334,17 +353,14 @@ ipcMain.on('show-empty-slide', () => {
       Transliteration: '',
     },
   };
-  const payload = Object.assign(emptyLine, overlayPrefs);
-
-  io.emit('show-line', payload);
-
+  showLine(emptyLine);
+  const overlayPrefs = store.get('obs');
   if (overlayPrefs.live) {
     createBroadcastFiles(emptyLine);
   }
 });
 
 ipcMain.on('show-text', (event, arg) => {
-  const overlayPrefs = store.get('obs');
   const textLine = {
     Line: {
       Gurmukhi: arg.isGurmukhi ? arg.text : '',
@@ -353,9 +369,7 @@ ipcMain.on('show-text', (event, arg) => {
       Transliteration: '',
     },
   };
-  const payload = Object.assign(textLine, overlayPrefs);
-
-  io.emit('show-line', payload);
+  showLine(textLine);
 
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
