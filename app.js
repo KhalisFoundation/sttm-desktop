@@ -322,7 +322,7 @@ const updateOverlayVars = () => {
 ipcMain.on('update-overlay-vars', updateOverlayVars);
 
 io.on('connection', (socket) => {
-    updateOverlayVars();
+  updateOverlayVars();
   if (lastLine) {
     showLine(lastLine, socket);
   }
