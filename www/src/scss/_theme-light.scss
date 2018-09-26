@@ -117,7 +117,7 @@ $base-text: #4e4e4e;
         color: $base-text;
 
         &:hover {
-          background-color: $nav-bg;
+          cursor: pointer;
         }
       }
     }
