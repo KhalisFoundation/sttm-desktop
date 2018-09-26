@@ -61,10 +61,16 @@ function addDisplayTab() {
     if (userPrefs[catKey][settingKey][option]) {
       switchListAttrs.checked = true;
     }
+    let optionLabel = setting.options[option];
+    let subLabel = false;
+    if (typeof setting.options[option] === 'object') {
+      optionLabel = setting.options[option].label;
+      subLabel = setting.options[option].subLabel;
+    }
     switchList.appendChild(
       h('li',
         [
-          h('span', setting.options[option]),
+          h('span', optionLabel),
           h('div.switch',
             [
               h(`input#${optionId}`,
@@ -72,6 +78,9 @@ function addDisplayTab() {
               h('label',
                 {
                   htmlFor: optionId })])]));
+    if (subLabel) {
+      switchList.appendChild(h('div.sub-label', subLabel));
+    }
   });
   document.getElementById('display-tab-content').appendChild(switchList);
 }
@@ -219,10 +228,16 @@ function createSettingsPage(userPrefs) {
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;
             }
+            let optionLabel = setting.options[option];
+            let subLabel = false;
+            if (typeof setting.options[option] === 'object') {
+              optionLabel = setting.options[option].label;
+              subLabel = setting.options[option].subLabel;
+            }
             switchList.appendChild(
               h('li',
                 [
-                  h('span', setting.options[option]),
+                  h('span', optionLabel),
                   h('div.switch',
                     [
                       h(`input#${optionId}`,
@@ -230,6 +245,9 @@ function createSettingsPage(userPrefs) {
                       h('label',
                         {
                           htmlFor: optionId })])]));
+            if (subLabel) {
+              switchList.appendChild(h('div.sub-label', subLabel));
+            }
           });
           settingCat.appendChild(switchList);
           break;

@@ -63,7 +63,10 @@
         "title": "Display Options",
         "type": "switch",
         "options": {
-          "akhandpaatt": "Akhand Paatth View (Beta)",
+          "akhandpaatt": {
+            "label": "Akhand Paatth View (Beta)",
+            "subLabel": "(Google ChromeCast Unavailable)"
+          },
           "larivaar": "Larivaar",
           "left-align": "Left-Align",
           "autoplay": "Auto Play",
