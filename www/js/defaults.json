@@ -18,7 +18,8 @@
       "fields": {
         "display-translation": true,
         "display-transliteration": true,
-        "display-teeka": true
+        "display-teeka": true,
+        "display-next-line": false
       },
       "font-sizes": {
         "gurbani": 9,
