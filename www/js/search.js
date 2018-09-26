@@ -48,8 +48,9 @@ const searchInputs = h('div#search-container', [
     },
     h('i.fa.fa-keyboard-o'),
   ),
-  h('div#search-bg'),
-  h('div#db-download-progress'),
+  h('div#search-bg', [
+    h('div#db-download-progress'),
+  ]),
 ]);
 
 // build the Gurmukhi keyboard and append to HTML
