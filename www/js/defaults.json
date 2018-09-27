@@ -52,9 +52,9 @@
         "bgColor": "#2c3e50",
         "bgOpacity": 1,
         "textColor": "#EAC445",
-        "height": 30,
-        "fontSize": 12,
-        "gurbaniFontSize": 15,
+        "padding": 0.5,
+        "fontSize": 3,
+        "gurbaniFontSize": 5,
         "gurbaniTextColor": "#EAC445",
         "showLogo": true
       },
