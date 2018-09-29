@@ -293,7 +293,8 @@ ipcMain.on('clear-apv', () => {
 });
 
 function createBroadcastFiles(arg) {
-  const userDataPath = electron.app.getPath('userData');
+  const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
+  const userDataPath = (liveFeedLocation === 'default' || !liveFeedLocation) ? electron.app.getPath('desktop') : liveFeedLocation;
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
   try {

@@ -2,6 +2,7 @@
 const electron = require('electron');
 
 const remote = electron.remote;
+const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
@@ -492,5 +493,21 @@ module.exports = {
 
   autoplay() {
     global.core.search.checkAutoPlay();
+  },
+
+  livefeed(val) {
+    if (val) {
+      dialog.showOpenDialog({
+        defaultPath: remote.app.getPath('desktop'),
+        properties: ['openDirectory'],
+      }, (path) => {
+        store.set('userPrefs.app.live-feed-location', path[0]);
+        const locationLabel = document.getElementsByClassName('sub-label livefeed');
+
+        for (let i = 0, len = locationLabel.length; i < len; i += 1) {
+          locationLabel[i].innerText = path;
+        }
+      });
+    }
   },
 };

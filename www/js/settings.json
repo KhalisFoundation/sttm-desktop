@@ -70,7 +70,12 @@
           "larivaar": "Larivaar",
           "left-align": "Left-Align",
           "autoplay": "Auto Play",
-          "livefeed": "Live Feed Text Files"
+          "livefeed": {
+            "label":"Live Feed Text Files",
+            "subLabel": {
+              "storepref": "userPrefs.app.live-feed-location"
+            }
+          }
         }
       },
       "autoplay-options": {

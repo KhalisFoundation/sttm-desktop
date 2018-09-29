@@ -66,7 +66,12 @@ function addDisplayTab() {
     if (typeof setting.options[option] === 'object') {
       optionLabel = setting.options[option].label;
       subLabel = setting.options[option].subLabel;
+
+      if (typeof subLabel === 'object') {
+        subLabel = store.get(subLabel.storepref);
+      }
     }
+
     switchList.appendChild(
       h('li',
         [
@@ -79,7 +84,7 @@ function addDisplayTab() {
                 {
                   htmlFor: optionId })])]));
     if (subLabel) {
-      switchList.appendChild(h('div.sub-label', subLabel));
+      switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
     }
   });
   document.getElementById('display-tab-content').appendChild(switchList);
@@ -228,12 +233,17 @@ function createSettingsPage(userPrefs) {
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;
             }
+
             let optionLabel = setting.options[option];
             let subLabel = false;
             if (typeof setting.options[option] === 'object') {
               optionLabel = setting.options[option].label;
               subLabel = setting.options[option].subLabel;
+              if (typeof subLabel === 'object') {
+                subLabel = store.get(subLabel.storepref);
+              }
             }
+
             switchList.appendChild(
               h('li',
                 [
@@ -246,7 +256,7 @@ function createSettingsPage(userPrefs) {
                         {
                           htmlFor: optionId })])]));
             if (subLabel) {
-              switchList.appendChild(h('div.sub-label', subLabel));
+              switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
             }
           });
           settingCat.appendChild(switchList);
