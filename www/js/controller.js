@@ -441,6 +441,9 @@ global.platform.ipc.on('cast-session-active', () => {
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
+  global.webview.send('clear-apv');
+  global.platform.ipc.send('clear-apv');
+
   document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
 });

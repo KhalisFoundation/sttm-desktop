@@ -59,19 +59,23 @@ const castToReceiver = () => {
 
 const castShabadLine = (lineID) => {
   document.querySelector('.viewer-controls').innerHTML = '';
-  castCur = decks[currentShabad][lineID];
-  let nextLine = '';
-  if (decks[currentShabad][lineID + 1]) {
-    nextLine = decks[currentShabad][lineID + 1].gurmukhi;
-  }
-  castCur.nextLine = nextLine;
-  castToReceiver();
+  // make sure that the deck is created before attempting to cast it.
+  if (decks && decks[currentShabad]) {
+    castCur = decks[currentShabad][lineID];
+    let nextLine = '';
+    if (decks[currentShabad][lineID + 1]) {
+      nextLine = decks[currentShabad][lineID + 1].gurmukhi;
+    }
+    castCur.nextLine = nextLine;
+    castToReceiver();
 
-  const activeSlide = document.querySelector('.deck.active .slide.active').children;
-  Array.prototype.forEach.call(activeSlide, ((element) => {
-    const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-    if (icons) document.querySelector('.viewer-controls').appendChild(icons);
-  }));
+
+    const activeSlide = document.querySelector('.deck.active .slide.active').children;
+    Array.prototype.forEach.call(activeSlide, ((element) => {
+      const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+      if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+    }));
+  }
 };
 
 const castText = (text, isGurmukhi) => {
@@ -293,7 +297,6 @@ const showLine = (ShabadID, LineID) => {
     } else {
       smoothScroll(`#apv #slide${LineID}`);
     }
-    castShabadLine(LineID);
   } else if (newShabadID in decks) {
     const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
     if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
