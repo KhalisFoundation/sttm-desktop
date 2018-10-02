@@ -2,7 +2,7 @@
 
 Originally developed by SHARE Charity UK, SikhiToTheMax has become a de facto standard for Keertans and Gurdwaras around the world to display Gurbani on screens for Sangat to join into the depth of Gurbani and translations.
 
-SikhiToTheMax is now developed by Khalis Foundation as Seva to the Panth and is working hard to ensure it lives up to its name.
+SikhiToTheMax is now developed by Khalis Foundation as Seva to the Panth and Khalis Foundation is working hard to ensure it lives up to its name.
 Khalis Foundation Sevadaars are currently working hard to build a newer version of SikhiToTheMax app using modern technologies.
 
 Download: https://khalisfoundation.org/portfolio/sikhitothemax/
