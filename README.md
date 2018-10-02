@@ -7,7 +7,7 @@ Khalis Foundation Sevadaars are currently working hard to build a newer version 
 
 Download: https://khalisfoundation.org/portfolio/sikhitothemax/
 
-Developer: Khalis Foundation and sevadars (see commiters for more details)
+Developer: Khalis Foundation and sevadars (see committers for more details)
 
 Acknowledgements: Bhai Tarsem Singh UK, SHARE UK, Khalis Foundation, Khalsa Foundation UK, Dr. Sant Singh Khalsa, Dr. Kulbir Singh Thind
 
