@@ -121,8 +121,6 @@ Array.from($titleButtons).forEach((el) => {
 });
 
 const allTabs = document.getElementsByClassName('nav-header-tab');
-const moreTabs = document.querySelector('.more-tabs');
-const sessionPage = document.querySelector('#session-page .block-list');
 
 function showTabContent(clickedTab) {
   document.querySelector('.nav-header-tab.active').classList.remove('active');
@@ -133,30 +131,11 @@ function showTabContent(clickedTab) {
 
 Array.prototype.forEach.call(allTabs, ((element) => {
   element.addEventListener('click', (event) => {
-    const clickedTab = event.currentTarget;
     const clickedTabId = event.currentTarget.id;
-    const tabParent = event.currentTarget.parentElement;
-    if (tabParent.classList.contains('more-tabs')) {
-      moreTabs.insertBefore(clickedTab, moreTabs.firstChild);
-    } else {
-      moreTabs.classList.remove('listview');
-    }
     showTabContent(clickedTabId);
     document.getElementById(clickedTabId).classList.add('active');
   });
 }));
-
-if (moreTabs) {
-  moreTabs.addEventListener('click', () => {
-    moreTabs.classList.toggle('listview');
-  });
-}
-
-if (sessionPage) {
-  sessionPage.addEventListener('click', () => {
-    moreTabs.classList.remove('listview');
-  });
-}
 
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
