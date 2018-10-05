@@ -27,6 +27,8 @@
       document.querySelector('.o-translation').innerHTML = Line.English;
       document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
       document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
+
+      document.querySelector('.overlay-wrapper').hidden = (Line.Gurmukhi === '' && Line.English === '');
     };
 
     var applyOverlayPrefs = function() {
