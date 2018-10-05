@@ -1,6 +1,4 @@
 const electron = require('electron');
-const decompress = require('decompress');
-const decompressBzip2 = require('decompress-bzip2');
 const fs = require('fs');
 const isOnline = require('is-online');
 const path = require('path');
@@ -90,38 +88,7 @@ module.exports = {
                   win.setProgressBar(state.percent);
                   global.core.search.updateDLProgress(state);
                 })
-                .on('end', () => {
-                  decompress(dbCompressed, userDataPath,
-                    {
-                      plugins: [
-                        decompressBzip2({ path: 'sttmdesktop.realm' }),
-                      ],
-                    })
-                    .then(() => {
-                      fs.chmodSync(dbPath, '755');
-                      module.exports.initDB();
-                      store.set('curDBHash', newestDBHash);
-                      fs.unlinkSync(dbCompressed);
-
-                      // Delete pre-realm DB
-                      const oldDBs = ['data.db', 'sttmdesktop.db'];
-                      oldDBs.forEach((oldDB) => {
-                        const oldDBPath = path.resolve(userDataPath, oldDB);
-                        fs.access(oldDBPath, (err) => {
-                          if (!err) {
-                            fs.unlink(oldDBPath, (err1) => {
-                              if (err1) {
-                                // eslint-disable-next-line no-console
-                                console.log(`Could not delete old database ${oldDB}: ${err1}`);
-                              }
-                            });
-                          }
-                        });
-                      });
-                      const win = remote.getCurrentWindow();
-                      win.setProgressBar(-1);
-                    });
-                })
+                .on('end', () => ipc.send('decompress', { dbCompressed, userDataPath, dbPath, newestDBHash }))
                 .pipe(fs.createWriteStream(dbCompressed));
             }
           }
