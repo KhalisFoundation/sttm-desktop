@@ -53,6 +53,7 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
+    "adm-zip": "^0.4.7",
     "copy-to-clipboard": "^3.0.8",
     "decompress": "^4.2.0",
     "decompress-bzip2": "^4.0.0",

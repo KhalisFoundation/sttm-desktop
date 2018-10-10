@@ -6,8 +6,6 @@ const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const decompress = require('decompress');
-const decompressBzip2 = require('decompress-bzip2');
 
 const expressApp = express();
 
@@ -409,38 +407,6 @@ ipcMain.on('update-settings', () => {
     viewerWindow.webContents.send('update-settings');
   }
   mainWindow.webContents.send('sync-settings');
-});
-
-ipcMain.on('decompress', ({ dbCompressed, userDataPath, dbPath, newestDBHash }) => {
-  decompress(dbCompressed, userDataPath,
-    {
-      plugins: [
-        decompressBzip2({ path: 'sttmdesktop.realm' }),
-      ],
-    })
-    .then(() => {
-      fs.chmodSync(dbPath, '755');
-      store.set('curDBHash', newestDBHash);
-      fs.unlinkSync(dbCompressed);
-
-      // Delete pre-realm DB
-      const oldDBs = ['data.db', 'sttmdesktop.db'];
-      oldDBs.forEach((oldDB) => {
-        const oldDBPath = path.resolve(userDataPath, oldDB);
-        fs.access(oldDBPath, (err) => {
-          if (!err) {
-            fs.unlink(oldDBPath, (err1) => {
-              if (err1) {
-                // eslint-disable-next-line no-console
-                console.log(`Could not delete old database ${oldDB}: ${err1}`);
-              }
-            });
-          }
-        });
-      });
-      const win = electron.getCurrentWindow();
-      win.setProgressBar(-1);
-    });
 });
 
 module.exports = {
