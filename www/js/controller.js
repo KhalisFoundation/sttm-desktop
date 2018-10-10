@@ -451,11 +451,6 @@ global.platform.ipc.on('cast-session-active', () => {
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.remove('presenter-view', 'scale-viewer');
-    store.setUserPref('app.layout.presenter-view', false);
-    global.core.platformMethod('updateSettings');
-  }
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
 
