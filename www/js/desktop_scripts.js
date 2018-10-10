@@ -91,7 +91,7 @@ module.exports = {
                 })
                 .on('end', () => {
                   const zip = new AdmZip(dbCompressed);
-                  zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
+                  zip.extractEntryTo('sttmdesktop.realm', userDataPath, true, true);
                   fs.chmodSync(dbPath, '755');
                   module.exports.initDB();
                   store.set('curDBHash', newestDBHash);
