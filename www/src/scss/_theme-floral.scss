@@ -124,6 +124,7 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
         color: $base-text;
 
         &:hover {
+          background-color: $nav-bg;
           cursor: pointer;
         }
       }
