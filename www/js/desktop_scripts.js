@@ -1,6 +1,5 @@
 const electron = require('electron');
-const decompress = require('decompress');
-const decompressBzip2 = require('decompress-bzip2');
+const extract = require('extract-zip');
 const fs = require('fs');
 const isOnline = require('is-online');
 const path = require('path');
@@ -83,44 +82,42 @@ module.exports = {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbCompressed = path.resolve(userDataPath, 'sttmdesktop.realm.bz2');
-              progress(request('https://banidb.com/databases/sttmdesktop.realm.bz2'))
+              const dbCompressed = path.resolve(userDataPath, 'sttmdesktop.realm.zip');
+              progress(request('https://banidb.com/databases/sttmdesktop.realm.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
                   global.core.search.updateDLProgress(state);
                 })
                 .on('end', () => {
-                  decompress(dbCompressed, userDataPath,
-                    {
-                      plugins: [
-                        decompressBzip2({ path: 'sttmdesktop.realm' }),
-                      ],
-                    })
-                    .then(() => {
-                      fs.chmodSync(dbPath, '755');
-                      module.exports.initDB();
-                      store.set('curDBHash', newestDBHash);
-                      fs.unlinkSync(dbCompressed);
+                  extract(dbCompressed, { dir: userDataPath }, (err0) => {
+                    if (err0) {
+                      // ToDo: Log errors
+                      console.log(err0);
+                    }
+                    fs.chmodSync(dbPath, '755');
+                    module.exports.initDB();
+                    store.set('curDBHash', newestDBHash);
+                    fs.unlinkSync(dbCompressed);
 
-                      // Delete pre-realm DB
-                      const oldDBs = ['data.db', 'sttmdesktop.db'];
-                      oldDBs.forEach((oldDB) => {
-                        const oldDBPath = path.resolve(userDataPath, oldDB);
-                        fs.access(oldDBPath, (err) => {
-                          if (!err) {
-                            fs.unlink(oldDBPath, (err1) => {
-                              if (err1) {
-                                // eslint-disable-next-line no-console
-                                console.log(`Could not delete old database ${oldDB}: ${err1}`);
-                              }
-                            });
-                          }
-                        });
+                    // Delete pre-realm DB
+                    const oldDBs = ['data.db', 'sttmdesktop.db'];
+                    oldDBs.forEach((oldDB) => {
+                      const oldDBPath = path.resolve(userDataPath, oldDB);
+                      fs.access(oldDBPath, (err) => {
+                        if (!err) {
+                          fs.unlink(oldDBPath, (err1) => {
+                            if (err1) {
+                              // eslint-disable-next-line no-console
+                              console.log(`Could not delete old database ${oldDB}: ${err1}`);
+                            }
+                          });
+                        }
                       });
-                      const win = remote.getCurrentWindow();
-                      win.setProgressBar(-1);
                     });
+                    const win = remote.getCurrentWindow();
+                    win.setProgressBar(-1);
+                  });
                 })
                 .pipe(fs.createWriteStream(dbCompressed));
             }
