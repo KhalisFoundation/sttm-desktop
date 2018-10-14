@@ -172,6 +172,7 @@ $highlight-text: #cfd8dc;
         color: $text-base;
 
         &:hover {
+          background-color: $bg-bright;
           cursor: pointer;
         }
       }
