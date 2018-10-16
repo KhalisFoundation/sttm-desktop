@@ -9,7 +9,9 @@ const progress = require('request-progress');
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbPath = path.resolve(userDataPath, 'sttmdesktop.realm');
+const dbName = 'sttmdesktop.realm';
+const dbCompressedName = `${dbName}.zip`;
+const dbPath = path.resolve(userDataPath, dbName);
 
 const { store } = remote.require('./app');
 
@@ -60,29 +62,27 @@ module.exports = {
   store,
 
   init() {
-    // Initialize DB right away if it exists
-    if (fs.existsSync(dbPath)) {
-      this.initDB();
-      // Check if there's a newer version
-      this.downloadLatestDB();
-    } else {
-      // Download the DB
-      this.downloadLatestDB(true);
-    }
+    // Check if there's a newer version
+    this.downloadLatestDB();
     checkForNotifcations();
   },
 
-  downloadLatestDB(force = false) {
-    if (force) {
-      global.core.search.$search.placeholder = 'Downloading database...';
-    }
+  downloadLatestDB() {
+    const dbExists = fs.existsSync(dbPath);
+    global.core.search.$search.placeholder = 'Checking for database update...';
     isOnline().then((online) => {
       if (online) {
         request('https://banidb.com/databases/sttmdesktop.realm.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
-            if (force || curDBHash !== newestDBHash) {
-              const dbCompressed = path.resolve(userDataPath, 'sttmdesktop.realm.zip');
+            // If the database already exists and the current hash matches the latest,
+            // initialize search
+            if (dbExists && curDBHash === newestDBHash) {
+              module.exports.initDB();
+            } else {
+              // Otherwise grab a new one
+              global.core.search.$search.placeholder = 'Downloading database...';
+              const dbCompressed = path.resolve(userDataPath, dbCompressedName);
               progress(request('https://banidb.com/databases/sttmdesktop.realm.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
@@ -123,7 +123,10 @@ module.exports = {
             }
           }
         });
-      } else if (force) {
+      } else if (dbExists) {
+        // If offline but the DB exists, initialize search
+        module.exports.initDB();
+      } else {
         global.core.search.offline(10);
       }
     });
