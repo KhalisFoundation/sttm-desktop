@@ -78,7 +78,7 @@ module.exports = {
 
   downloadLatestDB(force = false) {
     if (force) {
-      global.core.search.$search.placeholder = 'Checking for database update...';
+      global.core.search.$search.placeholder = 'Downloading database...';
     }
     isOnline().then((online) => {
       if (online) {
@@ -87,6 +87,7 @@ module.exports = {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
               const dbCompressed = path.resolve(userDataPath, dbCompressedName);
+              global.core.search.$search.placeholder = 'Downloading database...';
               progress(request('https://banidb.com/databases/sttmdesktop.realm.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
