@@ -34,6 +34,7 @@ const searchInputs = h('div#search-container', [
   h('span', 'Ang'),
   h('input#ang-input.gurmukhi', {
     type: 'number',
+    disabled: 'disabled',
     placeholder: '123',
     min: 1,
     max: 1430,
@@ -315,6 +316,7 @@ module.exports = {
   initSearch() {
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
+    this.$angSearch.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
     this.changeSearchSource(this.searchSource);

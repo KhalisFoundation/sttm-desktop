@@ -9,7 +9,11 @@ const progress = require('request-progress');
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbPath = path.resolve(userDataPath, 'sttmdesktop.realm');
+const dbName = 'sttmdesktop.realm';
+const dbCompressedName = `${dbName}.zip`;
+const dbPath = path.resolve(userDataPath, dbName);
+const newDBFolder = path.resolve(userDataPath, 'new-db');
+const newDBPath = path.resolve(newDBFolder, dbName);
 
 const { store } = remote.require('./app');
 
@@ -82,7 +86,8 @@ module.exports = {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbCompressed = path.resolve(userDataPath, 'sttmdesktop.realm.zip');
+              const dbCompressed = path.resolve(userDataPath, dbCompressedName);
+              global.core.search.$search.placeholder = 'Downloading database...';
               progress(request('https://banidb.com/databases/sttmdesktop.realm.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
@@ -90,16 +95,20 @@ module.exports = {
                   global.core.search.updateDLProgress(state);
                 })
                 .on('end', () => {
-                  extract(dbCompressed, { dir: userDataPath }, (err0) => {
+                  extract(dbCompressed, { dir: newDBFolder }, (err0) => {
                     if (err0) {
                       // ToDo: Log errors
+                      // eslint-disable-next-line no-console
                       console.log(err0);
                     }
-                    fs.chmodSync(dbPath, '755');
+                    fs.chmodSync(newDBPath, '755');
                     module.exports.initDB();
+                    // Save the hash for comparison next time
                     store.set('curDBHash', newestDBHash);
+                    // Delete compressed database
                     fs.unlinkSync(dbCompressed);
-
+                    // Replace current DB file with new version
+                    fs.renameSync(newDBPath, dbPath);
                     // Delete pre-realm DB
                     const oldDBs = ['data.db', 'sttmdesktop.db'];
                     oldDBs.forEach((oldDB) => {
