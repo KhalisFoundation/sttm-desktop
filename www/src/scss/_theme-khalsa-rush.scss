@@ -54,7 +54,8 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
     }
   }
 
-  .navigator-header {
+  .navigator-header,
+  .more-tabs .nav-header-tab {
     background-color: $statusbar-bg;
     color: $base-text;
   }
