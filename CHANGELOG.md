@@ -1,5 +1,21 @@
 ## SikhiToTheMax Desktop App
 
+### 4.2.0 - _181031_
+#### Improved
+* **Searching**: Your searches will be faster than ever thanks to our improved database.
+* **Bani Overlay** - 
+  * You can now Overlay with Lareevaar! 
+  * "Insert" slide options (custom slide, Waheguru slide, blank slide, etc) now appear on the overlay.
+  * The font for the English translation looks cooler.
+  * The overlaying padding and sizes are way smarter.
+* **Chromecast** - Spacing on ChromeCast now matches Presenter View preview
+* Moved the "Others" tab in Presenter View to a dedicated location rather than a drop-down
+* Bug Fixes
+* Style Fixes
+
+#### Added
+* **Live Feed** - Added ability to choose where you save Live Feed Text Files
+
 ### 4.1.0 - _180824_
 
 #### Improved
