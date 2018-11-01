@@ -7,7 +7,8 @@
       },
       "custom-theme-options": {
         "show-theme-editor": true
-      }
+      },
+      "live-feed-location": "default"
     },
     "searchResults": {
       "translationEnglish": "ssk",
@@ -18,7 +19,8 @@
       "fields": {
         "display-translation": true,
         "display-transliteration": true,
-        "display-teeka": true
+        "display-teeka": true,
+        "display-next-line": false
       },
       "font-sizes": {
         "gurbani": 9,
@@ -51,9 +53,9 @@
         "bgColor": "#2c3e50",
         "bgOpacity": 1,
         "textColor": "#EAC445",
-        "height": 30,
-        "fontSize": 12,
-        "gurbaniFontSize": 15,
+        "padding": 0.5,
+        "fontSize": 3,
+        "gurbaniFontSize": 5,
         "gurbaniTextColor": "#EAC445",
         "showLogo": true
       },
