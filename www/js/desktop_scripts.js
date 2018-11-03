@@ -2,6 +2,7 @@ const electron = require('electron');
 const extract = require('extract-zip');
 const fs = require('fs');
 const isOnline = require('is-online');
+const os = require('os');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
@@ -9,11 +10,33 @@ const progress = require('request-progress');
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const dbName = 'sttmdesktop.realm';
-const dbCompressedName = `${dbName}.zip`;
-const dbPath = path.resolve(userDataPath, dbName);
+const database = {
+  realm: {
+    dbCompressedName: 'sttmdesktop.realm.zip',
+    dbName: 'sttmdesktop.realm',
+    md5: 'sttmdesktop.realm.md5',
+  },
+  sqlite: {
+    dbCompressedName: 'sttmdesktop.zip',
+    dbName: 'sttmdesktop.db',
+    md5: 'sttmdesktop.md5',
+  },
+};
+
+let dbPlatform = 'realm';
+
+const platform = os.platform();
+if (platform === 'win32') {
+  const version = /\d+\.\d/.exec(os.release())[0];
+  if (version !== '6.3' && version !== '10.0') {
+    dbPlatform = 'sqlite';
+  }
+}
+
+
+const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
 const newDBFolder = path.resolve(userDataPath, 'new-db');
-const newDBPath = path.resolve(newDBFolder, dbName);
+const newDBPath = path.resolve(newDBFolder, database[dbPlatform].dbName);
 
 const { store } = remote.require('./app');
 
@@ -82,13 +105,15 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request('https://banidb.com/databases/sttmdesktop.realm.md5', (error, response, newestDBHash) => {
+        request(`https://banidb.com/databases/${database[dbPlatform].md5}`, (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbCompressed = path.resolve(userDataPath, dbCompressedName);
+              const dbCompressed = path.resolve(
+                userDataPath,
+                database[dbPlatform].dbCompressedName);
               global.core.search.$search.placeholder = 'Downloading database...';
-              progress(request('https://banidb.com/databases/sttmdesktop.realm.zip'))
+              progress(request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
@@ -109,8 +134,8 @@ module.exports = {
                     fs.unlinkSync(dbCompressed);
                     // Replace current DB file with new version
                     fs.renameSync(newDBPath, dbPath);
-                    // Delete pre-realm DB
-                    const oldDBs = ['data.db', 'sttmdesktop.db'];
+                    // Delete old DBs
+                    const oldDBs = ['data.db'];
                     oldDBs.forEach((oldDB) => {
                       const oldDBPath = path.resolve(userDataPath, oldDB);
                       fs.access(oldDBPath, (err) => {
