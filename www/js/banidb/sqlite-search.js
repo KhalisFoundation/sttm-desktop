@@ -81,7 +81,7 @@ const query = (searchQuery, searchType, searchSource) => (
         const words = saniQuery.split(' ').map(word => `(${searchCol} LIKE '% ${word}%' OR ${searchCol} LIKE '${word}%')`);
         condition = words.join(' AND ');
         if (searchSource !== 'all') {
-          condition += ` AND Source.SourceID = '${searchSource}'`;
+          condition += ` AND v.SourceID = '${searchSource}'`;
         }
         break;
       }
@@ -108,7 +108,12 @@ const query = (searchQuery, searchType, searchSource) => (
     db.all(q, (err, rows) => {
       if (err) {
         reject(err);
-      } else if (rows.length > 0) {
+      } else {
+        rows.map((row) => {
+          // eslint-disable-next-line no-param-reassign
+          row.Shabads = [{ ShabadID: row.ShabadID }];
+          return row;
+        });
         resolve(rows);
       }
     });
