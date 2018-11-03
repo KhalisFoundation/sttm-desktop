@@ -2,7 +2,6 @@ os: Visual Studio 2017
 branches:
   only:
     - release
-skip_non_tags: true
 cache:
   - '%USERPROFILE%\.electron'
 environment:

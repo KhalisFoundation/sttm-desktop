@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -76,6 +76,7 @@
     "request-progress": "^3.0.0",
     "scroll": "^2.0.1",
     "socket.io": "^2.1.1",
+    "sqlite3": "^4.0.3",
     "tippy.js": "^2.5.2",
     "update": "^0.7.4"
   },
