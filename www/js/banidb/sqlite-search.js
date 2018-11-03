@@ -7,6 +7,13 @@ const userDataPath = remote.app.getPath('userData');
 const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 
 let db;
+let initialized = false;
+
+
+const init = () => {
+  db = new sqlite3.Database(dbPath);
+  initialized = true;
+};
 
 const CONSTS = require('./constants');
 
@@ -30,6 +37,9 @@ LEFT JOIN Raag r USING(RaagID)`;
  */
 const query = (searchQuery, searchType, searchSource) => (
   new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
@@ -141,6 +151,9 @@ const query = (searchQuery, searchType, searchSource) => (
  */
 const loadShabad = ShabadID => (
   new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
     db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (err) {
         reject(err);
@@ -163,6 +176,9 @@ const loadShabad = ShabadID => (
  */
 const getAng = ShabadID => (
   new Promise((resolve) => {
+    if (!initialized) {
+      init();
+    }
     const q = `SELECT ${allColumns} WHERE s.ShabadID = ?`;
     db.get(q, [ShabadID],
       (err, row) => {
@@ -188,6 +204,9 @@ const getAng = ShabadID => (
  */
 const loadAng = (PageNo, SourceID = 'G') => (
   new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
     global.platform.db.all(`SELECT ${allColumns} WHERE PageNo = ${PageNo} AND SourceID = '${SourceID}'`,
       (err, rows) => {
         if (rows.length > 0) {
@@ -212,6 +231,9 @@ const loadAng = (PageNo, SourceID = 'G') => (
  */
 const getShabad = VerseID => (
   new Promise((resolve) => {
+    if (!initialized) {
+      init();
+    }
     db.get('SELECT ShabadID FROM Shabad WHERE VerseID = ?',
     [VerseID],
     (err, row) => {
@@ -233,6 +255,9 @@ const getShabad = VerseID => (
  */
 const randomShabad = (SourceID = 'G') => (
   new Promise((resolve) => {
+    if (!initialized) {
+      init();
+    }
     db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
       [SourceID],
       (err, row) => {
@@ -250,7 +275,4 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
-  init() {
-    db = new sqlite3.Database(dbPath);
-  },
 };

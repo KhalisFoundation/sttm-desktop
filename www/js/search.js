@@ -316,9 +316,6 @@ module.exports = {
   },
 
   initSearch() {
-    if (banidb.init) {
-      banidb.init();
-    }
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
     this.$angSearch.disabled = false;
