@@ -1,5 +1,6 @@
-/* eslint-disable arrow-parens */
-const { CONSTS, query, getAng, loadAng, getShabad, loadShabad } = require('./banidb');
+/* eslint-disable arrow-parens, global-require */
+const banidb = require('./banidb');
+const CONSTS = require('./banidb/constants');
 
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
@@ -314,6 +315,9 @@ module.exports = {
   },
 
   initSearch() {
+    if (banidb.init) {
+      banidb.init();
+    }
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
     this.$angSearch.disabled = false;
@@ -474,7 +478,7 @@ module.exports = {
       searchQuery = this.$search.value;
     }
     if (searchQuery.length >= 1) {
-      query(searchQuery, searchType, this.searchSource)
+      banidb.query(searchQuery, searchType, this.searchSource)
         .then(rows => this.printResults(rows));
     } else {
       this.$results.innerHTML = '';
@@ -573,20 +577,20 @@ module.exports = {
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv) {
-      getAng(ShabadID)
+      banidb.getAng(ShabadID)
         .then(ang => {
           currentMeta = ang;
-          return loadAng(ang.PageNo, ang.SourceID);
+          return banidb.loadAng(ang.PageNo, ang.SourceID);
         })
         .then(rows => this.printShabad(rows, ShabadID, LineID));
     } else {
-      loadShabad(ShabadID, LineID)
+      banidb.loadShabad(ShabadID, LineID)
         .then(rows => this.printShabad(rows, ShabadID, LineID));
     }
   },
 
   loadAng(PageNo, SourceID) {
-    loadAng(PageNo, SourceID)
+    banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
   },
 
@@ -600,10 +604,10 @@ module.exports = {
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
     const adjacentVerseID = Forward ? NextVerseID : PreviousVerseID;
     let adjacentShabadID;
-    getShabad(adjacentVerseID)
+    banidb.getShabad(adjacentVerseID)
       .then(ShabadID => {
         adjacentShabadID = ShabadID;
-        return loadShabad(ShabadID);
+        return banidb.loadShabad(ShabadID);
       })
       .then((rows) => {
         this.printShabad(rows, adjacentShabadID);

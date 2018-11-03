@@ -88,7 +88,7 @@ module.exports = {
 
   init() {
     // Initialize DB right away if it exists
-    if (fs.existsSync(dbPath)) {
+    if (fs.existsSync(dbPath) && fs.statSync(dbPath).size > 0) {
       this.initDB();
       // Check if there's a newer version
       this.downloadLatestDB();

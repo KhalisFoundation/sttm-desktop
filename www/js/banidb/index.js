@@ -15,7 +15,7 @@ if (!search) {
   search = require('./realm-search');
 }
 
-const { query, loadShabad, getAng, loadAng, getShabad, randomShabad } = search;
+const { query, loadShabad, getAng, loadAng, getShabad, randomShabad, init } = search;
 
 // Re-export CONSTS for use in other areas
 module.exports = {
@@ -26,4 +26,5 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  init,
 };

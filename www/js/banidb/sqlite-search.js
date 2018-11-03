@@ -1,5 +1,14 @@
+const sqlite3 = require('sqlite3').verbose();
+const electron = require('electron');
+const path = require('path');
+
+const { remote } = electron;
+const userDataPath = remote.app.getPath('userData');
+const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
+
+let db;
+
 const CONSTS = require('./constants');
-const db = require('./sqlite-db');
 
 const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
@@ -241,4 +250,7 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  init() {
+    db = new sqlite3.Database(dbPath);
+  },
 };
