@@ -1,6 +1,7 @@
-/* eslint-disable arrow-parens, global-require */
+/* eslint-disable arrow-parens */
 const banidb = require('./banidb');
-const CONSTS = require('./banidb/constants');
+
+const { CONSTS } = banidb;
 
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');

@@ -127,13 +127,13 @@ module.exports = {
                       console.log(err0);
                     }
                     fs.chmodSync(newDBPath, '755');
-                    module.exports.initDB();
                     // Save the hash for comparison next time
                     store.set('curDBHash', newestDBHash);
                     // Delete compressed database
                     fs.unlinkSync(dbCompressed);
                     // Replace current DB file with new version
                     fs.renameSync(newDBPath, dbPath);
+                    module.exports.initDB();
                     // Delete old DBs
                     const oldDBs = ['data.db'];
                     oldDBs.forEach((oldDB) => {
