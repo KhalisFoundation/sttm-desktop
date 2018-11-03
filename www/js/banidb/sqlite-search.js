@@ -1,0 +1,239 @@
+const CONSTS = require('./constants');
+const db = require('./sqlite-db');
+
+const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
+LEFT JOIN Writer w USING(WriterID)
+LEFT JOIN Raag r USING(RaagID)`;
+
+
+/**
+ * Retrieve lines matching queries
+ *
+ * @param {string} searchQuery The string for which to search
+ * @param {number} searchType The type of search to execute
+ * @param {string} searchSource The one-letter SourceID (or 'all')
+ * @returns {array} Returns array of objects for each line
+ * @example
+ *
+ * search('jggsspp', 0, 'all');
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const query = (searchQuery, searchType, searchSource) => (
+  new Promise((resolve, reject) => {
+    let dbQuery = '';
+    let searchCol = '';
+    let condition = '';
+    // Sanitize query
+    const saniQuery = searchQuery.trim().replace("'", "\\'");
+    // default source for ang search to GURU_GRANTH_SAHIB
+    let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
+    const order = [];
+    let howManyRows = 20;
+    switch (searchType) {
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
+        searchCol = 'v.FirstLetterStr';
+        for (let x = 0, len = saniQuery.length; x < len; x += 1) {
+          let charCode = saniQuery.charCodeAt(x);
+          if (charCode < 100) {
+            charCode = `0${charCode}`;
+          }
+          dbQuery += `,${charCode}`;
+        }
+
+        // Replace kh with kh pair bindi
+        let replaced = '';
+        if (dbQuery.includes('075')) {
+          replaced = dbQuery.replace(/075/g, '094');
+        }
+
+        // Use LIKE if anywhere, otherwise use operators
+        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) {
+          condition = `${searchCol} LIKE '%${dbQuery}%'`;
+          if (replaced) {
+            condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
+          }
+        } else {
+          condition = `(${searchCol} > '${dbQuery}' AND ${searchCol} < '${dbQuery},z')`;
+          if (replaced) {
+            condition += ` OR (${searchCol} > '${replaced}' AND ${searchCol} < '${replaced},z')`;
+          }
+        }
+        if (searchSource !== 'all') {
+          condition += `  AND v.SourceID = '${searchSource}'`;
+        }
+
+
+        // Give preference to shorter lines if searching for 1 or 2 words
+        if (searchQuery.length < 3) {
+          order.push('v.FirstLetterLen');
+        }
+        break;
+      }
+      case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
+      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
+        if (searchType === 2) {
+          searchCol = 'v.Gurmukhi';
+        } else {
+          searchCol = 'v.English';
+        }
+        const words = saniQuery.split(' ').map(word => `(${searchCol} LIKE '% ${word}%' OR ${searchCol} LIKE '${word}%')`);
+        condition = words.join(' AND ');
+        if (searchSource !== 'all') {
+          condition += ` AND Source.SourceID = '${searchSource}'`;
+        }
+        break;
+      }
+      case CONSTS.SEARCH_TYPES.ANG: // Ang
+        searchCol = 'PageNo';
+        howManyRows = 1000;
+        dbQuery = parseInt(saniQuery, 10);
+        condition = `${searchCol} = ${dbQuery}`;
+
+        switch (global.core.search.currentMeta.source) {
+          case null:
+            break;
+          default:
+            angSearchSourceId = global.core.search.currentMeta.source;
+            break;
+        }
+        condition = `${searchCol} = ${dbQuery} AND v.SourceID = '${angSearchSourceId}'`;
+        break;
+      default:
+        break;
+    }
+    order.push('s.ShabadID');
+    const q = `SELECT ${allColumns} WHERE ${condition} ORDER BY ${order.join()} LIMIT ${howManyRows}`;
+    db.all(q, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
+
+/**
+ * Retrieve all lines from a Shabad
+ *
+ * @param {number} ShabadID The specific Shabad to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadShabad(2776);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadShabad = ShabadID => (
+  new Promise((resolve, reject) => {
+    db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
+
+/**
+ * Retrieve the Ang number and source for any given ShabadID
+ *
+ * @param {number} ShabadID The ShabadID for which to search
+ * @returns {object} Returns the PageNo and SourceID on which the ShabadID starts
+ * @example
+ *
+ * getAng(2776);
+ * // => { PageNo: 726, SourceID: 'G' }
+ */
+const getAng = ShabadID => (
+  new Promise((resolve) => {
+    const q = `SELECT ${allColumns} WHERE s.ShabadID = ?`;
+    db.get(q, [ShabadID],
+      (err, row) => {
+        resolve({
+          PageNo: row.PageNo,
+          SourceID: row.SourceID,
+        });
+      });
+  })
+);
+
+/**
+ * Retrieve all lines from a page
+ *
+ * @since 3.3.0
+ * @param {number} PageNo Page number to get
+ * @param {string} [SourceID=G] Source from which to get
+ * @returns {array} Returns array of objects for each line
+ * @example
+ *
+ * loadAng(1);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadAng = (PageNo, SourceID = 'G') => (
+  new Promise((resolve, reject) => {
+    global.platform.db.all(`SELECT ${allColumns} WHERE PageNo = ${PageNo} AND SourceID = '${SourceID}'`,
+      (err, rows) => {
+        if (rows.length > 0) {
+          resolve(rows);
+        } else {
+          reject();
+        }
+      });
+  })
+);
+
+/**
+ * Retrieve Shabad for Verse
+ *
+ * @since 4.2.0
+ * @param {number} VerseID Verse to search
+ * @returns {number} Returns ShabadID as a Promise
+ * @example
+ *
+ * getShabad(1);
+ * // => 1
+ */
+const getShabad = VerseID => (
+  new Promise((resolve) => {
+    db.get('SELECT ShabadID FROM Shabad WHERE VerseID = ?',
+    [VerseID],
+    (err, row) => {
+      resolve(row.ShabadID);
+    });
+  })
+);
+
+/**
+ * Retrieve a random Shabad from a source
+ *
+ * @since 3.3.2
+ * @param {string} [SourceID=G] Source from which to get
+ * @returns {integer} Returns integer for ShabadID
+ * @example
+ *
+ * randomShabad();
+ * // => 13
+ */
+const randomShabad = (SourceID = 'G') => (
+  new Promise((resolve) => {
+    db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
+      [SourceID],
+      (err, row) => {
+        resolve(row.ShabadID);
+      });
+  })
+);
+
+// Re-export CONSTS for use in other areas
+module.exports = {
+  CONSTS,
+  query,
+  loadShabad,
+  getAng,
+  loadAng,
+  getShabad,
+  randomShabad,
+};
