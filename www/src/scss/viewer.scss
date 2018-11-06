@@ -80,7 +80,7 @@ body {
   position: absolute;
   transition: opacity 400ms ease-out;
   width: calc(100% - #{$viewer-padding} * 2);
-  z-index: 100;
+  z-index: 10;
 
   &.active {
     opacity: 1;
@@ -108,7 +108,7 @@ body {
   opacity: 0;
   position: absolute;
   width: 100%;
-  z-index: 100;
+  z-index: 10;
 
   &.active {
     opacity: 1;

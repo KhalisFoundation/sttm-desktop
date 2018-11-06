@@ -35,7 +35,6 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
-applyThemebg();
 
 // Synchronize scrolling to presenter window
 $scroll.addEventListener('wheel', () => {
@@ -98,6 +97,8 @@ const applyThemebg = () => {
     $body.classList.remove('show-overlay');
   }
 };
+
+applyThemebg();
 
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
