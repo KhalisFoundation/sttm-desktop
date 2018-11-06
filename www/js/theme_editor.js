@@ -1,34 +1,10 @@
 const h = require('hyperscript');
-// const fs = require('fs');
 const Noty = require('noty');
 const themes = require('./themes.json');
 
 const { store } = require('electron').remote.require('./app');
 
-// const imagesPath = 'assets/custom_backgrounds';
-
 const defaultTheme = themes[0];
-
-/* defaultTheme.bgImage = '';
-const getCurrentTheme = () => {
-  const currentThemeString = localStorage.getItem('customTheme');
-  if (currentThemeString) {
-    try {
-      return JSON.parse(currentThemeString);
-    } catch (error) {
-      new Noty({
-        type: 'error',
-        text: `There is an error reading current theme.
-        Try checking theme file for errors. If error persists,
-        report it at www.sttm.co`,
-        timeout: 3000,
-        modal: true,
-      }).show();
-      return defaultTheme;
-    }
-  }
-  return defaultTheme;
-}; */
 
 const swatchFactory = themeInstance =>
   h(
@@ -39,11 +15,13 @@ const swatchFactory = themeInstance =>
         'background-image': themeInstance['background-image'] ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})` : 'none',
       },
       onclick: () => {
-        // const newTheme = themeInstance;
-        // newTheme.bgImage = getCurrentTheme().bgImage;
         try {
           document.body.classList.remove(store.getUserPref('app.theme'));
           store.setUserPref('app.theme', themeInstance.key);
+          store.setUserPref('app.themebg', {
+            type: 'default',
+            url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
+          });
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
         } catch (error) {
@@ -67,37 +45,29 @@ const swatchFactory = themeInstance =>
       },
       themeInstance.name));
 
-/*
-const bgTileFactory = (bgImage) => {
-  const bgImageUrl = bgImage ? `url(../${imagesPath}/${bgImage})` : '';
-  return h(
-    'li.theme-instance',
-    {
-      style: {
-        'background-image': bgImageUrl,
-      },
-      onclick: () => {
-        const currentTheme = getCurrentTheme();
-        currentTheme.bgImage = bgImage;
-        try {
-          localStorage.setItem('customTheme', JSON.stringify(currentTheme));
-          global.core.platformMethod('updateTheme');
-        } catch (error) {
-          new Noty({
-            type: 'error',
-            text: `There is an error adding this background to current theme.
-            Try checking themes.json for errors. If error persists,
-            report it at www.sttm.co`,
-            timeout: 3000,
-            modal: true,
-          }).show();
-        }
-      },
-    },
-  );
-};
-*/
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
+
+const imageInput = () =>
+  h(
+    'label.file-input-label',
+    {
+      for: 'themebg-upload',
+    },
+    'Choose a file',
+    h('input.file-input#themebg-upload',
+      {
+        type: 'file',
+        accept: 'image/*',
+        onchange: (evt) => {
+          store.setUserPref('app.themebg', {
+            type: 'custom',
+            url: evt.target.files[0].path,
+          });
+          global.core.platformMethod('updateSettings');
+        },
+      },
+    ),
+  );
 
 module.exports = {
   defaultTheme,
@@ -125,12 +95,7 @@ module.exports = {
       }
     });
 
-    /* customThemeOptions.appendChild(swatchHeaderFactory('Custom Backgrounds'));
-    // customThemeOptions.appendChild(bgTileFactory(''));
-    fs.readdir(imagesPath, (err, images) => {
-      images.forEach((image) => {
-        customThemeOptions.appendChild(bgTileFactory(image));
-      });
-    }); */
+    themeOptions.appendChild(swatchHeaderFactory('Custom background'));
+    themeOptions.appendChild(imageInput());
   },
 };

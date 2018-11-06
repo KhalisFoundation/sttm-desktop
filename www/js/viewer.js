@@ -35,6 +35,7 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
+applyThemebg();
 
 // Synchronize scrolling to presenter window
 $scroll.addEventListener('wheel', () => {
@@ -84,6 +85,18 @@ const castText = (text, isGurmukhi) => {
   castCur.gurmukhi = text;
   castCur.larivaar = text;
   castToReceiver();
+};
+
+const applyThemebg = () => {
+  if (prefs.app.themebg.url) {
+    $body.style.backgroundImage = `url(${prefs.app.themebg.url})`;
+  }
+
+  if (prefs.app.themebg.type === 'custom') {
+    $body.classList.add('show-overlay');
+  } else {
+    $body.classList.remove('show-overlay');
+  }
 };
 
 // IPC
@@ -144,6 +157,7 @@ global.platform.ipc.on('update-settings', () => {
 
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
+  applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
 });
