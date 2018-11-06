@@ -31,3 +31,11 @@
   -webkit-user-select: none; /* Chrome/Safari/Opera */
   user-select: none;
 }
+
+.file-input {
+  display: none;
+}
+
+.file-input-label {
+  @extend .button;
+}

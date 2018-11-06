@@ -26,6 +26,7 @@
     "transliteration-color": "#413b3d",
     "teeka-color": "#723c03",
     "background-image": "thumbnails/golden.jpg",
+    "background-image-full": "golden.jpg",
     "type": "BACKGROUND",
     "key": "khalsa-gold"
   },
@@ -38,6 +39,7 @@
     "transliteration-color": "#f4f4f9",
     "teeka-color": "#d3ecff",
     "background-image": "thumbnails/dark-blue.jpg",
+    "background-image-full": "dark-blue.jpg",
     "type": "BACKGROUND",
     "key": "baagi-blue"
   },
@@ -49,6 +51,7 @@
     "transliteration-color": "#f7faf6",
     "teeka-color": "#433e5d",
     "background-image": "thumbnails/orange.jpg",
+    "background-image-full": "orange.jpg",
     "type": "BACKGROUND",
     "key": "khalsa-rush"
   },
@@ -60,6 +63,7 @@
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#d1dbe2",
     "background-image": "thumbnails/blue.jpg",
+    "background-image-full": "blue.jpg",
     "type": "BACKGROUND",
     "key": "moody-blue"
   },
@@ -72,6 +76,7 @@
     "transliteration-color": "#80878a",
     "teeka-color": "#033780",
     "background-image": "thumbnails/clouds.jpg",
+    "background-image-full": "clouds.jpg",
     "type": "BACKGROUND",
     "key": "a-new-day"
   },
@@ -83,6 +88,7 @@
     "transliteration-color": "#ededef",
     "teeka-color": "#d4d4d4",
     "background-image": "thumbnails/black.jpg",
+    "background-image-full": "black.jpg",
     "type": "BACKGROUND",
     "key": "black-blue"
   },
@@ -94,6 +100,7 @@
     "transliteration-color": "#a4244e",
     "teeka-color": "#484848",
     "background-image": "thumbnails/floral-bg.jpg",
+    "background-image-full": "floral-bg.jpg",
     "type": "BACKGROUND",
     "key": "floral"
   },
@@ -105,6 +112,7 @@
     "transliteration-color": "#ededef",
     "teeka-color": "#d4d4d4",
     "background-image": "thumbnails/blue-darbar.jpg",
+    "background-image-full": "blue-darbar.jpg",
     "type": "BACKGROUND",
     "key": "blue-darbar"
   },
