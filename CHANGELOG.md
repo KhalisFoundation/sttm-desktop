@@ -1,5 +1,8 @@
 ## SikhiToTheMax Desktop App
 
+### 4.2.2 - _181106_
+#### Roll backed to 4.1.0
+
 ### 4.2.1 - _181103_
 #### Improved
 * Bug Fixes for Windows 7 and 8 users. For the best Sikhi to the Max experience, consider updating to Windows 10. 
