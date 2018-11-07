@@ -2,80 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bani Overlay</title>
   <link rel="stylesheet" href="bundle.css">
   <script src="socket.io.js"></script>
 
   <script>
-    var previewData = {
-      Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
-      English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
-      PunjabiUni: 'ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।',
-      Transliteration: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
-    };
     var socket = io();
-    var preview = (document.location.href.indexOf('preview') > -1);
     var overlayPrefs;
     function hexToRgb(hex) {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
     }
-    var writeLine = function(Line, larivaar) {
-      document.querySelector('.o-gurbani').innerHTML = larivaar ? Line.Gurmukhi.replace(/ /g, '') : Line.Gurmukhi;
+    var writeLine = function(Line) {
+      document.querySelector('.o-gurbani').innerHTML = Line.Gurmukhi;
       document.querySelector('.o-translation').innerHTML = Line.English;
       document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
       document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
-
-      document.querySelector('.overlay-wrapper').hidden = (Line.Gurmukhi === '' && Line.English === '');
-    };
-
-    var applyOverlayPrefs = function() {
       document.querySelectorAll('.content-bar').forEach((el) => {
         el.style.color = overlayPrefs.overlayVars.textColor;
-        el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
-        el.style.paddingTop = `${overlayPrefs.overlayVars.padding}%`;
-        el.style.paddingBottom = `${overlayPrefs.overlayVars.padding}%`;
-      });
-      document.querySelectorAll('.content-top, .content-bottom').forEach((el) => {
         el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${overlayPrefs.overlayVars.bgOpacity})`;
+        el.style.height = `${overlayPrefs.overlayVars.height}px`;
+        el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}px`;
       });
-      document.querySelector('.o-gurbani').style.fontSize = `${overlayPrefs.overlayVars.gurbaniFontSize}vh`;
+      document.querySelector('.o-gurbani').style.fontSize = `${overlayPrefs.overlayVars.gurbaniFontSize}px`;
       document.querySelector('.o-gurbani').style.color = overlayPrefs.overlayVars.gurbaniTextColor;
 
-      document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
-      document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
+      switch (overlayPrefs.overlayVars.layout) {
+        case 'top':
+          topLayoutApply();
+          break;
+        case 'bottom':
+          bottomLayoutApply();
+          break;
+        case 'split':
+          splitLayoutApply();
+          break;
+      }
+
+    };
+
+    var topLayoutApply = function() {
+      document.querySelector('.o-gurbani').style.top = '0';
+      document.querySelector('.o-gurbani').style.bottom = 'auto';
+      document.querySelector('.o-teeka').style.display = 'none';
+      document.querySelector('.o-transliteration').style.display = 'none';
+      document.querySelector('.o-translation').style.top =  `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-translation').style.bottom = 'auto';
+    };
+
+    var bottomLayoutApply = function() {
+
+      document.querySelector('.o-gurbani').style.top = 'auto';
+      document.querySelector('.o-gurbani').style.bottom =  `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-translation').style.top = 'auto';
+      document.querySelector('.o-translation').style.bottom = '0';
+      document.querySelector('.o-teeka').style.display = 'none';
+      document.querySelector('.o-transliteration').style.display = 'none';
+    };
+
+    var splitLayoutApply = function() {
+
+      document.querySelector('.o-gurbani').style.top = '0';
+      document.querySelector('.o-gurbani').style.bottom = 'auto';
+      document.querySelector('.o-teeka').style.display = 'block';
+      document.querySelector('.o-teeka').style.top = `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-teeka').style.bottom = 'auto';
+      document.querySelector('.o-transliteration').style.display = 'block';
+      document.querySelector('.o-transliteration').style.top = 'auto';
+      document.querySelector('.o-transliteration').style.bottom = `${overlayPrefs.overlayVars.height + 12}px`;
+      document.querySelector('.o-translation').style.top = 'auto';
+      document.querySelector('.o-translation').style.bottom = '0';
     };
 
     socket.on('show-line', function(request) {
-      if (!preview) {
-        overlayPrefs = request.overlayPrefs;
-        writeLine(request.Line, request.larivaar);
-      }
-    });
-
-    socket.on('update-prefs', function(request) {
       overlayPrefs = request.overlayPrefs;
-      applyOverlayPrefs();
-    })
+      writeLine(request.Line);
+    });
   </script>
 </head>
-<body class="layout-bottom">
-  <section class="overlay-wrapper">
-    <div class="content-top">
+<body>
+    <section class="overlay-wrapper">
       <div class="content-bar gurmukhi o-gurbani"> </div>
-      <div class="content-bar o-teeka"> </div>
-    </div>
-    <div class="content-bottom">
-      <div class="content-bar o-transliteration"> </div>
       <div class="content-bar o-translation"> </div>
-    </div>
-  </section>
-  <script type="text/javascript">
-    if (preview) {
-      writeLine(previewData);
-    }
-  </script>
+      <div class="content-bar o-teeka"> </div>
+      <div class="content-bar o-transliteration"> </div>
+    </section>
 </body>
 </html>

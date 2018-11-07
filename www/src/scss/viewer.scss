@@ -228,9 +228,10 @@ h2 {
 .logo {
   display: none;
   height: 20%;
-  left: 12px;
+  left: 5%;
   position: fixed;
   top: 20%;
+  transform: translateX(-50%);
 
   path {
     fill: #c8c8c8;

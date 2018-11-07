@@ -6,7 +6,8 @@
     "node": true
   },
   "rules": {
-    "no-mixed-operators": "off"
+    "no-mixed-operators": "off",
+    "arrow-parens": "off"
   },
   "settings": {
     "import/core-modules": "electron"

@@ -1,42 +1,18 @@
 const electron = require('electron');
-const extract = require('extract-zip');
+const AdmZip = require('adm-zip');
 const fs = require('fs');
 const isOnline = require('is-online');
-const os = require('os');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
+const sqlite3 = require('sqlite3').verbose();
+
+const search = require('./search-database');
 
 const { remote } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
-const database = {
-  realm: {
-    dbCompressedName: 'sttmdesktop.realm.zip',
-    dbName: 'sttmdesktop.realm',
-    md5: 'sttmdesktop.realm.md5',
-  },
-  sqlite: {
-    dbCompressedName: 'sttmdesktop.zip',
-    dbName: 'sttmdesktop.db',
-    md5: 'sttmdesktop.md5',
-  },
-};
-
-let dbPlatform = 'realm';
-
-const platform = os.platform();
-if (platform === 'win32') {
-  const version = /\d+\.\d/.exec(os.release())[0];
-  if (version !== '6.3' && version !== '10.0') {
-    dbPlatform = 'sqlite';
-  }
-}
-
-
-const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
-const newDBFolder = path.resolve(userDataPath, 'new-db');
-const newDBPath = path.resolve(newDBFolder, database[dbPlatform].dbName);
+const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 
 const { store } = remote.require('./app');
 
@@ -84,11 +60,12 @@ function checkForNotifcations() {
 
 module.exports = {
   ipc,
+  search,
   store,
 
   init() {
     // Initialize DB right away if it exists
-    if (fs.existsSync(dbPath) && fs.statSync(dbPath).size > 0) {
+    if (fs.existsSync(dbPath)) {
       this.initDB();
       // Check if there's a newer version
       this.downloadLatestDB();
@@ -105,55 +82,39 @@ module.exports = {
     }
     isOnline().then((online) => {
       if (online) {
-        request(`https://banidb.com/databases/${database[dbPlatform].md5}`, (error, response, newestDBHash) => {
+        request('https://banidb.com/databases/sttmdesktop.md5', (error, response, newestDBHash) => {
           if (!error && response.statusCode === 200) {
             const curDBHash = store.get('curDBHash');
             if (force || curDBHash !== newestDBHash) {
-              const dbCompressed = path.resolve(
-                userDataPath,
-                database[dbPlatform].dbCompressedName);
-              global.core.search.$search.placeholder = 'Downloading database...';
-              progress(request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`))
+              const dbZip = path.resolve(userDataPath, 'sttmdesktop.zip');
+              progress(request('https://banidb.com/databases/sttmdesktop.zip'))
                 .on('progress', (state) => {
                   const win = remote.getCurrentWindow();
                   win.setProgressBar(state.percent);
                   global.core.search.updateDLProgress(state);
                 })
                 .on('end', () => {
-                  extract(dbCompressed, { dir: newDBFolder }, (err0) => {
-                    if (err0) {
-                      // ToDo: Log errors
-                      // eslint-disable-next-line no-console
-                      console.log(err0);
-                    }
-                    fs.chmodSync(newDBPath, '755');
-                    // Save the hash for comparison next time
-                    store.set('curDBHash', newestDBHash);
-                    // Delete compressed database
-                    fs.unlinkSync(dbCompressed);
-                    // Replace current DB file with new version
-                    fs.renameSync(newDBPath, dbPath);
-                    module.exports.initDB();
-                    // Delete old DBs
-                    const oldDBs = ['data.db'];
-                    oldDBs.forEach((oldDB) => {
-                      const oldDBPath = path.resolve(userDataPath, oldDB);
-                      fs.access(oldDBPath, (err) => {
-                        if (!err) {
-                          fs.unlink(oldDBPath, (err1) => {
-                            if (err1) {
-                              // eslint-disable-next-line no-console
-                              console.log(`Could not delete old database ${oldDB}: ${err1}`);
-                            }
-                          });
+                  const zip = new AdmZip(dbZip);
+                  zip.extractEntryTo('sttmdesktop.db', userDataPath, true, true);
+                  module.exports.initDB();
+                  store.set('curDBHash', newestDBHash);
+                  fs.unlinkSync(dbZip);
+                  // Delete pre-4.0 DB
+                  const oldDB = path.resolve(userDataPath, 'data.db');
+                  fs.access(oldDB, (err) => {
+                    if (!err) {
+                      fs.unlink(oldDB, (err1) => {
+                        if (err1) {
+                          // eslint-disable-next-line no-console
+                          console.log(`Could not delete old database: ${err1}`);
                         }
                       });
-                    });
-                    const win = remote.getCurrentWindow();
-                    win.setProgressBar(-1);
+                    }
                   });
+                  const win = remote.getCurrentWindow();
+                  win.setProgressBar(-1);
                 })
-                .pipe(fs.createWriteStream(dbCompressed));
+                .pipe(fs.createWriteStream(dbZip));
             }
           }
         });
@@ -164,6 +125,9 @@ module.exports = {
   },
 
   initDB() {
+    const db = new sqlite3.Database(dbPath);
+    this.db = db;
+    search.db = db;
     if (global.core) {
       global.core.search.initSearch();
     }
@@ -185,6 +149,8 @@ Array.from($titleButtons).forEach((el) => {
 });
 
 const allTabs = document.getElementsByClassName('nav-header-tab');
+const moreTabs = document.querySelector('.more-tabs');
+const sessionPage = document.querySelector('#session-page .block-list');
 
 function showTabContent(clickedTab) {
   document.querySelector('.nav-header-tab.active').classList.remove('active');
@@ -193,21 +159,40 @@ function showTabContent(clickedTab) {
   tabContent.classList.add('active');
 }
 
-Array.prototype.forEach.call(allTabs, ((element) => {
-  element.addEventListener('click', (event) => {
+Array.prototype.forEach.call(allTabs, (element => {
+  element.addEventListener('click', event => {
+    const clickedTab = event.currentTarget;
     const clickedTabId = event.currentTarget.id;
+    const tabParent = event.currentTarget.parentElement;
+    if (tabParent.classList.contains('more-tabs')) {
+      moreTabs.insertBefore(clickedTab, moreTabs.firstChild);
+    } else {
+      moreTabs.classList.remove('listview');
+    }
     showTabContent(clickedTabId);
     document.getElementById(clickedTabId).classList.add('active');
   });
 }));
 
+if (moreTabs) {
+  moreTabs.addEventListener('click', () => {
+    moreTabs.classList.toggle('listview');
+  });
+}
+
+if (sessionPage) {
+  sessionPage.addEventListener('click', () => {
+    moreTabs.classList.remove('listview');
+  });
+}
+
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
 
 if ($minimize) {
-  Array.prototype.forEach.call($minimize, ((minimize) => {
+  Array.prototype.forEach.call($minimize, (minimize => {
     minimize.addEventListener('click', () => {
-      Array.prototype.forEach.call($minimizeIcons, ((element) => {
+      Array.prototype.forEach.call($minimizeIcons, (element => {
         element.classList.toggle('disabled');
       }));
       document.getElementById('navigator').classList.toggle('minimized');

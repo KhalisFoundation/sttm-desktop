@@ -54,28 +54,13 @@ function addDisplayTab() {
       type: 'checkbox',
       value: option,
     };
-    if (option === 'akhandpaatt') {
-      switchListAttrs.disabled = store.get('userPrefs.slide-layout.display-options.disable-akhandpaatt');
-      switchListAttrs.title = 'Disabled during casting';
-    }
     if (userPrefs[catKey][settingKey][option]) {
       switchListAttrs.checked = true;
     }
-    let optionLabel = setting.options[option];
-    let subLabel = false;
-    if (typeof setting.options[option] === 'object') {
-      optionLabel = setting.options[option].label;
-      subLabel = setting.options[option].subLabel;
-
-      if (typeof subLabel === 'object') {
-        subLabel = store.get(subLabel.storepref);
-      }
-    }
-
     switchList.appendChild(
       h('li',
         [
-          h('span', optionLabel),
+          h('span', setting.options[option]),
           h('div.switch',
             [
               h(`input#${optionId}`,
@@ -83,9 +68,6 @@ function addDisplayTab() {
               h('label',
                 {
                   htmlFor: optionId })])]));
-    if (subLabel) {
-      switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
-    }
   });
   document.getElementById('display-tab-content').appendChild(switchList);
 }
@@ -233,21 +215,10 @@ function createSettingsPage(userPrefs) {
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;
             }
-
-            let optionLabel = setting.options[option];
-            let subLabel = false;
-            if (typeof setting.options[option] === 'object') {
-              optionLabel = setting.options[option].label;
-              subLabel = setting.options[option].subLabel;
-              if (typeof subLabel === 'object') {
-                subLabel = store.get(subLabel.storepref);
-              }
-            }
-
             switchList.appendChild(
               h('li',
                 [
-                  h('span', optionLabel),
+                  h('span', setting.options[option]),
                   h('div.switch',
                     [
                       h(`input#${optionId}`,
@@ -255,9 +226,6 @@ function createSettingsPage(userPrefs) {
                       h('label',
                         {
                           htmlFor: optionId })])]));
-            if (subLabel) {
-              switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
-            }
           });
           settingCat.appendChild(switchList);
           break;

@@ -46,7 +46,6 @@ $bg-bright: #424242;
 $text-base: #bdbdbd;
 $text-bright: #e0e0e0;
 $text-dim: #9e9e9e;
-$text-inactive: rgba(189, 189, 189, 0.5);
 $border: #424242;
 $scrollbar: #999;
 $white: #fff;
@@ -72,14 +71,6 @@ $highlight-text: #cfd8dc;
   .more-tabs .nav-header-tab {
     background-color: $bg-main;
     color: $text-base;
-  }
-
-  .nav-header-tab {
-    color: $text-inactive;
-
-    &.active {
-      color: $text-base;
-    }
   }
 
   #gurmukhi-keyboard {
@@ -174,7 +165,6 @@ $highlight-text: #cfd8dc;
 
         &:hover {
           background-color: $bg-bright;
-          cursor: pointer;
         }
       }
     }
