@@ -1,3 +1,5 @@
+const { randomShabad } = require('./banidb');
+
 const h = require('hyperscript');
 const settings = require('./settings');
 const getJSON = require('get-json');
@@ -5,7 +7,7 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
-const debounce = require('lodash.debounce');
+const { store } = require('electron').remote.require('./app');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -134,7 +136,7 @@ const randomShabadButton = h(
     'a.random-shabad-button',
     {
       onclick: () => {
-        global.platform.search.randomShabad()
+        randomShabad()
           .then(goToShabadPage);
       } },
     h('i.fa.fa-random.list-icon'),
@@ -144,7 +146,7 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: debounce(() => { goToShabadPage(2897); }, 500, { leading: true }),
+      onclick: () => { goToShabadPage(2897); },
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
@@ -162,11 +164,15 @@ const hukamnamaButton = h(
   h(
     'a.hukamnama-button',
     {
-      onclick: debounce(() => {
+      onclick: () => {
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
-          goToShabadPage(response.shabadinfo.id);
+          if (!error) {
+            const hukamShabadID = parseInt(response.shabadinfo.id, 10);
+            goToShabadPage(hukamShabadID);
+          }
         });
-      }, 500, { leading: true }) },
+      },
+    },
     h('i.fa.fa-gavel.list-icon'),
     'Daily Hukamnama'));
 
@@ -293,6 +299,9 @@ module.exports = {
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(anandKarajButton);
     $listOfShabadOptions.appendChild(notificationButton);
+
+    // when the app is reloaded, enable the control for akhandpaatt
+    store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
     settings.init();
   },
 
