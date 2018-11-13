@@ -49,62 +49,37 @@
 
   .nav-header-tab {
     cursor: pointer;
-    display: inline-block;
-    font-size: 0;
     height: 100%;
+    opacity: 0.5;
     padding: 0 10px;
-    position: relative;
-
-    i {
-      font-size: 16px;
-    }
 
     @extend .nav-header-text;
 
     &.active {
-      color: rgb(78, 78, 78);
+      opacity: 1;
     }
+  }
 
-    &::after {
-      background-color: #000;
-      border: 1px solid #333;
-      border-radius: 8px;
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
-      color: #fff;
-      content: attr(data-title);
-      display: none;
-      font-size: 16px;
-      left: 50%;
-      line-height: 1;
-      padding: 10px 20px;
+  .more-tabs.listview {
+    overflow: inherit;
+    z-index: 20;
+
+    .nav-header-tab {
+      opacity: 1;
+    }
+  }
+
+  .more-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-right: 6px;
+    position: relative;
+
+    .more-icon {
       position: absolute;
-      top: -15px;
-      transform: translate(-50%, -100%);
-      z-index: 999;
-    }
-
-    &::before {
-      background-color: #000;
-      border: 1px solid #333;
-      border-left-width: 0;
-      border-top-width: 0;
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
-      content: '';
-      display: none;
-      height: 12px;
-      left: 50%;
-      position: absolute;
-      top: -15px;
-      transform: translate(-50%, -50%) rotate(45deg);
-      width: 12px;
-      z-index: 1000;
-    }
-
-    &:hover {
-      &::after,
-      &::before {
-        display: block;
-      }
+      right: 0;
     }
   }
 
@@ -155,14 +130,7 @@
 }
 
 .presenter-view.scale-viewer .nav-header-tab {
-  @media screen and (min-width: 1040px) {
-    font-size: inherit;
-
-    &:hover {
-      &::after,
-      &::before {
-        display: none;
-      }
-    }
+  @media screen and (max-width: 900px) {
+    font-size: 14px;
   }
 }

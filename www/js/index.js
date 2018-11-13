@@ -41,7 +41,7 @@ function spaceBar(e) {
 
   if (mainLineID === currentLineId) {
     let done = false;
-    search.$shabad.querySelectorAll('a.panktee').forEach((item) => {
+    search.$shabad.querySelectorAll('a.panktee').forEach(item => {
       if (!item.classList.contains(['seen_check']) && !done) {
         newLineId = item.dataset.lineId;
         done = true;

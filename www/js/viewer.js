@@ -5,8 +5,6 @@
   no-use-before-define: 0,
   no-undef: 0
 */
-const { loadAng, getAng, loadShabad } = require('./js/banidb');
-
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -46,45 +44,41 @@ $scroll.addEventListener('wheel', () => {
   passive: true,
 });
 
-const hideDecks = () => {
+function hideDecks() {
   Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.remove('active');
   });
-};
+}
 
-const castToReceiver = () => {
+function castToReceiver() {
   castCur.prefs = store.get('userPrefs');
   sendMessage(JSON.stringify(castCur));
-};
+}
 
-const castShabadLine = (lineID) => {
+function castShabadLine(lineID) {
   document.querySelector('.viewer-controls').innerHTML = '';
-  // make sure that the deck is created before attempting to cast it.
-  if (decks && decks[currentShabad]) {
-    castCur = decks[currentShabad][lineID];
-    let nextLine = '';
-    if (decks[currentShabad][lineID + 1]) {
-      nextLine = decks[currentShabad][lineID + 1].gurmukhi;
-    }
-    castCur.nextLine = nextLine;
-    castToReceiver();
-
-
-    const activeSlide = document.querySelector('.deck.active .slide.active').children;
-    Array.prototype.forEach.call(activeSlide, ((element) => {
-      const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-      if (icons) document.querySelector('.viewer-controls').appendChild(icons);
-    }));
+  castCur = decks[currentShabad][lineID];
+  let nextLine = '';
+  if (decks[currentShabad][lineID + 1]) {
+    nextLine = decks[currentShabad][lineID + 1].gurmukhi;
   }
-};
+  castCur.nextLine = nextLine;
+  castToReceiver();
 
-const castText = (text, isGurmukhi) => {
+  const activeSlide = document.querySelector('.deck.active .slide.active').children;
+  Array.prototype.forEach.call(activeSlide, (element => {
+    const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+    if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+  }));
+}
+
+function castText(text, isGurmukhi) {
   castCur = {};
   castCur.showInEnglish = isGurmukhi !== true;
   castCur.gurmukhi = text;
   castCur.larivaar = text;
   castToReceiver();
-};
+}
 
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
@@ -148,14 +142,14 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
-const nextAng = () => {
+function nextAng() {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
   showAng(next, apvCur.SourceID);
   global.platform.ipc.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
-};
+}
 
-const createAPVContainer = () => {
+function createAPVContainer() {
   if (!$apv) {
     $apv = document.createElement('div');
     $apv.id = 'apv';
@@ -169,7 +163,7 @@ const createAPVContainer = () => {
     hideDecks();
     $apv.classList.add('active');
   }
-};
+}
 
 const iconsetHtml = (classname, content) => {
   let icons;
@@ -192,48 +186,50 @@ const iconsetHtml = (classname, content) => {
   return icons;
 };
 
-const createCards = (rows, LineID) => new Promise((resolve) => {
-  if (rows.length > 0) {
-    const cards = [];
-    const lines = [];
-    const shabad = {};
-    rows.forEach((row) => {
-      lines.push(row.ID);
-      const gurmukhiShabads = row.Gurmukhi.split(' ');
-      const taggedGurmukhi = [];
-      gurmukhiShabads.forEach((val, index) => {
-        if (val.indexOf(']') !== -1) {
-          taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-        } else {
-          taggedGurmukhi[index] = val;
-        }
+function createCards(rows, LineID) {
+  return new Promise((resolve) => {
+    if (rows.length > 0) {
+      const cards = [];
+      const lines = [];
+      const shabad = {};
+      rows.forEach((row) => {
+        lines.push(row.ID);
+        const gurmukhiShabads = row.Gurmukhi.split(' ');
+        const taggedGurmukhi = [];
+        gurmukhiShabads.forEach((val, index) => {
+          if (val.indexOf(']') !== -1) {
+            taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+          } else {
+            taggedGurmukhi[index] = val;
+          }
+        });
+        const gurmukhiContainer = document.createElement('div');
+
+        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
+                                       <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+        cards.push(
+          h(
+            `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
+            [
+              h('h1.gurbani.gurmukhi', gurmukhiContainer),
+              h('h2.translation', row.English),
+              h('h2.teeka', row.PunjabiUni),
+              h('h2.transliteration', row.Transliteration),
+            ]));
+        shabad[row.ID] = {
+          gurmukhi: row.Gurmukhi,
+          larivaar: taggedGurmukhi.join('<wbr>'),
+          translation: row.English,
+          teeka: row.Punjabi,
+          transliteration: row.Transliteration,
+        };
       });
-      const gurmukhiContainer = document.createElement('div');
+      resolve({ cards, lines, shabad });
+    }
+  });
+}
 
-      gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
-                                      <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-      cards.push(
-        h(
-          `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
-          [
-            h('h1.gurbani.gurmukhi', gurmukhiContainer),
-            h('h2.translation', row.English),
-            h('h2.teeka', row.PunjabiUni),
-            h('h2.transliteration', row.Transliteration),
-          ]));
-      shabad[row.ID] = {
-        gurmukhi: row.Gurmukhi,
-        larivaar: taggedGurmukhi.join('<wbr>'),
-        translation: row.English,
-        teeka: row.Punjabi,
-        transliteration: row.Transliteration,
-      };
-    });
-    resolve({ cards, lines, shabad });
-  }
-});
-
-const createDeck = (cards, curSlide, shabad, ShabadID) => {
+function createDeck(cards, curSlide, shabad, ShabadID) {
   document.querySelector('.vc-toggle-icon').style.left = '0';
   hideDecks();
   if (document.querySelector('.vc-open')) {
@@ -245,10 +241,10 @@ const createDeck = (cards, curSlide, shabad, ShabadID) => {
   currentShabad = parseInt(ShabadID, 10);
   decks[ShabadID] = shabad;
   castShabadLine(curSlide);
-};
+}
 
-const showAng = (PageNo, SourceID, LineID) => {
-  loadAng(PageNo, SourceID)
+function showAng(PageNo, SourceID, LineID) {
+  global.platform.search.loadAng(PageNo, SourceID)
     .then(res => createCards(res, LineID))
     .then(({ cards, lines }) => {
       apvCur.PageNo = PageNo;
@@ -265,9 +261,9 @@ const showAng = (PageNo, SourceID, LineID) => {
         setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
       }
     });
-};
+}
 
-const smoothScroll = (pos = 0) => {
+function smoothScroll(pos = 0) {
   let newScrollPos;
   switch (typeof pos) {
     case 'object':
@@ -281,9 +277,9 @@ const smoothScroll = (pos = 0) => {
       break;
   }
   scroll.top($body, newScrollPos);
-};
+}
 
-const showLine = (ShabadID, LineID) => {
+function showLine(ShabadID, LineID) {
   if (!global.platform.db) {
     global.platform.initDB();
   }
@@ -291,12 +287,13 @@ const showLine = (ShabadID, LineID) => {
   if (apv) {
     createAPVContainer();
     if (!apvCur.ShabadID || apvCur.ShabadID !== ShabadID) {
-      getAng(ShabadID)
+      global.platform.search.getAng(ShabadID)
         .then(ang => showAng(ang.PageNo, ang.SourceID, LineID));
       apvCur.ShabadID = ShabadID;
     } else {
       smoothScroll(`#apv #slide${LineID}`);
     }
+    castShabadLine(LineID);
   } else if (newShabadID in decks) {
     const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
     if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
@@ -310,13 +307,15 @@ const showLine = (ShabadID, LineID) => {
     smoothScroll(line);
     castShabadLine(LineID);
   } else {
-    loadShabad(newShabadID)
-      .then(rows => createCards(rows, LineID))
-      .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
+    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni, v.Punjabi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
+      (err, rows) => {
+        createCards(rows, LineID)
+          .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
+      });
   }
-};
+}
 
-const showText = (text, isGurmukhi = false) => {
+function showText(text, isGurmukhi = false) {
   hideDecks();
   $message.classList.add('active');
   while ($message.firstChild) {
@@ -325,16 +324,16 @@ const showText = (text, isGurmukhi = false) => {
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
   castText(text, isGurmukhi);
-};
+}
 
-const toggleSideMenu = () => {
-  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach((el) => {
+function toggleSideMenu() {
+  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach(el => {
     el.classList.toggle('vc-icon-hidden');
   });
-  Array.from(document.querySelectorAll('.deck')).forEach((el) => {
+  Array.from(document.querySelectorAll('.deck')).forEach(el => {
     el.classList.toggle('vc-open');
   });
   document.querySelector('.viewer-controls').classList.toggle('viewer-controls-open');
-};
+}
 
 document.querySelector('.vc-toggle-icon').onclick = toggleSideMenu;

@@ -63,19 +63,11 @@
         "title": "Display Options",
         "type": "switch",
         "options": {
-          "akhandpaatt": {
-            "label": "Akhand Paatth View (Beta)",
-            "subLabel": "(Google ChromeCast Unavailable)"
-          },
+          "akhandpaatt": "Akhand Paatth View (Beta)",
           "larivaar": "Larivaar",
           "left-align": "Left-Align",
           "autoplay": "Auto Play",
-          "livefeed": {
-            "label":"Live Feed Text Files",
-            "subLabel": {
-              "storepref": "userPrefs.app.live-feed-location"
-            }
-          }
+          "livefeed": "Live Feed Text Files"
         }
       },
       "autoplay-options": {
