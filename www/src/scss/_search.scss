@@ -115,7 +115,7 @@
   }
 
   #search-page .block-list {
-    height: calc(100% - 116px - 128px);
+    height: calc(100% - 158px - 128px);
   }
 }
 
@@ -190,7 +190,7 @@ button {
   }
 
   .block-list {
-    height: calc(100% - 116px);
+    height: calc(100% - 158px);
     transition: height $transition-time $transition-easing;
     z-index: 5;
   }
