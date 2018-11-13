@@ -5,8 +5,6 @@
   no-use-before-define: 0,
   no-undef: 0
 */
-const { loadAng, getAng, loadShabad } = require('./js/banidb');
-
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -18,6 +16,7 @@ let prefs = store.get('userPrefs');
 
 let isWebView = false;
 let apv = false;
+const infiniteScroll = false;
 let $apv;
 let $apvObserver;
 let $apvObserving;
@@ -120,7 +119,7 @@ global.platform.ipc.on('clear-apv', () => {
 
 global.platform.ipc.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
-  showLine(data.shabadID, data.lineID);
+  showLine(data.shabadID, data.lineID, data.rows);
 });
 
 global.platform.ipc.on('show-ang', (event, data) => {
@@ -161,9 +160,13 @@ const createAPVContainer = () => {
     $apv.id = 'apv';
     $apv.classList.add('deck');
     $viewer.appendChild($apv);
-    if (isWebView) {
+    if (isWebView && infiniteScroll) {
       $apvObserver = new IntersectionObserver(nextAng);
     }
+  }
+  if (!infiniteScroll) {
+    // Clear out APV container if not scrolling infinitely
+    $apv.innerHTML = '';
   }
   if (!$apv.classList.contains('active')) {
     hideDecks();
@@ -192,46 +195,45 @@ const iconsetHtml = (classname, content) => {
   return icons;
 };
 
-const createCards = (rows, LineID) => new Promise((resolve) => {
-  if (rows.length > 0) {
-    const cards = [];
-    const lines = [];
-    const shabad = {};
-    rows.forEach((row) => {
-      lines.push(row.ID);
-      const gurmukhiShabads = row.Gurmukhi.split(' ');
-      const taggedGurmukhi = [];
-      gurmukhiShabads.forEach((val, index) => {
-        if (val.indexOf(']') !== -1) {
-          taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-        } else {
-          taggedGurmukhi[index] = val;
-        }
-      });
-      const gurmukhiContainer = document.createElement('div');
-
-      gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
-                                      <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-      cards.push(
-        h(
-          `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
-          [
-            h('h1.gurbani.gurmukhi', gurmukhiContainer),
-            h('h2.translation', row.English),
-            h('h2.teeka', row.PunjabiUni),
-            h('h2.transliteration', row.Transliteration),
-          ]));
-      shabad[row.ID] = {
-        gurmukhi: row.Gurmukhi,
-        larivaar: taggedGurmukhi.join('<wbr>'),
-        translation: row.English,
-        teeka: row.Punjabi,
-        transliteration: row.Transliteration,
-      };
+const createCards = (rows, LineID) => {
+  const cards = [];
+  const lines = [];
+  const shabad = {};
+  Object.keys(rows).forEach((key) => {
+    row = rows[key];
+    lines.push(row.ID);
+    const gurmukhiShabads = row.Gurmukhi.split(' ');
+    const taggedGurmukhi = [];
+    gurmukhiShabads.forEach((val, index) => {
+      if (val.indexOf(']') !== -1) {
+        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+      } else {
+        taggedGurmukhi[index] = val;
+      }
     });
-    resolve({ cards, lines, shabad });
-  }
-});
+    const gurmukhiContainer = document.createElement('div');
+
+    gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
+                                    <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+    cards.push(
+      h(
+        `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
+        [
+          h('h1.gurbani.gurmukhi', gurmukhiContainer),
+          h('h2.translation', row.English),
+          h('h2.teeka', row.PunjabiUni),
+          h('h2.transliteration', row.Transliteration),
+        ]));
+    shabad[row.ID] = {
+      gurmukhi: row.Gurmukhi,
+      larivaar: taggedGurmukhi.join('<wbr>'),
+      translation: row.English,
+      teeka: row.Punjabi,
+      transliteration: row.Transliteration,
+    };
+  });
+  return { cards, lines, shabad };
+};
 
 const createDeck = (cards, curSlide, shabad, ShabadID) => {
   document.querySelector('.vc-toggle-icon').style.left = '0';
@@ -241,30 +243,28 @@ const createDeck = (cards, curSlide, shabad, ShabadID) => {
   } else {
     $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
   }
-  smoothScroll(curSlide);
+  // Wait a tiny bit for rendering to finish before scrolling to the slide
+  setTimeout(() => smoothScroll(`#slide${curSlide}`), 100);
   currentShabad = parseInt(ShabadID, 10);
   decks[ShabadID] = shabad;
   castShabadLine(curSlide);
 };
 
-const showAng = (PageNo, SourceID, LineID) => {
-  loadAng(PageNo, SourceID)
-    .then(res => createCards(res, LineID))
-    .then(({ cards, lines }) => {
-      apvCur.PageNo = PageNo;
-      apvCur.SourceID = SourceID;
-      apvPages[PageNo] = lines;
-      cards.forEach(card => $apv.appendChild(card));
-      hideDecks();
-      $apv.classList.add('active');
-      if (isWebView) {
-        $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
-        $apvObserver.observe($apvObserving);
-      }
-      if (LineID) {
-        setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
-      }
-    });
+const showAng = (PageNo, SourceID, LineID, rows) => {
+  const { cards, lines } = createCards(rows, LineID);
+  apvCur.PageNo = PageNo;
+  apvCur.SourceID = SourceID;
+  apvPages[PageNo] = lines;
+  cards.forEach(card => $apv.appendChild(card));
+  hideDecks();
+  $apv.classList.add('active');
+  if (isWebView && infiniteScroll) {
+    $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
+    $apvObserver.observe($apvObserving);
+  }
+  if (LineID) {
+    setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
+  }
 };
 
 const smoothScroll = (pos = 0) => {
@@ -283,16 +283,13 @@ const smoothScroll = (pos = 0) => {
   scroll.top($body, newScrollPos);
 };
 
-const showLine = (ShabadID, LineID) => {
-  if (!global.platform.db) {
-    global.platform.initDB();
-  }
+const showLine = (ShabadID, LineID, rows) => {
   const newShabadID = parseInt(ShabadID, 10);
-  if (apv) {
+  if (apv && infiniteScroll) {
     createAPVContainer();
     if (!apvCur.ShabadID || apvCur.ShabadID !== ShabadID) {
-      getAng(ShabadID)
-        .then(ang => showAng(ang.PageNo, ang.SourceID, LineID));
+      const info = rows[0];
+      showAng(info.PageNo, info.Source.SourceID, LineID, rows);
       apvCur.ShabadID = ShabadID;
     } else {
       smoothScroll(`#apv #slide${LineID}`);
@@ -310,9 +307,8 @@ const showLine = (ShabadID, LineID) => {
     smoothScroll(line);
     castShabadLine(LineID);
   } else {
-    loadShabad(newShabadID)
-      .then(rows => createCards(rows, LineID))
-      .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
+    const { cards, shabad } = createCards(rows, LineID);
+    createDeck(cards, LineID, shabad, newShabadID);
   }
 };
 
