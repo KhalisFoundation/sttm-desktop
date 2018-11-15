@@ -24,6 +24,8 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+// Temp
+const infiniteScroll = false;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
@@ -251,8 +253,9 @@ document.body.addEventListener('click', e => {
 });
 
 function akhandPaatt() {
-  module.exports.$shabad.innerHTML = '';
-  global.controller.clearAPV();
+  // FIXME
+  // module.exports.$shabad.innerHTML = '';
+  // global.controller.clearAPV();
 }
 
 module.exports = {
@@ -553,8 +556,6 @@ module.exports = {
     }
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
-    // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, LineID, Line);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -574,7 +575,7 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
-    if (apv) {
+    if (apv && infiniteScroll) {
       banidb.getAng(ShabadID)
         .then(ang => {
           currentMeta = ang;
@@ -640,7 +641,7 @@ module.exports = {
           {
             'data-line-id': item.ID,
             onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                           item.ID, item),
+                           item.ID, item, rows),
           },
           [
             h('i.fa.fa-fw.fa-check'),
@@ -659,11 +660,14 @@ module.exports = {
       }
     });
     // scroll the Shabad controller to the current Panktee
-    const curPankteeTop = shabad.querySelector('.current').parentNode
-      .offsetTop;
-    this.$shabadContainer.scrollTop = curPankteeTop;
+    const $curPanktee = shabad.querySelector('.current');
+    if ($curPanktee) {
+      const curPankteeTop = $curPanktee.parentNode
+        .offsetTop;
+      this.$shabadContainer.scrollTop = curPankteeTop;
+    }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine);
+    global.controller.sendLine(shabadID, lineID, mainLine, rows);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -716,7 +720,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID, Line) {
+  clickShabad(e, ShabadID, LineID, Line, rows) {
     /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
@@ -732,7 +736,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID, Line);
+      global.controller.sendLine(ShabadID, LineID, Line, rows);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
