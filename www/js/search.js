@@ -1,16 +1,16 @@
 /* eslint-disable arrow-parens */
+const banidb = require('./banidb');
+
+const { CONSTS } = banidb;
 
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
-const debounce = require('lodash.debounce');
 
 // HTMLElement builder
 const h = require('hyperscript');
 
 const { store } = require('electron').remote.require('./app');
-
-const CONSTS = require('./constants.js');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
@@ -24,6 +24,8 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+// Temp
+const infiniteScroll = false;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
@@ -36,6 +38,7 @@ const searchInputs = h('div#search-container', [
   h('span', 'Ang'),
   h('input#ang-input.gurmukhi', {
     type: 'number',
+    disabled: 'disabled',
     placeholder: '123',
     min: 1,
     max: 1430,
@@ -50,8 +53,9 @@ const searchInputs = h('div#search-container', [
     },
     h('i.fa.fa-keyboard-o'),
   ),
-  h('div#search-bg'),
-  h('div#db-download-progress'),
+  h('div#search-bg', [
+    h('div#db-download-progress'),
+  ]),
 ]);
 
 // build the Gurmukhi keyboard and append to HTML
@@ -249,8 +253,8 @@ document.body.addEventListener('click', e => {
 });
 
 function akhandPaatt() {
-  module.exports.$shabad.innerHTML = '';
-  global.controller.clearAPV();
+  // module.exports.$shabad.innerHTML = '';
+  // global.controller.clearAPV();
 }
 
 module.exports = {
@@ -316,6 +320,7 @@ module.exports = {
   initSearch() {
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
+    this.$angSearch.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
     this.changeSearchSource(this.searchSource);
@@ -473,7 +478,8 @@ module.exports = {
       searchQuery = this.$search.value;
     }
     if (searchQuery.length >= 1) {
-      global.platform.search.search(searchQuery, searchType, this.searchSource);
+      banidb.query(searchQuery, searchType, this.searchSource)
+        .then(rows => this.printResults(rows));
     } else {
       this.$results.innerHTML = '';
     }
@@ -504,8 +510,8 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: debounce(ev => this.clickResult(ev, item.ShabadID, item.ID,
-                                                  item), 500, { leading: true }),
+              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
+                                                  item),
             },
             resultNode,
           ),
@@ -549,8 +555,6 @@ module.exports = {
     }
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
-    // send the line to app.js, which will send it to the viewer window
-    global.controller.sendLine(ShabadID, LineID, Line);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -570,22 +574,21 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
-    if (apv) {
-      global.platform.search
-        .getAng(ShabadID)
+    if (apv && infiniteScroll) {
+      banidb.getAng(ShabadID)
         .then(ang => {
           currentMeta = ang;
-          return global.platform.search.loadAng(ang.PageNo, ang.SourceID);
+          return banidb.loadAng(ang.PageNo, ang.SourceID);
         })
         .then(rows => this.printShabad(rows, ShabadID, LineID));
     } else {
-      global.platform.search.loadShabad(ShabadID, LineID);
+      banidb.loadShabad(ShabadID, LineID)
+        .then(rows => this.printShabad(rows, ShabadID, LineID));
     }
   },
 
   loadAng(PageNo, SourceID) {
-    global.platform.search
-      .loadAng(PageNo, SourceID)
+    banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
   },
 
@@ -597,16 +600,32 @@ module.exports = {
     // Load the same shabad if on first or last shabad
     const PreviousVerseID = FirstLine === 1 ? FirstLine : FirstLine - 1;
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
-    global.platform.search.loadAdjacentShabad(
-      PreviousVerseID,
-      NextVerseID,
-      Forward,
-    );
+    const adjacentVerseID = Forward ? NextVerseID : PreviousVerseID;
+    let adjacentShabadID;
+    banidb.getShabad(adjacentVerseID)
+      .then(ShabadID => {
+        adjacentShabadID = ShabadID;
+        return banidb.loadShabad(ShabadID);
+      })
+      .then((rows) => {
+        this.printShabad(rows, adjacentShabadID);
+      });
   },
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
+    const shabadID = ShabadID || rows[0].Shabads[0].ShabadID;
     let mainLine;
+    const shabad = this.$shabad;
+    const apv = document.body.classList.contains('akhandpaatt');
+
+    // remove currently printed shabad if not in apv mode.
+    if (!apv) {
+      while (shabad.firstChild) {
+        shabad.removeChild(shabad.firstChild);
+      }
+    }
+
     rows.forEach((item) => {
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
@@ -620,8 +639,8 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
-            onclick: e => this.clickShabad(e, item.ShabadID || ShabadID,
-                           item.ID, item),
+            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
+                           item.ID, item, rows),
           },
           [
             h('i.fa.fa-fw.fa-check'),
@@ -632,7 +651,7 @@ module.exports = {
         ),
       );
       // write the Panktee to the controller
-      this.$shabad.appendChild(shabadLine);
+      shabad.appendChild(shabadLine);
       // append the currentShabad array
       currentShabad.push(item.ID);
       if (lineID === item.ID) {
@@ -640,11 +659,14 @@ module.exports = {
       }
     });
     // scroll the Shabad controller to the current Panktee
-    const curPankteeTop = this.$shabad.querySelector('.current').parentNode
-      .offsetTop;
-    this.$shabadContainer.scrollTop = curPankteeTop;
+    const $curPanktee = shabad.querySelector('.current');
+    if ($curPanktee) {
+      const curPankteeTop = $curPanktee.parentNode
+        .offsetTop;
+      this.$shabadContainer.scrollTop = curPankteeTop;
+    }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(ShabadID, lineID, mainLine);
+    global.controller.sendLine(shabadID, lineID, mainLine, rows);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -697,7 +719,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID, Line) {
+  clickShabad(e, ShabadID, LineID, Line, rows) {
     /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
@@ -713,7 +735,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID, Line);
+      global.controller.sendLine(ShabadID, LineID, Line, rows);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee

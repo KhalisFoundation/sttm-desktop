@@ -2,6 +2,7 @@
 const electron = require('electron');
 
 const remote = electron.remote;
+const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
@@ -441,17 +442,15 @@ global.platform.ipc.on('cast-session-active', () => {
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
+  global.webview.send('clear-apv');
+  global.platform.ipc.send('clear-apv');
+
   document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.remove('presenter-view', 'scale-viewer');
-    store.setUserPref('app.layout.presenter-view', false);
-    global.core.platformMethod('updateSettings');
-  }
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
 
@@ -462,9 +461,9 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID, Line) {
-    global.webview.send('show-line', { shabadID, lineID });
-    const showLinePayload = { shabadID, lineID, Line, live: false };
+  sendLine(shabadID, lineID, Line, rows) {
+    global.webview.send('show-line', { shabadID, lineID, rows });
+    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
@@ -472,10 +471,10 @@ module.exports = {
   },
 
   sendText(text, isGurmukhi) {
-    global.webview.send('show-text', { text, isGurmukhi });
     global.webview.send('show-empty-slide');
-    global.platform.ipc.send('show-text', { text, isGurmukhi });
+    global.webview.send('show-text', { text, isGurmukhi });
     global.platform.ipc.send('show-empty-slide');
+    global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
 
   sendScroll(pos) {
@@ -489,5 +488,21 @@ module.exports = {
 
   autoplay() {
     global.core.search.checkAutoPlay();
+  },
+
+  livefeed(val) {
+    if (val) {
+      dialog.showOpenDialog({
+        defaultPath: remote.app.getPath('desktop'),
+        properties: ['openDirectory'],
+      }, (path) => {
+        store.set('userPrefs.app.live-feed-location', path[0]);
+        const locationLabel = document.getElementsByClassName('sub-label livefeed');
+
+        for (let i = 0, len = locationLabel.length; i < len; i += 1) {
+          locationLabel[i].innerText = path;
+        }
+      });
+    }
   },
 };

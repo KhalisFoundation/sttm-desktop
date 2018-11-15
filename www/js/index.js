@@ -41,7 +41,7 @@ function spaceBar(e) {
 
   if (mainLineID === currentLineId) {
     let done = false;
-    search.$shabad.querySelectorAll('a.panktee').forEach(item => {
+    search.$shabad.querySelectorAll('a.panktee').forEach((item) => {
       if (!item.classList.contains(['seen_check']) && !done) {
         newLineId = item.dataset.lineId;
         done = true;
@@ -53,20 +53,22 @@ function spaceBar(e) {
   e.preventDefault();
 }
 
-function prevLine() {
+function prevLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
   if (pos > 0) {
     highlightLine(search.currentShabad[pos - 1]);
   }
+  e.preventDefault();
 }
 
-function nextLine() {
+function nextLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
   if (pos < search.currentShabad.length - 1) {
     highlightLine(search.currentShabad[pos + 1]);
   }
+  e.preventDefault();
 }
 
 // Keyboard shortcuts

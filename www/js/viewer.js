@@ -16,6 +16,7 @@ let prefs = store.get('userPrefs');
 
 let isWebView = false;
 let apv = false;
+const infiniteScroll = false;
 let $apv;
 let $apvObserver;
 let $apvObserving;
@@ -44,41 +45,45 @@ $scroll.addEventListener('wheel', () => {
   passive: true,
 });
 
-function hideDecks() {
+const hideDecks = () => {
   Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.remove('active');
   });
-}
+};
 
-function castToReceiver() {
+const castToReceiver = () => {
   castCur.prefs = store.get('userPrefs');
   sendMessage(JSON.stringify(castCur));
-}
+};
 
-function castShabadLine(lineID) {
+const castShabadLine = (lineID) => {
   document.querySelector('.viewer-controls').innerHTML = '';
-  castCur = decks[currentShabad][lineID];
-  let nextLine = '';
-  if (decks[currentShabad][lineID + 1]) {
-    nextLine = decks[currentShabad][lineID + 1].gurmukhi;
+  // make sure that the deck is created before attempting to cast it.
+  if (decks && decks[currentShabad]) {
+    castCur = decks[currentShabad][lineID];
+    let nextLine = '';
+    if (decks[currentShabad][lineID + 1]) {
+      nextLine = decks[currentShabad][lineID + 1].gurmukhi;
+    }
+    castCur.nextLine = nextLine;
+    castToReceiver();
+
+
+    const activeSlide = document.querySelector('.deck.active .slide.active').children;
+    Array.prototype.forEach.call(activeSlide, ((element) => {
+      const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+      if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+    }));
   }
-  castCur.nextLine = nextLine;
-  castToReceiver();
+};
 
-  const activeSlide = document.querySelector('.deck.active .slide.active').children;
-  Array.prototype.forEach.call(activeSlide, (element => {
-    const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-    if (icons) document.querySelector('.viewer-controls').appendChild(icons);
-  }));
-}
-
-function castText(text, isGurmukhi) {
+const castText = (text, isGurmukhi) => {
   castCur = {};
   castCur.showInEnglish = isGurmukhi !== true;
   castCur.gurmukhi = text;
   castCur.larivaar = text;
   castToReceiver();
-}
+};
 
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
@@ -114,7 +119,7 @@ global.platform.ipc.on('clear-apv', () => {
 
 global.platform.ipc.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
-  showLine(data.shabadID, data.lineID);
+  showLine(data.shabadID, data.lineID, data.rows);
 });
 
 global.platform.ipc.on('show-ang', (event, data) => {
@@ -142,28 +147,32 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
-function nextAng() {
+const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
   showAng(next, apvCur.SourceID);
   global.platform.ipc.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
-}
+};
 
-function createAPVContainer() {
+const createAPVContainer = () => {
   if (!$apv) {
     $apv = document.createElement('div');
     $apv.id = 'apv';
     $apv.classList.add('deck');
     $viewer.appendChild($apv);
-    if (isWebView) {
+    if (isWebView && infiniteScroll) {
       $apvObserver = new IntersectionObserver(nextAng);
     }
+  }
+  if (!infiniteScroll) {
+    // Clear out APV container if not scrolling infinitely
+    $apv.innerHTML = '';
   }
   if (!$apv.classList.contains('active')) {
     hideDecks();
     $apv.classList.add('active');
   }
-}
+};
 
 const iconsetHtml = (classname, content) => {
   let icons;
@@ -186,50 +195,47 @@ const iconsetHtml = (classname, content) => {
   return icons;
 };
 
-function createCards(rows, LineID) {
-  return new Promise((resolve) => {
-    if (rows.length > 0) {
-      const cards = [];
-      const lines = [];
-      const shabad = {};
-      rows.forEach((row) => {
-        lines.push(row.ID);
-        const gurmukhiShabads = row.Gurmukhi.split(' ');
-        const taggedGurmukhi = [];
-        gurmukhiShabads.forEach((val, index) => {
-          if (val.indexOf(']') !== -1) {
-            taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-          } else {
-            taggedGurmukhi[index] = val;
-          }
-        });
-        const gurmukhiContainer = document.createElement('div');
+const createCards = (rows, LineID) => {
+  const cards = [];
+  const lines = [];
+  const shabad = {};
+  Object.keys(rows).forEach((key) => {
+    row = rows[key];
+    lines.push(row.ID);
+    const gurmukhiShabads = row.Gurmukhi.split(' ');
+    const taggedGurmukhi = [];
+    gurmukhiShabads.forEach((val, index) => {
+      if (val.indexOf(']') !== -1) {
+        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+      } else {
+        taggedGurmukhi[index] = val;
+      }
+    });
+    const gurmukhiContainer = document.createElement('div');
 
-        gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
-                                       <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
-        cards.push(
-          h(
-            `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
-            [
-              h('h1.gurbani.gurmukhi', gurmukhiContainer),
-              h('h2.translation', row.English),
-              h('h2.teeka', row.PunjabiUni),
-              h('h2.transliteration', row.Transliteration),
-            ]));
-        shabad[row.ID] = {
-          gurmukhi: row.Gurmukhi,
-          larivaar: taggedGurmukhi.join('<wbr>'),
-          translation: row.English,
-          teeka: row.Punjabi,
-          transliteration: row.Transliteration,
-        };
-      });
-      resolve({ cards, lines, shabad });
-    }
+    gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
+                                    <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+    cards.push(
+      h(
+        `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
+        [
+          h('h1.gurbani.gurmukhi', gurmukhiContainer),
+          h('h2.translation', row.English),
+          h('h2.teeka', row.PunjabiUni),
+          h('h2.transliteration', row.Transliteration),
+        ]));
+    shabad[row.ID] = {
+      gurmukhi: row.Gurmukhi,
+      larivaar: taggedGurmukhi.join('<wbr>'),
+      translation: row.English,
+      teeka: row.Punjabi,
+      transliteration: row.Transliteration,
+    };
   });
-}
+  return { cards, lines, shabad };
+};
 
-function createDeck(cards, curSlide, shabad, ShabadID) {
+const createDeck = (cards, curSlide, shabad, ShabadID) => {
   document.querySelector('.vc-toggle-icon').style.left = '0';
   hideDecks();
   if (document.querySelector('.vc-open')) {
@@ -237,33 +243,31 @@ function createDeck(cards, curSlide, shabad, ShabadID) {
   } else {
     $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
   }
-  smoothScroll(curSlide);
+  // Wait a tiny bit for rendering to finish before scrolling to the slide
+  setTimeout(() => smoothScroll(`#slide${curSlide}`), 100);
   currentShabad = parseInt(ShabadID, 10);
   decks[ShabadID] = shabad;
   castShabadLine(curSlide);
-}
+};
 
-function showAng(PageNo, SourceID, LineID) {
-  global.platform.search.loadAng(PageNo, SourceID)
-    .then(res => createCards(res, LineID))
-    .then(({ cards, lines }) => {
-      apvCur.PageNo = PageNo;
-      apvCur.SourceID = SourceID;
-      apvPages[PageNo] = lines;
-      cards.forEach(card => $apv.appendChild(card));
-      hideDecks();
-      $apv.classList.add('active');
-      if (isWebView) {
-        $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
-        $apvObserver.observe($apvObserving);
-      }
-      if (LineID) {
-        setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
-      }
-    });
-}
+const showAng = (PageNo, SourceID, LineID, rows) => {
+  const { cards, lines } = createCards(rows, LineID);
+  apvCur.PageNo = PageNo;
+  apvCur.SourceID = SourceID;
+  apvPages[PageNo] = lines;
+  cards.forEach(card => $apv.appendChild(card));
+  hideDecks();
+  $apv.classList.add('active');
+  if (isWebView && infiniteScroll) {
+    $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
+    $apvObserver.observe($apvObserving);
+  }
+  if (LineID) {
+    setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
+  }
+};
 
-function smoothScroll(pos = 0) {
+const smoothScroll = (pos = 0) => {
   let newScrollPos;
   switch (typeof pos) {
     case 'object':
@@ -277,23 +281,19 @@ function smoothScroll(pos = 0) {
       break;
   }
   scroll.top($body, newScrollPos);
-}
+};
 
-function showLine(ShabadID, LineID) {
-  if (!global.platform.db) {
-    global.platform.initDB();
-  }
+const showLine = (ShabadID, LineID, rows) => {
   const newShabadID = parseInt(ShabadID, 10);
-  if (apv) {
+  if (apv && infiniteScroll) {
     createAPVContainer();
     if (!apvCur.ShabadID || apvCur.ShabadID !== ShabadID) {
-      global.platform.search.getAng(ShabadID)
-        .then(ang => showAng(ang.PageNo, ang.SourceID, LineID));
+      const info = rows[0];
+      showAng(info.PageNo, info.Source.SourceID, LineID, rows);
       apvCur.ShabadID = ShabadID;
     } else {
       smoothScroll(`#apv #slide${LineID}`);
     }
-    castShabadLine(LineID);
   } else if (newShabadID in decks) {
     const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
     if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
@@ -307,15 +307,12 @@ function showLine(ShabadID, LineID) {
     smoothScroll(line);
     castShabadLine(LineID);
   } else {
-    global.platform.db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.transliteration, v.PunjabiUni, v.Punjabi FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = ${newShabadID} ORDER BY v.ID ASC`,
-      (err, rows) => {
-        createCards(rows, LineID)
-          .then(({ cards, shabad }) => createDeck(cards, LineID, shabad, newShabadID));
-      });
+    const { cards, shabad } = createCards(rows, LineID);
+    createDeck(cards, LineID, shabad, newShabadID);
   }
-}
+};
 
-function showText(text, isGurmukhi = false) {
+const showText = (text, isGurmukhi = false) => {
   hideDecks();
   $message.classList.add('active');
   while ($message.firstChild) {
@@ -324,16 +321,16 @@ function showText(text, isGurmukhi = false) {
   const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
   $message.appendChild(h('div.slide.active', textNode));
   castText(text, isGurmukhi);
-}
+};
 
-function toggleSideMenu() {
-  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach(el => {
+const toggleSideMenu = () => {
+  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach((el) => {
     el.classList.toggle('vc-icon-hidden');
   });
-  Array.from(document.querySelectorAll('.deck')).forEach(el => {
+  Array.from(document.querySelectorAll('.deck')).forEach((el) => {
     el.classList.toggle('vc-open');
   });
   document.querySelector('.viewer-controls').classList.toggle('viewer-controls-open');
-}
+};
 
 document.querySelector('.vc-toggle-icon').onclick = toggleSideMenu;
