@@ -129,8 +129,10 @@ const query = (searchQuery, searchType, searchSource) => (
         reject(err);
       } else {
         rows.map((row) => {
-          // eslint-disable-next-line no-param-reassign
+          /* eslint-disable no-param-reassign */
           row.Shabads = [{ ShabadID: row.ShabadID }];
+          row.Source = { SourceID: row.SourceID };
+          /* eslint-enable */
           return row;
         });
         resolve(rows);

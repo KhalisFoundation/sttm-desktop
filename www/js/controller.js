@@ -461,9 +461,9 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID, Line) {
-    global.webview.send('show-line', { shabadID, lineID });
-    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar') };
+  sendLine(shabadID, lineID, Line, rows) {
+    global.webview.send('show-line', { shabadID, lineID, rows });
+    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
