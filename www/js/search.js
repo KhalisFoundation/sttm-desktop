@@ -253,6 +253,7 @@ document.body.addEventListener('click', e => {
 });
 
 function akhandPaatt() {
+  // FIXME
   // module.exports.$shabad.innerHTML = '';
   // global.controller.clearAPV();
 }
