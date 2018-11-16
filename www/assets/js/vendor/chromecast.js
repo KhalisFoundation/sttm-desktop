@@ -9,6 +9,8 @@
   no-undef: 0,
   prefer-template: 0
 */
+const tingle = require('tingle.js');
+
 let trigID = 0;
 const receiverFn = receivers =>
   new Promise((resolve) => {

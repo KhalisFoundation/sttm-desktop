@@ -1,8 +1,9 @@
 /* global Mousetrap */
+const { ipcRenderer } = require('electron');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
-const shareSync = require('./share-sync');
+// const shareSync = require('./share-sync');
 const settings = require('../js/settings');
 
 /* const Settings = require('../../js/settings');
@@ -96,14 +97,14 @@ function platformMethod(method, args) {
   }
 }
 
-global.platform.ipc.on('sync-settings', () => {
+ipcRenderer.on('sync-settings', () => {
   settings.init();
 });
 
 module.exports = {
   menu,
   search,
-  shareSync,
+  // shareSync,
   platformMethod,
   themeEditor,
   'custom-theme': () => {

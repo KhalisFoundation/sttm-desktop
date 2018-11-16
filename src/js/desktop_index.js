@@ -1,7 +1,7 @@
 /* eslint import/no-unresolved: 0 */
-global.platform = require('./js/desktop_scripts');
-global.controller = require('./js/controller');
-global.core = require('./js/index');
+global.platform = require('./desktop_scripts');
+global.controller = require('./controller');
+global.core = require('./index');
 
 // Pull in navigator from core
 global.core.search.init();

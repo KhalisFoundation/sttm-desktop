@@ -1,6 +1,4 @@
 const electron = require('electron');
-const Store = require('./www/js/store.js');
-const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const express = require('express');
@@ -11,6 +9,9 @@ const expressApp = express();
 
 const http = require('http').Server(expressApp);
 const io = require('socket.io')(http);
+
+const Store = require('./src/js/store.js');
+const defaultPrefs = require('./src/js/defaults.json');
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 

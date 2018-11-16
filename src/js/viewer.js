@@ -5,12 +5,12 @@
   no-use-before-define: 0,
   no-undef: 0
 */
-global.platform = require('./js/desktop_scripts');
+const { ipcRenderer } = require('electron');
 const h = require('hyperscript');
 const scroll = require('scroll');
-const core = require('./js/index');
+const core = require('./index');
 const { store } = require('electron').remote.require('./app');
-const themes = require('./js/themes.json');
+const themes = require('./themes.json');
 
 let prefs = store.get('userPrefs');
 
@@ -39,7 +39,7 @@ core.menu.settings.applySettings(prefs);
 $scroll.addEventListener('wheel', () => {
   const pos = $body.scrollTop / ($body.scrollHeight - $body.offsetHeight);
   const sendMethod = isWebView ? 'sendToHost' : 'send';
-  global.platform.ipc[sendMethod]('scroll-pos', pos);
+  ipcRenderer[sendMethod]('scroll-pos', pos);
 }, {
   capture: true,
   passive: true,
@@ -86,22 +86,22 @@ const castText = (text, isGurmukhi) => {
 };
 
 // IPC
-global.platform.ipc.on('search-cast', (event, pos) => {
+ipcRenderer.on('search-cast', (event, pos) => {
   requestSession();
   appendMessage(event);
   appendMessage(pos);
 });
 
-global.platform.ipc.on('stop-cast', () => {
+ipcRenderer.on('stop-cast', () => {
   stopApp();
 });
 
-global.platform.ipc.on('is-webview', () => {
+ipcRenderer.on('is-webview', () => {
   isWebView = true;
   document.body.classList.add('webview');
 });
 
-global.platform.ipc.on('clear-apv', () => {
+ipcRenderer.on('clear-apv', () => {
   apv = document.body.classList.contains('akhandpaatt');
   if (apv) {
     hideDecks();
@@ -117,27 +117,27 @@ global.platform.ipc.on('clear-apv', () => {
   });
 });
 
-global.platform.ipc.on('show-line', (event, data) => {
+ipcRenderer.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
   showLine(data.shabadID, data.lineID, data.rows);
 });
 
-global.platform.ipc.on('show-ang', (event, data) => {
+ipcRenderer.on('show-ang', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
   showAng(data.PageNo, data.SourceID);
 });
 
-global.platform.ipc.on('show-text', (event, data) => {
+ipcRenderer.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
 });
 
-global.platform.ipc.on('send-scroll', (event, pos) => {
+ipcRenderer.on('send-scroll', (event, pos) => {
   $scroll.scrollTo(0,
     (document.documentElement.scrollHeight - document.documentElement.offsetHeight) * pos);
 });
 
-global.platform.ipc.on('update-settings', () => {
+ipcRenderer.on('update-settings', () => {
   prefs = store.get('userPrefs');
   const themeKeys = themes.map(item => item.key);
 
@@ -151,7 +151,7 @@ const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
   showAng(next, apvCur.SourceID);
-  global.platform.ipc.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
+  ipcRenderer.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
 };
 
 const createAPVContainer = () => {

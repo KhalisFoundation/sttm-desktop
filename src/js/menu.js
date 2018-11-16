@@ -1,15 +1,15 @@
 const { randomShabad } = require('./banidb');
 
 const h = require('hyperscript');
+const tingle = require('tingle.js');
 const settings = require('./settings');
 const getJSON = require('get-json');
-const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const { store } = require('electron').remote.require('./app');
 
-const modal = new tingle.Modal({
+const modal = new tingle.modal({
   footer: true,
   stickyFooter: false,
   cssClass: ['notifications-modal'],
