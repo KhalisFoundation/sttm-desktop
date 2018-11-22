@@ -6,6 +6,8 @@ const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const Analytics = require('./analytics');
+const uuid = require('uuid/v4');
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -42,6 +44,17 @@ const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
 });
+
+// Retrieve the userid value, and if it's not there, assign it a new uuid.
+let userId = store.get('userId');
+
+if (!userId) {
+  userId = uuid();
+  store.set('userId', userId);
+}
+const analytics = new Analytics(userId);
+global.trackEvent = analytics.trackEvent;
+
 const appVersion = app.getVersion();
 
 let mainWindow;
@@ -250,6 +263,7 @@ app.on('ready', () => {
     if (!viewerWindow) {
       createViewer();
     }
+    analytics.trackEvent('', '');
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
@@ -423,4 +437,5 @@ module.exports = {
   autoUpdater,
   store,
   appstore,
+  analytics,
 };

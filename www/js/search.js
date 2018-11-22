@@ -10,7 +10,7 @@ const pageNavJSON = require('./footer-left.json');
 // HTMLElement builder
 const h = require('hyperscript');
 
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
@@ -400,6 +400,7 @@ module.exports = {
     this.searchSource = value;
     currentMeta.source = value === 'all' ? null : value;
     store.set('searchOptions.searchSource', this.searchSource);
+    analytics.trackEvent('search', 'searchSource', this.searchSource);
     this.search();
   },
 
@@ -435,6 +436,7 @@ module.exports = {
 
   openGurmukhiKB() {
     this.$navigator.classList.add('kb-active');
+    analytics.trackEvent('search', 'gurmukhi-keyboard', 'opened');
   },
 
   closeGurmukhiKB() {
@@ -484,6 +486,7 @@ module.exports = {
     } else {
       this.$results.innerHTML = '';
     }
+    analytics.trackEvent('search', CONSTS.SEARCH_TEXTS[searchType], searchQuery);
   },
 
   akhandPaatt,
