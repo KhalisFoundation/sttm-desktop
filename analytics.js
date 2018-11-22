@@ -11,6 +11,7 @@ class Analytics {
   }
 
   /**
+   * https://developers.google.com/analytics/devguides/collection/analyticsjs/events
    * Name           | type | required | example
    * ------------------------------------------
    * eventCategory  | text |  yes     | Typically the object that was interacted with (e.g. 'Video')
@@ -24,6 +25,7 @@ class Analytics {
    */
   trackEvent(category, action, label, value) {
     isOnline().then((online) => {
+      // TODO: for offline users, come up with a way of storing and send when online.
       if (online && this.usr) {
         this.usr
           .event({
