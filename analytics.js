@@ -38,6 +38,27 @@ class Analytics {
       }
     });
   }
+
+
+  /**
+   *
+   * @param path
+   * @param title
+   * @param hostname
+   */
+  trackPageView(path, title, hostname = 'SikhiToTheMax Desktop') {
+    isOnline().then((online) => {
+      if (online && this.usr) {
+        this.usr
+          .pageview({
+            dp: path,
+            dt: title,
+            dh: hostname,
+          })
+          .send();
+      }
+    });
+  }
 }
 
 module.exports = Analytics;

@@ -263,7 +263,6 @@ app.on('ready', () => {
     if (!viewerWindow) {
       createViewer();
     }
-    analytics.trackEvent('', '');
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
