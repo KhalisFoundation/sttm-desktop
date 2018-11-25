@@ -1,14 +1,15 @@
-const { randomShabad } = require('./banidb');
-
-const h = require('hyperscript');
-const tingle = require('tingle.js');
-const settings = require('./settings');
-const getJSON = require('get-json');
-const request = require('request');
-const moment = require('moment');
 const electron = require('electron');
 const { store } = require('electron').remote.require('./app');
+const getJSON = require('get-json');
+const h = require('hyperscript');
+const moment = require('moment');
+const request = require('request');
+const tingle = require('tingle.js');
 
+const { randomShabad } = require('./banidb');
+const settings = require('./settings');
+
+// eslint-disable-next-line new-cap
 const modal = new tingle.modal({
   footer: true,
   stickyFooter: false,
@@ -40,8 +41,10 @@ const buttonFactory = ({
     {
       onclick: () => {
         module.exports.toggleMenu(pageToToggle);
-      } },
-    h(`i.fa.${buttonIcon}`));
+      },
+    },
+    h(`i.fa.${buttonIcon}`),
+  );
 };
 
 const goToShabadPage = (shabadId) => {
@@ -123,7 +126,8 @@ const notificationsBellClickHandler = () => {
 /* Generate Toggle Buttons */
 const menuButton = h(
   'a.menu-button.navigator-button.active',
-  h('i.fa.fa-bars'));
+  h('i.fa.fa-bars'),
+);
 const closeButton = buttonFactory({
   buttonType: 'close',
   pageToToggle: '#menu-page',
@@ -138,9 +142,12 @@ const randomShabadButton = h(
       onclick: () => {
         randomShabad()
           .then(goToShabadPage);
-      } },
+      },
+    },
     h('i.fa.fa-random.list-icon'),
-    'Show Random Shabad'));
+    'Show Random Shabad',
+  ),
+);
 const anandKarajButton = h(
   'li',
   h(
@@ -149,7 +156,9 @@ const anandKarajButton = h(
       onclick: () => { goToShabadPage(2897); },
     },
     h('i.fa.fa-heart.list-icon'),
-    'Anand Karaj / Sikh Marriage'));
+    'Anand Karaj / Sikh Marriage',
+  ),
+);
 const notificationButton = h(
   'li',
   h(
@@ -158,7 +167,9 @@ const notificationButton = h(
       onclick: notificationsBellClickHandler,
     },
     h('i.fa.fa-bell.list-icon'),
-    "What's New"));
+    "What's New",
+  ),
+);
 const hukamnamaButton = h(
   'li',
   h(
@@ -174,7 +185,9 @@ const hukamnamaButton = h(
       },
     },
     h('i.fa.fa-gavel.list-icon'),
-    'Daily Hukamnama'));
+    'Daily Hukamnama',
+  ),
+);
 
 /* load text buttons */
 const emptySlideButton = h(
@@ -184,9 +197,12 @@ const emptySlideButton = h(
     {
       onclick: () => {
         global.controller.sendText('');
-      } },
+      },
+    },
     h('i.fa.fa-eye-slash.list-icon'),
-    'Add Empty Slide'));
+    'Add Empty Slide',
+  ),
+);
 const waheguruSlideButton = h(
   'li',
   h(
@@ -194,9 +210,12 @@ const waheguruSlideButton = h(
     {
       onclick: () => {
         global.controller.sendText('vwihgurU', true);
-      } },
+      },
+    },
     h('i.fa.fa-circle.list-icon'),
-    'Add Waheguru Slide'));
+    'Add Waheguru Slide',
+  ),
+);
 const dhanGuruSlideButton = h(
   'li',
   h(
@@ -205,7 +224,8 @@ const dhanGuruSlideButton = h(
       onclick: () => {
         const guruJi = document.querySelector('#dhan-guru').value;
         global.controller.sendText(guruJi, true);
-      } },
+      },
+    },
     h('i.fa.fa-circle-o.list-icon'),
     [
       h('label', { htmlFor: 'dhan-guru' }, 'Add Dhan Guru '),
@@ -225,13 +245,18 @@ const dhanGuruSlideButton = h(
           h('option', { value: 'DMn gurU qyg bhwdr swihb jI' }, 'Teg Bahadur Sahib Ji'),
           h('option', { value: 'DMn gurU goibMd isMG swihb jI' }, 'Gobind Singh Sahib Ji'),
           h('option', { value: 'DMn gurU gRMQ swihb jI' }, 'Granth Sahib Ji'),
-        ])]));
+        ],
+      ),
+    ],
+  ),
+);
 const announcementSlideButton = h(
   'li.announcement-box',
   h(
     'header',
     h('i.fa.fa-bullhorn.list-icon'),
-    'Add announcement slide'),
+    'Add announcement slide',
+  ),
   h('li',
     [
       h('span', 'Announcement in gurmukhi'),
@@ -248,15 +273,16 @@ const announcementSlideButton = h(
                 $announcementText.value = '';
                 $announcementText.placeholder = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
               },
-              value: 'gurmukhi' }),
+              value: 'gurmukhi',
+            }),
           h('label',
-            {
-              htmlFor: 'announcement-language' })])]),
+            { htmlFor: 'announcement-language' })])]),
   h(
     'textarea.announcement-text',
     {
       placeholder: 'Add announcement text here ..',
-    }),
+    },
+  ),
   h(
     'button.announcement-slide-btn.button',
     {
@@ -264,12 +290,15 @@ const announcementSlideButton = h(
         const isGurmukhi = document.querySelector('#announcement-language').checked;
         const announcementText = document.querySelector('.announcement-text').value;
         global.controller.sendText(announcementText, isGurmukhi);
-      } },
-    'Add Announcement'));
+      },
+    },
+    'Add Announcement',
+  ),
+);
 
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', (e) => {
-  const target = e.target;
+  const { target } = e;
   const link = target.href;
   if (target.href) {
     e.preventDefault();

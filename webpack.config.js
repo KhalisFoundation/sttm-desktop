@@ -4,7 +4,7 @@ const marked = require('marked');
 const renderer = new marked.Renderer();
 
 const BUILD_DIR = path.resolve(__dirname, 'www/assets/js');
-const APP_DIR = path.resolve(__dirname, 'src/js');
+const APP_DIR = path.resolve(__dirname, 'src/js/renderer');
 
 const config = {
   mode: 'development',
@@ -54,6 +54,7 @@ const config = {
     request: "require('request')",
     sqlite3: "require('sqlite3')",
   },
+  stats: 'minimal',
 };
 
 module.exports = config;

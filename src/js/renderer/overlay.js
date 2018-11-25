@@ -12,7 +12,7 @@ const url = `http://${host}:${overlayPort}/`;
 
 const { store } = require('electron').remote.require('./app');
 
-const overlayVars = store.get('obs').overlayPrefs.overlayVars;
+const { overlayVars } = store.get('obs').overlayPrefs;
 
 const savePrefs = () => {
   store.set('obs', {

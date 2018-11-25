@@ -4,7 +4,7 @@ const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 // const shareSync = require('./share-sync');
-const settings = require('../js/settings');
+const settings = require('./settings');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -27,8 +27,7 @@ function highlightLine(newLine) {
     search.$shabadContainer.scrollTop = curPankteeTop;
   }
   if (containerTop + containerHeight < curPankteeTop + curPankteeHeight) {
-    search.$shabadContainer.scrollTop =
-      curPankteeTop - containerHeight + curPankteeHeight;
+    search.$shabadContainer.scrollTop = curPankteeTop - containerHeight + curPankteeHeight;
   }
 }
 

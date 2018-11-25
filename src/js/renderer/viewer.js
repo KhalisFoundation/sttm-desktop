@@ -6,10 +6,11 @@
   no-undef: 0
 */
 const { ipcRenderer } = require('electron');
+const { platform, store } = require('electron').remote.require('./app');
 const h = require('hyperscript');
 const scroll = require('scroll');
+
 const core = require('./index');
-const { store } = require('electron').remote.require('./app');
 const themes = require('./themes.json');
 
 let prefs = store.get('userPrefs');
@@ -31,7 +32,7 @@ const $body = document.body;
 const $viewer = document.getElementById('viewer');
 const $scroll = window;
 
-$body.classList.add(process.platform);
+$body.classList.add(platform);
 
 core.menu.settings.applySettings(prefs);
 
@@ -179,18 +180,19 @@ const iconsetHtml = (classname, content) => {
   const iconType = classname.split('-')[1];
   if (content) {
     icons = h(
-    `span.${classname}.iconset`, [
-      h('p.tagline', iconType),
-      h('span.visibility', {
-        onclick: e => core.menu.settings.showHide(e, iconType),
-      }, h('i.fa.fa-eye-slash')),
-      h('span.minus.size', {
-        onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
-      }, h('i.fa.fa-minus-circle')),
-      h('span.plus.size', {
-        onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
-      }, h('i.fa.fa-plus-circle')),
-    ]);
+      `span.${classname}.iconset`, [
+        h('p.tagline', iconType),
+        h('span.visibility', {
+          onclick: e => core.menu.settings.showHide(e, iconType),
+        }, h('i.fa.fa-eye-slash')),
+        h('span.minus.size', {
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+        }, h('i.fa.fa-minus-circle')),
+        h('span.plus.size', {
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+        }, h('i.fa.fa-plus-circle')),
+      ],
+    );
   }
   return icons;
 };
@@ -223,7 +225,9 @@ const createCards = (rows, LineID) => {
           h('h2.translation', row.English),
           h('h2.teeka', row.PunjabiUni),
           h('h2.transliteration', row.Transliteration),
-        ]));
+        ],
+      ),
+    );
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),

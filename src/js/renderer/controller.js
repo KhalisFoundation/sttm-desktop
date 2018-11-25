@@ -1,12 +1,11 @@
 /* global Mousetrap */
 const electron = require('electron');
 
-const remote = electron.remote;
-const dialog = remote.dialog;
-const app = remote.app;
-const Menu = remote.Menu;
+const { remote } = electron;
+const { dialog } = remote;
+const { app, Menu } = remote;
 const main = remote.require('./app');
-const { store } = main;
+const { NODE_ENV, platform, store } = main;
 
 global.webview = document.querySelector('webview');
 
@@ -140,7 +139,7 @@ const menuTemplate = [
 
 const devMenu = [];
 
-if (process.env.NODE_ENV === 'development') {
+if (NODE_ENV === 'development') {
   devMenu.push({
     label: 'Dev',
     submenu: [
@@ -301,8 +300,8 @@ const macMenu = [
   },
   ...devMenu,
 ];
-const menu = Menu.buildFromTemplate(process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu);
-if (process.platform === 'darwin' || process.platform === 'linux') {
+const menu = Menu.buildFromTemplate(platform === 'darwin' || platform === 'linux' ? macMenu : winMenu);
+if (platform === 'darwin' || platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
 
@@ -365,7 +364,8 @@ function updateViewerScale() {
   previewStyles += `transform: scale(${scale});`;
   previewStyles = document.createTextNode(
     `.scale-viewer #main-viewer { ${previewStyles} }
-    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`);
+    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`,
+  );
   const $previewStyles = document.getElementById('preview-styles');
 
   if ($previewStyles) {
@@ -407,7 +407,7 @@ window.onresize = () => {
   updateViewerScale();
 };
 
-const menuUpdate = (process.platform === 'darwin' || process.platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
+const menuUpdate = (platform === 'darwin' || platform === 'linux' ? menu.items[0].submenu : menu.items[3].submenu);
 const menuCast = menu.items[3].submenu;
 
 global.platform.ipc.on('checking-for-update', () => {
@@ -463,7 +463,14 @@ module.exports = {
 
   sendLine(shabadID, lineID, Line, rows) {
     global.webview.send('show-line', { shabadID, lineID, rows });
-    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
+    const showLinePayload = {
+      shabadID,
+      lineID,
+      Line,
+      live: false,
+      larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'),
+      rows,
+    };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }

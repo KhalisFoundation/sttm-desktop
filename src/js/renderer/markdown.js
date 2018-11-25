@@ -1,7 +1,9 @@
-/* eslint-disable global-require */
+const changelog = require('../../../CHANGELOG.md');
+const help = require('../../../HELP.md');
+
 const markdownFiles = {
-  changelog: require('../../CHANGELOG.md'),
-  help: require('../../HELP.md'),
+  changelog,
+  help,
 };
 
 function markdownToHTML(file) {

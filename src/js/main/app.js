@@ -3,21 +3,28 @@ const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
+const op = require('openport');
 const path = require('path');
 
 const expressApp = express();
 
 const http = require('http').Server(expressApp);
-const io = require('socket.io')(http);
+const socketio = require('socket.io');
 
-const Store = require('./src/js/store.js');
-const defaultPrefs = require('./src/js/defaults.json');
+const io = socketio(http);
 
-expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
+const Store = require('../shared/store');
+const defaultPrefs = require('../shared/defaults.json');
 
-const { app, BrowserWindow, dialog, ipcMain } = electron;
+expressApp.use(express.static(path.join(__dirname, '..', 'obs')));
 
-const op = require('openport');
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+} = electron;
+
 
 op.find(
   {
@@ -34,7 +41,8 @@ op.find(
     global.overlayPort = port;
     // console.log(`Overlay Port No ${port}`);
     http.listen(port);
-  });
+  },
+);
 
 const store = new Store({
   configName: 'user-preferences',
@@ -47,16 +55,16 @@ let viewerWindow = false;
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
-    url: `file://${__dirname}/www/changelog.html`,
+    url: `file://${__dirname}/../changelog.html`,
     onClose: () => { store.set('changelog-seen', appVersion); },
   },
   helpWindow: {
     obj: false,
-    url: `file://${__dirname}/www/help.html`,
+    url: `file://${__dirname}/../help.html`,
   },
   overlayWindow: {
     obj: false,
-    url: `file://${__dirname}/www/overlay.html`,
+    url: `file://${__dirname}/../overlay.html`,
   },
 };
 let manualUpdate = false;
@@ -180,7 +188,7 @@ function createViewer(ipcData) {
       titleBarStyle: 'hidden',
       frame: (process.platform !== 'win32'),
     });
-    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.loadURL(`file://${__dirname}/../viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -245,7 +253,7 @@ app.on('ready', () => {
       createViewer();
     }
   });
-  mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+  mainWindow.loadURL(`file://${__dirname}/../index.html`);
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
@@ -269,8 +277,8 @@ app.on('ready', () => {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
@@ -416,4 +424,6 @@ module.exports = {
   checkForUpdates,
   autoUpdater,
   store,
+  NODE_ENV: process.env.NODE_ENV,
+  platform: process.platform,
 };

@@ -237,10 +237,10 @@ const getShabad = VerseID => (
       init();
     }
     db.get('SELECT ShabadID FROM Shabad WHERE VerseID = ?',
-    [VerseID],
-    (err, row) => {
-      resolve(row.ShabadID);
-    });
+      [VerseID],
+      (err, row) => {
+        resolve(row.ShabadID);
+      });
   })
 );
 

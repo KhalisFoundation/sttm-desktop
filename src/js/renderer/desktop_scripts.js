@@ -111,7 +111,8 @@ module.exports = {
             if (force || curDBHash !== newestDBHash) {
               const dbCompressed = path.resolve(
                 userDataPath,
-                database[dbPlatform].dbCompressedName);
+                database[dbPlatform].dbCompressedName,
+              );
               global.core.search.$search.placeholder = 'Downloading database...';
               progress(request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`))
                 .on('progress', (state) => {

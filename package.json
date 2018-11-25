@@ -3,12 +3,13 @@
   "name": "sttm-desktop",
   "version": "4.2.1",
   "description": "The SikhiToTheMax desktop app",
-  "main": "app.js",
+  "main": "www/main/app.js",
   "scripts": {
     "precommit": "npm test",
     "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ src/js && stylelint \"src/scss/*.scss\" --syntax scss --fix",
-    "start": "concurrently --kill-others \"npm run watch-css\" \"webpack --watch\" \"cross-env NODE_ENV=development electron .\"",
-    "build": "rm -rf www/assets/js/*.js && webpack && npm run build-css",
+    "start": "cross-env NODE_ENV=development electron .",
+    "clean": "rimraf www/assets/js/*.js www/main www/shared",
+    "build": "npm run clean && webpack && cp -R src/js/main www/main && cp -R src/js/shared www/shared && npm run build-css",
     "pack:mac": "npm run build && build --mac",
     "pack:win": "npm run build && build --win --x64",
     "pack:win32": "npm run build && build --win --ia32",
@@ -22,7 +23,7 @@
     "build-css": "run-p build-css:*",
     "build-css:main": "node-sass --output-style compressed --include-path src/scss src/scss/styles.scss www/assets/css/bundle.css",
     "build-css:obs": "node-sass --output-style compressed --include-path src/scss/obs src/scss/obs/styles.scss www/obs/bundle.css",
-    "watch-css": "nodemon --watch src -e scss -x \"npm run build-css\"",
+    "watch": "nodemon --watch src -x \"npm run build\"",
     "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
@@ -55,6 +56,7 @@
     "node-sass": "^4.9.3",
     "nodemon": "^1.18.4",
     "npm-run-all": "^4.1.3",
+    "rimraf": "^2.6.2",
     "spectron": "^3.6.1",
     "ssh2": "^0.5.4",
     "stylelint": "^7.9.0",
@@ -101,14 +103,10 @@
     "appId": "org.khalisfoundation.sttm",
     "copyright": "Copyright © 2018 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
-      "**/*",
-      "!assets${/*}",
-      "!builds${/*}",
-      "!src${/*}",
-      "!packaging${/*}",
-      "!test${/*}",
-      "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
-      "!**/*.map"
+      "node_modules",
+      "www",
+      "package.json",
+      "LICENSE"
     ],
     "extraResources": [
       "data.db"

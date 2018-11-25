@@ -1,4 +1,8 @@
 /* eslint-disable arrow-parens */
+const { store } = require('electron').remote.require('./app');
+// HTMLElement builder
+const h = require('hyperscript');
+
 const banidb = require('./banidb');
 
 const { CONSTS } = banidb;
@@ -6,11 +10,6 @@ const { CONSTS } = banidb;
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
-
-// HTMLElement builder
-const h = require('hyperscript');
-
-const { store } = require('electron').remote.require('./app');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
@@ -120,13 +119,9 @@ const englishSearchTypes = Object.keys(englishSearchText);
 const sourceTexts = CONSTS.SOURCE_TEXTS;
 const sourceKeys = Object.keys(sourceTexts);
 
-const gurmukhiSearchOptions = gurmukhiSearchTypes.map((value) =>
-  h('option', { value }, gurmukhiSearchText[value]),
-);
+const gurmukhiSearchOptions = gurmukhiSearchTypes.map((value) => h('option', { value }, gurmukhiSearchText[value]));
 
-const englishSearchOptions = englishSearchTypes.map((value) =>
-  h('option', { value }, englishSearchText[value]),
-);
+const englishSearchOptions = englishSearchTypes.map((value) => h('option', { value }, englishSearchText[value]));
 
 const gurmukhiInputs = h(
   'select',
@@ -175,9 +170,7 @@ const searchLanguage = h(
   h('label', { htmlFor: 'english-language' }, 'ABC'),
 );
 
-const sourceOptions = sourceKeys.map((key) =>
-  h('option', { value: key }, sourceTexts[key]),
-);
+const sourceOptions = sourceKeys.map((key) => h('option', { value: key }, sourceTexts[key]));
 
 const shabadNavFwd = h(
   'div#shabad-next.navigator-button',
@@ -210,7 +203,8 @@ const searchOptions = h(
   ),
   h(
     'label.filter-text#source-selection', { htmlFor: 'search-source' },
-    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')]),
+    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')],
+  ),
 );
 
 const navPageLinks = [];
@@ -242,11 +236,11 @@ const sources = {
 
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', e => {
-  const target = e.target;
+  const { target } = e;
   if (
-    document.querySelector('.search-div') &&
-    !document.querySelector('.search-div').contains(target) &&
-    !document.querySelector('#search-page .navigator-header').contains(target)
+    document.querySelector('.search-div')
+    && !document.querySelector('.search-div').contains(target)
+    && !document.querySelector('#search-page .navigator-header').contains(target)
   ) {
     module.exports.closeGurmukhiKB();
   }
@@ -342,9 +336,9 @@ module.exports = {
   typeSearch(e) {
     // if a key is pressed in the Gurmukhi KB or is one of the allowed keys
     if (
-      e === 'gKB' ||
-      (e.which <= 90 && e.which >= 48) ||
-      allowedKeys.indexOf(e.which) > -1
+      e === 'gKB'
+      || (e.which <= 90 && e.which >= 48)
+      || allowedKeys.indexOf(e.which) > -1
     ) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
@@ -470,7 +464,7 @@ module.exports = {
   },
 
   search() {
-    const searchType = this.searchType;
+    const { searchType } = this;
     let searchQuery;
     if (searchType === 4) {
       searchQuery = this.$angSearch.value;
@@ -510,8 +504,7 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
-                                                  item),
+              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item),
             },
             resultNode,
           ),
@@ -539,7 +532,9 @@ module.exports = {
         {
           onclick: ev => this.clickSession(ev, ShabadID, LineID),
         },
-        Line.Gurmukhi));
+        Line.Gurmukhi,
+      ),
+    );
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -639,8 +634,7 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
-            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                           item.ID, item, rows),
+            onclick: e => this.clickShabad(e, item.ShabadID || shabadID, item.ID, item, rows),
           },
           [
             h('i.fa.fa-fw.fa-check'),
@@ -709,9 +703,9 @@ module.exports = {
       .find(value => /^autoplayTimer-/.test(value))
       .replace('autoplayTimer-', '');
     if (
-      bodyClassList.contains('autoplay') &&
-      LineID !== currentShabad[currentShabad.length - 1] &&
-      LineID !== null
+      bodyClassList.contains('autoplay')
+      && LineID !== currentShabad[currentShabad.length - 1]
+      && LineID !== null
     ) {
       autoplaytimer = setTimeout(() => {
         document.getElementById(`line${LineID + 1}`).click();

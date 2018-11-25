@@ -45,8 +45,7 @@ module.exports = {
     this.$connectBtn.textContent = previousText;
 
     if (error) {
-      this.$connectBox.querySelector('.help-block').textContent =
-        "Couldn't establish connection with sync server";
+      this.$connectBox.querySelector('.help-block').textContent = "Couldn't establish connection with sync server";
     } else {
       const { namespaceString } = data;
 
@@ -64,8 +63,7 @@ module.exports = {
       .querySelector('input')
       .setAttribute('value', namespaceString);
 
-    this.$shareBox.querySelector('.end-btn').onclick = () =>
-      this.onEnd(namespaceString);
+    this.$shareBox.querySelector('.end-btn').onclick = () => this.onEnd(namespaceString);
 
     window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
   },

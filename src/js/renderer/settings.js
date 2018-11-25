@@ -1,8 +1,8 @@
+const { store } = require('electron').remote.require('./app');
 const h = require('hyperscript');
 const ldGet = require('lodash.get');
-const settings = require('./settings.json');
 
-const { store } = require('electron').remote.require('./app');
+const settings = require('./settings.json');
 
 const defaultPrefs = store.getDefaults().userPrefs;
 
@@ -65,7 +65,7 @@ function addDisplayTab() {
     let subLabel = false;
     if (typeof setting.options[option] === 'object') {
       optionLabel = setting.options[option].label;
-      subLabel = setting.options[option].subLabel;
+      ({ subLabel } = setting.options[option]);
 
       if (typeof subLabel === 'object') {
         subLabel = store.get(subLabel.storepref);
@@ -82,7 +82,11 @@ function addDisplayTab() {
                 switchListAttrs),
               h('label',
                 {
-                  htmlFor: optionId })])]));
+                  htmlFor: optionId,
+                }),
+            ]),
+        ]),
+    );
     if (subLabel) {
       switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
     }
@@ -99,13 +103,15 @@ function createSettingsPage(userPrefs) {
   Object.keys(settings).forEach((catKey) => {
     const cat = settings[catKey];
     settingsPage.appendChild(
-      h('h2', cat.title));
+      h('h2', cat.title),
+    );
     const settingCat = h('section.block-list');
 
     Object.keys(cat.settings).forEach((settingKey) => {
       const setting = cat.settings[settingKey];
       settingCat.appendChild(
-        h('header', setting.title));
+        h('header', setting.title),
+      );
       switch (setting.type) {
         case 'checkbox': {
           const checkboxList = h('ul');
@@ -130,9 +136,9 @@ function createSettingsPage(userPrefs) {
                   h(`input#${optionId}`,
                     checkboxListAttrs),
                   h('label',
-                    {
-                      htmlFor: optionId },
-                    setting.options[option])]));
+                    { htmlFor: optionId },
+                    setting.options[option])]),
+            );
           });
           settingCat.appendChild(checkboxList);
           break;
@@ -159,9 +165,9 @@ function createSettingsPage(userPrefs) {
                   h(`input#${optionId}`,
                     radioListAttrs),
                   h('label',
-                    {
-                      htmlFor: optionId },
-                    setting.options[option])]));
+                    { htmlFor: optionId },
+                    setting.options[option])]),
+            );
           });
           settingCat.appendChild(radioList);
           break;
@@ -197,8 +203,8 @@ function createSettingsPage(userPrefs) {
                       h(`input#${optionId}`,
                         switchListAttrs),
                       h('label',
-                        {
-                          htmlFor: optionId })])]));
+                        { htmlFor: optionId })])]),
+            );
           });
           settingCat.appendChild(rangeList);
           break;
@@ -238,7 +244,7 @@ function createSettingsPage(userPrefs) {
             let subLabel = false;
             if (typeof setting.options[option] === 'object') {
               optionLabel = setting.options[option].label;
-              subLabel = setting.options[option].subLabel;
+              ({ subLabel } = setting.options[option]);
               if (typeof subLabel === 'object') {
                 subLabel = store.get(subLabel.storepref);
               }
@@ -253,8 +259,8 @@ function createSettingsPage(userPrefs) {
                       h(`input#${optionId}`,
                         switchListAttrs),
                       h('label',
-                        {
-                          htmlFor: optionId })])]));
+                        { htmlFor: optionId })])]),
+            );
             if (subLabel) {
               switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
             }
