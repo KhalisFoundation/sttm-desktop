@@ -12,6 +12,7 @@ function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
   } */
+  // show Empty Slide
   global.controller.sendText('');
 }
 
