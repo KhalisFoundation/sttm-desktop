@@ -121,14 +121,14 @@ autoUpdater.on('update-downloaded', () => {
     type: 'info',
     buttons: [
       'Dismiss',
-      'Install & Restart',
+      'Install and Restart',
     ],
     defaultId: 1,
     title: 'Update available.',
     message: 'Update available.',
     detail: 'Update downloaded and ready to install',
     cancelId: 0,
-  }, response => {
+  }, (response) => {
     if (response === 1) {
       autoUpdater.quitAndInstall();
     }
@@ -153,7 +153,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach(i => {
+  Object.keys(displays).forEach((i) => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -300,7 +300,8 @@ ipcMain.on('clear-apv', () => {
 });
 
 function createBroadcastFiles(arg) {
-  const userDataPath = electron.app.getPath('userData');
+  const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
+  const userDataPath = (liveFeedLocation === 'default' || !liveFeedLocation) ? electron.app.getPath('desktop') : liveFeedLocation;
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
   try {
@@ -314,10 +315,30 @@ function createBroadcastFiles(arg) {
   }
 }
 
-ipcMain.on('show-line', (event, arg) => {
+let lastLine;
+const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
-  const payload = Object.assign(arg, overlayPrefs);
-  io.emit('show-line', payload);
+  const payload = Object.assign(line, overlayPrefs);
+  socket.emit('show-line', payload);
+};
+
+const updateOverlayVars = () => {
+  const overlayPrefs = store.get('obs');
+  io.emit('update-prefs', overlayPrefs);
+};
+
+ipcMain.on('update-overlay-vars', updateOverlayVars);
+
+io.on('connection', (socket) => {
+  updateOverlayVars();
+  if (lastLine) {
+    showLine(lastLine, socket);
+  }
+});
+
+ipcMain.on('show-line', (event, arg) => {
+  lastLine = arg;
+  showLine(arg);
   if (viewerWindow) {
     viewerWindow.webContents.send('show-line', arg);
   } else {
@@ -332,7 +353,6 @@ ipcMain.on('show-line', (event, arg) => {
 });
 
 ipcMain.on('show-empty-slide', () => {
-  const overlayPrefs = store.get('obs');
   const emptyLine = {
     Line: {
       Gurmukhi: '',
@@ -341,16 +361,24 @@ ipcMain.on('show-empty-slide', () => {
       Transliteration: '',
     },
   };
-  const payload = Object.assign(emptyLine, overlayPrefs);
-
-  io.emit('show-line', payload);
-
+  showLine(emptyLine);
+  const overlayPrefs = store.get('obs');
   if (overlayPrefs.live) {
     createBroadcastFiles(emptyLine);
   }
 });
 
 ipcMain.on('show-text', (event, arg) => {
+  const textLine = {
+    Line: {
+      Gurmukhi: arg.isGurmukhi ? arg.text : '',
+      English: !arg.isGurmukhi ? arg.text : '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  showLine(textLine);
+
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);
   } else {
@@ -358,6 +386,9 @@ ipcMain.on('show-text', (event, arg) => {
       send: 'show-text',
       data: arg,
     });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
   }
 });
 

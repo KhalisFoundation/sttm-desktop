@@ -1,7 +1,7 @@
 ## SikhiToTheMax Desktop App
 
-### 4.2.2 - _181106_
-#### Roll backed to 4.1.0
+### 4.2.3 - _181115_
+* Bug Fixes 
 
 ### 4.2.1 - _181103_
 #### Improved
