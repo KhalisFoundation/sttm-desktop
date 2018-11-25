@@ -384,7 +384,12 @@ function checkPresenterView() {
     document.body.classList.add('presenter-view');
     document.body.classList.remove('home');
     document.body.classList.add('scale-viewer');
+  } else {
+    document.body.classList.remove('presenter-view');
+    document.body.classList.add('home');
+    document.body.classList.remove('scale-viewer');
   }
+  document.querySelector('#presenter-view-toggle').checked = store.getUserPref('app.layout.presenter-view');
 }
 
 global.platform.ipc.on('presenter-view', () => {
