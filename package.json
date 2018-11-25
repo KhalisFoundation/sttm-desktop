@@ -6,7 +6,7 @@
   "main": "www/main/app.js",
   "scripts": {
     "precommit": "npm test",
-    "test": "htmlhint --config .htmlhintrc www && eslint app.js packaging/ src/js && stylelint \"src/scss/*.scss\" --syntax scss --fix",
+    "test": "htmlhint --config .htmlhintrc www && eslint packaging/ src/js && stylelint \"src/scss/*.scss\" --syntax scss --fix",
     "start": "cross-env NODE_ENV=development electron .",
     "clean": "rimraf www/assets/js/*.js www/main www/shared",
     "build": "npm run clean && webpack && cp -R src/js/main www/main && cp -R src/js/shared www/shared && npm run build-css",

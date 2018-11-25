@@ -2,9 +2,9 @@
 // Load the SDK
 const AWS = require('aws-sdk');
 const fs = require('fs');
-const version = require('../package.json').version;
 const path = require('path');
 const SSH = require('ssh2').Client;
+const { version } = require('../package.json');
 
 const buildsDir = './builds/';
 const dmgFile = `SikhiToTheMax-${version}.dmg`;
