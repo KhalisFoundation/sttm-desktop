@@ -1,5 +1,7 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
+$bisram-1: #ffba00; //sunflower
+$bisram-2: #00ac47; //nephritis
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -146,6 +148,14 @@ h2 {
       display: none;
       font-style: normal;
     }
+  }
+
+  .bisram-1 {
+    color: $bisram-1;
+  }
+
+  .bisram-2 {
+    color: $bisram-2;
   }
 }
 
