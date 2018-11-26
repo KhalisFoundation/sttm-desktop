@@ -1,7 +1,7 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
-$bisram-1: #ffba00; //sunflower
-$bisram-2: #00ac47; //nephritis
+$bisram-1: #ffba00; 
+$bisram-2: #00ac47;
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -148,14 +148,6 @@ h2 {
       display: none;
       font-style: normal;
     }
-  }
-
-  .bisram-1 {
-    color: $bisram-1;
-  }
-
-  .bisram-2 {
-    color: $bisram-2;
   }
 }
 
@@ -371,6 +363,16 @@ h2 {
 
   .vc-toggle-icon {
     width: 30vh;
+  }
+}
+
+.display-bisrams .gurbani {
+  .bisram-1 {
+    color: $bisram-1;
+  }
+
+  .bisram-2 {
+    color: $bisram-2;
   }
 }
 
