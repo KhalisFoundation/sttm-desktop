@@ -7,6 +7,9 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
+// Are we packaging for a platform's app store?
+const appstore = false;
+
 const expressApp = express();
 
 const http = require('http').Server(expressApp);
@@ -234,7 +237,11 @@ app.on('ready', () => {
       });
     }
     mainWindow.show();
-    checkForUpdates();
+    // Platform-specific app stores have their own update mechanism
+    // so only check if we're not in one
+    if (!appstore) {
+      checkForUpdates();
+    }
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
     if (lastSeen !== appVersion) {
@@ -415,4 +422,5 @@ module.exports = {
   checkForUpdates,
   autoUpdater,
   store,
+  appstore,
 };
