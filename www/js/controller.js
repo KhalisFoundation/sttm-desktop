@@ -6,7 +6,7 @@ const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
-const { store } = main;
+const { store, appstore } = main;
 
 global.webview = document.querySelector('webview');
 
@@ -37,6 +37,8 @@ const updateMenu = [
     click: () => {
       main.checkForUpdates(true);
     },
+    // Only show if not in a platform-specific app store
+    visible: !appstore,
   },
   {
     label: 'Checking for Updates',
