@@ -6,7 +6,7 @@ const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
-const { store } = main;
+const { store, appstore } = main;
 
 global.webview = document.querySelector('webview');
 
@@ -37,6 +37,8 @@ const updateMenu = [
     click: () => {
       main.checkForUpdates(true);
     },
+    // Only show if not in a platform-specific app store
+    visible: !appstore,
   },
   {
     label: 'Checking for Updates',
@@ -461,9 +463,9 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID, Line) {
-    global.webview.send('show-line', { shabadID, lineID });
-    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar') };
+  sendLine(shabadID, lineID, Line, rows) {
+    global.webview.send('show-line', { shabadID, lineID, rows });
+    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
