@@ -1,0 +1,11 @@
+$highlightStregnth: 0.8;
+
+$lightHighlight: rgba(255, 255, 255, 0.5);
+$darkHighlight: rgba(0, 0, 0, 0.5);
+
+@mixin highlight($highlightType) {
+  background: if($highlightType == light, $lightHighlight, $darkHighlight);
+  border-radius: 15px;
+  margin: 5px auto;
+  padding: 0 10px;
+}

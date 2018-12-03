@@ -27,6 +27,15 @@ body.floral {
     color: #a4244e;
   }
 
+  &.show-overlay {
+    .gurbani,
+    .translation,
+    .teeka,
+    .transliteration {
+      @include highlight(light);
+    }
+  }
+
   .logo {
     path {
       fill: #e0e0e0;

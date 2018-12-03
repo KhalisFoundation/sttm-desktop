@@ -22,6 +22,15 @@ body.baagi-blue {
     color: #f4f4f9;
   }
 
+  &.show-overlay {
+    .gurbani,
+    .translation,
+    .teeka,
+    .transliteration {
+      @include highlight(dark);
+    }
+  }
+
   .logo {
     path {
       fill: #e0e0e0;
@@ -45,7 +54,7 @@ body.baagi-blue {
   }
 }
 
-$bg-main: #212121;
+$bg-main: #080707;
 $bg-alt: #3a3a3a;
 $bg-bright: #424242;
 $text-base: #bdbdbd;

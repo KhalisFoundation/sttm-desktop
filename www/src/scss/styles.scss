@@ -19,6 +19,7 @@ $keyboard-height:128px;
   }
 }
 
+@import "theme-common";
 @import
   "controller.scss",
   "markdown",
@@ -57,7 +58,7 @@ a {
 
 body.show-overlay {
   .color-overlay {
-    display: block;
+    display: none;
     opacity: 0.5;
     position: fixed;
     z-index: 0;
