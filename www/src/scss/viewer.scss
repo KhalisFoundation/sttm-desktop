@@ -1,6 +1,6 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
-$bisram-1: #c0392b; 
+$bisram-1: #c0392b;
 $bisram-2: #ffc500;
 
 @font-face {
@@ -383,15 +383,15 @@ h2 {
 
   .padchhed .bisram-1,
   .padchhed .bisram-2 {
-    padding-right:5px;
+    padding-right: 5px;
   }
 
   .bisram-1 {
-    background: linear-gradient(to right, rgba(229,229,229,0) 1%,rgba(255,69,0,0.5) 100%);
+    background: linear-gradient(to right, rgba(229, 229, 229, 0) 1%, rgba(255, 69, 0, 0.5) 100%);
   }
 
   .bisram-2 {
-    background: linear-gradient(to right, rgba(229,229,229,0) 1%,rgba(255,197,0,0.5) 100%); ;
+    background: linear-gradient(to right, rgba(229, 229, 229, 0) 1%, rgba(255, 197, 0, 0.5) 100%);
   }
 }
 
