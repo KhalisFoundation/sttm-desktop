@@ -38,7 +38,7 @@ const query = (searchQuery, searchType, searchSource) => (
           }
           if (charCode === '042') {
             isWildChar = true;
-            dbQuery += ',???';
+            dbQuery += ',*';
             operator = 'LIKE';
           } else {
             dbQuery += `,${charCode}`;
