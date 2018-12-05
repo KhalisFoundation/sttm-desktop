@@ -25,4 +25,30 @@
       }
     }
   }
+
+  .presenter-switch {
+    @extend .menu-bar;
+    $switchHeight: 24px;
+
+    bottom: 0;
+    position: absolute;
+    right: 0;
+
+    span {
+      font-size: 14px;
+      line-height: 0;
+    }
+
+    .switch {
+      height: $switchHeight;
+      margin: 8px;
+      vertical-align: middle;
+      width: 42px;
+    }
+
+    label::after {
+      height: $switchHeight;
+      width: $switchHeight;
+    }
+  }
 }
