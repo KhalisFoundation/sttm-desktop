@@ -76,6 +76,28 @@ function nextLine(e) {
   e.preventDefault();
 }
 
+function findLine(e) {
+  e.preventDefault();
+  const filterKey = e.key;
+
+  // Find position of current line in shabad
+  const pos = search.currentShabad.indexOf(search.currentLine);
+
+  // Rotate the array based on current shabad
+  const panktees = Array.from(search.$shabad.getElementsByClassName('panktee'));
+  const pankteesBeforePos = panktees.splice(0, pos + 1);
+  const pankteesRotated = panktees.concat(pankteesBeforePos);
+
+  const lineFound = pankteesRotated.find((panktee) => {
+    const pankteeText = panktee.querySelector('.main-letters').innerText;
+    return pankteeText.substring(0, 1) === filterKey;
+  });
+
+  if (lineFound) {
+    lineFound.click();
+  }
+}
+
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
@@ -84,6 +106,11 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
   Mousetrap.bind('space', spaceBar);
+}
+
+const $shabadPage = document.getElementById('shabad-page');
+if ($shabadPage) {
+  $shabadPage.addEventListener('keypress', findLine);
 }
 
 /**

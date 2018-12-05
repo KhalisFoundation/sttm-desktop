@@ -648,6 +648,10 @@ module.exports = {
             h('i.fa.fa-fw.fa-home'),
             ' ',
             item.Gurmukhi,
+            h(
+              'span.hidden.main-letters',
+              item.MainLetters,
+            ),
           ],
         ),
       );
