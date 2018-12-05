@@ -12,8 +12,6 @@ function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
   } */
-
-  global.controller.sendText('');
 }
 
 function hideSlide() {
