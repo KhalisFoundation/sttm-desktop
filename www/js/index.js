@@ -12,6 +12,11 @@ function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
   } */
+
+  global.controller.sendText('');
+}
+
+function hideSlide() {
   // show Empty Slide
   global.controller.sendText('');
 }
@@ -76,6 +81,7 @@ function nextLine(e) {
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
+  Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
