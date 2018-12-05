@@ -382,11 +382,14 @@ function updateViewerScale() {
 }
 
 function checkPresenterView() {
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.add('presenter-view');
-    document.body.classList.remove('home');
-    document.body.classList.add('scale-viewer');
-  }
+  const inPresenterView = store.getUserPref('app.layout.presenter-view');
+  const classList = document.body.classList;
+
+  classList.toggle('presenter-view', inPresenterView);
+  classList.toggle('home', !inPresenterView);
+  classList.toggle('scale-viewer', inPresenterView);
+
+  document.querySelector('#presenter-view-toggle').checked = inPresenterView;
 }
 
 global.platform.ipc.on('presenter-view', () => {
