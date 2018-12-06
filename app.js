@@ -52,7 +52,7 @@ if (!userId) {
   userId = uuid();
   store.set('userId', userId);
 }
-const analytics = new Analytics(userId);
+const analytics = new Analytics(userId, store);
 global.trackEvent = analytics.trackEvent;
 
 const appVersion = app.getVersion();

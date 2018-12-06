@@ -4,9 +4,10 @@ const isOnline = require('is-online');
 const trackingId = 'UA-129669333-1';
 
 class Analytics {
-  constructor(userId) {
+  constructor(userId, store) {
     if (trackingId) {
       this.usr = ua(trackingId, userId);
+      this.store = store;
     }
   }
 
@@ -24,19 +25,21 @@ class Analytics {
    * @param value
    */
   trackEvent(category, action, label, value) {
-    isOnline().then((online) => {
-      // TODO: for offline users, come up with a way of storing and send when online.
-      if (online && this.usr) {
-        this.usr
-          .event({
-            ec: category,
-            ea: action,
-            el: label,
-            ev: value,
-          })
-          .send();
-      }
-    });
+    if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
+      isOnline().then((online) => {
+        // TODO: for offline users, come up with a way of storing and send when online.
+        if (online && this.usr) {
+          this.usr
+            .event({
+              ec: category,
+              ea: action,
+              el: label,
+              ev: value,
+            })
+            .send();
+        }
+      });
+    }
   }
 
 
@@ -47,17 +50,19 @@ class Analytics {
    * @param hostname
    */
   trackPageView(path, title, hostname = 'SikhiToTheMax Desktop') {
-    isOnline().then((online) => {
-      if (online && this.usr) {
-        this.usr
-          .pageview({
-            dp: path,
-            dt: title,
-            dh: hostname,
-          })
-          .send();
-      }
-    });
+    if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
+      isOnline().then((online) => {
+        if (online && this.usr) {
+          this.usr
+            .pageview({
+              dp: path,
+              dt: title,
+              dh: hostname,
+            })
+            .send();
+        }
+      });
+    }
   }
 }
 

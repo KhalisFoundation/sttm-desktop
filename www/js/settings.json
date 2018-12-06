@@ -13,6 +13,13 @@
         "options": {
           "presenter-view": "Presenter View"
         }
+      },
+      "analytics": {
+        "title": "Other Options",
+        "type": "switch",
+        "options": {
+          "collect-statistics":"Collect Statistics"
+        }
       }
     }
   },
