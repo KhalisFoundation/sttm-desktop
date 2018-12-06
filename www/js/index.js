@@ -14,6 +14,11 @@ function escKey() {
   } */
 }
 
+function hideSlide() {
+  // show Empty Slide
+  global.controller.sendText('');
+}
+
 function highlightLine(newLine) {
   const $line = search.$shabad.querySelector(`#line${newLine}`);
   $line.click();
@@ -74,6 +79,7 @@ function nextLine(e) {
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
+  Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
