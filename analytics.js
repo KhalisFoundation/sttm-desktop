@@ -1,7 +1,7 @@
 const ua = require('universal-analytics'); // https://www.npmjs.com/package/universal-analytics
 const isOnline = require('is-online');
 
-const trackingId = 'UA-129669333-1';
+const trackingId = 'UA-45513519-12';
 
 class Analytics {
   constructor(userId, store) {
