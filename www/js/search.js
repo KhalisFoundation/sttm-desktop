@@ -663,6 +663,7 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
+            'data-main-letters': item.MainLetters,
             onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
                            item.ID, item, rows),
           },
@@ -671,10 +672,6 @@ module.exports = {
             h('i.fa.fa-fw.fa-home'),
             ' ',
             item.Gurmukhi,
-            h(
-              'span.hidden.main-letters',
-              item.MainLetters,
-            ),
           ],
         ),
       );

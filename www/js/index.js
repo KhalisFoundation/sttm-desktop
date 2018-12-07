@@ -84,12 +84,12 @@ function findLine(e) {
   const pos = search.currentShabad.indexOf(search.currentLine);
 
   // Rotate the array based on current shabad
-  const panktees = Array.from(search.$shabad.getElementsByClassName('panktee'));
+  const panktees = [...search.$shabad.getElementsByClassName('panktee')];
   const pankteesBeforePos = panktees.splice(0, pos + 1);
-  const pankteesRotated = panktees.concat(pankteesBeforePos);
+  const pankteesRotated = [...panktees, ...pankteesBeforePos];
 
   const lineFound = pankteesRotated.find((panktee) => {
-    const pankteeText = panktee.querySelector('.main-letters').innerText;
+    const pankteeText = panktee.getAttribute('data-main-letters');
     return pankteeText.substring(0, 1) === filterKey;
   });
 
