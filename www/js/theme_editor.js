@@ -3,7 +3,7 @@ const h = require('hyperscript');
 const Noty = require('noty');
 const themes = require('./themes.json');
 
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 // const imagesPath = 'assets/custom_backgrounds';
 
@@ -46,6 +46,7 @@ const swatchFactory = themeInstance =>
           store.setUserPref('app.theme', themeInstance.key);
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
+          analytics.trackEvent('theme', themeInstance.key);
         } catch (error) {
           new Noty({
             type: 'error',

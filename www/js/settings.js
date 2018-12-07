@@ -1,8 +1,7 @@
 const h = require('hyperscript');
 const ldGet = require('lodash.get');
 const settings = require('./settings.json');
-
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 const defaultPrefs = store.getDefaults().userPrefs;
 
@@ -12,11 +11,14 @@ function updateMultipleChoiceSetting(key, val) {
   });
   document.body.classList.add(val);
   global.core.platformMethod('updateSettings');
+  analytics.trackEvent('settings', key, val);
 }
 
 function updateCheckboxSetting(val) {
-  document.body.classList.toggle(val);
+  const classList = document.body.classList;
+  classList.toggle(val);
   global.core.platformMethod('updateSettings');
+  analytics.trackEvent('settings', val, classList.contains(val));
 }
 
 function updateRangeSetting(key, val) {
@@ -27,6 +29,7 @@ function updateRangeSetting(key, val) {
   }
   document.body.classList.add(`${optionKey}-${val}`);
   global.core.platformMethod('updateSettings');
+  analytics.trackEvent('settings', optionKey, val);
 }
 
 function addDisplayTab() {
@@ -337,6 +340,7 @@ module.exports = {
     document.body.classList.add(`${iconType}-${newSize}`);
     store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
     global.platform.updateSettings();
+    analytics.trackEvent('settings', `${iconType}`, newSize);
   },
   showHide(e, type) {
     const catKey = 'slide-layout';
@@ -346,5 +350,6 @@ module.exports = {
     const newVal = document.body.classList.contains(option);
     store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
     global.platform.updateSettings();
+    analytics.trackEvent('settings', `${option}`, newVal);
   },
 };

@@ -16,6 +16,14 @@ const ENGLISH_SEARCH_TEXTS = {
   [SEARCH_TYPES.ENGLISH_WORD]: 'Full Word(s)',
 };
 
+const SEARCH_TEXTS = {
+  [SEARCH_TYPES.FIRST_LETTERS]: 'First Letter (Start)',
+  [SEARCH_TYPES.FIRST_LETTERS_ANYWHERE]: 'First Letter (Anywhere)',
+  [SEARCH_TYPES.GURMUKHI_WORD]: 'Full Word(s) - Gurmukhi',
+  [SEARCH_TYPES.ENGLISH_WORD]: 'Full Word(s) - English',
+  [SEARCH_TYPES.ANG]: 'ANG',
+};
+
 const SOURCE_TYPES = {
   ALL_SOURCES: 'all',
   GURU_GRANTH_SAHIB: 'G',
@@ -42,6 +50,7 @@ module.exports = {
   SEARCH_TYPES,
   GURMUKHI_SEARCH_TEXTS,
   ENGLISH_SEARCH_TEXTS,
+  SEARCH_TEXTS,
   SOURCE_TEXTS,
   SOURCE_TYPES,
 };

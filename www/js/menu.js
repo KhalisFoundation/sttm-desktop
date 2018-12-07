@@ -7,7 +7,7 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -117,6 +117,7 @@ const getNotifications = (timeStamp, callback) => {
 };
 
 const notificationsBellClickHandler = () => {
+  analytics.trackEvent('display', 'notifications');
   getNotifications(null, showNotificationsModal);
 };
 
@@ -136,6 +137,7 @@ const randomShabadButton = h(
     'a.random-shabad-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'random-shabad');
         randomShabad()
           .then(goToShabadPage);
       } },
@@ -146,7 +148,10 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: () => { goToShabadPage(2897); },
+      onclick: () => {
+        analytics.trackEvent('display', 'anand-karaj');
+        goToShabadPage(2897);
+      },
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
@@ -165,6 +170,7 @@ const hukamnamaButton = h(
     'a.hukamnama-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'hukamnam');
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
           if (!error) {
             const hukamShabadID = parseInt(response.shabadinfo.id, 10);
@@ -183,6 +189,7 @@ const emptySlideButton = h(
     'a.empty-slide-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'empty-slide');
         global.controller.sendText('');
       } },
     h('i.fa.fa-eye-slash.list-icon'),
@@ -193,6 +200,7 @@ const waheguruSlideButton = h(
     'a.waheguru-slide-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'waheguru-slide');
         global.controller.sendText('vwihgurU', true);
       } },
     h('i.fa.fa-circle.list-icon'),
@@ -204,6 +212,7 @@ const dhanGuruSlideButton = h(
     {
       onclick: () => {
         const guruJi = document.querySelector('#dhan-guru').value;
+        analytics.trackEvent('display', 'dhanguru-slide', guruJi);
         global.controller.sendText(guruJi, true);
       } },
     h('i.fa.fa-circle-o.list-icon'),
@@ -261,6 +270,7 @@ const announcementSlideButton = h(
     'button.announcement-slide-btn.button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'announcement-slide');
         const isGurmukhi = document.querySelector('#announcement-language').checked;
         const announcementText = document.querySelector('.announcement-text').value;
         global.controller.sendText(announcementText, isGurmukhi);
