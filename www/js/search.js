@@ -666,6 +666,7 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
+            'data-main-letters': item.MainLetters,
             onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
                            item.ID, item, rows),
           },
