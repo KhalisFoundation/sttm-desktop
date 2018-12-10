@@ -10,7 +10,7 @@ const { ipcRenderer, remote } = electron;
 const overlayPort = remote.getGlobal('overlayPort');
 const url = `http://${host}:${overlayPort}/`;
 
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 const overlayVars = store.get('obs').overlayPrefs.overlayVars;
 
@@ -132,6 +132,7 @@ const layoutButtonFactory = layoutName => h(
         });
         overlayVars.layout = layoutName;
         savePrefs();
+        analytics.trackEvent('overlay', 'layout', layoutName);
       },
     },
   ),

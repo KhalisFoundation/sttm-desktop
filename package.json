@@ -78,7 +78,9 @@
     "socket.io": "^2.1.1",
     "sqlite3": "^4.0.3",
     "tippy.js": "^2.5.2",
-    "update": "^0.7.4"
+    "universal-analytics": "^0.4.20",
+    "update": "^0.7.4",
+    "uuid": "^3.3.2"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
