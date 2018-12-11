@@ -16,6 +16,7 @@
     };
     var socket = io();
     var preview = (document.location.href.indexOf('preview') > -1);
+    var larivaar = (document.location.href.indexOf('larivaar') > -1);
     var overlayPrefs;
     function hexToRgb(hex) {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -51,7 +52,7 @@
     socket.on('show-line', function(request) {
       if (!preview) {
         overlayPrefs = request.overlayPrefs;
-        writeLine(request.Line, request.larivaar);
+        writeLine(request.Line, overlayPrefs.overlayVars.overlayLarivaar);
       }
     });
 
@@ -74,7 +75,7 @@
   </section>
   <script type="text/javascript">
     if (preview) {
-      writeLine(previewData);
+      writeLine(previewData, larivaar);
     }
   </script>
 </body>

@@ -23,6 +23,18 @@ const savePrefs = () => {
   ipcRenderer.send('update-overlay-vars');
 };
 
+const upsertPreview = () => {
+  const $existingWebview = document.querySelector('webview');
+  if($existingWebview) {
+    $existingWebview.remove();
+  }
+
+  const webview = document.createElement('webview');
+  webview.src = `${url}?preview&${overlayVars.overlayLarivaar ? 'larivaar' : 'padched'}`;
+  webview.className = 'preview';
+  document.querySelector('.canvas').appendChild(webview);
+}
+
 const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
   `div.${inputName}.input-wrap`,
   h(
@@ -179,6 +191,31 @@ const copyURLButton = h(
   ),
 );
 
+const toggleLarivaar = h(
+  'div.input-wrap',
+  {
+    onclick: (evt) => {
+      overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
+      savePrefs();
+      upsertPreview();
+
+      isItLarivaar = overlayVars.overlayLarivaar;
+      const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
+      $larivaarIcon.classList.toggle('fa-unlink', isItLarivaar);
+      $larivaarIcon.classList.toggle('fa-link', !isItLarivaar);
+      evt.currentTarget.querySelector('.setting-label').innerHTML = isItLarivaar ? 'Padched' : 'Larivaar';
+    },
+  },
+  h(
+    'div.export-btn#larivaar-btn',
+    h(`i.fa.cp-icon.${overlayVars.overlayLarivaar ? 'fa-unlink' : 'fa-link'}`),
+  ),
+  h (
+    'div.setting-label',
+    overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar',
+  ),
+);
+
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
@@ -215,11 +252,9 @@ controlPanel.append(topLayoutBtn);
 controlPanel.append(splitLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
+controlPanel.append(toggleLarivaar);
 
-const webview = document.createElement('webview');
-webview.src = `${url}?preview`;
-webview.className = 'preview';
-document.querySelector('.canvas').appendChild(webview);
+upsertPreview();
 
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
