@@ -6,6 +6,9 @@
       "layout": {
         "presenter-view": true
       },
+      "analytics": {
+        "collect-statistics": false
+      },
       "custom-theme-options": {
         "show-theme-editor": true
       },

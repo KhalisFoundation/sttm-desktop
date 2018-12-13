@@ -2,7 +2,7 @@ const h = require('hyperscript');
 const Noty = require('noty');
 const themes = require('./themes.json');
 
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 const defaultTheme = themes[0];
 
@@ -24,6 +24,7 @@ const swatchFactory = themeInstance =>
           });
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
+          analytics.trackEvent('theme', themeInstance.key);
         } catch (error) {
           new Noty({
             type: 'error',
