@@ -34,6 +34,7 @@ const searchInputs = h('div#search-container', [
     type: 'search',
     onfocus: e => module.exports.focusSearch(e),
     onkeyup: e => module.exports.typeSearch(e),
+    onpaste: e => module.exports.search(e, true),
   }),
   h('span', 'Ang'),
   h('input#ang-input.gurmukhi', {
@@ -495,14 +496,17 @@ module.exports = {
     }
   },
 
-  search() {
+  search(e, pasteTrigger) {
     const searchType = this.searchType;
-    let searchQuery;
+    let searchValue;
     if (searchType === 4) {
-      searchQuery = this.$angSearch.value;
+      searchValue = this.$angSearch.value;
     } else {
-      searchQuery = this.$search.value;
+      searchValue = this.$search.value;
     }
+
+    const searchQuery = pasteTrigger ? e.clipboardData.getData('Text') : searchValue;
+
     if (searchQuery.length >= 1) {
       banidb.query(searchQuery, searchType, this.searchSource)
         .then(rows => this.printResults(rows));
@@ -666,6 +670,7 @@ module.exports = {
           }`,
           {
             'data-line-id': item.ID,
+            'data-main-letters': item.MainLetters,
             onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
                            item.ID, item, rows),
           },
