@@ -366,32 +366,37 @@ h2 {
   }
 }
 
-.display-bisrams.colored-words .gurbani {
-  .bisram-1 {
-    color: $bisram-1;
+.light-theme,
+.dark-theme,
+.high-contrast,
+.low-light {
+  &.display-bisrams.colored-words .gurbani {
+    .bisram-1 {
+      color: $bisram-1;
+    }
+
+    .bisram-2 {
+      color: $bisram-2;
+    }
   }
 
-  .bisram-2 {
-    color: $bisram-2;
-  }
-}
+  &.display-bisrams.gradient-bg .gurbani {
+    span {
+      border-radius: 15px;
+    }
 
-.display-bisrams.gradient-bg .gurbani {
-  span {
-    border-radius: 15px;
-  }
+    .padchhed .bisram-1,
+    .padchhed .bisram-2 {
+      padding-right: 5px;
+    }
 
-  .padchhed .bisram-1,
-  .padchhed .bisram-2 {
-    padding-right: 5px;
-  }
+    .bisram-1 {
+      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
+    }
 
-  .bisram-1 {
-    background: linear-gradient(to right, rgba(229, 229, 229, 0) 1%, rgba(255, 69, 0, 0.5) 100%);
-  }
-
-  .bisram-2 {
-    background: linear-gradient(to right, rgba(229, 229, 229, 0) 1%, rgba(255, 197, 0, 0.5) 100%);
+    .bisram-2 {
+      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
+    }
   }
 }
 
