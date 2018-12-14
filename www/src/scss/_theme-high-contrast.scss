@@ -21,17 +21,6 @@ body.high-contrast {
     color: #000;
   }
 
-  &.show-overlay {
-    &.show-overlay {
-      .gurbani,
-      .translation,
-      .teeka,
-      .transliteration {
-        @include highlight(light);
-      }
-    }
-  }
-
   .logo {
     path {
       fill: #212121;

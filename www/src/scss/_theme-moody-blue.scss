@@ -22,17 +22,6 @@ body.moody-blue {
     color: #f1f5f4;
   }
 
-  &.show-overlay {
-    &.show-overlay {
-      .gurbani,
-      .translation,
-      .teeka,
-      .transliteration {
-        @include highlight(dark);
-      }
-    }
-  }
-
   .logo {
     path {
       fill: #e0e0e0;

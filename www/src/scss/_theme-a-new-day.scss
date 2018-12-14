@@ -4,7 +4,6 @@ body.a-new-day {
 
   .color-overlay {
     background-color: #07ccf3;
-    opacity: 0.5;
   }
 
   .gurbani {
@@ -21,15 +20,6 @@ body.a-new-day {
 
   .transliteration {
     color: #80878a;
-  }
-
-  &.show-overlay {
-    .gurbani,
-    .translation,
-    .teeka,
-    .transliteration {
-      @include highlight(light);
-    }
   }
 
   .logo {

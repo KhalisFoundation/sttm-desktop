@@ -21,17 +21,6 @@ body.light-theme {
     color: #666;
   }
 
-  &.show-overlay {
-    &.show-overlay {
-      .gurbani,
-      .translation,
-      .teeka,
-      .transliteration {
-        @include highlight(light);
-      }
-    }
-  }
-
   .logo {
     path {
       fill: #e0e0e0;

@@ -22,18 +22,6 @@ body.khalsa-gold {
     color: #413b3d;
   }
 
-  &.show-overlay {
-    .gurbani {
-      @include highlight(dark);
-    }
-
-    .translation,
-    .teeka,
-    .transliteration {
-      @include highlight(light);
-    }
-  }
-
   .logo {
     path {
       fill: #e0e0e0;

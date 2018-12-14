@@ -22,6 +22,8 @@ body.black-blue {
     color: #ededef;
   }
 
+  /*
+  Keeping it here just as an example for future
   &.show-overlay {
     .gurbani,
     .translation,
@@ -32,7 +34,7 @@ body.black-blue {
     .teeka {
       @include highlight(light);
     }
-  }
+  } */
 
   .logo {
     path {

@@ -6,7 +6,11 @@ const { store, analytics } = require('electron').remote.require('./app');
 
 const defaultTheme = themes[0];
 
-const swatchFactory = themeInstance =>
+const themesWithCustomBg = themes
+                            .filter(theme => theme.type === 'COLOR' || theme.type === 'SPECIAL')
+                            .map(theme => theme.key);
+
+const swatchFactory = (themeInstance, isItCustom) =>
   h(
     'li.theme-instance',
     {
@@ -18,10 +22,12 @@ const swatchFactory = themeInstance =>
         try {
           document.body.classList.remove(store.getUserPref('app.theme'));
           store.setUserPref('app.theme', themeInstance.key);
-          store.setUserPref('app.themebg', {
-            type: 'default',
-            url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
-          });
+          if (!isItCustom) {
+            store.setUserPref('app.themebg', {
+              type: 'default',
+              url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
+            });
+          }
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
           analytics.trackEvent('theme', themeInstance.key);
@@ -60,9 +66,13 @@ const imageInput = () =>
         type: 'file',
         accept: 'image/*',
         onchange: (evt) => {
+          const curTheme = store.getUserPref('app.theme');
+          if (!themesWithCustomBg.includes(curTheme)) {
+            store.setUserPref('app.theme', themesWithCustomBg[0]);
+          }
           store.setUserPref('app.themebg', {
             type: 'custom',
-            url: evt.target.files[0].path,
+            url: evt.target.files[0].path.replace(/(\s)/g, '\\ '),
           });
           global.core.platformMethod('updateSettings');
         },
@@ -70,33 +80,33 @@ const imageInput = () =>
     ),
   );
 
+const swatchGroupFactory = (themeType, themesContainer, isItCustom) => {
+  themes.forEach((themeInstance) => {
+    if (themeInstance.type === themeType) {
+      themesContainer.appendChild(swatchFactory(themeInstance, isItCustom));
+    }
+  });
+};
+
 module.exports = {
   defaultTheme,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
-
-    themes.forEach((themeInstance) => {
-      if (themeInstance.type === 'COLOR') {
-        themeOptions.appendChild(swatchFactory(themeInstance));
-      }
-    });
+    swatchGroupFactory('COLOR', themeOptions);
 
     themeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
-    themes.forEach((themeInstance) => {
-      if (themeInstance.type === 'BACKGROUND') {
-        themeOptions.appendChild(swatchFactory(themeInstance));
-      }
-    });
+    swatchGroupFactory('BACKGROUND', themeOptions);
+
     themeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
-    themes.forEach((themeInstance) => {
-      if (themeInstance.type === 'SPECIAL') {
-        themeOptions.appendChild(swatchFactory(themeInstance));
-      }
-    });
+    swatchGroupFactory('SPECIAL', themeOptions);
 
     themeOptions.appendChild(swatchHeaderFactory('Custom background'));
     themeOptions.appendChild(imageInput());
+
+    themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
+    swatchGroupFactory('COLOR', themeOptions, true);
+    swatchGroupFactory('SPECIAL', themeOptions, true);
   },
 };

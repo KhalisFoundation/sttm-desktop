@@ -21,15 +21,6 @@ body.dark-theme {
     color: #ababab;
   }
 
-  &.show-overlay {
-    .gurbani,
-    .translation,
-    .teeka,
-    .transliteration {
-      @include highlight(dark);
-    }
-  }
-
   .logo {
     path {
       fill: #212121;
