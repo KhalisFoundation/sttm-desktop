@@ -1,8 +1,18 @@
 const h = require('hyperscript');
 const Noty = require('noty');
+const fs = require('fs');
+const util = require('util');
+const imagemin = require('imagemin');
+const imageminJpegtran = require('imagemin-jpegtran');
+const imageminPngquant = require('imagemin-pngquant');
+const { remote } = require('electron');
+
 const themes = require('./themes.json');
 
-const { store, analytics } = require('electron').remote.require('./app');
+const mkdir = util.promisify(fs.mkdir);
+const userDataPath = remote.app.getPath('userData');
+
+const { store, analytics } = remote.require('./app');
 
 const defaultTheme = themes[0];
 
@@ -10,7 +20,7 @@ const themesWithCustomBg = themes
                             .filter(theme => theme.type === 'COLOR' || theme.type === 'SPECIAL')
                             .map(theme => theme.key);
 
-const swatchFactory = (themeInstance, isItCustom) =>
+const swatchFactory = (themeInstance, isCustom) =>
   h(
     'li.theme-instance',
     {
@@ -22,7 +32,7 @@ const swatchFactory = (themeInstance, isItCustom) =>
         try {
           document.body.classList.remove(store.getUserPref('app.theme'));
           store.setUserPref('app.theme', themeInstance.key);
-          if (!isItCustom) {
+          if (!isCustom) {
             store.setUserPref('app.themebg', {
               type: 'default',
               url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
@@ -64,26 +74,48 @@ const imageInput = () =>
     h('input.file-input#themebg-upload',
       {
         type: 'file',
-        accept: 'image/*',
-        onchange: (evt) => {
+        accept: 'image/png, image/jpeg',
+        onchange: async (evt) => {
           const curTheme = store.getUserPref('app.theme');
+
           if (!themesWithCustomBg.includes(curTheme)) {
             store.setUserPref('app.theme', themesWithCustomBg[0]);
           }
-          store.setUserPref('app.themebg', {
-            type: 'custom',
-            url: evt.target.files[0].path.replace(/(\s)/g, '\\ '),
-          });
-          global.core.platformMethod('updateSettings');
+          try {
+            const userBackgroundsPath = `${userDataPath}/user_backgrounds`;
+
+            if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
+
+            const files = await imagemin([evt.target.files[0].path], userBackgroundsPath, {
+              plugins: [
+                imageminJpegtran(),
+                imageminPngquant({ quality: '65-80' }),
+              ],
+            });
+            store.setUserPref('app.themebg', {
+              type: 'custom',
+              url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
+            });
+
+            global.core.platformMethod('updateSettings');
+          } catch (error) {
+            new Noty({
+              type: 'error',
+              text: `There was an error using this image. If error persists,
+              report it at www.sttm.co: ${error}`,
+              timeout: 3000,
+              modal: true,
+            }).show();
+          }
         },
       },
     ),
   );
 
-const swatchGroupFactory = (themeType, themesContainer, isItCustom) => {
+const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   themes.forEach((themeInstance) => {
     if (themeInstance.type === themeType) {
-      themesContainer.appendChild(swatchFactory(themeInstance, isItCustom));
+      themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
     }
   });
 };

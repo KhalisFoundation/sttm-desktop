@@ -319,9 +319,6 @@ module.exports = {
             });
             break;
 
-          case 'dynamic':
-            break;
-
           default:
             break;
         }
