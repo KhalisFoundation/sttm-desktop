@@ -18,20 +18,6 @@ body.black-blue {
     color: #ededef;
   }
 
-  /*
-  Keeping it here just as an example for future
-  &.show-overlay {
-    .gurbani,
-    .translation,
-    .transliteration {
-      @include highlight(dark);
-    }
-
-    .teeka {
-      @include highlight(light);
-    }
-  } */
-
   .logo {
     path {
       fill: #e0e0e0;
