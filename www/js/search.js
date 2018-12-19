@@ -592,7 +592,8 @@ module.exports = {
     // scroll the session block to the top to see the highlighted line
     this.$sessionContainer.scrollTop = 0;
     this.navPage('shabad');
-    const searchType = this.searchType;
+
+    const { searchType } = this;
     let searchValue;
     if (searchType === 4) {
       searchValue = this.$angSearch.value;

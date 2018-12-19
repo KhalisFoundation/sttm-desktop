@@ -41,6 +41,8 @@ class Analytics {
           }
         });
       }
+    } else {
+      console.log(`Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}`);
     }
   }
 
@@ -66,6 +68,8 @@ class Analytics {
           }
         });
       }
+    } else {
+      console.log('Tracking Page suppressed for development');
     }
   }
 }
