@@ -25,20 +25,24 @@ class Analytics {
    * @param value
    */
   trackEvent(category, action, label, value) {
-    if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
-      isOnline().then((online) => {
-        // TODO: for offline users, come up with a way of storing and send when online.
-        if (online && this.usr) {
-          this.usr
-            .event({
-              ec: category,
-              ea: action,
-              el: label,
-              ev: value,
-            })
-            .send();
-        }
-      });
+    if (process.env.NODE_ENV !== 'development') {
+      if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
+        isOnline().then((online) => {
+          // TODO: for offline users, come up with a way of storing and send when online.
+          if (online && this.usr) {
+            this.usr
+              .event({
+                ec: category,
+                ea: action,
+                el: label,
+                ev: value,
+              })
+              .send();
+          }
+        });
+      }
+    } else {
+      console.log(`Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}`);
     }
   }
 
@@ -50,18 +54,22 @@ class Analytics {
    * @param hostname
    */
   trackPageView(path, title, hostname = 'SikhiToTheMax Desktop') {
-    if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
-      isOnline().then((online) => {
-        if (online && this.usr) {
-          this.usr
-            .pageview({
-              dp: path,
-              dt: title,
-              dh: hostname,
-            })
-            .send();
-        }
-      });
+    if (process.env.NODE_ENV !== 'development') {
+      if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
+        isOnline().then((online) => {
+          if (online && this.usr) {
+            this.usr
+              .pageview({
+                dp: path,
+                dt: title,
+                dh: hostname,
+              })
+              .send();
+          }
+        });
+      }
+    } else {
+      console.log('Tracking Page suppressed for development');
     }
   }
 }
