@@ -76,11 +76,11 @@ const imageInput = () =>
         type: 'file',
         accept: 'image/png, image/jpeg',
         onchange: async (evt) => {
-          const curTheme = store.getUserPref('app.theme');
+          // const curTheme = store.getUserPref('app.theme');
 
-          if (!themesWithCustomBg.includes(curTheme)) {
-            store.setUserPref('app.theme', themesWithCustomBg[0]);
-          }
+          // if (!themesWithCustomBg.includes(curTheme)) {
+          store.setUserPref('app.theme', themesWithCustomBg[0]);
+          // }
           try {
             const userBackgroundsPath = `${userDataPath}/user_backgrounds`;
 
@@ -137,8 +137,8 @@ module.exports = {
     themeOptions.appendChild(swatchHeaderFactory('Custom background'));
     themeOptions.appendChild(imageInput());
 
-    themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
+    /*themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
     swatchGroupFactory('COLOR', themeOptions, true);
-    swatchGroupFactory('SPECIAL', themeOptions, true);
+    swatchGroupFactory('SPECIAL', themeOptions, true);*/
   },
 };
