@@ -48,7 +48,6 @@
       document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
       const $gurbani = document.querySelector('.o-gurbani');
-      const isLarivaar = overlayPrefs.overlayVars.overlayLarivaar;
       if (overlayPrefs.overlayVars.overlayLarivaar) {
         $gurbani.innerHTML = $gurbani.innerHTML.replace(/ /g, '<wbr>');
       } else {
