@@ -43,6 +43,8 @@ const query = (searchQuery, searchType, searchSource) => (
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    let isWildChar = false;
+
     // Sanitize query
     const saniQuery = searchQuery.trim().replace("'", "\\'");
     // default source for ang search to GURU_GRANTH_SAHIB
@@ -58,7 +60,12 @@ const query = (searchQuery, searchType, searchSource) => (
           if (charCode < 100) {
             charCode = `0${charCode}`;
           }
-          dbQuery += `,${charCode}`;
+          if (charCode === '042') {
+            isWildChar = true;
+            dbQuery += ',___';
+          } else {
+            dbQuery += `,${charCode}`;
+          }
         }
 
         // Replace kh with kh pair bindi
@@ -68,7 +75,7 @@ const query = (searchQuery, searchType, searchSource) => (
         }
 
         // Use LIKE if anywhere, otherwise use operators
-        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) {
+        if ((searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) || isWildChar) {
           condition = `${searchCol} LIKE '%${dbQuery}%'`;
           if (replaced) {
             condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
