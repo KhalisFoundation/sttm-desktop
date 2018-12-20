@@ -38,6 +38,7 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
+        "display-bisrams": true,
         "left-align": false
       }
     }
