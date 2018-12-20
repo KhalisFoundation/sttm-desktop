@@ -16,7 +16,6 @@
     };
     var socket = io();
     var preview = (document.location.href.indexOf('preview') > -1);
-    var larivaar = (document.location.href.indexOf('larivaar') > -1);
     var overlayPrefs;
     function hexToRgb(hex) {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -47,6 +46,15 @@
 
       document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
       document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
+
+      const $gurbani = document.querySelector('.o-gurbani');
+      const isLarivaar = overlayPrefs.overlayVars.overlayLarivaar;
+      if (overlayPrefs.overlayVars.overlayLarivaar) {
+        $gurbani.innerHTML = $gurbani.innerHTML.replace(/ /g, '<wbr>');
+      } else {
+        $gurbani.innerHTML = $gurbani.innerHTML.replace(/<wbr>/g, ' ');
+      }
+
     };
 
     socket.on('show-line', function(request) {
@@ -75,7 +83,7 @@
   </section>
   <script type="text/javascript">
     if (preview) {
-      writeLine(previewData, larivaar);
+      writeLine(previewData);
     }
   </script>
 </body>

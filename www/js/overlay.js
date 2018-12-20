@@ -23,18 +23,6 @@ const savePrefs = () => {
   ipcRenderer.send('update-overlay-vars');
 };
 
-const upsertPreview = () => {
-  const $existingWebview = document.querySelector('webview');
-  if ($existingWebview) {
-    $existingWebview.remove();
-  }
-
-  const webview = document.createElement('webview');
-  webview.src = `${url}?preview&${overlayVars.overlayLarivaar ? 'larivaar' : 'padched'}`;
-  webview.className = 'preview';
-  document.querySelector('.canvas').appendChild(webview);
-};
-
 const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
   `div.${inputName}.input-wrap`,
   h(
@@ -197,16 +185,15 @@ const toggleLarivaar = h(
     onclick: (evt) => {
       overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
       savePrefs();
-      upsertPreview();
 
-      const isItLarivaar = overlayVars.overlayLarivaar;
+      const isLarivaar = overlayVars.overlayLarivaar;
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
-      $larivaarIcon.classList.toggle('fa-unlink', isItLarivaar);
-      $larivaarIcon.classList.toggle('fa-link', !isItLarivaar);
+      $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
+      $larivaarIcon.classList.toggle('fa-link', !isLarivaar);
 
       const $larivaarLabel = evt.currentTarget.querySelector('.setting-label');
-      $larivaarLabel.innerText = `Use ${isItLarivaar ? 'Padched' : 'Larivaar'}`;
+      $larivaarLabel.innerText = `Use ${isLarivaar ? 'Padched' : 'Larivaar'}`;
     },
   },
   h(
