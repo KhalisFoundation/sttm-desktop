@@ -7,7 +7,7 @@
         "presenter-view": true
       },
       "analytics": {
-        "collect-statistics": false
+        "collect-statistics": true
       },
       "custom-theme-options": {
         "show-theme-editor": true
