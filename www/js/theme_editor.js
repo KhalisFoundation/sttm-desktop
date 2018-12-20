@@ -137,8 +137,8 @@ module.exports = {
     themeOptions.appendChild(swatchHeaderFactory('Custom background'));
     themeOptions.appendChild(imageInput());
 
-    /*themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
+    /* themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
     swatchGroupFactory('COLOR', themeOptions, true);
-    swatchGroupFactory('SPECIAL', themeOptions, true);*/
+    swatchGroupFactory('SPECIAL', themeOptions, true); */
   },
 };
