@@ -204,14 +204,15 @@ const createCards = (rows, LineID) => {
     lines.push(row.ID);
     const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const taggedGurmukhi = [];
-    let bisramIndex = 0;
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
       } else if (val.includes(';')) {
-        bisramWord = val.slice(0, -1);
-        bisramIndex += 1;
-        taggedGurmukhi[index] = `<span class="bisram-${bisramIndex}">${bisramWord}</span>`;
+        const bisramWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
+      } else if (val.includes(',')) {
+        const yamkiWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`;
       } else {
         taggedGurmukhi[index] = val;
       }

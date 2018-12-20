@@ -1,7 +1,7 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
-$bisram-1: #c0392b;
-$bisram-2: #ffc500;
+$bisram-main: #c0392b;
+$bisram-yamki: #ffc500;
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -371,12 +371,12 @@ h2 {
 .high-contrast,
 .low-light {
   &.display-bisrams.colored-words .gurbani {
-    .bisram-1 {
-      color: $bisram-1;
+    .bisram-main {
+      color: $bisram-main;
     }
 
-    .bisram-2 {
-      color: $bisram-2;
+    .bisram-yamki {
+      color: $bisram-yamki;
     }
   }
 
@@ -385,16 +385,16 @@ h2 {
       border-radius: 15px;
     }
 
-    .padchhed .bisram-1,
-    .padchhed .bisram-2 {
+    .padchhed .bisram-main,
+    .padchhed .bisram-yamki {
       padding-right: 5px;
     }
 
-    .bisram-1 {
+    .bisram-main {
       background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
     }
 
-    .bisram-2 {
+    .bisram-yamki {
       background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
     }
   }
