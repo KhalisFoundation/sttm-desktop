@@ -25,7 +25,23 @@ After launching STTM, by default you can search for a shabad by entering the fir
 
 *   STTM's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
 *   If you verified your shabad should be in the database and it is still not coming up, make sure you are typing in the correct letters for search. If you aren’t sure about a letter, or are still having difficulties, try using one of the different search types to locate the shabad.
-
+*   If you don't know one of the letters, consider using an asterisk in its place. Here's some information on how it works:
+    *   *First letter start* - 
+        `ssnh` it will search for “soche soch na hovayi je sochi lakh vaar”  not “jat sat sanjam naam hai”
+    *   *First letter anywhere* - 
+        `ssnh` it will search for “soche soch na hovayi je sochi lakh vaar” and “jat sat sanjam naam hai”
+    *   *First letter start* - 
+        `*ssnh` will search for “jat sat sanjam naam hai” and not “soche soch na hovayi je sochi lakh vaar”
+    *   *First letter anywhere* - 
+        `*ssnh` will search for “jat sat sanjam naam hai” and not “soche soch na hovayi je sochi lakh vaar”
+    *   *First letter start* - 
+        `ssnh*` will search for “soche soch na hovayi je sochi lakh vaar” and not  “jat sat sanjam naam hai”
+    *   *First letter anywhere* - 
+        `ssnh*` will search for “soche soch na hovayi je sochi lakh vaar” and  “jat sat sanjam naam hai”
+    *   *First letter start* - 
+        `ss*nh` will search for “sukh sagar har naam hai” and neither “soche soch na hovayi..” nor “rasna sacha simriye man tan nirmal hoye”
+    *   *First letter anywhere* - 
+        `ss*nh` will search for “sukh sagar har naam hai” and “rasna sacha simriye man tan nirmal hoye” but not “soche soch na hovayi…”
 
 ### How do I connect STTM to a projector?
 
