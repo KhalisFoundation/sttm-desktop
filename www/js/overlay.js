@@ -243,6 +243,10 @@ controlPanel.append(splitLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
+const webview = document.createElement('webview');
+webview.src = `${url}?preview`;
+webview.className = 'preview';
+document.querySelector('.canvas').appendChild(webview);
 
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
