@@ -2,6 +2,7 @@
   "userPrefs": {
     "app": {
       "theme": "light-theme",
+      "themebg": "",
       "layout": {
         "presenter-view": true
       },

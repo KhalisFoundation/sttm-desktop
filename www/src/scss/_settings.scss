@@ -16,6 +16,8 @@
     letter-spacing: 0.2em;
     padding-top: 0.75em;
     word-spacing: 0.2em;
+
+    &:empty { display: none; }
   }
 
   h2:first-child + section.block-list > header:first-child {

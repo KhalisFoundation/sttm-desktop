@@ -85,6 +85,13 @@ const castText = (text, isGurmukhi) => {
   castToReceiver();
 };
 
+const applyThemebg = () => {
+  $body.style.backgroundImage = `url(${prefs.app.themebg.url || ' '})`;
+  $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+};
+
+applyThemebg();
+
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
   requestSession();
@@ -143,6 +150,7 @@ global.platform.ipc.on('update-settings', () => {
 
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
+  applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
 });
