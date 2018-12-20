@@ -513,7 +513,6 @@ module.exports = {
     } else {
       this.$results.innerHTML = '';
     }
-    analytics.trackEvent('search', CONSTS.SEARCH_TEXTS[searchType], searchQuery);
   },
 
   akhandPaatt,
@@ -593,6 +592,15 @@ module.exports = {
     // scroll the session block to the top to see the highlighted line
     this.$sessionContainer.scrollTop = 0;
     this.navPage('shabad');
+
+    const { searchType } = this;
+    let searchValue;
+    if (searchType === 4) {
+      searchValue = this.$angSearch.value;
+    } else {
+      searchValue = this.$search.value;
+    }
+    analytics.trackEvent('search', CONSTS.SEARCH_TEXTS[searchType], searchValue);
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
