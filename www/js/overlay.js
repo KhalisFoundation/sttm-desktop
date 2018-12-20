@@ -244,8 +244,6 @@ controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
 
-upsertPreview();
-
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
   if (typeof overlayVars.padding === 'undefined') {
