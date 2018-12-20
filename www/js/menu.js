@@ -7,6 +7,7 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
+const sanitizeHtml = require('sanitize-html');
 const { store, analytics } = require('electron').remote.require('./app');
 
 const modal = new tingle.Modal({
@@ -275,7 +276,9 @@ const announcementSlideButton = h(
       onclick: () => {
         analytics.trackEvent('display', 'announcement-slide');
         const isGurmukhi = document.querySelector('#announcement-language').checked;
-        const announcementText = document.querySelector('.announcement-text').innerHTML;
+        const announcementText = sanitizeHtml(document.querySelector('.announcement-text').innerHTML, {
+          allowedTags: ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'],
+        });
         global.controller.sendText(announcementText, isGurmukhi);
       } },
     'Add Announcement'));
