@@ -59,6 +59,19 @@ a {
   width: 100%;
 }
 
+.color-overlay {
+  display: none;
+}
+
+body.show-overlay {
+  .color-overlay {
+    display: block;
+    opacity: 0.7;
+    position: fixed;
+    z-index: 0;
+  }
+}
+
 #navigator {
   bottom: 0;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
@@ -291,6 +304,11 @@ a {
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+}
+
+.file-input-label {
+  display: block;
+  margin: 10px;
 }
 
 .win32 .options-page {

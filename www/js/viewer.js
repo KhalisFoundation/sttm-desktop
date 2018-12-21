@@ -85,6 +85,13 @@ const castText = (text, isGurmukhi) => {
   castToReceiver();
 };
 
+const applyThemebg = () => {
+  $body.style.backgroundImage = `url(${prefs.app.themebg.url || ' '})`;
+  $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+};
+
+applyThemebg();
+
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
   requestSession();
@@ -143,6 +150,7 @@ global.platform.ipc.on('update-settings', () => {
 
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
+  applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
 });
@@ -202,11 +210,17 @@ const createCards = (rows, LineID) => {
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
-    const gurmukhiShabads = row.Gurmukhi.split(' ');
+    const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+      } else if (val.includes(';')) {
+        const bisramWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
+      } else if (val.includes(',')) {
+        const yamkiWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`;
       } else {
         taggedGurmukhi[index] = val;
       }
@@ -214,7 +228,7 @@ const createCards = (rows, LineID) => {
     const gurmukhiContainer = document.createElement('div');
 
     gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
-                                    <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+                                    <span class="larivaar">${taggedGurmukhi.join('<wbr>')} </span>`;
     cards.push(
       h(
         `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
@@ -225,7 +239,7 @@ const createCards = (rows, LineID) => {
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
-      gurmukhi: row.Gurmukhi,
+      gurmukhi: row.GurmukhiBisram,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
