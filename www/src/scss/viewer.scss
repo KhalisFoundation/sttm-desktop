@@ -1,5 +1,7 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
+$bisram-main: #c0392b;
+$bisram-yamki: #ffc500;
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -85,6 +87,7 @@ body {
   position: absolute;
   transition: opacity 400ms ease-out;
   width: calc(100% - #{$viewer-padding} * 2);
+  z-index: 10;
 
   &.active {
     opacity: 1;
@@ -97,7 +100,6 @@ body {
 }
 
 .overlay {
-  display: none;
   height: 100%;
   left: 0;
   position: fixed;
@@ -112,6 +114,7 @@ body {
   opacity: 0;
   position: absolute;
   width: 100%;
+  z-index: 10;
 
   &.active {
     opacity: 1;
@@ -373,6 +376,40 @@ h2 {
 
   .vc-toggle-icon {
     width: 30vh;
+  }
+}
+
+.light-theme,
+.dark-theme,
+.high-contrast,
+.low-light {
+  &.display-bisrams.colored-words .gurbani {
+    .bisram-main {
+      color: $bisram-main;
+    }
+
+    .bisram-yamki {
+      color: $bisram-yamki;
+    }
+  }
+
+  &.display-bisrams.gradient-bg .gurbani {
+    span {
+      border-radius: 15px;
+    }
+
+    .padchhed .bisram-main,
+    .padchhed .bisram-yamki {
+      padding-right: 5px;
+    }
+
+    .bisram-main {
+      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
+    }
+
+    .bisram-yamki {
+      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
+    }
   }
 }
 

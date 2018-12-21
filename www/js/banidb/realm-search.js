@@ -29,19 +29,29 @@ const query = (searchQuery, searchType, searchSource) => (
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
         searchCol = 'FirstLetterStr';
-        const operator = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? 'BEGINSWITH' : 'CONTAINS';
+        let operator = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? 'BEGINSWITH' : 'CONTAINS';
+        let isWildChar = false;
         for (let x = 0, len = saniQuery.length; x < len; x += 1) {
           let charCode = saniQuery.charCodeAt(x);
           if (charCode < 100) {
             charCode = `0${charCode}`;
           }
-          dbQuery += `,${charCode}`;
+          if (charCode === '042') {
+            isWildChar = true;
+            dbQuery += ',*';
+            operator = 'LIKE';
+          } else {
+            dbQuery += `,${charCode}`;
+          }
         }
 
         // Replace kh with kh pair bindi
         let replaced = '';
         if (dbQuery.includes('075')) {
           replaced = `OR ${searchCol} ${operator} '${dbQuery.replace(/075/g, '094')}'`;
+        }
+        if (isWildChar) {
+          dbQuery = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
         }
         condition = `${searchCol} ${operator} '${dbQuery}' ${replaced}`;
         if (saniQuery.length < 3) {
