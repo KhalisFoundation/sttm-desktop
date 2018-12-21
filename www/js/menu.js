@@ -272,7 +272,7 @@ const announcementSlideButton = h(
       'data-placeholder': 'Add announcement text here ...',
       oninput: () => {
         const $announcementInput = document.querySelector('.announcement-text');
-        $announcementInput.innerHTML = sanitizeHtml($announcementInput.innerHTML, { allowedTags });
+        $announcementInput.innerHTML.replace(/.*/g, sanitizeHtml($announcementInput.innerHTML, { allowedTags }));
       },
     },
   ),
