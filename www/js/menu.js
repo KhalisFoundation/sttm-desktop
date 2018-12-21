@@ -7,7 +7,10 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
+const sanitizeHtml = require('sanitize-html');
 const { store, analytics } = require('electron').remote.require('./app');
+
+const allowedTags = ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'];
 
 const modal = new tingle.Modal({
   footer: true,
@@ -251,28 +254,35 @@ const announcementSlideButton = h(
               name: 'announcement-language',
               type: 'checkbox',
               onclick: () => {
-                const $announcementText = document.querySelector('.announcement-text');
-                $announcementText.classList.toggle('gurmukhi');
                 const isGurmukhi = document.querySelector('#announcement-language').checked;
-                $announcementText.value = '';
-                $announcementText.placeholder = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
+                const placeholderText = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
+
+                const $announcementText = document.querySelector('.announcement-text');
+                $announcementText.classList.toggle('gurmukhi', isGurmukhi);
+                $announcementText.setAttribute('data-placeholder', placeholderText);
               },
               value: 'gurmukhi' }),
           h('label',
             {
               htmlFor: 'announcement-language' })])]),
   h(
-    'textarea.announcement-text',
+    'div.announcement-text',
     {
-      placeholder: 'Add announcement text here ..',
-    }),
+      contentEditable: true,
+      'data-placeholder': 'Add announcement text here ...',
+      oninput: () => {
+        const $announcementInput = document.querySelector('.announcement-text');
+        $announcementInput.innerHTML = sanitizeHtml($announcementInput.innerHTML, { allowedTags });
+      },
+    },
+  ),
   h(
     'button.announcement-slide-btn.button',
     {
       onclick: () => {
         analytics.trackEvent('display', 'announcement-slide');
         const isGurmukhi = document.querySelector('#announcement-language').checked;
-        const announcementText = document.querySelector('.announcement-text').value;
+        const announcementText = sanitizeHtml(document.querySelector('.announcement-text').innerHTML, { allowedTags });
         global.controller.sendText(announcementText, isGurmukhi);
       } },
     'Add Announcement'));
