@@ -105,10 +105,11 @@ ul {
   }
 
   .announcement-text {
+    border: 1px solid white;
     border-radius: 10px;
     display: inline-block;
     margin: 0 20px 10px;
-    min-height: 40px;
+    min-height: 100px;
     outline: none;
     padding: 10px;
   }
