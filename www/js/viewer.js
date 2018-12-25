@@ -66,6 +66,7 @@ const castShabadLine = (lineID) => {
       nextLine = decks[currentShabad][lineID + 1].gurmukhi;
     }
     castCur.nextLine = nextLine;
+    castCur.gurmukhi = castCur.gurmukhiWithoutBisram;
     castToReceiver();
 
 
@@ -240,6 +241,7 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.GurmukhiBisram,
+      gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
