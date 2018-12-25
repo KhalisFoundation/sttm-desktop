@@ -11,7 +11,7 @@
 * We have added Google Analytics to help support our future updates. You can toggle this off/on in the settings
 
 ### Improved:
-* The announcements section now supports formatting such as bold, italics, underline, and line breaks/spacing!
+* The announcements section now supports formatting, line breaks, and spacing!
 * We've made the toggle for Presenter View more accessible
 
 ### 4.2.3 - _181115_
