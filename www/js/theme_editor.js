@@ -3,8 +3,6 @@ const Noty = require('noty');
 const fs = require('fs');
 const util = require('util');
 const imagemin = require('imagemin');
-const imageminJpegtran = require('imagemin-jpegtran');
-const imageminPngquant = require('imagemin-pngquant');
 const { remote } = require('electron');
 
 const themes = require('./themes.json');
@@ -64,6 +62,15 @@ const swatchFactory = (themeInstance, isCustom) =>
 
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
+const uploadErrorNotification = (message) => {
+  new Noty({
+    type: 'error',
+    text: message,
+    timeout: 3000,
+    modal: true,
+  }).show();
+};
+
 const imageInput = () =>
   h(
     'label.file-input-label',
@@ -81,31 +88,26 @@ const imageInput = () =>
           // if (!themesWithCustomBg.includes(curTheme)) {
           store.setUserPref('app.theme', themesWithCustomBg[0]);
           // }
+          const userBackgroundsPath = `${userDataPath}/user_backgrounds`;
+
           try {
-            const userBackgroundsPath = `${userDataPath}/user_backgrounds`;
-
             if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
-
-            const files = await imagemin([evt.target.files[0].path], userBackgroundsPath, {
-              plugins: [
-                imageminJpegtran(),
-                imageminPngquant({ quality: '65-80' }),
-              ],
-            });
-            store.setUserPref('app.themebg', {
-              type: 'custom',
-              url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
-            });
-
-            global.core.platformMethod('updateSettings');
           } catch (error) {
-            new Noty({
-              type: 'error',
-              text: `There was an error using this image. If error persists,
-              report it at www.sttm.co: ${error}`,
-              timeout: 3000,
-              modal: true,
-            }).show();
+            uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: Error Creating Directory - ${error}`);
+          }
+
+          try {
+            const files = await imagemin([evt.target.files[0].path], userBackgroundsPath);
+            if (files) {
+              store.setUserPref('app.themebg', {
+                type: 'custom',
+                url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
+              });
+
+              global.core.platformMethod('updateSettings');
+            }
+          } catch (error) {
+            uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: ${error}`);
           }
         },
       },
