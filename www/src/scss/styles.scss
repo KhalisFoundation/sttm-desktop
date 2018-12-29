@@ -164,6 +164,19 @@ body.show-overlay {
 
       @include calculateTop(1);
     }
+
+    .current-shabad-header {
+      border-bottom: 2px solid transparent;
+      transition: 0.5s border ease;
+    }
+
+    &:focus {
+      outline: 0;
+
+      .current-shabad-header {
+        border-bottom-color: #01579b;
+      }
+    }
   }
 
   #navigator.kb-active {
