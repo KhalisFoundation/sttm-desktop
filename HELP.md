@@ -53,16 +53,15 @@ After launching STTM, click the icon for Themes and choose your preferred option
 
 ### Can you view the Gurbani in Larivaar?
 
-Yes! After launching STTM, click the icon for settings, and choose the Larivaar option. ![](https://www.sikhitothemax.org/assets/images/help/desktop-larivaar.png)</div>
-
+Yes! After launching STTM, click the icon for Display Settings, and choose the Larivaar option. 
 
 ### How can I adjust the font size?
 
-<div>After launching STTM, click the icon for settings, and scroll down for options to adjust the font size. ![](https://www.sikhitothemax.org/assets/images/help/desktop-font-size.png)</div>
+After launching STTM, click the icon for settings, and scroll down for options to adjust the font size. Alternatively, you can adjust font sizes by using the "Quick Tools" menu in the preview pane. 
 
 ### Where can I see my previous shabads?
 
-When using STTM in “Presenter View”, your history will appear in the bottom right quadrant under the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one. ![](https://www.sikhitothemax.org/assets/images/help/desktop-history.png)
+When using STTM in “Presenter View”, your history will appear in the bottom right quadrant under the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one.
 
 ### What is Bani Overlay?
 
