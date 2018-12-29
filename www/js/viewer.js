@@ -60,12 +60,17 @@ const castShabadLine = (lineID) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   // make sure that the deck is created before attempting to cast it.
   if (decks && decks[currentShabad]) {
-    castCur = decks[currentShabad][lineID];
     let nextLine = '';
     if (decks[currentShabad][lineID + 1]) {
       nextLine = decks[currentShabad][lineID + 1].gurmukhi;
     }
-    castCur.nextLine = nextLine;
+    castCur = Object.assign(
+      decks[currentShabad][lineID],
+      {
+        nextLine,
+        gurmukhi: decks[currentShabad][lineID].gurmukhiWithoutBisram,
+      },
+    );
     castToReceiver();
 
 
@@ -240,6 +245,7 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.GurmukhiBisram,
+      gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
