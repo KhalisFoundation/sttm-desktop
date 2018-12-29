@@ -49,20 +49,26 @@ Plug in your computer to the projector or TV. Once you do this, go to your compu
 
 ### How do I change the background color?
 
-After launching STTM, click the icon for settings, and choose your theme. ![](https://www.sikhitothemax.org/assets/images/help/desktop-theme.png)
+After launching STTM, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image.
 
 ### Can you view the Gurbani in Larivaar?
 
 Yes! After launching STTM, click the icon for settings, and choose the Larivaar option. ![](https://www.sikhitothemax.org/assets/images/help/desktop-larivaar.png)</div>
 
 
-### How can I make the fonts on the screen smaller?
+### How can I adjust the font size?
 
 <div>After launching STTM, click the icon for settings, and scroll down for options to adjust the font size. ![](https://www.sikhitothemax.org/assets/images/help/desktop-font-size.png)</div>
 
 ### Where can I see my previous shabads?
 
-When using STTM in “Presenter View”, your history will appear in the bottom right quadrant. You can click any of the shabads in the list to bring them back up as your primary one. ![](https://www.sikhitothemax.org/assets/images/help/desktop-history.png)
+When using STTM in “Presenter View”, your history will appear in the bottom right quadrant under the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one. ![](https://www.sikhitothemax.org/assets/images/help/desktop-history.png)
+
+### What is Bani Overlay?
+
+Bani Overlay allows you to display Gurbani from SikhiToTheMax on a Live Stream. It will require a third party software such as OBS. To learn more, watch this video: 
+
+<div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/WrckmAcwboM" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
 
 ### How do I report a mistake?
 
