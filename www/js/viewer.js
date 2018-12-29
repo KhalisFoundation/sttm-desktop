@@ -60,12 +60,17 @@ const castShabadLine = (lineID) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   // make sure that the deck is created before attempting to cast it.
   if (decks && decks[currentShabad]) {
-    castCur = decks[currentShabad][lineID];
     let nextLine = '';
     if (decks[currentShabad][lineID + 1]) {
       nextLine = decks[currentShabad][lineID + 1].gurmukhi;
     }
-    castCur.nextLine = nextLine;
+    castCur = Object.assign(
+      decks[currentShabad][lineID],
+      {
+        nextLine,
+        gurmukhi: decks[currentShabad][lineID].gurmukhiWithoutBisram,
+      },
+    );
     castToReceiver();
 
 
@@ -240,6 +245,7 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.GurmukhiBisram,
+      gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
@@ -328,13 +334,21 @@ const showLine = (ShabadID, LineID, rows) => {
 
 const showText = (text, isGurmukhi = false) => {
   hideDecks();
+
   $message.classList.add('active');
   while ($message.firstChild) {
     $message.removeChild($message.firstChild);
   }
-  const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
-  $message.appendChild(h('div.slide.active', textNode));
-  castText(text, isGurmukhi);
+
+  const $textIs = document.createElement('div');
+  $textIs.classList.add('gurbani');
+  if (isGurmukhi) {
+    $textIs.classList.add('gurmukhi');
+  }
+  $textIs.innerHTML = text;
+
+  $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
+  castText($textIs.innerText, isGurmukhi);
 };
 
 const toggleSideMenu = () => {

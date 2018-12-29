@@ -41,7 +41,8 @@
         "larivaar": false,
         "display-bisrams": true,
         "left-align": false
-      }
+      },
+      "Vishraam-options": "colored-words"
     }
   },
   "gurmukhiKB": false,
@@ -62,7 +63,8 @@
         "fontSize": 3,
         "gurbaniFontSize": 5,
         "gurbaniTextColor": "#EAC445",
-        "showLogo": true
+        "showLogo": true,
+        "overlayLarivaar": false
       },
       "gurbani": {
         "bottom": 156,
