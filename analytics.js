@@ -25,6 +25,8 @@ class Analytics {
    * @param value
    */
   trackEvent(category, action, label, value) {
+    const useragent = this.store.get('user-agent');
+
     if (process.env.NODE_ENV !== 'development') {
       if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
         isOnline().then((online) => {
@@ -36,13 +38,14 @@ class Analytics {
                 ea: action,
                 el: label,
                 ev: value,
+                ua: useragent,
               })
               .send();
           }
         });
       }
     } else {
-      console.log(`Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}`);
+      console.log(`Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, ua: ${useragent}`);
     }
   }
 
@@ -58,11 +61,14 @@ class Analytics {
       if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
         isOnline().then((online) => {
           if (online && this.usr) {
+            const useragent = this.store.get('user-agent');
+
             this.usr
               .pageview({
                 dp: path,
                 dt: title,
                 dh: hostname,
+                ua: useragent,
               })
               .send();
           }
