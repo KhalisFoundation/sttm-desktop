@@ -17,7 +17,7 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
@@ -163,7 +163,7 @@ const loadShabad = ShabadID => (
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {
