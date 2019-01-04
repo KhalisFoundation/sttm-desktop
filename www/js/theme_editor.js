@@ -103,6 +103,7 @@ const imageInput = () =>
                 type: 'custom',
                 url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
               });
+              analytics.trackEvent('theme', 'custom');
 
               global.core.platformMethod('updateSettings');
             }
