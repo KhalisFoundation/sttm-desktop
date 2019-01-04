@@ -1,6 +1,6 @@
 ## SikhiToTheMax Desktop App
 
-### 5.0 - _181226_
+### 5.0 - _190108_
 ### Added:
 * You can now upload a custom background image! Check out the Custom option in the Themes menu
 * We've added Vishraams for both our light and dark themes. Choose between colored text or a gradient effect. Support for additional themes coming soon
