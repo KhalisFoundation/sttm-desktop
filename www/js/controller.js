@@ -499,6 +499,16 @@ module.exports = {
     updateViewerScale();
   },
 
+  'colored-words': function coloredWords() {
+    const coloredWordsVal = store.getUserPref('slide-layout.display-options.colored-words');
+    store.setUserPref('slide-layout.display-options.gradient-bg', !coloredWordsVal);
+  },
+
+  'gradient-bg': function gradientBg() {
+    const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
+    store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
+  },
+
   autoplay() {
     global.core.search.checkAutoPlay();
   },
