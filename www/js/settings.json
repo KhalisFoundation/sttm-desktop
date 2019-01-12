@@ -80,7 +80,9 @@
             "subLabel": "(Google ChromeCast Unavailable)"
           },
           "larivaar": "Larivaar",
-          "display-bisrams": "Vishraams",
+          "display-bisrams": "Display Vishraams",
+          "colored-words": "Coloured Word Vishraams",
+          "gradient-bg": "Gradient Background Vishraams",
           "left-align": "Left-Align",
           "autoplay": "Auto Play",
           "livefeed": {
@@ -102,14 +104,6 @@
             "step": 1
           }
         }
-      },
-      "Vishraam-options": {
-          "title": "Vishraam Options",
-          "type": "radio",
-          "options": {
-            "colored-words": "Colored Words",
-            "gradient-bg": "Gradient Background"
-          }
       }
     }
   }
