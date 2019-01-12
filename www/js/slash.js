@@ -8,5 +8,5 @@ module.exports = (input) => {
     return input;
   }
 
-  return input.replace(/\\/g, '/');
+  return input.replace(/\\(?!\\?\s)/g, '/');
 };
