@@ -39,9 +39,6 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
-        "display-bisrams": true,
-        "colored-words": true,
-        "gradient-bg": false,
         "left-align": false
       }
     }
