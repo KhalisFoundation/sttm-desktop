@@ -8,6 +8,7 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
+const slash = require('./js/slash');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
 const themes = require('./js/themes.json');
@@ -91,7 +92,7 @@ const castText = (text, isGurmukhi) => {
 };
 
 const applyThemebg = () => {
-  $body.style.backgroundImage = `url(${prefs.app.themebg.url || ' '})`;
+  $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
   $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
 };
 

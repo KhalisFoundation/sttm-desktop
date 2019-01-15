@@ -266,6 +266,10 @@ app.on('ready', () => {
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
+  if (!store.get('user-agent')) {
+    store.set('user-agent', mainWindow.webContents.getUserAgent());
+  }
+
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
     if (viewerWindow && !viewerWindow.isDestroyed()) {

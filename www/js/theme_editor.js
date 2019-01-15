@@ -1,6 +1,7 @@
 const h = require('hyperscript');
 const Noty = require('noty');
 const fs = require('fs');
+const path = require('path');
 const util = require('util');
 const imagemin = require('imagemin');
 const { remote } = require('electron');
@@ -88,7 +89,7 @@ const imageInput = () =>
           // if (!themesWithCustomBg.includes(curTheme)) {
           store.setUserPref('app.theme', themesWithCustomBg[0]);
           // }
-          const userBackgroundsPath = `${userDataPath}/user_backgrounds`;
+          const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
           try {
             if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
@@ -103,6 +104,7 @@ const imageInput = () =>
                 type: 'custom',
                 url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
               });
+              analytics.trackEvent('theme', 'custom');
 
               global.core.platformMethod('updateSettings');
             }

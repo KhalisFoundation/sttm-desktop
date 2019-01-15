@@ -601,6 +601,7 @@ module.exports = {
       searchValue = this.$search.value;
     }
     analytics.trackEvent('search', CONSTS.SEARCH_TEXTS[searchType], searchValue);
+    analytics.trackEvent('shabad', ShabadID, LineID);
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
