@@ -1,9 +1,8 @@
 ## SikhiToTheMax Desktop App
 
-### 5.0 - _181226_
+### 4.3 - _190115_
 ### Added:
 * You can now upload a custom background image! Check out the Custom option in the Themes menu
-* We've added Vishraams for both our light and dark themes. Choose between colored text or a gradient effect. Support for additional themes coming soon
 * Added wildcard support. Type a * when you are searching if you are unsure of a letter. See the Help section for more info
 * Pressing CTRL (Windows) or CMD (Mac) + E will now display a blank slide
 * You can now paste text into the search field
