@@ -1,6 +1,9 @@
 const ua = require('universal-analytics'); // https://www.npmjs.com/package/universal-analytics
 const isOnline = require('is-online');
 
+const pjson = require('./package.json');
+
+const appVersion = pjson.version;
 const trackingId = 'UA-45513519-12';
 
 class Analytics {
@@ -39,6 +42,7 @@ class Analytics {
                 el: label,
                 ev: value,
                 ua: useragent,
+                cd1: appVersion,
               })
               .send();
           }
