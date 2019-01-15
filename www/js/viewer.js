@@ -218,7 +218,8 @@ const createCards = (rows, LineID) => {
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
-    const gurmukhiShabads = row.GurmukhiBisram.split(' ');
+    const taggedGurmukhi = row.Gurmukhi.split(' ');
+    /* const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
@@ -232,7 +233,7 @@ const createCards = (rows, LineID) => {
       } else {
         taggedGurmukhi[index] = val;
       }
-    });
+    }); */
     const gurmukhiContainer = document.createElement('div');
 
     gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
@@ -247,7 +248,7 @@ const createCards = (rows, LineID) => {
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
-      gurmukhi: row.GurmukhiBisram,
+      gurmukhi: row.Gurmukhi,
       gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
