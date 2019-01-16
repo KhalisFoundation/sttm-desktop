@@ -10,7 +10,7 @@ const { ipcRenderer, remote } = electron;
 const overlayPort = remote.getGlobal('overlayPort');
 const url = `http://${host}:${overlayPort}/`;
 
-const { store } = require('electron').remote.require('./app');
+const { store, analytics } = require('electron').remote.require('./app');
 
 const overlayVars = store.get('obs').overlayPrefs.overlayVars;
 
@@ -132,6 +132,7 @@ const layoutButtonFactory = layoutName => h(
         });
         overlayVars.layout = layoutName;
         savePrefs();
+        analytics.trackEvent('overlay', 'layout', layoutName);
       },
     },
   ),
@@ -178,6 +179,33 @@ const copyURLButton = h(
   ),
 );
 
+const toggleLarivaar = h(
+  'div.input-wrap',
+  {
+    onclick: (evt) => {
+      overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
+      savePrefs();
+
+      const isLarivaar = overlayVars.overlayLarivaar;
+
+      const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
+      $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
+      $larivaarIcon.classList.toggle('fa-link', !isLarivaar);
+
+      const $larivaarLabel = evt.currentTarget.querySelector('.setting-label');
+      $larivaarLabel.innerText = `Use ${isLarivaar ? 'Padched' : 'Larivaar'}`;
+    },
+  },
+  h(
+    'div.export-btn#larivaar-btn',
+    h(`i.fa.cp-icon.${overlayVars.overlayLarivaar ? 'fa-unlink' : 'fa-link'}`),
+  ),
+  h(
+    'div.setting-label',
+    `Use ${overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar'}`,
+  ),
+);
+
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
@@ -214,7 +242,7 @@ controlPanel.append(topLayoutBtn);
 controlPanel.append(splitLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
-
+controlPanel.append(toggleLarivaar);
 const webview = document.createElement('webview');
 webview.src = `${url}?preview`;
 webview.className = 'preview';

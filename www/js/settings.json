@@ -7,11 +7,23 @@
         "type": "radio",
         "options": {}
       },
+      "themebg": {
+        "title": "",
+        "type": "dynamic",
+        "options": {}
+      },
       "layout": {
         "title": "App Layout",
         "type": "switch",
         "options": {
           "presenter-view": "Presenter View"
+        }
+      },
+      "analytics": {
+        "title": "Other Options",
+        "type": "switch",
+        "options": {
+          "collect-statistics":"Collect Statistics"
         }
       }
     }

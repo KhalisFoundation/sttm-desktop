@@ -46,12 +46,20 @@
 
       document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
       document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
+
+      const $gurbani = document.querySelector('.o-gurbani');
+      if (overlayPrefs.overlayVars.overlayLarivaar) {
+        $gurbani.innerHTML = $gurbani.innerHTML.replace(/ /g, '<wbr>');
+      } else {
+        $gurbani.innerHTML = $gurbani.innerHTML.replace(/<wbr>/g, ' ');
+      }
+
     };
 
     socket.on('show-line', function(request) {
       if (!preview) {
         overlayPrefs = request.overlayPrefs;
-        writeLine(request.Line, request.larivaar);
+        writeLine(request.Line, overlayPrefs.overlayVars.overlayLarivaar);
       }
     });
 

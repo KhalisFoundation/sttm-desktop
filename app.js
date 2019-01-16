@@ -6,6 +6,11 @@ const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const Analytics = require('./analytics');
+const uuid = require('uuid/v4');
+
+// Are we packaging for a platform's app store?
+const appstore = false;
 
 const expressApp = express();
 
@@ -39,6 +44,17 @@ const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
 });
+
+// Retrieve the userid value, and if it's not there, assign it a new uuid.
+let userId = store.get('userId');
+
+if (!userId) {
+  userId = uuid();
+  store.set('userId', userId);
+}
+const analytics = new Analytics(userId, store);
+global.trackEvent = analytics.trackEvent;
+
 const appVersion = app.getVersion();
 
 let mainWindow;
@@ -234,7 +250,11 @@ app.on('ready', () => {
       });
     }
     mainWindow.show();
-    checkForUpdates();
+    // Platform-specific app stores have their own update mechanism
+    // so only check if we're not in one
+    if (!appstore) {
+      checkForUpdates();
+    }
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
     if (lastSeen !== appVersion) {
@@ -245,6 +265,10 @@ app.on('ready', () => {
     }
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+
+  if (!store.get('user-agent')) {
+    store.set('user-agent', mainWindow.webContents.getUserAgent());
+  }
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
@@ -415,4 +439,6 @@ module.exports = {
   checkForUpdates,
   autoUpdater,
   store,
+  appstore,
+  analytics,
 };
