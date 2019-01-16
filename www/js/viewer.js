@@ -8,6 +8,7 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
+const slash = require('./js/slash');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
 const themes = require('./js/themes.json');
@@ -60,12 +61,17 @@ const castShabadLine = (lineID) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   // make sure that the deck is created before attempting to cast it.
   if (decks && decks[currentShabad]) {
-    castCur = decks[currentShabad][lineID];
     let nextLine = '';
     if (decks[currentShabad][lineID + 1]) {
       nextLine = decks[currentShabad][lineID + 1].gurmukhi;
     }
-    castCur.nextLine = nextLine;
+    castCur = Object.assign(
+      decks[currentShabad][lineID],
+      {
+        nextLine,
+        gurmukhi: decks[currentShabad][lineID].gurmukhiWithoutBisram,
+      },
+    );
     castToReceiver();
 
 
@@ -84,6 +90,15 @@ const castText = (text, isGurmukhi) => {
   castCur.larivaar = text;
   castToReceiver();
 };
+
+const applyThemebg = () => {
+  if (prefs.app.themebg.url) {
+    $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
+    $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+  }
+};
+
+applyThemebg();
 
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
@@ -143,6 +158,7 @@ global.platform.ipc.on('update-settings', () => {
 
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
+  applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
 });
@@ -202,11 +218,18 @@ const createCards = (rows, LineID) => {
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
+    // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const gurmukhiShabads = row.Gurmukhi.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+      /* } else if (val.includes(';')) {
+        const bisramWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
+      } else if (val.includes(',')) {
+        const yamkiWord = val.slice(0, -1);
+        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`; */
       } else {
         taggedGurmukhi[index] = val;
       }
@@ -226,6 +249,7 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi,
+      gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
@@ -314,13 +338,21 @@ const showLine = (ShabadID, LineID, rows) => {
 
 const showText = (text, isGurmukhi = false) => {
   hideDecks();
+
   $message.classList.add('active');
   while ($message.firstChild) {
     $message.removeChild($message.firstChild);
   }
-  const textNode = isGurmukhi ? h('h1.gurmukhi.gurbani', text) : h('h1.gurbani', text);
-  $message.appendChild(h('div.slide.active', textNode));
-  castText(text, isGurmukhi);
+
+  const $textIs = document.createElement('div');
+  $textIs.classList.add('gurbani');
+  if (isGurmukhi) {
+    $textIs.classList.add('gurmukhi');
+  }
+  $textIs.innerHTML = text;
+
+  $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
+  castText($textIs.innerText, isGurmukhi);
 };
 
 const toggleSideMenu = () => {

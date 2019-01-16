@@ -6,7 +6,7 @@ const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
-const { store } = main;
+const { store, appstore, analytics } = main;
 
 global.webview = document.querySelector('webview');
 
@@ -35,8 +35,11 @@ const updateMenu = [
     label: 'Check for Update',
     accelerator: 'CmdOrCtrl+U',
     click: () => {
+      analytics.trackEvent('menu', 'check-update');
       main.checkForUpdates(true);
     },
+    // Only show if not in a platform-specific app store
+    visible: !appstore,
   },
   {
     label: 'Checking for Updates',
@@ -51,6 +54,7 @@ const updateMenu = [
   {
     label: 'Install and Restart',
     click: () => {
+      analytics.trackEvent('menu', 'install-restart');
       main.autoUpdater.quitAndInstall();
     },
     visible: false,
@@ -170,6 +174,7 @@ const winMenu = [
         label: 'Preferences',
         accelerator: 'Ctrl+,',
         click: () => {
+          analytics.trackEvent('menu', 'preferences');
           global.core.menu.toggleMenu();
         },
       },
@@ -180,6 +185,7 @@ const winMenu = [
         label: 'Quit',
         accelerator: 'Ctrl+Q',
         click: () => {
+          analytics.trackEvent('menu', 'quit');
           app.quit();
         },
       },
@@ -197,12 +203,14 @@ const winMenu = [
       {
         label: 'Guide...',
         click: () => {
+          analytics.trackEvent('menu', 'guide');
           main.openSecondaryWindow('helpWindow');
         },
       },
       {
         label: 'Changelog...',
         click: () => {
+          analytics.trackEvent('menu', 'changelog');
           main.openSecondaryWindow('changelogWindow');
         },
       },
@@ -212,6 +220,7 @@ const winMenu = [
   {
     label: 'Donate...',
     click: () => {
+      analytics.trackEvent('menu', 'donate');
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
@@ -380,11 +389,14 @@ function updateViewerScale() {
 }
 
 function checkPresenterView() {
-  if (store.getUserPref('app.layout.presenter-view')) {
-    document.body.classList.add('presenter-view');
-    document.body.classList.remove('home');
-    document.body.classList.add('scale-viewer');
-  }
+  const inPresenterView = store.getUserPref('app.layout.presenter-view');
+  const classList = document.body.classList;
+
+  classList.toggle('presenter-view', inPresenterView);
+  classList.toggle('home', !inPresenterView);
+  classList.toggle('scale-viewer', inPresenterView);
+
+  document.querySelector('#presenter-view-toggle').checked = inPresenterView;
 }
 
 global.platform.ipc.on('presenter-view', () => {
@@ -447,6 +459,7 @@ global.platform.ipc.on('cast-session-active', () => {
 
   document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
+  analytics.trackEvent('chromecast', 'start');
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
@@ -484,6 +497,16 @@ module.exports = {
   'presenter-view': function presenterView() {
     checkPresenterView();
     updateViewerScale();
+  },
+
+  'colored-words': function coloredWords() {
+    const coloredWordsVal = store.getUserPref('slide-layout.display-options.colored-words');
+    store.setUserPref('slide-layout.display-options.gradient-bg', !coloredWordsVal);
+  },
+
+  'gradient-bg': function gradientBg() {
+    const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
+    store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
   autoplay() {

@@ -7,7 +7,10 @@ const tingle = require('./vendor/tingle');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
-const { store } = require('electron').remote.require('./app');
+const sanitizeHtml = require('sanitize-html');
+const { store, analytics } = require('electron').remote.require('./app');
+
+const allowedTags = ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'];
 
 const modal = new tingle.Modal({
   footer: true,
@@ -117,6 +120,7 @@ const getNotifications = (timeStamp, callback) => {
 };
 
 const notificationsBellClickHandler = () => {
+  analytics.trackEvent('display', 'notifications');
   getNotifications(null, showNotificationsModal);
 };
 
@@ -136,6 +140,7 @@ const randomShabadButton = h(
     'a.random-shabad-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'random-shabad');
         randomShabad()
           .then(goToShabadPage);
       } },
@@ -146,7 +151,10 @@ const anandKarajButton = h(
   h(
     'a.anand-karaj-button',
     {
-      onclick: () => { goToShabadPage(2897); },
+      onclick: () => {
+        analytics.trackEvent('display', 'anand-karaj');
+        goToShabadPage(2897);
+      },
     },
     h('i.fa.fa-heart.list-icon'),
     'Anand Karaj / Sikh Marriage'));
@@ -165,6 +173,7 @@ const hukamnamaButton = h(
     'a.hukamnama-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'hukamnam');
         getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
           if (!error) {
             const hukamShabadID = parseInt(response.shabadinfo.id, 10);
@@ -183,6 +192,7 @@ const emptySlideButton = h(
     'a.empty-slide-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'empty-slide');
         global.controller.sendText('');
       } },
     h('i.fa.fa-eye-slash.list-icon'),
@@ -193,6 +203,7 @@ const waheguruSlideButton = h(
     'a.waheguru-slide-button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'waheguru-slide');
         global.controller.sendText('vwihgurU', true);
       } },
     h('i.fa.fa-circle.list-icon'),
@@ -204,6 +215,7 @@ const dhanGuruSlideButton = h(
     {
       onclick: () => {
         const guruJi = document.querySelector('#dhan-guru').value;
+        analytics.trackEvent('display', 'dhanguru-slide', guruJi);
         global.controller.sendText(guruJi, true);
       } },
     h('i.fa.fa-circle-o.list-icon'),
@@ -242,27 +254,35 @@ const announcementSlideButton = h(
               name: 'announcement-language',
               type: 'checkbox',
               onclick: () => {
-                const $announcementText = document.querySelector('.announcement-text');
-                $announcementText.classList.toggle('gurmukhi');
                 const isGurmukhi = document.querySelector('#announcement-language').checked;
-                $announcementText.value = '';
-                $announcementText.placeholder = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
+                const placeholderText = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
+
+                const $announcementText = document.querySelector('.announcement-text');
+                $announcementText.classList.toggle('gurmukhi', isGurmukhi);
+                $announcementText.setAttribute('data-placeholder', placeholderText);
               },
               value: 'gurmukhi' }),
           h('label',
             {
               htmlFor: 'announcement-language' })])]),
   h(
-    'textarea.announcement-text',
+    'div.announcement-text',
     {
-      placeholder: 'Add announcement text here ..',
-    }),
+      contentEditable: true,
+      'data-placeholder': 'Add announcement text here ...',
+      oninput: () => {
+        const $announcementInput = document.querySelector('.announcement-text');
+        $announcementInput.innerHTML.replace(/.*/g, sanitizeHtml($announcementInput.innerHTML, { allowedTags }));
+      },
+    },
+  ),
   h(
     'button.announcement-slide-btn.button',
     {
       onclick: () => {
+        analytics.trackEvent('display', 'announcement-slide');
         const isGurmukhi = document.querySelector('#announcement-language').checked;
-        const announcementText = document.querySelector('.announcement-text').value;
+        const announcementText = sanitizeHtml(document.querySelector('.announcement-text').innerHTML, { allowedTags });
         global.controller.sendText(announcementText, isGurmukhi);
       } },
     'Add Announcement'));

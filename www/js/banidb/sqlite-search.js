@@ -17,7 +17,7 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
@@ -43,6 +43,8 @@ const query = (searchQuery, searchType, searchSource) => (
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
+    let isWildChar = false;
+
     // Sanitize query
     const saniQuery = searchQuery.trim().replace("'", "\\'");
     // default source for ang search to GURU_GRANTH_SAHIB
@@ -58,7 +60,12 @@ const query = (searchQuery, searchType, searchSource) => (
           if (charCode < 100) {
             charCode = `0${charCode}`;
           }
-          dbQuery += `,${charCode}`;
+          if (charCode === '042') {
+            isWildChar = true;
+            dbQuery += ',___';
+          } else {
+            dbQuery += `,${charCode}`;
+          }
         }
 
         // Replace kh with kh pair bindi
@@ -68,7 +75,7 @@ const query = (searchQuery, searchType, searchSource) => (
         }
 
         // Use LIKE if anywhere, otherwise use operators
-        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) {
+        if ((searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) || isWildChar) {
           condition = `${searchCol} LIKE '%${dbQuery}%'`;
           if (replaced) {
             condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
@@ -156,7 +163,7 @@ const loadShabad = ShabadID => (
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {

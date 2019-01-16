@@ -1,5 +1,18 @@
 ## SikhiToTheMax Desktop App
 
+### 4.3 - _190115_
+### Added:
+* You can now upload a custom background image! Check out the Custom option in the Themes menu
+* Added wildcard support. Type a * when you are searching if you are unsure of a letter. See the Help section for more info
+* Pressing CTRL (Windows) or CMD (Mac) + E will now display a blank slide
+* You can now paste text into the search field
+* When viewing a Shabad, you can now press a letter on your keyboard to go to the next panktee that starts with that letter
+* We have added Google Analytics to help support our future updates. You can toggle this off/on in the settings
+
+### Improved:
+* The announcements section now supports formatting, line breaks, and spacing!
+* We've made the toggle for Presenter View more accessible
+
 ### 4.2.3 - _181115_
 * Bug Fixes 
 

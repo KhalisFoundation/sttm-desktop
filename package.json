@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "4.2.3",
+  "version": "4.3.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -61,6 +61,9 @@
     "extract-zip": "^1.6.7",
     "get-json": "^1.0.0",
     "hyperscript": "^2.0.2",
+    "imagemin": "^6.0.0",
+    "imagemin-jpegtran": "^6.0.0",
+    "imagemin-pngquant": "^6.0.0",
     "ip": "^1.1.5",
     "is-online": "^7.0.0",
     "lodash.debounce": "^4.0.8",
@@ -74,11 +77,14 @@
     "realm": "^2.18.0",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
+    "sanitize-html": "^1.20.0",
     "scroll": "^2.0.1",
     "socket.io": "^2.1.1",
     "sqlite3": "^4.0.3",
     "tippy.js": "^2.5.2",
-    "update": "^0.7.4"
+    "universal-analytics": "^0.4.20",
+    "update": "^0.7.4",
+    "uuid": "^3.3.2"
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
