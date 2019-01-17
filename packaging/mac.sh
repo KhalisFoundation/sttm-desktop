@@ -4,6 +4,8 @@ set -ev
 
 echo $TRAVIS_BRANCH
 if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "dev" ]; then
+  # TEMPORARY
+  npm install semver
   GIT_TAG=$(git describe --abbrev=0 2>&1)
   echo "GIT_TAG"
   echo $GIT_TAG
