@@ -2,7 +2,8 @@
 # exit when any command fails
 set -ev
 
-if [ "$TRAVIS_BRANCH" = "release" || "$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "dev" ]; then
+echo $TRAVIS_BRANCH
+if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "dev" ]; then
   git describe --abbrev=0
   GIT_TAG=$?
   echo "GIT_TAG"
