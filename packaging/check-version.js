@@ -34,7 +34,7 @@ if (branch === 'dev' || branch === 'master') {
   } else if (semver.gt(currentReleaseMain, lastReleaseMain)) {
     // If the release version is newer than the last one
     // start a new prerelease track for the release
-    currentRelease = semver.inc(currentRelease, 'prerelease', track);
+    currentRelease = `${currentRelease}-${track}.0`;
   } else {
     throw new Error('Release cannot be older than previous version');
   }
