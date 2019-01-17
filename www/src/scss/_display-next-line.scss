@@ -24,7 +24,7 @@
   }
 
   .slide.active {
-    display: block;
+    display: flex;
 
     & + .slide {
       display: block;
@@ -34,6 +34,10 @@
       .transliteration,
       .teeka {
         display: none;
+      }
+
+      .gurbani {
+        padding-top: 0.5em;
       }
     }
 
