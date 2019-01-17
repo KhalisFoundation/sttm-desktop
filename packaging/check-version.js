@@ -41,7 +41,7 @@ if (branch === 'dev' || branch === 'master') {
 
   packageJSON.version = currentRelease;
 
-  fs.writeFileSync(path.resolve(__dirname, '..', 'package.json'), packageJSON);
+  fs.writeFileSync(path.resolve(__dirname, '..', 'package.json'), JSON.stringify(packageJSON));
 }
 
 console.log(currentRelease);
