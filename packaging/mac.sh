@@ -7,7 +7,7 @@ if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TR
   GIT_TAG=$(git describe --abbrev=0 2>&1)
   echo "GIT_TAG"
   echo $GIT_TAG
-  RELEASE_VERSION=$(node check-version.js $TRAVIS_BRANCH $GIT_TAG)
+  RELEASE_VERSION=$(node packaging/check-version.js $TRAVIS_BRANCH $GIT_TAG)
   echo "RELEASE_VERSION"
   echo $RELEASE_VERSION
   # npm test
