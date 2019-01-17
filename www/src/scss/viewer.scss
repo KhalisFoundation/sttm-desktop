@@ -77,6 +77,10 @@ body {
 .left-align {
   #viewer {
     text-align: left;
+
+    .viewer-controls {
+      text-align: center;
+    }
   }
 }
 
