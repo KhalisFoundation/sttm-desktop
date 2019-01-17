@@ -4,19 +4,17 @@ set -ev
 
 echo $TRAVIS_BRANCH
 if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "dev" ]; then
-  # TEMPORARY
-  npm install semver
   GIT_TAG=$(git describe --abbrev=0 2>&1)
-  echo "GIT_TAG"
-  echo $GIT_TAG
   RELEASE_VERSION=$(node packaging/check-version.js $TRAVIS_BRANCH $GIT_TAG)
-  echo "RELEASE_VERSION"
-  echo $RELEASE_VERSION
-  # npm test
-  # npm run dist:mac
-  # git tag $RELEASE_VERSION
-  # git push --tags
-  # node update-mac.js $TRAVIS_BRANCH
+  npm test
+  npm run dist:mac
+  git remote add origin https://$GH_TOKEN@github.com/khalisfoundation/sttm-desktop.git
+  git tag $RELEASE_VERSION
+  git push --tags
+  if [ "$TRAVIS_BRANCH" = "release" ]; then
+    echo "should not echo"
+    # node update-mac.js $TRAVIS_BRANCH
+  fi
 else
   npm test;
 fi
