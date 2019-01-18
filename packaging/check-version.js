@@ -9,9 +9,10 @@ let currentRelease = currentReleaseMain;
 
 const branch = process.argv[2];
 const lastTag = process.argv[3];
+const lastRelease = semver.valid(lastTag);
 
-const lastReleaseMain = semver.coerce(lastTag);
-const lastReleasePrerelease = semver.prerelease(lastTag);
+const lastReleaseMain = semver.coerce(lastRelease);
+const lastReleasePrerelease = semver.prerelease(lastRelease);
 
 if (!semver.valid(currentReleaseMain)) {
   throw new Error(`Release version (${currentReleaseMain}) is not valid. Please check package.json`);
@@ -30,11 +31,11 @@ if (branch === 'dev' || branch === 'master') {
       (branch === 'master' && lastReleasePrerelease[0] === 'dev')
      )
   ) {
-    currentRelease = semver.inc(currentReleaseMain, 'prerelease');
+    currentRelease = semver.inc(lastRelease, 'prerelease');
   } else if (semver.gt(currentReleaseMain, lastReleaseMain)) {
     // If the release version is newer than the last one
     // start a new prerelease track for the release
-    currentRelease = `${currentRelease}-${track}.0`;
+    currentRelease = `${currentReleaseMain}-${track}.0`;
   } else {
     throw new Error('Release cannot be older than previous version');
   }
