@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-console, import/no-extraneous-dependencies */
 const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
@@ -34,14 +34,14 @@ if (branch === 'dev' || branch === 'master') {
   } else if (semver.gt(currentReleaseMain, lastReleaseMain)) {
     // If the release version is newer than the last one
     // start a new prerelease track for the release
-    currentRelease = semver.inc(currentRelease, 'prerelease', track);
+    currentRelease = `${currentRelease}-${track}.0`;
   } else {
     throw new Error('Release cannot be older than previous version');
   }
 
   packageJSON.version = currentRelease;
 
-  fs.writeFileSync(path.resolve(__dirname, '..', 'package.json'), packageJSON);
+  fs.writeFileSync(path.resolve(__dirname, '..', 'package.json'), JSON.stringify(packageJSON));
 }
 
 console.log(currentRelease);

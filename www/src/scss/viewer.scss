@@ -95,11 +95,6 @@ body {
 
   &.active {
     opacity: 1;
-
-    &.vc-open {
-      right: #{$viewer-padding};
-      width: calc(100% - #{$viewer-padding} * 2 - 28vh);
-    }
   }
 }
 
@@ -297,10 +292,22 @@ h2 {
   }
 }
 
+.quick-tools {
+  .viewer-controls,
+  &.webview .vc-toggle-icon {
+    display: flex;
+  }
+
+  .deck.vc-open {
+    right: #{$viewer-padding};
+    width: calc(100% - #{$viewer-padding} * 2 - 28vh);
+  }
+}
+
 .viewer-controls {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.1);
-  display: flex;
+  display: none;
   flex-direction: column;
   height: 0;
   justify-content: space-around;
@@ -354,10 +361,6 @@ h2 {
   &.icons-gurbani .visibility {
     display: none;
   }
-}
-
-.webview .vc-toggle-icon {
-  display: flex;
 }
 
 .presenter-view.webview {
