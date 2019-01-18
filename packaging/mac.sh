@@ -7,9 +7,8 @@ if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TR
   RELEASE_VERSION=$(node packaging/check-version.js $TRAVIS_BRANCH $GIT_TAG)
   npm test
   npm run dist:mac
-  # git remote add origin https://$GH_TOKEN@github.com/khalisfoundation/sttm-desktop.git
   git tag $RELEASE_VERSION
-  git push --tags
+  git push https://$GH_TOKEN@github.com/khalisfoundation/sttm-desktop.git --tags
   if [ "$TRAVIS_BRANCH" = "release" ]; then
     echo "should not echo"
     # node update-mac.js $TRAVIS_BRANCH
