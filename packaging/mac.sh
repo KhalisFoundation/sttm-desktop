@@ -12,7 +12,7 @@ if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TR
   git config --global push.default current
   git checkout ${TRAVIS_BRANCH}
   git tag $RELEASE_VERSION
-  git push https://${GH_TOKEN}@github.com/stoplay/stoplay-ext.git --tags
+  git push https://${GH_TOKEN}@github.com/khalisfoundation/sttm-desktop.git --tags
   if [ "$TRAVIS_BRANCH" = "release" ]; then
     echo "should not echo"
     # node update-mac.js $TRAVIS_BRANCH
