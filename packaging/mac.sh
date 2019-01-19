@@ -3,7 +3,7 @@
 set -ev
 
 if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "dev" ]; then
-  GIT_TAG=$(git describe --abbrev=0 2>&1)
+  GIT_TAG=$(git describe --tags --abbrev=0 2>&1)
   RELEASE_VERSION=$(node packaging/check-version.js $TRAVIS_BRANCH $GIT_TAG)
   npm test
   npm run dist:mac
