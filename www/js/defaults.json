@@ -39,7 +39,8 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
-        "left-align": false
+        "left-align": false,
+        "quick-tools": true
       }
     }
   },
