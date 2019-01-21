@@ -120,19 +120,19 @@
     },
     "mac": {
       "category": "public.app-category.reference",
-      "icon": "assets/STTM3.icns",
+      "icon": "assets/STTM.icns",
       "target": [
         "dmg",
         "zip"
       ]
     },
     "nsis": {
-      "artifactName": "${productName}Setup-${version}.${ext}",
+      "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
       "deleteAppDataOnUninstall": true,
       "perMachine": true
     },
     "win": {
-      "icon": "assets/STTME.ico",
+      "icon": "assets/STTM.ico",
       "target": [
         "nsis"
       ]

@@ -41,6 +41,9 @@ if (branch === 'dev' || branch === 'master') {
   }
 
   packageJSON.version = currentRelease;
+  packageJSON.productName = `${packageJSON.productName} ${track.charAt(0).toUpperCase()}${track.slice(1)}`;
+  packageJSON.build.mac.icon = `assets/STTM-${track}.icns`;
+  packageJSON.build.win.icon = `assets/STTM-${track}.ico`;
 
   fs.writeFileSync(path.resolve(__dirname, '..', 'package.json'), JSON.stringify(packageJSON));
 }
