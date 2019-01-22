@@ -10,6 +10,7 @@ const themes = require('./themes.json');
 
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
+const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
 const { store, analytics } = remote.require('./app');
 
@@ -18,6 +19,50 @@ const defaultTheme = themes[0];
 const themesWithCustomBg = themes
                             .filter(theme => theme.type === 'COLOR' || theme.type === 'SPECIAL')
                             .map(theme => theme.key);
+
+const uploadErrorNotification = (message) => {
+  new Noty({
+    type: 'error',
+    text: message,
+    timeout: 3000,
+    modal: true,
+  }).show();
+};
+
+const recentSwatchFactory = backgroundPath =>
+  h(
+    'li.theme-instance.custom-bg',
+    {
+      style: {
+        'background-image': `url(${backgroundPath.replace(/(\s)/g, '\\ ')})`,
+      },
+      onclick: () => {
+        store.setUserPref('app.theme', themesWithCustomBg[0]);
+        store.setUserPref('app.themebg', {
+          type: 'custom',
+          url: backgroundPath.replace(/(\s)/g, '\\ '),
+        });
+        global.core.platformMethod('updateSettings');
+      },
+    },
+    h(
+      'button.delete-btn',
+      {
+        onclick: (evt) => {
+          evt.stopPropagation();
+          fs.unlink(backgroundPath, (error) => {
+            if (error) {
+              uploadErrorNotification(`Unable to delete that image. Press cmd+r / ctrl+r to refresh. - ${error}`);
+            } else {
+              evt.target.parentNode.parentNode.classList.add('delete-animate');
+            }
+          });
+        },
+      },
+      h('i.fa.fa-trash-o'),
+    ),
+  );
+
 
 const swatchFactory = (themeInstance, isCustom) =>
   h(
@@ -63,16 +108,7 @@ const swatchFactory = (themeInstance, isCustom) =>
 
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
-const uploadErrorNotification = (message) => {
-  new Noty({
-    type: 'error',
-    text: message,
-    timeout: 3000,
-    modal: true,
-  }).show();
-};
-
-const imageInput = () =>
+const imageInput = themesContainer =>
   h(
     'label.file-input-label',
     {
@@ -82,14 +118,14 @@ const imageInput = () =>
     h('input.file-input#themebg-upload',
       {
         type: 'file',
-        accept: 'image/png, image/jpeg',
+        accept: 'image/x-png, image/jpeg',
         onchange: async (evt) => {
           // const curTheme = store.getUserPref('app.theme');
 
           // if (!themesWithCustomBg.includes(curTheme)) {
           store.setUserPref('app.theme', themesWithCustomBg[0]);
           // }
-          const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
+
 
           try {
             if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
@@ -104,8 +140,8 @@ const imageInput = () =>
                 type: 'custom',
                 url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
               });
+              themesContainer.appendChild(recentSwatchFactory(files[0].path));
               analytics.trackEvent('theme', 'custom');
-
               global.core.platformMethod('updateSettings');
             }
           } catch (error) {
@@ -124,6 +160,26 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   });
 };
 
+const upsertCustomBackgrounds = (themesContainer) => {
+  document.querySelectorAll('.custom-bg').forEach((swatch) => {
+    swatch.remove();
+  });
+  fs.readdir(userBackgroundsPath, (error, files) => {
+    if (error) {
+      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
+    } else {
+      files.forEach((file) => {
+        const acceptedExtensions = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.JPEG'];
+        const extension = path.extname(file);
+
+        if (acceptedExtensions.includes(extension)) {
+          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
+        }
+      });
+    }
+  });
+};
+
 module.exports = {
   defaultTheme,
   init() {
@@ -138,8 +194,12 @@ module.exports = {
     themeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
     swatchGroupFactory('SPECIAL', themeOptions);
 
-    themeOptions.appendChild(swatchHeaderFactory('Custom background'));
-    themeOptions.appendChild(imageInput());
+    themeOptions.appendChild(swatchHeaderFactory('New Custom background'));
+    themeOptions.appendChild(imageInput(themeOptions));
+
+    themeOptions.appendChild(swatchHeaderFactory('Recent custom backgrounds'));
+    upsertCustomBackgrounds(themeOptions);
+
 
     /* themeOptions.appendChild(swatchHeaderFactory('Custom background themes'));
     swatchGroupFactory('COLOR', themeOptions, true);
