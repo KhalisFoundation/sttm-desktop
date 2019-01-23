@@ -20,6 +20,10 @@ const themesWithCustomBg = themes
                             .filter(theme => theme.type === 'COLOR' || theme.type === 'SPECIAL')
                             .map(theme => theme.key);
 
+/* 
+ * Helper Functions
+ */
+
 const uploadErrorNotification = (message) => {
   new Noty({
     type: 'error',
@@ -28,6 +32,34 @@ const uploadErrorNotification = (message) => {
     modal: true,
   }).show();
 };
+
+const imageCheck = (filePath) => {
+  const acceptedExtensions = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.JPEG'];
+  const extension = path.extname(filePath);
+
+  return acceptedExtensions.includes(extension);
+}
+
+const upsertCustomBackgrounds = (themesContainer) => {
+  document.querySelectorAll('.custom-bg').forEach((swatch) => {
+    swatch.remove();
+  });
+  fs.readdir(userBackgroundsPath, (error, files) => {
+    if (error) {
+      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
+    } else {
+      files.forEach((file) => {
+        if (imageCheck(file)) {
+          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
+        }
+      });
+    }
+  });
+};
+
+/* 
+ * DOM Factories
+ */
 
 const recentSwatchFactory = backgroundPath =>
   h(
@@ -118,7 +150,7 @@ const imageInput = themesContainer =>
     h('input.file-input#themebg-upload',
       {
         type: 'file',
-        accept: 'image/x-png, image/jpeg',
+        accept: '*.png',
         onchange: async (evt) => {
           // const curTheme = store.getUserPref('app.theme');
 
@@ -135,7 +167,7 @@ const imageInput = themesContainer =>
 
           try {
             const files = await imagemin([evt.target.files[0].path], userBackgroundsPath);
-            if (files) {
+            if (files && imageCheck(files[0].path)) {
               store.setUserPref('app.themebg', {
                 type: 'custom',
                 url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
@@ -143,6 +175,8 @@ const imageInput = themesContainer =>
               themesContainer.appendChild(recentSwatchFactory(files[0].path));
               analytics.trackEvent('theme', 'custom');
               global.core.platformMethod('updateSettings');
+            } else {
+              throw 'Only png and jpg images are allowed.';
             }
           } catch (error) {
             uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: ${error}`);
@@ -160,25 +194,6 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   });
 };
 
-const upsertCustomBackgrounds = (themesContainer) => {
-  document.querySelectorAll('.custom-bg').forEach((swatch) => {
-    swatch.remove();
-  });
-  fs.readdir(userBackgroundsPath, (error, files) => {
-    if (error) {
-      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
-    } else {
-      files.forEach((file) => {
-        const acceptedExtensions = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.JPEG'];
-        const extension = path.extname(file);
-
-        if (acceptedExtensions.includes(extension)) {
-          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
-        }
-      });
-    }
-  });
-};
 
 module.exports = {
   defaultTheme,
