@@ -20,7 +20,7 @@ const themesWithCustomBg = themes
                             .filter(theme => theme.type === 'COLOR' || theme.type === 'SPECIAL')
                             .map(theme => theme.key);
 
-/* 
+/*
  * Helper Functions
  */
 
@@ -38,26 +38,9 @@ const imageCheck = (filePath) => {
   const extension = path.extname(filePath);
 
   return acceptedExtensions.includes(extension);
-}
-
-const upsertCustomBackgrounds = (themesContainer) => {
-  document.querySelectorAll('.custom-bg').forEach((swatch) => {
-    swatch.remove();
-  });
-  fs.readdir(userBackgroundsPath, (error, files) => {
-    if (error) {
-      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
-    } else {
-      files.forEach((file) => {
-        if (imageCheck(file)) {
-          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
-        }
-      });
-    }
-  });
 };
 
-/* 
+/*
  * DOM Factories
  */
 
@@ -94,6 +77,24 @@ const recentSwatchFactory = backgroundPath =>
       h('i.fa.fa-trash-o'),
     ),
   );
+
+
+const upsertCustomBackgrounds = (themesContainer) => {
+  document.querySelectorAll('.custom-bg').forEach((swatch) => {
+    swatch.remove();
+  });
+  fs.readdir(userBackgroundsPath, (error, files) => {
+    if (error) {
+      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
+    } else {
+      files.forEach((file) => {
+        if (imageCheck(file)) {
+          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
+        }
+      });
+    }
+  });
+};
 
 
 const swatchFactory = (themeInstance, isCustom) =>
@@ -176,7 +177,7 @@ const imageInput = themesContainer =>
               analytics.trackEvent('theme', 'custom');
               global.core.platformMethod('updateSettings');
             } else {
-              throw 'Only png and jpg images are allowed.';
+              throw new Error('Only png and jpg images are allowed.');
             }
           } catch (error) {
             uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: ${error}`);
