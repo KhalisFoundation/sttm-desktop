@@ -167,20 +167,22 @@ const imageInput = themesContainer =>
           }
 
           try {
-            const files = await imagemin([evt.target.files[0].path], userBackgroundsPath);
-            if (files && imageCheck(files[0].path)) {
-              store.setUserPref('app.themebg', {
-                type: 'custom',
-                url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
-              });
-              themesContainer.appendChild(recentSwatchFactory(files[0].path));
-              analytics.trackEvent('theme', 'custom');
-              global.core.platformMethod('updateSettings');
+            if (imageCheck(evt.target.files[0].path)) {
+              const files = await imagemin([evt.target.files[0].path], userBackgroundsPath);
+              if (files) {
+                store.setUserPref('app.themebg', {
+                  type: 'custom',
+                  url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
+                });
+                themesContainer.appendChild(recentSwatchFactory(files[0].path));
+                analytics.trackEvent('theme', 'custom');
+                global.core.platformMethod('updateSettings');
+              }
             } else {
-              throw new Error('Only png and jpg images are allowed.');
+              throw new Error('Only .png and .jpg images are allowed.');
             }
           } catch (error) {
-            uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: ${error}`);
+            uploadErrorNotification(`There was an error using this file. If error persists, report it at www.sttm.co: ${error}`);
           }
         },
       },
