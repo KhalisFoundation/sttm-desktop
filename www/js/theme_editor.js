@@ -67,7 +67,7 @@ const recentSwatchFactory = backgroundPath =>
           evt.stopPropagation();
           fs.unlink(backgroundPath, (error) => {
             if (error) {
-              uploadErrorNotification(`Unable to delete that image. Press cmd+r / ctrl+r to refresh. - ${error}`);
+              uploadErrorNotification(`Unable to delete that image. - ${error}`);
             } else {
               evt.target.parentNode.parentNode.classList.add('delete-animate');
             }
