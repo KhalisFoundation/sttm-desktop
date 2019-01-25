@@ -178,7 +178,7 @@ function createSettingsPage(userPrefs) {
               'data-value': userPrefs[catKey][settingKey][optionKey],
               max: option.max,
               min: option.min,
-              oninput: (e) => {
+              onchange: (e) => {
                 const newVal = e.target.value;
                 e.target.dataset.value = newVal;
                 store.setUserPref(`${catKey}.${settingKey}.${optionKey}`, newVal);
