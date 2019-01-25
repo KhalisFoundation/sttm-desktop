@@ -151,7 +151,6 @@ const imageInput = themesContainer =>
     h('input.file-input#themebg-upload',
       {
         type: 'file',
-        accept: '*.png',
         onchange: async (evt) => {
           // const curTheme = store.getUserPref('app.theme');
 
