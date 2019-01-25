@@ -166,8 +166,9 @@ const imageInput = themesContainer =>
           }
 
           try {
-            if (imageCheck(evt.target.files[0].path)) {
-              const files = await imagemin([evt.target.files[0].path], userBackgroundsPath);
+            const filePath = evt.target.files[0].path;
+            if (imageCheck(filePath)) {
+              const files = await imagemin([filePath], userBackgroundsPath);
               if (files) {
                 store.setUserPref('app.themebg', {
                   type: 'custom',
