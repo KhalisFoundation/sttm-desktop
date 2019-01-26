@@ -2,8 +2,8 @@
 
 ### 4.4 - _190206_
 ### Added:
-* Added an option to hide the quick tools menu
 * Added the ability to upload multiple custom backgrounds and save them for future use
+* Added an option to hide the quick tools menu
 
 ### Improved:
 * Moved all settings to a dedictaed tab and removed duplicate options
