@@ -325,17 +325,6 @@ body.show-overlay {
     text-transform: uppercase;
   }
 
-  .themebg-text {
-    @extend .theme-text;
-
-    color: black;
-  }
-
-  .themebg-icon {
-    color: #333;
-    font-size: 21px;
-  }
-
   .delete-btn {
     background-color: #c0392b;
     border-radius: 50%;
@@ -363,6 +352,14 @@ body.show-overlay {
 .file-input-label {
   display: block;
   margin: 10px;
+}
+
+.helper-text {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 12px;
+  margin: 0 auto 10px 10px;
+  width: 100%;
 }
 
 .win32 .options-page {

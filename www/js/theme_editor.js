@@ -40,13 +40,19 @@ const imageCheck = (filePath) => {
   return acceptedExtensions.includes(extension);
 };
 
+const toggleRecentBgHeader = () => {
+  const customBgExists = document.querySelector('.custom-bg:not(.delete-animate)');
+  const recentBgHeader = document.querySelector('.recentbg-header');
+  recentBgHeader.classList.toggle('hidden', !customBgExists);
+};
+
 /*
  * DOM Factories
  */
 
 const recentSwatchFactory = backgroundPath =>
   h(
-    'li.theme-instance.custom-bg',
+    'li.theme-instance.custom-bg.visible',
     {
       style: {
         'background-image': `url(${backgroundPath.replace(/(\s)/g, '\\ ')})`,
@@ -70,6 +76,7 @@ const recentSwatchFactory = backgroundPath =>
               uploadErrorNotification(`Unable to delete that image. - ${error}`);
             } else {
               evt.target.closest('.custom-bg').classList.add('delete-animate');
+              toggleRecentBgHeader();
             }
           });
         },
@@ -77,27 +84,6 @@ const recentSwatchFactory = backgroundPath =>
       h('i.fa.fa-trash-o'),
     ),
   );
-
-
-const upsertCustomBackgrounds = (themesContainer) => {
-  const recentBgsContainer = themesContainer.appendChild(h('ul.recentbgs-container'));
-  fs.readdir(userBackgroundsPath, (error, files) => {
-    if (error) {
-      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
-    } else {
-      files.forEach((file) => {
-        if (imageCheck(file)) {
-          recentBgsContainer.appendChild(
-            recentSwatchFactory(
-              path.resolve(userBackgroundsPath, file),
-            ),
-          );
-        }
-      });
-    }
-  });
-};
-
 
 const swatchFactory = (themeInstance, isCustom) =>
   h(
@@ -145,12 +131,11 @@ const swatchHeaderFactory = headerText => h('header.options-header', headerText)
 
 const imageInput = recentBgsContainer =>
   h(
-    'label.theme-instance',
+    'label.file-input-label',
     {
       for: 'themebg-upload',
     },
-    h('span.themebg-icon', h('i.fa.fa-file-image-o')),
-    h('span.themebg-text', 'New Image'),
+    'New Image',
     h('input.file-input#themebg-upload',
       {
         type: 'file',
@@ -178,6 +163,8 @@ const imageInput = recentBgsContainer =>
                   url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
                 });
                 recentBgsContainer.appendChild(recentSwatchFactory(files[0].path));
+                toggleRecentBgHeader();
+
                 analytics.trackEvent('theme', 'custom');
                 global.core.platformMethod('updateSettings');
               }
@@ -200,6 +187,30 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   });
 };
 
+const upsertCustomBackgrounds = (themesContainer) => {
+  const recentBgHeader = themesContainer.appendChild(swatchHeaderFactory('Recent Custom backgrounds'));
+  recentBgHeader.classList.add('recentbg-header');
+
+  const recentBgsContainer = themesContainer.appendChild(h('ul.recentbgs-container'));
+
+  fs.readdir(userBackgroundsPath, (error, files) => {
+    if (error) {
+      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
+    } else {
+      files.forEach((file) => {
+        const fullPath = path.resolve(userBackgroundsPath, file);
+        if (imageCheck(file)) {
+          recentBgsContainer.appendChild(recentSwatchFactory(fullPath));
+        } else {
+          fs.unlink(fullPath, (deleteError) => {
+            if (deleteError) uploadErrorNotification(`Unable to delete a file. - ${deleteError}`);
+          });
+        }
+      });
+    }
+    toggleRecentBgHeader();
+  });
+};
 
 module.exports = {
   defaultTheme,
@@ -217,6 +228,7 @@ module.exports = {
 
     themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
     themeOptions.appendChild(imageInput(themeOptions));
+    themeOptions.appendChild(h('p.helper-text', '(The preferred resolution is 1920 X 1080)'));
 
     upsertCustomBackgrounds(themeOptions);
 
