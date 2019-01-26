@@ -2,9 +2,8 @@
 
 <div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/ZDX8nPkDBSc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
 
-### How do I install the desktop application?
 
-You can install SikhiToTheMax (STTM) by visiting [this website](https://khalisfoundation.org/portfolio/sikhitothemax-everywhere/) and choosing the Windows or macOS download link. After that, open the installer and follow the steps that are displayed.
+
 
 ### How do I search for a shabad?
 
