@@ -5,9 +5,7 @@ After launching SikhiToTheMax, by default you can search for a shabad by enterin
 
 ### How do I type in Gurmukhi?
 
-When using SikhiToTheMax, your keyboard will automatically type in Gurmukhi. Reference the keyboard map below to know which character goes with which key. Alternatively, you can click on the Gurmukhi keyboard icon and type in the letters manually.
-
-![](./assets/img/help_images/web-desktop-keyboard-map.png)
+When using SikhiToTheMax, your keyboard will automatically type in Gurmukhi. Reference the keyboard map below to know which character goes with which key. Alternatively, you can click on the Gurmukhi keyboard icon and type in the letters manually.![](./assets/img/help_images/web-desktop-keyboard-map.png)
 
 ### What do the different search types do?
 
