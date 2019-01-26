@@ -282,6 +282,11 @@ body.show-overlay {
   left: 0;
 }
 
+.recentbgs-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .theme-instance {
   align-items: center;
   background-color: #fff;
@@ -305,6 +310,7 @@ body.show-overlay {
 
   &:hover {
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 14px;
     margin-top: 6px;
   }
 
@@ -312,11 +318,22 @@ body.show-overlay {
     box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4);
   }
 
-  span {
+  .theme-text {
     background: transparent !important;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
+  }
+
+  .themebg-text {
+    @extend .theme-text;
+
+    color: black;
+  }
+
+  .themebg-icon {
+    color: #333;
+    font-size: 21px;
   }
 
   .delete-btn {

@@ -69,7 +69,7 @@ const recentSwatchFactory = backgroundPath =>
             if (error) {
               uploadErrorNotification(`Unable to delete that image. - ${error}`);
             } else {
-              evt.target.parentNode.parentNode.classList.add('delete-animate');
+              evt.target.closest('.custom-bg').classList.add('delete-animate');
             }
           });
         },
@@ -80,16 +80,18 @@ const recentSwatchFactory = backgroundPath =>
 
 
 const upsertCustomBackgrounds = (themesContainer) => {
-  document.querySelectorAll('.custom-bg').forEach((swatch) => {
-    swatch.remove();
-  });
+  const recentBgsContainer = themesContainer.appendChild(h('ul.recentbgs-container'));
   fs.readdir(userBackgroundsPath, (error, files) => {
     if (error) {
       uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
     } else {
       files.forEach((file) => {
         if (imageCheck(file)) {
-          themesContainer.appendChild(recentSwatchFactory(path.resolve(userBackgroundsPath, file)));
+          recentBgsContainer.appendChild(
+            recentSwatchFactory(
+              path.resolve(userBackgroundsPath, file),
+            ),
+          );
         }
       });
     }
@@ -131,7 +133,7 @@ const swatchFactory = (themeInstance, isCustom) =>
       },
     },
     h(
-      `span.${themeInstance.name}`,
+      `span.theme-text.${themeInstance.name}`,
       {
         style: {
           color: themeInstance['gurbani-color'],
@@ -141,13 +143,14 @@ const swatchFactory = (themeInstance, isCustom) =>
 
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
-const imageInput = themesContainer =>
+const imageInput = recentBgsContainer =>
   h(
-    'label.file-input-label',
+    'label.theme-instance',
     {
       for: 'themebg-upload',
     },
-    'Choose a file',
+    h('span.themebg-icon', h('i.fa.fa-file-image-o')),
+    h('span.themebg-text', 'New Image'),
     h('input.file-input#themebg-upload',
       {
         type: 'file',
@@ -174,7 +177,7 @@ const imageInput = themesContainer =>
                   type: 'custom',
                   url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
                 });
-                themesContainer.appendChild(recentSwatchFactory(files[0].path));
+                recentBgsContainer.appendChild(recentSwatchFactory(files[0].path));
                 analytics.trackEvent('theme', 'custom');
                 global.core.platformMethod('updateSettings');
               }
@@ -212,10 +215,9 @@ module.exports = {
     themeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
     swatchGroupFactory('SPECIAL', themeOptions);
 
-    themeOptions.appendChild(swatchHeaderFactory('New Custom background'));
+    themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
     themeOptions.appendChild(imageInput(themeOptions));
 
-    themeOptions.appendChild(swatchHeaderFactory('Recent custom backgrounds'));
     upsertCustomBackgrounds(themeOptions);
 
 
