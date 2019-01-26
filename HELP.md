@@ -7,6 +7,14 @@ After launching SikhiToTheMax, by default you can search for a shabad by enterin
 
 When using SikhiToTheMax, your keyboard will automatically type in Gurmukhi. Reference the keyboard map below to know which character goes with which key. Alternatively, you can click on the Gurmukhi keyboard icon and type in the letters manually.![](./assets/img/help_images/web-desktop-keyboard-map.png)
 
+### How can I adjust the font size?
+
+The easiest way to change the font size is through quick tools. The quick tools menu is available in the preview pane when you are viewing a shabad. ![](./assets/img/help_images/desktop-quick-tools.gif)
+
+### How do I change the background color?
+
+After launching STTM, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image. We recommend a resolution of 1920x1080 for custom backgrounds.
+
 ### What do the different search types do?
 
 *   First Letter (Start)
@@ -29,17 +37,11 @@ If you are unsure of a letter when searching, you can enter in a * as a wildcard
 
 Plug in your computer to the projector or TV. Once you do this, go to your computer's display settings and change it to "Extended Desktop" (NOT mirroring). After that, launch STTM and turn on "Presenter View" in the settings! ![](./assets/img/help_images//desktop-extend-pc.png) ![](./assets/img/help_images/desktop-extend-mac.png)
 
-### How do I change the background color?
-
-After launching STTM, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image. We recommend a resolution of 1920x1080 for custom backgrounds.
 
 ### Can you view the Gurbani in Larivaar?
 
 Yes! After launching STTM, click the icon for Display Settings, and choose the Larivaar option. 
 
-### How can I adjust the font size?
-
-After launching STTM, click the icon for settings, and scroll down for options to adjust the font size. Alternatively, you can adjust font sizes by using the "Quick Tools" menu in the preview pane. 
 
 ### Where can I see my previous shabads?
 
