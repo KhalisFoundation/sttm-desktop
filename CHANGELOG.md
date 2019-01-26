@@ -6,7 +6,7 @@
 * Added an option to hide the quick tools menu
 
 ### Improved:
-* Moved all settings to a dedictaed tab and removed duplicate options
+* Moved all settings to a dedicated tab and removed duplicate options
 * Fixed an issue when using the "Next Line" toggle that caused a large gap on the slide
 * Fixed some issues with the custom background uploader
 * Fixed some formatting issues when using Chromecast
