@@ -7,7 +7,7 @@
 
 ### How do I search for a shabad?
 
-After launching STTM, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn".'" ![](./assets/img/help_images/desktop-search-ex.png) Alternatively, you can click on the gurmukhi keyboard icon and type in the letters manually. ![](./assets/img/help_images//desktop-keyboard.png)
+After launching STTM, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn".'" ![](./assets/img/help_images/search_example.gif) Alternatively, you can click on the gurmukhi keyboard icon and type in the letters manually. ![](./assets/img/help_images//desktop-keyboard.png)
 
 ### What do the different search types do?
 
