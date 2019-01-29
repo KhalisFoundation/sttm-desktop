@@ -2,13 +2,12 @@
 
 <div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/ZDX8nPkDBSc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
 
-### How do I install the desktop application?
 
-You can install SikhiToTheMax (STTM) by visiting [this website](https://khalisfoundation.org/portfolio/sikhitothemax-everywhere/) and choosing the Windows or macOS download link. After that, open the installer and follow the steps that are displayed.
+
 
 ### How do I search for a shabad?
 
-After launching STTM, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn".'" ![](./assets/img/help_images/desktop-search-ex.png) Alternatively, you can click on the gurmukhi keyboard icon and type in the letters manually. ![](./assets/img/help_images//desktop-keyboard.png)
+After launching STTM, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn".'" ![](./assets/img/help_images/search_example.gif) Alternatively, you can click on the gurmukhi keyboard icon and type in the letters manually. ![](./assets/img/help_images//desktop-keyboard.png)
 
 ### What do the different search types do?
 
