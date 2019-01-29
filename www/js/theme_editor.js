@@ -24,11 +24,11 @@ const themesWithCustomBg = themes
  * Helper Functions
  */
 
-const uploadErrorNotification = (message) => {
+const uploadErrorNotification = (message, timeout = 3000) => {
   new Noty({
     type: 'error',
     text: message,
-    timeout: 3000,
+    timeout,
     modal: true,
   }).show();
 };
@@ -186,6 +186,7 @@ const imageInput = themesContainer =>
                 global.core.platformMethod('updateSettings');
               }
             } else {
+              event.target.value = '';
               throw new Error('Only .png and .jpg images are allowed.');
             }
           } catch (error) {
