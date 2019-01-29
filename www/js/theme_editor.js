@@ -107,14 +107,9 @@ const swatchFactory = (themeInstance, isCustom) =>
           global.core.platformMethod('updateSettings');
           analytics.trackEvent('theme', themeInstance.key);
         } catch (error) {
-          new Noty({
-            type: 'error',
-            text: `There is an error parsing this theme.
-            Try checking theme file for errors. If error persists,
-            report it at www.sttm.co`,
-            timeout: 3000,
-            modal: true,
-          }).show();
+          uploadErrorNotification(`There is an error parsing this theme.
+          Try checking theme file for errors. ERROR: ${error} - If error persists,
+          report it at www.sttm.co`, 5000);
         }
       },
     },
@@ -168,7 +163,7 @@ const imageInput = themesContainer =>
           try {
             if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
           } catch (error) {
-            uploadErrorNotification(`There was an error using this image. If error persists, report it at www.sttm.co: Error Creating Directory - ${error}`);
+            uploadErrorNotification(` Error Creating Directory. ERROR: ${error} - If error persists, report it at www.sttm.co:`);
           }
 
           try {
@@ -190,7 +185,7 @@ const imageInput = themesContainer =>
               throw new Error('Only .png and .jpg images are allowed.');
             }
           } catch (error) {
-            uploadErrorNotification(`There was an error using this file. If error persists, report it at www.sttm.co: ${error}`);
+            uploadErrorNotification(`There was an error using this file. ERROR:  ${error} - If error persists, report it at www.sttm.co`);
           }
         },
       },
