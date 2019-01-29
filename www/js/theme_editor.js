@@ -163,12 +163,7 @@ const imageInput = themesContainer =>
       {
         type: 'file',
         onchange: async (evt) => {
-          // const curTheme = store.getUserPref('app.theme');
-
-          // if (!themesWithCustomBg.includes(curTheme)) {
           store.setUserPref('app.theme', themesWithCustomBg[0]);
-          // }
-
 
           try {
             if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
