@@ -168,6 +168,7 @@ const imageInput = themesContainer =>
 
           try {
             const filePath = evt.target.files[0].path;
+            event.target.value = '';
             if (imageCheck(filePath)) {
               const files = await imagemin([filePath], userBackgroundsPath);
               if (files) {
@@ -181,7 +182,6 @@ const imageInput = themesContainer =>
                 global.core.platformMethod('updateSettings');
               }
             } else {
-              event.target.value = '';
               throw new Error('Only .png and .jpg images are allowed.');
             }
           } catch (error) {
