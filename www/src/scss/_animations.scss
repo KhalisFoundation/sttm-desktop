@@ -1,5 +1,5 @@
 .animated {
-  animation-duration: 0.25s;
+  animation-duration: 0.5s;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
 }
@@ -20,19 +20,30 @@
   animation-name: fadeInUp;
 }
 
-@keyframes fadeOutDown {
+@keyframes fadeOutRollDown {
   0% {
     opacity: 1;
   }
 
-  to {
+  50% {
+    transform: rotate(15deg);
+  }
+
+  100% {
     opacity: 0;
-    transform: translate3d(0, 5%, 0);
+    transform: translateY(100px);
   }
 }
 
-.fadeOutDown {
-  animation-name: fadeOutDown;
+@keyframes gayab {
+  from {
+    visibility: visible;
+  }
+
+  to {
+    position: fixed;
+    visibility: hidden;
+  }
 }
 
 @keyframes blank {
@@ -53,4 +64,10 @@
   100% {
     opacity: 1;
   }
+}
+
+.delete-animate {
+  animation: fadeOutRollDown 0.5s ease 1, gayab 0.1s ease 1;
+  animation-delay: 0s, 0.5s;
+  animation-fill-mode: both;
 }
