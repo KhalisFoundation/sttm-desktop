@@ -71,14 +71,19 @@ const recentSwatchFactory = backgroundPath =>
       {
         onclick: (evt) => {
           evt.stopPropagation();
-          fs.unlink(backgroundPath, (error) => {
-            if (error) {
-              uploadErrorNotification(`Unable to delete that image. - ${error}`);
-            } else {
-              evt.target.closest('.custom-bg').classList.add('delete-animate');
-              toggleRecentBgHeader();
-            }
-          });
+          const currentBg = store.getUserPref('app.themebg');
+          if (currentBg.url === backgroundPath.replace(/(\s)/g, '\\ ')) {
+            uploadErrorNotification('This image is being used, please switch to another image or theme before deleting this image.', 5000);
+          } else {
+            fs.unlink(backgroundPath, (error) => {
+              if (error) {
+                uploadErrorNotification(`Unable to delete that image. - ${error}`);
+              } else {
+                evt.target.closest('.custom-bg').classList.add('delete-animate');
+                toggleRecentBgHeader();
+              }
+            });
+          }
         },
       },
       h('i.fa.fa-trash-o'),
