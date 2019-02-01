@@ -285,7 +285,7 @@ body.show-overlay {
 .recentbgs-container {
   display: flex;
   flex-wrap: wrap;
-  min-height: 300px;
+  min-height: 100px;
 }
 
 .theme-instance {
@@ -325,6 +325,7 @@ body.show-overlay {
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+
   .delete-btn {
     background-color: #c0392b;
     border-radius: 50%;

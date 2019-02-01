@@ -132,7 +132,12 @@ const upsertCustomBackgrounds = (themesContainer) => {
     if (error) {
       uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
     } else {
-      files.forEach((file) => {
+      const sortedFiles = files.map(fileName => ({
+        name: fileName,
+        time: fs.statSync(path.resolve(userBackgroundsPath, fileName)).mtime.getTime(),
+      })).sort((a, b) => b.time - a.time).map(v => v.name);
+
+      sortedFiles.forEach((file) => {
         const fullPath = path.resolve(userBackgroundsPath, file);
         if (imageCheck(file)) {
           recentBgsContainer.appendChild(recentSwatchFactory(fullPath));
