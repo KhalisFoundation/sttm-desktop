@@ -1,14 +1,37 @@
 {
   "search": {
     "label": "Search",
-    "icon": "search"
+    "icon": "search",
+    "type": "pane-nav"
   },
-  "session": {
+  "history": {
     "label": "History",
-    "icon": "history"
+    "icon": "history",
+    "type": "tab-nav"
   },
   "shabad": {
     "label": "Current Shabad",
-    "icon": "dot-circle-o"
+    "icon": "dot-circle-o",
+    "type": "pane-nav"
+  },
+  "themes": {
+    "label": "Themes",
+    "icon": "paint-brush",
+    "type": "tab-nav"
+  },
+  "insert": {
+    "label": "Insert",
+    "icon": "desktop",
+    "type": "tab-nav"
+  },
+  "display": {
+    "label": "Display",
+    "icon": "cogs",
+    "type": "tab-nav"
+  },
+  "others": {
+    "label": "Others",
+    "icon": "ellipsis-h",
+    "type": "tab-nav"
   }
 }

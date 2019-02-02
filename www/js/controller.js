@@ -397,6 +397,7 @@ function checkPresenterView() {
   classList.toggle('scale-viewer', inPresenterView);
 
   document.querySelector('#presenter-view-toggle').checked = inPresenterView;
+  document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
 }
 
 global.platform.ipc.on('presenter-view', () => {
