@@ -229,6 +229,7 @@ button {
 #custom-theme-options {
   display: flex;
   flex-wrap: wrap;
+  transition: 0.5s all ease;
 
   header {
     flex-basis: 100%;
