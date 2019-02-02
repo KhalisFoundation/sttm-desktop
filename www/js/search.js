@@ -224,7 +224,7 @@ Object.keys(pageNavJSON).forEach(id => {
         `a#${id}-pageLink.${navType}`,
         {
           onclick: () => {
-            if (navType !== 'tab-nav') {
+            if (navType === 'pane-nav') {
               module.exports.navPage(id);
             } else {
               module.exports.activateNavPage('session', { id, label: pageNavJSON[id].label });
