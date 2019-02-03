@@ -32,67 +32,6 @@ function updateRangeSetting(key, val) {
   analytics.trackEvent('settings', optionKey, val);
 }
 
-function addDisplayTab() {
-  document.getElementById('display-tab-content').innerHTML = '';
-  const catKey = 'slide-layout';
-  const settingKey = 'display-options';
-  const userPrefs = store.getAllPrefs();
-  const setting = settings[catKey].settings[settingKey];
-  const switchList = h('ul');
-  Object.keys(setting.options).forEach((option) => {
-    const optionId = `setting-${catKey}-${settingKey}-${option}`;
-    const switchListAttrs = {
-      name: `setting-${catKey}-${settingKey}`,
-      onclick: (e) => {
-        const newVal = e.target.checked;
-        store.setUserPref(`${catKey}.${settingKey}.${option}`, newVal);
-        updateCheckboxSetting(option);
-        if (typeof global.controller[option] === 'function') {
-          global.controller[option](newVal);
-        }
-        if (typeof global.core[option] === 'function') {
-          global.core[option](newVal);
-        }
-      },
-      type: 'checkbox',
-      value: option,
-    };
-    if (option === 'akhandpaatt') {
-      switchListAttrs.disabled = store.get('userPrefs.slide-layout.display-options.disable-akhandpaatt');
-      switchListAttrs.title = 'Disabled during casting';
-    }
-    if (userPrefs[catKey][settingKey][option]) {
-      switchListAttrs.checked = true;
-    }
-    let optionLabel = setting.options[option];
-    let subLabel = false;
-    if (typeof setting.options[option] === 'object') {
-      optionLabel = setting.options[option].label;
-      subLabel = setting.options[option].subLabel;
-
-      if (typeof subLabel === 'object') {
-        subLabel = store.get(subLabel.storepref);
-      }
-    }
-
-    switchList.appendChild(
-      h('li',
-        [
-          h('span', optionLabel),
-          h('div.switch',
-            [
-              h(`input#${optionId}`,
-                switchListAttrs),
-              h('label',
-                {
-                  htmlFor: optionId })])]));
-    if (subLabel) {
-      switchList.appendChild(h(`div.sub-label.${option}`, subLabel));
-    }
-  });
-  document.getElementById('display-tab-content').appendChild(switchList);
-}
-
 function createSettingsPage(userPrefs) {
   if (document.getElementById('settings')) {
     document.getElementById('settings').remove();
@@ -280,8 +219,7 @@ module.exports = {
   init() {
     const userPrefs = store.getAllPrefs();
     this.settingsPage = createSettingsPage(userPrefs);
-    document.querySelector('#menu-page').appendChild(this.settingsPage);
-    addDisplayTab();
+    document.querySelector('#display-tab-content').appendChild(this.settingsPage);
     this.applySettings();
   },
 

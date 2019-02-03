@@ -1,36 +1,27 @@
 {
-  "app": {
-    "title": "App Settings",
-    "settings": {
-      "theme": {
-        "title": "",
-        "type": "radio",
-        "options": {}
-      },
-      "themebg": {
-        "title": "",
-        "type": "dynamic",
-        "options": {}
-      },
-      "layout": {
-        "title": "App Layout",
-        "type": "switch",
-        "options": {
-          "presenter-view": "Presenter View"
-        }
-      },
-      "analytics": {
-        "title": "Other Options",
-        "type": "switch",
-        "options": {
-          "collect-statistics":"Collect Statistics"
-        }
-      }
-    }
-  },
   "slide-layout": {
     "title": "Slide Layout",
     "settings": {
+      "display-options": {
+        "title": "Display Options",
+        "type": "switch",
+        "options": {
+          "akhandpaatt": {
+            "label": "Akhand Paatth View (Beta)",
+            "subLabel": "(Google ChromeCast Unavailable)"
+          },
+          "larivaar": "Larivaar",
+          "left-align": "Left-Align",
+          "autoplay": "Auto Play",
+          "quick-tools": "Quick Tools",
+          "livefeed": {
+            "label":"Live Feed Text Files",
+            "subLabel": {
+              "storepref": "userPrefs.app.live-feed-location"
+            }
+          }
+        }
+      },
       "fields": {
         "title": "Fields to Display",
         "type": "checkbox",
@@ -71,26 +62,6 @@
           }
         }
       },
-      "display-options": {
-        "title": "Display Options",
-        "type": "switch",
-        "options": {
-          "akhandpaatt": {
-            "label": "Akhand Paatth View (Beta)",
-            "subLabel": "(Google ChromeCast Unavailable)"
-          },
-          "larivaar": "Larivaar",
-          "left-align": "Left-Align",
-          "autoplay": "Auto Play",
-          "quick-tools": "Quick Tools",
-          "livefeed": {
-            "label":"Live Feed Text Files",
-            "subLabel": {
-              "storepref": "userPrefs.app.live-feed-location"
-            }
-          }
-        }
-      },
       "autoplay-options": {
         "title": "Autoplay Options",
         "type": "range",
@@ -101,6 +72,35 @@
             "min": 1,
             "step": 1
           }
+        }
+      }
+    }
+  },
+  "app": {
+    "title": "App Settings",
+    "settings": {
+      "theme": {
+        "title": "",
+        "type": "radio",
+        "options": {}
+      },
+      "themebg": {
+        "title": "",
+        "type": "dynamic",
+        "options": {}
+      },
+      "layout": {
+        "title": "App Layout",
+        "type": "switch",
+        "options": {
+          "presenter-view": "Presenter View"
+        }
+      },
+      "analytics": {
+        "title": "Other Options",
+        "type": "switch",
+        "options": {
+          "collect-statistics":"Collect Statistics"
         }
       }
     }

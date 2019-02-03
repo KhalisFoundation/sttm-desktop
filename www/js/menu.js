@@ -9,6 +9,7 @@ const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
 const { store, analytics } = require('electron').remote.require('./app');
+const search = require('./search');
 
 const allowedTags = ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'];
 
@@ -304,7 +305,7 @@ module.exports = {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach(($menuToggle) => {
       $menuToggle.appendChild(menuButton.cloneNode(true));
-      $menuToggle.addEventListener('click', () => { module.exports.toggleMenu('#menu-page'); });
+      $menuToggle.addEventListener('click', module.exports.showDisplayTab);
     });
     document.querySelector('.preferences-close').appendChild(closeButton);
 
@@ -328,6 +329,23 @@ module.exports = {
   getNotifications,
 
   showNotificationsModal,
+
+  showDisplayTab(fromMainMenu) {
+    search.activateNavLink('display', true);
+    search.activateNavPage('session', { id: 'display', label: 'Display' });
+
+    const isPresenterView = document.body.classList.contains('presenter-view');
+    let settingsClickSource = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';
+    if (fromMainMenu) settingsClickSource += '_main_menu';
+    analytics.trackEvent('newSettings', settingsClickSource);
+
+    const sessionPage = document.querySelector('#session-page');
+    sessionPage.classList.add('bounce-animate');
+    sessionPage.offsetWidth = undefined; // reflow to restart animation
+    sessionPage.addEventListener('webkitAnimationEnd', () => {
+      sessionPage.classList.remove('bounce-animate');
+    });
+  },
 
   toggleMenu(pageSelector = '#menu-page') {
     document.querySelector(pageSelector).classList.toggle('active');
