@@ -179,6 +179,11 @@ const imageInput = themesContainer =>
           try {
             const filePath = evt.target.files[0].path;
             event.target.value = '';
+
+            if (fs.readdirSync(userBackgroundsPath).length > 4) {
+              throw new Error('Only 5 images allowed.');
+            }
+
             if (imageCheck(filePath)) {
               const files = await imagemin([filePath], userBackgroundsPath);
               if (files) {
