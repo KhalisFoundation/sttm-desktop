@@ -353,6 +353,14 @@ body.show-overlay {
 .file-input-label {
   display: block;
   margin: 10px;
+  &.disabled {
+    background: #e0e0e0;
+    cursor: default;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
 }
 
 .helper-text {

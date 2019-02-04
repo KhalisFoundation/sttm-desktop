@@ -46,6 +46,12 @@ const toggleRecentBgHeader = () => {
   recentBgHeader.classList.toggle('hidden', !customBgExists);
 };
 
+const toggleFileInput = () => {
+  const isLimitReached = document.querySelectorAll('.custom-bg:not(.delete-animate)').length > 4;
+  document.querySelector('.file-input-label').classList.toggle('disabled', isLimitReached);
+  document.querySelector('#themebg-upload').disabled = isLimitReached;
+};
+
 /*
  * DOM Factories
  */
@@ -81,6 +87,7 @@ const recentSwatchFactory = backgroundPath =>
               } else {
                 evt.target.closest('.custom-bg').classList.add('delete-animate');
                 toggleRecentBgHeader();
+                toggleFileInput();
               }
             });
           }
@@ -154,6 +161,7 @@ const upsertCustomBackgrounds = (themesContainer) => {
       });
     }
     toggleRecentBgHeader();
+    toggleFileInput();
   });
 };
 
@@ -228,7 +236,7 @@ module.exports = {
 
     themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
     themeOptions.appendChild(imageInput(themeOptions));
-    themeOptions.appendChild(h('p.helper-text', '(The preferred resolution is 1920 X 1080)'));
+    themeOptions.appendChild(h('p.helper-text', 'The preferred resolution is 1920 X 1080. For performance purposes, we limit the number of custom backgrounds to 5.'));
 
     const recentBgHeader = themeOptions.appendChild(swatchHeaderFactory('Recent Custom backgrounds'));
     recentBgHeader.classList.add('recentbg-header');
