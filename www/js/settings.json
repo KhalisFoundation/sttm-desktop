@@ -12,13 +12,25 @@
           },
           "larivaar": "Larivaar",
           "left-align": "Left-Align",
-          "autoplay": "Auto Play",
           "quick-tools": "Quick Tools",
           "livefeed": {
             "label":"Live Feed Text Files",
             "subLabel": {
               "storepref": "userPrefs.app.live-feed-location"
             }
+          },
+          "autoplay": "Auto Play"
+        }
+      },
+      "autoplay-options": {
+        "title": "Autoplay Options",
+        "type": "range",
+        "options": {
+          "autoplayTimer": {
+            "title": "Delay (Seconds)",
+            "max": 20,
+            "min": 1,
+            "step": 1
           }
         }
       },
@@ -56,18 +68,6 @@
           },
           "transliteration": {
             "title": "Transliteration",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          }
-        }
-      },
-      "autoplay-options": {
-        "title": "Autoplay Options",
-        "type": "range",
-        "options": {
-          "autoplayTimer": {
-            "title": "Delay (Seconds)",
             "max": 20,
             "min": 1,
             "step": 1
