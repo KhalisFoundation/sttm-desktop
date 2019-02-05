@@ -341,7 +341,6 @@ module.exports = {
 
     const sessionPage = document.querySelector('#session-page');
     sessionPage.classList.add('bounce-animate');
-    sessionPage.offsetWidth = undefined; // reflow to restart animation
     sessionPage.addEventListener('webkitAnimationEnd', () => {
       sessionPage.classList.remove('bounce-animate');
     });
