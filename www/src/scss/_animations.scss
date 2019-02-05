@@ -66,8 +66,34 @@
   }
 }
 
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(50px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(25px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
 .delete-animate {
   animation: fadeOutRollDown 0.5s ease 1, gayab 0.1s ease 1;
   animation-delay: 0s, 0.5s;
   animation-fill-mode: both;
+}
+
+.presenter-view .bounce-animate {
+  animation: bounce 0.5s ease 1;
 }

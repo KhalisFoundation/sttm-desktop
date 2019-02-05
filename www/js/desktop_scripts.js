@@ -184,23 +184,6 @@ Array.from($titleButtons).forEach((el) => {
   el.addEventListener('click', e => windowAction(e));
 });
 
-const allTabs = document.getElementsByClassName('nav-header-tab');
-
-function showTabContent(clickedTab) {
-  document.querySelector('.nav-header-tab.active').classList.remove('active');
-  const tabContent = document.getElementById(`${clickedTab}-content`);
-  document.querySelector('.tab-content.active').classList.remove('active');
-  tabContent.classList.add('active');
-}
-
-Array.prototype.forEach.call(allTabs, ((element) => {
-  element.addEventListener('click', (event) => {
-    const clickedTabId = event.currentTarget.id;
-    showTabContent(clickedTabId);
-    document.getElementById(clickedTabId).classList.add('active');
-  });
-}));
-
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
 
