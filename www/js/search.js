@@ -225,8 +225,10 @@ Object.keys(pageNavJSON).forEach(id => {
         {
           onclick: () => {
             if (navType === 'pane-nav') {
+              // if it's one of the 4 panes (not a tab) then shift whole page
               module.exports.navPage(id);
             } else {
+              // if it's a tab, open that tab in session page (bottom right pane)
               module.exports.activateNavPage('session', { id, label: pageNavJSON[id].label });
               module.exports.activateNavLink(id, true);
             }
