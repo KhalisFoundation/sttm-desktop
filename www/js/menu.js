@@ -335,9 +335,9 @@ module.exports = {
     search.activateNavPage('session', { id: 'settings', label: 'Settings' });
 
     const isPresenterView = document.body.classList.contains('presenter-view');
-    let settingsClickSource = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';
-    if (fromMainMenu) settingsClickSource += '_main_menu';
-    analytics.trackEvent('newSettings', settingsClickSource);
+    const settingsViewType = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';
+    const settingsClickSource = fromMainMenu ? 'menu_settings' : 'hamburger_settings';
+    analytics.trackEvent(settingsClickSource, 'click', settingsViewType);
 
     const sessionPage = document.querySelector('#session-page');
     sessionPage.classList.add('bounce-animate');
