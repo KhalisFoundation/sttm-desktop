@@ -305,7 +305,7 @@ module.exports = {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach(($menuToggle) => {
       $menuToggle.appendChild(menuButton.cloneNode(true));
-      $menuToggle.addEventListener('click', module.exports.showDisplayTab);
+      $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
     document.querySelector('.preferences-close').appendChild(closeButton);
 
@@ -330,9 +330,9 @@ module.exports = {
 
   showNotificationsModal,
 
-  showDisplayTab(fromMainMenu) {
-    search.activateNavLink('display', true);
-    search.activateNavPage('session', { id: 'display', label: 'Display' });
+  showSettingsTab(fromMainMenu) {
+    search.activateNavLink('settings', true);
+    search.activateNavPage('session', { id: 'settings', label: 'Settings' });
 
     const isPresenterView = document.body.classList.contains('presenter-view');
     let settingsClickSource = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';

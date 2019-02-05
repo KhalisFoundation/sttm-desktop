@@ -219,7 +219,7 @@ module.exports = {
   init() {
     const userPrefs = store.getAllPrefs();
     this.settingsPage = createSettingsPage(userPrefs);
-    document.querySelector('#display-tab-content').appendChild(this.settingsPage);
+    document.querySelector('#settings-tab-content').appendChild(this.settingsPage);
     this.applySettings();
   },
 

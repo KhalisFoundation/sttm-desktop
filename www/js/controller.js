@@ -175,7 +175,7 @@ const winMenu = [
         accelerator: 'Ctrl+,',
         click: () => {
           analytics.trackEvent('menu', 'preferences');
-          global.core.menu.showDisplayTab(true);
+          global.core.menu.showSettingsTab(true);
         },
       },
       {
@@ -248,7 +248,7 @@ const macMenu = [
         label: 'Preferences',
         accelerator: 'Cmd+,',
         click: () => {
-          global.core.menu.showDisplayTab(true);
+          global.core.menu.showSettingsTab(true);
         },
       },
       {

@@ -24,8 +24,8 @@
     "icon": "desktop",
     "type": "tab-nav"
   },
-  "display": {
-    "label": "Display",
+  "settings": {
+    "label": "Settings",
     "icon": "cogs",
     "type": "tab-nav"
   },
