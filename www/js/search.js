@@ -216,18 +216,40 @@ const searchOptions = h(
 
 const navPageLinks = [];
 Object.keys(pageNavJSON).forEach(id => {
+  const navType = pageNavJSON[id].type;
   navPageLinks.push(
     h(
       'li',
       h(
-        `a#${id}-pageLink`,
+        `a#${id}-pageLink.${navType}`,
         {
-          onclick: () => module.exports.navPage(id),
+          onclick: () => {
+            if (navType === 'pane-nav') {
+              // if it's one of the 4 panes (not a tab) then shift whole page
+              module.exports.navPage(id);
+            } else {
+              // if it's a tab, open that tab in session page (bottom right pane)
+              module.exports.activateNavPage('session', { id, label: pageNavJSON[id].label });
+              module.exports.activateNavLink(id, true);
+            }
+          },
+          'data-title': id,
         },
         h(`i.fa.fa-${pageNavJSON[id].icon}`),
       ),
     ),
   );
+});
+
+document.querySelectorAll('.nav-header-tab').forEach((element) => {
+  element.addEventListener('click', (event) => {
+    const clickedTabId = event.currentTarget.dataset.title;
+    module.exports.activateNavPage('session', {
+      id: clickedTabId,
+      label: pageNavJSON[clickedTabId].label,
+    });
+    module.exports.activateNavLink(clickedTabId, true);
+  });
 });
 
 const presenterSwitch = h(
@@ -786,13 +808,33 @@ module.exports = {
   },
 
   navPage(page) {
-    this.$navPages.forEach($navPage => {
-      $navPage.classList.remove('active');
-    });
+    this.activateNavLink(page);
+    this.activateNavPage(page);
+  },
+
+  activateNavLink(page, tab = false) {
     this.$navPageLinks.forEach($navPageLink => {
       $navPageLink.classList.remove('active');
     });
-    document.querySelector(`#${page}-page`).classList.add('active');
     document.querySelector(`#${page}-pageLink`).classList.add('active');
+
+    if (tab) {
+      document.querySelector('.nav-header-tab.active').classList.remove('active');
+      document.getElementById(`${page}-tab`).classList.add('active');
+    }
+  },
+
+  activateNavPage(page, tab = null) {
+    this.$navPages.forEach($navPage => {
+      $navPage.classList.remove('active');
+    });
+
+    document.querySelector(`#${page}-page`).classList.add('active');
+
+    if (tab) {
+      document.querySelector('.tab-content.active').classList.remove('active');
+      document.querySelector(`#${tab.id}-tab-content`).classList.add('active');
+      document.querySelector('#session-page .nav-header-text').innerText = tab.label;
+    }
   },
 };
