@@ -1,6 +1,6 @@
 ## SikhiToTheMax Desktop App
 
-### 4.4 - _190206_
+### 4.4 - _190212_
 ### Added:
 * Added the ability to upload multiple custom backgrounds and save them for future use
 * Added an option to hide the quick tools menu
