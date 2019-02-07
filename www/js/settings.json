@@ -2,6 +2,36 @@
   "slide-layout": {
     "title": "Slide Layout",
     "settings": {
+      "font-sizes": {
+        "title": "Font Sizes",
+        "type": "range",
+        "options": {
+          "gurbani": {
+            "title": "Gurbani",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "translation": {
+            "title": "English Translation",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "teeka": {
+            "title": "Punjabi Teeka",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "transliteration": {
+            "title": "Transliteration",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
+        }
+      },
       "display-options": {
         "title": "Display Options",
         "type": "switch",
@@ -42,36 +72,6 @@
           "display-teeka": "Punjabi Teeka",
           "display-transliteration": "Transliteration",
           "display-next-line": "Next Line"
-        }
-      },
-      "font-sizes": {
-        "title": "Font Sizes",
-        "type": "range",
-        "options": {
-          "gurbani": {
-            "title": "Gurbani",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "translation": {
-            "title": "English Translation",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "teeka": {
-            "title": "Punjabi Teeka",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "transliteration": {
-            "title": "Transliteration",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          }
         }
       }
     }
