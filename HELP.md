@@ -13,7 +13,7 @@ The easiest way to change the font size is through quick tools. The quick tools 
 
 ### How do I change the background color?
 
-After launching STTM, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image. We recommend a resolution of 1920x1080 for custom backgrounds.
+After launching SikhiToTheMax, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image. We recommend a resolution of 1920x1080 for custom backgrounds.
 
 ### What do the different search types do?
 
@@ -33,23 +33,23 @@ After launching STTM, click the icon for Themes and choose your preferred option
 
 If you are unsure of a letter when searching, you can enter in a * as a wildcard search operator. This will act as a placeholder and will find results against every letter. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you can enter "gms*hn".
 
-### How do I connect STTM to a projector?
+### How do I connect SikhiToTheMax to a projector?
 
-Plug in your computer to the projector or TV. Once you do this, go to your computer's display settings and change it to "Extended Desktop" (NOT mirroring). After that, launch STTM and turn on "Presenter View" in the settings! ![](./assets/img/help_images//desktop-extend-pc.png) ![](./assets/img/help_images/desktop-extend-mac.png)
+Plug in your computer to the projector or TV. Once you do this, go to your computer's display settings and change it to "Extended Desktop" (NOT mirroring). After that, launch SikhiToTheMax and turn on "Presenter View" in the settings! ![](./assets/img/help_images//desktop-extend-pc.png) ![](./assets/img/help_images/desktop-extend-mac.png)
 
 
 ### Can you view the Gurbani in Larivaar?
 
-Yes! After launching STTM, click the icon for Display Settings, and choose the Larivaar option. 
+Yes! After launching SikhiToTheMax, click the icon for Display Settings, and choose the Larivaar option. 
 
 
 ### Where can I see my previous shabads?
 
-When using STTM in “Presenter View”, your history will appear in the bottom right quadrant under the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one.
+When using SikhiToTheMax, your history will appear in the the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one.
 
 ### Additional Database/Search Information
 
-*   STTM's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
+*   SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
 *   If you verified your shabad should be in the database and it is still not coming up, make sure you are typing in the correct letters for search. If you aren’t sure about a letter, or are still having difficulties, try using one of the different search types to locate the shabad.
 *   If you don't know one of the letters, consider using an asterisk in its place. Here's some information on how it works:
     *   *First letter start* - 
