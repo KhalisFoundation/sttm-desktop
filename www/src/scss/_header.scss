@@ -45,6 +45,7 @@
 
   .nav-header-text {
     padding: 0 10px;
+    text-transform: capitalize;
   }
 
   .nav-header-tab {
@@ -137,6 +138,11 @@
       display: none;
     }
   }
+}
+
+.presenter-view .navigator-header {
+  .nav-header-text { display: none; }
+  .nav-header-tab { display: inline-block; }
 }
 
 #session-page,
