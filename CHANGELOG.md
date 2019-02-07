@@ -32,7 +32,7 @@
 
 ### 4.2.1 - _181103_
 #### Improved
-* Bug Fixes for Windows 7 and 8 users. For the best Sikhi to the Max experience, consider updating to Windows 10. 
+* Bug Fixes for Windows 7 and 8 users. For the best SikhiToTheMax experience, consider updating to Windows 10. 
 
 ### 4.2.0 - _181031_
 #### Improved
