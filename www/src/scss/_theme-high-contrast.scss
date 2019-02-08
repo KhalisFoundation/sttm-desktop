@@ -86,6 +86,10 @@ $highlight-text: #cfd8dc;
     color: $text-base;
   }
 
+  .shortcut-tray { background: darken($bg-main, 10); }
+  .tray-item-icon { background: $text-bright; }
+  .tray-item-label { color: $bg-main; }
+
   .nav-header-tab {
     color: $text-inactive;
 

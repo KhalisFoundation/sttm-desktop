@@ -11,8 +11,7 @@ $sessionPageHeight: calc(100% - #{$totalSessionOffset});
 
 .presenter-view {
   #main-ui,
-  .nav-page:nth-child(2),
-  .nav-page .block-list {
+  .nav-page:nth-child(2) {
     height: $sessionPageHeight;
   }
 }
@@ -181,8 +180,40 @@ ul {
 }
 
 .shortcut-tray {
-  background: royalblue;
-  min-height: 100px;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  height: 70px;
+  justify-content: space-around;
+  overflow-y: auto;
+  text-align: center;
+
+  .tray-item-icon {
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    font-size: 10px;
+    height: 50px;
+    justify-content: center;
+    letter-spacing: 2px;
+    margin: 5px auto;
+    min-width: 100px;
+    padding: 10px;
+    text-transform: uppercase;
+    transition: 0.5s all ease;
+
+    &:hover {
+      box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
+      transform: translateY(-4px);
+    }
+
+    &:active {
+      box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
+      transform: translateY(1px);
+    }
+  }
 }
 
 #session {

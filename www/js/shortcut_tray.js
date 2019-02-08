@@ -3,7 +3,10 @@ const shortcutItemsJSON = require('./shortcut_tray.json');
 
 const trayItemFactory = (trayItemKey, trayItem) => h(
   `div.tray-item#tray-${trayItemKey}`,
-  trayItem.label,
+  h(
+    'div.tray-item-icon',
+    h('div.tray-item-label', trayItem.label),
+  ),
 );
 
 module.exports = {
