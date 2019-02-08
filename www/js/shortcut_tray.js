@@ -1,17 +1,17 @@
 const h = require('hyperscript');
-const getJSON = require('get-json');
+const shortcutItemsJSON = require('./shortcut_tray.json');
 
-const trayItemFactory = (label) => h(
-    'div.tray-item',
-    label
+const trayItemFactory = (trayItemKey, trayItem) => h(
+  `div.tray-item#tray-${trayItemKey}`,
+  trayItem.label,
 );
 
 module.exports = {
-    init() {
-        const shortcutTrayContainer = document.querySelector('.shortcut-tray');
-        console.log(shortcutTrayContainer);
-        shortcutTrayContainer.appendChild(trayItemFactory("Waheguru"));
-        shortcutTrayContainer.appendChild(trayItemFactory("Anand Sahib"));
-    }
-}
+  init() {
+    const shortcutTrayContainer = document.querySelector('.shortcut-tray');
 
+    Object.keys(shortcutItemsJSON).forEach((itemKey) => {
+      shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
+    });
+  },
+};

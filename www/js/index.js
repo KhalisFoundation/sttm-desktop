@@ -4,6 +4,7 @@ const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
 const settings = require('../js/settings');
+const shortcutTray = require('./shortcut_tray');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -139,6 +140,7 @@ module.exports = {
   shareSync,
   platformMethod,
   themeEditor,
+  shortcutTray,
   'custom-theme': () => {
     themeEditor.init();
   },

@@ -4,6 +4,19 @@ $sttm-blue: #29679b;
 $transition-time: 600ms;
 $transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
 
+$footerOffset: 40px;
+$shortcutTrayHeight: 70px;
+$totalSessionOffset: $footerOffset + $shortcutTrayHeight;
+$sessionPageHeight: calc(100% - #{$totalSessionOffset});
+
+.presenter-view {
+  #main-ui,
+  .nav-page:nth-child(2),
+  .nav-page .block-list {
+    height: $sessionPageHeight;
+  }
+}
+
 /*
   Fonts
 */
@@ -58,7 +71,7 @@ ul {
 }
 
 #main-ui {
-  height: calc(100% - 40px); //Full-height minus header, search, and footer
+  height: calc(100% - #{$footerOffset}); //Full-height minus header, search, and footer
   position: relative;
 }
 
@@ -133,7 +146,7 @@ ul {
   }
 
   .block-list {
-    height: calc(100% - 40px);
+    height: calc(100% - #{$footerOffset});
     margin: 0;
     overflow-y: auto;
     position: relative;
@@ -165,6 +178,11 @@ ul {
   height: calc(100% + 40px);
   overflow-y: auto;
   z-index: 3;
+}
+
+.shortcut-tray {
+  background: royalblue;
+  min-height: 100px;
 }
 
 #session {

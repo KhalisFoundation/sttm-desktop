@@ -1,0 +1,22 @@
+{
+    "anandSahib": {
+        "label": "Anand Sahib",
+        "type": "bani",
+        "ref": 1
+    },
+    "moolMantra": {
+        "label": "Mool Mantra",
+        "type": "shabad",
+        "ref": 1
+    },
+    "waheguru": {
+        "label": "Waheguru",
+        "type": "text",
+        "ref": "Waheguru"
+    },
+    "blank": {
+        "label": "blank",
+        "type": "text",
+        "ref": ""
+    }
+}
