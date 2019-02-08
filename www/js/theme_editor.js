@@ -46,6 +46,15 @@ const toggleRecentBgHeader = () => {
   recentBgHeader.classList.toggle('hidden', !customBgExists);
 };
 
+const toggleFileInput = (showError = false) => {
+  const isLimitReached = document.querySelectorAll('.custom-bg:not(.delete-animate)').length > 4;
+  document.querySelector('.file-input-label').classList.toggle('disabled', isLimitReached);
+  document.querySelector('#themebg-upload').disabled = isLimitReached;
+  if (isLimitReached && showError) {
+    uploadErrorNotification('Five custom backgrounds limit reached. Please delete one or more before adding another custom background.', 5000);
+  }
+};
+
 /*
  * DOM Factories
  */
@@ -81,6 +90,7 @@ const recentSwatchFactory = backgroundPath =>
               } else {
                 evt.target.closest('.custom-bg').classList.add('delete-animate');
                 toggleRecentBgHeader();
+                toggleFileInput();
               }
             });
           }
@@ -154,6 +164,7 @@ const upsertCustomBackgrounds = (themesContainer) => {
       });
     }
     toggleRecentBgHeader();
+    toggleFileInput();
   });
 };
 
@@ -162,6 +173,9 @@ const imageInput = themesContainer =>
     'label.file-input-label',
     {
       for: 'themebg-upload',
+      onclick: () => {
+        toggleFileInput(true);
+      },
     },
     'New Image',
     h('input.file-input#themebg-upload',
@@ -228,7 +242,7 @@ module.exports = {
 
     themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
     themeOptions.appendChild(imageInput(themeOptions));
-    themeOptions.appendChild(h('p.helper-text', '(The preferred resolution is 1920 X 1080)'));
+    themeOptions.appendChild(h('p.helper-text', 'Recommended 1920x1080'));
 
     const recentBgHeader = themeOptions.appendChild(swatchHeaderFactory('Recent Custom backgrounds'));
     recentBgHeader.classList.add('recentbg-header');
