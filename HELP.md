@@ -1,7 +1,7 @@
 
 ### How do I search for a shabad?
 
-After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn". ![](./assets/img/help_images/search_example.gif)
+After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is `ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ`, you would enter `gmsshn`. ![](./assets/img/help_images/search_example.gif)
 
 ### How do I type in Gurmukhi?
 
