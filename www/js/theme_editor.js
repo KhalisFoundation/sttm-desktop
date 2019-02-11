@@ -7,6 +7,7 @@ const imagemin = require('imagemin');
 const { remote } = require('electron');
 
 const themes = require('./themes.json');
+const slash = require('./js/slash');
 
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
@@ -64,7 +65,7 @@ const recentSwatchFactory = backgroundPath =>
     'li.theme-instance.custom-bg.visible',
     {
       style: {
-        'background-image': `url(${backgroundPath.replace(/(\s)/g, '\\ ')})`,
+        'background-image': `url(${slash(backgroundPath.replace(/(\s)/g, '\\ '))})`,
       },
       onclick: () => {
         store.setUserPref('app.theme', themesWithCustomBg[0]);
