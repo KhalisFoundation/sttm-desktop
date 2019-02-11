@@ -7,7 +7,7 @@ const imagemin = require('imagemin');
 const { remote } = require('electron');
 
 const themes = require('./themes.json');
-const slash = require('./js/slash');
+const slash = require('./slash');
 
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
