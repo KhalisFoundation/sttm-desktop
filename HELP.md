@@ -1,7 +1,7 @@
 
 ### How do I search for a shabad?
 
-After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you would enter "gmsshn". ![](./assets/img/help_images/search_example.gif)
+After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is `ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ`, you would enter `gmsshn`. ![](./assets/img/help_images/search_example.gif)
 
 ### How do I type in Gurmukhi?
 
@@ -31,7 +31,7 @@ After launching SikhiToTheMax, click the icon for Themes and choose your preferr
     
 ### Using wildcard when searching
 
-If you are unsure of a letter when searching, you can enter in a * as a wildcard search operator. This will act as a placeholder and will find results against every letter. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you can enter "gms*hn".
+If you are unsure of a letter when searching, you can enter in a `*` as a wildcard search operator. This will act as a placeholder and will find results against every letter. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you can enter `gms*hn`.
 
 ### How do I connect SikhiToTheMax to a projector?
 
