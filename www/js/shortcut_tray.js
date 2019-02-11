@@ -9,6 +9,16 @@ const trayItemFactory = (trayItemKey, trayItem) => h(
   ),
 );
 
+const shortcutsToggle = h(
+  'div.shortcut-toggle',
+  /* {
+    onclick: () => {
+    },
+  }, */
+  h('i.shortcut-toggle-icon.fa.fa-grip-horizontal'),
+  'Shortcut Tray',
+);
+
 module.exports = {
   init() {
     const shortcutTrayContainer = document.querySelector('.shortcut-tray');
@@ -16,5 +26,7 @@ module.exports = {
     Object.keys(shortcutItemsJSON).forEach((itemKey) => {
       shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
     });
+
+    document.querySelector('#footer').appendChild(shortcutsToggle);
   },
 };

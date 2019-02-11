@@ -179,13 +179,27 @@ ul {
   z-index: 3;
 }
 
+.shortcut-toggle {
+  height: 40px;
+  line-height: 40px;
+  vertical-align: -webkit-baseline-middle;
+
+  .shortcut-toggle-icon {
+    height: 40px;
+    text-align: center;
+    width: 40px;
+  }
+}
+
 .shortcut-tray {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   height: 70px;
   justify-content: space-around;
+  overflow: visible;
   overflow-y: auto;
+  position: relative;
   text-align: center;
 
   .tray-item-icon {

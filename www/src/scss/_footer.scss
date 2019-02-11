@@ -1,5 +1,8 @@
 #footer {
+  align-items: center;
+  display: flex;
   height: 40px;
+  justify-content: flex-start;
   position: relative;
 
   .menu-group > .menu-group-left,
