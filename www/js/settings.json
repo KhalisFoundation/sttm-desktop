@@ -32,6 +32,16 @@
           }
         }
       },
+      "fields": {
+        "title": "Fields to Display",
+        "type": "checkbox",
+        "options": {
+          "display-translation": "English Translation",
+          "display-teeka": "Punjabi Teeka",
+          "display-transliteration": "Transliteration",
+          "display-next-line": "Next Line"
+        }
+      },
       "display-options": {
         "title": "Display Options",
         "type": "switch",
@@ -62,16 +72,6 @@
             "min": 1,
             "step": 1
           }
-        }
-      },
-      "fields": {
-        "title": "Fields to Display",
-        "type": "checkbox",
-        "options": {
-          "display-translation": "English Translation",
-          "display-teeka": "Punjabi Teeka",
-          "display-transliteration": "Transliteration",
-          "display-next-line": "Next Line"
         }
       }
     }
