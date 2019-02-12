@@ -40,7 +40,8 @@
         "akhandpaatt": false,
         "larivaar": false,
         "left-align": false,
-        "quick-tools": true
+        "quick-tools": true,
+        "shortcut-tray-on": false
       }
     }
   },

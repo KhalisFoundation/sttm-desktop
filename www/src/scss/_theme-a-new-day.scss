@@ -67,6 +67,7 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
   .shortcut-tray { background: darken($statusbar-bg, 10); }
   .tray-item-icon { background: $nav-bg; }
   .tray-item-label { color: $base-text; }
+  &.shortcut-tray-on .shortcut-toggle { background: darken($statusbar-bg, 10); }
 
   .nav-header-tab {
     color: $base-text-inactive;
