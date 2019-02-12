@@ -9,6 +9,15 @@ let isShortcutTrayOn = store.getUserPref('slide-layout.display-options.shortcut-
 
 const trayItemFactory = (trayItemKey, trayItem) => h(
   `div.tray-item#tray-${trayItemKey}`,
+  {
+    onclick: () => {
+      if (trayItem.type === 'text') {
+        global.controller.sendText(trayItem.ref, true);
+      } else if (trayItem.type === 'shabad') {
+        global.core.search.loadShabad(trayItem.ref);
+      }
+    },
+  },
   h(
     'div.tray-item-icon',
     h('div.tray-item-label', trayItem.label),
