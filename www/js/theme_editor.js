@@ -7,6 +7,7 @@ const imagemin = require('imagemin');
 const { remote } = require('electron');
 
 const themes = require('./themes.json');
+const slash = require('./slash');
 
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
@@ -64,7 +65,7 @@ const recentSwatchFactory = backgroundPath =>
     'li.theme-instance.custom-bg.visible',
     {
       style: {
-        'background-image': `url(${backgroundPath.replace(/(\s)/g, '\\ ')})`,
+        'background-image': `url(${slash(backgroundPath.replace(/(\s)/g, '\\ '))})`,
       },
       onclick: () => {
         store.setUserPref('app.theme', themesWithCustomBg[0]);
@@ -142,6 +143,12 @@ const swatchHeaderFactory = headerText => h('header.options-header', headerText)
 const upsertCustomBackgrounds = (themesContainer) => {
   const recentBgsContainer = document.querySelector('.recentbgs-container') || themesContainer.appendChild(h('ul.recentbgs-container'));
   recentBgsContainer.innerHTML = '';
+
+  try {
+    if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
+  } catch (error) {
+    uploadErrorNotification(` Error creating directory for user backgrounds. ${error} - If error persists, report it at www.sttm.co:`);
+  }
 
   fs.readdir(userBackgroundsPath, (error, files) => {
     if (error) {
