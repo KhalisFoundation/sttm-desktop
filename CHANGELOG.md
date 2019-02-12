@@ -1,5 +1,19 @@
 ## SikhiToTheMax Desktop App
 
+### 4.4 - _190212_
+### Added:
+* Added the ability to upload multiple custom backgrounds and save them for future use
+* Added an option to hide the quick tools menu
+
+### Improved:
+* Moved all settings to a dedicated tab and removed duplicate options
+* Fixed an issue when using the "Next Line" toggle that caused a large gap on the slide
+* Fixed some issues with the custom background uploader
+* Fixed some formatting issues when using Chromecast
+* Fixed an issue where font sliders would not respond
+* Updated the Help Guide with new information and images
+* Updated Help Guide to no longer require an internet connection
+
 ### 4.3 - _190115_
 ### Added:
 * You can now upload a custom background image! Check out the Custom option in the Themes menu
@@ -18,7 +32,7 @@
 
 ### 4.2.1 - _181103_
 #### Improved
-* Bug Fixes for Windows 7 and 8 users. For the best Sikhi to the Max experience, consider updating to Windows 10. 
+* Bug Fixes for Windows 7 and 8 users. For the best SikhiToTheMax experience, consider updating to Windows 10. 
 
 ### 4.2.0 - _181031_
 #### Improved

@@ -7,6 +7,7 @@ const imagemin = require('imagemin');
 const { remote } = require('electron');
 
 const themes = require('./themes.json');
+const slash = require('./slash');
 
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
@@ -46,6 +47,15 @@ const toggleRecentBgHeader = () => {
   recentBgHeader.classList.toggle('hidden', !customBgExists);
 };
 
+const toggleFileInput = (showError = false) => {
+  const isLimitReached = document.querySelectorAll('.custom-bg:not(.delete-animate)').length > 4;
+  document.querySelector('.file-input-label').classList.toggle('disabled', isLimitReached);
+  document.querySelector('#themebg-upload').disabled = isLimitReached;
+  if (isLimitReached && showError) {
+    uploadErrorNotification('Five custom backgrounds limit reached. Please delete one or more before adding another custom background.', 5000);
+  }
+};
+
 /*
  * DOM Factories
  */
@@ -55,7 +65,7 @@ const recentSwatchFactory = backgroundPath =>
     'li.theme-instance.custom-bg.visible',
     {
       style: {
-        'background-image': `url(${backgroundPath.replace(/(\s)/g, '\\ ')})`,
+        'background-image': `url(${slash(backgroundPath.replace(/(\s)/g, '\\ '))})`,
       },
       onclick: () => {
         store.setUserPref('app.theme', themesWithCustomBg[0]);
@@ -81,6 +91,7 @@ const recentSwatchFactory = backgroundPath =>
               } else {
                 evt.target.closest('.custom-bg').classList.add('delete-animate');
                 toggleRecentBgHeader();
+                toggleFileInput();
               }
             });
           }
@@ -133,6 +144,12 @@ const upsertCustomBackgrounds = (themesContainer) => {
   const recentBgsContainer = document.querySelector('.recentbgs-container') || themesContainer.appendChild(h('ul.recentbgs-container'));
   recentBgsContainer.innerHTML = '';
 
+  try {
+    if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
+  } catch (error) {
+    uploadErrorNotification(` Error creating directory for user backgrounds. ${error} - If error persists, report it at www.sttm.co:`);
+  }
+
   fs.readdir(userBackgroundsPath, (error, files) => {
     if (error) {
       uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
@@ -154,6 +171,7 @@ const upsertCustomBackgrounds = (themesContainer) => {
       });
     }
     toggleRecentBgHeader();
+    toggleFileInput();
   });
 };
 
@@ -162,6 +180,9 @@ const imageInput = themesContainer =>
     'label.file-input-label',
     {
       for: 'themebg-upload',
+      onclick: () => {
+        toggleFileInput(true);
+      },
     },
     'New Image',
     h('input.file-input#themebg-upload',
@@ -228,7 +249,7 @@ module.exports = {
 
     themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
     themeOptions.appendChild(imageInput(themeOptions));
-    themeOptions.appendChild(h('p.helper-text', '(The preferred resolution is 1920 X 1080)'));
+    themeOptions.appendChild(h('p.helper-text', 'Recommended 1920x1080'));
 
     const recentBgHeader = themeOptions.appendChild(swatchHeaderFactory('Recent Custom backgrounds'));
     recentBgHeader.classList.add('recentbg-header');
