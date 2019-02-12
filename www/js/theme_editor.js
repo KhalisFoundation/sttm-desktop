@@ -199,7 +199,10 @@ const imageInput = themesContainer =>
 
           try {
             const filePath = evt.target.files[0].path;
-            event.target.value = '';
+
+            // eslint-disable-next-line no-param-reassign
+            evt.target.value = '';
+
             if (imageCheck(filePath)) {
               const files = await imagemin([filePath], userBackgroundsPath);
               if (files) {
