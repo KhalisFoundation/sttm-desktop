@@ -1,46 +1,7 @@
 {
-  "app": {
-    "title": "App Settings",
-    "settings": {
-      "theme": {
-        "title": "",
-        "type": "radio",
-        "options": {}
-      },
-      "themebg": {
-        "title": "",
-        "type": "dynamic",
-        "options": {}
-      },
-      "layout": {
-        "title": "App Layout",
-        "type": "switch",
-        "options": {
-          "presenter-view": "Presenter View"
-        }
-      },
-      "analytics": {
-        "title": "Other Options",
-        "type": "switch",
-        "options": {
-          "collect-statistics":"Collect Statistics"
-        }
-      }
-    }
-  },
   "slide-layout": {
     "title": "Slide Layout",
     "settings": {
-      "fields": {
-        "title": "Fields to Display",
-        "type": "checkbox",
-        "options": {
-          "display-translation": "English Translation",
-          "display-teeka": "Punjabi Teeka",
-          "display-transliteration": "Transliteration",
-          "display-next-line": "Next Line"
-        }
-      },
       "font-sizes": {
         "title": "Font Sizes",
         "type": "range",
@@ -71,6 +32,16 @@
           }
         }
       },
+      "fields": {
+        "title": "Fields to Display",
+        "type": "checkbox",
+        "options": {
+          "display-translation": "English Translation",
+          "display-teeka": "Punjabi Teeka",
+          "display-transliteration": "Transliteration",
+          "display-next-line": "Next Line"
+        }
+      },
       "display-options": {
         "title": "Display Options",
         "type": "switch",
@@ -81,13 +52,14 @@
           },
           "larivaar": "Larivaar",
           "left-align": "Left-Align",
-          "autoplay": "Auto Play",
+          "quick-tools": "Quick Tools",
           "livefeed": {
             "label":"Live Feed Text Files",
             "subLabel": {
               "storepref": "userPrefs.app.live-feed-location"
             }
-          }
+          },
+          "autoplay": "Auto Play"
         }
       },
       "autoplay-options": {
@@ -100,6 +72,35 @@
             "min": 1,
             "step": 1
           }
+        }
+      }
+    }
+  },
+  "app": {
+    "title": "App Settings",
+    "settings": {
+      "theme": {
+        "title": "",
+        "type": "radio",
+        "options": {}
+      },
+      "themebg": {
+        "title": "",
+        "type": "dynamic",
+        "options": {}
+      },
+      "layout": {
+        "title": "App Layout",
+        "type": "switch",
+        "options": {
+          "presenter-view": "Presenter View"
+        }
+      },
+      "analytics": {
+        "title": "Other Options",
+        "type": "switch",
+        "options": {
+          "collect-statistics":"Collect Statistics"
         }
       }
     }

@@ -352,7 +352,7 @@ const showText = (text, isGurmukhi = false) => {
   $textIs.innerHTML = text;
 
   $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
-  castText($textIs.innerText, isGurmukhi);
+  castText(text, isGurmukhi);
 };
 
 const toggleSideMenu = () => {
