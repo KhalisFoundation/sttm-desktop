@@ -235,7 +235,6 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   });
 };
 
-
 module.exports = {
   defaultTheme,
   init() {
