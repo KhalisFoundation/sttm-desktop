@@ -175,7 +175,7 @@ const winMenu = [
         accelerator: 'Ctrl+,',
         click: () => {
           analytics.trackEvent('menu', 'preferences');
-          global.core.menu.toggleMenu();
+          global.core.menu.showSettingsTab(true);
         },
       },
       {
@@ -248,7 +248,7 @@ const macMenu = [
         label: 'Preferences',
         accelerator: 'Cmd+,',
         click: () => {
-          global.core.menu.toggleMenu();
+          global.core.menu.showSettingsTab(true);
         },
       },
       {
@@ -397,6 +397,8 @@ function checkPresenterView() {
   classList.toggle('scale-viewer', inPresenterView);
 
   document.querySelector('#presenter-view-toggle').checked = inPresenterView;
+  // hide header-tabs for non presenter view
+  document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
 }
 
 global.platform.ipc.on('presenter-view', () => {

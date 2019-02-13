@@ -39,6 +39,7 @@ $keyboard-height:128px;
   "window",
   "akhandpaatt",
   "overlay",
+  "animations",
   "noty";
 
 a {
@@ -281,6 +282,12 @@ body.show-overlay {
   left: 0;
 }
 
+.recentbgs-container {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100px;
+}
+
 .theme-instance {
   align-items: center;
   background-color: #fff;
@@ -304,6 +311,7 @@ body.show-overlay {
 
   &:hover {
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 14px;
     margin-top: 6px;
   }
 
@@ -311,12 +319,62 @@ body.show-overlay {
     box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4);
   }
 
-  span {
+  .theme-text {
     background: transparent !important;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+
+  .delete-btn {
+    background-color: #c0392b;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: none;
+    font-size: 14px;
+    height: 20px;
+    padding: 3px;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 20px;
+
+    &:hover {
+      background-color: #e74c3c;
+    }
+  }
+
+  &:hover .delete-btn {
+    display: block;
+  }
+}
+
+.file-input-label {
+  display: block;
+  margin: 10px;
+
+  &.disabled {
+    background: #e0e0e0;
+    cursor: default;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+.helper-text {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 12px;
+  margin: 0 auto 10px 10px;
+  width: 100%;
+}
+
+.file-input-label {
+  display: block;
+  margin: 10px;
 }
 
 .file-input-label {
