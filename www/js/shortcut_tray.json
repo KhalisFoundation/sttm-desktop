@@ -1,21 +1,25 @@
 {
     "anandSahib": {
         "label": "Anand Sahib",
+        "labelType": "roman",
         "type": "bani",
         "ref": 1
     },
     "moolMantra": {
         "label": "Mool Mantra",
-        "type": "shabad",
-        "ref": 1
+        "labelType": "roman",
+        "type": "text",
+        "ref": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]"
     },
     "waheguru": {
-        "label": "Waheguru",
+        "label": "vwihgurU",
+        "labelType": "gurmukhi",
         "type": "text",
         "ref": "vwihgurU"
     },
     "blank": {
-        "label": "blank",
+        "label": "Blank",
+        "labelType": "roman",
         "type": "text",
         "ref": ""
     }

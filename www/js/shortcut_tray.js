@@ -8,7 +8,7 @@ const shortcutTrayContainer = document.querySelector('.shortcut-tray');
 let isShortcutTrayOn = store.getUserPref('slide-layout.display-options.shortcut-tray-on');
 
 const trayItemFactory = (trayItemKey, trayItem) => h(
-  `div.tray-item#tray-${trayItemKey}`,
+  `div.tray-item.${trayItem.labelType}#tray-${trayItemKey}`,
   {
     onclick: () => {
       if (trayItem.type === 'text') {
@@ -36,7 +36,6 @@ const shortcutsToggle = h(
     },
   },
   h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
-  'Shortcuts Tray',
 );
 
 module.exports = {

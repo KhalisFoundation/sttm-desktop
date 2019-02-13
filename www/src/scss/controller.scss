@@ -187,7 +187,6 @@ ul {
   font-size: 14px;
   height: 40px;
   line-height: 40px;
-  padding-right: 10px;
   transition: 0.5s all ease;
   vertical-align: -webkit-baseline-middle;
 
@@ -220,18 +219,15 @@ ul {
 
   .tray-item-icon {
     align-items: center;
-    border-radius: 5px;
     box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     display: flex;
-    font-size: 10px;
+    font-size: 16px;
     height: 50px;
     justify-content: center;
-    letter-spacing: 2px;
     margin: 5px auto;
     min-width: 100px;
     padding: 10px;
-    text-transform: uppercase;
     transition: 0.5s all ease;
 
     &:hover {
