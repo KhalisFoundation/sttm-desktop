@@ -9,8 +9,11 @@ const pageNavJSON = require('./footer-left.json');
 
 // HTMLElement builder
 const h = require('hyperscript');
+const { remote } = require('electron');
 
-const { store, analytics } = require('electron').remote.require('./app');
+const { store } = remote.require('./app');
+
+const analytics = remote.getGlobal('analytics');
 
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
