@@ -6,7 +6,8 @@ const dialog = remote.dialog;
 const app = remote.app;
 const Menu = remote.Menu;
 const main = remote.require('./app');
-const { store, appstore, analytics } = main;
+const { store, appstore } = main;
+const analytics = remote.getGlobal('analytics');
 
 global.webview = document.querySelector('webview');
 
