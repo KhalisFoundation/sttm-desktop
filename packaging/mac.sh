@@ -14,7 +14,6 @@ if [ "$TRAVIS_BRANCH" = "release" ] || [ "$TRAVIS_BRANCH" = "master" ] || [ "$TR
   git tag $RELEASE_VERSION
   git push https://${GH_TOKEN}@github.com/khalisfoundation/sttm-desktop.git --tags
   if [ "$TRAVIS_BRANCH" = "release" ]; then
-    echo "should not echo"
-    # node update-mac.js $TRAVIS_BRANCH
+    node update-mac.js $TRAVIS_BRANCH
   fi
 fi
