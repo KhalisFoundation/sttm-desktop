@@ -1,7 +1,10 @@
 const h = require('hyperscript');
 const ldGet = require('lodash.get');
 const settings = require('./settings.json');
-const { store, analytics } = require('electron').remote.require('./app');
+const remote = require('electron').remote;
+
+const { store } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const defaultPrefs = store.getDefaults().userPrefs;
 
