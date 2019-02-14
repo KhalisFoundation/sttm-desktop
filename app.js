@@ -45,16 +45,6 @@ const store = new Store({
   defaults: defaultPrefs,
 });
 
-// Retrieve the userid value, and if it's not there, assign it a new uuid.
-let userId = store.get('userId');
-
-if (!userId) {
-  userId = uuid();
-  store.set('userId', userId);
-}
-const analytics = new Analytics(userId, store);
-global.trackEvent = analytics.trackEvent;
-
 const appVersion = app.getVersion();
 
 let mainWindow;
@@ -231,6 +221,16 @@ function createViewer(ipcData) {
 }
 
 app.on('ready', () => {
+  // Retrieve the userid value, and if it's not there, assign it a new uuid.
+  let userId = store.get('userId');
+
+  if (!userId) {
+    userId = uuid();
+    store.set('userId', userId);
+  }
+  const analytics = new Analytics(userId, store);
+  global.analytics = analytics;
+
   const screens = electron.screen;
   const { width, height } = screens.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
@@ -440,5 +440,4 @@ module.exports = {
   autoUpdater,
   store,
   appstore,
-  analytics,
 };

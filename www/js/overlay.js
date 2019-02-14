@@ -8,11 +8,13 @@ const host = ip.address();
 const { ipcRenderer, remote } = electron;
 
 const overlayPort = remote.getGlobal('overlayPort');
-const url = `http://${host}:${overlayPort}/`;
 
-const { store, analytics } = require('electron').remote.require('./app');
+const { store } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const overlayVars = store.get('obs').overlayPrefs.overlayVars;
+
+const url = `http://${host}:${overlayPort}/`;
 
 const savePrefs = () => {
   store.set('obs', {
