@@ -28,7 +28,7 @@ if (branch === 'dev' || branch === 'master') {
     (
       (branch === 'dev' && lastReleasePrerelease[0] === 'alpha')
       ||
-      (branch === 'master' && lastReleasePrerelease[0] === 'dev')
+      (branch === 'master' && lastReleasePrerelease[0] === 'beta')
      )
   ) {
     currentRelease = semver.inc(lastRelease, 'prerelease');
