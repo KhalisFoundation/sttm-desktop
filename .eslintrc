@@ -12,5 +12,8 @@
   },
   "settings": {
     "import/core-modules": "electron"
+  },
+  "globals": {
+    "expect": true
   }
 }
