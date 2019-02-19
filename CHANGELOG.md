@@ -90,6 +90,8 @@
  * **Donate button** - If you would like to show your appreciation with a monetary gift, please click the Donate button
  * **Updates** - Get updated on the latest SikhiToTheMax news
 
+<details><summary>See more...</summary>
+
 ### 3.3.1 - _180401_
 #### Added
  * Help Section - Get your most frequently asked questions answered in the help section
@@ -152,3 +154,4 @@
  3. Navigate with up and down arrows and press space bar to return back to the main line
  4. Use the icons at the bottom of the footer to navigate between Search, Recent Shabads, and Current Shabad
  5. Please submit feedback to techsupport@khalisfoundation.org
+</details>
