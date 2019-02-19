@@ -1,5 +1,15 @@
 ## SikhiToTheMax Desktop App
 
+
+### 4.5 - _190221_
+### Added:
+* Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
+
+### Improved:
+* Removed the long animation when changing slides with the "Next Line" toggle enabled
+* Quick Tools will now overlay instead of push for a more accurate preview
+
+
 ### 4.4 - _190212_
 ### Added:
 * Added the ability to upload multiple custom backgrounds and save them for future use
