@@ -6,6 +6,7 @@ global.core = require('./js/index');
 // Pull in navigator from core
 global.core.search.init();
 global.core.menu.init();
+global.core.shortcutTray.init();
 global.core.themeEditor.init();
 // global.core.shareSync.init();
 global.platform.init();
