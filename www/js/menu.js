@@ -8,8 +8,10 @@ const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
-const { store, analytics } = require('electron').remote.require('./app');
 const search = require('./search');
+
+const { store } = electron.remote.require('./app');
+const analytics = electron.remote.getGlobal('analytics');
 
 const allowedTags = ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'];
 

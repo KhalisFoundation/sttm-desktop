@@ -9,11 +9,13 @@ const { remote } = require('electron');
 const themes = require('./themes.json');
 const slash = require('./slash');
 
+const analytics = remote.getGlobal('analytics');
+
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
-const { store, analytics } = remote.require('./app');
+const { store } = remote.require('./app');
 
 const defaultTheme = themes[0];
 
@@ -199,7 +201,10 @@ const imageInput = themesContainer =>
 
           try {
             const filePath = evt.target.files[0].path;
-            event.target.value = '';
+
+            // eslint-disable-next-line no-param-reassign
+            evt.target.value = '';
+
             if (imageCheck(filePath)) {
               const files = await imagemin([filePath], userBackgroundsPath);
               if (files) {
@@ -231,7 +236,6 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
     }
   });
 };
-
 
 module.exports = {
   defaultTheme,
