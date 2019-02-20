@@ -71,7 +71,7 @@
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "marked": "^0.3.6",
+    "marked": "^0.6.1",
     "moment": "^2.22.1",
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
