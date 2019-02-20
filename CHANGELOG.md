@@ -1,5 +1,4 @@
-## SikhiToTheMax Desktop App
-
+## Latest Update
 
 ### 4.5 - _190226_
 ### Added:
@@ -10,6 +9,7 @@
 * Quick Tools will now overlay instead of push for a more accurate preview
 
 
+## Previous Updates
 
 ### 4.4 - _190212_
 ### Added:
@@ -26,7 +26,6 @@
 * Updated Help Guide to no longer require an internet connection
 
 
-
 ### 4.3 - _190115_
 ### Added:
 * You can now upload a custom background image! Check out the Custom option in the Themes menu
@@ -39,7 +38,6 @@
 ### Improved:
 * The announcements section now supports formatting, line breaks, and spacing!
 * We've made the toggle for Presenter View more accessible
-
 
 
 <details><summary>See more...</summary>
