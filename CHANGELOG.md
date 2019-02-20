@@ -1,7 +1,7 @@
 ## SikhiToTheMax Desktop App
 
 
-### 4.5 - _190221_
+### 4.5 - _190226_
 ### Added:
 * Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
 
@@ -9,6 +9,7 @@
 * Removed the long animation when changing slides with the "Next Line" toggle enabled
 * Quick Tools will now overlay instead of push for a more accurate preview
 
+<details><summary>See more...</summary>
 
 ### 4.4 - _190212_
 ### Added:
@@ -89,8 +90,6 @@
  * **Anand Karaj** - Present all of the 4 Laavs for the Sikh Wedding Ceremony
  * **Donate button** - If you would like to show your appreciation with a monetary gift, please click the Donate button
  * **Updates** - Get updated on the latest SikhiToTheMax news
-
-<details><summary>See more...</summary>
 
 ### 3.3.1 - _180401_
 #### Added
