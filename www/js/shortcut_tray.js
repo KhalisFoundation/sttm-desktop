@@ -32,6 +32,7 @@ const shortcutsToggle = h(
   {
     onclick: () => {
       isShortcutTrayOn = !isShortcutTrayOn;
+      analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
       store.setUserPref('slide-layout.display-options.shortcut-tray-on', isShortcutTrayOn);
       global.core.platformMethod('updateSettings');
       document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-th-large', !isShortcutTrayOn);
