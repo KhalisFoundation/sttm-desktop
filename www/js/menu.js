@@ -96,10 +96,10 @@ const createNotificationContent = (msgList) => {
 };
 
 const showNotificationsModal = (message) => {
-  if (message && message.length > 0) {
+  if (message && message.rows && message.rows.length > 0) {
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
     global.core.platformMethod('updateNotificationsTimestamp', time);
-    const content = createNotificationContent(message);
+    const content = createNotificationContent(message.rows);
     // set content
     modal.setContent(content);
     // open modal
