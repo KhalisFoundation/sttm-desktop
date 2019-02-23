@@ -1,5 +1,10 @@
 ## SikhiToTheMax Desktop App
 
+### 4.4.1 - _190223_
+### Improved:
+* Fixed a bug that would cause preferences to be reset
+* Removed the animation that occurred when changing slides with the "Next Line" toggle enabled
+
 ### 4.4 - _190212_
 ### Added:
 * Added the ability to upload multiple custom backgrounds and save them for future use
