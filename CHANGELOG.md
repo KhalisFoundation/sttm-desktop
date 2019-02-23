@@ -5,7 +5,6 @@
 * Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
 
 ### Improved:
-* Removed the long animation when changing slides with the "Next Line" toggle enabled
 * Quick Tools will now overlay instead of push for a more accurate preview
 
 
