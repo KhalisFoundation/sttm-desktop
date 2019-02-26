@@ -1,4 +1,4 @@
-## Latest Update
+## SikhiToTheMax - Desktop
 
 ### 4.5 - _190228_
 ### Added:
