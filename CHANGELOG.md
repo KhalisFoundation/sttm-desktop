@@ -7,8 +7,7 @@
 ### Improved:
 * Quick Tools will now overlay instead of push for a more accurate preview
 
-## Previous Updates
-<details><summary>See more...</summary>
+<details><summary>See previous updates...</summary>
 
 ### 4.4.1 - _190223_
 ### Improved:
