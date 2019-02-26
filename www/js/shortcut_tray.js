@@ -4,6 +4,8 @@ const { remote } = require('electron');
 
 const { store } = remote.require('./app');
 
+const analytics = remote.getGlobal('analytics');
+
 const shortcutTrayContainer = document.querySelector('.shortcut-tray');
 let isShortcutTrayOn = store.getUserPref('slide-layout.display-options.shortcut-tray-on');
 
@@ -11,6 +13,7 @@ const trayItemFactory = (trayItemKey, trayItem) => h(
   `div.tray-item.${trayItem.labelType}#tray-${trayItemKey}`,
   {
     onclick: () => {
+      analytics.trackEvent('shortcutTray', trayItemKey);
       if (trayItem.type === 'text') {
         global.controller.sendText(trayItem.ref, true);
       } else if (trayItem.type === 'shabad') {
@@ -29,6 +32,7 @@ const shortcutsToggle = h(
   {
     onclick: () => {
       isShortcutTrayOn = !isShortcutTrayOn;
+      analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
       store.setUserPref('slide-layout.display-options.shortcut-tray-on', isShortcutTrayOn);
       global.core.platformMethod('updateSettings');
       document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-th-large', !isShortcutTrayOn);

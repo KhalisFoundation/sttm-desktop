@@ -1,14 +1,19 @@
 ## Latest Update
 
-### 4.5 - _190226_
+### 4.5 - _190228_
 ### Added:
 * Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
 
 ### Improved:
 * Quick Tools will now overlay instead of push for a more accurate preview
 
-
 ## Previous Updates
+<details><summary>See more...</summary>
+
+### 4.4.1 - _190223_
+### Improved:
+* Fixed a bug that would cause preferences to be reset
+* Removed the animation that occurred when changing slides with the "Next Line" toggle enabled
 
 ### 4.4 - _190212_
 ### Added:
@@ -38,8 +43,6 @@
 * The announcements section now supports formatting, line breaks, and spacing!
 * We've made the toggle for Presenter View more accessible
 
-
-<details><summary>See more...</summary>
 ### 4.2.3 - _181115_
 * Bug Fixes 
 
