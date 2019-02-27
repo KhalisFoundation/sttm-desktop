@@ -652,6 +652,14 @@ module.exports = {
     }
   },
 
+
+  loadCeremony(ceremonyID) {
+    const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.innerHTML = '';
+    banidb.loadCeremony(ceremonyID)
+      .then(rows => this.printShabad(rows, null, null, true));
+  },
+
   loadAng(PageNo, SourceID) {
     banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
@@ -677,7 +685,8 @@ module.exports = {
       });
   },
 
-  printShabad(rows, ShabadID, LineID) {
+  printShabad(rowsDb, ShabadID, LineID, ceremony = false) {
+    const rows = ceremony ? rowsDb.map(row => row.Verse) : rowsDb;
     const lineID = LineID || rows[0].ID;
     const shabadID = ShabadID || rows[0].Shabads[0].ShabadID;
     let mainLine;

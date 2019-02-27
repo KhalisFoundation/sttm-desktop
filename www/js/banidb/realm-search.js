@@ -131,6 +131,30 @@ const loadShabad = ShabadID => (
 );
 
 /**
+ * Retrieve all lines from a Ceremony
+ *
+ * @param {number} CermonyID The specific Shabad to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadCeremony(3);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+
+const loadCeremony = ceremonyID => (
+  new Promise((resolve, reject) => {
+    Realm.open(realmDB.realmVerseSchema)
+    .then((realm) => {
+      const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
+
+/**
  * Retrieve the Ang number and source for any given ShabadID
  *
  * @param {number} ShabadID The ShabadID for which to search
@@ -228,6 +252,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadCeremony,
   getAng,
   loadAng,
   getShabad,

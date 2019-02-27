@@ -217,6 +217,7 @@ const createCards = (rows, LineID) => {
   const shabad = {};
   Object.keys(rows).forEach((key) => {
     row = rows[key];
+    rowTranslations = JSON.parse(row.Translations);
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const gurmukhiShabads = row.Gurmukhi.split(' ');
@@ -243,8 +244,8 @@ const createCards = (rows, LineID) => {
         `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
         [
           h('h1.gurbani.gurmukhi', gurmukhiContainer),
-          h('h2.translation', row.English),
-          h('h2.teeka', row.PunjabiUni),
+          h('h2.translation', rowTranslations.en.bdb),
+          h('h2.teeka', rowTranslations.puu.ss),
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
