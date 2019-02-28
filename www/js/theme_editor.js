@@ -5,6 +5,8 @@ const path = require('path');
 const util = require('util');
 const imagemin = require('imagemin');
 const { remote } = require('electron');
+const readChunk = require('read-chunk');
+const imageType = require('image-type');
 
 const themes = require('./themes.json');
 const slash = require('./slash');
@@ -37,10 +39,21 @@ const uploadErrorNotification = (message, timeout = 3000) => {
 };
 
 const imageCheck = (filePath) => {
-  const acceptedExtensions = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.JPEG'];
-  const extension = path.extname(filePath);
+  const acceptedExtensions = ['png', 'jpg'];
+  const acceptedMimeTypes = ['image/png', 'image/jpeg'];
 
-  return acceptedExtensions.includes(extension);
+  try {
+    const buffer = readChunk.sync(filePath, 0, 12);
+    const fileMeta = imageType(buffer);
+    if (fileMeta) {
+      return acceptedExtensions.includes(fileMeta.ext) && acceptedMimeTypes.includes(fileMeta.mime);
+    }
+  } catch (error) {
+    uploadErrorNotification(`Failed to validate this file as an image. 
+      Error: ${error}. If error presists file a bug report at sttm.co`);
+  }
+
+  return false;
 };
 
 const toggleRecentBgHeader = () => {
