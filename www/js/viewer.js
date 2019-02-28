@@ -8,6 +8,7 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
+const anvaad = require('anvaad-js');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
@@ -222,6 +223,7 @@ const createCards = (rows, LineID) => {
       row.English = rowTranslations.en.bdb;
       row.PunjabiUni = rowTranslations.puu.ss;
     }
+    row.Transliteration = anvaad.translit(row.Gurmukhi);
 
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');

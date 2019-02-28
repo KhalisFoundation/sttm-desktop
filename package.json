@@ -54,6 +54,7 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
+    "anvaad-js": "^1.0.9",
     "copy-to-clipboard": "^3.0.8",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
