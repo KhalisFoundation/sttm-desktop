@@ -33,11 +33,9 @@ if (platform === 'win32') {
   }
 }
 
-
 const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
 const newDBFolder = path.resolve(userDataPath, 'new-db');
 const newDBPath = path.resolve(newDBFolder, database[dbPlatform].dbName);
-
 const { store } = remote.require('./app');
 
 const POLLING_INTERVAL = (120 * 60000); // poll for new notifications every 2hrs.

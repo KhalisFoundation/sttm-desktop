@@ -657,7 +657,10 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     banidb.loadCeremony(ceremonyID)
-      .then(rows => this.printShabad(rows, null, null, true));
+      .then(rowsDb => {
+        const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
+        return this.printShabad(rows);
+      });
   },
 
   loadAng(PageNo, SourceID) {
@@ -685,10 +688,9 @@ module.exports = {
       });
   },
 
-  printShabad(rowsDb, ShabadID, LineID, ceremony = false) {
-    const rows = ceremony ? rowsDb.map(row => row.Verse) : rowsDb;
+  printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
-    const shabadID = ShabadID || rows[0].Shabads[0].ShabadID;
+    const shabadID = ShabadID || rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '';
     let mainLine;
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
