@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "url": "ssh://git@github.com:khalisfoundation/sttm-desktop.git"
   },
   "author": "Khalis, Inc. <techsupport@khalisfoundation.org>",
-  "license": "KNC-GSL",
+  "license": "OSL-3.0",
   "devDependencies": {
     "aws-sdk": "^2.28.0",
     "concurrently": "^3.3.0",
@@ -71,7 +71,7 @@
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "marked": "^0.3.6",
+    "marked": "^0.6.1",
     "moment": "^2.22.1",
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",

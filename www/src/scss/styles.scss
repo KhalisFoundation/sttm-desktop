@@ -144,6 +144,7 @@ body.show-overlay {
     display: block;
     height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     position: fixed;
+    transition: 0.5s height ease;
     width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
 
     &:nth-child(1) {
@@ -153,7 +154,7 @@ body.show-overlay {
     }
 
     &:nth-child(2) {
-      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - 40px);
+      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$footerOffset});
       left: auto;
       right: $presenter-pane-gap;
 
@@ -181,7 +182,7 @@ body.show-overlay {
   }
 
   #navigator.kb-active {
-    $height:calc(50% - calc(#{$presenter-pane-gap} * 3) - calc(#{$keyboard-height} / 2));
+    $height: calc(50% - calc(#{$presenter-pane-gap} * 3) - calc(#{$keyboard-height} / 2));
 
     /* .nav-page {
       &:nth-child(1) {
@@ -197,6 +198,10 @@ body.show-overlay {
       display: none;
     }
   }
+}
+
+.controller.scale-viewer.presenter-view.shortcut-tray-on .nav-page:nth-child(2) {
+  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset});
 }
 
 .scale-viewer {
@@ -353,6 +358,15 @@ body.show-overlay {
 .file-input-label {
   display: block;
   margin: 10px;
+
+  &.disabled {
+    background: #e0e0e0;
+    cursor: default;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
 }
 
 .helper-text {
@@ -361,6 +375,16 @@ body.show-overlay {
   line-height: 12px;
   margin: 0 auto 10px 10px;
   width: 100%;
+}
+
+.file-input-label {
+  display: block;
+  margin: 10px;
+}
+
+.file-input-label {
+  display: block;
+  margin: 10px;
 }
 
 .win32 .options-page {

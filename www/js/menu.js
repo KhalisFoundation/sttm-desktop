@@ -8,7 +8,10 @@ const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
-const { store, analytics } = require('electron').remote.require('./app');
+const search = require('./search');
+
+const { store } = electron.remote.require('./app');
+const analytics = electron.remote.getGlobal('analytics');
 
 const allowedTags = ['b', 'i', 'em', 'u', 'pre', 'strong', 'div', 'code', 'br', 'p', 'ul', 'li', 'ol'];
 
@@ -93,10 +96,10 @@ const createNotificationContent = (msgList) => {
 };
 
 const showNotificationsModal = (message) => {
-  if (message && message.length > 0) {
+  if (message && message.rows && message.rows.length > 0) {
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
     global.core.platformMethod('updateNotificationsTimestamp', time);
-    const content = createNotificationContent(message);
+    const content = createNotificationContent(message.rows);
     // set content
     modal.setContent(content);
     // open modal
@@ -304,7 +307,7 @@ module.exports = {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach(($menuToggle) => {
       $menuToggle.appendChild(menuButton.cloneNode(true));
-      $menuToggle.addEventListener('click', () => { module.exports.toggleMenu('#menu-page'); });
+      $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
     document.querySelector('.preferences-close').appendChild(closeButton);
 
@@ -328,6 +331,22 @@ module.exports = {
   getNotifications,
 
   showNotificationsModal,
+
+  showSettingsTab(fromMainMenu) {
+    search.activateNavLink('settings', true);
+    search.activateNavPage('session', { id: 'settings', label: 'Settings' });
+
+    const isPresenterView = document.body.classList.contains('presenter-view');
+    const settingsViewType = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';
+    const settingsClickSource = fromMainMenu ? 'menu_settings' : 'hamburger_settings';
+    analytics.trackEvent(settingsClickSource, 'click', settingsViewType);
+
+    const sessionPage = document.querySelector('#session-page');
+    sessionPage.classList.add('bounce-animate');
+    sessionPage.addEventListener('webkitAnimationEnd', () => {
+      sessionPage.classList.remove('bounce-animate');
+    });
+  },
 
   toggleMenu(pageSelector = '#menu-page') {
     document.querySelector(pageSelector).classList.toggle('active');

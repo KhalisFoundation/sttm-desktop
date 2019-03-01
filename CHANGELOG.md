@@ -1,5 +1,32 @@
 ## SikhiToTheMax Desktop App
 
+### 4.5 - _190221_
+### Added:
+* Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
+
+### Improved:
+* Removed the long animation when changing slides with the "Next Line" toggle enabled
+* Quick Tools will now overlay instead of push for a more accurate preview
+
+### 4.4.1 - _190223_
+### Improved:
+* Fixed a bug that would cause preferences to be reset
+* Removed the animation that occurred when changing slides with the "Next Line" toggle enabled
+
+### 4.4 - _190212_
+### Added:
+* Added the ability to upload multiple custom backgrounds and save them for future use
+* Added an option to hide the quick tools menu
+
+### Improved:
+* Moved all settings to a dedicated tab and removed duplicate options
+* Fixed an issue when using the "Next Line" toggle that caused a large gap on the slide
+* Fixed some issues with the custom background uploader
+* Fixed some formatting issues when using Chromecast
+* Fixed an issue where font sliders would not respond
+* Updated the Help Guide with new information and images
+* Updated Help Guide to no longer require an internet connection
+
 ### 4.3 - _190115_
 ### Added:
 * You can now upload a custom background image! Check out the Custom option in the Themes menu
@@ -18,7 +45,7 @@
 
 ### 4.2.1 - _181103_
 #### Improved
-* Bug Fixes for Windows 7 and 8 users. For the best Sikhi to the Max experience, consider updating to Windows 10. 
+* Bug Fixes for Windows 7 and 8 users. For the best SikhiToTheMax experience, consider updating to Windows 10. 
 
 ### 4.2.0 - _181031_
 #### Improved
@@ -65,6 +92,8 @@
  * **Anand Karaj** - Present all of the 4 Laavs for the Sikh Wedding Ceremony
  * **Donate button** - If you would like to show your appreciation with a monetary gift, please click the Donate button
  * **Updates** - Get updated on the latest SikhiToTheMax news
+
+<details><summary>See more...</summary>
 
 ### 3.3.1 - _180401_
 #### Added
@@ -128,3 +157,4 @@
  3. Navigate with up and down arrows and press space bar to return back to the main line
  4. Use the icons at the bottom of the footer to navigate between Search, Recent Shabads, and Current Shabad
  5. Please submit feedback to techsupport@khalisfoundation.org
+</details>

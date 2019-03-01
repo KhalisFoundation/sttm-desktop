@@ -297,16 +297,11 @@ h2 {
   &.webview .vc-toggle-icon {
     display: flex;
   }
-
-  .deck.vc-open {
-    right: #{$viewer-padding};
-    width: calc(100% - #{$viewer-padding} * 2 - 28vh);
-  }
 }
 
 .viewer-controls {
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: #e0e0e0;
   display: none;
   flex-direction: column;
   height: 0;

@@ -78,20 +78,21 @@
                 <i class="fa fa-window-minimize"></i>
                 <i class="fa fa-window-maximize disabled"></i>
             </div>
+            <span class="nav-header-text"> </span>
             <div class="nav-header-tabs">
-              <span class="nav-header-tab nav-header-text active" id="history-tab" data-title="History">
+              <span class="nav-header-tab nav-header-text active" id="history-tab" data-title="history">
                 <i class="fa fa-clock-o"></i> History
               </span>
-              <span class="nav-header-tab nav-header-text" id="themes-tab" data-title="Themes">
+              <span class="nav-header-tab nav-header-text" id="themes-tab" data-title="themes">
                 <i class="fa fa-paint-brush"></i> Themes
               </span>
-              <span class="nav-header-tab nav-header-text" id="insert-tab" data-title="Insert">
+              <span class="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
                 <i class="fa fa-desktop"></i> Insert
               </span>
-              <span class="nav-header-tab nav-header-text" id="display-tab" data-title="Display">
-                <i class="fa fa-cogs"></i> Display
+              <span class="nav-header-tab nav-header-text" id="settings-tab" data-title="settings">
+                <i class="fa fa-cogs"></i> Settings
               </span>
-              <span class="nav-header-tab nav-header-text" id="other-tab" data-title="Others">
+              <span class="nav-header-tab nav-header-text" id="others-tab" data-title="others">
                 <i class="fa fa-ellipsis-h"></i> Others
               </span>
             </div>
@@ -107,9 +108,9 @@
             <div class="tab-content" id ="insert-tab-content">
               <ul id="list-of-custom-slides"></ul>
             </div>
-            <div class="tab-content" id ="display-tab-content">
+            <div class="tab-content" id ="settings-tab-content">
             </div>
-            <div class="tab-content" id ="other-tab-content">
+            <div class="tab-content" id ="others-tab-content">
                 <ul id="list-of-shabad-options"></ul>
             </div>
           </section>
@@ -132,27 +133,6 @@
             <ul id="shabad" class="gurmukhi"></ul>
           </section>
         </div>
-        <!--<div class="nav-page" id="sync-page">
-          <div class="navigator-header">
-            <div class="preferences-open"> </div>
-            <span class="nav-header-text">Synced Share</span>
-          </div>
-          <section class="block-list">
-            <div class="connect-box">
-              <div class="help-block">Give remote access to devices via unique code.</div>
-              <button class="button connect-btn">Start Sharing</button>
-            </div>
-            <div class="share-box hidden">
-              <div class="help-block">
-                Ask sangat to visit
-                <a href="https://sttm.co/sync" target="_blank">sttm.co/sync</a>
-                and enter the following code
-              </div>
-              <input name="code" readonly value="" />
-              <button class="button end-btn">Stop Sharing</button>
-            </div>
-          </section>
-        </div>-->
         <div class="takeover-page" id="menu-page">
           <div class="navigator-header">
             <div class="preferences-close"> </div>
@@ -170,6 +150,7 @@
           <div class="presenter-switch"> </div>
         </div>
       </div>
+      <section class="shortcut-tray"> </section>
     </div>
   </div>
   <script src="assets/js/vendor/mousetrap.min.js"></script>
