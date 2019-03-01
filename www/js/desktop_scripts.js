@@ -141,6 +141,8 @@ module.exports = {
                     }
                     module.exports.initDB();
                     // Delete old DBs
+                    // TODO: Update to check if directory and use fs.rmdir
+                    // TODO: Add sttmdesktop.realm.management
                     const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
                     oldDBs.forEach((oldDB) => {
                       const oldDBPath = path.resolve(userDataPath, oldDB);

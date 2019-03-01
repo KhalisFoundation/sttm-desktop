@@ -10,7 +10,10 @@ const userDataPath = remote.app.getPath('userData');
 const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 
-const realmSchemaDef = {
+
+// TODO: Investigate possible memory issues from multiple Realm.open calls
+// https://github.com/KhalisFoundation/sttm-desktop/pull/517#discussion_r261644205
+const realmConfig = {
   path: realmPath,
 };
 
@@ -19,8 +22,8 @@ let initialized = false;
 const init = () => {
   const realmSchema = require(realmSchemaPath);
 
-  realmSchemaDef.schema = realmSchema.schemas;
-  realmSchemaDef.schemaVersion = realmSchema.schemaVersion;
+  realmConfig.schema = realmSchema.schemas;
+  realmConfig.schemaVersion = realmSchema.schemaVersion;
   initialized = true;
 };
 
@@ -123,7 +126,7 @@ const query = (searchQuery, searchType, searchSource) => (
     }
     order.push('Shabads');
     condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition);
         resolve(rows.slice(0, howManyRows));
@@ -147,7 +150,7 @@ const loadShabad = ShabadID => (
     if (!initialized) {
       init();
     }
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
         if (rows.length > 0) {
@@ -173,7 +176,7 @@ const getAng = ShabadID => (
     if (!initialized) {
       init();
     }
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
         const { PageNo, Source } = row;
@@ -202,7 +205,7 @@ const loadAng = (PageNo, SourceID = 'G') => (
     if (!initialized) {
       init();
     }
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
         if (rows.length > 0) {
@@ -230,7 +233,7 @@ const getShabad = VerseID => (
     if (!initialized) {
       init();
     }
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
         resolve(shabad.Shabads[0].ShabadID);
@@ -251,7 +254,7 @@ const getShabad = VerseID => (
  */
 const randomShabad = (SourceID = 'G') => (
   new Promise((resolve) => {
-    Realm.open(realmSchemaDef)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
         const row = rows[Math.floor(Math.random() * rows.length)];
