@@ -479,7 +479,7 @@ module.exports = {
   },
 
   remapLine(rawLine) {
-    const Line = { ...rawLine };
+    const Line = Object.assign(rawLine, {});
     if (Line.Translations) {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;
