@@ -174,6 +174,9 @@ const loadShabad = ShabadID => (
 
 const loadCeremony = ceremonyID => (
   new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
     Realm.open(realmConfig)
     .then((realm) => {
       const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
