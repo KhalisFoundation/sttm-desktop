@@ -1,5 +1,6 @@
 /* global Mousetrap */
 const electron = require('electron');
+const anvaad = require('anvaad-js');
 
 const remote = electron.remote;
 const dialog = remote.dialog;
@@ -477,7 +478,20 @@ module.exports = {
     global.platform.ipc.send('clear-apv');
   },
 
-  sendLine(shabadID, lineID, Line, rows) {
+  remapLine(rawLine) {
+    const Line = Object.assign(rawLine, {});
+    if (Line.Translations) {
+      const lineTranslations = JSON.parse(Line.Translations);
+      Line.English = lineTranslations.en.bdb;
+      Line.PunjabiUni = lineTranslations.puu.ss;
+    }
+    Line.Transliteration = anvaad.translit(Line.Gurmukhi);
+    return Line;
+  },
+
+  sendLine(shabadID, lineID, rawLine, rawRows) {
+    const Line = this.remapLine(rawLine);
+    const rows = rawRows.map(row => this.remapLine(row));
     global.webview.send('show-line', { shabadID, lineID, rows });
     const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
     if (document.body.classList.contains('livefeed')) {

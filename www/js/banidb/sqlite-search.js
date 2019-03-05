@@ -173,6 +173,33 @@ const loadShabad = ShabadID => (
   })
 );
 
+
+/**
+ * Retrieve all lines from a Ceremony
+ *
+ * @param {number} CeremonyID The specific Ceremony to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadCeremony(3);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadCeremony = CeremonyID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY v.ID`, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
+
+
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -280,6 +307,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadCeremony,
   getAng,
   loadAng,
   getShabad,

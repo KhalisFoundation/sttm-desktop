@@ -18,6 +18,8 @@ const trayItemFactory = (trayItemKey, trayItem) => h(
         global.controller.sendText(trayItem.ref, true);
       } else if (trayItem.type === 'shabad') {
         global.core.search.loadShabad(trayItem.ref);
+      } else if (trayItem.type === 'ceremony') {
+        global.core.search.loadCeremony(trayItem.ref);
       }
     },
   },

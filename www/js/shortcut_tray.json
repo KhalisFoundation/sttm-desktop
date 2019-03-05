@@ -1,9 +1,9 @@
 {
     "anandSahib": {
-        "label": "Anand Sahib",
+        "label": "Anand Sahib & Salok",
         "labelType": "roman",
-        "type": "shabad",
-        "ref": 333375
+        "type": "ceremony",
+        "ref": 3
     },
     "moolMantra": {
         "label": "Mool Mantra",

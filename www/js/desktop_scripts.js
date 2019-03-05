@@ -34,7 +34,6 @@ if (platform === 'win32') {
   }
 }
 
-
 const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
 const dbSchema = path.resolve(userDataPath, database[dbPlatform].dbSchema);
 const newDBFolder = path.resolve(userDataPath, 'new-db');
