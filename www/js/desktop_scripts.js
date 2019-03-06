@@ -20,6 +20,7 @@ const database = {
   sqlite: {
     dbCompressedName: 'sttmdesktop.zip',
     dbName: 'sttmdesktop.db',
+    dbSchema: null,
     md5: 'sttmdesktop.md5',
   },
 };
@@ -34,11 +35,14 @@ if (platform === 'win32') {
   }
 }
 
+const dbSchemaPath = schemaPath =>
+  !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
+
 const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
-const dbSchema = path.resolve(userDataPath, database[dbPlatform].dbSchema);
+const dbSchema = dbSchemaPath(userDataPath);
 const newDBFolder = path.resolve(userDataPath, 'new-db');
 const newDBPath = path.resolve(newDBFolder, database[dbPlatform].dbName);
-const newDBSchema = path.resolve(newDBFolder, database[dbPlatform].dbSchema);
+const newDBSchema = dbSchemaPath(newDBFolder);
 
 const { store } = remote.require('./app');
 

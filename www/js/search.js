@@ -690,7 +690,7 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
-    const shabadID = ShabadID || rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '';
+    const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
     let mainLine;
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
