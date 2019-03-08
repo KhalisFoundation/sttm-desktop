@@ -1,6 +1,6 @@
 ## SikhiToTheMax - Desktop
 
-### 4.5 - _190228_
+### 4.5 - _190312_
 ### Added:
 * Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
 
