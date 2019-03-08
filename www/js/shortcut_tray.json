@@ -1,0 +1,26 @@
+{
+    "anandSahib": {
+        "label": "Anand Sahib & Salok",
+        "labelType": "roman",
+        "type": "ceremony",
+        "ref": 3
+    },
+    "moolMantra": {
+        "label": "Mool Mantra",
+        "labelType": "roman",
+        "type": "text",
+        "ref": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]"
+    },
+    "waheguru": {
+        "label": "vwihgurU",
+        "labelType": "gurmukhi",
+        "type": "text",
+        "ref": "vwihgurU"
+    },
+    "blank": {
+        "label": "Blank",
+        "labelType": "roman",
+        "type": "text",
+        "ref": ""
+    }
+}

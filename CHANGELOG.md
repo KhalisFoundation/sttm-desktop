@@ -1,4 +1,13 @@
-## SikhiToTheMax Desktop App
+## SikhiToTheMax - Desktop
+
+### 4.5 - _190312_
+### Added:
+* Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
+
+### Improved:
+* Quick Tools will now overlay instead of push for a more accurate preview
+
+<details><summary>See previous updates...</summary>
 
 ### 4.4.1 - _190223_
 ### Improved:
@@ -18,6 +27,7 @@
 * Fixed an issue where font sliders would not respond
 * Updated the Help Guide with new information and images
 * Updated Help Guide to no longer require an internet connection
+
 
 ### 4.3 - _190115_
 ### Added:
@@ -147,3 +157,4 @@
  3. Navigate with up and down arrows and press space bar to return back to the main line
  4. Use the icons at the bottom of the footer to navigate between Search, Recent Shabads, and Current Shabad
  5. Please submit feedback to techsupport@khalisfoundation.org
+</details>

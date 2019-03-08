@@ -252,7 +252,7 @@ const createCards = (rows, LineID) => {
       gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
-      teeka: row.Punjabi,
+      teeka: row.PunjabiUni,
       transliteration: row.Transliteration,
     };
   });

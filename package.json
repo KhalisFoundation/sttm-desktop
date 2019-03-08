@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "4.4.1",
+  "version": "4.5.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -54,6 +54,7 @@
     "stylelint-order": "^0.4.1"
   },
   "dependencies": {
+    "anvaad-js": "^1.0.9",
     "copy-to-clipboard": "^3.0.8",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
@@ -71,7 +72,7 @@
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "marked": "^0.3.6",
+    "marked": "^0.6.1",
     "moment": "^2.22.1",
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
