@@ -33,6 +33,6 @@ matrix:
 build: off
 version: '{build}'
 shallow_clone: false
-clone_depth: 1
+clone_depth: 50
 test_script:
   - npm run test && node ./packaging/release --branch=%APPVEYOR_REPO_BRANCH% --platform=win && node ./packaging/release --branch=%APPVEYOR_REPO_BRANCH% --platform=win32
