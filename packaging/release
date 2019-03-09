@@ -34,9 +34,8 @@ const release = async () => {
     await git().checkout(branch);
 
     console.log('git tag new version and push');
-    await git()
-      .addTag(releaseVersion)
-      .pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
+    await git().addTag(releaseVersion);
+    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
   }
 
   if (branch === 'release') {
