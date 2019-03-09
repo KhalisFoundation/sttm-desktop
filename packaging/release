@@ -28,16 +28,14 @@ const release = async () => {
   // Only push git tag if on Travis
   if (platform === 'mac') {
     console.log('Configure Git for Travis CI user');
-    await git()
-      .addConfig('user.email', 'travis@travis-ci.org')
-      .addConfig('user.name', 'Travis CI')
-      .addConfig('push.default', 'current')
-      .checkout(branch);
+    await git().addConfig('user.email', 'travis@travis-ci.org');
+    await git().addConfig('user.name', 'Travis CI');
+    await git().addConfig('push.default', 'current');
+    await git().checkout(branch);
 
     console.log('git tag new version and push');
-    await git()
-      .addTag(releaseVersion)
-      .pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
+    await git().addTag(releaseVersion);
+    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
   }
 
   if (branch === 'release') {

@@ -12,6 +12,9 @@ module.exports = (branch, lastTag) => {
 
   const lastReleaseMain = semver.coerce(lastRelease);
   const lastReleasePrerelease = semver.prerelease(lastRelease);
+  console.log(`semvar.valid=${lastRelease}`);
+  console.log(`semvar.coerce=${lastReleaseMain}`);
+  console.log(`semvar.prerelease=${lastReleasePrerelease}`);
 
   if (!semver.valid(currentReleaseMain)) {
     throw new Error(`Release version (${currentReleaseMain}) is not valid. Please check package.json`);
