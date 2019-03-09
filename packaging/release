@@ -29,9 +29,9 @@ const release = async () => {
   if (platform === 'mac') {
     console.log('Configure Git for Travis CI user');
     await git()
-      .config('user.email', 'travis@travis-ci.org')
-      .config('user.name', 'Travis CI')
-      .config('push.default', 'current')
+      .addConfig('user.email', 'travis@travis-ci.org')
+      .addConfig('user.name', 'Travis CI')
+      .addConfig('push.default', 'current')
       .checkout(branch);
 
     console.log('git tag new version and push');
