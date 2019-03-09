@@ -21,7 +21,7 @@ const release = async () => {
   console.log(`New release version: ${releaseVersion}`);
 
   console.log('TODO: stream output for the next command');
-  console.log('npm run dist:mac');
+  console.log(`npm run dist:${platform}`);
   const { stdout1 } = await exec(`npm run dist:${platform}`);
   console.log(stdout1);
 
