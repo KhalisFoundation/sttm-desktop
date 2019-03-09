@@ -32,7 +32,7 @@ matrix:
   fast_finish: true
 build: off
 version: '{build}'
-shallow_clone: true
+shallow_clone: false
 clone_depth: 1
 test_script:
   - npm run test && node ./packaging/release --branch=%APPVEYOR_REPO_BRANCH% --platform=win && node ./packaging/release --branch=%APPVEYOR_REPO_BRANCH% --platform=win32
