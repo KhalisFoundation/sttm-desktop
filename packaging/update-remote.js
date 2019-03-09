@@ -1,14 +1,21 @@
-/* eslint no-console: "off", import/no-extraneous-dependencies: 0 */
+/* eslint-disable no-console, import/no-extraneous-dependencies */
 const fs = require('fs');
 const version = require('../package.json').version;
 const path = require('path');
 const SSH = require('ssh2').Client;
 
-function updateRemoteVersion() {
+const files = {
+  mac: 'sttm-mac-x64',
+  win: 'sttm-win-x64',
+  win32: 'sttm-win-ia32',
+};
+
+module.exports = (platform) => {
+  const file = files[platform];
   const conn = new SSH();
   conn.on('ready', () => {
     console.log('Client :: ready');
-    conn.exec(`echo ${version} > /home/releases/sttm-mac-x64 && cat /home/releases/sttm-mac-x64`, (err, stream) => {
+    conn.exec(`echo ${version} > /home/releases/${file} && cat /home/releases/${file}`, (err, stream) => {
       if (err) throw err;
       stream.on('close', (code, signal) => {
         console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
@@ -25,9 +32,4 @@ function updateRemoteVersion() {
     username: 'kns',
     privateKey: fs.readFileSync(path.resolve(__dirname, 'id_rsa')),
   });
-}
-
-const branch = process.argv[2];
-if (branch === 'release') {
-  updateRemoteVersion();
-}
+};
