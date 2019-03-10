@@ -188,6 +188,21 @@ const loadCeremony = ceremonyID => (
   })
 );
 
+const loadBanis = () => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+    .then((realm) => {
+      const rows = realm.objects('Banis').sorted('ID');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -295,6 +310,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadBanis,
   loadCeremony,
   getAng,
   loadAng,

@@ -1,6 +1,8 @@
 $presenter-pane-gap: 25px;
 $title-bar-offset: 25px;
 $keyboard-height:128px;
+$toolbar-offset: 75px;
+$toolbar-width-offset: $toolbar-offset/2;
 
 @mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
   $screen-offset: 50 * $row-num;
@@ -17,6 +19,14 @@ $keyboard-height:128px;
   @else if $is-windows == 1 {
     top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
   }
+}
+
+@mixin calculateDimensions () {
+  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+  $presenter-panes-container: calc(50% - #{$toolbar-width-offset});
+
+  width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
 @import
@@ -50,8 +60,75 @@ a {
   display: none;
 }
 
+.fullscreen-fixed {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
 #app-frame {
-  height: 100%;
+  @extend .fullscreen-fixed;
+
+  z-index: 1100;
+}
+
+.focus-overlay {
+  @extend .fullscreen-fixed;
+
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1200;
+
+  &.hidden {
+    width: 0;
+  }
+}
+
+#toolbar {
+  @extend .fullscreen-fixed;
+
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding-top: $presenter-pane-gap;
+  width: $toolbar-offset;
+  z-index: 1300;
+
+  .toolbar-item {
+    background-position: center center;
+    background-size: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 60px;
+    transition: 0.5s all ease;
+    width: 60px;
+
+    &.active {
+      z-index: 1100;
+    }
+
+    &:hover {
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .bani-list {
+    height: calc(100vh - #{$presenter-pane-gap * 2});
+    left: $toolbar-offset + $presenter-pane-gap;
+    position: fixed;
+    top: $presenter-pane-gap;
+    width: 300px;
+  }
+
+  #tool-sunder-gutka {
+    background-image: url('../../assets/img/icons/sunder_gutka.png');
+  }
 }
 
 #main-viewer,
@@ -98,9 +175,9 @@ body.show-overlay {
 .controller.scale-viewer.presenter-view {
   #navigator {
     bottom: $presenter-pane-gap;
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     right: $presenter-pane-gap;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
   }
 
   #header {
@@ -118,9 +195,9 @@ body.show-overlay {
   }
 
   .fixed-takeover-pages {
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     position: fixed;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
   }
 
   #custom-slides-page {
@@ -142,13 +219,13 @@ body.show-overlay {
 
   .nav-page {
     display: block;
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     position: fixed;
     transition: 0.5s height ease;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
 
     &:nth-child(1) {
-      left: $presenter-pane-gap;
+      left: $presenter-pane-gap + $toolbar-offset;
 
       @include calculateTop(0);
     }
@@ -162,7 +239,7 @@ body.show-overlay {
     }
 
     &:nth-child(3) {
-      left: $presenter-pane-gap;
+      left: $presenter-pane-gap + $toolbar-offset;
 
       @include calculateTop(1);
     }
