@@ -663,6 +663,16 @@ module.exports = {
       });
   },
 
+  loadBani(BaniID) {
+    const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.innerHTML = '';
+    banidb.loadBani(BaniID)
+      .then(rowsDb => {
+        const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
+        return this.printShabad(rows);
+      });
+  },
+
   loadAng(PageNo, SourceID) {
     banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
@@ -703,36 +713,38 @@ module.exports = {
     }
 
     rows.forEach((item) => {
-      if (parseInt(lineID, 10) === item.ID) {
-        mainLine = item;
-      }
-      const shabadLine = h(
-        'li',
-        {},
-        h(
-          `a#line${item.ID}.panktee${
-            parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
-          }`,
-          {
-            'data-line-id': item.ID,
-            'data-main-letters': item.MainLetters,
-            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                           item.ID, item, rows),
-          },
-          [
-            h('i.fa.fa-fw.fa-check'),
-            h('i.fa.fa-fw.fa-home'),
-            ' ',
-            item.Gurmukhi,
-          ],
-        ),
-      );
-      // write the Panktee to the controller
-      shabad.appendChild(shabadLine);
-      // append the currentShabad array
-      currentShabad.push(item.ID);
-      if (lineID === item.ID) {
-        this.currentLine = item.ID;
+      if (item) {
+        if (parseInt(lineID, 10) === item.ID) {
+          mainLine = item;
+        }
+        const shabadLine = h(
+          'li',
+          {},
+          h(
+            `a#line${item.ID}.panktee${
+              parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
+            }`,
+            {
+              'data-line-id': item.ID,
+              'data-main-letters': item.MainLetters,
+              onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
+                            item.ID, item, rows),
+            },
+            [
+              h('i.fa.fa-fw.fa-check'),
+              h('i.fa.fa-fw.fa-home'),
+              ' ',
+              item.Gurmukhi,
+            ],
+          ),
+        );
+        // write the Panktee to the controller
+        shabad.appendChild(shabadLine);
+        // append the currentShabad array
+        currentShabad.push(item.ID);
+        if (lineID === item.ID) {
+          this.currentLine = item.ID;
+        }
       }
     });
     // scroll the Shabad controller to the current Panktee

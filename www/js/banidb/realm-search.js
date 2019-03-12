@@ -162,6 +162,32 @@ const loadShabad = ShabadID => (
 );
 
 /**
+ * Retrieve all lines from a Shabad
+ *
+ * @param {number} ShabadID The specific Shabad to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadShabad(2776);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadBani = BaniID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then((realm) => {
+        const rows = realm.objects('Banis_Shabad').filtered('Bani.ID == $0', BaniID).sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  })
+);
+
+/**
  * Retrieve all lines from a Ceremony
  *
  * @param {number} CermonyID The specific Shabad to get
@@ -311,6 +337,7 @@ module.exports = {
   query,
   loadShabad,
   loadBanis,
+  loadBani,
   loadCeremony,
   getAng,
   loadAng,
