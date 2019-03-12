@@ -219,7 +219,7 @@ const createCards = (rows, LineID) => {
     row = rows[key];
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
-    const gurmukhiShabads = row.Gurmukhi.split(' ');
+    const gurmukhiShabads = row.Gurmukhi ? row.Gurmukhi.split(' ') : row.PunjabiUni.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
@@ -248,8 +248,8 @@ const createCards = (rows, LineID) => {
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
-      gurmukhi: row.Gurmukhi,
-      gurmukhiWithoutBisram: row.Gurmukhi,
+      gurmukhi: row.Gurmukhi || row.PunjabiUni,
+      gurmukhiWithoutBisram: row.Gurmukhi || row.PunjabiUni,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.PunjabiUni,
@@ -327,8 +327,10 @@ const showLine = (ShabadID, LineID, rows) => {
     }
     [...$shabadDeck.querySelectorAll('.slide')].forEach(el => el.classList.remove('active'));
     const line = document.getElementById(`slide${LineID}`);
-    line.classList.add('active');
-    smoothScroll(line);
+    if (line) {
+      line.classList.add('active');
+      smoothScroll(line);
+    }
     castShabadLine(LineID);
   } else {
     const { cards, shabad } = createCards(rows, LineID);

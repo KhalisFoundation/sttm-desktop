@@ -479,17 +479,14 @@ module.exports = {
   },
 
   remapLine(rawLine) {
-    if (rawLine) {
-      const Line = Object.assign(rawLine, {});
-      if (Line.Translations) {
-        const lineTranslations = JSON.parse(Line.Translations);
-        Line.English = lineTranslations.en.bdb;
-        Line.PunjabiUni = lineTranslations.puu.ss;
-      }
-      Line.Transliteration = anvaad.translit(Line.Gurmukhi);
-      return Line;
+    const Line = Object.assign(rawLine, {});
+    if (Line.Translations) {
+      const lineTranslations = JSON.parse(Line.Translations);
+      Line.English = lineTranslations.en.bdb;
+      Line.PunjabiUni = lineTranslations.puu.ss;
     }
-    return false;
+    Line.Transliteration = anvaad.translit(Line.Gurmukhi);
+    return Line;
   },
 
   sendLine(shabadID, lineID, rawLine, rawRows) {
