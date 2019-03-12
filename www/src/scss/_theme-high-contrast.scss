@@ -69,6 +69,11 @@ $highlight-text: #cfd8dc;
 .high-contrast {
   color: $text-base;
 
+  .viewer-controls {
+    background-color: $bg-main;
+    color: $text-bright;
+  }
+
   #header {
     a {
       color: $text-base;

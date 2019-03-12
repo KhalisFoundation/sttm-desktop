@@ -58,6 +58,10 @@ $highlight-text: #cfd8dc;
 .blue-darbar {
   color: $text-base;
 
+  .viewer-controls {
+    background-color: $bg-main;
+  }
+
   #header {
     a {
       color: $text-base;
