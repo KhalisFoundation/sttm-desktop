@@ -11,7 +11,7 @@
     var previewData = {
       Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
       English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
-      PunjabiUni: 'ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।',
+      Punjabi: 'ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।',
       Transliteration: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
     };
     var socket = io();
@@ -25,7 +25,7 @@
     var writeLine = function(Line, larivaar) {
       document.querySelector('.o-gurbani').innerHTML = larivaar ? Line.Gurmukhi.replace(/ /g, '') : Line.Gurmukhi;
       document.querySelector('.o-translation').innerHTML = Line.English;
-      document.querySelector('.o-teeka').innerHTML = Line.PunjabiUni;
+      document.querySelector('.o-teeka').innerHTML = Line.Punjabi;
       document.querySelector('.o-transliteration').innerHTML = Line.Transliteration;
 
       document.querySelector('.overlay-wrapper').hidden = (Line.Gurmukhi === '' && Line.English === '');

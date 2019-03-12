@@ -244,7 +244,7 @@ const createCards = (rows, LineID) => {
         [
           h('h1.gurbani.gurmukhi', gurmukhiContainer),
           h('h2.translation', row.English),
-          h('h2.teeka', row.PunjabiUni),
+          h('h2.teeka', row.Punjabi),
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
@@ -252,7 +252,7 @@ const createCards = (rows, LineID) => {
       gurmukhiWithoutBisram: row.Gurmukhi,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
-      teeka: row.PunjabiUni,
+      teeka: row.Punjabi,
       transliteration: row.Transliteration,
     };
   });
