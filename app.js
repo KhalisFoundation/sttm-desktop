@@ -220,6 +220,49 @@ function createViewer(ipcData) {
   mainWindow.webContents.send('presenter-view');
 }
 
+function createBroadcastFiles(arg) {
+  const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
+  const userDataPath = (liveFeedLocation === 'default' || !liveFeedLocation) ? electron.app.getPath('desktop') : liveFeedLocation;
+  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
+  const englishFile = `${userDataPath}/sttm-English.txt`;
+  try {
+    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim());
+    fs.appendFile(gurbaniFile, '\n');
+    fs.writeFile(englishFile, arg.Line.English.trim());
+    fs.appendFile(englishFile, '\n');
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+  }
+}
+
+const showLine = (line, socket = io) => {
+  const overlayPrefs = store.get('obs');
+  const payload = Object.assign(line, overlayPrefs);
+  socket.emit('show-line', payload);
+};
+
+const updateOverlayVars = () => {
+  const overlayPrefs = store.get('obs');
+  io.emit('update-prefs', overlayPrefs);
+};
+
+const emptyOverlay = () => {
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      PunjabiUni: '',
+      Transliteration: '',
+    },
+  };
+  showLine(emptyLine);
+  const overlayPrefs = store.get('obs');
+  if (overlayPrefs.live) {
+    createBroadcastFiles(emptyLine);
+  }
+};
+
 app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
@@ -272,6 +315,7 @@ app.on('ready', () => {
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
+    emptyOverlay();
     if (viewerWindow && !viewerWindow.isDestroyed()) {
       viewerWindow.close();
     }
@@ -316,33 +360,7 @@ ipcMain.on('clear-apv', () => {
   }
 });
 
-function createBroadcastFiles(arg) {
-  const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
-  const userDataPath = (liveFeedLocation === 'default' || !liveFeedLocation) ? electron.app.getPath('desktop') : liveFeedLocation;
-  const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
-  const englishFile = `${userDataPath}/sttm-English.txt`;
-  try {
-    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim());
-    fs.appendFile(gurbaniFile, '\n');
-    fs.writeFile(englishFile, arg.Line.English.trim());
-    fs.appendFile(englishFile, '\n');
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.log(err);
-  }
-}
-
 let lastLine;
-const showLine = (line, socket = io) => {
-  const overlayPrefs = store.get('obs');
-  const payload = Object.assign(line, overlayPrefs);
-  socket.emit('show-line', payload);
-};
-
-const updateOverlayVars = () => {
-  const overlayPrefs = store.get('obs');
-  io.emit('update-prefs', overlayPrefs);
-};
 
 ipcMain.on('update-overlay-vars', updateOverlayVars);
 
@@ -370,19 +388,7 @@ ipcMain.on('show-line', (event, arg) => {
 });
 
 ipcMain.on('show-empty-slide', () => {
-  const emptyLine = {
-    Line: {
-      Gurmukhi: '',
-      English: '',
-      PunjabiUni: '',
-      Transliteration: '',
-    },
-  };
-  showLine(emptyLine);
-  const overlayPrefs = store.get('obs');
-  if (overlayPrefs.live) {
-    createBroadcastFiles(emptyLine);
-  }
+  emptyOverlay();
 });
 
 ipcMain.on('show-text', (event, arg) => {
