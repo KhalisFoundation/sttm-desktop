@@ -252,7 +252,7 @@ const emptyOverlay = () => {
     Line: {
       Gurmukhi: '',
       English: '',
-      PunjabiUni: '',
+      Punjabi: '',
       Transliteration: '',
     },
   };
@@ -396,7 +396,7 @@ ipcMain.on('show-text', (event, arg) => {
     Line: {
       Gurmukhi: arg.isGurmukhi ? arg.text : '',
       English: !arg.isGurmukhi ? arg.text : '',
-      PunjabiUni: '',
+      Punjabi: '',
       Transliteration: '',
     },
   };

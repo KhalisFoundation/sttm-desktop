@@ -483,7 +483,7 @@ module.exports = {
     if (Line.Translations) {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;
-      Line.PunjabiUni = lineTranslations.puu.ss;
+      Line.Punjabi = lineTranslations.pu.ss;
     }
     Line.Transliteration = anvaad.translit(Line.Gurmukhi);
     return Line;
