@@ -6,8 +6,10 @@
 
 ### Improved:
 * Quick Tools will now overlay instead of push for a more accurate preview
-   
-   
+* Fixed an issue with Quick Tools when using certain themes
+* Bani Overlay will now clear the current shabad upon closing the app
+
+<br/>  
 <details><summary>See previous updates...</summary>
 
 ### 4.4.1 - _190223_
