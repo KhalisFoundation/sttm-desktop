@@ -226,10 +226,7 @@ const loadBanis = () => (
  *
  * @param {number} BaniID The specific Bani to get
  * @returns {object} Returns array of objects for each line
- * @example
  *
- * loadCeremony(3);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
 
 const loadBani = BaniID => (
