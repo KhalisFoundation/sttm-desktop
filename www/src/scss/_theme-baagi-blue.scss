@@ -58,6 +58,10 @@ $highlight-text: #cfd8dc;
 .baagi-blue {
   color: $text-base;
 
+  .viewer-controls {
+    background-color: $bg-main;
+  }
+
   #header {
     a {
       color: $text-base;
@@ -74,6 +78,11 @@ $highlight-text: #cfd8dc;
     background-color: $bg-main;
     color: $text-base;
   }
+
+  .shortcut-tray { background: darken($bg-main, 10); }
+  .tray-item-icon { background: $text-bright; }
+  .tray-item-label { color: $bg-main; }
+  &.shortcut-tray-on .shortcut-toggle { background: darken($bg-main, 10); }
 
   .nav-header-tab {
     color: $text-inactive;

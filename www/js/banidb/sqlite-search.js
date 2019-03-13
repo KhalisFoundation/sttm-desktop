@@ -17,7 +17,7 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
@@ -163,7 +163,7 @@ const loadShabad = ShabadID => (
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {
@@ -172,6 +172,33 @@ const loadShabad = ShabadID => (
     });
   })
 );
+
+
+/**
+ * Retrieve all lines from a Ceremony
+ *
+ * @param {number} CeremonyID The specific Ceremony to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadCeremony(3);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadCeremony = CeremonyID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
+
 
 /**
  * Retrieve the Ang number and source for any given ShabadID
@@ -280,6 +307,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadCeremony,
   getAng,
   loadAng,
   getShabad,

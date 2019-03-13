@@ -652,6 +652,17 @@ module.exports = {
     }
   },
 
+
+  loadCeremony(ceremonyID) {
+    const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.innerHTML = '';
+    banidb.loadCeremony(ceremonyID)
+      .then(rowsDb => {
+        const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
+        return this.printShabad(rows);
+      });
+  },
+
   loadAng(PageNo, SourceID) {
     banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
@@ -679,7 +690,7 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
-    const shabadID = ShabadID || rows[0].Shabads[0].ShabadID;
+    const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
     let mainLine;
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');

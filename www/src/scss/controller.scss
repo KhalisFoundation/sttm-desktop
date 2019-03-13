@@ -4,6 +4,18 @@ $sttm-blue: #29679b;
 $transition-time: 600ms;
 $transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
 
+$footerOffset: 40px;
+$shortcutTrayHeight: 70px;
+$totalSessionOffset: $footerOffset + $shortcutTrayHeight;
+$sessionPageHeight: calc(100% - #{$totalSessionOffset});
+
+.presenter-view.shortcut-tray-on {
+  #main-ui,
+  .nav-page:nth-child(2) {
+    height: $sessionPageHeight;
+  }
+}
+
 /*
   Fonts
 */
@@ -58,8 +70,9 @@ ul {
 }
 
 #main-ui {
-  height: calc(100% - 40px); //Full-height minus header, search, and footer
+  height: calc(100% - #{$footerOffset}); //Full-height minus header, search, and footer
   position: relative;
+  transition: 0.5s height ease;
 }
 
 .minimized {
@@ -133,10 +146,11 @@ ul {
   }
 
   .block-list {
-    height: calc(100% - 40px);
+    height: calc(100% - #{$footerOffset});
     margin: 0;
     overflow-y: auto;
     position: relative;
+    transition: 0.5s height ease;
     width: 100%;
 
     ul {
@@ -165,6 +179,67 @@ ul {
   height: calc(100% + 40px);
   overflow-y: auto;
   z-index: 3;
+}
+
+.shortcut-toggle {
+  cursor: pointer;
+  display: none;
+  font-size: 14px;
+  height: 40px;
+  line-height: 40px;
+  transition: 0.5s all ease;
+  vertical-align: -webkit-baseline-middle;
+
+  .shortcut-toggle-icon {
+    height: 40px;
+    text-align: center;
+    width: 40px;
+  }
+}
+
+.presenter-view .shortcut-toggle {
+  display: block;
+}
+
+.presenter-view.shortcut-tray-on .shortcut-tray {
+  height: 70px;
+  overflow-y: auto;
+}
+
+.shortcut-tray {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  height: 0;
+  justify-content: space-around;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  transition: 0.5s all ease;
+
+  .tray-item-icon {
+    align-items: center;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    height: 50px;
+    justify-content: center;
+    margin: 5px auto;
+    min-width: 100px;
+    padding: 10px;
+    transition: 0.5s all ease;
+
+    &:hover {
+      box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
+      transform: translateY(-4px);
+    }
+
+    &:active {
+      box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
+      transform: translateY(1px);
+    }
+  }
 }
 
 #session {
