@@ -2,6 +2,7 @@ $presenter-pane-gap: 25px;
 $title-bar-offset: 25px;
 $keyboard-height:128px;
 $toolbar-offset: 75px;
+$toolbar-small-offset: 50px;
 $toolbar-width-offset: $toolbar-offset/2;
 $bani-list-width: 300px;
 
@@ -91,13 +92,15 @@ a {
 }
 
 #toolbar {
-  @extend .fullscreen-fixed;
-
   align-items: center;
   display: flex;
   flex-direction: column;
-  padding-top: $presenter-pane-gap;
-  width: $toolbar-offset;
+  height: 100%;
+  left: -$toolbar-small-offset;
+  padding-top: 10px;
+  position: absolute;
+  top: 0;
+  width: $toolbar-small-offset;
   z-index: 1300;
 
   .toolbar-item {
@@ -105,9 +108,9 @@ a {
     background-size: cover;
     border-radius: 5px;
     cursor: pointer;
-    height: 60px;
+    height: 40px;
     transition: 0.5s all ease;
-    width: 60px;
+    width: 40px;
 
     &:hover {
       box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
@@ -120,12 +123,12 @@ a {
   }
 
   .bani-list {
-    height: calc(100vh - #{$presenter-pane-gap * 2});
-    left: $toolbar-offset + $presenter-pane-gap;
+    bottom: 0;
+    height: 300px;
     overflow: hidden;
     position: fixed;
-    top: $presenter-pane-gap;
-    width: $bani-list-width;
+    right: 0;
+    width: 500px;
     word-wrap: break-word;
 
     .sunder-gutka-bani {
@@ -160,9 +163,9 @@ a {
   }
 
   .bani-extras {
-    left: $toolbar-offset + $bani-list-width + ($presenter-pane-gap * 2);
+    bottom: 325px;
     position: fixed;
-    top: $presenter-pane-gap;
+    right: 250px;
     width: $bani-list-width;
 
     .bani-group {
@@ -212,6 +215,30 @@ a {
 
   #tool-sunder-gutka {
     background-image: url('../../assets/img/icons/sunder_gutka.png');
+  }
+}
+
+.presenter-view #toolbar {
+  @extend .fullscreen-fixed;
+
+  padding-top: $presenter-pane-gap;
+  width: $toolbar-offset;
+
+  .toolbar-item {
+    height: 60px;
+    width: 60px;
+  }
+
+  .bani-list {
+    height: calc(100vh - #{$presenter-pane-gap * 2});
+    left: $toolbar-offset + $presenter-pane-gap;
+    top: $presenter-pane-gap;
+    width: $bani-list-width;
+  }
+
+  .bani-extras {
+    left: $toolbar-offset + $bani-list-width + ($presenter-pane-gap * 2);
+    top: $presenter-pane-gap;
   }
 }
 
