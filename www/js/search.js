@@ -670,7 +670,9 @@ module.exports = {
       .then(rowsDb => {
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
+          // when object from db is not a verse itself
           if (rowDb.Verse) row = rowDb.Verse;
+          // when its a custom panktee (decorator, bani heading, etc)
           if (rowDb.Custom) row = rowDb.Custom;
           return row;
         });
