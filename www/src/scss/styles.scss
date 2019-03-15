@@ -124,6 +124,28 @@ a {
     }
   }
 
+  .close-overlay-ui {
+    border: 2px solid white;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    height: 40px;
+    line-height: 35px;
+    position: fixed;
+    right: $presenter-pane-gap;
+    text-align: center;
+    top: $presenter-pane-gap;
+    width: 40px;
+
+    i {
+      transition: 0.3s all ease;
+    }
+
+    &:hover i {
+      transform: scale(1.3);
+    }
+  }
+
   .bani-list {
     bottom: 0;
     height: 300px;

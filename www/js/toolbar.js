@@ -78,8 +78,16 @@ const printBanis = (rows) => {
 const toolbarItemFactory = toolbarItem => h(
   `div.toolbar-item#tool-${toolbarItem}`,
   {
-    onclick: toggleOverlayUI
+    onclick: toggleOverlayUI,
   },
+);
+
+const closeOverlayUI = h(
+  'div.close-overlay-ui.overlay-ui.hidden',
+  {
+    onclick: toggleOverlayUI,
+  },
+  h('i.fa.fa-times'),
 );
 
 
@@ -87,6 +95,7 @@ module.exports = {
   init() {
     toolbarItems.forEach((toolbarItem) => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
+      $toolbar.appendChild(closeOverlayUI);
       $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
       $baniExtras.appendChild(baniGroupFactory('popular banis'));
       banidb.loadBanis().then(rows => printBanis(rows));
