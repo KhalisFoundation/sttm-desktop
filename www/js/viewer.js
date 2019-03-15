@@ -219,6 +219,7 @@ const createCards = (rows, LineID) => {
     row = rows[key];
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
+    // for some custom panktees that don't have Gurmukhi field
     const gurmukhiShabads = row.Gurmukhi ? row.Gurmukhi.split(' ') : row.PunjabiUni.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {

@@ -78,9 +78,7 @@ const printBanis = (rows) => {
 const toolbarItemFactory = toolbarItem => h(
   `div.toolbar-item#tool-${toolbarItem}`,
   {
-    onclick: () => {
-      toggleOverlayUI();
-    },
+    onclick: toggleOverlayUI
   },
 );
 

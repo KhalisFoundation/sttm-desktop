@@ -5,6 +5,8 @@ $toolbar-offset: 75px;
 $toolbar-small-offset: 50px;
 $toolbar-width-offset: $toolbar-offset/2;
 $bani-list-width: 300px;
+$tag-nitnem-color: #5488d6;
+$tag-popular-color: #ce744e;
 
 @mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
   $screen-offset: 50 * $row-num;
@@ -144,11 +146,11 @@ a {
       width: 10px;
 
       &.tag-nitnem {
-        background-color: #5488d6;
+        background-color: $tag-nitnem-color;
       }
 
       &.tag-popular {
-        background-color: #ce744e;
+        background-color: $tag-popular-color;
       }
     }
 
@@ -200,11 +202,11 @@ a {
       }
 
       &.nitnem-bani {
-        background-color: #5488d6;
+        background-color: $tag-nitnem-color;
       }
 
       &.popular-bani {
-        background-color: #ce744e;
+        background-color: $tag-popular-color;
       }
     }
 

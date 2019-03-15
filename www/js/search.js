@@ -724,12 +724,15 @@ module.exports = {
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
       }
+
+      const mainLineExists = !!document.querySelector('.main.seen_check');
+
       const shabadLine = h(
         'li',
         {},
         h(
           `a#line${item.ID}.panktee${
-            parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
+            (parseInt(lineID, 10) === item.ID) && !mainLineExists ? '.current.main.seen_check' : ''
           }`,
           {
             'data-line-id': item.ID,
