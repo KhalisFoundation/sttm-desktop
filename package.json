@@ -26,7 +26,7 @@
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "postinstall": "electron-builder install-app-deps",
     "test:pr": "npm run test && npm run pack:mac && npm run test:integration:mac",
-    "test:integration:mac": "TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax jest",
+    "test:integration:mac": "NODE_ENV=testing TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax jest",
     "test:integration:debug": "TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax node $NODE_DEBUG_OPTION node_modules/jest/bin/jest"
   },
   "repository": {
@@ -72,7 +72,7 @@
     "copy-to-clipboard": "^3.0.8",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
-    "electron-updater": "^2.21.0",
+    "electron-updater": "^4.0.6",
     "express": "^4.15.2",
     "extract-zip": "^1.6.7",
     "get-json": "^1.0.0",

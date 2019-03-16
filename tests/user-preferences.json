@@ -1,0 +1,109 @@
+{
+  "userPrefs": {
+    "app": {
+      "theme": "light-theme",
+      "themebg": {
+        "type": "default",
+        "url": "assets/img/custom_backgrounds/undefined"
+      },
+      "layout": {
+        "presenter-view": true
+      },
+      "analytics": {
+        "collect-statistics": true
+      },
+      "custom-theme-options": {
+        "show-theme-editor": true
+      },
+      "live-feed-location": "default"
+    },
+    "searchResults": {
+      "translationEnglish": "ssk",
+      "transliteration": true,
+      "meta": true
+    },
+    "slide-layout": {
+      "fields": {
+        "display-translation": true,
+        "display-transliteration": true,
+        "display-teeka": true,
+        "display-next-line": false
+      },
+      "font-sizes": {
+        "gurbani": 9,
+        "translation": 5,
+        "transliteration": 4,
+        "teeka": 4
+      },
+      "autoplay-options": {
+        "autoplayTimer": 10
+      },
+      "display-options": {
+        "disable-akhandpaatt": false,
+        "akhandpaatt": false,
+        "larivaar": false,
+        "left-align": false,
+        "quick-tools": true,
+        "shortcut-tray-on": true
+      }
+    },
+    "notification-timestamp": "2019-03-16 15:05:23"
+  },
+  "gurmukhiKB": false,
+  "changelog-seen": "5.0.0",
+  "searchOptions": {
+    "searchLanguage": "gr",
+    "searchType": 0,
+    "searchSource": "all"
+  },
+  "obs": {
+    "overlayPrefs": {
+      "overlayVars": {
+        "layout": "split",
+        "bgColor": "#2c3e50",
+        "bgOpacity": 1,
+        "textColor": "#EAC445",
+        "padding": 0.5,
+        "fontSize": 3,
+        "gurbaniFontSize": 5,
+        "gurbaniTextColor": "#EAC445",
+        "showLogo": true,
+        "overlayLarivaar": false
+      },
+      "gurbani": {
+        "bottom": 156,
+        "height": 42,
+        "left": 280,
+        "right": 1080,
+        "top": 114,
+        "width": 800
+      },
+      "teeka": {
+        "bottom": 192,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 156,
+        "width": 800
+      },
+      "translation": {
+        "bottom": 564,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 528,
+        "width": 800
+      },
+      "transliteration": {
+        "bottom": 528,
+        "height": 36,
+        "left": 280,
+        "right": 1080,
+        "top": 492,
+        "width": 800
+      }
+    }
+  },
+  "userId": "97128e62-bba6-4564-a44d-6ea21c1966bb",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) SikhiToTheMax/5.0.0 Chrome/59.0.3071.115 Electron/1.8.8 Safari/537.36"
+}

@@ -24,29 +24,66 @@ describe('Application launch', () => {
     return false;
   });
 
-  test('true is true', async () => { // true
+  test('should test true is true', async () => { // true
     expect(true).toBe(true);
   });
 
-  test('app is visible', async () => {
+  test('should be visible', async () => {
     const isVisible = await app.browserWindow.isVisible();
     expect(isVisible).toBe(true);
   });
 
-  test('app has the correct title', async () => {
+  test('should have the correct title', async () => {
     const title = await app.client.getTitle();
     expect(title).toBe('SikhiToTheMax');
   });
 
-  test('app the changelog open', async () => {
-    // the main window, the display window, and the change log.
-    expect(await app.client.getWindowCount()).toBe(3);
+  describe('Nav tabs', () => {
+    test('should be able to click on the tabs', async () => {
+      const mainTabString = await app.client.getAttribute('#history-tab-content', 'class');
+      const mainTab = mainTabString.split(' ');
+      expect(mainTab).toContain('active');
+
+      await app.client.click('#themes-tab');
+      let classListString = await app.client.getAttribute('#themes-tab-content', 'class');
+      let classList = classListString.split(' ');
+      expect(classList).toContain('active');
+
+      await app.client.click('#insert-tab');
+      classListString = await app.client.getAttribute('#insert-tab-content', 'class');
+      classList = classListString.split(' ');
+      expect(classList).toContain('active');
+
+      await app.client.click('#settings-tab');
+      classListString = await app.client.getAttribute('#settings-tab-content', 'class');
+      classList = classListString.split(' ');
+      expect(classList).toContain('active');
+    });
   });
 
-  test('app contains default theme', async () => {
-    const classListString = await app.client.getAttribute('body', 'class');
-    const classList = classListString.split(' ');
+  describe('Themes', () => {
+    test('app contains default theme', async () => {
+      const classListString = await app.client.getAttribute('body', 'class');
+      const classList = classListString.split(' ');
 
-    expect(classList).toContain('light-theme');
+      expect(classList).toContain('light-theme');
+    });
+
+    test('that the tabs are clickable', async () => {
+      await app.client.click('#themes-tab');
+      await app.client.click('.Dark');
+
+      let classListString = await app.client.getAttribute('body', 'class');
+      let classList = classListString.split(' ');
+
+      expect(classList).toContain('dark-theme');
+
+      await app.client.click('.Light');
+
+      classListString = await app.client.getAttribute('body', 'class');
+      classList = classListString.split(' ');
+
+      expect(classList).toContain('light-theme');
+    });
   });
 });
