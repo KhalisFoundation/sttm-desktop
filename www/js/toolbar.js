@@ -1,5 +1,8 @@
 const h = require('hyperscript');
 const banidb = require('./banidb');
+const { remote } = require('electron');
+
+const analytics = remote.getGlobal('analytics');
 
 const toolbarItems = ['sunder-gutka'];
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 22];
@@ -38,6 +41,7 @@ const extrasTile = (tileType, row) => h(
     onclick: () => {
       global.core.search.loadBani(row.ID);
       toggleOverlayUI();
+      analytics.trackEvent('sunderGutkaBanis', tileType, row.token);
     },
   },
   h('div.gurmukhi', row.Gurmukhi),
@@ -64,6 +68,7 @@ const printBanis = (rows) => {
       'li.sunder-gutka-bani.gurmukhi',
       {
         onclick: () => {
+          analytics.trackEvent('sunderGutkaBanis', row.token);
           global.core.search.loadBani(row.ID);
           toggleOverlayUI();
         },
