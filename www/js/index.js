@@ -21,8 +21,9 @@ function hideSlide() {
   global.controller.sendText('');
 }
 
-function highlightLine(newLine) {
-  const $line = search.$shabad.querySelector(`#line${newLine}`);
+function highlightLine(newLine, currentLineCount = null) {
+  const nextLineSelector = currentLineCount ? `#li_${(parseInt(currentLineCount, 10)) + 1} a.panktee` : `#line${newLine}`;
+  const $line = search.$shabad.querySelector(nextLineSelector);
   $line.click();
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
@@ -72,8 +73,9 @@ function prevLine(e) {
 function nextLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
+  const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
   if (pos < search.currentShabad.length - 1) {
-    highlightLine(search.currentShabad[pos + 1]);
+    highlightLine(search.currentShabad[pos + 1], $currentLine.dataset.lineCount);
   }
   e.preventDefault();
 }

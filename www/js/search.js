@@ -720,7 +720,11 @@ module.exports = {
       }
     }
 
+    let lineCount = 0;
+
     rows.forEach((item) => {
+      lineCount += 1;
+
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
       }
@@ -728,8 +732,10 @@ module.exports = {
       const mainLineExists = !!document.querySelector('.main.seen_check');
 
       const shabadLine = h(
-        'li',
-        {},
+        `li#li_${lineCount}`,
+        {
+          'data-line-count': lineCount,
+        },
         h(
           `a#line${item.ID}.panktee${
             (parseInt(lineID, 10) === item.ID) && !mainLineExists ? '.current.main.seen_check' : ''
