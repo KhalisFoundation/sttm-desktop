@@ -69,7 +69,7 @@ const printBanis = (rows) => {
         },
       },
       h(`span.tag.tag-${baniTag}`),
-      `${row.Gurmukhi}(${row.ID})`,
+      `${row.Gurmukhi}`,
     );
     $sunderGutkaBanis.appendChild($bani);
   });
