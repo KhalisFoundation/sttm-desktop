@@ -221,7 +221,7 @@ const loadBanis = () => (
     }
     Realm.open(realmConfig)
     .then((realm) => {
-      const rows = realm.objects('Banis').sorted('ID');
+      const rows = realm.objects('Banis').filtered('ID < 10000').sorted('ID');
       if (rows.length > 0) {
         resolve(rows);
       }
