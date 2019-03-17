@@ -211,7 +211,7 @@ const loadBanis = () => (
     if (!initialized) {
       init();
     }
-    db.all('SELECT ID, Token, Gurmukhi, GurmukhiUni, Transliteration FROM Banis ORDER BY ID', (err, rows) => {
+    db.all('SELECT ID, Token, Gurmukhi, GurmukhiUni, Transliteration FROM Banis WHERE ID < 10000 ORDER BY ID', (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {
