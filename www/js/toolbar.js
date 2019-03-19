@@ -1,12 +1,13 @@
 const h = require('hyperscript');
 const banidb = require('./banidb');
 const { remote } = require('electron');
+const anvaad = require('anvaad-js');
 
 const analytics = remote.getGlobal('analytics');
 
 const toolbarItems = ['sunder-gutka'];
-const nitnemBanis = [2, 4, 6, 9, 10, 20, 22];
-const popularBanis = [90, 22, 30, 31];
+const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
+const popularBanis = [90, 30, 31, 22];
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
@@ -25,6 +26,24 @@ const toggleOverlayUI = () => {
     uiElement.classList.toggle('hidden');
   });
 };
+
+const translitSwitch = h(
+  'div.translit-switch',
+  [
+    h('span', 'Abc'),
+    h('div.switch',
+      [
+        h('input#sg-translit-toggle',
+          {
+            name: 'hg-trasnlit-toggle',
+            type: 'checkbox',
+            onclick: () => {
+              $baniList.classList.toggle('translit');
+            },
+            value: 'sg-translit' }),
+        h('label',
+          {
+            htmlFor: 'sg-translit-toggle' })])]);
 
 const baniGroupFactory = (baniGroupName) => {
   const baniGroupClass = baniGroupName.replace(/ /g, '-');
@@ -65,7 +84,7 @@ const printBanis = (rows) => {
       $popularBanis.appendChild(extrasTileFactory('popular-bani', row));
     }
     const $bani = h(
-      'li.sunder-gutka-bani.gurmukhi',
+      'li.sunder-gutka-bani',
       {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.token);
@@ -74,7 +93,8 @@ const printBanis = (rows) => {
         },
       },
       h(`span.tag.tag-${baniTag}`),
-      `${row.Gurmukhi}`,
+      h('span.gurmukhi.gurmukhi-bani', row.Gurmukhi),
+      h('span.translit-bani', anvaad.translit(row.Gurmukhi)),
     );
     $sunderGutkaBanis.appendChild($bani);
   });
@@ -101,6 +121,7 @@ module.exports = {
     toolbarItems.forEach((toolbarItem) => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
       $toolbar.appendChild(closeOverlayUI);
+      $baniList.querySelector('header').appendChild(translitSwitch);
       $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
       $baniExtras.appendChild(baniGroupFactory('popular banis'));
       banidb.loadBanis().then(rows => printBanis(rows));

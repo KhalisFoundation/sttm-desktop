@@ -160,6 +160,25 @@ a {
       padding: 0.3rem 1rem;
     }
 
+    header,
+    .translit-switch {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .translit-switch { display: none; }
+
+    .translit-bani {
+      display: none;
+      text-transform: capitalize;
+    }
+
+    &.translit {
+      .translit-bani { display: inline; }
+      .gurmukhi-bani { display: none; }
+    }
+
     ul {
       padding-bottom: 40px;
     }
