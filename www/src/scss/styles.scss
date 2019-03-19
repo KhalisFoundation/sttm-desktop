@@ -93,6 +93,18 @@ a {
   }
 }
 
+.small,
+.medium,
+.large,
+.extraLarge {
+  display:none;
+}
+
+.bani-length-4 .extraLarge { display: block; }
+.bani-length-3 .large { display: block; }
+.bani-length-2 .medium { display:  block; }
+.bani-length-1 .small { display: block; }
+
 #toolbar {
   align-items: center;
   display: flex;
@@ -145,6 +157,8 @@ a {
       transform: scale(1.3);
     }
   }
+
+
 
   .bani-list {
     bottom: 0;

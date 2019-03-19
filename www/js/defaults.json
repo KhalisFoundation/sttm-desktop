@@ -4,7 +4,7 @@
       "theme": "light-theme",
       "themebg": "",
       "layout": {
-        "presenter-view": true
+        "presenterview": true
       },
       "analytics": {
         "collect-statistics": true
@@ -34,6 +34,9 @@
       },
       "autoplay-options": {
         "autoplayTimer": 10
+      },
+      "sunder-gutka": {
+        "bani-length": 4
       },
       "display-options": {
         "disable-akhandpaatt": false,

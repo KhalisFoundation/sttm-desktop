@@ -674,6 +674,14 @@ module.exports = {
           if (rowDb.Verse) { row = rowDb.Verse; }
           // when its a custom panktee (decorator, bani heading, etc)
           if (rowDb.Custom) { row = rowDb.Custom; }
+
+          row.baniLength = {
+            small : rowDb.existsSGPC,
+            medium: rowDb.existsMedium,
+            large: rowDb.existsTaksal,
+            extraLarge: rowDb.existsBuddhaDal
+          };
+
           return row;
         });
 
@@ -730,9 +738,11 @@ module.exports = {
       }
 
       const mainLineExists = !!document.querySelector('.main.seen_check');
+      
+      const baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
 
       const shabadLine = h(
-        `li#li_${lineCount}`,
+        `li#li_${lineCount}.${baniLengthClasses}`,
         {
           'data-line-count': lineCount,
         },
