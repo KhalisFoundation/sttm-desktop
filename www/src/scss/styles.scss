@@ -300,6 +300,8 @@ body.show-overlay {
 
   &.minimized {
     height: 40px;
+
+    #toolbar { display: none; }
   }
 }
 

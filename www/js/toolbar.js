@@ -35,7 +35,7 @@ const baniGroupFactory = (baniGroupName) => {
   );
 };
 
-const extrasTile = (tileType, row) => h(
+const extrasTileFactory = (tileType, row) => h(
   `div.extras-tile.${tileType}`,
   {
     onclick: () => {
@@ -58,11 +58,11 @@ const printBanis = (rows) => {
     let baniTag = 'none';
     if (nitnemBanis.includes(row.ID)) {
       baniTag = 'nitnem';
-      $nitnemBanis.appendChild(extrasTile('nitnem-bani', row));
+      $nitnemBanis.appendChild(extrasTileFactory('nitnem-bani', row));
     }
     if (popularBanis.includes(row.ID)) {
       baniTag = 'popular';
-      $popularBanis.appendChild(extrasTile('popular-bani', row));
+      $popularBanis.appendChild(extrasTileFactory('popular-bani', row));
     }
     const $bani = h(
       'li.sunder-gutka-bani.gurmukhi',
