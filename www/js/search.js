@@ -676,10 +676,10 @@ module.exports = {
           if (rowDb.Custom) { row = rowDb.Custom; }
 
           row.baniLength = {
-            small : rowDb.existsSGPC,
+            small: rowDb.existsSGPC,
             medium: rowDb.existsMedium,
             large: rowDb.existsTaksal,
-            extraLarge: rowDb.existsBuddhaDal
+            extraLarge: rowDb.existsBuddhaDal,
           };
 
           return row;
@@ -738,7 +738,6 @@ module.exports = {
       }
 
       const mainLineExists = !!document.querySelector('.main.seen_check');
-      
       const baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
 
       const shabadLine = h(

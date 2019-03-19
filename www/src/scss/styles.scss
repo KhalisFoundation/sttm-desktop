@@ -97,12 +97,12 @@ a {
 .medium,
 .large,
 .extraLarge {
-  display:none;
+  display: none;
 }
 
 .bani-length-4 .extraLarge { display: block; }
 .bani-length-3 .large { display: block; }
-.bani-length-2 .medium { display:  block; }
+.bani-length-2 .medium { display: block; }
 .bani-length-1 .small { display: block; }
 
 #toolbar {
@@ -157,8 +157,6 @@ a {
       transform: scale(1.3);
     }
   }
-
-
 
   .bani-list {
     bottom: 0;
