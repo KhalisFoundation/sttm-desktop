@@ -60,7 +60,7 @@ const extrasTileFactory = (tileType, row) => h(
     onclick: () => {
       global.core.search.loadBani(row.ID);
       toggleOverlayUI();
-      analytics.trackEvent('sunderGutkaBanis', tileType, row.token);
+      analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
     },
   },
   h('div.gurmukhi', row.Gurmukhi),
@@ -87,7 +87,7 @@ const printBanis = (rows) => {
       'li.sunder-gutka-bani',
       {
         onclick: () => {
-          analytics.trackEvent('sunderGutkaBanis', row.token);
+          analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
           toggleOverlayUI();
         },
