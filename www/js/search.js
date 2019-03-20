@@ -663,6 +663,13 @@ module.exports = {
       });
   },
 
+  getLineId(rows) {
+    const baniLengthList = ['small', 'medium', 'large', 'extraLarge'];
+    const baniLength = store.getUserPref('slide-layout.sunder-gutka.bani-length');
+    const line = rows.find((row) => row.baniLength[baniLengthList[baniLength]]);
+    return line ? line.ID : null;
+  },
+
   loadBani(BaniID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
@@ -678,7 +685,6 @@ module.exports = {
           if (rowDb.Custom) {
             row = rowDb.Custom;
             row.shabadID = rowDb.Bani.Token;
-            row.CID = `c-${row.ID}`;
           }
 
           row.baniLength = {
@@ -690,7 +696,8 @@ module.exports = {
 
           return row;
         });
-        return this.printShabad(rows, shabadID);
+        const lineID = this.getLineId(rows);
+        return this.printShabad(rows, shabadID, lineID);
       });
   },
 
@@ -718,6 +725,7 @@ module.exports = {
         this.printShabad(rows, adjacentShabadID);
       });
   },
+
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
