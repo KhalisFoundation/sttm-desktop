@@ -42,6 +42,10 @@ $base-text: #4e4e4e;
 $base-text-inactive: rgba(78, 78, 78, 0.5);
 
 .light-theme {
+  .viewer-controls {
+    background-color: $nav-bg;
+  }
+
   #header {
     a {
       color: $base-text;
