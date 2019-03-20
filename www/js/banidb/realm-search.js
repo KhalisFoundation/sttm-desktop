@@ -207,7 +207,6 @@ const loadCeremony = ceremonyID => (
     .then((realm) => {
       const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
       if (rows.length > 0) {
-        console.log(rows);
         resolve(rows);
       }
     })
