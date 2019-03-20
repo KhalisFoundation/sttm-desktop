@@ -21,8 +21,8 @@ function hideSlide() {
   global.controller.sendText('');
 }
 
-function highlightLine(newLine, currentLineCount = null) {
-  const nextLineSelector = currentLineCount ? `#li_${(parseInt(currentLineCount, 10)) + 1} a.panktee` : `#line${newLine}`;
+function highlightLine(newLine, nextLineCount = null) {
+  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
   const $line = search.$shabad.querySelector(nextLineSelector);
   $line.click();
   const curPankteeTop = $line.parentNode.offsetTop;
@@ -58,8 +58,10 @@ function spaceBar(e) {
 function prevLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
+  const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
+  const prevLineCount = (parseInt($currentLine.dataset.lineCount, 10)) - 1;
   if (pos > 0) {
-    highlightLine(search.currentShabad[pos - 1]);
+    highlightLine(search.currentShabad[pos - 1], prevLineCount);
   }
   e.preventDefault();
 }
@@ -68,8 +70,9 @@ function nextLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
+  const nextLineCount = (parseInt($currentLine.dataset.lineCount, 10)) + 1;
   if (pos < search.currentShabad.length - 1) {
-    highlightLine(search.currentShabad[pos + 1], $currentLine.dataset.lineCount);
+    highlightLine(search.currentShabad[pos + 1], nextLineCount);
   }
   e.preventDefault();
 }
