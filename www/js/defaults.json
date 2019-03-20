@@ -4,7 +4,7 @@
       "theme": "light-theme",
       "themebg": "",
       "layout": {
-        "presenterview": true
+        "presenter-view": true
       },
       "analytics": {
         "collect-statistics": true
