@@ -216,7 +216,6 @@ const createCards = (rows, LineID) => {
   const lines = [];
   const shabad = {};
   // empty the object from previous values
-  // Object.keys(shabad).forEach(function(key) { delete shabad[key]; });
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
