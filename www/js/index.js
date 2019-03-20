@@ -57,11 +57,10 @@ function spaceBar(e) {
 
 function prevLine(e) {
   // Find position of current line in Shabad
-  const pos = search.currentShabad.indexOf(search.currentLine);
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const prevLineCount = (parseInt($currentLine.dataset.lineCount, 10)) - 1;
-  if (pos > 0) {
-    highlightLine(search.currentShabad[pos - 1], prevLineCount);
+  const prevLineCount = parseInt($currentLine.dataset.lineCount, 10) - 1;
+  if (prevLineCount > 0) {
+    highlightLine(null, prevLineCount);
   }
   e.preventDefault();
 }
