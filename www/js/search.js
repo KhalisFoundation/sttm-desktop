@@ -666,14 +666,20 @@ module.exports = {
   loadBani(BaniID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
+    currentShabad.splice(0, currentShabad.length);
     banidb.loadBani(BaniID)
       .then(rowsDb => {
+        const shabadID = rowsDb[0].Bani.Token;
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
           // when object from db is not a verse itself
           if (rowDb.Verse) { row = rowDb.Verse; }
           // when its a custom panktee (decorator, bani heading, etc)
-          if (rowDb.Custom) { row = rowDb.Custom; }
+          if (rowDb.Custom) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Bani.Token;
+            row.CID = `c-${row.ID}`;
+          }
 
           row.baniLength = {
             small: rowDb.existsSGPC,
@@ -684,8 +690,7 @@ module.exports = {
 
           return row;
         });
-
-        return this.printShabad(rows);
+        return this.printShabad(rows, shabadID);
       });
   },
 
@@ -729,7 +734,6 @@ module.exports = {
     }
 
     let lineCount = 0;
-
     rows.forEach((item) => {
       lineCount += 1;
 
@@ -738,7 +742,11 @@ module.exports = {
       }
 
       const mainLineExists = !!document.querySelector('.main.seen_check');
-      const baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
+
+      let baniLengthClasses = 'noLength';
+      if (item.baniLength) {
+        baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
+      }
 
       const shabadLine = h(
         `li#li_${lineCount}.${baniLengthClasses}`,

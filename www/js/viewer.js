@@ -215,12 +215,13 @@ const createCards = (rows, LineID) => {
   const cards = [];
   const lines = [];
   const shabad = {};
+  // empty the object from previous values
+  // Object.keys(shabad).forEach(function(key) { delete shabad[key]; });
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
-    // for some custom panktees that don't have Gurmukhi field
-    const gurmukhiShabads = row.Gurmukhi ? row.Gurmukhi.split(' ') : row.PunjabiUni.split(' ');
+    const gurmukhiShabads = row.Gurmukhi.split(' ');
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
@@ -270,7 +271,7 @@ const createDeck = (cards, curSlide, shabad, ShabadID) => {
   }
   // Wait a tiny bit for rendering to finish before scrolling to the slide
   setTimeout(() => smoothScroll(`#slide${curSlide}`), 100);
-  currentShabad = parseInt(ShabadID, 10);
+  currentShabad = parseInt(ShabadID, 10) || ShabadID;
   decks[ShabadID] = shabad;
   castShabadLine(curSlide);
 };
@@ -309,7 +310,7 @@ const smoothScroll = (pos = 0) => {
 };
 
 const showLine = (ShabadID, LineID, rows) => {
-  const newShabadID = parseInt(ShabadID, 10);
+  const newShabadID = parseInt(ShabadID, 10) || ShabadID;
   if (apv && infiniteScroll) {
     createAPVContainer();
     if (!apvCur.ShabadID || apvCur.ShabadID !== ShabadID) {
@@ -327,11 +328,9 @@ const showLine = (ShabadID, LineID, rows) => {
       currentShabad = newShabadID;
     }
     [...$shabadDeck.querySelectorAll('.slide')].forEach(el => el.classList.remove('active'));
-    const line = document.getElementById(`slide${LineID}`);
-    if (line) {
-      line.classList.add('active');
-      smoothScroll(line);
-    }
+    const line = document.querySelector(`.deck.active #slide${LineID}`);
+    line.classList.add('active');
+    smoothScroll(line);
     castShabadLine(LineID);
   } else {
     const { cards, shabad } = createCards(rows, LineID);
