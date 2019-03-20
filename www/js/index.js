@@ -48,13 +48,7 @@ function spaceBar(e) {
   let newLineId = mainLineID;
 
   if (mainLineID === currentLineId) {
-    let done = false;
-    search.$shabad.querySelectorAll('a.panktee').forEach((item) => {
-      if (!item.classList.contains(['seen_check']) && !done) {
-        newLineId = item.dataset.lineId;
-        done = true;
-      }
-    });
+    newLineId = search.$shabad.querySelector('a.panktee:not(.seen_check)').dataset.lineId;
   }
 
   highlightLine(newLineId);
