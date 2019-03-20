@@ -162,14 +162,14 @@ const loadShabad = ShabadID => (
 );
 
 /**
- * Retrieve all lines from a Shabad
+ * Retrieve all lines from a Bani
  *
- * @param {number} ShabadID The specific Shabad to get
+ * @param {number} BaniID The specific Bani to get
  * @returns {object} Returns array of objects for each line
  * @example
  *
- * loadShabad(2776);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ * loadBani(2);
+ * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
  */
 const loadBani = BaniID => (
   new Promise((resolve, reject) => {
@@ -195,7 +195,7 @@ const loadBani = BaniID => (
  * @example
  *
  * loadCeremony(3);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ * // => [{ Ceremony: { ID: 26106, Seq:2,...},...}]
  */
 
 const loadCeremony = ceremonyID => (
@@ -207,6 +207,7 @@ const loadCeremony = ceremonyID => (
     .then((realm) => {
       const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
       if (rows.length > 0) {
+        console.log(rows);
         resolve(rows);
       }
     })
