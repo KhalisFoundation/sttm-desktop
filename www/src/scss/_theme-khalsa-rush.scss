@@ -39,6 +39,11 @@ $base-text: #4e4e4e;
 $base-text-inactive: rgba(78, 78, 78, 0.5);
 
 .khalsa-rush {
+  #toolbar,
+  .bani-list {
+    background-color: $nav-bg;
+  }
+  
   .deck {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   }
