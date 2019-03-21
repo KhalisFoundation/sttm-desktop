@@ -263,6 +263,20 @@ const emptyOverlay = () => {
   }
 };
 
+const shouldQuit = app.makeSingleInstance(() => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+    mainWindow.focus();
+  }
+});
+
+if (shouldQuit) {
+  app.quit();
+}
+
 app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
