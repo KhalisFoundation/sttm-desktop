@@ -35,6 +35,7 @@
       "autoplay-options": {
         "autoplayTimer": 10
       },
+      "vishraam-options": "colored-words",
       "sunder-gutka": {
         "bani-length": 4
       },
@@ -42,6 +43,7 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
+        "display-visraams": false,
         "left-align": false,
         "quick-tools": true,
         "shortcut-tray-on": true

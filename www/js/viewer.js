@@ -221,16 +221,19 @@ const createCards = (rows, LineID) => {
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const gurmukhiShabads = row.Gurmukhi.split(' ');
+    if (row.Visraam) {
+      const visraams = JSON.parse(row.Visraam);
+      if (visraams.sttm) {
+        visraams.sttm.forEach((visraam) => {
+          const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
+          gurmukhiShabads[visraam.p] = `<span class=${visraamClass}>${gurmukhiShabads[visraam.p]}</span>`;
+        });
+      }
+    }
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       if (val.indexOf(']') !== -1) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-      /* } else if (val.includes(';')) {
-        const bisramWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
-      } else if (val.includes(',')) {
-        const yamkiWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`; */
       } else {
         taggedGurmukhi[index] = val;
       }

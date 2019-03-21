@@ -51,6 +51,7 @@
             "subLabel": "(Google ChromeCast Unavailable)"
           },
           "larivaar": "Larivaar",
+          "display-visraams": "Vishraams",
           "left-align": "Left-Align",
           "quick-tools": "Quick Tools",
           "shortcut-tray-on": "Shortcut Tray",
@@ -73,6 +74,14 @@
             "min": 1,
             "step": 1
           }
+        }
+      },
+      "vishraam-options": {
+        "title": "Vishraam Options",
+        "type": "radio",
+        "options": {
+          "colored-words": "Colored Words",
+          "gradient-bg": "Gradient Background"
         }
       },
       "sunder-gutka": {
