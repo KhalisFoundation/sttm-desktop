@@ -74,6 +74,18 @@
             "step": 1
           }
         }
+      },
+      "sunder-gutka": {
+        "title": "Sundar Gutka",
+        "type": "range",
+        "options": {
+          "bani-length": {
+            "title": "Bani Length",
+            "max": 4,
+            "min": 1,
+            "step": 1
+          }
+        }
       }
     }
   },

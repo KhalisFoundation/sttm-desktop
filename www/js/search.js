@@ -663,6 +663,44 @@ module.exports = {
       });
   },
 
+  getLineId(rows) {
+    const baniLengthList = ['small', 'medium', 'large', 'extraLarge'];
+    const baniLength = store.getUserPref('slide-layout.sunder-gutka.bani-length');
+    const line = rows.find((row) => row.baniLength[baniLengthList[baniLength]]);
+    return line ? line.ID : null;
+  },
+
+  loadBani(BaniID) {
+    const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.innerHTML = '';
+    currentShabad.splice(0, currentShabad.length);
+    banidb.loadBani(BaniID)
+      .then(rowsDb => {
+        const shabadID = rowsDb[0].Bani.Token;
+        const rows = rowsDb.map((rowDb) => {
+          let row = rowDb;
+          // when object from db is not a verse itself
+          if (rowDb.Verse) { row = rowDb.Verse; }
+          // when its a custom panktee (decorator, bani heading, etc)
+          if (rowDb.Custom) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Bani.Token;
+          }
+
+          row.baniLength = {
+            small: rowDb.existsSGPC,
+            medium: rowDb.existsMedium,
+            large: rowDb.existsTaksal,
+            extraLarge: rowDb.existsBuddhaDal,
+          };
+
+          return row;
+        });
+        const lineID = this.getLineId(rows);
+        return this.printShabad(rows, shabadID, lineID);
+      });
+  },
+
   loadAng(PageNo, SourceID) {
     banidb.loadAng(PageNo, SourceID)
       .then(rows => this.printShabad(rows));
@@ -688,6 +726,7 @@ module.exports = {
       });
   },
 
+
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
     const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
@@ -702,22 +741,35 @@ module.exports = {
       }
     }
 
+    let lineCount = 0;
     rows.forEach((item) => {
+      lineCount += 1;
+
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
       }
+
+      const mainLineExists = !!document.querySelector('.main.seen_check');
+
+      let baniLengthClasses = 'noLength';
+      if (item.baniLength) {
+        baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
+      }
+
       const shabadLine = h(
-        'li',
-        {},
+        `li#li_${lineCount}.${baniLengthClasses}`,
+        {
+          'data-line-count': lineCount,
+        },
         h(
           `a#line${item.ID}.panktee${
-            parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
+            (parseInt(lineID, 10) === item.ID) && !mainLineExists ? '.current.main.seen_check' : ''
           }`,
           {
             'data-line-id': item.ID,
             'data-main-letters': item.MainLetters,
             onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                           item.ID, item, rows),
+                          item.ID, item, rows),
           },
           [
             h('i.fa.fa-fw.fa-check'),

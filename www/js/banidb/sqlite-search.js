@@ -199,6 +199,50 @@ const loadCeremony = CeremonyID => (
   })
 );
 
+/**
+ * Retrieve all banis from database
+ *
+ * @returns {object} Returns array of objects containing all banis
+ *
+ */
+
+const loadBanis = () => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all('SELECT ID, Token, Gurmukhi, GurmukhiUni, Transliteration FROM Banis WHERE ID < 10000 ORDER BY ID', (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
+
+/**
+ * Retrieve all lines from a Bani
+ *
+ * @param {number} BaniID The specific Bani to get
+ * @returns {object} Returns array of objects for each line
+ *
+ */
+
+const loadBani = BaniID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID WHERE b.Bani = ${BaniID} ORDER BY b.Seq`, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
+  })
+);
 
 /**
  * Retrieve the Ang number and source for any given ShabadID
@@ -308,6 +352,8 @@ module.exports = {
   query,
   loadShabad,
   loadCeremony,
+  loadBanis,
+  loadBani,
   getAng,
   loadAng,
   getShabad,

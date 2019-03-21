@@ -162,6 +162,32 @@ const loadShabad = ShabadID => (
 );
 
 /**
+ * Retrieve all lines from a Bani
+ *
+ * @param {number} BaniID The specific Bani to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBani(2);
+ * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
+ */
+const loadBani = BaniID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then((realm) => {
+        const rows = realm.objects('Banis_Shabad').filtered('Bani.ID == $0', BaniID).sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  })
+);
+
+/**
  * Retrieve all lines from a Ceremony
  *
  * @param {number} CermonyID The specific Shabad to get
@@ -169,7 +195,7 @@ const loadShabad = ShabadID => (
  * @example
  *
  * loadCeremony(3);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ * // => [{ Ceremony: { ID: 26106, Seq:2,...},...}]
  */
 
 const loadCeremony = ceremonyID => (
@@ -188,6 +214,21 @@ const loadCeremony = ceremonyID => (
   })
 );
 
+const loadBanis = () => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+    .then((realm) => {
+      const rows = realm.objects('Banis').filtered('ID < 10000').sorted('ID');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -295,6 +336,8 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadBanis,
+  loadBani,
   loadCeremony,
   getAng,
   loadAng,

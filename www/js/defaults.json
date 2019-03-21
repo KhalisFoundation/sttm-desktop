@@ -35,6 +35,9 @@
       "autoplay-options": {
         "autoplayTimer": 10
       },
+      "sunder-gutka": {
+        "bani-length": 4
+      },
       "display-options": {
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
