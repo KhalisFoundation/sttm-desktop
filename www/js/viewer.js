@@ -69,7 +69,7 @@ const castShabadLine = (lineID) => {
       decks[currentShabad][lineID],
       {
         nextLine,
-        gurmukhi: decks[currentShabad][lineID].gurmukhiWithoutBisram,
+        gurmukhi: decks[currentShabad][lineID].gurmukhi,
       },
     );
     castToReceiver();
@@ -215,11 +215,10 @@ const createCards = (rows, LineID) => {
   const cards = [];
   const lines = [];
   const shabad = {};
-  // empty the object from previous values
+
   Object.keys(rows).forEach((key) => {
     row = rows[key];
     lines.push(row.ID);
-    // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const gurmukhiShabads = row.Gurmukhi.split(' ');
     if (row.Visraam) {
       const visraams = JSON.parse(row.Visraam);
@@ -253,7 +252,6 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi || row.PunjabiUni,
-      gurmukhiWithoutBisram: row.Gurmukhi || row.PunjabiUni,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
