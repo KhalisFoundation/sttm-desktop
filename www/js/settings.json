@@ -74,16 +74,24 @@
             "step": 1
           }
         }
-      },
+      }
+    }
+  },
+  "toolbar": {
+    "title": "Toolbar",
+    "settings": {
       "sunder-gutka": {
-        "title": "Sundar Gutka",
-        "type": "range",
+        "title": "Sunder Gutka Settings",
+        "type": "dropdown",
         "options": {
           "bani-length": {
             "title": "Bani Length",
-            "max": 4,
-            "min": 1,
-            "step": 1
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "extraLarge": "Extra Large"
+            }
           }
         }
       }
