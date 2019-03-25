@@ -80,8 +80,8 @@
   "toolbar": {
     "title": "Toolbar",
     "settings": {
-      "sunder-gutka": {
-        "title": "Sunder Gutka Settings",
+      "gurbani": {
+        "title": "Gurbani Settings",
         "type": "dropdown",
         "options": {
           "bani-length": {
@@ -89,8 +89,8 @@
             "options": {
               "small": "Small",
               "medium": "Medium",
-              "large": "Large",
-              "extraLarge": "Extra Large"
+              "long": "Long",
+              "extralong": "Extra Long"
             }
           }
         }

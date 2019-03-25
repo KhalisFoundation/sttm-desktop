@@ -95,15 +95,15 @@ a {
 
 .small,
 .medium,
-.large,
-.extraLarge {
+.long,
+.extralong {
   display: none;
 }
 
-.bani-length-4 .extraLarge { display: block; }
-.bani-length-3 .large { display: block; }
-.bani-length-2 .medium { display: block; }
-.bani-length-1 .small { display: block; }
+.gurbani-bani-length-extralong .extralong { display: block; }
+.gurbani-bani-length-long .long { display: block; }
+.gurbani-bani-length-medium .medium { display: block; }
+.gurbani-bani-length-small .small { display: block; }
 
 #toolbar {
   align-items: center;

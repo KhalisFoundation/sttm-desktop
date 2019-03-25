@@ -664,7 +664,7 @@ module.exports = {
   },
 
   getLineId(rows) {
-    const baniLengthList = ['small', 'medium', 'large', 'extraLarge'];
+    const baniLengthList = ['small', 'medium', 'long', 'extralong'];
     const baniLength = store.getUserPref('slide-layout.sunder-gutka.bani-length');
     const line = rows.find((row) => row.baniLength[baniLengthList[baniLength]]);
     return line ? line.ID : null;
@@ -690,8 +690,8 @@ module.exports = {
           row.baniLength = {
             small: rowDb.existsSGPC,
             medium: rowDb.existsMedium,
-            large: rowDb.existsTaksal,
-            extraLarge: rowDb.existsBuddhaDal,
+            long: rowDb.existsTaksal,
+            extralong: rowDb.existsBuddhaDal,
           };
 
           return row;
