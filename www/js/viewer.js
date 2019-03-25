@@ -224,8 +224,13 @@ const createCards = (rows, LineID) => {
       const visraams = JSON.parse(row.Visraam);
       if (visraams.sttm) {
         visraams.sttm.forEach((visraam) => {
-          const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
-          gurmukhiShabads[visraam.p] = `<span class=${visraamClass}>${gurmukhiShabads[visraam.p]}</span>`;
+          try {
+            const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
+            gurmukhiShabads[visraam.p] = `<span class=${visraamClass}>${gurmukhiShabads[visraam.p]}</span>`;
+            return true;
+          } catch (error) {
+            return false;
+          }
         });
       }
     }
