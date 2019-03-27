@@ -726,76 +726,125 @@ module.exports = {
       });
   },
 
+  lineFactory(line, rows) {
+    let baniLengthClasses = 'noLength';
+    const mainLineExists = !!document.querySelector('.main');
 
-  printShabad(rows, ShabadID, LineID) {
+    if (line.baniLength) {
+      baniLengthClasses = Object.keys(line.baniLength).filter((key) => line.baniLength[key]).join('.');
+    }
+
+    const shabadLine = h(
+      `li#li_${line.lineCount}.${baniLengthClasses}`,
+      {
+        'data-line-count': line.lineCount,
+      },
+      h(
+        `a#line${line.ID}.panktee${
+           (line.mainLine && !mainLineExists) ? '.current.main.seen_check' : ''
+        }`,
+        {
+          'data-line-id': line.ID,
+          'data-main-letters': line.MainLetters,
+          onclick: e => this.clickShabad(e, line.ShabadID,
+                        line.ID, line, rows, 'click'),
+        },
+        [
+          h('i.fa.fa-fw.fa-check'),
+          h('i.fa.fa-fw.fa-home'),
+          ' ',
+          line.Gurmukhi,
+        ],
+      ),
+    );
+
+    return shabadLine;
+  },
+
+  printShabad(rows, ShabadID, LineID, start = 0) {
     const lineID = LineID || rows[0].ID;
     const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
-    let mainLine;
+    const lineIndex = rows.findIndex(row => row.ID === lineID);
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
+    // if the line clicked is further than throughput (in searches) then load until that line
+    let throughput = 40;
+
+    if (start) {
+      throughput = 10;
+    } else if (lineIndex > throughput) {
+      throughput = lineIndex + 1;
+    }
+
+    const end = start + throughput;
+
+    const lineHeight = 27;
+    // max scroll size, after which we would load the next part of bani
+    const maxScrollSize = (end * lineHeight) * 0.75;
+    // mode in which bani is printed, can be append, replace and click
+    const mode = start ? 'append' : 'replace';
+
+    let lineCount = start;
+    let mainLine = rows[0];
+
     // remove currently printed shabad if not in apv mode.
-    if (!apv) {
+    if (!apv && !start) {
       while (shabad.firstChild) {
         shabad.removeChild(shabad.firstChild);
       }
     }
 
-    let lineCount = 0;
-    rows.forEach((item) => {
+    shabad.parentNode.onscroll = (e) => {
+      if (e.target.scrollTop >= maxScrollSize) {
+        this.printShabad(rows, ShabadID, LineID, end);
+      }
+    };
+
+    const currentRows = rows.slice(start, end);
+
+    currentRows.forEach((rawItem) => {
       lineCount += 1;
+      const item = rawItem;
+      item.lineCount = lineCount;
 
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
+        item.mainLine = true;
       }
 
-      const mainLineExists = !!document.querySelector('.main.seen_check');
-
-      let baniLengthClasses = 'noLength';
-      if (item.baniLength) {
-        baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
-      }
-
-      const shabadLine = h(
-        `li#li_${lineCount}.${baniLengthClasses}`,
-        {
-          'data-line-count': lineCount,
-        },
-        h(
-          `a#line${item.ID}.panktee${
-            (parseInt(lineID, 10) === item.ID) && !mainLineExists ? '.current.main.seen_check' : ''
-          }`,
-          {
-            'data-line-id': item.ID,
-            'data-main-letters': item.MainLetters,
-            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                          item.ID, item, rows),
-          },
-          [
-            h('i.fa.fa-fw.fa-check'),
-            h('i.fa.fa-fw.fa-home'),
-            ' ',
-            item.Gurmukhi,
-          ],
-        ),
-      );
+      item.ShabadID = item.ShabadID || shabadID;
       // write the Panktee to the controller
-      shabad.appendChild(shabadLine);
+      shabad.appendChild(this.lineFactory(item, currentRows, mode));
       // append the currentShabad array
       currentShabad.push(item.ID);
       if (lineID === item.ID) {
         this.currentLine = item.ID;
       }
     });
+
+    const totalLines = rows.length;
+    const pendingLines = totalLines - end;
+    if (shabad.querySelector('.empty-space')) {
+      shabad.querySelector('.empty-space').remove();
+    }
+    const emptySpace = h(
+      'div.empty-space',
+      {
+        style: { height: `${pendingLines * lineHeight}px` },
+      },
+    );
+
+    shabad.appendChild(emptySpace);
     // scroll the Shabad controller to the current Panktee
     const $curPanktee = shabad.querySelector('.current');
-    if ($curPanktee) {
+    if ($curPanktee && !start) {
       const curPankteeTop = $curPanktee.parentNode
         .offsetTop;
       this.$shabadContainer.scrollTop = curPankteeTop;
     }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine, rows);
+    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -848,7 +897,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID, Line, rows) {
+  clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
     /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
@@ -864,7 +913,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID, Line, rows);
+      global.controller.sendLine(ShabadID, LineID, Line, rows, mode);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
