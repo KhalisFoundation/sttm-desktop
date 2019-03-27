@@ -333,20 +333,22 @@ const showLine = (ShabadID, LineID, rows, mode) => {
     } else {
       smoothScroll(`#apv #slide${LineID}`);
     }
-  } else if ((newShabadID in decks) && (mode === 'replace')) {
-    const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
-    if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
-      hideDecks();
-      $shabadDeck.classList.add('active');
-      currentShabad = newShabadID;
-    }
-    activateSlide($shabadDeck, LineID);
   } else {
     const $existingDeck = document.querySelector(`div#shabad${ShabadID}.deck.active`);
     const { cards, shabad } = createCards(rows, LineID);
     switch (mode) {
       case 'replace':
-        createDeck(cards, LineID, shabad, newShabadID, mode);
+        if (newShabadID in decks) {
+          const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
+          if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
+            hideDecks();
+            $shabadDeck.classList.add('active');
+            currentShabad = newShabadID;
+          }
+          activateSlide($shabadDeck, LineID);
+        } else {
+          createDeck(cards, LineID, shabad, newShabadID, mode);
+        }
         break;
       case 'append':
         cards.forEach((card) => { $existingDeck.appendChild(card); });
