@@ -69,6 +69,11 @@ $highlight-text: #cfd8dc;
 .high-contrast {
   color: $text-base;
 
+  #toolbar,
+  .bani-list {
+    background-color: $bg-alt;
+  }
+
   .viewer-controls {
     background-color: $bg-main;
     color: $text-bright;

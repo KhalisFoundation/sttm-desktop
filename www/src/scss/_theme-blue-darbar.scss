@@ -58,6 +58,11 @@ $highlight-text: #cfd8dc;
 .blue-darbar {
   color: $text-base;
 
+  #toolbar,
+  .bani-list {
+    background-color: $bg-alt;
+  }
+
   .viewer-controls {
     background-color: $bg-main;
   }
