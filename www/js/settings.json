@@ -87,7 +87,7 @@
           "bani-length": {
             "title": "Bani Length",
             "options": {
-              "small": "Small",
+              "short": "Short",
               "medium": "Medium",
               "long": "Long",
               "extralong": "Extra Long"
