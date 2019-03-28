@@ -796,7 +796,15 @@ module.exports = {
     }
 
     shabad.parentNode.onscroll = (e) => {
-      if (e.target.scrollTop >= maxScrollSize) {
+      let newStart = end;
+      let tooFar = e.target.scrollTop > ((end + throughput) * lineHeight);
+      if (tooFar) {
+        while (tooFar) {
+          this.printShabad(rows, ShabadID, LineID, newStart);
+          newStart += throughput;
+          tooFar = e.target.scrollTop > ((newStart + throughput) * lineHeight);
+        }
+      } else if (e.target.scrollTop >= maxScrollSize) {
         this.printShabad(rows, ShabadID, LineID, end);
       }
     };
