@@ -3,6 +3,7 @@ const banidb = require('./banidb');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
 
+const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const toolbarItems = ['sunder-gutka'];
@@ -118,6 +119,8 @@ const closeOverlayUI = h(
 
 module.exports = {
   init() {
+    const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
+    document.body.classList.add(`gurbani-bani-length-${baniLength}`);
     toolbarItems.forEach((toolbarItem) => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
       $toolbar.appendChild(closeOverlayUI);

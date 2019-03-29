@@ -17,6 +17,15 @@ function updateMultipleChoiceSetting(key, val) {
   analytics.trackEvent('settings', key, val);
 }
 
+function updateDropdownSetting(key, id, val) {
+  Object.keys(ldGet(settings, key)).forEach((optionToRemove) => {
+    document.body.classList.remove(`${id}-${optionToRemove}`);
+  });
+  document.body.classList.add(`${id}-${val}`);
+  global.core.platformMethod('updateSettings');
+  analytics.trackEvent('settings', key, val);
+}
+
 function updateCheckboxSetting(val) {
   const classList = document.body.classList;
   classList.toggle(val);
@@ -80,6 +89,52 @@ function createSettingsPage(userPrefs) {
                     setting.options[option])]));
           });
           settingCat.appendChild(checkboxList);
+          break;
+        }
+        case 'dropdown': {
+          const dropdownList = h('ul');
+          Object.keys(setting.options).forEach((dropdown) => {
+            const dropdownId = `setting-${catKey}-${settingKey}-${dropdown}`;
+
+            const dropdownListAttrs = {
+              name: `setting-${catKey}.${settingKey}`,
+              onchange: (evt) => {
+                store.setUserPref(`${catKey}.${settingKey}.${dropdown}`, evt.target.value);
+                updateDropdownSetting(`${catKey}.settings.${settingKey}.options.${dropdown}.options`, `${settingKey}-${dropdown}`, evt.target.value);
+              },
+            };
+
+            const selectBox = h(`select.settings-select#${dropdownId}`, dropdownListAttrs);
+
+            const dropdownListItem = h(
+              'span.setting-container',
+              [
+                setting.options[dropdown].title,
+                selectBox,
+              ],
+            );
+
+            dropdownList.appendChild(h('li', dropdownListItem));
+
+            Object.keys(setting.options[dropdown].options).forEach((option) => {
+              const selectOptionAttrs = {
+                value: option,
+                selected: false,
+              };
+
+              if (userPrefs[catKey][settingKey][dropdown] === option) {
+                selectOptionAttrs.selected = true;
+              }
+
+              selectBox.appendChild(
+                h('option',
+                selectOptionAttrs,
+                setting.options[dropdown].options[option]),
+              );
+            });
+          });
+
+          settingCat.appendChild(dropdownList);
           break;
         }
         case 'radio': {
