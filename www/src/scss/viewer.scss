@@ -385,7 +385,7 @@ h2 {
 .dark-theme,
 .high-contrast,
 .low-light {
-  &.display-visraams.colored-words .gurbani {
+  &.display-visraams.gurbani-vishraam-options-colored-words .gurbani {
     .visraam-main {
       color: $visraam-main;
     }
@@ -395,7 +395,7 @@ h2 {
     }
   }
 
-  &.display-visraams.gradient-bg .gurbani {
+  &.display-visraams.gurbani-vishraam-options-gradient-bg .gurbani {
     span {
       border-radius: 15px;
     }

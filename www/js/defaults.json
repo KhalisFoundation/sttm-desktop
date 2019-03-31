@@ -20,6 +20,9 @@
       "meta": true
     },
     "toolbar": {
+      "gurbani-options": {
+        "display-visraams": false
+      },
       "gurbani": {
         "bani-length": "extralong"
       }
@@ -45,7 +48,6 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
-        "display-visraams": false,
         "left-align": false,
         "quick-tools": true,
         "shortcut-tray-on": true

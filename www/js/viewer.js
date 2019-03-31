@@ -155,7 +155,6 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 global.platform.ipc.on('update-settings', () => {
   prefs = store.get('userPrefs');
   const themeKeys = themes.map(item => item.key);
-
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
   applyThemebg();
