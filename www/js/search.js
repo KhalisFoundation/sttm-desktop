@@ -688,13 +688,6 @@ module.exports = {
             row.shabadID = rowDb.Bani.Token;
           }
 
-          row.baniLength = {
-            short: rowDb.existsSGPC,
-            medium: rowDb.existsMedium,
-            long: rowDb.existsTaksal,
-            extralong: rowDb.existsBuddhaDal,
-          };
-
           return row;
         });
         return this.printShabad(rows, shabadID, null);
@@ -727,15 +720,10 @@ module.exports = {
   },
 
   lineFactory(line, rows) {
-    let baniLengthClasses = 'noLength';
     const mainLineExists = !!document.querySelector('.main');
 
-    if (line.baniLength) {
-      baniLengthClasses = Object.keys(line.baniLength).filter((key) => line.baniLength[key]).join('.');
-    }
-
     const shabadLine = h(
-      `li#li_${line.lineCount}.${baniLengthClasses}`,
+      `li#li_${line.lineCount}`,
       {
         'data-line-count': line.lineCount,
       },
