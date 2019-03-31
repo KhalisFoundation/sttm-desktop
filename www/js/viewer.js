@@ -55,9 +55,11 @@ const hideDecks = () => {
 const activateSlide = ($deck, LineID) => {
   [...$deck.querySelectorAll('.slide')].forEach(el => el.classList.remove('active'));
   const line = document.querySelector(`.deck.active #slide${LineID}`);
-  line.classList.add('active');
-  smoothScroll(line);
-  castShabadLine(LineID);
+  if (line) {
+    line.classList.add('active');
+    smoothScroll(line);
+    castShabadLine(LineID);
+  }
 };
 
 const castToReceiver = () => {

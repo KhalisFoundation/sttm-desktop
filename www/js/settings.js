@@ -100,6 +100,12 @@ function createSettingsPage(userPrefs) {
               name: `setting-${catKey}.${settingKey}`,
               onchange: (evt) => {
                 store.setUserPref(`${catKey}.${settingKey}.${dropdown}`, evt.target.value);
+                if (typeof global.controller[`${settingKey}-${dropdown}`] === 'function') {
+                  global.controller[`${settingKey}-${dropdown}`](evt.target.value);
+                }
+                if (typeof global.core[`${settingKey}-${dropdown}`] === 'function') {
+                  global.core[`${settingKey}-${dropdown}`](evt.target.value);
+                }
                 updateDropdownSetting(`${catKey}.settings.${settingKey}.options.${dropdown}.options`, `${settingKey}-${dropdown}`, evt.target.value);
               },
             };

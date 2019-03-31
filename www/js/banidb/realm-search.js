@@ -171,14 +171,15 @@ const loadShabad = ShabadID => (
  * loadBani(2);
  * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
  */
-const loadBani = BaniID => (
+const loadBani = (BaniID, BaniLength) => (
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
       .then((realm) => {
-        const rows = realm.objects('Banis_Shabad').filtered('Bani.ID == $0', BaniID).sorted('Seq');
+        const condition = `Bani.ID == ${BaniID} AND ${BaniLength} == true`;
+        const rows = realm.objects('Banis_Shabad').filtered(condition).sorted('Seq');
         if (rows.length > 0) {
           resolve(rows);
         }

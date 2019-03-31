@@ -663,20 +663,21 @@ module.exports = {
       });
   },
 
-  getLineId(rows) {
-    const baniLengthList = ['short', 'medium', 'long', 'extralong'];
-    const baniLength = store.getUserPref('slide-layout.sunder-gutka.bani-length');
-    const line = rows.find((row) => row.baniLength[baniLengthList[baniLength]]);
-    return line ? line.ID : null;
-  },
-
   loadBani(BaniID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
+    const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
+    const baniLengthCols = {
+      short: 'existsSGPC',
+      medium: 'existsMedium',
+      long: 'existsTaksal',
+      extralong: 'existsBuddhaDal',
+    };
     $shabadList.innerHTML = '';
+    $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
-    banidb.loadBani(BaniID)
+    banidb.loadBani(BaniID, baniLengthCols[baniLength])
       .then(rowsDb => {
-        const shabadID = rowsDb[0].Bani.Token;
+        const shabadID = `${rowsDb[0].Bani.Token}-${baniLength}`;
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
           // when object from db is not a verse itself
@@ -696,8 +697,7 @@ module.exports = {
 
           return row;
         });
-        const lineID = this.getLineId(rows);
-        return this.printShabad(rows, shabadID, lineID);
+        return this.printShabad(rows, shabadID, null);
       });
   },
 
@@ -800,12 +800,12 @@ module.exports = {
       let tooFar = e.target.scrollTop > ((end + throughput) * lineHeight);
       if (tooFar) {
         while (tooFar) {
-          this.printShabad(rows, ShabadID, LineID, newStart);
+          this.printShabad(rows, ShabadID, lineID, newStart);
           newStart += throughput;
           tooFar = e.target.scrollTop > ((newStart + throughput) * lineHeight);
         }
       } else if (e.target.scrollTop >= maxScrollSize) {
-        this.printShabad(rows, ShabadID, LineID, end);
+        this.printShabad(rows, ShabadID, lineID, end);
       }
     };
 

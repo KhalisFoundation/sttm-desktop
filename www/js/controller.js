@@ -526,6 +526,14 @@ module.exports = {
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
+  'gurbani-bani-length': function gurbaniBaniLength() {
+    // reload bani
+    const currentBani = document.getElementById('shabad').dataset.bani;
+    if (currentBani) {
+      global.core.search.loadBani(currentBani);
+    }
+  },
+
   autoplay() {
     global.core.search.checkAutoPlay();
   },
