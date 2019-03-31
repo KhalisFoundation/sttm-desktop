@@ -58,6 +58,11 @@ $highlight-text: #cfd8dc;
 .baagi-blue {
   color: $text-base;
 
+  #toolbar,
+  .bani-list {
+    background-color: $bg-alt;
+  }
+
   .viewer-controls {
     background-color: $bg-main;
   }

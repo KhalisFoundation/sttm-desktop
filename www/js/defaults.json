@@ -19,6 +19,11 @@
       "transliteration": true,
       "meta": true
     },
+    "toolbar": {
+      "gurbani": {
+        "bani-length": "extralong"
+      }
+    },
     "slide-layout": {
       "fields": {
         "display-translation": true,
@@ -36,9 +41,6 @@
         "autoplayTimer": 10
       },
       "vishraam-options": "colored-words",
-      "sunder-gutka": {
-        "bani-length": 4
-      },
       "display-options": {
         "disable-akhandpaatt": false,
         "akhandpaatt": false,

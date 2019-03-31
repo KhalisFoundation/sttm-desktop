@@ -84,15 +84,23 @@
           "gradient-bg": "Gradient Background"
         }
       },
-      "sunder-gutka": {
-        "title": "Sundar Gutka",
-        "type": "range",
+    }
+  },
+  "toolbar": {
+    "title": "Toolbar",
+    "settings": {
+      "gurbani": {
+        "title": "Gurbani Settings",
+        "type": "dropdown",
         "options": {
           "bani-length": {
             "title": "Bani Length",
-            "max": 4,
-            "min": 1,
-            "step": 1
+            "options": {
+              "short": "Short",
+              "medium": "Medium",
+              "long": "Long",
+              "extralong": "Extra Long"
+            }
           }
         }
       }
