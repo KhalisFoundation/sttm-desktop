@@ -1,6 +1,31 @@
+/* eslint-disable import/no-dynamic-require, global-require */
+const electron = require('electron');
+const path = require('path');
 const Realm = require('realm');
-const realmDB = require('./realm-db');
+
 const CONSTS = require('./constants');
+
+const { remote } = electron;
+const userDataPath = remote.app.getPath('userData');
+const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
+const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
+
+
+// TODO: Investigate possible memory issues from multiple Realm.open calls
+// https://github.com/KhalisFoundation/sttm-desktop/pull/517#discussion_r261644205
+const realmConfig = {
+  path: realmPath,
+};
+
+let initialized = false;
+
+const init = () => {
+  const realmSchema = require(realmSchemaPath);
+
+  realmConfig.schema = realmSchema.schemas;
+  realmConfig.schemaVersion = realmSchema.schemaVersion;
+  initialized = true;
+};
 
 /**
  * Retrieve lines matching queries
@@ -16,6 +41,9 @@ const CONSTS = require('./constants');
  */
 const query = (searchQuery, searchType, searchSource) => (
   new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
     let dbQuery = '';
     let searchCol = '';
     let condition = '';
@@ -98,7 +126,7 @@ const query = (searchQuery, searchType, searchSource) => (
     }
     order.push('Shabads');
     condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
-    Realm.open(realmDB.realmVerseSchema)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition);
         resolve(rows.slice(0, howManyRows));
@@ -119,7 +147,10 @@ const query = (searchQuery, searchType, searchSource) => (
  */
 const loadShabad = ShabadID => (
   new Promise((resolve, reject) => {
-    Realm.open(realmDB.realmVerseSchema)
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
         if (rows.length > 0) {
@@ -130,6 +161,74 @@ const loadShabad = ShabadID => (
   })
 );
 
+/**
+ * Retrieve all lines from a Bani
+ *
+ * @param {number} BaniID The specific Bani to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBani(2);
+ * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
+ */
+const loadBani = BaniID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then((realm) => {
+        const rows = realm.objects('Banis_Shabad').filtered('Bani.ID == $0', BaniID).sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  })
+);
+
+/**
+ * Retrieve all lines from a Ceremony
+ *
+ * @param {number} CermonyID The specific Shabad to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadCeremony(3);
+ * // => [{ Ceremony: { ID: 26106, Seq:2,...},...}]
+ */
+
+const loadCeremony = ceremonyID => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+    .then((realm) => {
+      const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
+
+const loadBanis = () => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+    .then((realm) => {
+      const rows = realm.objects('Banis').filtered('ID < 10000').sorted('ID');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -142,7 +241,10 @@ const loadShabad = ShabadID => (
  */
 const getAng = ShabadID => (
   new Promise((resolve) => {
-    Realm.open(realmDB.realmVerseSchema)
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
       .then((realm) => {
         const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
         const { PageNo, Source } = row;
@@ -168,7 +270,10 @@ const getAng = ShabadID => (
  */
 const loadAng = (PageNo, SourceID = 'G') => (
   new Promise((resolve, reject) => {
-    Realm.open(realmDB.realmVerseSchema)
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
         if (rows.length > 0) {
@@ -193,7 +298,10 @@ const loadAng = (PageNo, SourceID = 'G') => (
  */
 const getShabad = VerseID => (
   new Promise((resolve) => {
-    Realm.open(realmDB.realmVerseSchema)
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
       .then((realm) => {
         const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
         resolve(shabad.Shabads[0].ShabadID);
@@ -214,7 +322,7 @@ const getShabad = VerseID => (
  */
 const randomShabad = (SourceID = 'G') => (
   new Promise((resolve) => {
-    Realm.open(realmDB.realmVerseSchema)
+    Realm.open(realmConfig)
       .then((realm) => {
         const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
         const row = rows[Math.floor(Math.random() * rows.length)];
@@ -228,6 +336,9 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadBanis,
+  loadBani,
+  loadCeremony,
   getAng,
   loadAng,
   getShabad,

@@ -61,6 +61,15 @@ $highlight-text: #cfd8dc;
 .low-light {
   color: $text-base;
 
+  #toolbar,
+  .bani-list {
+    background-color: $bg-alt;
+  }
+
+  .viewer-controls {
+    background-color: $bg-main;
+  }
+
   #header {
     a {
       color: $text-base;

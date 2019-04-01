@@ -77,6 +77,26 @@
       }
     }
   },
+  "toolbar": {
+    "title": "Toolbar",
+    "settings": {
+      "gurbani": {
+        "title": "Gurbani Settings",
+        "type": "dropdown",
+        "options": {
+          "bani-length": {
+            "title": "Bani Length",
+            "options": {
+              "short": "Short",
+              "medium": "Medium",
+              "long": "Long",
+              "extralong": "Extra Long"
+            }
+          }
+        }
+      }
+    }
+  },
   "app": {
     "title": "App Settings",
     "settings": {

@@ -9,3 +9,5 @@ data.db
 *.provisionprofile
 npm-debug.log*
 .idea/
+.DS_Store/
+www/.DS_Store

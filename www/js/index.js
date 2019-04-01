@@ -5,6 +5,7 @@ const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
 const settings = require('../js/settings');
 const shortcutTray = require('./shortcut_tray');
+const toolbar = require('./toolbar');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
@@ -20,8 +21,9 @@ function hideSlide() {
   global.controller.sendText('');
 }
 
-function highlightLine(newLine) {
-  const $line = search.$shabad.querySelector(`#line${newLine}`);
+function highlightLine(newLine, nextLineCount = null) {
+  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
+  const $line = search.$shabad.querySelector(nextLineSelector);
   $line.click();
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
@@ -46,13 +48,7 @@ function spaceBar(e) {
   let newLineId = mainLineID;
 
   if (mainLineID === currentLineId) {
-    let done = false;
-    search.$shabad.querySelectorAll('a.panktee').forEach((item) => {
-      if (!item.classList.contains(['seen_check']) && !done) {
-        newLineId = item.dataset.lineId;
-        done = true;
-      }
-    });
+    newLineId = search.$shabad.querySelector('a.panktee:not(.seen_check)').dataset.lineId;
   }
 
   highlightLine(newLineId);
@@ -61,9 +57,10 @@ function spaceBar(e) {
 
 function prevLine(e) {
   // Find position of current line in Shabad
-  const pos = search.currentShabad.indexOf(search.currentLine);
-  if (pos > 0) {
-    highlightLine(search.currentShabad[pos - 1]);
+  const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
+  const prevLineCount = parseInt($currentLine.dataset.lineCount, 10) - 1;
+  if (prevLineCount > 0) {
+    highlightLine(null, prevLineCount);
   }
   e.preventDefault();
 }
@@ -71,8 +68,10 @@ function prevLine(e) {
 function nextLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
+  const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
+  const nextLineCount = (parseInt($currentLine.dataset.lineCount, 10)) + 1;
   if (pos < search.currentShabad.length - 1) {
-    highlightLine(search.currentShabad[pos + 1]);
+    highlightLine(search.currentShabad[pos + 1], nextLineCount);
   }
   e.preventDefault();
 }
@@ -141,6 +140,7 @@ module.exports = {
   platformMethod,
   themeEditor,
   shortcutTray,
+  toolbar,
   'custom-theme': () => {
     themeEditor.init();
   },

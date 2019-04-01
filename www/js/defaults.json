@@ -19,6 +19,11 @@
       "transliteration": true,
       "meta": true
     },
+    "toolbar": {
+      "gurbani": {
+        "bani-length": "extralong"
+      }
+    },
     "slide-layout": {
       "fields": {
         "display-translation": true,

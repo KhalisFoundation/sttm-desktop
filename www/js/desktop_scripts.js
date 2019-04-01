@@ -12,13 +12,15 @@ const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
   realm: {
-    dbCompressedName: 'sttmdesktop.realm.zip',
-    dbName: 'sttmdesktop.realm',
-    md5: 'sttmdesktop.realm.md5',
+    dbCompressedName: 'sttmdesktop-evergreen.zip',
+    dbName: 'sttmdesktop-evergreen.realm',
+    dbSchema: 'realm-schema-evergreen.json',
+    md5: 'sttmdesktop-evergreen.md5',
   },
   sqlite: {
     dbCompressedName: 'sttmdesktop.zip',
     dbName: 'sttmdesktop.db',
+    dbSchema: null,
     md5: 'sttmdesktop.md5',
   },
 };
@@ -33,10 +35,14 @@ if (platform === 'win32') {
   }
 }
 
+const dbSchemaPath = schemaPath =>
+  !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
 
 const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
+const dbSchema = dbSchemaPath(userDataPath);
 const newDBFolder = path.resolve(userDataPath, 'new-db');
 const newDBPath = path.resolve(newDBFolder, database[dbPlatform].dbName);
+const newDBSchema = dbSchemaPath(newDBFolder);
 
 const { store } = remote.require('./app');
 
@@ -88,7 +94,7 @@ module.exports = {
 
   init() {
     // Initialize DB right away if it exists
-    if (fs.existsSync(dbPath) && fs.statSync(dbPath).size > 0) {
+    if (fs.existsSync(dbPath) && fs.statSync(dbPath).size > 0 && (dbPlatform !== 'realm' || fs.existsSync(dbSchema))) {
       this.initDB();
       // Check if there's a newer version
       this.downloadLatestDB();
@@ -133,9 +139,14 @@ module.exports = {
                     fs.unlinkSync(dbCompressed);
                     // Replace current DB file with new version
                     fs.renameSync(newDBPath, dbPath);
+                    if (dbPlatform === 'realm') {
+                      fs.renameSync(newDBSchema, dbSchema);
+                    }
                     module.exports.initDB();
                     // Delete old DBs
-                    const oldDBs = ['data.db'];
+                    // TODO: Update to check if directory and use fs.rmdir
+                    // TODO: Add sttmdesktop.realm.management
+                    const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
                     oldDBs.forEach((oldDB) => {
                       const oldDBPath = path.resolve(userDataPath, oldDB);
                       fs.access(oldDBPath, (err) => {
