@@ -176,7 +176,7 @@ const upsertCustomBackgrounds = (themesContainer) => {
 
       sortedFiles.forEach((file) => {
         const fullPath = path.resolve(userBackgroundsPath, file);
-        if (imageCheck(file)) {
+        if (imageCheck(fullPath)) {
           recentBgsContainer.appendChild(recentSwatchFactory(fullPath));
         } else {
           fs.unlink(fullPath, (deleteError) => {
