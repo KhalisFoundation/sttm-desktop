@@ -221,24 +221,35 @@ const createCards = (rows, LineID) => {
     const gurmukhiShabads = row.Gurmukhi.split(' ');
     if (row.Visraam) {
       const visraams = JSON.parse(row.Visraam);
-      if (visraams.sttm) {
-        visraams.sttm.forEach((visraam) => {
-          try {
-            const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
-            gurmukhiShabads[visraam.p] = `<span class=${visraamClass}>${gurmukhiShabads[visraam.p]}</span>`;
-            return true;
-          } catch (error) {
-            return false;
-          }
-        });
-      }
+      Object.keys(visraams).forEach((visraamSource) => {
+        if (visraams[visraamSource]) {
+          visraams[visraamSource].forEach((visraam) => {
+            try {
+              const visraamShabad = gurmukhiShabads[visraam.p];
+              if (typeof (visraamShabad) === 'string') {
+                const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
+                const visraamEl = document.createElement('span');
+                visraamEl.classList.add(visraamClass, `visraam-${visraamSource}`);
+                visraamEl.innerText = visraamShabad;
+                gurmukhiShabads[visraam.p] = visraamEl;
+              } else {
+                gurmukhiShabads[visraam.p].classList.add(`visraam-${visraamSource}`);
+              }
+              return true;
+            } catch (error) {
+              return false;
+            }
+          });
+        }
+      });
     }
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
-      if (val.indexOf(']') !== -1) {
-        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+      const valHTML = typeof (val) === 'string' ? val : val.outerHTML;
+      if (valHTML.indexOf(']') !== -1) {
+        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${valHTML}</span>`;
       } else {
-        taggedGurmukhi[index] = val;
+        taggedGurmukhi[index] = valHTML;
       }
     });
     const gurmukhiContainer = document.createElement('div');

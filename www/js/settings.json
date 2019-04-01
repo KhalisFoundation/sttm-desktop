@@ -99,6 +99,14 @@
               "colored-words": "Colored Words",
               "gradient-bg": "Gradient Background"
             }
+          },
+          "vishraam-source": {
+            "title": "Vishraam Source",
+            "options": {
+              "sttm2": "STTM 2",
+              "igurbani": "iGurbani",
+              "sttm": "STTM Living" 
+            }
           }
         }
       },

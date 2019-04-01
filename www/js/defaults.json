@@ -24,7 +24,9 @@
         "display-visraams": false
       },
       "gurbani": {
-        "bani-length": "extralong"
+        "bani-length": "extralong",
+        "vishraam-options": "colored-words",
+        "vishraam-source": "sttm"
       }
     },
     "slide-layout": {
@@ -44,6 +46,7 @@
         "autoplayTimer": 10
       },
       "vishraam-options": "colored-words",
+      "vishraam-source": "sttm",
       "display-options": {
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
