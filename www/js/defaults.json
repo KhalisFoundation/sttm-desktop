@@ -45,8 +45,6 @@
       "autoplay-options": {
         "autoplayTimer": 10
       },
-      "vishraam-options": "colored-words",
-      "vishraam-source": "sttm",
       "display-options": {
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
