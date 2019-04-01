@@ -677,7 +677,7 @@ module.exports = {
     currentShabad.splice(0, currentShabad.length);
     banidb.loadBani(BaniID, baniLengthCols[baniLength])
       .then(rowsDb => {
-        const shabadID = `${rowsDb[0].Bani.Token}-${baniLength}`;
+        const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
           // when object from db is not a verse itself
