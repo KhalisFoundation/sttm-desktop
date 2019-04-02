@@ -51,6 +51,25 @@ When using SikhiToTheMax, your history will appear in the the "History" tab. You
 
 Sundar Gutka is a a list of frequently read Banis such as Sukhmani Sahib, Asa Kee Vaar, Nitnem, and many more. This list is avaialble within SikhiToTheMax for easy access rather than needing to search for each Bani. Simply click on the Sundar Gutka icon to get started. ![](./assets/img/help_images/SG.gif)
 
+### Why are some Banis in Sundar Gutka so short/long? How do I fix this?
+
+Throughout the past few centuries, there have been many different “sampardhas” or “jathas” that have been conceived from the core concepts of Sikhi and Gurmat. These sampardhas often have different opinions and thoughts about some aspects of Sikh history, Gurbani and Rehat, but still fall collectively under the united Khalsa Panth and, most importantly, the Akaal Takht. The Akaal Takht is the highest order and institution that all Sikhs adhere to.
+
+These differences have also brought about different recommendations about compiled Baanis and the Paath (prayers) that we read on a daily basis which makes it difficult to create a single Sundar Gutka  with a single version of Paath that would satisfy everyone. 
+
+We therefore have created the option to select lengths of what Paath you do that apply to four of the main Banis read most often. These have been structured in relation to length but all have a minimum of the SGPC standard or fall under the Akaal Takht. We do not include any versions that are by sampardhas excommunicated by the Akaal Takht as a standard.
+
+For those who may be confused about which version to begin reading these Banis, we recommend reading the longest Bani because the more we read and recite, the better it is for our souls. However, for beginners, we would suggest to start with the “short” setting and change to increase the length setting in future once you are comfortable, confident and have more time.
+
+Here is a breakdown of the lengths and which sampardhas typically use them:
+
+SHORT: This is the minimum SGPC/Akaal Takht standard.
+MEDIUM: Typically read by followers of the Akhand Keertani Jatha and others.
+LONG: Typically read by followers of Damdami Taksaal and others.
+EXTRA LONG: Most popular amongst followers of Buddha Dal.
+
+You can adjust Bani Length in the Settings tab. 
+
 ### Additional Database/Search Information
 
 *   SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
