@@ -64,8 +64,11 @@ For those who may be confused about which version to begin reading these Banis, 
 Here is a breakdown of the lengths and which sampardhas typically use them:
 
 SHORT: This is the minimum SGPC/Akaal Takht standard.
+
 MEDIUM: Typically read by followers of the Akhand Keertani Jatha and others.
+
 LONG: Typically read by followers of Damdami Taksaal and others.
+
 EXTRA LONG: Most popular amongst followers of Buddha Dal.
 
 You can adjust Bani Length in the Settings tab. 
