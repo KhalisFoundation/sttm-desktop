@@ -47,6 +47,10 @@ Yes! After launching SikhiToTheMax, click the icon for Display Settings, and cho
 
 When using SikhiToTheMax, your history will appear in the the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one.
 
+### What is Sundar Gutka?
+
+Sundar Gutka is a a list of frequently read Banis such as Sukhmani Sahib, Asa Kee Vaar, Nitnem, and many more. This list is avaialble within SikhiToTheMax for easy access rather than needing to search for each Bani. Simply click on the Sundar Gutka icon to get started. ![](./assets/img/help_images/SG.gif)
+
 ### Additional Database/Search Information
 
 *   SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
