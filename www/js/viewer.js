@@ -8,11 +8,13 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
+const { remote } = require('electron');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
 const themes = require('./js/themes.json');
 
+const analytics = remote.getGlobal('analytics');
 let prefs = store.get('userPrefs');
 
 let isWebView = false;
@@ -216,15 +218,15 @@ const createCards = (rows, LineID) => {
   const shabad = {};
 
   Object.keys(rows).forEach((key) => {
-    row = rows[key];
+    const row = rows[key];
     lines.push(row.ID);
     const gurmukhiShabads = row.Gurmukhi.split(' ');
     if (row.Visraam) {
-      const visraams = JSON.parse(row.Visraam);
-      Object.keys(visraams).forEach((visraamSource) => {
-        if (visraams[visraamSource]) {
-          visraams[visraamSource].forEach((visraam) => {
-            try {
+      try {
+        const visraams = JSON.parse(row.Visraam);
+        Object.keys(visraams).forEach((visraamSource) => {
+          if (visraams[visraamSource]) {
+            visraams[visraamSource].forEach((visraam) => {
               const visraamShabad = gurmukhiShabads[visraam.p];
               if (typeof (visraamShabad) === 'string') {
                 const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
@@ -235,13 +237,12 @@ const createCards = (rows, LineID) => {
               } else {
                 gurmukhiShabads[visraam.p].classList.add(`visraam-${visraamSource}`);
               }
-              return true;
-            } catch (error) {
-              return false;
-            }
-          });
-        }
-      });
+            });
+          }
+        });
+      } catch (error) {
+        analytics.trackEvent('visraamsFailed', row, error);
+      }
     }
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
