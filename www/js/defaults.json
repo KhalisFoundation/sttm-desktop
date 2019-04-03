@@ -24,9 +24,9 @@
         "display-visraams": false
       },
       "gurbani": {
-        "bani-length": "extralong",
         "vishraam-options": "colored-words",
-        "vishraam-source": "sttm"
+        "vishraam-source": "sttm",
+        "bani-length": "short"
       }
     },
     "slide-layout": {
