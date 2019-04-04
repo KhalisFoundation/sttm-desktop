@@ -20,7 +20,12 @@
       "meta": true
     },
     "toolbar": {
+      "gurbani-options": {
+        "display-visraams": false
+      },
       "gurbani": {
+        "vishraam-options": "colored-words",
+        "vishraam-source": "sttm",
         "bani-length": "short"
       }
     },
