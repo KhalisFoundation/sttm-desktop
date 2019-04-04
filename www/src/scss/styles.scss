@@ -123,6 +123,7 @@ a {
     border-radius: 5px;
     cursor: pointer;
     height: 40px;
+    margin-bottom: 5px;
     transition: 0.5s all ease;
     width: 40px;
 
@@ -158,7 +159,8 @@ a {
     }
   }
 
-  .bani-list {
+  .bani-list,
+  .ceremonies-list {
     bottom: 0;
     height: 300px;
     overflow: hidden;
@@ -275,6 +277,10 @@ a {
   #tool-sunder-gutka {
     background-image: url('../../assets/img/icons/sunder_gutka.png');
   }
+
+  #tool-ceremonies {
+    background-color: rebeccapurple;
+  }
 }
 
 .presenter-view #toolbar {
@@ -288,11 +294,19 @@ a {
     width: 60px;
   }
 
-  .bani-list {
+  .bani-list,
+  .ceremonies-list {
     height: calc(100vh - #{$presenter-pane-gap * 2});
     left: $toolbar-offset + $presenter-pane-gap;
     top: $presenter-pane-gap;
     width: $bani-list-width;
+  }
+
+  .ceremonies-list .ceremonies-header {
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    padding: 0;
   }
 
   .bani-extras {

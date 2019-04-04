@@ -229,6 +229,22 @@ const loadBanis = () => (
     .catch(reject);
   })
 );
+
+const loadCeremonies = () => (
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+    .then((realm) => {
+      const rows = realm.objects('Ceremonies').sorted('ID');
+      if (rows.length > 0) {
+        resolve(rows);
+      }
+    })
+    .catch(reject);
+  })
+);
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -339,6 +355,7 @@ module.exports = {
   loadBanis,
   loadBani,
   loadCeremony,
+  loadCeremonies,
   getAng,
   loadAng,
   getShabad,

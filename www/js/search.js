@@ -658,7 +658,17 @@ module.exports = {
     $shabadList.innerHTML = '';
     banidb.loadCeremony(ceremonyID)
       .then(rowsDb => {
-        const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
+        const rows = rowsDb.map((rowDb) => {
+          let row = rowDb;
+
+          if (rowDb.Verse) { row = rowDb.Verse; }
+
+          if (rowDb.Custom) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Ceremony.Token;
+          }
+          return row;
+        });
         return this.printShabad(rows);
       });
   },
@@ -729,7 +739,7 @@ module.exports = {
 
   printShabad(rows, ShabadID, LineID) {
     const lineID = LineID || rows[0].ID;
-    const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
+    const shabadID = ShabadID || rows[0].shabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
     let mainLine;
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
@@ -756,13 +766,17 @@ module.exports = {
         baniLengthClasses = Object.keys(item.baniLength).filter((key) => item.baniLength[key]).join('.');
       }
 
+      const englishHeadingEl = document.createElement('span');
+      englishHeadingEl.innerHTML = item.English;
+      const englishHeading = englishHeadingEl.querySelector('h1') ? englishHeadingEl.querySelector('h1').innerText : '';
+
       const shabadLine = h(
         `li#li_${lineCount}.${baniLengthClasses}`,
         {
           'data-line-count': lineCount,
         },
         h(
-          `a#line${item.ID}.panktee${
+          `a#line${item.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${
             (parseInt(lineID, 10) === item.ID) && !mainLineExists ? '.current.main.seen_check' : ''
           }`,
           {
@@ -775,7 +789,7 @@ module.exports = {
             h('i.fa.fa-fw.fa-check'),
             h('i.fa.fa-fw.fa-home'),
             ' ',
-            item.Gurmukhi,
+            item.Gurmukhi || englishHeading,
           ],
         ),
       );

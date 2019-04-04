@@ -6,25 +6,39 @@ const anvaad = require('anvaad-js');
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const toolbarItems = ['sunder-gutka'];
+const toolbarItems = ['sunder-gutka', 'ceremonies'];
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
+const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
+let currentToolbarItem;
+
+const navigatorHeader = (id, content, lang) => h(
+  `header.navigator-header#${id}`,
+  h(`span.${lang}`, content),
+);
 
 const blockList = (lang, id) => h(
   'section.blocklist',
-  h(`ul#${id}.lang`),
+  h(`ul#${id}.${lang}`),
 );
 
-const toggleOverlayUI = () => {
+const toggleOverlayUI = (toolbarItem, show) => {
+  if (currentToolbarItem !== toolbarItem) {
+    toggleOverlayUI(currentToolbarItem, false);
+  }
+  currentToolbarItem = toolbarItem;
   document.querySelectorAll('.base-ui').forEach((uiElement) => {
-    uiElement.classList.toggle('blur');
+    uiElement.classList.toggle('blur', show);
   });
-  document.querySelectorAll('.overlay-ui').forEach((uiElement) => {
-    uiElement.classList.toggle('hidden');
+  document.querySelectorAll('overlay-ui').forEach((uiElement) => {
+    uiElement.classList.toggle('hidden', show);
+  });
+  document.querySelectorAll(`.overlay-ui.ui-${toolbarItem}, .common-overlay`).forEach((uiElement) => {
+    uiElement.classList.toggle('hidden', !show);
   });
 };
 
@@ -90,7 +104,7 @@ const printBanis = (rows) => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
-          toggleOverlayUI();
+          toggleOverlayUI(currentToolbarItem, false);
         },
       },
       h(`span.tag.tag-${baniTag}`),
@@ -101,17 +115,34 @@ const printBanis = (rows) => {
   });
 };
 
+const printCeremonies = (rows) => {
+  rows.forEach((row) => {
+    const $ceremony = h(
+      'div.ceremony-pane',
+      {
+        onclick: () => {
+          analytics.trackEvent('ceremony', row.Token);
+          global.core.search.loadCeremony(row.ID);
+          toggleOverlayUI(currentToolbarItem, false);
+        },
+      },
+      navigatorHeader(row.Token, row.Gurmukhi, 'gurmukhi'),
+    );
+    $ceremoniesList.appendChild($ceremony);
+  });
+};
+
 const toolbarItemFactory = toolbarItem => h(
   `div.toolbar-item#tool-${toolbarItem}`,
   {
-    onclick: toggleOverlayUI,
+    onclick: () => { toggleOverlayUI(toolbarItem, true); },
   },
 );
 
 const closeOverlayUI = h(
-  'div.close-overlay-ui.overlay-ui.hidden',
+  'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
   {
-    onclick: toggleOverlayUI,
+    onclick: () => { toggleOverlayUI(currentToolbarItem, false); },
   },
   h('i.fa.fa-times'),
 );
@@ -123,11 +154,13 @@ module.exports = {
     document.body.classList.add(`gurbani-bani-length-${baniLength}`);
     toolbarItems.forEach((toolbarItem) => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-      $toolbar.appendChild(closeOverlayUI);
-      $baniList.querySelector('header').appendChild(translitSwitch);
-      $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
-      $baniExtras.appendChild(baniGroupFactory('popular banis'));
-      banidb.loadBanis().then(rows => printBanis(rows));
     });
+
+    $baniList.querySelector('header').appendChild(translitSwitch);
+    $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
+    $baniExtras.appendChild(baniGroupFactory('popular banis'));
+    banidb.loadBanis().then(rows => printBanis(rows));
+    banidb.loadCeremonies().then(rows => printCeremonies(rows));
+    $toolbar.appendChild(closeOverlayUI);
   },
 };

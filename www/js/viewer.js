@@ -220,21 +220,23 @@ const createCards = (rows, LineID) => {
     row = rows[key];
     lines.push(row.ID);
     // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
-    const gurmukhiShabads = row.Gurmukhi.split(' ');
     const taggedGurmukhi = [];
-    gurmukhiShabads.forEach((val, index) => {
-      if (val.indexOf(']') !== -1) {
-        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-      /* } else if (val.includes(';')) {
-        const bisramWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
-      } else if (val.includes(',')) {
-        const yamkiWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`; */
-      } else {
-        taggedGurmukhi[index] = val;
-      }
-    });
+    if (row.Gurmukhi) {
+      const gurmukhiShabads = row.Gurmukhi.split(' ');
+      gurmukhiShabads.forEach((val, index) => {
+        if (val.indexOf(']') !== -1) {
+          taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
+        /* } else if (val.includes(';')) {
+          const bisramWord = val.slice(0, -1);
+          taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
+        } else if (val.includes(',')) {
+          const yamkiWord = val.slice(0, -1);
+          taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`; */
+        } else {
+          taggedGurmukhi[index] = val;
+        }
+      });
+    }
     const gurmukhiContainer = document.createElement('div');
 
     gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
@@ -249,8 +251,8 @@ const createCards = (rows, LineID) => {
           h('h2.transliteration', row.Transliteration),
         ]));
     shabad[row.ID] = {
-      gurmukhi: row.Gurmukhi || row.PunjabiUni,
-      gurmukhiWithoutBisram: row.Gurmukhi || row.PunjabiUni,
+      gurmukhi: row.Gurmukhi || row.PunjabiUni || row.English,
+      gurmukhiWithoutBisram: row.Gurmukhi || row.PunjabiUni || row.English,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,
