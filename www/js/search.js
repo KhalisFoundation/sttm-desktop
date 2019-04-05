@@ -786,7 +786,7 @@ module.exports = {
       }
     }
 
-    //print the next set of banis on scroll
+    // print the next set of banis on scroll
     shabad.parentNode.onscroll = (e) => {
       let newStart = end;
       let tooFar = e.target.scrollTop > ((end + throughput) * lineHeight);
