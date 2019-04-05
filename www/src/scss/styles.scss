@@ -221,6 +221,34 @@ a {
     header {
       padding: 0.3rem 1rem;
     }
+
+    .ceremony-pane-themes {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-height: 200px;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .ceremony-theme-header {
+      font-size: 12px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .ceremonies-header {
+      font-weight: bold;
+    }
+  }
+
+  .ceremonies-list {
+    overflow-y: auto;
+
+    .navigator-header {
+      cursor: pointer;
+    }
   }
 
   .bani-extras {
@@ -300,6 +328,18 @@ a {
     left: $toolbar-offset + $presenter-pane-gap;
     top: $presenter-pane-gap;
     width: $bani-list-width;
+  }
+
+  .ceremonies-header {
+    width: 100%;
+  }
+
+  .ceremony-pane {
+    margin-bottom: 15px;
+  }
+
+  .ceremonies-list {
+    background: transparent;
   }
 
   .ceremonies-list .ceremonies-header {

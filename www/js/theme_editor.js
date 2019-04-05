@@ -244,7 +244,13 @@ const imageInput = themesContainer =>
 
 const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   themes.forEach((themeInstance) => {
-    if (themeInstance.type === themeType) {
+    let themeTypeMatches = false;
+    if (Array.isArray(themeInstance.type)) {
+      themeTypeMatches = themeInstance.type.includes(themeType);
+    } else {
+      themeTypeMatches = themeInstance.type === themeType;
+    }
+    if (themeTypeMatches) {
       themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
     }
   });
@@ -254,6 +260,13 @@ module.exports = {
   defaultTheme,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
+    setTimeout(() => {
+      const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
+      swatchGroupFactory('anandkaraj', anandKarajPane);
+
+      const deathPane = document.querySelector('.ceremony-pane-themes#death');
+      swatchGroupFactory('death', deathPane);
+    }, 1000);
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
     swatchGroupFactory('COLOR', themeOptions);

@@ -116,18 +116,23 @@ const printBanis = (rows) => {
 
 const printCeremonies = (rows) => {
   rows.forEach((row) => {
-    const $ceremony = h(
-      'div.ceremony-pane',
-      {
-        onclick: () => {
-          analytics.trackEvent('ceremony', row.Token);
-          global.core.search.loadCeremony(row.ID);
-          toggleOverlayUI(currentToolbarItem, false);
+    if (row.Token !== 'anand') {
+      const $ceremony = h(
+        `div.ceremony-pane#${row.Token}`,
+        {
+          onclick: () => {
+            analytics.trackEvent('ceremony', row.Token);
+            global.core.search.loadCeremony(row.ID);
+            toggleOverlayUI(currentToolbarItem, false);
+          },
         },
-      },
-      navigatorHeader(row.Token, row.Gurmukhi, 'gurmukhi'),
-    );
-    $ceremoniesList.appendChild($ceremony);
+        navigatorHeader(row.Token, row.Gurmukhi, 'gurmukhi'),
+        h(`div.ceremony-pane-themes#${row.Token}`,
+          h('div.ceremony-theme-header', 'Choose a Theme (optional)'),
+        ),
+      );
+      $ceremoniesList.appendChild($ceremony);
+    }
   });
 };
 

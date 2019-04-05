@@ -138,9 +138,9 @@ module.exports = {
   search,
   shareSync,
   platformMethod,
+  toolbar,
   themeEditor,
   shortcutTray,
-  toolbar,
   'custom-theme': () => {
     themeEditor.init();
   },

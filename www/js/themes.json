@@ -6,7 +6,7 @@
     "translation-color": "#353535",
     "transliteration-color": "#353535",
     "teeka-color": "#4b4b4b",
-    "type": "COLOR",
+    "type": ["COLOR", "anandkaraj"],
     "key": "light-theme"
   }, {
     "name":"Dark",
@@ -15,7 +15,7 @@
     "translation-color": "#fff",
     "transliteration-color": "#fff",
     "teeka-color": "#fff",
-    "type": "COLOR",
+    "type": ["COLOR", "death"],
     "key": "dark-theme"
   }, {
     "name":"Khalsa Gold",
@@ -64,7 +64,7 @@
     "teeka-color": "#d1dbe2",
     "background-image": "thumbnails/blue.jpg",
     "background-image-full": "blue.jpg",
-    "type": "BACKGROUND",
+    "type": ["BACKGROUND", "death"],
     "key": "moody-blue"
   },
   {
@@ -101,7 +101,7 @@
     "teeka-color": "#484848",
     "background-image": "thumbnails/floral-bg.jpg",
     "background-image-full": "floral-bg.jpg",
-    "type": "BACKGROUND",
+    "type": ["BACKGROUND", "anandkaraj"],
     "key": "floral"
   },
   {

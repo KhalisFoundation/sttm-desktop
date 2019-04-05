@@ -220,28 +220,31 @@ const createCards = (rows, LineID) => {
   Object.keys(rows).forEach((key) => {
     const row = rows[key];
     lines.push(row.ID);
-    const gurmukhiShabads = row.Gurmukhi.split(' ');
-    if (row.Visraam) {
-      try {
-        const visraams = JSON.parse(row.Visraam);
-        Object.keys(visraams).forEach((visraamSource) => {
-          if (visraams[visraamSource]) {
-            visraams[visraamSource].forEach((visraam) => {
-              const visraamShabad = gurmukhiShabads[visraam.p];
-              if (typeof (visraamShabad) === 'string') {
-                const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
-                const visraamEl = document.createElement('span');
-                visraamEl.classList.add(visraamClass, `visraam-${visraamSource}`);
-                visraamEl.innerText = visraamShabad;
-                gurmukhiShabads[visraam.p] = visraamEl;
-              } else {
-                gurmukhiShabads[visraam.p].classList.add(`visraam-${visraamSource}`);
-              }
-            });
-          }
-        });
-      } catch (error) {
-        analytics.trackEvent('visraamsFailed', row, error);
+    let gurmukhiShabads = [];
+    if (row.Gurmukhi) {
+      gurmukhiShabads = row.Gurmukhi.split(' ');
+      if (row.Visraam) {
+        try {
+          const visraams = JSON.parse(row.Visraam);
+          Object.keys(visraams).forEach((visraamSource) => {
+            if (visraams[visraamSource]) {
+              visraams[visraamSource].forEach((visraam) => {
+                const visraamShabad = gurmukhiShabads[visraam.p];
+                if (typeof (visraamShabad) === 'string') {
+                  const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
+                  const visraamEl = document.createElement('span');
+                  visraamEl.classList.add(visraamClass, `visraam-${visraamSource}`);
+                  visraamEl.innerText = visraamShabad;
+                  gurmukhiShabads[visraam.p] = visraamEl;
+                } else {
+                  gurmukhiShabads[visraam.p].classList.add(`visraam-${visraamSource}`);
+                }
+              });
+            }
+          });
+        } catch (error) {
+          analytics.trackEvent('visraamsFailed', row, error);
+        }
       }
     }
     const taggedGurmukhi = [];
@@ -257,12 +260,16 @@ const createCards = (rows, LineID) => {
 
     gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
                                     <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+
+    const englishContainer = document.createElement('div');
+    englishContainer.innerHTML = row.English;
+
     cards.push(
       h(
         `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
         [
           h('h1.gurbani.gurmukhi', gurmukhiContainer),
-          h('h2.translation', row.English),
+          h('h2.translation', englishContainer),
           h('h2.teeka', row.Punjabi),
           h('h2.transliteration', row.Transliteration),
         ]));

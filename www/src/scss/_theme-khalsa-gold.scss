@@ -40,7 +40,9 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
 
 .khalsa-gold {
   #toolbar,
-  .bani-list {
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
     background-color: $nav-bg;
   }
 
