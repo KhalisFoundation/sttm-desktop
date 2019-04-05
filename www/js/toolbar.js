@@ -3,6 +3,7 @@ const banidb = require('./banidb');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
 
+const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const toolbarItems = ['sunder-gutka', 'ceremonies'];
@@ -15,16 +16,7 @@ const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
 let currentToolbarItem;
 
-const navigatorHeader = (id, content, lang) => h(
-  `header.navigator-header#${id}`,
-  h(`span.${lang}`, content),
-);
-
-const blockList = (lang, id) => h(
-  'section.blocklist',
-  h(`ul#${id}.${lang}`),
-);
-
+// helper functions
 const toggleOverlayUI = (toolbarItem, show) => {
   if (currentToolbarItem !== toolbarItem) {
     toggleOverlayUI(currentToolbarItem, false);
@@ -41,23 +33,37 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
-const translitSwitch = h(
-  'div.translit-switch',
+// factories
+const navigatorHeaderFactory = (id, content, lang) => h(
+  `header.navigator-header#${id}`,
+  h(`span.${lang}`, content),
+  h('i.fa.fa-play', {
+    onclick: () => {
+      toggleOverlayUI(currentToolbarItem, false);
+    },
+  }),
+);
+
+const blockListFactory = (lang, id) => h(
+  'section.blocklist',
+  h(`ul#${id}.${lang}`),
+);
+
+const switchFactory = (id, label, inputId, clickEvent) => h(
+  `div.${id}`,
   [
-    h('span', 'Abc'),
+    h('span', label),
     h('div.switch',
       [
-        h('input#sg-translit-toggle',
+        h(`input#${inputId}-toggle`,
           {
-            name: 'hg-trasnlit-toggle',
+            name: inputId,
             type: 'checkbox',
-            onclick: () => {
-              $baniList.classList.toggle('translit');
-            },
-            value: 'sg-translit' }),
+            onclick: clickEvent,
+            value: inputId }),
         h('label',
           {
-            htmlFor: 'sg-translit-toggle' })])]);
+            htmlFor: `${inputId}-toggle` })])]);
 
 const baniGroupFactory = (baniGroupName) => {
   const baniGroupClass = baniGroupName.replace(/ /g, '-');
@@ -73,16 +79,42 @@ const extrasTileFactory = (tileType, row) => h(
   {
     onclick: () => {
       global.core.search.loadBani(row.ID);
-      toggleOverlayUI();
+      toggleOverlayUI(currentToolbarItem, false);
       analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
     },
   },
   h('div.gurmukhi', row.Gurmukhi),
 );
 
+const toolbarItemFactory = toolbarItem => h(
+  `div.toolbar-item#tool-${toolbarItem}`,
+  {
+    onclick: () => { toggleOverlayUI(toolbarItem, true); },
+  },
+);
+
+// components
+const translitSwitch = switchFactory(
+  'translit-switch',
+  'Abc',
+  'sg-translit',
+  () => {
+    $baniList.classList.toggle('translit');
+  },
+);
+
+const closeOverlayUI = h(
+  'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
+  {
+    onclick: () => { toggleOverlayUI(currentToolbarItem, false); },
+  },
+  h('i.fa.fa-times'),
+);
+
+
 const printBanis = (rows) => {
   const banisListID = 'sunder-gutka-banis';
-  $baniList.appendChild(blockList('gurmukhi', banisListID));
+  $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
   const $sunderGutkaBanis = document.querySelector(`#${banisListID}`);
   const $nitnemBanis = document.querySelector('.nitnem-banis');
   const $popularBanis = document.querySelector('.popular-banis');
@@ -123,33 +155,36 @@ const printCeremonies = (rows) => {
           onclick: () => {
             analytics.trackEvent('ceremony', row.Token);
             global.core.search.loadCeremony(row.ID);
-            toggleOverlayUI(currentToolbarItem, false);
+            const currentCeremony = document.querySelector('div.ceremony-pane.active');
+            if (currentCeremony) {
+              currentCeremony.classList.remove('active');
+            }
+            document.querySelector(`div.ceremony-pane#${row.Token}`).classList.add('active');
           },
         },
-        navigatorHeader(row.Token, row.Gurmukhi, 'gurmukhi'),
-        h(`div.ceremony-pane-themes#${row.Token}`,
-          h('div.ceremony-theme-header', 'Choose a Theme (optional)'),
+        navigatorHeaderFactory(row.Token, row.Gurmukhi, 'gurmukhi'),
+        h('div.ceremony-pane-content',
+          h(`div.ceremony-pane-options#cpo-${row.Token}`,
+            switchFactory(
+              `${row.Token}-english-exp-switch`,
+              'English Explanations',
+              `${row.Token}-english-exp`,
+              () => {
+                const englishExpVal = store.getUserPref('gurbani.ceremonies.english');
+                store.setUserPref('gurbani.ceremonies.english', !englishExpVal);
+                document.body.classList.toggle('ceremonies-without-english', !englishExpVal);
+              },
+            ),
+          ),
+          h(`div.ceremony-pane-themes#${row.Token}`,
+            h('div.ceremony-theme-header', 'Choose a Theme (optional)'),
+          ),
         ),
       );
       $ceremoniesList.appendChild($ceremony);
     }
   });
 };
-
-const toolbarItemFactory = toolbarItem => h(
-  `div.toolbar-item#tool-${toolbarItem}`,
-  {
-    onclick: () => { toggleOverlayUI(toolbarItem, true); },
-  },
-);
-
-const closeOverlayUI = h(
-  'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
-  {
-    onclick: () => { toggleOverlayUI(currentToolbarItem, false); },
-  },
-  h('i.fa.fa-times'),
-);
 
 
 module.exports = {
