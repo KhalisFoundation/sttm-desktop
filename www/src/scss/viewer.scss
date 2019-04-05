@@ -1,7 +1,42 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
-$bisram-main: #c0392b;
-$bisram-yamki: #ffc500;
+
+@mixin vishraamStyles() {
+  $visraam-main: #c0392b;
+  $visraam-yamki: #ffc500;
+  $visraam-sources: ("sttm", "sttm2", "igurbani");
+
+  @each $source in $visraam-sources {
+    &.display-visraams.gurbani-vishraam-options-colored-words.gurbani-vishraam-source-#{$source} .gurbani {
+      .visraam-main.visraam-#{$source} {
+        color: $visraam-main;
+      }
+
+      .visraam-yamki.visraam-#{$source} {
+        color: $visraam-yamki;
+      }
+    }
+
+    &.display-visraams.gurbani-vishraam-options-gradient-bg.gurbani-vishraam-source-#{$source} .gurbani {
+      span {
+        border-radius: 15px;
+      }
+
+      .padchhed .visraam-main.visraam-#{$source},
+      .padchhed .visraam-yamki.visraam-#{$source} {
+        padding-right: 5px;
+      }
+
+      .visraam-main.visraam-#{$source} {
+        background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
+      }
+
+      .visraam-yamki.visraam-#{$source} {
+        background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
+      }
+    }
+  }
+}
 
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
@@ -385,34 +420,7 @@ h2 {
 .dark-theme,
 .high-contrast,
 .low-light {
-  &.display-bisrams.colored-words .gurbani {
-    .bisram-main {
-      color: $bisram-main;
-    }
-
-    .bisram-yamki {
-      color: $bisram-yamki;
-    }
-  }
-
-  &.display-bisrams.gradient-bg .gurbani {
-    span {
-      border-radius: 15px;
-    }
-
-    .padchhed .bisram-main,
-    .padchhed .bisram-yamki {
-      padding-right: 5px;
-    }
-
-    .bisram-main {
-      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
-    }
-
-    .bisram-yamki {
-      background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
-    }
-  }
+  @include vishraamStyles();
 }
 
 @import

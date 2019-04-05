@@ -8,11 +8,13 @@
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
+const { remote } = require('electron');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const { store } = require('electron').remote.require('./app');
 const themes = require('./js/themes.json');
 
+const analytics = remote.getGlobal('analytics');
 let prefs = store.get('userPrefs');
 
 let isWebView = false;
@@ -79,7 +81,7 @@ const castShabadLine = (lineID) => {
       decks[currentShabad][lineID],
       {
         nextLine,
-        gurmukhi: decks[currentShabad][lineID].gurmukhiWithoutBisram,
+        gurmukhi: decks[currentShabad][lineID].gurmukhi,
       },
     );
     castToReceiver();
@@ -165,7 +167,6 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 global.platform.ipc.on('update-settings', () => {
   prefs = store.get('userPrefs');
   const themeKeys = themes.map(item => item.key);
-
   $body.classList.remove(...themeKeys);
   $body.classList.add(prefs.app.theme);
   applyThemebg();
@@ -225,24 +226,41 @@ const createCards = (rows, LineID) => {
   const cards = [];
   const lines = [];
   const shabad = {};
-  // empty the object from previous values
+
   Object.keys(rows).forEach((key) => {
-    row = rows[key];
+    const row = rows[key];
     lines.push(row.ID);
-    // const gurmukhiShabads = row.GurmukhiBisram.split(' ');
     const gurmukhiShabads = row.Gurmukhi.split(' ');
+    if (row.Visraam) {
+      try {
+        const visraams = JSON.parse(row.Visraam);
+        Object.keys(visraams).forEach((visraamSource) => {
+          if (visraams[visraamSource]) {
+            visraams[visraamSource].forEach((visraam) => {
+              const visraamShabad = gurmukhiShabads[visraam.p];
+              if (typeof (visraamShabad) === 'string') {
+                const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
+                const visraamEl = document.createElement('span');
+                visraamEl.classList.add(visraamClass, `visraam-${visraamSource}`);
+                visraamEl.innerText = visraamShabad;
+                gurmukhiShabads[visraam.p] = visraamEl;
+              } else {
+                gurmukhiShabads[visraam.p].classList.add(`visraam-${visraamSource}`);
+              }
+            });
+          }
+        });
+      } catch (error) {
+        analytics.trackEvent('visraamsFailed', row, error);
+      }
+    }
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
-      if (val.indexOf(']') !== -1) {
-        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${val}</span>`;
-      /* } else if (val.includes(';')) {
-        const bisramWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-main">${bisramWord}</span>`;
-      } else if (val.includes(',')) {
-        const yamkiWord = val.slice(0, -1);
-        taggedGurmukhi[index] = `<span class="bisram-yamki">${yamkiWord}</span>`; */
+      const valHTML = typeof (val) === 'string' ? val : val.outerHTML;
+      if (valHTML.indexOf(']') !== -1) {
+        taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${valHTML}</span>`;
       } else {
-        taggedGurmukhi[index] = val;
+        taggedGurmukhi[index] = valHTML;
       }
     });
     const gurmukhiContainer = document.createElement('div');
@@ -260,7 +278,6 @@ const createCards = (rows, LineID) => {
         ]));
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi || row.PunjabiUni,
-      gurmukhiWithoutBisram: row.Gurmukhi || row.PunjabiUni,
       larivaar: taggedGurmukhi.join('<wbr>'),
       translation: row.English,
       teeka: row.Punjabi,

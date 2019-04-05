@@ -311,6 +311,17 @@ module.exports = {
             document.body.classList.add(newUserPrefs[catKey][settingKey]);
             break;
 
+          case 'dropdown':
+            Object.keys(setting.options).forEach((dropdown) => {
+              Object.keys(setting.options[dropdown].options).forEach((option) => {
+                document.body.classList.remove(`${settingKey}-${dropdown}-${option}`);
+                if (newUserPrefs[catKey][settingKey][dropdown] === option) {
+                  document.body.classList.add(`${settingKey}-${dropdown}-${option}`);
+                }
+              });
+            });
+            break;
+
           case 'range':
             Object.keys(setting.options).forEach((optionKey) => {
               const option = setting.options[optionKey];
