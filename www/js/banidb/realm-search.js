@@ -168,7 +168,7 @@ const loadShabad = ShabadID => (
  * @returns {object} Returns array of objects for each line
  * @example
  *
- * loadBani(2);
+ * loadBani(2, "extralong");
  * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
  */
 const loadBani = (BaniID, BaniLength) => (
@@ -215,6 +215,15 @@ const loadCeremony = ceremonyID => (
   })
 );
 
+/**
+ * Retrieve all banis for sunder gutka
+ *
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBanis();
+ * // => [ {Gurmukhi: "gur mMqR", ID: 1, Token: "gurmantar"}, {Gurmukhi: "jpujI swihb" ...} ]
+ */
 const loadBanis = () => (
   new Promise((resolve, reject) => {
     if (!initialized) {

@@ -666,6 +666,7 @@ module.exports = {
   loadBani(BaniID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
+    // translate user settings into its respective database fields
     const baniLengthCols = {
       short: 'existsSGPC',
       medium: 'existsMedium',
@@ -675,8 +676,10 @@ module.exports = {
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
+    // load verses for bani based on baniID and the length that user has decided
     banidb.loadBani(BaniID, baniLengthCols[baniLength])
       .then(rowsDb => {
+        // create a unique shabadID for whole bani, and append it with length
         const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
@@ -783,9 +786,11 @@ module.exports = {
       }
     }
 
+    //print the next set of banis on scroll
     shabad.parentNode.onscroll = (e) => {
       let newStart = end;
       let tooFar = e.target.scrollTop > ((end + throughput) * lineHeight);
+      // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
       if (tooFar) {
         while (tooFar) {
           this.printShabad(rows, ShabadID, lineID, newStart);
