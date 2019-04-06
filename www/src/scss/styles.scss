@@ -93,18 +93,6 @@ a {
   }
 }
 
-.short,
-.medium,
-.long,
-.extralong {
-  display: none;
-}
-
-.gurbani-bani-length-extralong .extralong { display: block; }
-.gurbani-bani-length-long .long { display: block; }
-.gurbani-bani-length-medium .medium { display: block; }
-.gurbani-bani-length-short .short { display: block; }
-
 #toolbar {
   align-items: center;
   display: flex;

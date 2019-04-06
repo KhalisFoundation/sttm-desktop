@@ -54,6 +54,16 @@ const hideDecks = () => {
   });
 };
 
+const activateSlide = ($deck, LineID) => {
+  [...$deck.querySelectorAll('.slide')].forEach(el => el.classList.remove('active'));
+  const line = document.querySelector(`.deck.active #slide${LineID}`);
+  if (line) {
+    line.classList.add('active');
+    smoothScroll(line);
+    castShabadLine(LineID);
+  }
+};
+
 const castToReceiver = () => {
   castCur.prefs = store.get('userPrefs');
   sendMessage(JSON.stringify(castCur));
@@ -136,7 +146,7 @@ global.platform.ipc.on('clear-apv', () => {
 
 global.platform.ipc.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
-  showLine(data.shabadID, data.lineID, data.rows);
+  showLine(data.shabadID, data.lineID, data.rows, data.mode);
 });
 
 global.platform.ipc.on('show-ang', (event, data) => {
@@ -277,19 +287,25 @@ const createCards = (rows, LineID) => {
   return { cards, lines, shabad };
 };
 
-const createDeck = (cards, curSlide, shabad, ShabadID) => {
-  document.querySelector('.vc-toggle-icon').style.left = '0';
-  hideDecks();
-  if (document.querySelector('.vc-open')) {
-    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));
-  } else {
-    $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+const createDeck = (cards, curSlide, shabad, ShabadID, mode) => {
+  const $existingDeck = document.querySelector(`div#shabad${ShabadID}.deck.active`);
+  if (mode === 'replace') {
+    document.querySelector('.vc-toggle-icon').style.left = '0';
+    hideDecks();
+    if (document.querySelector('.vc-open')) {
+      $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));
+    } else {
+      $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active`, cards));
+    }
+    // Wait a tiny bit for rendering to finish before scrolling to the slide
+    setTimeout(() => smoothScroll(`#slide${curSlide}`), 100);
+    currentShabad = parseInt(ShabadID, 10) || ShabadID;
+    decks[ShabadID] = shabad;
+    castShabadLine(curSlide);
+  } else if (mode === 'append') {
+    cards.forEach((card) => { $existingDeck.appendChild(card); });
+    Object.assign(decks[ShabadID], shabad);
   }
-  // Wait a tiny bit for rendering to finish before scrolling to the slide
-  setTimeout(() => smoothScroll(`#slide${curSlide}`), 100);
-  currentShabad = parseInt(ShabadID, 10) || ShabadID;
-  decks[ShabadID] = shabad;
-  castShabadLine(curSlide);
 };
 
 const showAng = (PageNo, SourceID, LineID, rows) => {
@@ -325,7 +341,7 @@ const smoothScroll = (pos = 0) => {
   scroll.top($body, newScrollPos);
 };
 
-const showLine = (ShabadID, LineID, rows) => {
+const showLine = (ShabadID, LineID, rows, mode) => {
   const newShabadID = parseInt(ShabadID, 10) || ShabadID;
   if (apv && infiniteScroll) {
     createAPVContainer();
@@ -336,21 +352,33 @@ const showLine = (ShabadID, LineID, rows) => {
     } else {
       smoothScroll(`#apv #slide${LineID}`);
     }
-  } else if (newShabadID in decks) {
-    const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
-    if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
-      hideDecks();
-      $shabadDeck.classList.add('active');
-      currentShabad = newShabadID;
-    }
-    [...$shabadDeck.querySelectorAll('.slide')].forEach(el => el.classList.remove('active'));
-    const line = document.querySelector(`.deck.active #slide${LineID}`);
-    line.classList.add('active');
-    smoothScroll(line);
-    castShabadLine(LineID);
   } else {
+    const $existingDeck = document.querySelector(`div#shabad${ShabadID}.deck.active`);
     const { cards, shabad } = createCards(rows, LineID);
-    createDeck(cards, LineID, shabad, newShabadID);
+    switch (mode) {
+      case 'replace':
+        if (newShabadID in decks) {
+          const $shabadDeck = document.getElementById(`shabad${newShabadID}`);
+          if (currentShabad !== newShabadID || !$shabadDeck.classList.contains('active')) {
+            hideDecks();
+            $shabadDeck.classList.add('active');
+            currentShabad = newShabadID;
+          }
+          activateSlide($shabadDeck, LineID);
+        } else {
+          createDeck(cards, LineID, shabad, newShabadID, mode);
+        }
+        break;
+      case 'append':
+        cards.forEach((card) => { $existingDeck.appendChild(card); });
+        Object.assign(decks[ShabadID], shabad);
+        break;
+      case 'click':
+        activateSlide($existingDeck, LineID);
+        break;
+      default:
+        break;
+    }
   }
 };
 

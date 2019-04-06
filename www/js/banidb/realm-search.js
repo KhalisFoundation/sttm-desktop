@@ -168,17 +168,18 @@ const loadShabad = ShabadID => (
  * @returns {object} Returns array of objects for each line
  * @example
  *
- * loadBani(2);
+ * loadBani(2, "extralong");
  * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
  */
-const loadBani = BaniID => (
+const loadBani = (BaniID, BaniLength) => (
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
       .then((realm) => {
-        const rows = realm.objects('Banis_Shabad').filtered('Bani.ID == $0', BaniID).sorted('Seq');
+        const condition = `Bani.ID == ${BaniID} AND ${BaniLength} == true`;
+        const rows = realm.objects('Banis_Shabad').filtered(condition).sorted('Seq');
         if (rows.length > 0) {
           resolve(rows);
         }
@@ -214,6 +215,15 @@ const loadCeremony = ceremonyID => (
   })
 );
 
+/**
+ * Retrieve all banis for sunder gutka
+ *
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBanis();
+ * // => [ {Gurmukhi: "gur mMqR", ID: 1, Token: "gurmantar"}, {Gurmukhi: "jpujI swihb" ...} ]
+ */
 const loadBanis = () => (
   new Promise((resolve, reject) => {
     if (!initialized) {
