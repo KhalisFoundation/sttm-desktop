@@ -92,7 +92,22 @@
               "long": "Long",
               "extralong": "Extra Long"
             }
-          },
+          }
+        }
+      },
+      "gurbani-options": {
+        "type": "switch",
+        "options": {
+          "display-visraams": {
+            "label": "Show Vishraams",
+            "subLabel": "Limited theme support"
+          }
+        }
+      },
+      "vishraam": {
+        "title": "",
+        "type": "dropdown",
+        "options": {
           "vishraam-options": {
             "title": "Vishraam Options",
             "options": {
@@ -108,12 +123,6 @@
               "sttm": "STTM Living" 
             }
           }
-        }
-      },
-      "gurbani-options": {
-        "type": "switch",
-        "options": {
-          "display-visraams": "Show Vishraams"
         }
       }
     }
