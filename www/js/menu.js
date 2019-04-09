@@ -180,7 +180,7 @@ const hukamnamaButton = h(
           if (!error) {
             const hukamShabadID = parseInt(response.shabadinfo.id, 10);
 
-            analytics.trackEvent('display', 'hukamnam', hukamShabadID);
+            analytics.trackEvent('display', 'hukamnama', hukamShabadID);
             goToShabadPage(hukamShabadID);
           }
         });
