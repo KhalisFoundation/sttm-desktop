@@ -489,11 +489,11 @@ module.exports = {
     return Line;
   },
 
-  sendLine(shabadID, lineID, rawLine, rawRows) {
+  sendLine(shabadID, lineID, rawLine, rawRows, mode) {
     const Line = this.remapLine(rawLine);
     const rows = rawRows.map(row => this.remapLine(row));
-    global.webview.send('show-line', { shabadID, lineID, rows });
-    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows };
+    global.webview.send('show-line', { shabadID, lineID, rows, mode });
+    const showLinePayload = { shabadID, lineID, Line, live: false, larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'), rows, mode };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
@@ -524,6 +524,14 @@ module.exports = {
   'gradient-bg': function gradientBg() {
     const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
+  },
+
+  'gurbani-bani-length': function gurbaniBaniLength() {
+    // reload bani
+    const currentBani = document.getElementById('shabad').dataset.bani;
+    if (currentBani) {
+      global.core.search.loadBani(currentBani);
+    }
   },
 
   autoplay() {

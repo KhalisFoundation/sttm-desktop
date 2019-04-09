@@ -229,12 +229,20 @@ const loadBanis = () => (
  *
  */
 
-const loadBani = BaniID => (
+const loadBani = (BaniID, BaniLength) => (
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID WHERE b.Bani = ${BaniID} ORDER BY b.Seq`, (err, rows) => {
+    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration,
+    v.punjabiUni, v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
+    b.existsTaksal, b.existsBuddhaDal
+    FROM Verse v 
+    LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID 
+    LEFT JOIN Banis c ON c.ID = ${BaniID} 
+    WHERE b.Bani = ${BaniID}
+    AND b.${BaniLength} = true
+    ORDER BY b.Seq`, (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {
