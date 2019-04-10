@@ -20,6 +20,10 @@
 
 [Why are some Banis in Sundar Gutka so short/long? How do I fix this?](#bani-length)
 
+[What are Vishraams?](#vishraams)
+
+[What are the Vishraam styles and sources?](#vishraam-options)
+
 [Additional Database/Search Information](#additional-info)
 
 [What is Bani Overlay?](#bani-overlay)
@@ -28,9 +32,7 @@
 
 [Video Tutorial](#video-tutorial)
 
-[What are Vishraams?](#vishraams)
 
-[What are the Vishraam styles and sources?](#vishraam-options)
 
 ### <a name="how-to-search">How do I search for a shabad?</a>
 
