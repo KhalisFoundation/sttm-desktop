@@ -3,17 +3,29 @@
 [How do I search for a shabad?](#how-to-search)
 
 [How do I type in Gurmukhi?](#type-in-gurmukhi)
+
 [How can I adjust the font size?](#adjust-font-size)
+
 [How do I change the background color?](#background-color)
+
 [What do the different search types do?](#search-type)
+
 [Using wildcard when searching](#wildcard)
+
 [How do I connect SikhiToTheMax to a projector?](#connect-to-projector)
+
 [Can you view the Gurbani in Larivaar?](#larivaar)
+
 [What is Sundar Gutka?](#sundar-gutka)
+
 [Why are some Banis in Sundar Gutka so short/long? How do I fix this?](#bani-length)
+
 [Additional Database/Search Information](#additional-info)
+
 [What is Bani Overlay?](#bani-overlay)
+
 [How do I report a mistake?](#report-mistake)
+
 [Video Tutorial](#video-tutorial)
 
 #### <a name="how-to-search">How do I search for a shabad?</a>
