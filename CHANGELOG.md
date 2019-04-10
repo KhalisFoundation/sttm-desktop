@@ -1,8 +1,9 @@
 ## New Updates
 
-### 5.0 - _1903XX_
+### 5.0 - _190410_
 ### Added:
 * Sundar Gutka! Now you can easily access compiled Banis such as Nitnem, Asa Kee Vaar, Sukhmani Sahib, and so much more
+![](./assets/img/help_images/SG.gif)
 * Thanks to your feedback, we have added two different styles of Vishraams. You can enable this in the Settings
 
 ### Improved:
