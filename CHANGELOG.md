@@ -5,6 +5,7 @@
 * Sundar Gutka! Now you can easily access compiled Banis such as Nitnem, Asa Kee Vaar, Sukhmani Sahib, and so much more
 ![](./assets/img/help_images/SG.gif)
 * Thanks to your feedback, we have added two different styles of Vishraams. You can enable this in the Settings
+![](./assets/img/help_images/desktop-vishraams.gif)
 
 ### Improved:
 * SikhiToTheMax will no longer open a second instance if it is already open
