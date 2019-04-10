@@ -644,4 +644,13 @@ body.show-overlay {
       &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     } */
   }
+
+  #toolbar,
+  .focus-overlay {
+    top: $title-bar-offset;
+  }
+
+  .close-overlay-ui {
+    top: $presenter-pane-gap + $title-bar-offset;
+  }
 }
