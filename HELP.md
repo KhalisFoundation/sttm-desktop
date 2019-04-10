@@ -1,4 +1,6 @@
 
+This is a [test](#test)
+
 ### How do I search for a shabad?
 
 After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is `ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ`, you would enter `gmsshn`. ![](./assets/img/help_images/search_example.gif)
@@ -73,7 +75,7 @@ EXTRA LONG: Most popular amongst followers of Buddha Dal.
 
 You can adjust Bani Length in the Settings tab. 
 
-### Additional Database/Search Information
+### <a name="test">Additional Database/Search Information</a>
 
 *   SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
 *   If you verified your shabad should be in the database and it is still not coming up, make sure you are typing in the correct letters for search. If you aren’t sure about a letter, or are still having difficulties, try using one of the different search types to locate the shabad.
