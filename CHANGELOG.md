@@ -1,5 +1,18 @@
-## SikhiToTheMax - Desktop
+## New Updates
 
+### 5.0 - _190410_
+### Added:
+* Sundar Gutka! Now you can easily access compiled Banis such as Nitnem, Asa Kee Vaar, Sukhmani Sahib, and so much more
+![](./assets/img/help_images/SG.gif)
+* Thanks to your feedback, we have added two different styles of Vishraams. You can enable this in the Settings
+![](./assets/img/help_images/desktop-vishraams.gif)
+
+### Improved:
+* SikhiToTheMax will no longer open a second instance if it is already open
+
+<br/>  
+<details><summary>See previous updates...</summary>
+  
 ### 4.5 - _190312_
 ### Added:
 * Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
@@ -7,10 +20,7 @@
 ### Improved:
 * Quick Tools will now overlay instead of push for a more accurate preview
 * Fixed an issue with Quick Tools when using certain themes
-* Bani Overlay will now clear the current shabad upon closing the app
-
-<br/>  
-<details><summary>See previous updates...</summary>
+* Bani Overlay will now clear the current shabad upon closing the app  
 
 ### 4.4.1 - _190223_
 ### Improved:
