@@ -22,7 +22,7 @@
 
 [What are Vishraams?](#vishraams)
 
-[What are the Vishraam styles and sources?](#vishraam-options)
+[What are the Vishraam styles and sources?](#vishraams-options)
 
 [Additional Database/Search Information](#additional-info)
 
