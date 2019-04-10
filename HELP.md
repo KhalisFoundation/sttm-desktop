@@ -1,24 +1,37 @@
 
 ## FAQ
 [How do I search for a shabad?](#how-to-search)
+[How do I type in Gurmukhi?](#type-in-gurmukhi)
+[How can I adjust the font size?](#adjust-font-size)
+[How do I change the background color?](#background-color)
+[What do the different search types do?](#search-type)
+[Using wildcard when searching](#wildcard)
+[How do I connect SikhiToTheMax to a projector?](#connect-to-projector)
+[Can you view the Gurbani in Larivaar?](#larivaar)
+[What is Sundar Gutka?](#sundar-gutka)
+[Why are some Banis in Sundar Gutka so short/long? How do I fix this?](#bani-length)
+[Additional Database/Search Information](#additional-info)
+[What is Bani Overlay?](#bani-overlay)
+[How do I report a mistake?](#report-mistake)
+[Video Tutorial](#video-tutorial)
 
-### <a name="how-to-search">How do I search for a shabad?</a>
+#### <a name="how-to-search">How do I search for a shabad?</a>
 
 After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is `ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ`, you would enter `gmsshn`. ![](./assets/img/help_images/search_example.gif)
 
-### How do I type in Gurmukhi?
+### <a name="type-in-gurmukhi">How do I type in Gurmukhi?</a>
 
 When using SikhiToTheMax, your keyboard will automatically type in Gurmukhi. Reference the keyboard map below to know which character goes with which key. Alternatively, you can click on the Gurmukhi keyboard icon and type in the letters manually.![](./assets/img/help_images/web-desktop-keyboard-map.png)
 
-### How can I adjust the font size?
+### <a name="adjust-font-size">How can I adjust the font size?</a>
 
 The easiest way to change the font size is through quick tools. The quick tools menu is available in the preview pane when you are viewing a shabad. ![](./assets/img/help_images/desktop-quick-tools.gif)
 
-### How do I change the background color?
+### <a name="background-color">How do I change the background color?</a>
 
 After launching SikhiToTheMax, click the icon for Themes and choose your preferred option. Alternatively, you can scroll to the bottom and upload a custom background image. We recommend a resolution of 1920x1080 for custom backgrounds.
 
-### What do the different search types do?
+### <a name="search-type">What do the different search types do?</a>
 
 *   First Letter (Start)
     *   The letters you input must be from the START of a line in a shabad.
@@ -32,29 +45,25 @@ After launching SikhiToTheMax, click the icon for Themes and choose your preferr
 *   English Translation (Full Word)
     *   You can search for shabads via the english translations. For example, type in the word "bird" and the results will show all shabads that include a translation for "bird".
     
-### Using wildcard when searching
+### <a name="wildcard">Using wildcard when searching</a>
 
 If you are unsure of a letter when searching, you can enter in a `*` as a wildcard search operator. This will act as a placeholder and will find results against every letter. For example, if the shabad is ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ , you can enter `gms*hn`.
 
-### How do I connect SikhiToTheMax to a projector?
+### <a name="connect-to-projector">How do I connect SikhiToTheMax to a projector?</a>
 
 Plug in your computer to the projector or TV. Once you do this, go to your computer's display settings and change it to "Extended Desktop" (NOT mirroring). After that, launch SikhiToTheMax and turn on "Presenter View" in the settings! ![](./assets/img/help_images//desktop-extend-pc.png) ![](./assets/img/help_images/desktop-extend-mac.png)
 
 
-### Can you view the Gurbani in Larivaar?
+### <a name="larivaar">Can you view the Gurbani in Larivaar?</a>
 
 Yes! After launching SikhiToTheMax, click the icon for Display Settings, and choose the Larivaar option. 
 
 
-### Where can I see my previous shabads?
-
-When using SikhiToTheMax, your history will appear in the the "History" tab. You can click any of the shabads in the list to bring them back up as your primary one.
-
-### What is Sundar Gutka?
+### <a name="sundar-gutka">What is Sundar Gutka?</a>
 
 Sundar Gutka is a a list of frequently read Banis such as Sukhmani Sahib, Asa Kee Vaar, Nitnem, and many more. This list is avaialble within SikhiToTheMax for easy access rather than needing to search for each Bani. Simply click on the Sundar Gutka icon to get started. ![](./assets/img/help_images/SG.gif)
 
-### Why are some Banis in Sundar Gutka so short/long? How do I fix this?
+### <a name="bani-length">Why are some Banis in Sundar Gutka so short/long? How do I fix this?</a>
 
 Throughout the past few centuries, there have been many different “sampardhas” or “jathas” that have been conceived from the core concepts of Sikhi and Gurmat. These sampardhas often have different opinions and thoughts about some aspects of Sikh history, Gurbani and Rehat, but still fall collectively under the united Khalsa Panth and, most importantly, the Akaal Takht. The Akaal Takht is the highest order and institution that all Sikhs adhere to.
 
@@ -76,7 +85,7 @@ EXTRA LONG: Most popular amongst followers of Buddha Dal.
 
 You can adjust Bani Length in the Settings tab. 
 
-### <a name="test">Additional Database/Search Information</a>
+### <a name="additional-info">Additional Database/Search Information</a>
 
 *   SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
 *   If you verified your shabad should be in the database and it is still not coming up, make sure you are typing in the correct letters for search. If you aren’t sure about a letter, or are still having difficulties, try using one of the different search types to locate the shabad.
@@ -99,16 +108,16 @@ You can adjust Bani Length in the Settings tab.
         `ss*nh` will search for “sukh sagar har naam hai” and “rasna sacha simriye man tan nirmal hoye” but not “soche soch na hovayi…”
 
 
-### What is Bani Overlay?
+### <a name="bani-overlay">What is Bani Overlay?</a>
 
 Bani Overlay allows you to display Gurbani from SikhiToTheMax on a Live Stream. It will require a third party software such as OBS. To learn more, watch this video: 
 
 <div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/WrckmAcwboM" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
 
-### How do I report a mistake?
+### <a name="report-mistake">How do I report a mistake?</a>
 
 Visit [SikhiToTheMax.org](https://sikhitothemax.org) and click "[Feedback](https://goo.gl/plk23h)" at the bottom of the page.
 
-###  Video Tutorial
+###  <a name="video-tutorial">Video Tutorial</a>
 
 <div class="video-wrapper"><iframe width="100%" height="400px" src="https://www.youtube.com/embed/ZDX8nPkDBSc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div>
