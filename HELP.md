@@ -28,6 +28,10 @@
 
 [Video Tutorial](#video-tutorial)
 
+[What are Vishraams?](#vishraams)
+
+[What are the Vishraam styles and sources?](#vishraam-options)
+
 ### <a name="how-to-search">How do I search for a shabad?</a>
 
 After launching SikhiToTheMax, by default you can search for a shabad by entering the first letter of each word. For example, if the shabad is `ਗੁਰੁ ਮੇਰੈ ਸੰਗਿ ਸਦਾ ਹੈ ਨਾਲੇ`, you would enter `gmsshn`. ![](./assets/img/help_images/search_example.gif)
@@ -97,6 +101,25 @@ LONG: Typically read by followers of Damdami Taksaal and others.
 EXTRA LONG: Most popular amongst followers of Buddha Dal.
 
 You can adjust Bani Length in the Settings tab. 
+
+### <a name="vishraams">What are Vishraams?</a>
+
+Vishraams indicate pauses in Gurbani. There are both long pauses and short pause that are denoted by different colors (see next question). It is important to note that Vishraams are interpretations from Gursikhs and are not written directly in Guru Granth Sahib Jee. 
+
+### <a name="vishraams-options">What are the Vishraam styles and sources?</a>
+
+The Khalis team preformed a user study to determine the best way to display Vishraams. You have the option (in the Settings) to choose between Colored Words or a Gradient Background. Colors are defined below:
+
+*   Colored Text:
+    *   *Red* - long pause
+    *   *Yellow* - short pause
+    
+Additionally, you have the option to choose between Vishraam sources:
+
+*   Sources:
+    *   *STTM Living* - Vishraams being actively updated/corrected by the Khalis Foundation team of sevaadaars
+    *   *iGurbani* - Vishraams as shown in the iGurbani mobile app
+     *  *STTM 2* - Vishraams as shown in the old SikhiToTheMax 2 app
 
 ### <a name="additional-info">Additional Database/Search Information</a>
 
