@@ -1,6 +1,7 @@
 
 ## FAQ
 [How do I search for a shabad?](#how-to-search)
+
 [How do I type in Gurmukhi?](#type-in-gurmukhi)
 [How can I adjust the font size?](#adjust-font-size)
 [How do I change the background color?](#background-color)
