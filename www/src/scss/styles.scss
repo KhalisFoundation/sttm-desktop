@@ -628,13 +628,13 @@ body.show-overlay {
   top: 30px;
 }
 
-.darwin {
+.win32 {
   #toolbar .close-overlay-ui {
     top: $presenter-pane-gap + $title-bar-offset;
   }
 }
 
-.controller.scale-viewer.presenter-view.darwin {
+.controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
   #shabad-menu-page { @include calculateTop(0, 1); }

@@ -17,6 +17,7 @@ body.win32:not(.webview) {
     top: 1px;
     transition: opacity 0.2s ease-out;
     width: calc(100% - 2px);
+    z-index: 1600;
 
     > * {
       display: initial;
