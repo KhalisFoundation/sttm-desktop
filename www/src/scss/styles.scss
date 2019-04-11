@@ -629,6 +629,9 @@ body.show-overlay {
 }
 
 .win32 {
+  .bani-list {
+    width: 470px;
+  }
   #toolbar .close-overlay-ui {
     top: $presenter-pane-gap + $title-bar-offset;
   }
@@ -652,7 +655,6 @@ body.show-overlay {
   }
 
   #toolbar {
-    height: calc(100vh - #{$title-bar-offset});
     padding-top: calc(#{$title-bar-offset} + 10px);
 
     .bani-list {
