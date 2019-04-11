@@ -11,6 +11,7 @@ const uuid = require('uuid/v4');
 
 // Are we packaging for a platform's app store?
 const appstore = false;
+const maxChangeLogSeenCount = 5;
 
 const expressApp = express();
 
@@ -53,7 +54,11 @@ const secondaryWindows = {
   changelogWindow: {
     obj: false,
     url: `file://${__dirname}/www/changelog.html`,
-    onClose: () => { store.set('changelog-seen', appVersion); },
+    onClose: () => {
+      const count = store.get('changelog-seen-count');
+      store.set('changelog-seen', appVersion);
+      store.set('changelog-seen-count', (count + 1));
+    },
   },
   helpWindow: {
     obj: false,
@@ -314,7 +319,8 @@ app.on('ready', () => {
     }
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
-    if (lastSeen !== appVersion) {
+    const lastSeenCount = store.get('changelog-seen-count');
+    if (lastSeen !== appVersion || lastSeenCount < maxChangeLogSeenCount) {
       openSecondaryWindow('changelogWindow');
     }
     if (!viewerWindow) {

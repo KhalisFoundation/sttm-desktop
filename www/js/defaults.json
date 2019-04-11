@@ -59,6 +59,7 @@
   },
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
+  "changelog-seen-count": 0,
   "searchOptions": {
     "searchLanguage":"gr",
     "searchType": 0,
