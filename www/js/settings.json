@@ -151,6 +151,10 @@
         "title": "Other Options",
         "type": "switch",
         "options": {
+          "limit-changelog": {
+            "label": "Limit Changelog",
+            "subLabel": "Only see changelog once per version"
+          },
           "collect-statistics":"Collect Statistics"
         }
       }
