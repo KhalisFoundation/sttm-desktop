@@ -320,7 +320,9 @@ app.on('ready', () => {
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
     const lastSeenCount = store.get('changelog-seen-count');
-    if (lastSeen !== appVersion || lastSeenCount < maxChangeLogSeenCount) {
+    const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
+
+    if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
       openSecondaryWindow('changelogWindow');
     }
     if (!viewerWindow) {
