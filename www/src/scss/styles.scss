@@ -1,5 +1,5 @@
 $presenter-pane-gap: 25px;
-$title-bar-offset: 25px;
+$title-bar-offset: 32px;
 $keyboard-height:128px;
 $toolbar-offset: 75px;
 $toolbar-small-offset: 50px;
@@ -628,12 +628,12 @@ body.show-overlay {
   top: 30px;
 }
 
-.win32 {
-  .focus-overlay {
-    top: $title-bar-offset;
+.win32 #toolbar {
+  .bani-list {
+    width: 470px;
   }
 
-  #toolbar .close-overlay-ui {
+  .close-overlay-ui {
     top: $presenter-pane-gap + $title-bar-offset;
   }
 }
@@ -656,12 +656,12 @@ body.show-overlay {
   }
 
   #toolbar {
-    height: calc(100vh - #{$title-bar-offset});
-    top: $title-bar-offset;
+    padding-top: calc(#{$title-bar-offset} + 10px);
 
     .bani-list {
       height: calc(100vh - calc(#{$presenter-pane-gap * 2} + #{$title-bar-offset}));
       top: $presenter-pane-gap + $title-bar-offset;
+      width: $bani-list-width;
     }
 
     .bani-extras {
