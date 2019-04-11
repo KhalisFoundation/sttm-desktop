@@ -628,6 +628,16 @@ body.show-overlay {
   top: 30px;
 }
 
+.win32 {
+  .focus-overlay {
+    top: $title-bar-offset;
+  }
+
+  #toolbar .close-overlay-ui {
+    top: $presenter-pane-gap + $title-bar-offset;
+  }
+}
+
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
@@ -643,5 +653,19 @@ body.show-overlay {
 
       &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     } */
+  }
+
+  #toolbar {
+    height: calc(100vh - #{$title-bar-offset});
+    top: $title-bar-offset;
+
+    .bani-list {
+      height: calc(100vh - calc(#{$presenter-pane-gap * 2} + #{$title-bar-offset}));
+      top: $presenter-pane-gap + $title-bar-offset;
+    }
+
+    .bani-extras {
+      top: $presenter-pane-gap + $title-bar-offset;
+    }
   }
 }
