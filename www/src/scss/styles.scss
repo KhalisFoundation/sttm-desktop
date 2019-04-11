@@ -628,11 +628,12 @@ body.show-overlay {
   top: 30px;
 }
 
-.win32 {
+.win32 #toolbar {
   .bani-list {
     width: 470px;
   }
-  #toolbar .close-overlay-ui {
+
+  .close-overlay-ui {
     top: $presenter-pane-gap + $title-bar-offset;
   }
 }
