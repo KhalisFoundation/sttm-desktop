@@ -1,8 +1,8 @@
 /* eslint-disable no-console, import/no-extraneous-dependencies */
 const fs = require('fs');
-const version = require('../package.json').version;
 const path = require('path');
 const SSH = require('ssh2').Client;
+const { version } = require('../package.json');
 
 const files = {
   mac: 'sttm-mac-x64',

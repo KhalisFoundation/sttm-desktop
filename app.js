@@ -1,28 +1,28 @@
 const electron = require('electron');
-const Store = require('./www/js/store.js');
-const defaultPrefs = require('./www/js/defaults.json');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const Analytics = require('./analytics');
 const uuid = require('uuid/v4');
+const op = require('openport');
+const Store = require('./www/js/store.js');
+const defaultPrefs = require('./www/js/defaults.json');
+const Analytics = require('./analytics');
 
 // Are we packaging for a platform's app store?
 const appstore = false;
 const maxChangeLogSeenCount = 5;
 
 const expressApp = express();
-
+/* eslint-disable import/order */
 const http = require('http').Server(expressApp);
 const io = require('socket.io')(http);
+/* eslint-enable */
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
-
-const op = require('openport');
 
 op.find(
   {
@@ -32,14 +32,18 @@ op.find(
   },
   (err, port) => {
     if (err) {
-      dialog.showErrorBox('Overlay Error', 'No free ports available. Close other applications and Reboot the machine');
+      dialog.showErrorBox(
+        'Overlay Error',
+        'No free ports available. Close other applications and Reboot the machine',
+      );
       app.exit(-1);
       return;
     }
     global.overlayPort = port;
     // console.log(`Overlay Port No ${port}`);
     http.listen(port);
-  });
+  },
+);
 
 const store = new Store({
   configName: 'user-preferences',
@@ -57,7 +61,7 @@ const secondaryWindows = {
     onClose: () => {
       const count = store.get('changelog-seen-count');
       store.set('changelog-seen', appVersion);
-      store.set('changelog-seen-count', (count + 1));
+      store.set('changelog-seen-count', count + 1);
     },
   },
   helpWindow: {
@@ -113,9 +117,7 @@ autoUpdater.on('update-not-available', () => {
   if (manualUpdate) {
     dialog.showMessageBox({
       type: 'info',
-      buttons: [
-        'OK',
-      ],
+      buttons: ['OK'],
       defaultId: 0,
       title: 'No update available.',
       message: 'No update available.',
@@ -125,22 +127,22 @@ autoUpdater.on('update-not-available', () => {
 });
 autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('update-downloaded');
-  dialog.showMessageBox({
-    type: 'info',
-    buttons: [
-      'Dismiss',
-      'Install and Restart',
-    ],
-    defaultId: 1,
-    title: 'Update available.',
-    message: 'Update available.',
-    detail: 'Update downloaded and ready to install',
-    cancelId: 0,
-  }, (response) => {
-    if (response === 1) {
-      autoUpdater.quitAndInstall();
-    }
-  });
+  dialog.showMessageBox(
+    {
+      type: 'info',
+      buttons: ['Dismiss', 'Install and Restart'],
+      defaultId: 1,
+      title: 'Update available.',
+      message: 'Update available.',
+      detail: 'Update downloaded and ready to install',
+      cancelId: 0,
+    },
+    response => {
+      if (response === 1) {
+        autoUpdater.quitAndInstall();
+      }
+    },
+  );
 });
 autoUpdater.on('error', () => {
   if (manualUpdate) {
@@ -161,7 +163,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach((i) => {
+  Object.keys(displays).forEach(i => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -188,7 +190,7 @@ function createViewer(ipcData) {
       autoHideMenuBar: true,
       show: false,
       titleBarStyle: 'hidden',
-      frame: (process.platform !== 'win32'),
+      frame: process.platform !== 'win32',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
@@ -227,7 +229,10 @@ function createViewer(ipcData) {
 
 function createBroadcastFiles(arg) {
   const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
-  const userDataPath = (liveFeedLocation === 'default' || !liveFeedLocation) ? electron.app.getPath('desktop') : liveFeedLocation;
+  const userDataPath =
+    liveFeedLocation === 'default' || !liveFeedLocation
+      ? electron.app.getPath('desktop')
+      : liveFeedLocation;
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
   try {
@@ -300,7 +305,7 @@ app.on('ready', () => {
     minHeight: 600,
     width,
     height,
-    frame: (process.platform !== 'win32'),
+    frame: process.platform !== 'win32',
     show: false,
     titleBarStyle: 'hidden',
   });
@@ -355,11 +360,10 @@ app.on('ready', () => {
   });
 });
 
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
@@ -386,7 +390,7 @@ let lastLine;
 
 ipcMain.on('update-overlay-vars', updateOverlayVars);
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   updateOverlayVars();
   if (lastLine) {
     showLine(lastLine, socket);
