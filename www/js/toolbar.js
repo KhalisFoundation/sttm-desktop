@@ -37,11 +37,6 @@ const toggleOverlayUI = (toolbarItem, show) => {
 const navigatorHeaderFactory = (id, content, lang) => h(
   `header.navigator-header#${id}`,
   h(`span.${lang}`, content),
-  h('i.fa.fa-play', {
-    onclick: () => {
-      toggleOverlayUI(currentToolbarItem, false);
-    },
-  }),
 );
 
 const blockListFactory = (lang, id) => h(
@@ -177,7 +172,12 @@ const printCeremonies = (rows) => {
             ),
           ),
           h(`div.ceremony-pane-themes#${row.Token}`,
-            h('div.ceremony-theme-header', 'Choose a Theme (optional)'),
+            {
+              onclick: () => {
+                toggleOverlayUI(currentToolbarItem, false);
+              },
+            },
+            h('div.ceremony-theme-header', 'Choose a Theme to launch'),
           ),
         ),
       );

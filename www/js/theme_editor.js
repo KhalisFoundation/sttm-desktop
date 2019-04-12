@@ -116,7 +116,7 @@ const recentSwatchFactory = backgroundPath =>
     ),
   );
 
-const swatchFactory = (themeInstance, isCustom) =>
+const swatchFactory = (themeInstance, isCustom, forceLabel = null) =>
   h(
     'li.theme-instance',
     {
@@ -137,6 +137,8 @@ const swatchFactory = (themeInstance, isCustom) =>
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
           analytics.trackEvent('theme', themeInstance.key);
+          // eslint-disable-next-line no-use-before-define
+          updateCeremonyThemeTiles();
         } catch (error) {
           uploadErrorNotification(`There is an error parsing this theme.
           Try checking theme file for error. ${error} - If error persists,
@@ -151,7 +153,7 @@ const swatchFactory = (themeInstance, isCustom) =>
           color: themeInstance['gurbani-color'],
         },
       },
-      themeInstance.name));
+      forceLabel || themeInstance.name));
 
 const swatchHeaderFactory = headerText => h('header.options-header', headerText);
 
@@ -256,16 +258,25 @@ const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
   });
 };
 
+const updateCeremonyThemeTiles = () => {
+  const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+  document.querySelectorAll('.ceremony-pane-themes .theme-instance').forEach(el => el.remove());
+
+  const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
+  swatchGroupFactory('anandkaraj', anandKarajPane);
+  anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+
+  const deathPane = document.querySelector('.ceremony-pane-themes#death');
+  swatchGroupFactory('death', deathPane);
+  deathPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+};
+
 module.exports = {
   defaultTheme,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
     setTimeout(() => {
-      const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
-      swatchGroupFactory('anandkaraj', anandKarajPane);
-
-      const deathPane = document.querySelector('.ceremony-pane-themes#death');
-      swatchGroupFactory('death', deathPane);
+      updateCeremonyThemeTiles();
     }, 1000);
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));

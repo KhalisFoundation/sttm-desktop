@@ -214,27 +214,9 @@ a {
       font-weight: bold;
     }
 
-    .ceremony-pane {
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: 0.5s all ease;
-
-      i.fa:hover {
-        color: $tag-nitnem-color;
-        transform: scale(1.4);
-      }
-
-      &:hover {
-        border: 2px solid $tag-nitnem-color;
-      }
-    }
-
     .ceremony-pane.active {
-      border: 2px solid $tag-nitnem-color;
-      box-shadow: 0 0 6px $tag-nitnem-color;
-
-      i.fa {
-        color: $tag-nitnem-color;
+      .navigator-header {
+        border-bottom: 2px solid $tag-nitnem-color;
       }
     }
 
@@ -251,6 +233,10 @@ a {
       max-height: 200px;
       padding: 10px;
       width: 100%;
+
+      .theme-instance {
+        width: 27%;
+      }
     }
 
     .ceremony-pane-options {
@@ -259,7 +245,7 @@ a {
       flex-direction: column;
       font-size: 12px;
       justify-content: center;
-      padding: 20px;
+      padding: 20px 10px;
       text-align: center;
 
       .switch {
