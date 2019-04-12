@@ -63,6 +63,9 @@ const secondaryWindows = {
       store.set('changelog-seen-count', (count + 1));
       global.analytics.trackEvent('changelog', 'closed', ((endChangelogOpenTimer - startChangelogOpenTimer) / 1000.0));
     },
+    show: () => {
+      startChangelogOpenTimer = (new Date()).getTime();
+    },
   },
   helpWindow: {
     obj: false,
@@ -90,6 +93,9 @@ function openSecondaryWindow(windowName) {
     });
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
+      if (window.show) {
+        window.show();
+      }
     });
     window.obj.loadURL(window.url);
 
@@ -327,7 +333,6 @@ app.on('ready', () => {
     const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
 
     if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
-      startChangelogOpenTimer = (new Date()).getTime();
       openSecondaryWindow('changelogWindow');
     }
     if (!viewerWindow) {
