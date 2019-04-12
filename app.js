@@ -50,14 +50,18 @@ const appVersion = app.getVersion();
 
 let mainWindow;
 let viewerWindow = false;
+let startChangelogOpenTimer;
+let endChangelogOpenTimer;
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
     url: `file://${__dirname}/www/changelog.html`,
     onClose: () => {
       const count = store.get('changelog-seen-count');
+      endChangelogOpenTimer = (new Date()).getTime();
       store.set('changelog-seen', appVersion);
       store.set('changelog-seen-count', (count + 1));
+      global.analytics.trackEvent('changelog', 'closed', ((endChangelogOpenTimer - startChangelogOpenTimer) / 1000.0));
     },
   },
   helpWindow: {
@@ -323,6 +327,7 @@ app.on('ready', () => {
     const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
 
     if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
+      startChangelogOpenTimer = (new Date()).getTime();
       openSecondaryWindow('changelogWindow');
     }
     if (!viewerWindow) {
