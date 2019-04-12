@@ -113,7 +113,7 @@ function createSettingsPage(userPrefs) {
             const selectBox = h(`select.settings-select#${dropdownId}`, dropdownListAttrs);
 
             const dropdownListItem = h(
-              'span.setting-container',
+              `span.setting-container#setting-container-${catKey}-${settingKey}-${dropdown}`,
               [
                 setting.options[dropdown].title,
                 selectBox,

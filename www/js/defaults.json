@@ -7,7 +7,8 @@
         "presenter-view": true
       },
       "analytics": {
-        "collect-statistics": true
+        "collect-statistics": true,
+        "limit-changelog": false
       },
       "custom-theme-options": {
         "show-theme-editor": true
@@ -24,9 +25,11 @@
         "display-visraams": false
       },
       "gurbani": {
-        "vishraam-options": "colored-words",
-        "vishraam-source": "sttm",
         "bani-length": "short"
+      },
+      "vishraam": {
+        "vishraam-options": "colored-words",
+        "vishraam-source": "sttm"
       }
     },
     "slide-layout": {
@@ -57,6 +60,7 @@
   },
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
+  "changelog-seen-count": 0,
   "searchOptions": {
     "searchLanguage":"gr",
     "searchType": 0,
