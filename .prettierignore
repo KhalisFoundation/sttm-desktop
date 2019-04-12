@@ -1,5 +1,4 @@
 assets
 builds
-packaging
 www/js/vendor
 www/obs/socket.io.js
