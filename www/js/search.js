@@ -684,7 +684,7 @@ module.exports = {
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
     // load verses for bani based on baniID and the length that user has decided
-    banidb.loadBani(BaniID, baniLengthCols[baniLength], blackListedMangalPosition)
+    banidb.loadBani(BaniID, baniLengthCols[baniLength])
       .then(rowsDb => {
         // create a unique shabadID for whole bani, and append it with length
         const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
