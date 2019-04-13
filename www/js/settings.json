@@ -92,6 +92,13 @@
               "long": "Long",
               "extralong": "Extra Long"
             }
+          },
+          "mangal-position": {
+            "title": "Mangal Position",
+            "options": {
+              "current":"Current Saroops (default)",
+              "above": "Above Raag Headings"
+            }
           }
         }
       },

@@ -663,9 +663,16 @@ module.exports = {
       });
   },
 
-  loadBani(BaniID) {
+  loadBani(BaniID, LineID = null) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
+    const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+    let blackListedMangalPosition;
+    if (mangalPosition === 'above') {
+      blackListedMangalPosition = 'current';
+    } else if (mangalPosition === 'current') {
+      blackListedMangalPosition = 'above';
+    }
     // translate user settings into its respective database fields
     const baniLengthCols = {
       short: 'existsSGPC',
@@ -677,11 +684,13 @@ module.exports = {
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
     // load verses for bani based on baniID and the length that user has decided
-    banidb.loadBani(BaniID, baniLengthCols[baniLength])
+    banidb.loadBani(BaniID, baniLengthCols[baniLength], blackListedMangalPosition)
       .then(rowsDb => {
         // create a unique shabadID for whole bani, and append it with length
         const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
-        const rows = rowsDb.map((rowDb) => {
+        const rows = rowsDb.filter(
+          (rowDb) => rowDb.MangalPosition !== blackListedMangalPosition,
+        ).map((rowDb) => {
           let row = rowDb;
           // when object from db is not a verse itself
           if (rowDb.Verse) { row = rowDb.Verse; }
@@ -693,7 +702,7 @@ module.exports = {
 
           return row;
         });
-        return this.printShabad(rows, shabadID, null);
+        return this.printShabad(rows, shabadID, LineID);
       });
   },
 
