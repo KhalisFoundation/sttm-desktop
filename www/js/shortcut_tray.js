@@ -37,11 +37,11 @@ const shortcutsToggle = h(
       analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
       store.setUserPref('slide-layout.display-options.shortcut-tray-on', isShortcutTrayOn);
       global.core.platformMethod('updateSettings');
-      document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-th-large', !isShortcutTrayOn);
-      document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-times', isShortcutTrayOn);
+      document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-caret-up', !isShortcutTrayOn);
+      document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-caret-down', isShortcutTrayOn);
     },
   },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
+  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
 );
 
 module.exports = {
