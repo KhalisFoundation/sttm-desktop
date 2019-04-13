@@ -530,7 +530,7 @@ module.exports = {
     // reload bani
     const currentBani = document.getElementById('shabad').dataset.bani;
     if (currentBani) {
-      global.core.search.loadBani(currentBani);
+      global.core.search.loadBani(currentBani, true);
     }
   },
 

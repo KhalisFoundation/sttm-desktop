@@ -663,7 +663,7 @@ module.exports = {
       });
   },
 
-  loadBani(BaniID) {
+  loadBani(BaniID, isReload = false) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     // translate user settings into its respective database fields
@@ -681,6 +681,39 @@ module.exports = {
       .then(rowsDb => {
         // create a unique shabadID for whole bani, and append it with length
         const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+        if (!isReload) {
+          const sessionItem = h(
+            `li#session-${shabadID}`,
+            {},
+            h(
+              'a.panktee.current',
+              {
+                onclick: (e) => {
+                  const $panktee = e.target;
+                  this.loadBani(BaniID, true);
+                  const sessionLines = this.$session.querySelectorAll('a.panktee');
+                  Array.from(sessionLines).forEach(el => el.classList.remove('current'));
+                  $panktee.classList.add('current');
+                  this.navPage('shabad');
+                },
+              },
+              rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi));
+          // get all the lines in the session block and remove the .current class from them
+          const sessionLines = this.$session.querySelectorAll('a.panktee');
+          Array.from(sessionLines).forEach(el => el.classList.remove('current'));
+          // if the ShabadID of the clicked Panktee isn't in the sessionList variable,
+          // add it to the variable
+          if (sessionList.indexOf(shabadID) < 0) {
+            sessionList.push(shabadID);
+          } else {
+            // if the ShabadID is already in the session, just remove the HTMLElement,
+            // and leave the sessionList
+            const line = this.$session.querySelector(`#session-${shabadID}`);
+            this.$session.removeChild(line);
+          }
+          // add the line to the top of the session block
+          this.$session.insertBefore(sessionItem, this.$session.firstChild);
+        }
         const rows = rowsDb.map((rowDb) => {
           let row = rowDb;
           // when object from db is not a verse itself
