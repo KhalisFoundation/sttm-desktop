@@ -44,7 +44,7 @@ const blockListFactory = (lang, id) => h(
   h(`ul#${id}.${lang}`),
 );
 
-const switchFactory = (id, label, inputId, clickEvent) => h(
+const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) => h(
   `div.${id}`,
   [
     h('span', label),
@@ -54,6 +54,7 @@ const switchFactory = (id, label, inputId, clickEvent) => h(
           {
             name: inputId,
             type: 'checkbox',
+            checked: defaultValue,
             onclick: clickEvent,
             value: inputId }),
         h('label',
@@ -165,10 +166,11 @@ const printCeremonies = (rows) => {
               'English Explanations',
               `${row.Token}-english-exp`,
               () => {
-                const englishExpVal = store.getUserPref('gurbani.ceremonies.english');
-                store.setUserPref('gurbani.ceremonies.english', !englishExpVal);
-                document.body.classList.toggle('ceremonies-without-english', !englishExpVal);
+                const englishExpVal = store.getUserPref(`gurbani.ceremonies.${row.Token}-english`);
+                store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
+                global.platform.updateSettings();
               },
+              store.getUserPref(`gurbani.ceremonies.${row.Token}-english`),
             ),
           ),
           h(`div.ceremony-pane-themes#${row.Token}`,
