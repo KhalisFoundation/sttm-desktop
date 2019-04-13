@@ -41,7 +41,7 @@ const shortcutsToggle = h(
       document.querySelector('i.shortcut-toggle-icon').classList.toggle('fa-times', isShortcutTrayOn);
     },
   },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-th-large' : 'fa-times'}`),
+  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
 );
 
 module.exports = {
