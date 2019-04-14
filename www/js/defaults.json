@@ -26,7 +26,7 @@
       },
       "gurbani": {
         "bani-length": "short",
-        "mangal-position": "above"
+        "mangal-position": "current"
       },
       "vishraam": {
         "vishraam-options": "colored-words",
