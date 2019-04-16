@@ -19,7 +19,8 @@ $sessionPageHeight: calc(100% - #{$totalSessionOffset});
 /*
   Fonts
 */
-$body-font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif !default;
+$body-font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+  'Helvetica Neue', Arial, sans-serif !default;
 $gurmukhi-font-family: 'gurbaniakhar';
 
 @font-face {
@@ -294,16 +295,5 @@ ul {
   }
 }
 
-@import
-  "foundation/foundation",
-  "animations",
-  "footer",
-  "forms",
-  "header",
-  "helpers",
-  "search",
-  "share-sync",
-  "settings",
-  "theme-dark",
-  "theme-light",
-  "notifications";
+@import 'foundation/foundation', 'animations', 'footer', 'forms', 'header', 'helpers', 'search',
+  'share-sync', 'settings', 'theme-dark', 'theme-light', 'notifications';
