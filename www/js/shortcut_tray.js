@@ -37,13 +37,13 @@ const shortcutsToggle = h(
       global.core.platformMethod('updateSettings');
       document
         .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-th-large', !isShortcutTrayOn);
+        .classList.toggle('fa-caret-up', !isShortcutTrayOn);
       document
         .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-times', isShortcutTrayOn);
+        .classList.toggle('fa-caret-down', isShortcutTrayOn);
     },
   },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
+  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
 );
 
 module.exports = {
