@@ -3,7 +3,7 @@ const electron = require('electron');
 const anvaad = require('anvaad-js');
 
 const { remote } = electron;
-const { app, dialog, Menu } = remote.dialog;
+const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore } = main;
 const analytics = remote.getGlobal('analytics');
