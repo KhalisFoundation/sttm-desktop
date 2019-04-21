@@ -180,6 +180,11 @@ button {
 
     label {
       margin-right: 5px;
+      line-height: 0;
+    }
+
+    input {
+      vertical-align: text-bottom;
     }
   }
 
