@@ -1,6 +1,6 @@
 $presenter-pane-gap: 25px;
 $title-bar-offset: 32px;
-$keyboard-height:128px;
+$keyboard-height: 128px;
 $toolbar-offset: 75px;
 $toolbar-small-offset: 50px;
 $toolbar-width-offset: $toolbar-offset/2;
@@ -8,7 +8,7 @@ $bani-list-width: 300px;
 $tag-nitnem-color: #5488d6;
 $tag-popular-color: #ce744e;
 
-@mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
+@mixin calculateTop($row-num, $is-windows: 0, $keyboard-offset: 0) {
   $screen-offset: 50 * $row-num;
   $pane-gap-ratio: 1;
 
@@ -18,14 +18,12 @@ $tag-popular-color: #ce744e;
 
   @if $is-windows == 0 {
     top: calc(#{$screen-offset}% + #{($presenter-pane-gap * $pane-gap-ratio) + $keyboard-offset});
-  }
-
-  @else if $is-windows == 1 {
+  } @else if $is-windows == 1 {
     top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
   }
 }
 
-@mixin calculateDimensions () {
+@mixin calculateDimensions() {
   height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
 
   $presenter-panes-container: calc(50% - #{$toolbar-width-offset});
@@ -33,28 +31,10 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import
-  "controller.scss",
-  "markdown",
-  "theme-dark",
-  "theme-light",
-  "theme-khalsa-gold",
-  "theme-baagi-blue",
-  "theme-khalsa-rush",
-  "theme-moody-blue",
-  "theme-a-new-day",
-  "theme-black-blue",
-  "theme-high-contrast",
-  "theme-low-light",
-  "theme-blue-darbar",
-  "theme-floral",
-  "update",
-  "viewer",
-  "window",
-  "akhandpaatt",
-  "overlay",
-  "animations",
-  "noty";
+@import 'controller.scss', 'markdown', 'theme-dark', 'theme-light', 'theme-khalsa-gold',
+  'theme-baagi-blue', 'theme-khalsa-rush', 'theme-moody-blue', 'theme-a-new-day', 'theme-black-blue',
+  'theme-high-contrast', 'theme-low-light', 'theme-blue-darbar', 'theme-floral', 'update', 'viewer',
+  'window', 'akhandpaatt', 'overlay', 'animations', 'noty';
 
 a {
   cursor: default;
@@ -167,7 +147,9 @@ a {
       justify-content: space-between;
     }
 
-    .translit-switch { display: none; }
+    .translit-switch {
+      display: none;
+    }
 
     .translit-bani {
       display: none;
@@ -175,8 +157,12 @@ a {
     }
 
     &.translit {
-      .translit-bani { display: inline; }
-      .gurmukhi-bani { display: none; }
+      .translit-bani {
+        display: inline;
+      }
+      .gurmukhi-bani {
+        display: none;
+      }
     }
 
     ul {
@@ -320,7 +306,9 @@ body.show-overlay {
   &.minimized {
     height: 40px;
 
-    #toolbar { display: none; }
+    #toolbar {
+      display: none;
+    }
   }
 }
 
@@ -641,10 +629,14 @@ body.show-overlay {
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
-  #shabad-menu-page { @include calculateTop(0, 1); }
+  #shabad-menu-page {
+    @include calculateTop(0, 1);
+  }
 
   #navigator.kb-active {
-    $height: calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
+    $height: calc(
+      50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2)
+    );
 
     /* .nav-page {
       &:nth-child(1) {
