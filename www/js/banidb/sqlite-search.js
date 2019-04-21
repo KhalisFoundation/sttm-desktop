@@ -16,7 +16,7 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
@@ -164,7 +164,7 @@ const loadShabad = ShabadID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -191,7 +191,7 @@ const loadCeremony = CeremonyID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`,
+      `SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -240,8 +240,8 @@ const loadBani = (BaniID, BaniLength) =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration,
-      v.punjabiUni, v.punjabi, v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration,
+      v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
       b.existsTaksal, b.existsBuddhaDal
       FROM Verse v
       LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID
