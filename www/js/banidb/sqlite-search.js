@@ -16,7 +16,7 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
