@@ -5,6 +5,8 @@ const banidb = require('./banidb');
 
 const analytics = remote.getGlobal('analytics');
 
+const navLinks = require('./search');
+
 const toolbarItems = ['sunder-gutka'];
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
@@ -58,6 +60,7 @@ const extrasTileFactory = (tileType, row) =>
         global.core.search.loadBani(row.ID);
         toggleOverlayUI();
         analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
+        navLinks.navPage('shabad');
       },
     },
     h('div.gurmukhi', row.Gurmukhi),
@@ -87,6 +90,7 @@ const printBanis = rows => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
           toggleOverlayUI();
+          navLinks.navPage('shabad');
         },
       },
       h(`span.tag.tag-${baniTag}`),
