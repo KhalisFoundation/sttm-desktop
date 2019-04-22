@@ -11,7 +11,7 @@
 */
 let trigID = 0;
 const receiverFn = receivers =>
-  new Promise((resolve) => {
+  new Promise(resolve => {
     trigID += 1;
     // instantiate new modal
     const modal = new tingle.Modal({
@@ -20,24 +20,33 @@ const receiverFn = receivers =>
       closeMethods: ['overlay', 'button', 'escape'],
     });
     let numReceivers = 0;
-    receivers.forEach((receiver) => {
+    receivers.forEach(receiver => {
       const fullName = receiver.service_fullname;
       const blacklist = ['Chromecast-Audio', 'Google-Home', 'Sound-Bar', 'Google-Cast-Group'];
-      if (!(new RegExp(blacklist.join('|')).test(fullName))) {
+      if (!new RegExp(blacklist.join('|')).test(fullName)) {
         numReceivers += 1;
         // add cast button
-        modal.addCastBtn(receiver.friendlyName, 'tingle-btn tingle-btn--primary', `${receiver.ipAddress}_${receiver.port}_${trigID}`, (e) => {
-          if (e.target.getAttribute('data-reciever-id') === `${receiver.ipAddress}_${receiver.port}_${trigID}`) {
-            resolve(receiver);
-            appendMessage(receiver);
-          }
-          modal.close();
-        });
+        modal.addCastBtn(
+          receiver.friendlyName,
+          'tingle-btn tingle-btn--primary',
+          `${receiver.ipAddress}_${receiver.port}_${trigID}`,
+          e => {
+            if (
+              e.target.getAttribute('data-reciever-id') ===
+              `${receiver.ipAddress}_${receiver.port}_${trigID}`
+            ) {
+              resolve(receiver);
+              appendMessage(receiver);
+            }
+            modal.close();
+          },
+        );
       }
     });
 
     // set content
-    const message = numReceivers === 0 ? 'No compatible Chromecast devices found.' : 'Select Cast device';
+    const message =
+      numReceivers === 0 ? 'No compatible Chromecast devices found.' : 'Select Cast device';
     modal.setContent('<h2>' + message + '</h2>');
     // add cancel button
     const cancelTitle = numReceivers === 0 ? 'OK' : 'Cancel';
@@ -175,9 +184,7 @@ function displayError(errorMessage) {
 function initializeCastApi() {
   appendMessage('initializing');
   const sessionRequest = new chrome.cast.SessionRequest(applicationID);
-  const apiConfig = new chrome.cast.ApiConfig(sessionRequest,
-    sessionListener,
-    receiverListener);
+  const apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
   chrome.cast.initialize(apiConfig, onInitSuccess, onError);
 }
 
@@ -203,8 +210,12 @@ function stopApp() {
  */
 function sendMessage(message) {
   if (session != null && session.status !== 'STOPPED') {
-    session.sendMessage(namespace, message, onSuccess.bind(this, 'Message sent: ' + message),
-      onError);
+    session.sendMessage(
+      namespace,
+      message,
+      onSuccess.bind(this, 'Message sent: ' + message),
+      onError,
+    );
   } else {
     appendMessage('Cannot send because session is null');
   }

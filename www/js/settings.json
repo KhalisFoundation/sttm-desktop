@@ -55,7 +55,7 @@
           "quick-tools": "Quick Tools",
           "shortcut-tray-on": "Shortcut Tray",
           "livefeed": {
-            "label":"Live Feed Text Files",
+            "label": "Live Feed Text Files",
             "subLabel": {
               "storepref": "userPrefs.app.live-feed-location"
             }
@@ -81,7 +81,7 @@
     "title": "Toolbar",
     "settings": {
       "gurbani": {
-        "title": "Gurbani Settings",
+        "title": "Bani Settings",
         "type": "dropdown",
         "options": {
           "bani-length": {
@@ -96,7 +96,7 @@
           "mangal-position": {
             "title": "Mangal Position",
             "options": {
-              "current":"Current Saroops (default)",
+              "current": "Current Saroops (default)",
               "above": "Above Raag Headings"
             }
           }
@@ -127,7 +127,7 @@
             "options": {
               "sttm2": "STTM 2",
               "igurbani": "iGurbani",
-              "sttm": "STTM Living" 
+              "sttm": "STTM Living"
             }
           }
         }
@@ -162,7 +162,7 @@
             "label": "Limit Changelog",
             "subLabel": "Only see changelog once per version"
           },
-          "collect-statistics":"Collect Statistics"
+          "collect-statistics": "Collect Statistics"
         }
       }
     }
