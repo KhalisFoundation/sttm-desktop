@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
-const CONSTS = require('./constants');
 const os = require('os');
+const CONSTS = require('./constants');
 
 let search;
 

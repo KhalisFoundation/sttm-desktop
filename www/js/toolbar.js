@@ -1,12 +1,14 @@
 const h = require('hyperscript');
-const banidb = require('./banidb');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
+const banidb = require('./banidb');
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const toolbarItems = ['sunder-gutka', 'ceremonies'];
+const navLinks = require('./search');
+
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
 
@@ -22,46 +24,59 @@ const toggleOverlayUI = (toolbarItem, show) => {
     toggleOverlayUI(currentToolbarItem, false);
   }
   currentToolbarItem = toolbarItem;
-  document.querySelectorAll('.base-ui').forEach((uiElement) => {
+  document.querySelectorAll('.base-ui').forEach(uiElement => {
     uiElement.classList.toggle('blur', show);
   });
-  document.querySelectorAll('overlay-ui').forEach((uiElement) => {
+  document.querySelectorAll('overlay-ui').forEach(uiElement => {
     uiElement.classList.toggle('hidden', show);
   });
-  document.querySelectorAll(`.overlay-ui.ui-${toolbarItem}, .common-overlay`).forEach((uiElement) => {
+  document.querySelectorAll(`.overlay-ui.ui-${toolbarItem}, .common-overlay`).forEach(uiElement => {
     uiElement.classList.toggle('hidden', !show);
   });
 };
 
 // factories
-const navigatorHeaderFactory = (id, content, lang) => h(
-  `header.navigator-header#${id}`,
-  h(`span.${lang}`, content),
-);
+const navigatorHeaderFactory = (id, content, lang) =>
+  h(`header.navigator-header#${id}`, h(`span.${lang}`, content));
 
-const blockListFactory = (lang, id) => h(
-  'section.blocklist',
-  h(`ul#${id}.${lang}`),
-);
+const blockListFactory = (lang, id) => h('section.blocklist', h(`ul#${id}.${lang}`));
 
-const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) => h(
-  `div.${id}`,
-  [
+const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
+  h(`div.${id}`, [
     h('span', label),
-    h('div.switch',
-      [
-        h(`input#${inputId}-toggle`,
-          {
-            name: inputId,
-            type: 'checkbox',
-            checked: defaultValue,
-            onclick: clickEvent,
-            value: inputId }),
-        h('label',
-          {
-            htmlFor: `${inputId}-toggle` })])]);
+    h('div.switch', [
+      h(`input#${inputId}-toggle`, {
+        name: inputId,
+        type: 'checkbox',
+        checked: defaultValue,
+        onclick: clickEvent,
+        value: inputId,
+      }),
+      h('label', {
+        htmlFor: `${inputId}-toggle`,
+      }),
+    ]),
+  ]);
+const blockList = (lang, id) => h('section.blocklist', h(`ul#${id}.lang`));
 
-const baniGroupFactory = (baniGroupName) => {
+const translitSwitch = h('div.translit-switch', [
+  h('span', 'Abc'),
+  h('div.switch', [
+    h('input#sg-translit-toggle', {
+      name: 'hg-trasnlit-toggle',
+      type: 'checkbox',
+      onclick: () => {
+        $baniList.classList.toggle('translit');
+      },
+      value: 'sg-translit',
+    }),
+    h('label', {
+      htmlFor: 'sg-translit-toggle',
+    }),
+  ]),
+]);
+
+const baniGroupFactory = baniGroupName => {
   const baniGroupClass = baniGroupName.replace(/ /g, '-');
   return h(
     'div.bani-group-container',
@@ -70,52 +85,45 @@ const baniGroupFactory = (baniGroupName) => {
   );
 };
 
-const extrasTileFactory = (tileType, row) => h(
-  `div.extras-tile.${tileType}`,
-  {
-    onclick: () => {
-      global.core.search.loadBani(row.ID);
-      toggleOverlayUI(currentToolbarItem, false);
-      analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
+const extrasTileFactory = (tileType, row) =>
+  h(
+    `div.extras-tile.${tileType}`,
+    {
+      onclick: () => {
+        global.core.search.loadBani(row.ID);
+        toggleOverlayUI(currentToolbarItem, false);
+        analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
+        navLinks.navPage('shabad');
+      },
     },
-  },
-  h('div.gurmukhi', row.Gurmukhi),
-);
+    h('div.gurmukhi', row.Gurmukhi),
+  );
 
-const toolbarItemFactory = toolbarItem => h(
-  `div.toolbar-item#tool-${toolbarItem}`,
-  {
-    onclick: () => { toggleOverlayUI(toolbarItem, true); },
-  },
-);
-
-// components
-const translitSwitch = switchFactory(
-  'translit-switch',
-  'Abc',
-  'sg-translit',
-  () => {
-    $baniList.classList.toggle('translit');
-  },
-);
+const toolbarItemFactory = toolbarItem =>
+  h(`div.toolbar-item#tool-${toolbarItem}`, {
+    onclick: () => {
+      toggleOverlayUI(toolbarItem, true);
+    },
+  });
 
 const closeOverlayUI = h(
   'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
   {
-    onclick: () => { toggleOverlayUI(currentToolbarItem, false); },
+    onclick: () => {
+      toggleOverlayUI(currentToolbarItem, false);
+    },
   },
   h('i.fa.fa-times'),
 );
 
-
-const printBanis = (rows) => {
+const printBanis = rows => {
   const banisListID = 'sunder-gutka-banis';
   $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
   const $sunderGutkaBanis = document.querySelector(`#${banisListID}`);
   const $nitnemBanis = document.querySelector('.nitnem-banis');
   const $popularBanis = document.querySelector('.popular-banis');
 
-  rows.forEach((row) => {
+  rows.forEach(row => {
     let baniTag = 'none';
     if (nitnemBanis.includes(row.ID)) {
       baniTag = 'nitnem';
@@ -132,6 +140,7 @@ const printBanis = (rows) => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
           toggleOverlayUI(currentToolbarItem, false);
+          navLinks.navPage('shabad');
         },
       },
       h(`span.tag.tag-${baniTag}`),
@@ -142,9 +151,9 @@ const printBanis = (rows) => {
   });
 };
 
-const printCeremonies = (rows) => {
-  rows.forEach((row) => {
-    if (row.Token !== 'anand') {
+const printCeremonies = rows => {
+  rows.forEach(row => {
+    if (row.Token !== 'anand' && row.Token !== 'death') {
       const $ceremony = h(
         `div.ceremony-pane#${row.Token}`,
         {
@@ -159,8 +168,10 @@ const printCeremonies = (rows) => {
           },
         },
         navigatorHeaderFactory(row.Token, row.Gurmukhi, 'gurmukhi'),
-        h('div.ceremony-pane-content',
-          h(`div.ceremony-pane-options#cpo-${row.Token}`,
+        h(
+          'div.ceremony-pane-content',
+          h(
+            `div.ceremony-pane-options#cpo-${row.Token}`,
             switchFactory(
               `${row.Token}-english-exp-switch`,
               'English Explanations',
@@ -173,7 +184,8 @@ const printCeremonies = (rows) => {
               store.getUserPref(`gurbani.ceremonies.${row.Token}-english`),
             ),
           ),
-          h(`div.ceremony-pane-themes#${row.Token}`,
+          h(
+            `div.ceremony-pane-themes#${row.Token}`,
             {
               onclick: () => {
                 toggleOverlayUI(currentToolbarItem, false);
@@ -188,10 +200,9 @@ const printCeremonies = (rows) => {
   });
 };
 
-
 module.exports = {
   init() {
-    toolbarItems.forEach((toolbarItem) => {
+    toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
 

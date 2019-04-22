@@ -179,7 +179,12 @@ button {
     text-align: left;
 
     label {
+      line-height: 0;
       margin-right: 5px;
+    }
+
+    input {
+      vertical-align: text-bottom;
     }
   }
 

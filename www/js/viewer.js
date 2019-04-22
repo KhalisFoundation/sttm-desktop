@@ -9,9 +9,9 @@ global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
 const { remote } = require('electron');
+const { store } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
-const { store } = require('electron').remote.require('./app');
 const themes = require('./js/themes.json');
 
 const analytics = remote.getGlobal('analytics');
@@ -39,17 +39,21 @@ $body.classList.add(process.platform);
 core.menu.settings.applySettings(prefs);
 
 // Synchronize scrolling to presenter window
-$scroll.addEventListener('wheel', () => {
-  const pos = $body.scrollTop / ($body.scrollHeight - $body.offsetHeight);
-  const sendMethod = isWebView ? 'sendToHost' : 'send';
-  global.platform.ipc[sendMethod]('scroll-pos', pos);
-}, {
-  capture: true,
-  passive: true,
-});
+$scroll.addEventListener(
+  'wheel',
+  () => {
+    const pos = $body.scrollTop / ($body.scrollHeight - $body.offsetHeight);
+    const sendMethod = isWebView ? 'sendToHost' : 'send';
+    global.platform.ipc[sendMethod]('scroll-pos', pos);
+  },
+  {
+    capture: true,
+    passive: true,
+  },
+);
 
 const hideDecks = () => {
-  Array.from(document.querySelectorAll('.deck')).forEach((el) => {
+  Array.from(document.querySelectorAll('.deck')).forEach(el => {
     el.classList.remove('active');
   });
 };
@@ -69,7 +73,7 @@ const castToReceiver = () => {
   sendMessage(JSON.stringify(castCur));
 };
 
-const castShabadLine = (lineID) => {
+const castShabadLine = lineID => {
   document.querySelector('.viewer-controls').innerHTML = '';
   // make sure that the deck is created before attempting to cast it.
   if (decks && decks[currentShabad]) {
@@ -77,21 +81,17 @@ const castShabadLine = (lineID) => {
     if (decks[currentShabad][lineID + 1]) {
       nextLine = decks[currentShabad][lineID + 1].gurmukhi;
     }
-    castCur = Object.assign(
-      decks[currentShabad][lineID],
-      {
-        nextLine,
-        gurmukhi: decks[currentShabad][lineID].gurmukhi,
-      },
-    );
+    castCur = Object.assign(decks[currentShabad][lineID], {
+      nextLine,
+      gurmukhi: decks[currentShabad][lineID].gurmukhi,
+    });
     castToReceiver();
 
-
     const activeSlide = document.querySelector('.deck.active .slide.active').children;
-    Array.prototype.forEach.call(activeSlide, ((element) => {
+    Array.prototype.forEach.call(activeSlide, element => {
       const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
       if (icons) document.querySelector('.viewer-controls').appendChild(icons);
-    }));
+    });
   }
 };
 
@@ -136,10 +136,10 @@ global.platform.ipc.on('clear-apv', () => {
   if ($apv) {
     $apv.innerHTML = '';
   }
-  Object.keys(apvCur).forEach((key) => {
+  Object.keys(apvCur).forEach(key => {
     delete apvCur[key];
   });
-  Object.keys(apvPages).forEach((key) => {
+  Object.keys(apvPages).forEach(key => {
     delete apvPages[key];
   });
 });
@@ -160,8 +160,10 @@ global.platform.ipc.on('show-text', (event, data) => {
 });
 
 global.platform.ipc.on('send-scroll', (event, pos) => {
-  $scroll.scrollTo(0,
-    (document.documentElement.scrollHeight - document.documentElement.offsetHeight) * pos);
+  $scroll.scrollTo(
+    0,
+    (document.documentElement.scrollHeight - document.documentElement.offsetHeight) * pos,
+  );
 });
 
 global.platform.ipc.on('update-settings', () => {
@@ -205,18 +207,29 @@ const iconsetHtml = (classname, content) => {
   let icons;
   const iconType = classname.split('-')[1];
   if (content) {
-    icons = h(
-    `span.${classname}.iconset`, [
+    icons = h(`span.${classname}.iconset`, [
       h('p.tagline', iconType),
-      h('span.visibility', {
-        onclick: e => core.menu.settings.showHide(e, iconType),
-      }, h('i.fa.fa-eye-slash')),
-      h('span.minus.size', {
-        onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
-      }, h('i.fa.fa-minus-circle')),
-      h('span.plus.size', {
-        onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
-      }, h('i.fa.fa-plus-circle')),
+      h(
+        'span.visibility',
+        {
+          onclick: e => core.menu.settings.showHide(e, iconType),
+        },
+        h('i.fa.fa-eye-slash'),
+      ),
+      h(
+        'span.minus.size',
+        {
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+        },
+        h('i.fa.fa-minus-circle'),
+      ),
+      h(
+        'span.plus.size',
+        {
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+        },
+        h('i.fa.fa-plus-circle'),
+      ),
     ]);
   }
   return icons;
@@ -227,7 +240,7 @@ const createCards = (rows, LineID) => {
   const lines = [];
   const shabad = {};
 
-  Object.keys(rows).forEach((key) => {
+  Object.keys(rows).forEach(key => {
     const row = rows[key];
     lines.push(row.ID);
     let gurmukhiShabads = [];
@@ -236,11 +249,11 @@ const createCards = (rows, LineID) => {
       if (row.Visraam) {
         try {
           const visraams = JSON.parse(row.Visraam);
-          Object.keys(visraams).forEach((visraamSource) => {
+          Object.keys(visraams).forEach(visraamSource => {
             if (visraams[visraamSource]) {
-              visraams[visraamSource].forEach((visraam) => {
+              visraams[visraamSource].forEach(visraam => {
                 const visraamShabad = gurmukhiShabads[visraam.p];
-                if (typeof (visraamShabad) === 'string') {
+                if (typeof visraamShabad === 'string') {
                   const visraamClass = visraam.t === 'v' ? 'visraam-main' : 'visraam-yamki';
                   const visraamEl = document.createElement('span');
                   visraamEl.classList.add(visraamClass, `visraam-${visraamSource}`);
@@ -259,7 +272,7 @@ const createCards = (rows, LineID) => {
     }
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
-      const valHTML = typeof (val) === 'string' ? val : val.outerHTML;
+      const valHTML = typeof val === 'string' ? val : val.outerHTML;
       if (valHTML.indexOf(']') !== -1) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${valHTML}</span>`;
       } else {
@@ -275,14 +288,13 @@ const createCards = (rows, LineID) => {
     englishContainer.innerHTML = row.English;
 
     cards.push(
-      h(
-        `div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`,
-        [
-          h('h1.gurbani.gurmukhi', gurmukhiContainer),
-          h('h2.translation', englishContainer),
-          h('h2.teeka', row.Punjabi),
-          h('h2.transliteration', row.Transliteration),
-        ]));
+      h(`div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`, [
+        h('h1.gurbani.gurmukhi', gurmukhiContainer),
+        h('h2.translation', englishContainer),
+        h('h2.teeka', row.Punjabi),
+        h('h2.transliteration', row.Transliteration),
+      ]),
+    );
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi || row.PunjabiUni,
       larivaar: taggedGurmukhi.join('<wbr>'),
@@ -310,7 +322,9 @@ const createDeck = (cards, curSlide, shabad, ShabadID, mode) => {
     decks[ShabadID] = shabad;
     castShabadLine(curSlide);
   } else if (mode === 'append') {
-    cards.forEach((card) => { $existingDeck.appendChild(card); });
+    cards.forEach(card => {
+      $existingDeck.appendChild(card);
+    });
     Object.assign(decks[ShabadID], shabad);
   }
 };
@@ -377,7 +391,9 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         }
         break;
       case 'append':
-        cards.forEach((card) => { $existingDeck.appendChild(card); });
+        cards.forEach(card => {
+          $existingDeck.appendChild(card);
+        });
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
@@ -409,10 +425,10 @@ const showText = (text, isGurmukhi = false) => {
 };
 
 const toggleSideMenu = () => {
-  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach((el) => {
+  Array.from(document.querySelectorAll('.vc-toggle-icon i')).forEach(el => {
     el.classList.toggle('vc-icon-hidden');
   });
-  Array.from(document.querySelectorAll('.deck')).forEach((el) => {
+  Array.from(document.querySelectorAll('.deck')).forEach(el => {
     el.classList.toggle('vc-open');
   });
   document.querySelector('.viewer-controls').classList.toggle('viewer-controls-open');

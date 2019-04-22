@@ -12,9 +12,7 @@ module.exports = {
 
   init() {
     // Inject socket.io script
-    if (
-      document.querySelector(`script[src="${SOCKET_SCRIPT_SOURCE}"]`) === null
-    ) {
+    if (document.querySelector(`script[src="${SOCKET_SCRIPT_SOURCE}"]`) === null) {
       const script = document.createElement('script');
       script.src = SOCKET_SCRIPT_SOURCE;
       document.body.appendChild(script);
@@ -24,9 +22,7 @@ module.exports = {
     this.$connectBtn = this.$content.querySelector('.connect-btn');
     this.$connectBox = this.$content.querySelector('.connect-box');
     this.$shareBox = this.$content.querySelector('.share-box');
-    this.$shareBox.querySelector(
-      'input[name="code"]',
-    ).onclick = function onInputClick() {
+    this.$shareBox.querySelector('input[name="code"]').onclick = function onInputClick() {
       this.select();
     };
 
@@ -60,12 +56,9 @@ module.exports = {
   onConnect(namespaceString) {
     this.$connectBox.classList.add('hidden');
     this.$shareBox.classList.remove('hidden');
-    this.$shareBox
-      .querySelector('input')
-      .setAttribute('value', namespaceString);
+    this.$shareBox.querySelector('input').setAttribute('value', namespaceString);
 
-    this.$shareBox.querySelector('.end-btn').onclick = () =>
-      this.onEnd(namespaceString);
+    this.$shareBox.querySelector('.end-btn').onclick = () => this.onEnd(namespaceString);
 
     window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
   },

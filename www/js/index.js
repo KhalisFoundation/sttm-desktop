@@ -34,16 +34,13 @@ function highlightLine(newLine, nextLineCount = null) {
     search.$shabadContainer.scrollTop = curPankteeTop;
   }
   if (containerTop + containerHeight < curPankteeTop + curPankteeHeight) {
-    search.$shabadContainer.scrollTop =
-      curPankteeTop - containerHeight + curPankteeHeight;
+    search.$shabadContainer.scrollTop = curPankteeTop - containerHeight + curPankteeHeight;
   }
 }
 
 function spaceBar(e) {
-  const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset
-    .lineId;
-  const currentLineId = search.$shabad.querySelector('a.panktee.current')
-    .dataset.lineId;
+  const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
+  const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
 
   let newLineId = mainLineID;
 
@@ -69,7 +66,7 @@ function nextLine(e) {
   // Find position of current line in Shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const nextLineCount = (parseInt($currentLine.dataset.lineCount, 10)) + 1;
+  const nextLineCount = parseInt($currentLine.dataset.lineCount, 10) + 1;
   if (pos < search.currentShabad.length - 1) {
     highlightLine(search.currentShabad[pos + 1], nextLineCount);
   }
@@ -88,7 +85,7 @@ function findLine(e) {
   const pankteesBeforePos = panktees.splice(0, pos + 1);
   const pankteesRotated = [...panktees, ...pankteesBeforePos];
 
-  const lineFound = pankteesRotated.find((panktee) => {
+  const lineFound = pankteesRotated.find(panktee => {
     const pankteeText = panktee.getAttribute('data-main-letters');
     return pankteeText.substring(0, 1) === filterKey;
   });

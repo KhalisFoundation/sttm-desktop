@@ -23,10 +23,11 @@ $viewer-padding: 30px;
 @mixin vishraamStyles() {
   $visraam-main: #c0392b;
   $visraam-yamki: #ffc500;
-  $visraam-sources: ("sttm", "sttm2", "igurbani");
+  $visraam-sources: ('sttm', 'sttm2', 'igurbani');
 
   @each $source in $visraam-sources {
-    &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source} .gurbani {
+    &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
+      .gurbani {
       .visraam-main.visraam-#{$source} {
         color: $visraam-main;
       }
@@ -36,7 +37,8 @@ $viewer-padding: 30px;
       }
     }
 
-    &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source} .gurbani {
+    &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
+      .gurbani {
       span {
         border-radius: 15px;
       }
@@ -47,11 +49,19 @@ $viewer-padding: 30px;
       }
 
       .visraam-main.visraam-#{$source} {
-        background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 69, 0, 0.5) 100%);
+        background: linear-gradient(
+          to right,
+          rgba(229, 229, 229, 0) 20%,
+          rgba(255, 69, 0, 0.5) 100%
+        );
       }
 
       .visraam-yamki.visraam-#{$source} {
-        background: linear-gradient(to right, rgba(229, 229, 229, 0) 20%, rgba(255, 197, 0, 0.5) 100%);
+        background: linear-gradient(
+          to right,
+          rgba(229, 229, 229, 0) 20%,
+          rgba(255, 197, 0, 0.5) 100%
+        );
       }
     }
   }
@@ -92,7 +102,7 @@ body {
   background-size: cover;
 }
 
-[contenteditable=true]:empty:not(:focus)::before {
+[contenteditable='true']:empty:not(:focus)::before {
   content: attr(data-placeholder);
   display: block;
 }
@@ -109,7 +119,7 @@ body {
 }
 
 .ribbon {
-  background-image: url("../../assets/img/custom_backgrounds/embellishes/floral.png");
+  background-image: url('../../assets/img/custom_backgrounds/embellishes/floral.png');
   height: 100px;
   position: fixed;
   visibility: hidden;
@@ -271,7 +281,7 @@ h2 {
 
   .visibility i {
     &::before {
-      content: "\f06e";
+      content: '\f06e';
     }
   }
 }
@@ -350,6 +360,7 @@ h2 {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;
+    opacity: 0.9;
   }
 }
 
@@ -442,8 +453,4 @@ h2 {
   @include vishraamStyles();
 }
 
-@import
-  "display-next-line",
-  "theme-dark",
-  "theme-light",
-  "win32";
+@import 'display-next-line', 'theme-dark', 'theme-light', 'win32';
