@@ -57,7 +57,6 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
       }),
     ]),
   ]);
-const blockList = (lang, id) => h('section.blocklist', h(`ul#${id}.lang`));
 
 const translitSwitch = h('div.translit-switch', [
   h('span', 'Abc'),

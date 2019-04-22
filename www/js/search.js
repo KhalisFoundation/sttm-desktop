@@ -842,7 +842,7 @@ module.exports = {
 
     // if there is a lineIDConflict make lineID the very first line in shabad.
     if (lineIDConflict) {
-      lineID = currentShabad[0];
+      [lineID] = currentShabad;
       shabad.querySelector(`#line${lineID}`).classList.add('current', 'main', 'seen_check');
     }
 
