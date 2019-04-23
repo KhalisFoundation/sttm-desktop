@@ -208,7 +208,7 @@ const iconsetHtml = (classname, content) => {
   const iconType = classname.split('-')[1];
   if (content) {
     icons = h(`span.${classname}.iconset`, [
-      h('p.tagline', iconType),
+      h('p.tagline', iconType === 'gurbani' ? 'bani' : iconType),
       h(
         'span.visibility',
         {
