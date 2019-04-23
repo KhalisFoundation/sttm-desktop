@@ -1,4 +1,8 @@
 /* eslint-disable arrow-parens */
+// HTMLElement builder
+const h = require('hyperscript');
+const { remote } = require('electron');
+
 const banidb = require('./banidb');
 
 const { CONSTS } = banidb;
@@ -6,10 +10,6 @@ const { CONSTS } = banidb;
 // Gurmukhi keyboard layout file
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
-
-// HTMLElement builder
-const h = require('hyperscript');
-const { remote } = require('electron');
 
 const { store } = remote.require('./app');
 
@@ -57,9 +57,7 @@ const searchInputs = h('div#search-container', [
     },
     h('i.fa.fa-keyboard-o'),
   ),
-  h('div#search-bg', [
-    h('div#db-download-progress'),
-  ]),
+  h('div#search-bg', [h('div#db-download-progress')]),
 ]);
 
 // build the Gurmukhi keyboard and append to HTML
@@ -124,11 +122,11 @@ const englishSearchTypes = Object.keys(englishSearchText);
 const sourceTexts = CONSTS.SOURCE_TEXTS;
 const sourceKeys = Object.keys(sourceTexts);
 
-const gurmukhiSearchOptions = gurmukhiSearchTypes.map((value) =>
+const gurmukhiSearchOptions = gurmukhiSearchTypes.map(value =>
   h('option', { value }, gurmukhiSearchText[value]),
 );
 
-const englishSearchOptions = englishSearchTypes.map((value) =>
+const englishSearchOptions = englishSearchTypes.map(value =>
   h('option', { value }, englishSearchText[value]),
 );
 
@@ -163,10 +161,14 @@ const searchLanguage = h(
       module.exports.changeSearchLanguage(this.value);
     },
   }),
-  h('label', {
-    htmlFor: 'gurmukhi-language',
-    className: 'gurmukhi',
-  }, 'aAe'),
+  h(
+    'label',
+    {
+      htmlFor: 'gurmukhi-language',
+      className: 'gurmukhi',
+    },
+    'aAe',
+  ),
   h('input', {
     type: 'radio',
     value: 'en',
@@ -179,9 +181,7 @@ const searchLanguage = h(
   h('label', { htmlFor: 'english-language' }, 'ABC'),
 );
 
-const sourceOptions = sourceKeys.map((key) =>
-  h('option', { value: key }, sourceTexts[key]),
-);
+const sourceOptions = sourceKeys.map(key => h('option', { value: key }, sourceTexts[key]));
 
 const shabadNavFwd = h(
   'div#shabad-next.navigator-button',
@@ -213,8 +213,10 @@ const searchOptions = h(
     sourceOptions,
   ),
   h(
-    'label.filter-text#source-selection', { htmlFor: 'search-source' },
-    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')]),
+    'label.filter-text#source-selection',
+    { htmlFor: 'search-source' },
+    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')],
+  ),
 );
 
 const navPageLinks = [];
@@ -244,8 +246,8 @@ Object.keys(pageNavJSON).forEach(id => {
   );
 });
 
-document.querySelectorAll('.nav-header-tab').forEach((element) => {
-  element.addEventListener('click', (event) => {
+document.querySelectorAll('.nav-header-tab').forEach(element => {
+  element.addEventListener('click', event => {
     const clickedTabId = event.currentTarget.dataset.title;
     module.exports.activateNavPage('session', {
       id: clickedTabId,
@@ -255,26 +257,28 @@ document.querySelectorAll('.nav-header-tab').forEach((element) => {
   });
 });
 
-const presenterSwitch = h(
-  'li',
-  [
-    h('span', 'Presenter View'),
-    h('div.switch',
-      [
-        h('input#presenter-view-toggle',
-          {
-            name: 'presenter-view-toggle',
-            type: 'checkbox',
-            checked: store.getUserPref('app.layout.presenter-view'),
-            onclick: () => {
-              store.setUserPref('app.layout.presenter-view', !store.getUserPref('app.layout.presenter-view'));
-              global.platform.updateSettings();
-              global.controller['presenter-view']();
-            },
-            value: 'presenter-view' }),
-        h('label',
-          {
-            htmlFor: 'presenter-view-toggle' })])]);
+const presenterSwitch = h('li', [
+  h('span', 'Presenter View'),
+  h('div.switch', [
+    h('input#presenter-view-toggle', {
+      name: 'presenter-view-toggle',
+      type: 'checkbox',
+      checked: store.getUserPref('app.layout.presenter-view'),
+      onclick: () => {
+        store.setUserPref(
+          'app.layout.presenter-view',
+          !store.getUserPref('app.layout.presenter-view'),
+        );
+        global.platform.updateSettings();
+        global.controller['presenter-view']();
+      },
+      value: 'presenter-view',
+    }),
+    h('label', {
+      htmlFor: 'presenter-view-toggle',
+    }),
+  ]),
+]);
 
 const footerNav = h('ul.menu-bar', navPageLinks);
 
@@ -289,7 +293,7 @@ const sources = {
 
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', e => {
-  const target = e.target;
+  const { target } = e;
   if (
     document.querySelector('.search-div') &&
     !document.querySelector('.search-div').contains(target) &&
@@ -331,17 +335,13 @@ module.exports = {
     this.$dbDownloadProgress = document.getElementById('db-download-progress');
     this.$results = document.getElementById('results');
     this.$session = document.getElementById('session');
-    this.$sessionContainer = document.querySelector(
-      '#session-page .block-list',
-    );
+    this.$sessionContainer = document.querySelector('#session-page .block-list');
     this.$shabad = document.getElementById('shabad');
     this.$shabadContainer = document.querySelector('#shabad-page .block-list');
     this.$gurmukhiKB = document.getElementById('gurmukhi-keyboard');
     this.$kbPages = this.$gurmukhiKB.querySelectorAll('.page');
     this.$navPages = document.querySelectorAll('.nav-page');
-    this.$navPageLinks = document.querySelectorAll(
-      '#footer .menu-group-left a',
-    );
+    this.$navPageLinks = document.querySelectorAll('#footer .menu-group-left a');
 
     this.navPage('search');
     this.searchType = parseInt(store.get('searchOptions.searchType'), 10);
@@ -391,11 +391,7 @@ module.exports = {
 
   typeSearch(e) {
     // if a key is pressed in the Gurmukhi KB or is one of the allowed keys
-    if (
-      e === 'gKB' ||
-      (e.which <= 90 && e.which >= 48) ||
-      allowedKeys.indexOf(e.which) > -1
-    ) {
+    if (e === 'gKB' || (e.which <= 90 && e.which >= 48) || allowedKeys.indexOf(e.which) > -1) {
       // don't search if there is less than a 100ms gap in between key presses
       clearTimeout(newSearchTimeout);
       newSearchTimeout = setTimeout(() => {
@@ -496,10 +492,7 @@ module.exports = {
     const button = e.currentTarget;
     if (action) {
       if (action === 'bksp') {
-        this.$search.value = this.$search.value.substring(
-          0,
-          this.$search.value.length - 1,
-        );
+        this.$search.value = this.$search.value.substring(0, this.$search.value.length - 1);
         this.typeSearch('gKB');
       } else if (action === 'close') {
         this.toggleGurmukhiKB();
@@ -507,9 +500,7 @@ module.exports = {
         Array.from(this.$kbPages).forEach(el => {
           el.classList.remove('active');
         });
-        document
-          .getElementById(`gurmukhi-keyboard-${action}`)
-          .classList.add('active');
+        document.getElementById(`gurmukhi-keyboard-${action}`).classList.add('active');
       }
     } else {
       // some buttons may have a different value than what is displayed on the key,
@@ -522,7 +513,7 @@ module.exports = {
   },
 
   search(e, pasteTrigger) {
-    const searchType = this.searchType;
+    const { searchType } = this;
     let searchValue;
     if (searchType === 4) {
       searchValue = this.$angSearch.value;
@@ -533,7 +524,8 @@ module.exports = {
     const searchQuery = pasteTrigger ? e.clipboardData.getData('Text') : searchValue;
 
     if (searchQuery.length >= 1) {
-      banidb.query(searchQuery, searchType, this.searchSource)
+      banidb
+        .query(searchQuery, searchType, this.searchSource)
         .then(rows => this.printResults(rows));
     } else {
       this.$results.innerHTML = '';
@@ -554,9 +546,9 @@ module.exports = {
         resultNode.push(
           h(
             'span.meta.roman',
-            `${sources[item.SourceID]} - ${item.PageNo} - ${
-              item.RaagEnglish
-            } - ${item.WriterEnglish}`,
+            `${sources[item.SourceID]} - ${item.PageNo} - ${item.RaagEnglish} - ${
+              item.WriterEnglish
+            }`,
           ),
         );
         const result = h(
@@ -565,8 +557,7 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID,
-                                                  item),
+              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item),
             },
             resultNode,
           ),
@@ -594,7 +585,9 @@ module.exports = {
         {
           onclick: ev => this.clickSession(ev, ShabadID, LineID),
         },
-        Line.Gurmukhi));
+        Line.Gurmukhi,
+      ),
+    );
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -640,32 +633,73 @@ module.exports = {
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv && infiniteScroll) {
-      banidb.getAng(ShabadID)
+      banidb
+        .getAng(ShabadID)
         .then(ang => {
           currentMeta = ang;
           return banidb.loadAng(ang.PageNo, ang.SourceID);
         })
         .then(rows => this.printShabad(rows, ShabadID, LineID));
     } else {
-      banidb.loadShabad(ShabadID, LineID)
-        .then(rows => this.printShabad(rows, ShabadID, LineID));
+      banidb.loadShabad(ShabadID, LineID).then(rows => this.printShabad(rows, ShabadID, LineID));
     }
   },
-
 
   loadCeremony(ceremonyID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
-    banidb.loadCeremony(ceremonyID)
-      .then(rowsDb => {
-        const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
-        return this.printShabad(rows);
-      });
+    banidb.loadCeremony(ceremonyID).then(rowsDb => {
+      const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
+      return this.printShabad(rows);
+    });
+  },
+
+  loadBani(BaniID, LineID = null) {
+    const $shabadList = this.$shabad || document.getElementById('shabad');
+    const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
+    const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+    let blackListedMangalPosition;
+    if (mangalPosition === 'above') {
+      blackListedMangalPosition = 'current';
+    } else if (mangalPosition === 'current') {
+      blackListedMangalPosition = 'above';
+    }
+    // translate user settings into its respective database fields
+    const baniLengthCols = {
+      short: 'existsSGPC',
+      medium: 'existsMedium',
+      long: 'existsTaksal',
+      extralong: 'existsBuddhaDal',
+    };
+    $shabadList.innerHTML = '';
+    $shabadList.dataset.bani = BaniID;
+    currentShabad.splice(0, currentShabad.length);
+    // load verses for bani based on baniID and the length that user has decided
+    banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
+      // create a unique shabadID for whole bani, and append it with length
+      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const rows = rowsDb
+        .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
+        .map(rowDb => {
+          let row = rowDb;
+          // when object from db is not a verse itself
+          if (rowDb.Verse) {
+            row = rowDb.Verse;
+          }
+          // when its a custom panktee (decorator, bani heading, etc)
+          if (rowDb.Custom) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Bani.Token;
+          }
+
+          return row;
+        });
+      return this.printShabad(rows, shabadID, LineID);
+    });
   },
 
   loadAng(PageNo, SourceID) {
-    banidb.loadAng(PageNo, SourceID)
-      .then(rows => this.printShabad(rows));
+    banidb.loadAng(PageNo, SourceID).then(rows => this.printShabad(rows));
   },
 
   loadAdjacentShabad(Forward = true) {
@@ -678,72 +712,131 @@ module.exports = {
     const NextVerseID = LastLine === 60403 ? LastLine : LastLine + 1;
     const adjacentVerseID = Forward ? NextVerseID : PreviousVerseID;
     let adjacentShabadID;
-    banidb.getShabad(adjacentVerseID)
+    banidb
+      .getShabad(adjacentVerseID)
       .then(ShabadID => {
         adjacentShabadID = ShabadID;
         return banidb.loadShabad(ShabadID);
       })
-      .then((rows) => {
+      .then(rows => {
         this.printShabad(rows, adjacentShabadID);
       });
   },
 
-  printShabad(rows, ShabadID, LineID) {
+  lineFactory(line, rows) {
+    const mainLineExists = !!document.querySelector('.main');
+
+    const shabadLine = h(
+      `li#li_${line.lineCount}`,
+      {
+        'data-line-count': line.lineCount,
+      },
+      h(
+        `a#line${line.ID}.panktee${
+          line.mainLine && !mainLineExists ? '.current.main.seen_check' : ''
+        }`,
+        {
+          'data-line-id': line.ID,
+          'data-main-letters': line.MainLetters,
+          onclick: e => this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click'),
+        },
+        [h('i.fa.fa-fw.fa-check'), h('i.fa.fa-fw.fa-home'), ' ', line.Gurmukhi],
+      ),
+    );
+
+    return shabadLine;
+  },
+
+  printShabad(rows, ShabadID, LineID, start = 0) {
     const lineID = LineID || rows[0].ID;
     const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
-    let mainLine;
+    const lineIndex = rows.findIndex(row => row.ID === lineID);
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
+    // if the line clicked is further than throughput (in searches) then load until that line
+    let throughput = 40;
+
+    if (start) {
+      throughput = 10;
+    } else if (lineIndex > throughput) {
+      throughput = lineIndex + 1;
+    }
+
+    const end = start + throughput;
+
+    const lineHeight = 27;
+    // max scroll size, after which we would load the next part of bani
+    const maxScrollSize = end * lineHeight * 0.75;
+    // mode in which bani is printed, can be append, replace and click
+    const mode = start ? 'append' : 'replace';
+
+    let lineCount = start;
+    let mainLine = rows[0];
+
     // remove currently printed shabad if not in apv mode.
-    if (!apv) {
+    if (!apv && !start) {
       while (shabad.firstChild) {
         shabad.removeChild(shabad.firstChild);
       }
     }
 
-    rows.forEach((item) => {
+    // print the next set of banis on scroll
+    shabad.parentNode.onscroll = e => {
+      let newStart = end;
+      let tooFar = e.target.scrollTop > (end + throughput) * lineHeight;
+      // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
+      if (tooFar) {
+        while (tooFar) {
+          this.printShabad(rows, ShabadID, lineID, newStart);
+          newStart += throughput;
+          tooFar = e.target.scrollTop > (newStart + throughput) * lineHeight;
+        }
+      } else if (e.target.scrollTop >= maxScrollSize) {
+        this.printShabad(rows, ShabadID, lineID, end);
+      }
+    };
+
+    const currentRows = rows.slice(start, end);
+
+    currentRows.forEach(rawItem => {
+      lineCount += 1;
+      const item = rawItem;
+      item.lineCount = lineCount;
+
       if (parseInt(lineID, 10) === item.ID) {
         mainLine = item;
+        item.mainLine = true;
       }
-      const shabadLine = h(
-        'li',
-        {},
-        h(
-          `a#line${item.ID}.panktee${
-            parseInt(lineID, 10) === item.ID ? '.current.main.seen_check' : ''
-          }`,
-          {
-            'data-line-id': item.ID,
-            'data-main-letters': item.MainLetters,
-            onclick: e => this.clickShabad(e, item.ShabadID || shabadID,
-                           item.ID, item, rows),
-          },
-          [
-            h('i.fa.fa-fw.fa-check'),
-            h('i.fa.fa-fw.fa-home'),
-            ' ',
-            item.Gurmukhi,
-          ],
-        ),
-      );
+
+      item.ShabadID = item.ShabadID || shabadID;
       // write the Panktee to the controller
-      shabad.appendChild(shabadLine);
+      shabad.appendChild(this.lineFactory(item, currentRows, mode));
       // append the currentShabad array
       currentShabad.push(item.ID);
       if (lineID === item.ID) {
         this.currentLine = item.ID;
       }
     });
+
+    const totalLines = rows.length;
+    const pendingLines = totalLines - end;
+    if (shabad.querySelector('.empty-space')) {
+      shabad.querySelector('.empty-space').remove();
+    }
+    const emptySpace = h('div.empty-space', {
+      style: { height: `${pendingLines * lineHeight}px` },
+    });
+
+    shabad.appendChild(emptySpace);
     // scroll the Shabad controller to the current Panktee
     const $curPanktee = shabad.querySelector('.current');
-    if ($curPanktee) {
-      const curPankteeTop = $curPanktee.parentNode
-        .offsetTop;
+    if ($curPanktee && !start) {
+      const curPankteeTop = $curPanktee.parentNode.offsetTop;
       this.$shabadContainer.scrollTop = curPankteeTop;
     }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine, rows);
+    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode);
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
@@ -796,7 +889,7 @@ module.exports = {
     }
   },
 
-  clickShabad(e, ShabadID, LineID, Line, rows) {
+  clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
     /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
@@ -812,7 +905,7 @@ module.exports = {
       // Change line to click target
       const $panktee = e.target;
       this.currentLine = LineID;
-      global.controller.sendLine(ShabadID, LineID, Line, rows);
+      global.controller.sendLine(ShabadID, LineID, Line, rows, mode);
       // Remove 'current' class from all Panktees
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee

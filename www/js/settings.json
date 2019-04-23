@@ -55,7 +55,7 @@
           "quick-tools": "Quick Tools",
           "shortcut-tray-on": "Shortcut Tray",
           "livefeed": {
-            "label":"Live Feed Text Files",
+            "label": "Live Feed Text Files",
             "subLabel": {
               "storepref": "userPrefs.app.live-feed-location"
             }
@@ -72,6 +72,63 @@
             "max": 20,
             "min": 1,
             "step": 1
+          }
+        }
+      }
+    }
+  },
+  "toolbar": {
+    "title": "Toolbar",
+    "settings": {
+      "gurbani": {
+        "title": "Bani Settings",
+        "type": "dropdown",
+        "options": {
+          "bani-length": {
+            "title": "Bani Length",
+            "options": {
+              "short": "Short",
+              "medium": "Medium",
+              "long": "Long",
+              "extralong": "Extra Long"
+            }
+          },
+          "mangal-position": {
+            "title": "Mangal Position",
+            "options": {
+              "current": "Current Saroops (default)",
+              "above": "Above Raag Headings"
+            }
+          }
+        }
+      },
+      "gurbani-options": {
+        "type": "switch",
+        "options": {
+          "display-visraams": {
+            "label": "Show Vishraams",
+            "subLabel": "Limited theme support"
+          }
+        }
+      },
+      "vishraam": {
+        "title": "",
+        "type": "dropdown",
+        "options": {
+          "vishraam-options": {
+            "title": "Vishraam Options",
+            "options": {
+              "colored-words": "Colored Words",
+              "gradient-bg": "Gradient Background"
+            }
+          },
+          "vishraam-source": {
+            "title": "Vishraam Source",
+            "options": {
+              "sttm2": "STTM 2",
+              "igurbani": "iGurbani",
+              "sttm": "STTM Living"
+            }
           }
         }
       }
@@ -101,7 +158,11 @@
         "title": "Other Options",
         "type": "switch",
         "options": {
-          "collect-statistics":"Collect Statistics"
+          "limit-changelog": {
+            "label": "Limit Changelog",
+            "subLabel": "Only see changelog once per version"
+          },
+          "collect-statistics": "Collect Statistics"
         }
       }
     }

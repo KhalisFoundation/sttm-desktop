@@ -39,6 +39,11 @@ $base-text: #4e4e4e;
 $base-text-inactive: rgba(78, 78, 78, 0.5);
 
 .a-new-day {
+  #toolbar,
+  .bani-list {
+    background-color: $nav-bg;
+  }
+
   .viewer-controls {
     background-color: $nav-bg;
   }
@@ -92,6 +97,10 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
 
   #gurmukhi-keyboard button {
     color: $base-text;
+  }
+
+  #toolbar {
+    background-color: $nav-bg;
   }
 
   .nav-page {

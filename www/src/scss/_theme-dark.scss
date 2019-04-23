@@ -61,6 +61,11 @@ $highlight-text: #cfd8dc;
 .dark-theme {
   color: $text-base;
 
+  #toolbar,
+  .bani-list {
+    background-color: $bg-alt;
+  }
+
   .viewer-controls {
     background-color: $bg-main;
   }
@@ -106,6 +111,10 @@ $highlight-text: #cfd8dc;
 
   #gurmukhi-keyboard button {
     color: $text-base;
+  }
+
+  #toolbar {
+    background: $bg-alt;
   }
 
   .nav-page,
