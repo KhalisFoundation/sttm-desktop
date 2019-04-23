@@ -424,6 +424,16 @@ function checkPresenterView() {
   document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
 }
 
+function reloadBani(resume = false) {
+  const $shabad = document.getElementById('shabad');
+  const currentBani = $shabad.dataset.bani;
+  const $currentLine = $shabad.querySelector('.current');
+  const lineID = resume && $currentLine ? $currentLine.dataset.lineId : null;
+  if (currentBani) {
+    global.core.search.loadBani(currentBani, lineID);
+  }
+}
+
 global.platform.ipc.on('presenter-view', () => {
   checkPresenterView();
   updateViewerScale();
@@ -558,11 +568,11 @@ module.exports = {
   },
 
   'gurbani-bani-length': function gurbaniBaniLength() {
-    // reload bani
-    const currentBani = document.getElementById('shabad').dataset.bani;
-    if (currentBani) {
-      global.core.search.loadBani(currentBani);
-    }
+    reloadBani();
+  },
+
+  'gurbani-mangal-position': function gurbaniMangalPosition() {
+    reloadBani(true);
   },
 
   autoplay() {

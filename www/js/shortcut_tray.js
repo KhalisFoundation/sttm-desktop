@@ -43,7 +43,7 @@ const shortcutsToggle = h(
         .classList.toggle('fa-caret-down', isShortcutTrayOn);
     },
   },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
+  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
 );
 
 module.exports = {
