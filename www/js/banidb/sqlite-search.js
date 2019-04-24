@@ -242,7 +242,7 @@ const loadBani = (BaniID, BaniLength) =>
     db.all(
       `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration,
       v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
-      b.existsTaksal, b.existsBuddhaDal
+      b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
       FROM Verse v
       LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID
       LEFT JOIN Banis c ON c.ID = ${BaniID}

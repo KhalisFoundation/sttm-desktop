@@ -7,7 +7,7 @@
         "type": "range",
         "options": {
           "gurbani": {
-            "title": "Gurbani",
+            "title": "Bani",
             "max": 20,
             "min": 1,
             "step": 1
