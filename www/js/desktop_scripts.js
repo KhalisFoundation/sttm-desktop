@@ -110,7 +110,7 @@ module.exports = {
   },
 
   downloadLatestDB(force = false) {
-    const $search = global.core.search.$search;
+    const { $search } = global.core.search;
 
     if (force) {
       $search.placeholder = 'Downloading database...';

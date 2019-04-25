@@ -105,7 +105,7 @@ const printBanis = rows => {
 const toolbarItemFactory = toolbarItem =>
   h(`div.toolbar-item#tool-${toolbarItem}`, {
     onclick: () => {
-      const databaseState = global.core.search.$search.dataset.databaseState;
+      const { databaseState } = global.core.search.$search.dataset;
       if (databaseState === 'loaded') {
         toggleOverlayUI();
         if (!banisLoaded) {
