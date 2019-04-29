@@ -160,7 +160,10 @@ const loadShabad = ShabadID =>
     }
     Realm.open(realmConfig)
       .then(realm => {
-        const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
+        const rows = realm
+          .objects('Verse')
+          .filtered('ANY Shabads.ShabadID == $0', ShabadID)
+          .sorted('ID');
         if (rows.length > 0) {
           resolve(rows);
         }
