@@ -110,8 +110,11 @@ module.exports = {
   },
 
   downloadLatestDB(force = false) {
+    const { $search } = global.core.search;
+
     if (force) {
-      global.core.search.$search.placeholder = 'Downloading database...';
+      $search.placeholder = 'Downloading database...';
+      $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
       if (online) {
@@ -125,7 +128,8 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
-                global.core.search.$search.placeholder = 'Downloading database...';
+                $search.placeholder = 'Downloading database...';
+                $search.dataset.databaseState = 'loading';
                 progress(
                   request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),
                 )

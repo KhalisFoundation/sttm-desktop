@@ -10,6 +10,7 @@ const navLinks = require('./search');
 const toolbarItems = ['sunder-gutka'];
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
+let banisLoaded = false;
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
@@ -103,7 +104,19 @@ const printBanis = rows => {
 
 const toolbarItemFactory = toolbarItem =>
   h(`div.toolbar-item#tool-${toolbarItem}`, {
-    onclick: toggleOverlayUI,
+    onclick: () => {
+      const { databaseState } = global.core.search.$search.dataset;
+      if (databaseState === 'loaded') {
+        toggleOverlayUI();
+        if (!banisLoaded) {
+          banidb.loadBanis().then(rows => {
+            printBanis(rows);
+            banisLoaded = !!rows;
+          });
+          analytics.trackEvent('banisLoaded', true);
+        }
+      }
+    },
   });
 
 const closeOverlayUI = h(
@@ -122,7 +135,6 @@ module.exports = {
       $baniList.querySelector('header').appendChild(translitSwitch);
       $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
       $baniExtras.appendChild(baniGroupFactory('popular banis'));
-      banidb.loadBanis().then(rows => printBanis(rows));
     });
   },
 };

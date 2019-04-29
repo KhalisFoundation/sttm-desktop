@@ -370,6 +370,7 @@ module.exports = {
   initSearch() {
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
+    this.$search.dataset.databaseState = 'loaded';
     this.$angSearch.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
