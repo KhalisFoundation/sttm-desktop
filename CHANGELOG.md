@@ -1,6 +1,6 @@
 ## New Updates
 
-### 5.0 - _190410_
+### 5.0 - _190506_
 ### Added:
 * Sundar Gutka! Now you can easily access compiled Banis such as Nitnem, Asa Kee Vaar, Sukhmani Sahib, and so much more
 ![](./assets/img/help_images/SG.gif)
@@ -9,6 +9,7 @@
 
 ### Improved:
 * SikhiToTheMax will no longer open a second instance if it is already open
+* Bug fixes & UI enhancements
 
 <br/>  
 <details><summary>See previous updates...</summary>
