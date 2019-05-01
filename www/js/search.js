@@ -631,6 +631,7 @@ module.exports = {
     */
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.dataset.bani = '';
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv && infiniteScroll) {
