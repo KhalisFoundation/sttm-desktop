@@ -10,7 +10,6 @@ const userDataPath = remote.app.getPath('userData');
 const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 
-
 // TODO: Investigate possible memory issues from multiple Realm.open calls
 // https://github.com/KhalisFoundation/sttm-desktop/pull/517#discussion_r261644205
 const realmConfig = {
@@ -39,7 +38,7 @@ const init = () => {
  * search('jggsspp', 0, 'all');
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const query = (searchQuery, searchType, searchSource) => (
+const query = (searchQuery, searchType, searchSource) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
@@ -55,7 +54,8 @@ const query = (searchQuery, searchType, searchSource) => (
     let howManyRows = 20;
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
-      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: {
+        // First letter anywhere
         searchCol = 'FirstLetterStr';
         let operator = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? 'BEGINSWITH' : 'CONTAINS';
         let isWildChar = false;
@@ -79,7 +79,8 @@ const query = (searchQuery, searchType, searchSource) => (
           replaced = `OR ${searchCol} ${operator} '${dbQuery.replace(/075/g, '094')}'`;
         }
         if (isWildChar) {
-          dbQuery = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
+          dbQuery =
+            searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
         }
         condition = `${searchCol} ${operator} '${dbQuery}' ${replaced}`;
         if (saniQuery.length < 3) {
@@ -91,7 +92,8 @@ const query = (searchQuery, searchType, searchSource) => (
         break;
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
-      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
+      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: {
+        // Full word (English)
         let caseInsensitive = false;
         if (searchType === 2) {
           searchCol = 'Gurmukhi';
@@ -99,7 +101,14 @@ const query = (searchQuery, searchType, searchSource) => (
           searchCol = 'English';
           caseInsensitive = true;
         }
-        const words = saniQuery.split(' ').map(word => `(${searchCol} CONTAINS${caseInsensitive ? '[c]' : ''} ' ${word}' OR ${searchCol} BEGINSWITH${caseInsensitive ? '[c]' : ''} '${word}')`);
+        const words = saniQuery
+          .split(' ')
+          .map(
+            word =>
+              `(${searchCol} CONTAINS${
+                caseInsensitive ? '[c]' : ''
+              } ' ${word}' OR ${searchCol} BEGINSWITH${caseInsensitive ? '[c]' : ''} '${word}')`,
+          );
         condition = words.join(' AND ');
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
@@ -127,13 +136,12 @@ const query = (searchQuery, searchType, searchSource) => (
     order.push('Shabads');
     condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
     Realm.open(realmConfig)
-      .then((realm) => {
+      .then(realm => {
         const rows = realm.objects('Verse').filtered(condition);
         resolve(rows.slice(0, howManyRows));
       })
       .catch(reject);
-  })
-);
+  });
 
 /**
  * Retrieve all lines from a Shabad
@@ -145,21 +153,52 @@ const query = (searchQuery, searchType, searchSource) => (
  * loadShabad(2776);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadShabad = ShabadID => (
+const loadShabad = ShabadID =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-      .then((realm) => {
-        const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID);
+      .then(realm => {
+        const rows = realm
+          .objects('Verse')
+          .filtered('ANY Shabads.ShabadID == $0', ShabadID)
+          .sorted('ID');
         if (rows.length > 0) {
           resolve(rows);
         }
       })
       .catch(reject);
-  })
-);
+  });
+
+/**
+ * Retrieve all lines from a Bani
+ *
+ * @param {number} BaniID The specific Bani to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBani(2, "extralong");
+ * // => [{ Bani: { Gurmukhi: 'jpujI swihb', ID: 2,...},...}]
+ */
+const loadBani = (BaniID, BaniLength) =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then(realm => {
+        const condition = `Bani.ID == ${BaniID} AND ${BaniLength} == true`;
+        const rows = realm
+          .objects('Banis_Shabad')
+          .filtered(condition)
+          .sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  });
 
 /**
  * Retrieve all lines from a Ceremony
@@ -169,25 +208,53 @@ const loadShabad = ShabadID => (
  * @example
  *
  * loadCeremony(3);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ * // => [{ Ceremony: { ID: 26106, Seq:2,...},...}]
  */
 
-const loadCeremony = ceremonyID => (
+const loadCeremony = ceremonyID =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-    .then((realm) => {
-      const rows = realm.objects('Ceremonies_Shabad').filtered('Ceremony.ID == $0', ceremonyID).sorted('Seq');
-      if (rows.length > 0) {
-        resolve(rows);
-      }
-    })
-    .catch(reject);
-  })
-);
+      .then(realm => {
+        const rows = realm
+          .objects('Ceremonies_Shabad')
+          .filtered('Ceremony.ID == $0', ceremonyID)
+          .sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  });
 
+/**
+ * Retrieve all banis for sunder gutka
+ *
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadBanis();
+ * // => [ {Gurmukhi: "gur mMqR", ID: 1, Token: "gurmantar"}, {Gurmukhi: "jpujI swihb" ...} ]
+ */
+const loadBanis = () =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then(realm => {
+        const rows = realm
+          .objects('Banis')
+          .filtered('ID < 10000')
+          .sorted('ID');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  });
 /**
  * Retrieve the Ang number and source for any given ShabadID
  *
@@ -198,22 +265,20 @@ const loadCeremony = ceremonyID => (
  * getAng(2776);
  * // => { PageNo: 726, SourceID: 'G' }
  */
-const getAng = ShabadID => (
-  new Promise((resolve) => {
+const getAng = ShabadID =>
+  new Promise(resolve => {
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
-        const { PageNo, Source } = row;
-        resolve({
-          PageNo,
-          SourceID: Source.SourceID,
-        });
+    Realm.open(realmConfig).then(realm => {
+      const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
+      const { PageNo, Source } = row;
+      resolve({
+        PageNo,
+        SourceID: Source.SourceID,
       });
-  })
-);
+    });
+  });
 
 /**
  * Retrieve all lines from a page
@@ -227,22 +292,22 @@ const getAng = ShabadID => (
  * loadAng(1);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadAng = (PageNo, SourceID = 'G') => (
+const loadAng = (PageNo, SourceID = 'G') =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const rows = realm.objects('Verse').filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
-        if (rows.length > 0) {
-          resolve(rows);
-        } else {
-          reject();
-        }
-      });
-  })
-);
+    Realm.open(realmConfig).then(realm => {
+      const rows = realm
+        .objects('Verse')
+        .filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
+      if (rows.length > 0) {
+        resolve(rows);
+      } else {
+        reject();
+      }
+    });
+  });
 
 /**
  * Retrieve Shabad for Verse
@@ -255,18 +320,16 @@ const loadAng = (PageNo, SourceID = 'G') => (
  * getShabad(1);
  * // => 1
  */
-const getShabad = VerseID => (
-  new Promise((resolve) => {
+const getShabad = VerseID =>
+  new Promise(resolve => {
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
-        resolve(shabad.Shabads[0].ShabadID);
-      });
-  })
-);
+    Realm.open(realmConfig).then(realm => {
+      const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
+      resolve(shabad.Shabads[0].ShabadID);
+    });
+  });
 
 /**
  * Retrieve a random Shabad from a source
@@ -279,22 +342,22 @@ const getShabad = VerseID => (
  * randomShabad();
  * // => 13
  */
-const randomShabad = (SourceID = 'G') => (
-  new Promise((resolve) => {
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
-        const row = rows[Math.floor(Math.random() * rows.length)];
-        resolve(row.Shabads[0].ShabadID);
-      });
-  })
-);
+const randomShabad = (SourceID = 'G') =>
+  new Promise(resolve => {
+    Realm.open(realmConfig).then(realm => {
+      const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
+      const row = rows[Math.floor(Math.random() * rows.length)];
+      resolve(row.Shabads[0].ShabadID);
+    });
+  });
 
 // Re-export CONSTS for use in other areas
 module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadBanis,
+  loadBani,
   loadCeremony,
   getAng,
   loadAng,

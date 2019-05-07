@@ -1,8 +1,14 @@
 $presenter-pane-gap: 25px;
-$title-bar-offset: 25px;
-$keyboard-height:128px;
+$title-bar-offset: 32px;
+$keyboard-height: 128px;
+$toolbar-offset: 75px;
+$toolbar-small-offset: 50px;
+$toolbar-width-offset: $toolbar-offset/2;
+$bani-list-width: 300px;
+$tag-nitnem-color: #5488d6;
+$tag-popular-color: #ce744e;
 
-@mixin calculateTop ($row-num, $is-windows:0, $keyboard-offset:0) {
+@mixin calculateTop($row-num, $is-windows: 0, $keyboard-offset: 0) {
   $screen-offset: 50 * $row-num;
   $pane-gap-ratio: 1;
 
@@ -12,35 +18,23 @@ $keyboard-height:128px;
 
   @if $is-windows == 0 {
     top: calc(#{$screen-offset}% + #{($presenter-pane-gap * $pane-gap-ratio) + $keyboard-offset});
-  }
-
-  @else if $is-windows == 1 {
+  } @else if $is-windows == 1 {
     top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
   }
 }
 
-@import
-  "controller.scss",
-  "markdown",
-  "theme-dark",
-  "theme-light",
-  "theme-khalsa-gold",
-  "theme-baagi-blue",
-  "theme-khalsa-rush",
-  "theme-moody-blue",
-  "theme-a-new-day",
-  "theme-black-blue",
-  "theme-high-contrast",
-  "theme-low-light",
-  "theme-blue-darbar",
-  "theme-floral",
-  "update",
-  "viewer",
-  "window",
-  "akhandpaatt",
-  "overlay",
-  "animations",
-  "noty";
+@mixin calculateDimensions() {
+  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+  $presenter-panes-container: calc(50% - #{$toolbar-width-offset});
+
+  width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
+}
+
+@import 'controller.scss', 'markdown', 'theme-dark', 'theme-light', 'theme-khalsa-gold',
+  'theme-baagi-blue', 'theme-khalsa-rush', 'theme-moody-blue', 'theme-a-new-day', 'theme-black-blue',
+  'theme-high-contrast', 'theme-low-light', 'theme-blue-darbar', 'theme-floral', 'update', 'viewer',
+  'window', 'akhandpaatt', 'overlay', 'animations', 'noty';
 
 a {
   cursor: default;
@@ -50,8 +44,235 @@ a {
   display: none;
 }
 
+.blur {
+  filter: blur(20px);
+}
+
+.fullscreen-fixed {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
 #app-frame {
+  @extend .fullscreen-fixed;
+
+  z-index: 1100;
+}
+
+.focus-overlay {
+  @extend .fullscreen-fixed;
+
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1200;
+
+  &.hidden {
+    width: 0;
+  }
+}
+
+#toolbar {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  left: -$toolbar-small-offset;
+  padding-top: 10px;
+  position: absolute;
+  top: 0;
+  width: $toolbar-small-offset;
+  z-index: 1300;
+
+  .toolbar-item {
+    background-position: center center;
+    background-size: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 40px;
+    transition: 0.5s all ease;
+    width: 40px;
+
+    &:hover {
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .close-overlay-ui {
+    border: 2px solid white;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    height: 40px;
+    line-height: 35px;
+    position: fixed;
+    right: $presenter-pane-gap;
+    text-align: center;
+    top: $presenter-pane-gap;
+    width: 40px;
+
+    i {
+      transition: 0.3s all ease;
+    }
+
+    &:hover i {
+      transform: scale(1.3);
+    }
+  }
+
+  .bani-list {
+    bottom: 0;
+    height: 300px;
+    overflow: hidden;
+    position: fixed;
+    right: 0;
+    width: 500px;
+    word-wrap: break-word;
+
+    .sunder-gutka-bani {
+      cursor: pointer;
+      padding: 0.3rem 1rem;
+    }
+
+    header,
+    .translit-switch {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .translit-switch {
+      display: none;
+    }
+
+    .translit-bani {
+      display: none;
+      text-transform: capitalize;
+    }
+
+    &.translit {
+      .translit-bani {
+        display: inline;
+      }
+      .gurmukhi-bani {
+        display: none;
+      }
+    }
+
+    ul {
+      padding-bottom: 40px;
+    }
+
+    li .tag {
+      border-radius: 2px;
+      display: inline-block;
+      height: 10px;
+      margin: 0 5px;
+      width: 10px;
+
+      &.tag-nitnem {
+        background-color: $tag-nitnem-color;
+      }
+
+      &.tag-popular {
+        background-color: $tag-popular-color;
+      }
+    }
+
+    .blocklist {
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    header {
+      padding: 0.3rem 1rem;
+    }
+  }
+
+  .bani-extras {
+    bottom: 325px;
+    position: fixed;
+    right: 250px;
+    width: $bani-list-width;
+
+    .bani-group {
+      display: grid;
+      grid-gap: 15px;
+      grid-template-columns: 1fr 1fr 1fr;
+      width: 100%;
+    }
+
+    .bani-group-heading {
+      color: white;
+      padding: 1rem 0;
+      text-transform: capitalize;
+    }
+
+    .extras-tile {
+      align-items: center;
+      border-radius: 3px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      height: 75px;
+      justify-content: center;
+      line-height: 1.5;
+      padding: 5px;
+      text-align: center;
+      transition: 0.3s all ease;
+      width: 125px;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      &.nitnem-bani {
+        background-color: $tag-nitnem-color;
+      }
+
+      &.popular-bani {
+        background-color: $tag-popular-color;
+      }
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  #tool-sunder-gutka {
+    background-image: url('../../assets/img/icons/sunder_gutka.png');
+  }
+}
+
+.presenter-view #toolbar {
+  @extend .fullscreen-fixed;
+
+  padding-top: $presenter-pane-gap;
+  width: $toolbar-offset;
+
+  .toolbar-item {
+    height: 60px;
+    width: 60px;
+  }
+
+  .bani-list {
+    height: calc(100vh - #{$presenter-pane-gap * 2});
+    left: $toolbar-offset + $presenter-pane-gap;
+    top: $presenter-pane-gap;
+    width: $bani-list-width;
+  }
+
+  .bani-extras {
+    left: $toolbar-offset + $bani-list-width + ($presenter-pane-gap * 2);
+    top: $presenter-pane-gap;
+  }
 }
 
 #main-viewer,
@@ -84,6 +305,10 @@ body.show-overlay {
 
   &.minimized {
     height: 40px;
+
+    #toolbar {
+      display: none;
+    }
   }
 }
 
@@ -98,9 +323,9 @@ body.show-overlay {
 .controller.scale-viewer.presenter-view {
   #navigator {
     bottom: $presenter-pane-gap;
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     right: $presenter-pane-gap;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
   }
 
   #header {
@@ -118,9 +343,9 @@ body.show-overlay {
   }
 
   .fixed-takeover-pages {
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     position: fixed;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
   }
 
   #custom-slides-page {
@@ -142,13 +367,13 @@ body.show-overlay {
 
   .nav-page {
     display: block;
-    height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
     position: fixed;
     transition: 0.5s height ease;
-    width: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+
+    @include calculateDimensions();
 
     &:nth-child(1) {
-      left: $presenter-pane-gap;
+      left: $presenter-pane-gap + $toolbar-offset;
 
       @include calculateTop(0);
     }
@@ -162,7 +387,7 @@ body.show-overlay {
     }
 
     &:nth-child(3) {
-      left: $presenter-pane-gap;
+      left: $presenter-pane-gap + $toolbar-offset;
 
       @include calculateTop(1);
     }
@@ -391,13 +616,27 @@ body.show-overlay {
   top: 30px;
 }
 
+.win32 #toolbar {
+  .bani-list {
+    width: 470px;
+  }
+
+  .close-overlay-ui {
+    top: $presenter-pane-gap + $title-bar-offset;
+  }
+}
+
 .controller.scale-viewer.presenter-view.win32 {
   .nav-page:nth-child(1),
   #menu-page,
-  #shabad-menu-page { @include calculateTop(0, 1); }
+  #shabad-menu-page {
+    @include calculateTop(0, 1);
+  }
 
   #navigator.kb-active {
-    $height: calc(50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2));
+    $height: calc(
+      50% - calc(#{$presenter-pane-gap * 3} + #{$title-bar-offset}) - calc(#{$keyboard-height} / 2)
+    );
 
     /* .nav-page {
       &:nth-child(1) {
@@ -406,5 +645,19 @@ body.show-overlay {
 
       &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     } */
+  }
+
+  #toolbar {
+    padding-top: calc(#{$title-bar-offset} + 10px);
+
+    .bani-list {
+      height: calc(100vh - calc(#{$presenter-pane-gap * 2} + #{$title-bar-offset}));
+      top: $presenter-pane-gap + $title-bar-offset;
+      width: $bani-list-width;
+    }
+
+    .bani-extras {
+      top: $presenter-pane-gap + $title-bar-offset;
+    }
   }
 }

@@ -12,7 +12,7 @@ const overlayPort = remote.getGlobal('overlayPort');
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const overlayVars = store.get('obs').overlayPrefs.overlayVars;
+const { overlayVars } = store.get('obs').overlayPrefs;
 
 const url = `http://${host}:${overlayPort}/`;
 
@@ -25,35 +25,30 @@ const savePrefs = () => {
   ipcRenderer.send('update-overlay-vars');
 };
 
-const colorInputFactory = (inputName, label, defaultColor, onchangeAction) => h(
-  `div.${inputName}.input-wrap`,
+const colorInputFactory = (inputName, label, defaultColor, onchangeAction) =>
   h(
-    `input.${inputName}.color-input`,
-    {
+    `div.${inputName}.input-wrap`,
+    h(`input.${inputName}.color-input`, {
       type: 'color',
       onchange: onchangeAction,
       value: defaultColor,
-    },
-  ),
-  h(
-    'div.setting-label',
-    label,
-  ),
-);
+    }),
+    h('div.setting-label', label),
+  );
 
-const changeColor = (e) => {
+const changeColor = e => {
   const color = e.target.value;
   overlayVars.textColor = color;
   savePrefs();
 };
 
-const changeGurbaniColor = (e) => {
+const changeGurbaniColor = e => {
   const color = e.target.value;
   overlayVars.gurbaniTextColor = color;
   savePrefs();
 };
 
-const changeBg = (e) => {
+const changeBg = e => {
   const color = e.target.value;
   overlayVars.bgColor = color;
   savePrefs();
@@ -119,49 +114,50 @@ const decreaseOpacity = () => {
 
 const separator = h('div.separator');
 
-const layoutButtonFactory = layoutName => h(
-  'div.input-wrap',
+const layoutButtonFactory = layoutName =>
   h(
-    `div.layout-btn.${layoutName}`,
-    h('div.layout-bar.layout-bar-1'),
-    h('div.layout-bar.layout-bar-2'),
-    h('div.layout-bar.layout-bar-3'),
-    h('div.layout-bar.layout-bar-4'),
-    {
-      onclick: () => {
-        document.querySelectorAll('.content-bar').forEach((bar) => {
-          bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
-        });
-        overlayVars.layout = layoutName;
-        savePrefs();
-        analytics.trackEvent('overlay', 'layout', layoutName);
+    'div.input-wrap',
+    h(
+      `div.layout-btn.${layoutName}`,
+      h('div.layout-bar.layout-bar-1'),
+      h('div.layout-bar.layout-bar-2'),
+      h('div.layout-bar.layout-bar-3'),
+      h('div.layout-bar.layout-bar-4'),
+      {
+        onclick: () => {
+          document.querySelectorAll('.content-bar').forEach(bar => {
+            bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
+          });
+          overlayVars.layout = layoutName;
+          savePrefs();
+          analytics.trackEvent('overlay', 'layout', layoutName);
+        },
       },
-    },
-  ),
-);
+    ),
+  );
 
-const resizeButtonFactory = (increaseFunc, decreaseFunc) => h(
-  'div.input-wrap.resize-btn',
+const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
   h(
-    'span.export-btn',
-    {
-      onclick: () => {
-        decreaseFunc();
+    'div.input-wrap.resize-btn',
+    h(
+      'span.export-btn',
+      {
+        onclick: () => {
+          decreaseFunc();
+        },
       },
-    },
-    h('i.fa.fa-minus-circle.cp-icon'),
-  ),
-  h(
-    'span.export-btn',
-    {
-      onclick: () => {
-        increaseFunc();
+      h('i.fa.fa-minus-circle.cp-icon'),
+    ),
+    h(
+      'span.export-btn',
+      {
+        onclick: () => {
+          increaseFunc();
+        },
       },
-    },
-    h('i.fa.fa-plus-circle.cp-icon'),
-  ),
-);
-
+      h('i.fa.fa-plus-circle.cp-icon'),
+    ),
+  );
 
 const copyURLButton = h(
   'div.input-wrap',
@@ -171,20 +167,14 @@ const copyURLButton = h(
       copy(url);
     },
   },
-  h(
-    'div.export-btn',
-    h('i.fa.fa-files-o.cp-icon'),
-  ),
-  h(
-    'div.setting-label',
-    'Copy URL',
-  ),
+  h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
+  h('div.setting-label', 'Copy URL'),
 );
 
 const toggleLarivaar = h(
   'div.input-wrap',
   {
-    onclick: (evt) => {
+    onclick: evt => {
       overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
       savePrefs();
 
@@ -202,22 +192,25 @@ const toggleLarivaar = h(
     'div.export-btn#larivaar-btn',
     h(`i.fa.cp-icon.${overlayVars.overlayLarivaar ? 'fa-unlink' : 'fa-link'}`),
   ),
-  h(
-    'div.setting-label',
-    `Use ${overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar'}`,
-  ),
+  h('div.setting-label', `Use ${overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar'}`),
 );
 
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
-const gurbaniColor = colorInputFactory('toggle-text', 'Gurbani', overlayVars.gurbaniTextColor, changeGurbaniColor);
+const gurbaniColor = colorInputFactory(
+  'toggle-text',
+  'Gurbani',
+  overlayVars.gurbaniTextColor,
+  changeGurbaniColor,
+);
 const textColor = colorInputFactory('toggle-text', 'Text', overlayVars.textColor, changeColor);
 const backgroundColor = colorInputFactory('background', 'BG', overlayVars.bgColor, changeBg);
 const changeBarSizeButton = resizeButtonFactory(increaseBarSize, decreaseBarSize);
 const changefontSizeButton = resizeButtonFactory(increasefontSize, decreasefontSize);
 const changeGurbanifontSizeButton = resizeButtonFactory(
-  increaseGurbanifontSize, decreaseGurbanifontSize,
+  increaseGurbanifontSize,
+  decreaseGurbanifontSize,
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
@@ -229,15 +222,9 @@ controlPanel.append(changefontSizeButton);
 controlPanel.append(separator);
 controlPanel.append(backgroundColor);
 controlPanel.append(changeBarSizeButton);
-controlPanel.append(h(
-  'div.setting-label',
-  'Size',
-));
+controlPanel.append(h('div.setting-label', 'Size'));
 controlPanel.append(changeOpacityButton);
-controlPanel.append(h(
-  'div.setting-label',
-  'Opacity',
-));
+controlPanel.append(h('div.setting-label', 'Opacity'));
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(bottomLayoutBtn);
 controlPanel.append(topLayoutBtn);

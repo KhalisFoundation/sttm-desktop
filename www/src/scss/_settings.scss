@@ -30,6 +30,12 @@
   }
 
   .block-list li {
+    span.setting-container {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
     span i {
       color: #999;
       font-size: 0.8em;
@@ -65,3 +71,4 @@
   font-weight: lighter;
   margin-left: 1.5rem;
 }
+
