@@ -25,9 +25,9 @@
     "build-css:obs": "node-sass --output-style compressed --include-path www/src/scss/obs www/src/scss/obs/styles.scss www/obs/bundle.css",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "postinstall": "electron-builder install-app-deps",
-    "test:pr": "npm run test && npm run pack:mac && npm run test:integration:mac",
-    "test:integration:mac": "NODE_ENV=testing TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax jest",
-    "test:integration:debug": "TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax node $NODE_DEBUG_OPTION node_modules/jest/bin/jest"
+    "integration-test:pr": "npm run test && npm run pack:mac && npm run integration-test:mac",
+    "integration-test:mac": "NODE_ENV=testing TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax jest",
+    "integration-test:debug": "TESTING_APP_PATH=./builds/mac/SikhiToTheMax.app/Contents/MacOS/SikhiToTheMax node $NODE_DEBUG_OPTION node_modules/jest/bin/jest"
   },
   "repository": {
     "type": "git",
