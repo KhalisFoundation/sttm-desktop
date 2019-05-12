@@ -202,10 +202,8 @@ const loadCeremony = CeremonyID =>
       ORDER BY cs.Seq`,
       (err, rows) => {
         if (err) {
-          console.log(err);
           reject(err);
         } else if (rows.length > 0) {
-          console.log(rows);
           resolve(rows);
         }
       },

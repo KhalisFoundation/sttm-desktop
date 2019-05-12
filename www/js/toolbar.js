@@ -99,24 +99,6 @@ const extrasTileFactory = (tileType, row) =>
     h('div.gurmukhi', row.Gurmukhi),
   );
 
-const toolbarItemFactory = toolbarItem =>
-  h(`div.toolbar-item#tool-${toolbarItem}`, {
-    onclick: () => {
-      const { databaseState } = global.core.search.$search.dataset;
-      if (databaseState === 'loaded') {
-        toggleOverlayUI(toolbarItem, true);
-        if (!banisLoaded) {
-          banidb.loadBanis().then(rows => {
-            printBanis(rows);
-            banisLoaded = !!rows;
-          });
-
-          analytics.trackEvent('banisLoaded', true);
-        }
-      }
-    },
-  });
-
 const closeOverlayUI = h(
   'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
   {
@@ -161,6 +143,24 @@ const printBanis = rows => {
     $sunderGutkaBanis.appendChild($bani);
   });
 };
+
+const toolbarItemFactory = toolbarItem =>
+  h(`div.toolbar-item#tool-${toolbarItem}`, {
+    onclick: () => {
+      const { databaseState } = global.core.search.$search.dataset;
+      if (databaseState === 'loaded') {
+        toggleOverlayUI(toolbarItem, true);
+        if (!banisLoaded) {
+          banidb.loadBanis().then(rows => {
+            printBanis(rows);
+            banisLoaded = !!rows;
+          });
+
+          analytics.trackEvent('banisLoaded', true);
+        }
+      }
+    },
+  });
 
 const printCeremonies = rows => {
   rows.forEach(row => {
