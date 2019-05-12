@@ -370,6 +370,7 @@ module.exports = {
   initSearch() {
     this.$dbDownloadProgress.style.height = 0;
     this.$search.disabled = false;
+    this.$search.dataset.databaseState = 'loaded';
     this.$angSearch.disabled = false;
     this.$search.focus();
     this.changeSearchType(this.searchType);
@@ -630,6 +631,7 @@ module.exports = {
     */
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
+    $shabadList.dataset.bani = '';
     $shabadList.innerHTML = '';
     currentShabad.splice(0, currentShabad.length);
     if (apv && infiniteScroll) {

@@ -164,7 +164,7 @@ const loadShabad = ShabadID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
+      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -191,15 +191,49 @@ const loadCeremony = CeremonyID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`,
+      `SELECT v.ID,  v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.MainLetters,
+      c.Token, cs.Custom, cc.English, v.PageNo 
+      AS PageNo
+      FROM Ceremonies_Shabad cs
+      LEFT JOIN Ceremonies c ON cs.Ceremony = c.ID
+      LEFT JOIN Verse v  ON v.ID = cs.VerseID 
+      LEFT JOIN Ceremonies_Custom cc ON cs.Custom = cc.ID
+      WHERE cs.Ceremony = ${CeremonyID} 
+      ORDER BY cs.Seq`,
       (err, rows) => {
         if (err) {
+          console.log(err);
           reject(err);
         } else if (rows.length > 0) {
+          console.log(rows);
           resolve(rows);
         }
       },
     );
+  });
+
+/**
+ * Retrieve all ceremonies
+ *
+ * @param {number} CeremonyID The specific Ceremony to get
+ * @returns {object} Returns array of objects for each line
+ * @example
+ *
+ * loadCeremony(3);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadCeremonies = () =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all('SELECT * FROM Ceremonies ORDER BY ID', (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
   });
 
 /**
@@ -240,9 +274,9 @@ const loadBani = (BaniID, BaniLength) =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration,
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration,
       v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
-      b.existsTaksal, b.existsBuddhaDal
+      b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
       FROM Verse v
       LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID
       LEFT JOIN Banis c ON c.ID = ${BaniID}
@@ -364,6 +398,7 @@ module.exports = {
   query,
   loadShabad,
   loadCeremony,
+  loadCeremonies,
   loadBanis,
   loadBani,
   getAng,

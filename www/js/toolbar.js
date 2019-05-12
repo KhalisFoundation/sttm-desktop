@@ -11,6 +11,7 @@ const navLinks = require('./search');
 
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
+let banisLoaded = false;
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
@@ -101,7 +102,18 @@ const extrasTileFactory = (tileType, row) =>
 const toolbarItemFactory = toolbarItem =>
   h(`div.toolbar-item#tool-${toolbarItem}`, {
     onclick: () => {
-      toggleOverlayUI(toolbarItem, true);
+      const { databaseState } = global.core.search.$search.dataset;
+      if (databaseState === 'loaded') {
+        toggleOverlayUI(toolbarItem, true);
+        if (!banisLoaded) {
+          banidb.loadBanis().then(rows => {
+            printBanis(rows);
+            banisLoaded = !!rows;
+          });
+
+          analytics.trackEvent('banisLoaded', true);
+        }
+      }
     },
   });
 
@@ -205,11 +217,14 @@ module.exports = {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
 
+    banidb.loadCeremonies().then(rows => {
+      printCeremonies(rows);
+      analytics.trackEvent('ceremoniesLoaded', true);
+    });
+
     $baniList.querySelector('header').appendChild(translitSwitch);
     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
     $baniExtras.appendChild(baniGroupFactory('popular banis'));
-    banidb.loadBanis().then(rows => printBanis(rows));
-    banidb.loadCeremonies().then(rows => printCeremonies(rows));
     $toolbar.appendChild(closeOverlayUI);
   },
 };

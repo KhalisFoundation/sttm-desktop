@@ -208,7 +208,7 @@ const iconsetHtml = (classname, content) => {
   const iconType = classname.split('-')[1];
   if (content) {
     icons = h(`span.${classname}.iconset`, [
-      h('p.tagline', iconType),
+      h('p.tagline', iconType === 'gurbani' ? 'bani' : iconType),
       h(
         'span.visibility',
         {
@@ -374,7 +374,9 @@ const showLine = (ShabadID, LineID, rows, mode) => {
       smoothScroll(`#apv #slide${LineID}`);
     }
   } else {
-    const $existingDeck = document.querySelector(`div#shabad${ShabadID}.deck.active`);
+    const $existingDeck =
+      document.querySelector(`div#shabad${ShabadID}.deck.active`) ||
+      document.querySelector(`div#shabad${ShabadID}.deck`);
     const { cards, shabad } = createCards(rows, LineID);
     switch (mode) {
       case 'replace':
@@ -397,6 +399,12 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
+        /* if you click on verse when message is open (announcement, blank, waheguru) 
+        it should hide the message deck and show the shabad deck */
+        if ($message.classList.contains('active')) {
+          $message.classList.remove('active');
+          $existingDeck.classList.add('active');
+        }
         activateSlide($existingDeck, LineID);
         break;
       default:
