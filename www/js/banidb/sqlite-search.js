@@ -204,7 +204,8 @@ const loadCeremony = CeremonyID =>
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
-          rows.map(row => {
+          const rowsMapped = rows.map(rawRow => {
+            const row = Object.assign({}, rawRow);
             row.Ceremony = {
               Token: row.Token,
               Gurmukhi: row.CeremonyGurmukhi,
@@ -225,8 +226,9 @@ const loadCeremony = CeremonyID =>
               LineNo: row.LineNo,
               PageNo: row.PageNo,
             };
+            return row;
           });
-          resolve(rows);
+          resolve(rowsMapped);
         }
       },
     );
