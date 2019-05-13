@@ -237,12 +237,12 @@ const loadCeremony = CeremonyID =>
 /**
  * Retrieve all ceremonies
  *
- * @param {number} CeremonyID The specific Ceremony to get
- * @returns {object} Returns array of objects for each line
+ * @returns {object} Returns array of objects for each ceremony
  * @example
  *
- * loadCeremony(3);
- * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ * loadCeremonies();
+ * "AnMd kwrj"
+ * // => [{ Gurmukhi:  "AnMd kwrj", ID: 1 ... },...]
  */
 const loadCeremonies = () =>
   new Promise((resolve, reject) => {

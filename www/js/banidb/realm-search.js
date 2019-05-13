@@ -256,6 +256,16 @@ const loadBanis = () =>
       .catch(reject);
   });
 
+/**
+ * Retrieve all ceremonies
+ *
+ * @returns {object} Returns array of objects for each ceremony
+ * @example
+ *
+ * loadCeremonies();
+ * // => [{ Gurmukhi:  "AnMd kwrj", ID: 1 ... },...]
+ */
+
 const loadCeremonies = () =>
   new Promise((resolve, reject) => {
     if (!initialized) {
@@ -265,6 +275,7 @@ const loadCeremonies = () =>
       .then(realm => {
         const rows = realm.objects('Ceremonies').sorted('ID');
         if (rows.length > 0) {
+          console.log(rows);
           resolve(rows);
         }
       })
