@@ -191,8 +191,8 @@ const loadCeremony = CeremonyID =>
       init();
     }
     db.all(
-      `SELECT v.ID,  v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.MainLetters,
-      c.Token, cs.Custom, cc.English, v.PageNo 
+      `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.MainLetters,
+      c.Token, c.Gurmukhi as CeremonyGurmukhi, cs.Custom, cc.English, v.PageNo 
       AS PageNo
       FROM Ceremonies_Shabad cs
       LEFT JOIN Ceremonies c ON cs.Ceremony = c.ID
@@ -204,6 +204,28 @@ const loadCeremony = CeremonyID =>
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
+          rows.map(row => {
+            row.Ceremony = {
+              Token: row.Token,
+              Gurmukhi: row.CeremonyGurmukhi,
+            };
+            const customID = row.Custom;
+            row.Custom = {
+              ID: customID,
+              English: row.English,
+            };
+            row.Verse = {
+              Gurmukhi: row.Gurmukhi,
+              MainLetters: row.MainLetters,
+              Translations: row.Translations,
+              Transliteration: row.Transliteration,
+              Visraam: row.Visraam,
+              SourceID: row.SourceID,
+              ID: row.ID,
+              LineNo: row.LineNo,
+              PageNo: row.PageNo,
+            };
+          });
           resolve(rows);
         }
       },

@@ -658,7 +658,7 @@ module.exports = {
           row = rowDb.Verse;
         }
 
-        if (rowDb.Custom) {
+        if (rowDb.Custom && rowDb.Custom.ID) {
           row = rowDb.Custom;
           row.shabadID = rowDb.Ceremony.Token;
         }
@@ -853,7 +853,7 @@ module.exports = {
 
     // if there is a lineIDConflict make lineID the very first line in shabad.
     if (lineIDConflict) {
-      [lineID] = currentShabad;
+      lineID = document.querySelector(`#shabad > li:first-child > a`).dataset.lineId;
       shabad.querySelector(`#line${lineID}`).classList.add('current', 'main', 'seen_check');
     }
 
