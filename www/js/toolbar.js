@@ -163,7 +163,7 @@ const toolbarItemFactory = toolbarItem =>
   });
 
 const getEnglishExp = token => {
-  let englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
+  const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
   if (englishExpVal === undefined) {
     return true;
   }
