@@ -21,10 +21,7 @@ function hideSlide() {
   global.controller.sendText('');
 }
 
-function highlightLine(newLine, nextLineCount = null) {
-  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
-  const $line = search.$shabad.querySelector(nextLineSelector);
-  $line.click();
+function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
   const containerTop = search.$shabadContainer.scrollTop;
@@ -36,6 +33,13 @@ function highlightLine(newLine, nextLineCount = null) {
   if (containerTop + containerHeight < curPankteeTop + curPankteeHeight) {
     search.$shabadContainer.scrollTop = curPankteeTop - containerHeight + curPankteeHeight;
   }
+}
+
+function highlightLine(newLine, nextLineCount = null) {
+  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
+  const $line = search.$shabad.querySelector(nextLineSelector);
+  $line.click();
+  maintainScroll($line);
 }
 
 function spaceBar(e) {
@@ -53,22 +57,27 @@ function spaceBar(e) {
 }
 
 function prevLine(e) {
-  // Find position of current line in Shabad
+  // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const prevLineCount = parseInt($currentLine.dataset.lineCount, 10) - 1;
-  if (prevLineCount > 0) {
-    highlightLine(null, prevLineCount);
+  const $prevLine = $currentLine.previousElementSibling;
+  // if its not at the topmost panktee
+  if ($prevLine && $prevLine.dataset.lineCount) {
+    const $prevPanktee = $prevLine.querySelector('a.panktee');
+    $prevPanktee.click();
+    maintainScroll($prevPanktee);
   }
   e.preventDefault();
 }
 
 function nextLine(e) {
-  // Find position of current line in Shabad
-  const pos = search.currentShabad.indexOf(search.currentLine);
+  // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const nextLineCount = parseInt($currentLine.dataset.lineCount, 10) + 1;
-  if (pos < search.currentShabad.length - 1) {
-    highlightLine(search.currentShabad[pos + 1], nextLineCount);
+  const $nextLine = $currentLine.nextElementSibling;
+  // if its not at the last panktee
+  if ($nextLine && $nextLine.dataset.lineCount) {
+    const $nextPanktee = $nextLine.querySelector('a.panktee');
+    $nextPanktee.click();
+    maintainScroll($nextPanktee);
   }
   e.preventDefault();
 }
