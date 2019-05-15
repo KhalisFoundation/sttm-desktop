@@ -5,11 +5,12 @@
 ### Added:
 
 - We've made it easier than ever to have every shabad you need for an Anand Kaaraj in one place! Check out the new Ceremonies tab!
-  ![](./assets/img/help_images/SG.gif)
+  ![](./assets/img/help_images/desktop-ceremonies.png)
 
 ### Improved:
 
 - Expanded Vishraams to be supported on all themes
+- Bug fixes & UI enhancements 
 
 <br/>  
 <details><summary>See previous updates...</summary>
