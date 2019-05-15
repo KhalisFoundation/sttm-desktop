@@ -285,22 +285,22 @@ const createCards = (rows, LineID) => {
                                     <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
 
     const englishContainer = document.createElement('div');
-    englishContainer.innerHTML = row.English;
+    englishContainer.innerHTML = row.English || '';
 
     cards.push(
       h(`div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`, [
         h('h1.gurbani.gurmukhi', gurmukhiContainer),
         h('h2.translation', englishContainer),
-        h('h2.teeka', row.Punjabi),
-        h('h2.transliteration', row.Transliteration),
+        h('h2.teeka', row.Punjabi || ''),
+        h('h2.transliteration', row.Transliteration || ''),
       ]),
     );
     shabad[row.ID] = {
       gurmukhi: row.Gurmukhi || row.PunjabiUni,
       larivaar: taggedGurmukhi.join('<wbr>'),
-      translation: row.English,
-      teeka: row.Punjabi,
-      transliteration: row.Transliteration,
+      translation: row.English || '',
+      teeka: row.Punjabi || '',
+      transliteration: row.Transliteration || '',
     };
   });
   return { cards, lines, shabad };
