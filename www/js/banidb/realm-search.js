@@ -275,7 +275,6 @@ const loadCeremonies = () =>
       .then(realm => {
         const rows = realm.objects('Ceremonies').sorted('ID');
         if (rows.length > 0) {
-          console.log(rows);
           resolve(rows);
         }
       })
