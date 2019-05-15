@@ -212,6 +212,29 @@ const upsertCustomBackgrounds = themesContainer => {
   });
 };
 
+const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
+  themes.forEach(themeInstance => {
+    let themeTypeMatches = false;
+    if (Array.isArray(themeInstance.type)) {
+      themeTypeMatches = themeInstance.type.includes(themeType);
+    } else {
+      themeTypeMatches = themeInstance.type === themeType;
+    }
+    if (themeTypeMatches) {
+      themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
+    }
+  });
+};
+
+const updateCeremonyThemeTiles = () => {
+  const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+  document.querySelectorAll('.ceremony-pane-themes .theme-instance').forEach(el => el.remove());
+
+  const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
+  swatchGroupFactory('anandkaraj', anandKarajPane);
+  anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+};
+
 const imageInput = themesContainer =>
   h(
     'label.file-input-label',
@@ -266,29 +289,6 @@ const imageInput = themesContainer =>
       },
     }),
   );
-
-const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
-  themes.forEach(themeInstance => {
-    let themeTypeMatches = false;
-    if (Array.isArray(themeInstance.type)) {
-      themeTypeMatches = themeInstance.type.includes(themeType);
-    } else {
-      themeTypeMatches = themeInstance.type === themeType;
-    }
-    if (themeTypeMatches) {
-      themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
-    }
-  });
-};
-
-const updateCeremonyThemeTiles = () => {
-  const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
-  document.querySelectorAll('.ceremony-pane-themes .theme-instance').forEach(el => el.remove());
-
-  const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
-  swatchGroupFactory('anandkaraj', anandKarajPane);
-  anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
-};
 
 module.exports = {
   defaultTheme,
