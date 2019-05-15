@@ -745,7 +745,12 @@ module.exports = {
       ? englishHeadingEl.querySelector('h1').innerText
       : '';
 
-    if (englishHeading && !store.getUserPref(`gurbani.ceremonies.${line.ShabadID}-english`)) {
+    let englishAllowed = store.getUserPref(`gurbani.ceremonies.${line.ShabadID}-english`);
+    if (englishAllowed === undefined) {
+      englishAllowed = true;
+    }
+
+    if (englishHeading && !englishAllowed) {
       return false;
     }
 

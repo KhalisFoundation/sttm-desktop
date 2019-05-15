@@ -162,6 +162,14 @@ const toolbarItemFactory = toolbarItem =>
     },
   });
 
+const getEnglishExp = token => {
+  let englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
+  if (englishExpVal === undefined) {
+    return true;
+  }
+  return englishExpVal;
+};
+
 const printCeremonies = rows => {
   rows.forEach(row => {
     if (row.Token !== 'anand' && row.Token !== 'death') {
@@ -188,11 +196,11 @@ const printCeremonies = rows => {
               'English Explanations',
               `${row.Token}-english-exp`,
               () => {
-                const englishExpVal = store.getUserPref(`gurbani.ceremonies.${row.Token}-english`);
+                const englishExpVal = getEnglishExp(row.Token);
                 store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
                 global.platform.updateSettings();
               },
-              store.getUserPref(`gurbani.ceremonies.${row.Token}-english`),
+              getEnglishExp(row.Token),
             ),
           ),
           h(
