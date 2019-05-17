@@ -36,6 +36,11 @@
   }
 }
 
+.toolbar-nh {
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 .navigator-header {
   align-items: center;
   display: flex;
@@ -116,9 +121,13 @@
     text-align: center;
     width: 40px;
 
-    &.close-button { background: white; }
+    &.close-button {
+      background: white;
+    }
 
-    &.hide { display: none; }
+    &.hide {
+      display: none;
+    }
   }
 
   .current-shabad-header {
@@ -141,8 +150,12 @@
 }
 
 .presenter-view .navigator-header {
-  .nav-header-text { display: none; }
-  .nav-header-tab { display: inline-block; }
+  .nav-header-text {
+    display: none;
+  }
+  .nav-header-tab {
+    display: inline-block;
+  }
 }
 
 #session-page,

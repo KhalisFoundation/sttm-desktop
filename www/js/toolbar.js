@@ -38,7 +38,7 @@ const toggleOverlayUI = (toolbarItem, show) => {
 
 // factories
 const navigatorHeaderFactory = (id, content, lang) =>
-  h(`header.navigator-header#${id}`, h(`span.${lang}`, content));
+  h(`header.toolbar-nh.navigator-header#${id}`, h(`span.${lang}`, content));
 
 const blockListFactory = (lang, id) => h('section.blocklist', h(`ul#${id}.${lang}`));
 
