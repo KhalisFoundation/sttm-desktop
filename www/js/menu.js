@@ -167,20 +167,7 @@ const randomShabadButton = h(
     'Show Random Shabad',
   ),
 );
-const anandKarajButton = h(
-  'li',
-  h(
-    'a.anand-karaj-button',
-    {
-      onclick: () => {
-        analytics.trackEvent('display', 'anand-karaj');
-        goToShabadPage(2897);
-      },
-    },
-    h('i.fa.fa-heart.list-icon'),
-    'Anand Karaj / Sikh Marriage',
-  ),
-);
+
 const notificationButton = h(
   'li',
   h(
@@ -357,7 +344,6 @@ module.exports = {
     const $listOfShabadOptions = document.querySelector('#list-of-shabad-options');
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
-    $listOfShabadOptions.appendChild(anandKarajButton);
     $listOfShabadOptions.appendChild(notificationButton);
 
     // when the app is reloaded, enable the control for akhandpaatt

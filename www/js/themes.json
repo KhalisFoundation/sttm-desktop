@@ -1,6 +1,6 @@
 [
   {
-    "name":"Light",
+    "name": "Light",
     "background-color": "#fff",
     "gurbani-color": "#000000",
     "translation-color": "#353535",
@@ -8,8 +8,9 @@
     "teeka-color": "#4b4b4b",
     "type": ["COLOR", "anandkaraj"],
     "key": "light-theme"
-  }, {
-    "name":"Dark",
+  },
+  {
+    "name": "Dark",
     "background-color": "#000",
     "gurbani-color": "#c9e7ff",
     "translation-color": "#fff",
@@ -17,8 +18,9 @@
     "teeka-color": "#fff",
     "type": ["COLOR", "death"],
     "key": "dark-theme"
-  }, {
-    "name":"Khalsa Gold",
+  },
+  {
+    "name": "Khalsa Gold",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
     "gurbani-shadow": "0 0 4px rgba(140,81,5,1)",
@@ -127,7 +129,7 @@
     "key": "high-contrast"
   },
   {
-    "name":"Low Light",
+    "name": "Low Light",
     "background-color": "#000",
     "gurbani-color": "#98b1c5",
     "translation-color": "#b1b1b1",

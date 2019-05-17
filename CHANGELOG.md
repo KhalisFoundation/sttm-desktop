@@ -10,7 +10,7 @@
 ### Improved:
 
 - Expanded Vishraams to be supported on all themes
-- Bug fixes & UI enhancements 
+- Bug fixes & UI enhancements
 
 <br/>  
 <details><summary>See previous updates...</summary>
@@ -27,11 +27,13 @@
 ### Improved:
 
 - SikhiToTheMax will no longer open a second instance if it is already open
-- Bug fixes & UI enhancements  
-  
+- Bug fixes & UI enhancements
+
 ### 4.5 - _190312_
+
 ### Added:
-* Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
+
+- Added Shortcut Tray! A quick way to access Anand Sahib (6 Paurees + Salok), Mool Mantra, and more!
 
 ### Improved:
 

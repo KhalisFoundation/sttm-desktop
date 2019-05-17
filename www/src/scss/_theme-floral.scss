@@ -1,6 +1,6 @@
 body.floral {
   background-color: #a4244e;
-  background-image: url("../../assets/img/custom_backgrounds/floral-bg.jpg");
+  background-image: url('../../assets/img/custom_backgrounds/floral-bg.jpg');
 
   #ribbon1,
   #ribbon2 {
@@ -76,10 +76,18 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
     color: $base-text;
   }
 
-  .shortcut-tray { background: $alt-bg; }
-  .tray-item-icon { background: lighten($base-text, 30); }
-  .tray-item-label { color: $nav-bg; }
-  &.shortcut-tray-on .shortcut-toggle { background: $alt-bg; }
+  .shortcut-tray {
+    background: $alt-bg;
+  }
+  .tray-item-icon {
+    background: lighten($base-text, 30);
+  }
+  .tray-item-label {
+    color: $nav-bg;
+  }
+  &.shortcut-tray-on .shortcut-toggle {
+    background: $alt-bg;
+  }
 
   .nav-header-tab {
     color: $base-text-inactive;
