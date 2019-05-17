@@ -221,6 +221,10 @@ const printCeremonies = rows => {
 
 module.exports = {
   init() {
+    document.querySelector('.focus-overlay').addEventListener('click', () => {
+      toggleOverlayUI(currentToolbarItem, false);
+    });
+
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
