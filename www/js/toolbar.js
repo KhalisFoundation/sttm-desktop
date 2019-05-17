@@ -1,52 +1,82 @@
 const h = require('hyperscript');
-const banidb = require('./banidb');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
+const banidb = require('./banidb');
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const toolbarItems = ['sunder-gutka'];
+const toolbarItems = ['sunder-gutka', 'ceremonies'];
+const navLinks = require('./search');
+
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
+let banisLoaded = false;
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
+const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
+let currentToolbarItem;
 
-const blockList = (lang, id) => h(
-  'section.blocklist',
-  h(`ul#${id}.lang`),
-);
-
-const toggleOverlayUI = () => {
-  document.querySelectorAll('.base-ui').forEach((uiElement) => {
-    uiElement.classList.toggle('blur');
+// helper functions
+const toggleOverlayUI = (toolbarItem, show) => {
+  if (currentToolbarItem !== toolbarItem) {
+    toggleOverlayUI(currentToolbarItem, false);
+  }
+  currentToolbarItem = toolbarItem;
+  document.querySelectorAll('.base-ui').forEach(uiElement => {
+    uiElement.classList.toggle('blur', show);
   });
-  document.querySelectorAll('.overlay-ui').forEach((uiElement) => {
-    uiElement.classList.toggle('hidden');
+  document.querySelectorAll('overlay-ui').forEach(uiElement => {
+    uiElement.classList.toggle('hidden', show);
+  });
+  document.querySelectorAll(`.overlay-ui.ui-${toolbarItem}, .common-overlay`).forEach(uiElement => {
+    uiElement.classList.toggle('hidden', !show);
   });
 };
 
-const translitSwitch = h(
-  'div.translit-switch',
-  [
-    h('span', 'Abc'),
-    h('div.switch',
-      [
-        h('input#sg-translit-toggle',
-          {
-            name: 'hg-trasnlit-toggle',
-            type: 'checkbox',
-            onclick: () => {
-              $baniList.classList.toggle('translit');
-            },
-            value: 'sg-translit' }),
-        h('label',
-          {
-            htmlFor: 'sg-translit-toggle' })])]);
+// factories
+const navigatorHeaderFactory = (id, content, lang) =>
+  h(`header.navigator-header#${id}`, h(`span.${lang}`, content));
 
-const baniGroupFactory = (baniGroupName) => {
+const blockListFactory = (lang, id) => h('section.blocklist', h(`ul#${id}.${lang}`));
+
+const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
+  h(`div.${id}`, [
+    h('span', label),
+    h('div.switch', [
+      h(`input#${inputId}-toggle`, {
+        name: inputId,
+        type: 'checkbox',
+        checked: defaultValue,
+        onclick: clickEvent,
+        value: inputId,
+      }),
+      h('label', {
+        htmlFor: `${inputId}-toggle`,
+      }),
+    ]),
+  ]);
+
+const translitSwitch = h('div.translit-switch', [
+  h('span', 'Abc'),
+  h('div.switch', [
+    h('input#sg-translit-toggle', {
+      name: 'hg-trasnlit-toggle',
+      type: 'checkbox',
+      onclick: () => {
+        $baniList.classList.toggle('translit');
+      },
+      value: 'sg-translit',
+    }),
+    h('label', {
+      htmlFor: 'sg-translit-toggle',
+    }),
+  ]),
+]);
+
+const baniGroupFactory = baniGroupName => {
   const baniGroupClass = baniGroupName.replace(/ /g, '-');
   return h(
     'div.bani-group-container',
@@ -55,26 +85,38 @@ const baniGroupFactory = (baniGroupName) => {
   );
 };
 
-const extrasTileFactory = (tileType, row) => h(
-  `div.extras-tile.${tileType}`,
+const extrasTileFactory = (tileType, row) =>
+  h(
+    `div.extras-tile.${tileType}`,
+    {
+      onclick: () => {
+        global.core.search.loadBani(row.ID);
+        toggleOverlayUI(currentToolbarItem, false);
+        analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
+        navLinks.navPage('shabad');
+      },
+    },
+    h('div.gurmukhi', row.Gurmukhi),
+  );
+
+const closeOverlayUI = h(
+  'div.close-overlay-ui.overlay-ui.common-overlay.hidden',
   {
     onclick: () => {
-      global.core.search.loadBani(row.ID);
-      toggleOverlayUI();
-      analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
+      toggleOverlayUI(currentToolbarItem, false);
     },
   },
-  h('div.gurmukhi', row.Gurmukhi),
+  h('i.fa.fa-times'),
 );
 
-const printBanis = (rows) => {
+const printBanis = rows => {
   const banisListID = 'sunder-gutka-banis';
-  $baniList.appendChild(blockList('gurmukhi', banisListID));
+  $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
   const $sunderGutkaBanis = document.querySelector(`#${banisListID}`);
   const $nitnemBanis = document.querySelector('.nitnem-banis');
   const $popularBanis = document.querySelector('.popular-banis');
 
-  rows.forEach((row) => {
+  rows.forEach(row => {
     let baniTag = 'none';
     if (nitnemBanis.includes(row.ID)) {
       baniTag = 'nitnem';
@@ -90,7 +132,8 @@ const printBanis = (rows) => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
-          toggleOverlayUI();
+          toggleOverlayUI(currentToolbarItem, false);
+          navLinks.navPage('shabad');
         },
       },
       h(`span.tag.tag-${baniTag}`),
@@ -101,33 +144,95 @@ const printBanis = (rows) => {
   });
 };
 
-const toolbarItemFactory = toolbarItem => h(
-  `div.toolbar-item#tool-${toolbarItem}`,
-  {
-    onclick: toggleOverlayUI,
-  },
-);
+const toolbarItemFactory = toolbarItem =>
+  h(`div.toolbar-item#tool-${toolbarItem}`, {
+    onclick: () => {
+      const { databaseState } = global.core.search.$search.dataset;
+      if (databaseState === 'loaded') {
+        toggleOverlayUI(toolbarItem, true);
+        if (!banisLoaded) {
+          banidb.loadBanis().then(rows => {
+            printBanis(rows);
+            banisLoaded = !!rows;
+          });
 
-const closeOverlayUI = h(
-  'div.close-overlay-ui.overlay-ui.hidden',
-  {
-    onclick: toggleOverlayUI,
-  },
-  h('i.fa.fa-times'),
-);
+          analytics.trackEvent('banisLoaded', true);
+        }
+      }
+    },
+  });
 
+const getEnglishExp = token => {
+  const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
+  if (englishExpVal === undefined) {
+    return true;
+  }
+  return englishExpVal;
+};
+
+const printCeremonies = rows => {
+  rows.forEach(row => {
+    if (row.Token !== 'anand' && row.Token !== 'death') {
+      const $ceremony = h(
+        `div.ceremony-pane#${row.Token}`,
+        {
+          onclick: () => {
+            analytics.trackEvent('ceremony', row.Token);
+            global.core.search.loadCeremony(row.ID);
+            const currentCeremony = document.querySelector('div.ceremony-pane.active');
+            if (currentCeremony) {
+              currentCeremony.classList.remove('active');
+            }
+            document.querySelector(`div.ceremony-pane#${row.Token}`).classList.add('active');
+          },
+        },
+        navigatorHeaderFactory(row.Token, row.Gurmukhi, 'gurmukhi'),
+        h(
+          'div.ceremony-pane-content',
+          h(
+            `div.ceremony-pane-options#cpo-${row.Token}`,
+            switchFactory(
+              `${row.Token}-english-exp-switch`,
+              'English Explanations',
+              `${row.Token}-english-exp`,
+              () => {
+                const englishExpVal = getEnglishExp(row.Token);
+                store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
+                global.platform.updateSettings();
+              },
+              getEnglishExp(row.Token),
+            ),
+          ),
+          h(
+            `div.ceremony-pane-themes#${row.Token}`,
+            {
+              onclick: () => {
+                toggleOverlayUI(currentToolbarItem, false);
+              },
+            },
+            h('div.ceremony-theme-header', 'Choose a Theme to launch'),
+          ),
+        ),
+      );
+      $ceremoniesList.appendChild($ceremony);
+    }
+  });
+};
 
 module.exports = {
   init() {
-    const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
-    document.body.classList.add(`gurbani-bani-length-${baniLength}`);
-    toolbarItems.forEach((toolbarItem) => {
+    toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-      $toolbar.appendChild(closeOverlayUI);
-      $baniList.querySelector('header').appendChild(translitSwitch);
-      $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
-      $baniExtras.appendChild(baniGroupFactory('popular banis'));
-      banidb.loadBanis().then(rows => printBanis(rows));
     });
+
+    banidb.loadCeremonies().then(rows => {
+      printCeremonies(rows);
+      analytics.trackEvent('ceremoniesLoaded', true);
+    });
+
+    $baniList.querySelector('header').appendChild(translitSwitch);
+    $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
+    $baniExtras.appendChild(baniGroupFactory('popular banis'));
+    $toolbar.appendChild(closeOverlayUI);
   },
 };

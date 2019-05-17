@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
-const CONSTS = require('./constants');
 const os = require('os');
+const CONSTS = require('./constants');
 
 let search;
 
@@ -21,6 +21,7 @@ const {
   loadBanis,
   loadBani,
   loadCeremony,
+  loadCeremonies,
   getAng,
   loadAng,
   getShabad,
@@ -35,6 +36,7 @@ module.exports = {
   loadBanis,
   loadBani,
   loadCeremony,
+  loadCeremonies,
   getAng,
   loadAng,
   getShabad,

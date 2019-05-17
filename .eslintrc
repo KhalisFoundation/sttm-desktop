@@ -1,12 +1,14 @@
 {
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base", "prettier"],
   "env": {
     "browser": true,
     "mocha": true,
     "node": true
   },
+  "plugins": ["prettier"],
   "rules": {
-    "no-mixed-operators": "off"
+    "no-mixed-operators": "off",
+    "prettier/prettier": ["error"]
   },
   "settings": {
     "import/core-modules": "electron"

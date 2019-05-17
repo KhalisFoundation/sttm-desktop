@@ -1,6 +1,6 @@
 body.khalsa-gold {
   background-color: #ffda39;
-  background-image: url("../../assets/img/custom_backgrounds/golden.jpg");
+  background-image: url('../../assets/img/custom_backgrounds/golden.jpg');
 
   .gurbani {
     color: #fff;
@@ -40,7 +40,9 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
 
 .khalsa-gold {
   #toolbar,
-  .bani-list {
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
     background-color: $nav-bg;
   }
 
@@ -73,10 +75,18 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
     color: $base-text;
   }
 
-  .shortcut-tray { background: $alt-bg; }
-  .tray-item-icon { background: lighten($base-text, 30); }
-  .tray-item-label { color: $nav-bg; }
-  &.shortcut-tray-on .shortcut-toggle { background: $alt-bg; }
+  .shortcut-tray {
+    background: $alt-bg;
+  }
+  .tray-item-icon {
+    background: lighten($base-text, 30);
+  }
+  .tray-item-label {
+    color: $nav-bg;
+  }
+  &.shortcut-tray-on .shortcut-toggle {
+    background: $alt-bg;
+  }
 
   .nav-header-tab {
     color: $base-text-inactive;

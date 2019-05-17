@@ -5,7 +5,7 @@ body.win32:not(.webview) {
     -webkit-app-region: drag;
     background-color: #333;
     color: #fff;
-    font-family: "Segoe UI", sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
     height: 32px;
     left: 1px;
@@ -17,6 +17,7 @@ body.win32:not(.webview) {
     top: 1px;
     transition: opacity 0.2s ease-out;
     width: calc(100% - 2px);
+    z-index: 1600;
 
     > * {
       display: initial;

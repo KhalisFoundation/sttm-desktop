@@ -9,7 +9,6 @@ const dbPath = path.resolve(userDataPath, 'sttmdesktop.db');
 let db;
 let initialized = false;
 
-
 const init = () => {
   db = new sqlite3.Database(dbPath);
   initialized = true;
@@ -17,11 +16,10 @@ const init = () => {
 
 const CONSTS = require('./constants');
 
-const allColumns = `v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
+const allColumns = `v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.Punjabi, s.ShabadID, v.SourceID, v.PageNo AS PageNo, w.WriterEnglish, r.RaagEnglish FROM Verse v
 LEFT JOIN Shabad s ON s.VerseID = v.ID AND s.ShabadID < 5000000
 LEFT JOIN Writer w USING(WriterID)
 LEFT JOIN Raag r USING(RaagID)`;
-
 
 /**
  * Retrieve lines matching queries
@@ -35,7 +33,7 @@ LEFT JOIN Raag r USING(RaagID)`;
  * search('jggsspp', 0, 'all');
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const query = (searchQuery, searchType, searchSource) => (
+const query = (searchQuery, searchType, searchSource) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
@@ -53,7 +51,8 @@ const query = (searchQuery, searchType, searchSource) => (
     let howManyRows = 20;
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
-      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: { // First letter anywhere
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: {
+        // First letter anywhere
         searchCol = 'v.FirstLetterStr';
         for (let x = 0, len = saniQuery.length; x < len; x += 1) {
           let charCode = saniQuery.charCodeAt(x);
@@ -75,7 +74,7 @@ const query = (searchQuery, searchType, searchSource) => (
         }
 
         // Use LIKE if anywhere, otherwise use operators
-        if ((searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE) || isWildChar) {
+        if (searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE || isWildChar) {
           condition = `${searchCol} LIKE '%${dbQuery}%'`;
           if (replaced) {
             condition += ` OR ${searchCol} LIKE '%${replaced}%'`;
@@ -90,7 +89,6 @@ const query = (searchQuery, searchType, searchSource) => (
           condition += `  AND v.SourceID = '${searchSource}'`;
         }
 
-
         // Give preference to shorter lines if searching for 1 or 2 words
         if (searchQuery.length < 3) {
           order.push('v.FirstLetterLen');
@@ -98,13 +96,16 @@ const query = (searchQuery, searchType, searchSource) => (
         break;
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: // Full word (Gurmukhi)
-      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: { // Full word (English)
+      case CONSTS.SEARCH_TYPES.ENGLISH_WORD: {
+        // Full word (English)
         if (searchType === 2) {
           searchCol = 'v.Gurmukhi';
         } else {
           searchCol = 'v.English';
         }
-        const words = saniQuery.split(' ').map(word => `(${searchCol} LIKE '% ${word}%' OR ${searchCol} LIKE '${word}%')`);
+        const words = saniQuery
+          .split(' ')
+          .map(word => `(${searchCol} LIKE '% ${word}%' OR ${searchCol} LIKE '${word}%')`);
         condition = words.join(' AND ');
         if (searchSource !== 'all') {
           condition += ` AND v.SourceID = '${searchSource}'`;
@@ -135,7 +136,7 @@ const query = (searchQuery, searchType, searchSource) => (
       if (err) {
         reject(err);
       } else {
-        rows.map((row) => {
+        rows.map(row => {
           /* eslint-disable no-param-reassign */
           row.Shabads = [{ ShabadID: row.ShabadID }];
           row.Source = { SourceID: row.SourceID };
@@ -145,8 +146,7 @@ const query = (searchQuery, searchType, searchSource) => (
         resolve(rows);
       }
     });
-  })
-);
+  });
 
 /**
  * Retrieve all lines from a Shabad
@@ -158,21 +158,22 @@ const query = (searchQuery, searchType, searchSource) => (
  * loadShabad(2776);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadShabad = ShabadID => (
+const loadShabad = ShabadID =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else if (rows.length > 0) {
-        resolve(rows);
-      }
-    });
-  })
-);
-
+    db.all(
+      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length > 0) {
+          resolve(rows);
+        }
+      },
+    );
+  });
 
 /**
  * Retrieve all lines from a Ceremony
@@ -184,20 +185,78 @@ const loadShabad = ShabadID => (
  * loadCeremony(3);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadCeremony = CeremonyID => (
+const loadCeremony = CeremonyID =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`, (err, rows) => {
+    db.all(
+      `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.MainLetters,
+      c.Token, c.Gurmukhi as CeremonyGurmukhi, cs.Custom, cc.English, v.PageNo 
+      AS PageNo
+      FROM Ceremonies_Shabad cs
+      LEFT JOIN Ceremonies c ON cs.Ceremony = c.ID
+      LEFT JOIN Verse v  ON v.ID = cs.VerseID 
+      LEFT JOIN Ceremonies_Custom cc ON cs.Custom = cc.ID
+      WHERE cs.Ceremony = ${CeremonyID} 
+      ORDER BY cs.Seq`,
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length > 0) {
+          const rowsMapped = rows.map(rawRow => {
+            const row = Object.assign({}, rawRow);
+            row.Ceremony = {
+              Token: row.Token,
+              Gurmukhi: row.CeremonyGurmukhi,
+            };
+            const customID = row.Custom;
+            row.Custom = {
+              ID: customID,
+              English: row.English,
+            };
+            row.Verse = {
+              Gurmukhi: row.Gurmukhi,
+              MainLetters: row.MainLetters,
+              Translations: row.Translations,
+              Transliteration: row.Transliteration,
+              Visraam: row.Visraam,
+              SourceID: row.SourceID,
+              ID: row.ID,
+              LineNo: row.LineNo,
+              PageNo: row.PageNo,
+            };
+            return row;
+          });
+          resolve(rowsMapped);
+        }
+      },
+    );
+  });
+
+/**
+ * Retrieve all ceremonies
+ *
+ * @returns {object} Returns array of objects for each ceremony
+ * @example
+ *
+ * loadCeremonies();
+ * "AnMd kwrj"
+ * // => [{ Gurmukhi:  "AnMd kwrj", ID: 1 ... },...]
+ */
+const loadCeremonies = () =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all('SELECT * FROM Ceremonies ORDER BY ID', (err, rows) => {
       if (err) {
         reject(err);
       } else if (rows.length > 0) {
         resolve(rows);
       }
     });
-  })
-);
+  });
 
 /**
  * Retrieve all banis from database
@@ -206,20 +265,22 @@ const loadCeremony = CeremonyID => (
  *
  */
 
-const loadBanis = () => (
+const loadBanis = () =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    db.all('SELECT ID, Token, Gurmukhi, GurmukhiUni, Transliteration FROM Banis WHERE ID < 10000 ORDER BY ID', (err, rows) => {
-      if (err) {
-        reject(err);
-      } else if (rows.length > 0) {
-        resolve(rows);
-      }
-    });
-  })
-);
+    db.all(
+      'SELECT ID, Token, Gurmukhi, GurmukhiUni, Transliteration FROM Banis WHERE ID < 10000 ORDER BY ID',
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length > 0) {
+          resolve(rows);
+        }
+      },
+    );
+  });
 
 /**
  * Retrieve all lines from a Bani
@@ -229,20 +290,30 @@ const loadBanis = () => (
  *
  */
 
-const loadBani = BaniID => (
+const loadBani = (BaniID, BaniLength) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    db.all(`SELECT v.ID, v.Gurmukhi, v.GurmukhiBisram, v.English, v.Transliteration, v.punjabiUni, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID WHERE b.Bani = ${BaniID} ORDER BY b.Seq`, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else if (rows.length > 0) {
-        resolve(rows);
-      }
-    });
-  })
-);
+    db.all(
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration,
+      v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
+      b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
+      FROM Verse v
+      LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID
+      LEFT JOIN Banis c ON c.ID = ${BaniID}
+      WHERE b.Bani = ${BaniID}
+      AND b.${BaniLength} = true
+      ORDER BY b.Seq`,
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length > 0) {
+          resolve(rows);
+        }
+      },
+    );
+  });
 
 /**
  * Retrieve the Ang number and source for any given ShabadID
@@ -254,21 +325,19 @@ const loadBani = BaniID => (
  * getAng(2776);
  * // => { PageNo: 726, SourceID: 'G' }
  */
-const getAng = ShabadID => (
-  new Promise((resolve) => {
+const getAng = ShabadID =>
+  new Promise(resolve => {
     if (!initialized) {
       init();
     }
     const q = `SELECT ${allColumns} WHERE s.ShabadID = ?`;
-    db.get(q, [ShabadID],
-      (err, row) => {
-        resolve({
-          PageNo: row.PageNo,
-          SourceID: row.SourceID,
-        });
+    db.get(q, [ShabadID], (err, row) => {
+      resolve({
+        PageNo: row.PageNo,
+        SourceID: row.SourceID,
       });
-  })
-);
+    });
+  });
 
 /**
  * Retrieve all lines from a page
@@ -282,21 +351,22 @@ const getAng = ShabadID => (
  * loadAng(1);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadAng = (PageNo, SourceID = 'G') => (
+const loadAng = (PageNo, SourceID = 'G') =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    global.platform.db.all(`SELECT ${allColumns} WHERE PageNo = ${PageNo} AND SourceID = '${SourceID}'`,
+    global.platform.db.all(
+      `SELECT ${allColumns} WHERE PageNo = ${PageNo} AND SourceID = '${SourceID}'`,
       (err, rows) => {
         if (rows.length > 0) {
           resolve(rows);
         } else {
           reject();
         }
-      });
-  })
-);
+      },
+    );
+  });
 
 /**
  * Retrieve Shabad for Verse
@@ -309,18 +379,15 @@ const loadAng = (PageNo, SourceID = 'G') => (
  * getShabad(1);
  * // => 1
  */
-const getShabad = VerseID => (
-  new Promise((resolve) => {
+const getShabad = VerseID =>
+  new Promise(resolve => {
     if (!initialized) {
       init();
     }
-    db.get('SELECT ShabadID FROM Shabad WHERE VerseID = ?',
-    [VerseID],
-    (err, row) => {
+    db.get('SELECT ShabadID FROM Shabad WHERE VerseID = ?', [VerseID], (err, row) => {
       resolve(row.ShabadID);
     });
-  })
-);
+  });
 
 /**
  * Retrieve a random Shabad from a source
@@ -333,18 +400,19 @@ const getShabad = VerseID => (
  * randomShabad();
  * // => 13
  */
-const randomShabad = (SourceID = 'G') => (
-  new Promise((resolve) => {
+const randomShabad = (SourceID = 'G') =>
+  new Promise(resolve => {
     if (!initialized) {
       init();
     }
-    db.get('SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
+    db.get(
+      'SELECT DISTINCT s.ShabadID, v.PageNo FROM Shabad s JOIN Verse v ON s.VerseID = v.ID WHERE v.SourceID = ? ORDER BY RANDOM() LIMIT 1',
       [SourceID],
       (err, row) => {
         resolve(row.ShabadID);
-      });
-  })
-);
+      },
+    );
+  });
 
 // Re-export CONSTS for use in other areas
 module.exports = {
@@ -352,6 +420,7 @@ module.exports = {
   query,
   loadShabad,
   loadCeremony,
+  loadCeremonies,
   loadBanis,
   loadBani,
   getAng,

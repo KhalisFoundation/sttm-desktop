@@ -1,6 +1,6 @@
 body.moody-blue {
   background-color: #38987b;
-  background-image: url("../../assets/img/custom_backgrounds/blue.jpg");
+  background-image: url('../../assets/img/custom_backgrounds/blue.jpg');
 
   .gurbani {
     color: #fcfefe;
@@ -59,7 +59,9 @@ $highlight-text: #cfd8dc;
   color: $text-base;
 
   #toolbar,
-  .bani-list {
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
     background-color: $bg-alt;
   }
 
@@ -84,10 +86,18 @@ $highlight-text: #cfd8dc;
     color: $text-base;
   }
 
-  .shortcut-tray { background: darken($bg-main, 10); }
-  .tray-item-icon { background: $text-bright; }
-  .tray-item-label { color: $bg-main; }
-  &.shortcut-tray-on .shortcut-toggle { background: darken($bg-main, 10); }
+  .shortcut-tray {
+    background: darken($bg-main, 10);
+  }
+  .tray-item-icon {
+    background: $text-bright;
+  }
+  .tray-item-label {
+    color: $bg-main;
+  }
+  &.shortcut-tray-on .shortcut-toggle {
+    background: darken($bg-main, 10);
+  }
 
   .nav-header-tab {
     color: $text-inactive;
