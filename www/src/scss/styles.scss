@@ -66,6 +66,7 @@ a {
   @extend .fullscreen-fixed;
 
   background: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
   z-index: 1200;
 
   &.hidden {
@@ -348,6 +349,7 @@ a {
 
   .ceremonies-list {
     background: transparent;
+    height: 250px;
   }
 
   .ceremonies-list .ceremonies-header {

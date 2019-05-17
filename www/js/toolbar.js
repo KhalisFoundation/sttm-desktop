@@ -38,7 +38,7 @@ const toggleOverlayUI = (toolbarItem, show) => {
 
 // factories
 const navigatorHeaderFactory = (id, content, lang) =>
-  h(`header.navigator-header#${id}`, h(`span.${lang}`, content));
+  h(`header.toolbar-nh.navigator-header#${id}`, h(`span.${lang}`, content));
 
 const blockListFactory = (lang, id) => h('section.blocklist', h(`ul#${id}.${lang}`));
 
@@ -221,6 +221,10 @@ const printCeremonies = rows => {
 
 module.exports = {
   init() {
+    document.querySelector('.focus-overlay').addEventListener('click', () => {
+      toggleOverlayUI(currentToolbarItem, false);
+    });
+
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
