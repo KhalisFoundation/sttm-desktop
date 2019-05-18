@@ -178,7 +178,9 @@ const printCeremonies = rows => {
         {
           onclick: () => {
             analytics.trackEvent('ceremony', row.Token);
-            global.core.search.loadCeremony(row.ID);
+            global.core.search.loadCeremony(row.ID).catch(error => {
+              analytics.trackEvent('ceremonyFailed', row.ID, error);
+            });
             const currentCeremony = document.querySelector('div.ceremony-pane.active');
             if (currentCeremony) {
               currentCeremony.classList.remove('active');
