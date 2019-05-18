@@ -647,33 +647,41 @@ module.exports = {
     }
   },
 
-  loadCeremony(ceremonyID) {
+  async loadCeremony(ceremonyID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
-    banidb.loadCeremony(ceremonyID).then(rowsDb => {
-      const rows = rowsDb.map(rowDb => {
-        let row = rowDb;
+    try {
+      const rowsDb = await banidb.loadCeremony(ceremonyID);
+      const rows = await Promise.all(
+        rowsDb.map(async rowDb => {
+          let row = rowDb;
 
-        if (rowDb.Verse) {
-          row = rowDb.Verse;
-        }
+          if (rowDb.Verse) {
+            row = rowDb.Verse;
+          }
 
-        if (rowDb.Custom && rowDb.Custom.ID) {
-          row = rowDb.Custom;
-          row.shabadID = rowDb.Ceremony.Token;
-        }
+          if (rowDb.Custom && rowDb.Custom.ID) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Ceremony.Token;
+          }
 
-        if (rowDb.VerseRange.length) {
-          row = [...rowDb.VerseRange];
-        }
+          if (rowDb.VerseRange && rowDb.VerseRange.length) {
+            row = [...rowDb.VerseRange];
+          }
 
-        return row;
-      });
+          if (rowDb.VerseIDRangeStart && rowDb.VerseIDRangeEnd) {
+            row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
+          }
 
+          return row;
+        }),
+      );
       const flatRows = [].concat(...rows);
       return this.printShabad(flatRows);
-    });
+    } catch (error) {
+      throw error;
+    }
   },
 
   loadBani(BaniID, LineID = null) {
