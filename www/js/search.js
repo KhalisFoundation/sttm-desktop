@@ -650,6 +650,7 @@ module.exports = {
   loadCeremony(ceremonyID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
+    $shabadList.dataset.bani = '';
     banidb.loadCeremony(ceremonyID).then(rowsDb => {
       const rows = rowsDb.map(rowDb => {
         let row = rowDb;
@@ -662,9 +663,16 @@ module.exports = {
           row = rowDb.Custom;
           row.shabadID = rowDb.Ceremony.Token;
         }
+
+        if (rowDb.VerseRange.length) {
+          row = [...rowDb.VerseRange];
+        }
+
         return row;
       });
-      return this.printShabad(rows);
+
+      const flatRows = [].concat(...rows);
+      return this.printShabad(flatRows);
     });
   },
 
