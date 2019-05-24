@@ -4,7 +4,6 @@
  */
 
 const Application = require('spectron').Application;
-const defaults = require('../user-preferences');
 
 const appPAth = process.env.TESTING_APP_PATH;
 let app;
@@ -63,7 +62,7 @@ describe('Application launch', () => {
       const classListString = await app.client.getAttribute('body', 'class');
       const classList = classListString.split(' ');
 
-      expect(classList).toContain(defaults.userPrefs.app.theme);
+      expect(classList).toContain('light-theme');
     });
 
     test('that the tabs are clickable', async () => {
