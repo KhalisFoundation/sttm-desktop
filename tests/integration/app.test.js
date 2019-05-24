@@ -24,6 +24,11 @@ describe('Application launch', () => {
     return false;
   });
 
+  test('should test true is true', async () => {
+    // true
+    expect(true).toBe(true);
+  });
+
   test('should be visible', async () => {
     const isVisible = await app.browserWindow.isVisible();
     expect(isVisible).toBe(true);
