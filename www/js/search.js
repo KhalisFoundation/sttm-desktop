@@ -654,7 +654,7 @@ module.exports = {
     try {
       const rowsDb = await banidb.loadCeremony(ceremonyID);
       const rows = await Promise.all(
-        rowsDb.map(async rowDb => {
+        rowsDb.map(rowDb => {
           let row = rowDb;
 
           if (rowDb.Verse) {
