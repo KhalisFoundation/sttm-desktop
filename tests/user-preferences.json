@@ -2,26 +2,13 @@
   "userPrefs": {
     "app": {
       "theme": "light-theme",
-      "themebg": {
-        "type": "default",
-        "url": "assets/img/custom_backgrounds/undefined"
-      },
-      "layout": {
-        "presenter-view": true
-      },
-      "analytics": {
-        "collect-statistics": true
-      },
-      "custom-theme-options": {
-        "show-theme-editor": true
-      },
+      "themebg": { "type": "default", "url": "assets/img/custom_backgrounds/undefined" },
+      "layout": { "presenter-view": true },
+      "analytics": { "collect-statistics": true },
+      "custom-theme-options": { "show-theme-editor": true },
       "live-feed-location": "default"
     },
-    "searchResults": {
-      "translationEnglish": "ssk",
-      "transliteration": true,
-      "meta": true
-    },
+    "searchResults": { "translationEnglish": "ssk", "transliteration": true, "meta": true },
     "slide-layout": {
       "fields": {
         "display-translation": true,
@@ -29,15 +16,8 @@
         "display-teeka": true,
         "display-next-line": false
       },
-      "font-sizes": {
-        "gurbani": 9,
-        "translation": 5,
-        "transliteration": 4,
-        "teeka": 4
-      },
-      "autoplay-options": {
-        "autoplayTimer": 10
-      },
+      "font-sizes": { "gurbani": 9, "translation": 5, "transliteration": 4, "teeka": 4 },
+      "autoplay-options": { "autoplayTimer": 10 },
       "display-options": {
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
@@ -51,11 +31,7 @@
   },
   "gurmukhiKB": false,
   "changelog-seen": "5.0.0",
-  "searchOptions": {
-    "searchLanguage": "gr",
-    "searchType": 0,
-    "searchSource": "all"
-  },
+  "searchOptions": { "searchLanguage": "gr", "searchType": 0, "searchSource": "all" },
   "obs": {
     "overlayPrefs": {
       "overlayVars": {
