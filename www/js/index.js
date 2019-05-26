@@ -20,7 +20,9 @@ function hideSlide() {
   // show Empty Slide
   global.controller.sendText('');
 }
-
+function waheguruSlide() {
+  global.controller.sendText('vwihgurU', true);
+}
 function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
@@ -108,6 +110,7 @@ function findLine(e) {
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
   Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
+  Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
