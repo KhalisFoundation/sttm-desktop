@@ -1,13 +1,12 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
-const copy = require('copy-to-clipboard');
 const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
 let code = '...';
-let isPresenting = false;
+let isConntected = false;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -93,32 +92,36 @@ const syncContent = h('div.sync-content', [
     ),
     h('div.button-wrap', [
       h(
+        'button.button.present-btn',
+        {
+          onclick: async () => {
+            if (isConntected) {
+              isConntected = false;
+              onEnd(code);
+              code = '...';
+              global.controller.sendText('');
+              document.querySelector('.sync-code-num').innerText = '...';
+            } else {
+              isConntected = true;
+              await remoteSyncInit();
+            }
+            document.querySelector('.present-btn').innerText = isConntected
+              ? 'Stop Session'
+              : 'Start Session';
+          },
+        },
+        isConntected ? 'Stop Session' : 'Start Session',
+      ),
+      h(
         'button.button.copy-code-btn',
         {
           onclick: () => {
-            copy(code);
-          },
-        },
-        'Copy Code',
-      ),
-      h(
-        'button.button.present-btn',
-        {
-          onclick: () => {
-            if (isPresenting) {
-              isPresenting = false;
-              onEnd(code);
-              document.querySelector('.sync-code-num').innerText = '...';
-            } else {
-              isPresenting = true;
-              remoteSyncInit();
+            if (code !== '...') {
+              global.controller.sendText(code);
             }
-            document.querySelector('.present-btn').innerText = isPresenting
-              ? 'Stop Session'
-              : 'Present';
           },
         },
-        isPresenting ? 'Stop Session' : 'Present',
+        'Present',
       ),
     ]),
   ]),
