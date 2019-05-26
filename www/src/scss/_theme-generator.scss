@@ -1,0 +1,37 @@
+@import 'light-base';
+@import 'dark-base';
+
+@mixin generateTheme(
+  $type,
+  $background-color,
+  $background-image,
+  $gurbani,
+  $translation,
+  $teeka,
+  $transliteration
+) {
+  @if $type == 'light' {
+    @include light-base();
+  } @else {
+    @include dark-base();
+  }
+
+  background-color: $background-color;
+  background-image: $background-image;
+
+  .gurbani {
+    color: $gurbani;
+  }
+
+  .translation {
+    color: $translation;
+  }
+
+  .teeka {
+    color: $teeka;
+  }
+
+  .transliteration {
+    color: $transliteration;
+  }
+}
