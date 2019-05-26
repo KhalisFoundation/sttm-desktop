@@ -31,10 +31,8 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'markdown', 'theme-dark', 'theme-light', 'theme-khalsa-gold',
-  'theme-baagi-blue', 'theme-khalsa-rush', 'theme-moody-blue', 'theme-a-new-day', 'theme-black-blue',
-  'theme-high-contrast', 'theme-low-light', 'theme-blue-darbar', 'theme-floral', 'update', 'viewer',
-  'window', 'akhandpaatt', 'overlay', 'animations', 'noty';
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
+  'overlay', 'animations', 'noty';
 
 a {
   cursor: default;
