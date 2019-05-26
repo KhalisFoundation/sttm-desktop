@@ -83,4 +83,6 @@
   .transliteration {
     color: $transliteration;
   }
+
+  @include vishraamStyles($visraam, $yamki);
 }
