@@ -110,7 +110,7 @@ function findLine(e) {
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
   Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
-  Mousetrap.bindGlobal(['command+t', 'ctrl+t'], waheguruSlide);
+  Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
