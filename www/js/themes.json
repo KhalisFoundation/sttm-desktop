@@ -1,24 +1,26 @@
 [
   {
-    "name":"Light",
+    "name": "Light",
     "background-color": "#fff",
     "gurbani-color": "#000000",
     "translation-color": "#353535",
     "transliteration-color": "#353535",
     "teeka-color": "#4b4b4b",
-    "type": "COLOR",
+    "type": ["COLOR", "anandkaraj"],
     "key": "light-theme"
-  }, {
-    "name":"Dark",
+  },
+  {
+    "name": "Dark",
     "background-color": "#000",
     "gurbani-color": "#c9e7ff",
     "translation-color": "#fff",
     "transliteration-color": "#fff",
     "teeka-color": "#fff",
-    "type": "COLOR",
+    "type": ["COLOR", "death"],
     "key": "dark-theme"
-  }, {
-    "name":"Khalsa Gold",
+  },
+  {
+    "name": "Khalsa Gold",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
     "gurbani-shadow": "0 0 4px rgba(140,81,5,1)",
@@ -64,7 +66,7 @@
     "teeka-color": "#d1dbe2",
     "background-image": "thumbnails/blue.jpg",
     "background-image-full": "blue.jpg",
-    "type": "BACKGROUND",
+    "type": ["BACKGROUND", "death"],
     "key": "moody-blue"
   },
   {
@@ -101,7 +103,7 @@
     "teeka-color": "#484848",
     "background-image": "thumbnails/floral-bg.jpg",
     "background-image-full": "floral-bg.jpg",
-    "type": "BACKGROUND",
+    "type": ["BACKGROUND", "anandkaraj"],
     "key": "floral"
   },
   {
@@ -127,7 +129,7 @@
     "key": "high-contrast"
   },
   {
-    "name":"Low Light",
+    "name": "Low Light",
     "background-color": "#000",
     "gurbani-color": "#98b1c5",
     "translation-color": "#b1b1b1",

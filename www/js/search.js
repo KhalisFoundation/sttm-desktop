@@ -647,13 +647,41 @@ module.exports = {
     }
   },
 
-  loadCeremony(ceremonyID) {
+  async loadCeremony(ceremonyID) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
-    banidb.loadCeremony(ceremonyID).then(rowsDb => {
-      const rows = rowsDb[0].Verse ? rowsDb.map(row => row.Verse) : rowsDb;
-      return this.printShabad(rows);
-    });
+    $shabadList.dataset.bani = '';
+    try {
+      const rowsDb = await banidb.loadCeremony(ceremonyID);
+      const rows = await Promise.all(
+        rowsDb.map(rowDb => {
+          let row = rowDb;
+
+          if (rowDb.Verse) {
+            row = rowDb.Verse;
+          }
+
+          if (rowDb.Custom && rowDb.Custom.ID) {
+            row = rowDb.Custom;
+            row.shabadID = rowDb.Ceremony.Token;
+          }
+
+          if (rowDb.VerseRange && rowDb.VerseRange.length) {
+            row = [...rowDb.VerseRange];
+          }
+
+          if (rowDb.VerseIDRangeStart && rowDb.VerseIDRangeEnd) {
+            row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
+          }
+
+          return row;
+        }),
+      );
+      const flatRows = [].concat(...rows);
+      return this.printShabad(flatRows);
+    } catch (error) {
+      throw error;
+    }
   },
 
   loadBani(BaniID, LineID = null) {
@@ -727,6 +755,20 @@ module.exports = {
 
   lineFactory(line, rows) {
     const mainLineExists = !!document.querySelector('.main');
+    const englishHeadingEl = document.createElement('span');
+    englishHeadingEl.innerHTML = line.English;
+    const englishHeading = englishHeadingEl.querySelector('h1')
+      ? englishHeadingEl.querySelector('h1').innerText
+      : '';
+
+    let englishAllowed = store.getUserPref(`gurbani.ceremonies.${line.ShabadID}-english`);
+    if (englishAllowed === undefined) {
+      englishAllowed = true;
+    }
+
+    if (englishHeading && !englishAllowed) {
+      return false;
+    }
 
     const shabadLine = h(
       `li#li_${line.lineCount}`,
@@ -734,7 +776,7 @@ module.exports = {
         'data-line-count': line.lineCount,
       },
       h(
-        `a#line${line.ID}.panktee${
+        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${
           line.mainLine && !mainLineExists ? '.current.main.seen_check' : ''
         }`,
         {
@@ -742,16 +784,16 @@ module.exports = {
           'data-main-letters': line.MainLetters,
           onclick: e => this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click'),
         },
-        [h('i.fa.fa-fw.fa-check'), h('i.fa.fa-fw.fa-home'), ' ', line.Gurmukhi],
+        [h('i.fa.fa-fw.fa-check'), h('i.fa.fa-fw.fa-home'), ' ', line.Gurmukhi || englishHeading],
       ),
     );
-
     return shabadLine;
   },
 
   printShabad(rows, ShabadID, LineID, start = 0) {
-    const lineID = LineID || rows[0].ID;
-    const shabadID = ShabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
+    let lineID = LineID || rows[0].ID;
+    const shabadID =
+      ShabadID || rows[0].shabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
     const lineIndex = rows.findIndex(row => row.ID === lineID);
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
@@ -800,6 +842,7 @@ module.exports = {
     };
 
     const currentRows = rows.slice(start, end);
+    let lineIDConflict = false;
 
     currentRows.forEach(rawItem => {
       lineCount += 1;
@@ -812,14 +855,28 @@ module.exports = {
       }
 
       item.ShabadID = item.ShabadID || shabadID;
-      // write the Panktee to the controller
-      shabad.appendChild(this.lineFactory(item, currentRows, mode));
-      // append the currentShabad array
-      currentShabad.push(item.ID);
-      if (lineID === item.ID) {
-        this.currentLine = item.ID;
+
+      const thisLine = this.lineFactory(item, currentRows, mode);
+      // if thisLine is english and englishExplanation is off then don't append this line
+      if (thisLine) {
+        // write the Panktee to the controller
+        shabad.appendChild(thisLine);
+        // append the currentShabad array
+        currentShabad.push(item.ID);
+        if (lineID === item.ID) {
+          this.currentLine = item.ID;
+        }
+      } else if (!thisLine && item.ID === lineID) {
+        // if the line we are ignoring is the first line (main line) then toggle lineIDConflict
+        lineIDConflict = true;
       }
     });
+
+    // if there is a lineIDConflict make lineID the very first line in shabad.
+    if (lineIDConflict) {
+      lineID = document.querySelector(`#shabad > li:first-child > a`).dataset.lineId;
+      shabad.querySelector(`#line${lineID}`).classList.add('current', 'main', 'seen_check');
+    }
 
     const totalLines = rows.length;
     const pendingLines = totalLines - end;
@@ -831,6 +888,7 @@ module.exports = {
     });
 
     shabad.appendChild(emptySpace);
+
     // scroll the Shabad controller to the current Panktee
     const $curPanktee = shabad.querySelector('.current');
     if ($curPanktee && !start) {

@@ -164,7 +164,7 @@ const loadShabad = ShabadID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
+      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -191,7 +191,68 @@ const loadCeremony = CeremonyID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.English, v.Transliteration, v.Visraam, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Ceremonies_Shabad c ON v.ID = c.VerseID WHERE c.Ceremony = ${CeremonyID} ORDER BY c.Seq`,
+      `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration,
+      v.Visraam, v.Punjabi, v.SourceID, v.MainLetters,
+      c.Token, c.Gurmukhi as CeremonyGurmukhi,
+      cs.Custom, cs.VerseIDRangeEnd, cs.VerseIDRangeStart,
+      cc.English AS ceremonyEnglish, v.PageNo 
+      AS PageNo
+      FROM Ceremonies_Shabad cs
+      LEFT JOIN Ceremonies c ON cs.Ceremony = c.ID
+      LEFT JOIN Verse v  ON v.ID = cs.VerseID 
+      LEFT JOIN Ceremonies_Custom cc ON cs.Custom = cc.ID
+      WHERE cs.Ceremony = ${CeremonyID} 
+      ORDER BY cs.Seq`,
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length > 0) {
+          const rowsMapped = rows.map(rawRow => {
+            const row = Object.assign({}, rawRow);
+            row.Ceremony = {
+              Token: row.Token,
+              Gurmukhi: row.CeremonyGurmukhi,
+            };
+            const customID = row.Custom;
+            row.Custom = {
+              ID: customID,
+              English: row.ceremonyEnglish,
+            };
+            row.Verse = {
+              Gurmukhi: row.Gurmukhi,
+              MainLetters: row.MainLetters,
+              Translations: row.Translations,
+              Transliteration: row.Transliteration,
+              English: row.English,
+              Visraam: row.Visraam,
+              SourceID: row.SourceID,
+              ID: row.ID,
+              LineNo: row.LineNo,
+              PageNo: row.PageNo,
+              Punjabi: row.Punjabi,
+            };
+
+            return row;
+          });
+          resolve(rowsMapped);
+        }
+      },
+    );
+  });
+
+const loadVerses = (start, end) =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all(
+      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo 
+      FROM Verse v
+      LEFT JOIN Shabad s 
+      ON v.ID = s.VerseID
+      WHERE v.ID >= ${start}
+      AND v.ID <= ${end}
+      ORDER BY v.ID`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -200,6 +261,30 @@ const loadCeremony = CeremonyID =>
         }
       },
     );
+  });
+
+/**
+ * Retrieve all ceremonies
+ *
+ * @returns {object} Returns array of objects for each ceremony
+ * @example
+ *
+ * loadCeremonies();
+ * "AnMd kwrj"
+ * // => [{ Gurmukhi:  "AnMd kwrj", ID: 1 ... },...]
+ */
+const loadCeremonies = () =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    db.all('SELECT * FROM Ceremonies ORDER BY ID', (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows.length > 0) {
+        resolve(rows);
+      }
+    });
   });
 
 /**
@@ -240,7 +325,7 @@ const loadBani = (BaniID, BaniLength) =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.English, v.Transliteration,
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration,
       v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
       b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
       FROM Verse v
@@ -364,6 +449,8 @@ module.exports = {
   query,
   loadShabad,
   loadCeremony,
+  loadCeremonies,
+  loadVerses,
   loadBanis,
   loadBani,
   getAng,
