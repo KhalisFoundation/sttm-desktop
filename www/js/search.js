@@ -653,11 +653,10 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
     }
-    */
+
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.dataset.bani = '';
@@ -1017,11 +1016,10 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
-    /*
     if (window.socket !== undefined) {
       window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
     }
-    */
+
     const lines = this.$shabad.querySelectorAll('a.panktee');
     const shabadState = sessionStatesList[Line.sessionKey || `shabad-${ShabadID}`];
     if (e.target.classList.contains('fa-home')) {

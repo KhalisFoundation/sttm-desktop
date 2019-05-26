@@ -4,12 +4,14 @@ const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
+const copy = require('copy-to-clipboard');
 const strings = require('./strings');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
 const tingle = require('./vendor/tingle');
 const search = require('./search');
+const { tryConnection } = require('./share-sync');
 
 const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
@@ -322,6 +324,49 @@ const announcementSlideButton = h(
   ),
 );
 
+const remoteSyncButton = h(
+  'li',
+  h(
+    'a.remote-sync-button',
+    {
+      onclick: async () => {
+        const code = await tryConnection();
+        if (code) {
+          const syncModal = new tingle.Modal({
+            footer: true,
+            stickyFooter: false,
+            cssClass: ['sync-code-modal'],
+            closeMethods: ['overlay', 'button', 'escape'],
+          });
+          // open modal
+          syncModal.open();
+
+          syncModal.addFooterBtn('Copy', 'tingle-btn tingle-btn--primary', () => {
+            copy(code);
+            syncModal.close();
+            syncModal.destroy();
+          });
+
+          // set content
+          syncModal.setContent(`<h2>Sync code: ${code}</h2>`);
+          // add cancel button
+          const cancelTitle = 'Cancel';
+          syncModal.addFooterBtn(
+            cancelTitle,
+            'tingle-btn tingle-btn--pull-right tingle-btn--default',
+            () => {
+              syncModal.close();
+              syncModal.destroy();
+            },
+          );
+        }
+      },
+    },
+    h('i.fa.fa-desktop.list-icon'),
+    'Remote Sync',
+  ),
+);
+
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -353,6 +398,7 @@ module.exports = {
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(notificationButton);
+    $listOfShabadOptions.appendChild(remoteSyncButton);
 
     // when the app is reloaded, enable the control for akhandpaatt
     store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
