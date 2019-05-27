@@ -5,6 +5,7 @@ const path = require('path');
 const markdownFiles = {
   changelog: '../CHANGELOG.md',
   help: '../HELP.md',
+  legend: '../LEGEND.md',
 };
 
 function markdownToHTML(file) {
