@@ -247,7 +247,7 @@ const themeLabels = [
   'moody blue',
   'black and blue',
   'floral',
-  'darbar blue',
+  'khalsa gold',
   'never forget',
 ];
 
