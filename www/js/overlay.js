@@ -246,20 +246,23 @@ const themeLabels = [
   'never forget',
 ];
 
-const themeSwatchFactory = themeLabel =>
-  h(
-    `div.overlay-theme-swatch.${themeLabel
-      .toLowerCase()
-      .split(' ')
-      .join('-')}`,
+const themeSwatchFactory = themeLabel => {
+  const themeClass = themeLabel
+    .toLowerCase()
+    .split(' ')
+    .join('-');
+
+  return h(
+    `div.overlay-theme-swatch.${themeClass}`,
     {
       onclick: () => {
-        overlayVars.theme = themeLabel;
+        overlayVars.theme = themeClass;
         savePrefs();
       },
     },
     h('span', themeLabel),
   );
+};
 
 themeLabels.forEach(themeLabel => {
   themeSelector.appendChild(themeSwatchFactory(themeLabel));
