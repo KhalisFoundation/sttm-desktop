@@ -14,17 +14,19 @@
 
 ### <a name="slides">Slide Shortcuts</a>
 
-#### Mac:
+#### MacOS:
 
 Cmd + e = empty slide
+Cmd + 1 = Waheguru Slide
 
 #### Windows:
 
 Ctrl + e = empty slide
+Ctrl + 1 = Waheguru Slide
 
 ### <a name="others">Others</a>
 
-#### Mac:
+#### MacOS:
 
 Cmd + q = Close app (shut down app)
 
@@ -46,11 +48,9 @@ Cmd + v = paste
 
 Cmd + m = minimize window
 
-#### Window:
+#### Windows:
 
 Ctrl + q = Close app (shut down app)
-
-Ctrl + u = check for updates
 
 Ctrl + a = select all
 
@@ -61,5 +61,3 @@ Ctrl + x = cut
 Ctrl + c = copy
 
 Ctrl + v = paste
-
-Ctrl + m = minimize window
