@@ -67,6 +67,15 @@
   }
 }
 
+.theme-selector-header {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 10px;
+  text-transform: uppercase;
+}
+
 .bani-overlay-page,
 .theme-selector {
   .never-forget {
@@ -108,7 +117,7 @@
     }
   }
 
-  .black-blue {
+  .black-and-blue {
     background: #000;
     color: #fff;
 

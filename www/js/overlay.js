@@ -264,6 +264,8 @@ const themeSwatchFactory = themeLabel => {
   );
 };
 
+themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
+
 themeLabels.forEach(themeLabel => {
   themeSelector.appendChild(themeSwatchFactory(themeLabel));
 });
