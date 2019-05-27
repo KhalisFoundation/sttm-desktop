@@ -1,5 +1,3 @@
-@import 'themes/themes';
-
 .canvas {
   align-items: center;
   display: flex;
@@ -55,9 +53,9 @@
   justify-content: center;
   letter-spacing: 2px;
   margin: 20px auto;
+  text-align: center;
   text-transform: uppercase;
   transition: 0.3s all ease;
-  text-align: center;
   width: 140px;
 
   &:hover {
@@ -99,7 +97,7 @@
   }
 
   &.black-blue {
-    background: #000000;
+    background: #000;
     color: #fff;
   }
 
@@ -129,7 +127,7 @@ input[type='color'] {
 }
 
 .setting-label {
-  color: #333333;
+  color: #333;
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
