@@ -215,6 +215,8 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
 const controlPanel = document.querySelector('.control-panel');
+const themeSelector = document.querySelector('.theme-selector');
+
 controlPanel.append(gurbaniColor);
 controlPanel.append(changeGurbanifontSizeButton);
 controlPanel.append(textColor);
@@ -232,6 +234,37 @@ controlPanel.append(splitLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
+
+const themeLabels = [
+  'a new day',
+  'baagi blue',
+  'khalsa rush',
+  'moody blue',
+  'black and blue',
+  'floral',
+  'darbar blue',
+  'never forget',
+];
+
+const themeSwatchFactory = themeLabel =>
+  h(
+    `div.overlay-theme-swatch.${themeLabel
+      .toLowerCase()
+      .split(' ')
+      .join('-')}`,
+    {
+      onclick: () => {
+        overlayVars.theme = themeLabel;
+        savePrefs();
+      },
+    },
+    h('span', themeLabel),
+  );
+
+themeLabels.forEach(themeLabel => {
+  themeSelector.appendChild(themeSwatchFactory(themeLabel));
+});
+
 const webview = document.createElement('webview');
 webview.src = `${url}?preview`;
 webview.className = 'preview';
