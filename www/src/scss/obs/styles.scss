@@ -66,7 +66,7 @@ body {
 }
 
 .o-teeka {
-  font-family: "gurbaniakhar";
+  font-family: 'gurbaniakhar';
 }
 
 .o-transliteration,
@@ -117,5 +117,114 @@ body {
   .content-bottom {
     bottom: 0;
     position: absolute;
+  }
+}
+
+.content-top,
+.content-bottom {
+  &.never-forget {
+    background: #000;
+    color: #f00;
+    .o-translation,
+    .o-teeka,
+    .o-gurbani,
+    .o-transliteration {
+      color: #f00;
+    }
+  }
+
+  &.khalsa-gold {
+    background: #58330a;
+    color: #ffba00;
+
+    .o-translation,
+    .o-teeka,
+    .o-gurbani,
+    .o-transliteration {
+      color: #ffba00;
+    }
+  }
+
+  &.baagi-blue {
+    background: #274f69;
+    color: #fff;
+
+    .o-translation,
+    .o-teeka,
+    .o-gurbani {
+      color: #fff;
+    }
+
+    .o-transliteration {
+      color: #a0d5fe;
+    }
+  }
+
+  &.khalsa-rush {
+    background: #ffa61a;
+    color: #071f77;
+
+    .o-translation,
+    .o-teeka,
+    .o-gurbani,
+    .o-transliteration {
+      color: #071f77;
+    }
+  }
+
+  &.moody-blue {
+    background: #2d73a7;
+    color: #fff;
+
+    .o-translation,
+    .o-teeka,
+    .o-gurbani,
+    .o-transliteration {
+      color: #fff;
+    }
+  }
+
+  &.a-new-day {
+    background: #97d6f7;
+    color: #0e2654;
+
+    .o-translation,
+    .o-teeka {
+      color: #003a8c;
+    }
+    .o-gurbani,
+    .o-transliteration {
+      color: #0e2654;
+    }
+  }
+
+  &.black-and-blue {
+    background: #000;
+    color: #fff;
+
+    .o-gurbani,
+    .o-transliteration {
+      color: #fff;
+    }
+
+    .o-teeka,
+    .o-translation {
+      color: #a3eafd;
+    }
+  }
+
+  &.floral {
+    background: #f5b7d1;
+    color: #460a1e;
+
+    .o-gurbani,
+    .o-transliteration {
+      color: #460a1e;
+    }
+
+    .o-teeka,
+    .o-translation {
+      color: #821d3e;
+    }
   }
 }

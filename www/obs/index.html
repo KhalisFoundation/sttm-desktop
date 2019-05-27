@@ -18,6 +18,9 @@
       var preview = document.location.href.indexOf('preview') > -1;
       var overlayPrefs;
       function hexToRgb(hex) {
+        if (hex === '#000') {
+          return '0, 0, 0';
+        }
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
         return result
@@ -55,6 +58,7 @@
           overlayPrefs.overlayVars.gurbaniTextColor;
 
         document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
+
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
         const $gurbani = document.querySelector('.o-gurbani');
@@ -78,7 +82,7 @@
       });
     </script>
   </head>
-  <body class="layout-bottom">
+  <body class="layout-bottom bani-overlay-page">
     <section class="overlay-wrapper">
       <div class="content-top">
         <div class="content-bar gurmukhi o-gurbani"></div>
