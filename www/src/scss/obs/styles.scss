@@ -120,19 +120,19 @@ body {
   }
 }
 
-.bani-overlay-page,
-.theme-selector {
-  .never-forget {
+.content-top,
+.content-bottom {
+  &.never-forget {
     background: #000;
     color: #f00;
   }
 
-  .khalsa-gold {
+  &.khalsa-gold {
     background: #58330a;
     color: #ffba00;
   }
 
-  .baagi-blue {
+  &.baagi-blue {
     background: #274f69;
     color: #fff;
 
@@ -141,17 +141,17 @@ body {
     }
   }
 
-  .khalsa-rush {
+  &.khalsa-rush {
     background: #ffa61a;
     color: #071f77;
   }
 
-  .moody-blue {
+  &.moody-blue {
     background: #2d73a7;
     color: #fff;
   }
 
-  .a-new-day {
+  &.a-new-day {
     background: #97d6f7;
     color: #0e2654;
 
@@ -161,7 +161,7 @@ body {
     }
   }
 
-  .black-blue {
+  &.black-blue {
     background: #000;
     color: #fff;
 
@@ -171,7 +171,7 @@ body {
     }
   }
 
-  .floral {
+  &.floral {
     background: #f5b7d1;
     color: #460a1e;
 
