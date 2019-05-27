@@ -240,17 +240,6 @@ controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
 
-const themeLabels = [
-  'a new day',
-  'baagi blue',
-  'khalsa rush',
-  'moody blue',
-  'black and blue',
-  'floral',
-  'khalsa gold',
-  'never forget',
-];
-
 const themeObjects = {
   aNewDay: {
     label: 'a new day',
@@ -338,8 +327,8 @@ const themeSwatchFactory = themeOptions => {
 
 themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
 
-themeLabels.forEach(themeLabel => {
-  themeSelector.appendChild(themeSwatchFactory(themeOptions));
+themeObjects.forEach(themeObject => {
+  themeSelector.appendChild(themeSwatchFactory(themeObject));
 });
 
 const webview = document.createElement('webview');
