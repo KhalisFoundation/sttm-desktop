@@ -36,29 +36,29 @@
 .theme-selector {
   background: #eee;
   height: 100vh;
-  right: 0;
   padding: 10px;
   position: fixed;
+  right: 0;
   top: 0;
   width: 180px;
 }
 
 .overlay-theme-swatch {
-  width: 140px;
-  height: 70px;
-  margin: 20px auto 20px auto;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  background: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  display: flex;
-  justify-content: center;
   align-items: center;
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 5px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 12px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  height: 70px;
+  justify-content: center;
+  letter-spacing: 2px;
+  margin: 20px auto;
+  text-transform: uppercase;
   transition: 0.3s all ease;
+  text-align: center;
+  width: 140px;
 
   &:hover {
     transform: scale(1.1);
@@ -70,7 +70,7 @@
 
   &.never-forget {
     background: #000;
-    color: #ff0000;
+    color: #f00;
   }
 
   &.khalsa-gold {
@@ -80,7 +80,7 @@
 
   &.baagi-blue {
     background: #274f69;
-    color: #ffffff;
+    color: #fff;
   }
 
   &.khalsa-rush {
@@ -100,7 +100,7 @@
 
   &.black-blue {
     background: #000000;
-    color: #ffffff;
+    color: #fff;
   }
 
   &.floral {
@@ -129,7 +129,7 @@ input[type='color'] {
 }
 
 .setting-label {
-  color: #333;
+  color: #333333;
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
