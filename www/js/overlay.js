@@ -251,8 +251,75 @@ const themeLabels = [
   'never forget',
 ];
 
-const themeSwatchFactory = themeLabel => {
-  const themeClass = themeLabel
+const themeObjects = {
+  aNewDay: {
+    label: 'a new day',
+    background: '#97d6f7',
+    translation: '#003a8c',
+    teeka: '#003a8c',
+    gurbani: '#0e2654',
+    transliteration: '#0e2654',
+  },
+  baagiBlue: {
+    label: 'baagi blue',
+    background: '#274f69',
+    translation: '#fff',
+    teeka: '#fff',
+    gurbani: '#fff',
+    transliteration: '#a0d5fe',
+  },
+  khalsaRush: {
+    label: 'khalsa rush',
+    background: '#ffa61a',
+    translation: '#071f77',
+    teeka: '#071f77',
+    gurbani: '#071f77',
+    transliteration: '#071f77',
+  },
+  moodyBlue: {
+    label: 'moody blue',
+    background: '#2d73a7',
+    translation: '#fff',
+    teeka: '#fff',
+    gurbani: '#fff',
+    transliteration: '#fff',
+  },
+  blackAndBlue: {
+    label: 'black and blue',
+    background: '#000',
+    translation: '#a3eafd',
+    teeka: '#a3eafd',
+    gurbani: '#fff',
+    transliteration: '#fff',
+  },
+  floral: {
+    label: 'floral',
+    background: '#f5b7d1',
+    translation: '#a3eafd',
+    teeka: '#a3eafd',
+    gurbani: '#fff',
+    transliteration: '#fff',
+  },
+  khalsaGold: {
+    label: 'khalsa gold',
+    background: '#58330a',
+    translation: '#ffba00',
+    teeka: '#ffba00',
+    gurbani: '#ffba00',
+    transliteration: '#ffba00',
+  },
+  neverForget: {
+    label: 'never forget',
+    background: '#000',
+    translation: '#f00',
+    teeka: '#f00',
+    gurbani: '#f00',
+    transliteration: '#f00',
+  },
+};
+
+const themeSwatchFactory = themeOptions => {
+  const themeClass = themeOptions.label
     .toLowerCase()
     .split(' ')
     .join('-');
@@ -261,18 +328,18 @@ const themeSwatchFactory = themeLabel => {
     `div.overlay-theme-swatch.${themeClass}`,
     {
       onclick: () => {
-        overlayVars.theme = themeClass;
+        overlayVars.theme = themeOptions;
         savePrefs();
       },
     },
-    h('span', themeLabel),
+    h('span', themeOptions.label),
   );
 };
 
 themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
 
 themeLabels.forEach(themeLabel => {
-  themeSelector.appendChild(themeSwatchFactory(themeLabel));
+  themeSelector.appendChild(themeSwatchFactory(themeOptions));
 });
 
 const webview = document.createElement('webview');
