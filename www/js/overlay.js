@@ -39,18 +39,21 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) =>
 const changeColor = e => {
   const color = e.target.value;
   overlayVars.textColor = color;
+  overlayVars.theme = false;
   savePrefs();
 };
 
 const changeGurbaniColor = e => {
   const color = e.target.value;
   overlayVars.gurbaniTextColor = color;
+  overlayVars.theme = false;
   savePrefs();
 };
 
 const changeBg = e => {
   const color = e.target.value;
   overlayVars.bgColor = color;
+  overlayVars.theme = false;
   savePrefs();
 };
 
@@ -102,6 +105,7 @@ const increaseOpacity = () => {
   const newSize = opacity > 0.9 ? 1 : opacity + 0.1;
 
   overlayVars.bgOpacity = newSize;
+  overlayVars.theme = false;
   savePrefs();
 };
 const decreaseOpacity = () => {
@@ -109,6 +113,7 @@ const decreaseOpacity = () => {
   const newSize = opacity < 0.1 ? 0 : opacity - 0.1;
 
   overlayVars.bgOpacity = newSize;
+  overlayVars.theme = false;
   savePrefs();
 };
 
