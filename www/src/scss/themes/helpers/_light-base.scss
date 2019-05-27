@@ -1,16 +1,17 @@
 @mixin light-base() {
-  $logo: #e0e0e0;
-  $border: #333;
-  $statusbar-bg: #e0e0e0;
-  $nav-bg: #f5f5f5;
-  $alt-bg: #fafafa;
-  $dialog-bg: #fff;
-  $base-text: #4e4e4e;
-  $base-text-inactive: rgba(78, 78, 78, 0.5);
-  $text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  $shadow-filter: drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.7));
-  $current-focus: #c5deea;
-  $active-focus: #0277bd;
+  $logo: $not-so-white;
+  $border: $dark-grey;
+  $statusbar-bg: $not-so-white;
+  $nav-bg: $extra-light-grey;
+  $alt-bg: $snow-white;
+  $dialog-bg: $white;
+  $base-text: $dark-grey;
+  $base-text-inactive: $disabled-dark;
+  $text-shadow: 1px 1px 2px rgba($black, 0.3);
+  $shadow-filter: drop-shadow(2px 2px 2px rgba($white, 0.7));
+  $current-focus: $transparent-blue;
+  $active-focus: $sky-blue;
+  $scrollbar-bg: $light-grey;
 
   .logo {
     path {
