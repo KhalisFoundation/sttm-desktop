@@ -39,21 +39,18 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) =>
 const changeColor = e => {
   const color = e.target.value;
   overlayVars.textColor = color;
-  overlayVars.theme = false;
   savePrefs();
 };
 
 const changeGurbaniColor = e => {
   const color = e.target.value;
   overlayVars.gurbaniTextColor = color;
-  overlayVars.theme = false;
   savePrefs();
 };
 
 const changeBg = e => {
   const color = e.target.value;
   overlayVars.bgColor = color;
-  overlayVars.theme = false;
   savePrefs();
 };
 
@@ -105,7 +102,6 @@ const increaseOpacity = () => {
   const newSize = opacity > 0.9 ? 1 : opacity + 0.1;
 
   overlayVars.bgOpacity = newSize;
-  overlayVars.theme = false;
   savePrefs();
 };
 const decreaseOpacity = () => {
@@ -113,7 +109,6 @@ const decreaseOpacity = () => {
   const newSize = opacity < 0.1 ? 0 : opacity - 0.1;
 
   overlayVars.bgOpacity = newSize;
-  overlayVars.theme = false;
   savePrefs();
 };
 
@@ -243,67 +238,51 @@ controlPanel.append(toggleLarivaar);
 const themeObjects = {
   aNewDay: {
     label: 'a new day',
-    background: '#97d6f7',
-    translation: '#003a8c',
-    teeka: '#003a8c',
-    gurbani: '#0e2654',
-    transliteration: '#0e2654',
+    bgColor: '#97d6f7',
+    textColor: '#003a8c',
+    gurbaniTextColor: '#0e2654',
   },
   baagiBlue: {
     label: 'baagi blue',
-    background: '#274f69',
-    translation: '#fff',
-    teeka: '#fff',
-    gurbani: '#fff',
-    transliteration: '#a0d5fe',
+    bgColor: '#274f69',
+    textColor: '#fff',
+    gurbaniTextColor: '#fff',
   },
   khalsaRush: {
     label: 'khalsa rush',
-    background: '#ffa61a',
-    translation: '#071f77',
-    teeka: '#071f77',
-    gurbani: '#071f77',
-    transliteration: '#071f77',
+    bgColor: '#ffa61a',
+    textColor: '#071f77',
+    gurbaniTextColor: '#071f77',
   },
   moodyBlue: {
     label: 'moody blue',
-    background: '#2d73a7',
-    translation: '#fff',
-    teeka: '#fff',
-    gurbani: '#fff',
-    transliteration: '#fff',
+    bgColor: '#2d73a7',
+    textColor: '#fff',
+    gurbaniTextColor: '#fff',
   },
   blackAndBlue: {
     label: 'black and blue',
-    background: '#000',
-    translation: '#a3eafd',
-    teeka: '#a3eafd',
-    gurbani: '#fff',
-    transliteration: '#fff',
+    bgColor: '#000',
+    textColor: '#a3eafd',
+    gurbaniTextColor: '#fff',
   },
   floral: {
     label: 'floral',
-    background: '#f5b7d1',
-    translation: '#a3eafd',
-    teeka: '#a3eafd',
-    gurbani: '#fff',
-    transliteration: '#fff',
+    bgColor: '#f5b7d1',
+    textColor: '#a3eafd',
+    gurbaniTextColor: '#fff',
   },
   khalsaGold: {
     label: 'khalsa gold',
-    background: '#58330a',
-    translation: '#ffba00',
-    teeka: '#ffba00',
-    gurbani: '#ffba00',
-    transliteration: '#ffba00',
+    bgColor: '#58330a',
+    textColor: '#ffba00',
+    gurbaniTextColor: '#ffba00',
   },
   neverForget: {
     label: 'never forget',
-    background: '#000',
-    translation: '#f00',
-    teeka: '#f00',
-    gurbani: '#f00',
-    transliteration: '#f00',
+    bgColor: '#000',
+    textColor: '#f00',
+    gurbaniTextColor: '#f00',
   },
 };
 
@@ -317,7 +296,10 @@ const themeSwatchFactory = themeOptions => {
     `div.overlay-theme-swatch.${themeClass}`,
     {
       onclick: () => {
-        overlayVars.theme = themeOptions;
+        overlayVars.theme = themeClass;
+        overlayVars.textColor = themeOptions.textColor;
+        overlayVars.gurbaniTextColor = themeOptions.gurbaniTextColor;
+        overlayVars.bgColor = themeOptions.bgColor;
         savePrefs();
       },
     },
@@ -327,8 +309,8 @@ const themeSwatchFactory = themeOptions => {
 
 themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
 
-themeObjects.forEach(themeObject => {
-  themeSelector.appendChild(themeSwatchFactory(themeObject));
+Object.keys(themeObjects).forEach(themeObject => {
+  themeSelector.appendChild(themeSwatchFactory(themeObjects[themeObject]));
 });
 
 const webview = document.createElement('webview');

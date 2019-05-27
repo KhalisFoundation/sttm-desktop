@@ -18,6 +18,9 @@
       var preview = document.location.href.indexOf('preview') > -1;
       var overlayPrefs;
       function hexToRgb(hex) {
+        if (hex === '#000') {
+          return '0, 0, 0';
+        }
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
         return result
@@ -38,56 +41,25 @@
 
       var applyOverlayPrefs = function() {
         document.querySelectorAll('.content-bar').forEach(el => {
-          el.style.color = overlayPrefs.overlayVars.theme
-            ? null
-            : overlayPrefs.overlayVars.textColor;
+          el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
           el.style.paddingTop = `${overlayPrefs.overlayVars.padding}%`;
           el.style.paddingBottom = `${overlayPrefs.overlayVars.padding}%`;
         });
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
-          el.style.backgroundColor = overlayPrefs.overlayVars.theme
-            ? null
-            : `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
-                overlayPrefs.overlayVars.bgOpacity
-              })`;
-          el.classList.remove(
-            'a-new-day',
-            'baagi-blue',
-            'khalsa-rush',
-            'moody-blue',
-            'black-and-blue',
-            'floral',
-            'darbar-blue',
-            'never-forget',
-          );
-          if (overlayPrefs.overlayVars.theme) {
-            el.classList.add(overlayPrefs.overlayVars.theme);
-          }
+          el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
+            overlayPrefs.overlayVars.bgOpacity
+          })`;
         });
         document.querySelector('.o-gurbani').style.fontSize = `${
           overlayPrefs.overlayVars.gurbaniFontSize
         }vh`;
-        document.querySelector('.o-gurbani').style.color = overlayPrefs.overlayVars.theme
-          ? null
-          : overlayPrefs.overlayVars.gurbaniTextColor;
+        document.querySelector('.o-gurbani').style.color =
+          overlayPrefs.overlayVars.gurbaniTextColor;
 
         document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
-        document.body.classList.remove(
-          'a-new-day',
-          'baagi-blue',
-          'khalsa-rush',
-          'moody-blue',
-          'black-and-blue',
-          'floral',
-          'darbar-blue',
-          'never-forget',
-        );
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
-        if (overlayPrefs.overlayVars.theme) {
-          document.body.classList.add(overlayPrefs.overlayVars.theme);
-        }
 
         const $gurbani = document.querySelector('.o-gurbani');
         if (overlayPrefs.overlayVars.overlayLarivaar) {
