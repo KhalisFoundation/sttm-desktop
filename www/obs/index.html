@@ -51,6 +51,19 @@
             : `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
                 overlayPrefs.overlayVars.bgOpacity
               })`;
+          el.classList.remove(
+            'a-new-day',
+            'baagi-blue',
+            'khalsa-rush',
+            'moody-blue',
+            'black-and-blue',
+            'floral',
+            'darbar-blue',
+            'never-forget',
+          );
+          if (overlayPrefs.overlayVars.theme) {
+            el.classList.add(overlayPrefs.overlayVars.theme);
+          }
         });
         document.querySelector('.o-gurbani').style.fontSize = `${
           overlayPrefs.overlayVars.gurbaniFontSize
@@ -74,7 +87,6 @@
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
         if (overlayPrefs.overlayVars.theme) {
           document.body.classList.add(overlayPrefs.overlayVars.theme);
-          document.body.classList.add();
         }
 
         const $gurbani = document.querySelector('.o-gurbani');
