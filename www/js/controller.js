@@ -295,6 +295,13 @@ const macMenu = [
         },
       },
       {
+        label: 'Shorcut Legend...',
+        click: () => {
+          analytics.trackEvent('menu', 'shortcut-legend');
+          main.openSecondaryWindow('shortcutLegend');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
           main.openSecondaryWindow('changelogWindow');
