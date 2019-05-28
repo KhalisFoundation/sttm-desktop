@@ -1,15 +1,21 @@
 ## New Updates
 
-### 5.1 - _190520_
+### 5.2 - _190611_
 
 ### Added:
 
 - We've made it easier than ever to have every shabad you need for an Anand Kaaraj in one place! Check out the new Ceremonies tab!
   ![](./assets/img/help_images/desktop-ceremonies.png)
+  
+- Make your live streams stand out with all new Bani Overlay themes!
+  ![](./assets/img/help_images/desktop-overlay-themes.png)
+  
+- Did you know SikhiToTheMax has keyboard shortcuts? Try pressing CTRL (or CMD) + 1! Check out the new Shortcut Legend in the Help menu 
+  
 
 ### Improved:
 
-- Expanded Vishraams to be supported on all themes
+- Expanded Vishraams to be supported on all themes 
 - Bug fixes & UI enhancements
 
 <br/>  
