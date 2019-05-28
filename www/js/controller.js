@@ -206,7 +206,7 @@ const winMenu = [
           analytics.trackEvent('menu', 'guide');
           main.openSecondaryWindow('helpWindow');
         },
-        {
+       {
         label: 'Shorcut Legend...',
         click: () => {
           analytics.trackEvent('menu', 'shortcut-legend');
