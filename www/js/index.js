@@ -16,12 +16,18 @@ function escKey() {
   } */
 }
 
-function hideSlide() {
+function waheguruSlide() {
+  global.controller.sendText('vwihgurU', true);
+}
+function ikOankarSlide() {
+  global.controller.sendText();
+}
+function emptySlide() {
   // show Empty Slide
   global.controller.sendText('');
 }
-function waheguruSlide() {
-  global.controller.sendText('vwihgurU', true);
+function helpGuide() {
+  global.controller.sendWindow('helpGuide');
 }
 function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
@@ -109,8 +115,10 @@ function findLine(e) {
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
-  Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
   Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
+  Mousetrap.bindGlobal(['command+2', 'ctrl+2'], ikOankarSlide);
+  Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
+  Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuide);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
