@@ -555,9 +555,6 @@ module.exports = {
     global.platform.ipc.send('show-empty-slide');
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
-  sendNewWindow(window) {
-    main.openSecondaryWindow(window);
-  },
   sendScroll(pos) {
     global.platform.ipc.send('send-scroll', { pos });
   },

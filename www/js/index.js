@@ -1,4 +1,8 @@
 /* global Mousetrap */
+const electron = require('electron');
+
+const { remote } = electron;
+const main = remote.require('./app');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -20,14 +24,23 @@ function waheguruSlide() {
   global.controller.sendText('vwihgurU', true);
 }
 function ikOankarSlide() {
-  global.controller.sendText();
+  global.controller.sendText(
+    '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
+    true,
+  );
 }
 function emptySlide() {
   // show Empty Slide
   global.controller.sendText('');
 }
-function helpGuide() {
-  global.controller.sendWindow('helpGuide');
+function anandSahibBhog() {
+  //add anad sahib functionality
+}
+function helpGuideShortcut() {
+  main.openSecondaryWindow('helpWindow');
+}
+function legendShortcut() {
+  main.openSecondaryWindow('shortcutLegend');
 }
 function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
@@ -118,7 +131,9 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
   Mousetrap.bindGlobal(['command+2', 'ctrl+2'], ikOankarSlide);
   Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
-  Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuide);
+  Mousetrap.bindGlobal(['command+4', 'command+4'], anandSahibBhog);
+  Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
+  Mousetrap.bindGlobal(['command+6', 'ctrl+5'], legendShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
