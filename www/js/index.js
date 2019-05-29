@@ -34,7 +34,7 @@ function emptySlide() {
   global.controller.sendText('');
 }
 function anandSahibBhog() {
-  //add anad sahib functionality
+  // add anad sahib functionality
 }
 function helpGuideShortcut() {
   main.openSecondaryWindow('helpWindow');
