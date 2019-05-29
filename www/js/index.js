@@ -143,7 +143,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
   Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
-  Mousetrap.bindGlobal(['command+6', 'ctrl+5'], legendShortcut);
+  Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
 
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
