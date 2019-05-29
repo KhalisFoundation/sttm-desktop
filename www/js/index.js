@@ -3,6 +3,7 @@ const electron = require('electron');
 
 const { remote } = electron;
 const main = remote.require('./app');
+
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -11,6 +12,7 @@ const settings = require('../js/settings');
 const shortcutTray = require('./shortcut_tray');
 const toolbar = require('./toolbar');
 
+const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
@@ -21,9 +23,11 @@ function escKey() {
 }
 
 function waheguruSlide() {
+  // waheguru slide shortcut
   global.controller.sendText('vwihgurU', true);
 }
 function ikOankarSlide() {
+  // ik oankar slide shortcut
   global.controller.sendText(
     '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
     true,
@@ -34,12 +38,17 @@ function emptySlide() {
   global.controller.sendText('');
 }
 function anandSahibBhog() {
-  // add anad sahib functionality
+  // anand sahib (6 pauri) shortcut
+  global.core.search.loadCeremony(3).catch(error => {
+    analytics.trackEvent('ceremonyFailed', 3, error);
+  });
 }
 function helpGuideShortcut() {
+  // help window
   main.openSecondaryWindow('helpWindow');
 }
 function legendShortcut() {
+  // shortcut legend window
   main.openSecondaryWindow('shortcutLegend');
 }
 function maintainScroll($line) {
@@ -128,12 +137,14 @@ function findLine(e) {
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
+
   Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
   Mousetrap.bindGlobal(['command+2', 'ctrl+2'], ikOankarSlide);
   Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
-  Mousetrap.bindGlobal(['command+4', 'command+4'], anandSahibBhog);
+  Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
   Mousetrap.bindGlobal(['command+6', 'ctrl+5'], legendShortcut);
+
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
