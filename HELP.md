@@ -120,7 +120,7 @@ The Khalis team preformed a user study to determine the best way to display Vish
 Additionally, you have the option to choose between Vishraam sources:
 
 - Sources:
-  - _STTM Living_ - Vishraams being actively updated/corrected by the Khalis Foundation team of sevaadaars
+  - _BaniDB Living_ - Vishraams being actively updated/corrected by the BaniDB & Khalis Foundation team of sevaadaars
   - _iGurbani_ - Vishraams as shown in the iGurbani mobile app
   - _STTM 2_ - Vishraams as shown in the old SikhiToTheMax 2 app
 
