@@ -17,7 +17,7 @@
 #### macOS:
 
 - Cmd + 1 = Waheguru Slide
-- Cmd + 2 = Ik Oankar Slide
+- Cmd + 2 = Mool Mantra Slide
 - Cmd + 3 = Empty Slide
 - Cmd + 4 = Anand Sahib (Bhog)
 - Cmd + 5 = Help Guide
@@ -26,7 +26,7 @@
 #### Windows:
 
 - Ctrl + 1 = Waheguru Slide
-- Ctrl + 2 = Ik Oankar Slide
+- Ctrl + 2 = Mool Mantra Slide
 - Ctrl + 3 = Empty Slide
 - Ctrl + 4 = Anand Sahib (Bhog)
 - Ctrl + 5 = Help Guide
@@ -45,4 +45,5 @@
 #### Windows:
 
 - Ctrl + q = Close app (shut down app)
-- _Some Windows Shortcuts are currently broken and will be fixed in a later update_
+- Ctrl + u = Check for update
+- Ctrl + m = minimize window
