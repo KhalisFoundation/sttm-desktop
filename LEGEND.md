@@ -22,6 +22,7 @@
 - Cmd + 4 = Anand Sahib (Bhog)
 - Cmd + 5 = Help Guide
 - Cmd + 6 = Shortcut Legend
+- Cmd + / = Jump to search
 
 #### Windows:
 
@@ -31,6 +32,7 @@
 - Ctrl + 4 = Anand Sahib (Bhog)
 - Ctrl + 5 = Help Guide
 - Ctrl + 6 = Shortcut Legend
+- Cmd + / = Jump to search
 
 ### <a name="others">Others</a>
 
