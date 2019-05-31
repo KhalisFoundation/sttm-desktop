@@ -22,6 +22,7 @@
 
 ### <a name="slides">Slide Shortcuts</a>
 
+<<<<<<< HEAD
 #### <a name="macos-slides">macOS:</a>:
 
 | Combination                                | Description                                 |
@@ -50,6 +51,27 @@
 | ctrl + /    | Jump to search bar                  |
 | ----------- | -----------                         |
 | ctrl + g    | Add Dhan Guru slide or announcement |
+=======
+#### macOS:
+
+- Cmd + 1 = Waheguru Slide
+- Cmd + 2 = Mool Mantra Slide
+- Cmd + 3 = Empty Slide
+- Cmd + 4 = Anand Sahib (Bhog)
+- Cmd + 5 = Help Guide
+- Cmd + 6 = Shortcut Legend
+- Cmd + / = Jump to search
+
+#### Windows:
+
+- Ctrl + 1 = Waheguru Slide
+- Ctrl + 2 = Mool Mantra Slide
+- Ctrl + 3 = Empty Slide
+- Ctrl + 4 = Anand Sahib (Bhog)
+- Ctrl + 5 = Help Guide
+- Ctrl + 6 = Shortcut Legend
+- Cmd + / = Jump to search
+>>>>>>> updating legend.md
 
 ### <a name="others">Others</a>
 
