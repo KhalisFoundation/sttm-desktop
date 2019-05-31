@@ -317,6 +317,7 @@ const macMenu = [
   },
   ...devMenu,
 ];
+
 const menu = Menu.buildFromTemplate(
   process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu,
 );
@@ -554,7 +555,6 @@ module.exports = {
     global.platform.ipc.send('show-empty-slide');
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
-
   sendScroll(pos) {
     global.platform.ipc.send('send-scroll', { pos });
   },
