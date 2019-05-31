@@ -26,7 +26,7 @@ function waheguruSlide() {
   // waheguru slide shortcut
   global.controller.sendText('vwihgurU', true);
 }
-function ikOankarSlide() {
+function moolMantraSlide() {
   // ik oankar slide shortcut
   global.controller.sendText(
     '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
@@ -139,7 +139,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
 
   Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
-  Mousetrap.bindGlobal(['command+2', 'ctrl+2'], ikOankarSlide);
+  Mousetrap.bindGlobal(['command+2', 'ctrl+2'], moolMantraSlide);
   Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
   Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
