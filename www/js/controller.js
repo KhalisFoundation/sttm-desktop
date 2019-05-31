@@ -208,6 +208,13 @@ const winMenu = [
         },
       },
       {
+        label: 'Shorcut Legend...',
+        click: () => {
+          analytics.trackEvent('menu', 'shortcut-legend');
+          main.openSecondaryWindow('shortcutLegend');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
           analytics.trackEvent('menu', 'changelog');

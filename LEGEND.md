@@ -10,54 +10,40 @@
 
 ![](./assets/img/help_images/web-desktop-keyboard-map.png)
 
-- Note that the chars on the top require shift + key.\*
+- _Note that the chars on the top require shift + key._
 
 ### <a name="slides">Slide Shortcuts</a>
 
-#### MacOS:
+#### macOS:
 
-Cmd + e = empty slide
-Cmd + 1 = Waheguru Slide
+- Cmd + 1 = Waheguru Slide
+- Cmd + 2 = Mool Mantra Slide
+- Cmd + 3 = Empty Slide
+- Cmd + 4 = Anand Sahib (Bhog)
+- Cmd + 5 = Help Guide
+- Cmd + 6 = Shortcut Legend
 
 #### Windows:
 
-Ctrl + e = empty slide
-Ctrl + 1 = Waheguru Slide
+- Ctrl + 1 = Waheguru Slide
+- Ctrl + 2 = Mool Mantra Slide
+- Ctrl + 3 = Empty Slide
+- Ctrl + 4 = Anand Sahib (Bhog)
+- Ctrl + 5 = Help Guide
+- Ctrl + 6 = Shortcut Legend
 
 ### <a name="others">Others</a>
 
-#### MacOS:
+#### macOS:
 
-Cmd + q = Close app (shut down app)
-
-Cmd w = Close app (shut down app)
-
-Cmd + u = check for updates
-
-Cmd + a = select all
-
-Cmd + h = minimize window
-
-Cmd + z = undo
-
-Cmd + x = cut
-
-Cmd + c = copy
-
-Cmd + v = paste
-
-Cmd + m = minimize window
+- Cmd + q = Close app (shut down app)
+- Cmd w = Close app (shut down app)
+- Cmd + u = check for updates
+- Cmd + h = minimize window
+- Cmd + m = minimize window
 
 #### Windows:
 
-Ctrl + q = Close app (shut down app)
-
-Ctrl + a = select all
-
-Ctrl + z = undo
-
-Ctrl + x = cut
-
-Ctrl + c = copy
-
-Ctrl + v = paste
+- Ctrl + q = Close app (shut down app)
+- Ctrl + u = Check for update
+- Ctrl + m = minimize window
