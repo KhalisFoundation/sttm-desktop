@@ -537,7 +537,7 @@ module.exports = {
     return Line;
   },
 
-  sendLine(shabadID, lineID, rawLine, rawRows, mode) {
+  sendLine(shabadID, lineID, rawLine, rawRows, mode, start) {
     const Line = this.remapLine(rawLine);
     const rows = rawRows.map(row => this.remapLine(row));
     global.webview.send('show-line', { shabadID, lineID, rows, mode });
@@ -553,7 +553,9 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-    global.platform.ipc.send('show-line', showLinePayload);
+    if (start === 0 || start === undefined) {
+      global.platform.ipc.send('show-line', showLinePayload);
+    }
   },
 
   sendText(text, isGurmukhi) {
