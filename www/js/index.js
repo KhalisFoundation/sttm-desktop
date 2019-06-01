@@ -51,6 +51,9 @@ function legendShortcut() {
   // shortcut legend window
   main.openSecondaryWindow('shortcutLegend');
 }
+function searchBarShortcut() {
+  search.$search.focus();
+}
 function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
@@ -145,9 +148,9 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
   Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
 
+  Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
-  Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
   Mousetrap.bind('space', spaceBar);
 }
 
