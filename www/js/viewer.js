@@ -281,8 +281,11 @@ const createCards = (rows, LineID) => {
     });
     const gurmukhiContainer = document.createElement('div');
 
-    gurmukhiContainer.innerHTML = `<span class="padchhed">${taggedGurmukhi.join(' ')}</span>
-                                    <span class="larivaar">${taggedGurmukhi.join('<wbr>')}</span>`;
+    const padched = taggedGurmukhi.join(' ');
+    const larivaar = taggedGurmukhi.join('<wbr>');
+
+    gurmukhiContainer.innerHTML = `<span class="padchhed">${padched}</span>
+                                    <span class="larivaar">${larivaar}</span>`;
 
     const englishContainer = document.createElement('div');
     englishContainer.innerHTML = row.English || '';
@@ -296,8 +299,8 @@ const createCards = (rows, LineID) => {
       ]),
     );
     shabad[row.ID] = {
-      gurmukhi: row.Gurmukhi || row.PunjabiUni,
-      larivaar: taggedGurmukhi.join('<wbr>'),
+      gurmukhi: padched || row.Gurmukhi || row.PunjabiUni,
+      larivaar,
       translation: row.English || '',
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
