@@ -111,6 +111,65 @@ const closeOverlayUI = h(
   h('i.fa.fa-times'),
 );
 
+const getEnglishExp = token => {
+  const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
+  if (englishExpVal === undefined) {
+    return true;
+  }
+  return englishExpVal;
+};
+
+const printCeremonies = rows => {
+  rows.forEach(row => {
+    if (row.Token !== 'anand' && row.Token !== 'death') {
+      const $ceremony = h(
+        `div.ceremony-pane#${row.Token}`,
+        {
+          onclick: () => {
+            analytics.trackEvent('ceremony', row.Token);
+            global.core.search.loadCeremony(row.ID).catch(error => {
+              analytics.trackEvent('ceremonyFailed', row.ID, error);
+            });
+            const currentCeremony = document.querySelector('div.ceremony-pane.active');
+            if (currentCeremony) {
+              currentCeremony.classList.remove('active');
+            }
+            document.querySelector(`div.ceremony-pane#${row.Token}`).classList.add('active');
+          },
+        },
+        navigatorHeaderFactory(row.Token, row.Gurmukhi, 'gurmukhi'),
+        h(
+          'div.ceremony-pane-content',
+          h(
+            `div.ceremony-pane-options#cpo-${row.Token}`,
+            switchFactory(
+              `${row.Token}-english-exp-switch`,
+              'English Explanations',
+              `${row.Token}-english-exp`,
+              () => {
+                const englishExpVal = getEnglishExp(row.Token);
+                store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
+                global.platform.updateSettings();
+              },
+              getEnglishExp(row.Token),
+            ),
+          ),
+          h(
+            `div.ceremony-pane-themes#${row.Token}`,
+            {
+              onclick: () => {
+                toggleOverlayUI(currentToolbarItem, false);
+              },
+            },
+            h('div.ceremony-theme-header', 'Choose a Theme to launch'),
+          ),
+        ),
+      );
+      $ceremoniesList.appendChild($ceremony);
+    }
+  });
+};
+
 const printBanis = rows => {
   const banisListID = 'sunder-gutka-banis';
   $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
@@ -173,65 +232,6 @@ const toolbarItemFactory = toolbarItem =>
       }
     },
   });
-
-const getEnglishExp = token => {
-  const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
-  if (englishExpVal === undefined) {
-    return true;
-  }
-  return englishExpVal;
-};
-
-const printCeremonies = rows => {
-  rows.forEach(row => {
-    if (row.Token !== 'anand' && row.Token !== 'death') {
-      const $ceremony = h(
-        `div.ceremony-pane#${row.Token}`,
-        {
-          onclick: () => {
-            analytics.trackEvent('ceremony', row.Token);
-            global.core.search.loadCeremony(row.ID).catch(error => {
-              analytics.trackEvent('ceremonyFailed', row.ID, error);
-            });
-            const currentCeremony = document.querySelector('div.ceremony-pane.active');
-            if (currentCeremony) {
-              currentCeremony.classList.remove('active');
-            }
-            document.querySelector(`div.ceremony-pane#${row.Token}`).classList.add('active');
-          },
-        },
-        navigatorHeaderFactory(row.Token, row.Gurmukhi, 'gurmukhi'),
-        h(
-          'div.ceremony-pane-content',
-          h(
-            `div.ceremony-pane-options#cpo-${row.Token}`,
-            switchFactory(
-              `${row.Token}-english-exp-switch`,
-              'English Explanations',
-              `${row.Token}-english-exp`,
-              () => {
-                const englishExpVal = getEnglishExp(row.Token);
-                store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
-                global.platform.updateSettings();
-              },
-              getEnglishExp(row.Token),
-            ),
-          ),
-          h(
-            `div.ceremony-pane-themes#${row.Token}`,
-            {
-              onclick: () => {
-                toggleOverlayUI(currentToolbarItem, false);
-              },
-            },
-            h('div.ceremony-theme-header', 'Choose a Theme to launch'),
-          ),
-        ),
-      );
-      $ceremoniesList.appendChild($ceremony);
-    }
-  });
-};
 
 module.exports = {
   init() {
