@@ -292,11 +292,9 @@ const imageInput = themesContainer =>
 
 module.exports = {
   defaultTheme,
+  updateCeremonyThemeTiles,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
-    setTimeout(() => {
-      updateCeremonyThemeTiles();
-    }, 1000);
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
     swatchGroupFactory('COLOR', themeOptions);

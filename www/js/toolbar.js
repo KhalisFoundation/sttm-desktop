@@ -5,6 +5,7 @@ const banidb = require('./banidb');
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
+const { updateCeremonyThemeTiles } = require('./theme_editor');
 
 const toolbarItems = ['sunder-gutka', 'ceremonies'];
 const navLinks = require('./search');
@@ -12,6 +13,7 @@ const navLinks = require('./search');
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
 let banisLoaded = false;
+let ceremoniesLoaded = false;
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
@@ -158,6 +160,16 @@ const toolbarItemFactory = toolbarItem =>
 
           analytics.trackEvent('banisLoaded', true);
         }
+
+        if (!ceremoniesLoaded) {
+          banidb.loadCeremonies().then(rows => {
+            printCeremonies(rows);
+            updateCeremonyThemeTiles();
+            ceremoniesLoaded = !!rows;
+          });
+
+          analytics.trackEvent('ceremoniesLoaded', true);
+        }
       }
     },
   });
@@ -229,11 +241,6 @@ module.exports = {
 
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-    });
-
-    banidb.loadCeremonies().then(rows => {
-      printCeremonies(rows);
-      analytics.trackEvent('ceremoniesLoaded', true);
     });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
