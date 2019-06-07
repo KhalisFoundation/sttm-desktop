@@ -22,6 +22,7 @@ const allowedKeys = [
   46, // Delete
 ];
 const sessionList = [];
+const sessionStatesList = {};
 const currentShabad = [];
 const kbPages = [];
 let currentMeta = {};
@@ -584,7 +585,7 @@ module.exports = {
       h(
         'a.panktee.current',
         {
-          onclick: ev => this.clickSession(ev, ShabadID, LineID),
+          onclick: ev => this.clickSession(ev, ShabadID),
         },
         Line.Gurmukhi,
       ),
@@ -596,6 +597,7 @@ module.exports = {
     // add it to the variable
     if (sessionList.indexOf(ShabadID) < 0) {
       sessionList.push(ShabadID);
+      sessionStatesList[ShabadID] = { resumePanktee: null, seenPanktees: new Set() };
     } else {
       // if the ShabadID is already in the session, just remove the HTMLElement,
       // and leave the sessionList
@@ -770,15 +772,22 @@ module.exports = {
       return false;
     }
 
+    let seenClasses = '';
+    const shabadState = sessionStatesList[line.ShabadID];
+
+    if (line.mainLine && !mainLineExists) {
+      seenClasses = '.current.main.seen_check';
+    } else if (shabadState.seenPanktees.has(line.ID)) {
+      seenClasses = '.seen_check';
+    }
+
     const shabadLine = h(
       `li#li_${line.lineCount}`,
       {
         'data-line-count': line.lineCount,
       },
       h(
-        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${
-          line.mainLine && !mainLineExists ? '.current.main.seen_check' : ''
-        }`,
+        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${seenClasses}`,
         {
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
@@ -876,6 +885,7 @@ module.exports = {
     if (lineIDConflict) {
       lineID = document.querySelector(`#shabad > li:first-child > a`).dataset.lineId;
       shabad.querySelector(`#line${lineID}`).classList.add('current', 'main', 'seen_check');
+      sessionStatesList[shabadID].seenPanktees.add(lineID);
     }
 
     const totalLines = rows.length;
@@ -921,9 +931,10 @@ module.exports = {
     }
   },
 
-  clickSession(e, ShabadID, LineID) {
+  clickSession(e, ShabadID) {
     const $panktee = e.target;
-    this.loadShabad(ShabadID, LineID);
+    const [resumePanktee] = sessionStatesList[ShabadID];
+    this.loadShabad(ShabadID, resumePanktee);
     const sessionLines = this.$session.querySelectorAll('a.panktee');
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
     $panktee.classList.add('current');
@@ -957,11 +968,13 @@ module.exports = {
     }
     */
     const lines = this.$shabad.querySelectorAll('a.panktee');
+    const shabadState = sessionStatesList[ShabadID];
     if (e.target.classList.contains('fa-home')) {
       // Change main line
       const $panktee = e.target.parentNode;
       Array.from(lines).forEach(el => el.classList.remove('main'));
       $panktee.classList.add('main', 'seen_check');
+      shabadState.seenPanktees.add(LineID);
     } else if (e.target.classList.contains('panktee')) {
       // Change line to click target
       const $panktee = e.target;
@@ -971,6 +984,8 @@ module.exports = {
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
       $panktee.classList.add('current', 'seen_check');
+      shabadState.seenPanktees.add(LineID);
+      shabadState.resumePanktee = LineID;
     }
     this.checkAutoPlay(LineID);
   },
