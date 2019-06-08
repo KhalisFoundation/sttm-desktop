@@ -928,6 +928,10 @@ module.exports = {
     while (this.$session.firstChild) {
       this.$session.removeChild(this.$session.firstChild);
       sessionList.splice(0, sessionList.length);
+      // clear object and its properties
+      Object.getOwnPropertyNames(sessionStatesList).forEach(shabadID => {
+        delete sessionStatesList[shabadID];
+      });
     }
   },
 
