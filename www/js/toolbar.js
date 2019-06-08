@@ -5,6 +5,7 @@ const banidb = require('./banidb');
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
+const { updateCeremonyThemeTiles } = require('./theme_editor');
 
 const toolbarItems = ['sunder-gutka', 'ceremonies'];
 const navLinks = require('./search');
@@ -12,6 +13,7 @@ const navLinks = require('./search');
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
 const popularBanis = [90, 30, 31, 22];
 let banisLoaded = false;
+let ceremoniesLoaded = false;
 
 const $toolbar = document.querySelector('#toolbar');
 const $baniList = document.querySelector('.bani-list');
@@ -109,59 +111,6 @@ const closeOverlayUI = h(
   h('i.fa.fa-times'),
 );
 
-const printBanis = rows => {
-  const banisListID = 'sunder-gutka-banis';
-  $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
-  const $sunderGutkaBanis = document.querySelector(`#${banisListID}`);
-  const $nitnemBanis = document.querySelector('.nitnem-banis');
-  const $popularBanis = document.querySelector('.popular-banis');
-
-  rows.forEach(row => {
-    let baniTag = 'none';
-    if (nitnemBanis.includes(row.ID)) {
-      baniTag = 'nitnem';
-      $nitnemBanis.appendChild(extrasTileFactory('nitnem-bani', row));
-    }
-    if (popularBanis.includes(row.ID)) {
-      baniTag = 'popular';
-      $popularBanis.appendChild(extrasTileFactory('popular-bani', row));
-    }
-    const $bani = h(
-      'li.sunder-gutka-bani',
-      {
-        onclick: () => {
-          analytics.trackEvent('sunderGutkaBanis', row.Token);
-          global.core.search.loadBani(row.ID);
-          toggleOverlayUI(currentToolbarItem, false);
-          navLinks.navPage('shabad');
-        },
-      },
-      h(`span.tag.tag-${baniTag}`),
-      h('span.gurmukhi.gurmukhi-bani', row.Gurmukhi),
-      h('span.translit-bani', anvaad.translit(row.Gurmukhi)),
-    );
-    $sunderGutkaBanis.appendChild($bani);
-  });
-};
-
-const toolbarItemFactory = toolbarItem =>
-  h(`div.toolbar-item#tool-${toolbarItem}`, {
-    onclick: () => {
-      const { databaseState } = global.core.search.$search.dataset;
-      if (databaseState === 'loaded') {
-        toggleOverlayUI(toolbarItem, true);
-        if (!banisLoaded) {
-          banidb.loadBanis().then(rows => {
-            printBanis(rows);
-            banisLoaded = !!rows;
-          });
-
-          analytics.trackEvent('banisLoaded', true);
-        }
-      }
-    },
-  });
-
 const getEnglishExp = token => {
   const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
   if (englishExpVal === undefined) {
@@ -221,6 +170,69 @@ const printCeremonies = rows => {
   });
 };
 
+const printBanis = rows => {
+  const banisListID = 'sunder-gutka-banis';
+  $baniList.appendChild(blockListFactory('gurmukhi', banisListID));
+  const $sunderGutkaBanis = document.querySelector(`#${banisListID}`);
+  const $nitnemBanis = document.querySelector('.nitnem-banis');
+  const $popularBanis = document.querySelector('.popular-banis');
+
+  rows.forEach(row => {
+    let baniTag = 'none';
+    if (nitnemBanis.includes(row.ID)) {
+      baniTag = 'nitnem';
+      $nitnemBanis.appendChild(extrasTileFactory('nitnem-bani', row));
+    }
+    if (popularBanis.includes(row.ID)) {
+      baniTag = 'popular';
+      $popularBanis.appendChild(extrasTileFactory('popular-bani', row));
+    }
+    const $bani = h(
+      'li.sunder-gutka-bani',
+      {
+        onclick: () => {
+          analytics.trackEvent('sunderGutkaBanis', row.Token);
+          global.core.search.loadBani(row.ID);
+          toggleOverlayUI(currentToolbarItem, false);
+          navLinks.navPage('shabad');
+        },
+      },
+      h(`span.tag.tag-${baniTag}`),
+      h('span.gurmukhi.gurmukhi-bani', row.Gurmukhi),
+      h('span.translit-bani', anvaad.translit(row.Gurmukhi)),
+    );
+    $sunderGutkaBanis.appendChild($bani);
+  });
+};
+
+const toolbarItemFactory = toolbarItem =>
+  h(`div.toolbar-item#tool-${toolbarItem}`, {
+    onclick: () => {
+      const { databaseState } = global.core.search.$search.dataset;
+      if (databaseState === 'loaded') {
+        toggleOverlayUI(toolbarItem, true);
+        if (!banisLoaded) {
+          banidb.loadBanis().then(rows => {
+            printBanis(rows);
+            banisLoaded = !!rows;
+          });
+
+          analytics.trackEvent('banisLoaded', true);
+        }
+
+        if (!ceremoniesLoaded) {
+          banidb.loadCeremonies().then(rows => {
+            printCeremonies(rows);
+            updateCeremonyThemeTiles();
+            ceremoniesLoaded = !!rows;
+          });
+
+          analytics.trackEvent('ceremoniesLoaded', true);
+        }
+      }
+    },
+  });
+
 module.exports = {
   init() {
     document.querySelector('.focus-overlay').addEventListener('click', () => {
@@ -229,11 +241,6 @@ module.exports = {
 
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-    });
-
-    banidb.loadCeremonies().then(rows => {
-      printCeremonies(rows);
-      analytics.trackEvent('ceremoniesLoaded', true);
     });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
