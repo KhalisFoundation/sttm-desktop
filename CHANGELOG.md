@@ -1,15 +1,29 @@
 ## New Updates
 
-### 5.1 - _190520_
+### 5.2 - _190611_
 
 ### Added:
 
 - We've made it easier than ever to have every shabad you need for an Anand Kaaraj in one place! Check out the new Ceremonies tab!
   ![](./assets/img/help_images/desktop-ceremonies.png)
+ 
+- Did you know SikhiToTheMax has keyboard shortcuts?
+     - CTRL (or CMD for Mac) + / = Search bar
+     - CTRL (or CMD for Mac) + 1 = Waheguru Slide
+     - CTRL (or CMD for Mac) + 2 = Mool Mantra
+     - CTRL (or CMD for Mac) + 3 = Blank Slide
+     - CTRL (or CMD for Mac) + 4 = Anand Sahib (Bhog)
+     - CTRL (or CMD for Mac) + 5 = Help Menu
+     - CTRL (or CMD for Mac) + 6 = Shortcut Legend 
+ 
+- Make your live streams stand out with all new Bani Overlay themes!
+  ![](./assets/img/help_images/desktop-overlay-themes.png)
+  
 
 ### Improved:
 
 - Expanded Vishraams to be supported on all themes
+- Fixed several bugs when using Chromecast
 - Bug fixes & UI enhancements
 
 <br/>  

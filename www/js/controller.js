@@ -208,6 +208,13 @@ const winMenu = [
         },
       },
       {
+        label: 'Shorcut Legend...',
+        click: () => {
+          analytics.trackEvent('menu', 'shortcut-legend');
+          main.openSecondaryWindow('shortcutLegend');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
           analytics.trackEvent('menu', 'changelog');
@@ -295,6 +302,13 @@ const macMenu = [
         },
       },
       {
+        label: 'Shorcut Legend...',
+        click: () => {
+          analytics.trackEvent('menu', 'shortcut-legend');
+          main.openSecondaryWindow('shortcutLegend');
+        },
+      },
+      {
         label: 'Changelog...',
         click: () => {
           main.openSecondaryWindow('changelogWindow');
@@ -310,6 +324,7 @@ const macMenu = [
   },
   ...devMenu,
 ];
+
 const menu = Menu.buildFromTemplate(
   process.platform === 'darwin' || process.platform === 'linux' ? macMenu : winMenu,
 );
@@ -522,7 +537,7 @@ module.exports = {
     return Line;
   },
 
-  sendLine(shabadID, lineID, rawLine, rawRows, mode) {
+  sendLine(shabadID, lineID, rawLine, rawRows, mode, start) {
     const Line = this.remapLine(rawLine);
     const rows = rawRows.map(row => this.remapLine(row));
     global.webview.send('show-line', { shabadID, lineID, rows, mode });
@@ -538,7 +553,9 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-    global.platform.ipc.send('show-line', showLinePayload);
+    if (start === 0 || start === undefined) {
+      global.platform.ipc.send('show-line', showLinePayload);
+    }
   },
 
   sendText(text, isGurmukhi) {
@@ -547,7 +564,6 @@ module.exports = {
     global.platform.ipc.send('show-empty-slide');
     global.platform.ipc.send('show-text', { text, isGurmukhi });
   },
-
   sendScroll(pos) {
     global.platform.ipc.send('send-scroll', { pos });
   },

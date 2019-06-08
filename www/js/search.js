@@ -896,7 +896,8 @@ module.exports = {
       this.$shabadContainer.scrollTop = curPankteeTop;
     }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode);
+    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode, start);
+
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
     const $shabadPrev = document.querySelector('#shabad-prev');
