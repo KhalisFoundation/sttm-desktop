@@ -14,7 +14,7 @@
      - CTRL (or CMD for Mac) + 6 = Shortcut Legend 
      
 
-- Check out the new Ceremonies tab - we've put every shabad you need for an Anand Kaaraj in one place!
+- Check out the new Ceremonies tab - we've put every Shabad you need for an Anand Kaaraj in one place!
   ![](./assets/img/help_images/desktop-ceremonies.png)
  
 - Make your live streams stand out with all new Bani Overlay themes!
