@@ -87,11 +87,13 @@ const castShabadLine = lineID => {
     });
     castToReceiver();
 
-    const activeSlide = document.querySelector('.deck.active .slide.active').children;
-    Array.prototype.forEach.call(activeSlide, element => {
-      const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-      if (icons) document.querySelector('.viewer-controls').appendChild(icons);
-    });
+    const activeSlide = document.querySelector('.deck.active .slide.active');
+    if (activeSlide) {
+      Array.prototype.forEach.call(activeSlide.children, element => {
+        const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+        if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+      });
+    }
   }
 };
 
