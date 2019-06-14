@@ -3,7 +3,8 @@ const electron = require('electron');
 
 const { remote } = electron;
 const main = remote.require('./app');
-
+const { store } = require('electron').remote.require('./app');
+const cast = require('./chromecast');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -159,6 +160,15 @@ if ($shabadPage) {
   $shabadPage.addEventListener('keypress', findLine);
 }
 
+global.platform.ipc.on('search-cast', () => {
+  if (store.getUserPref('app.layout.presenter-view')) {
+    cast.requestSession();
+    cast.appendMessage();
+    // eslint-disable-next-line no-console
+    console.log('ur a dum dum');
+  }
+});
+
 /**
  * Check if the platform has a method and call if it is does
  *
@@ -178,7 +188,6 @@ function platformMethod(method, args) {
 global.platform.ipc.on('sync-settings', () => {
   settings.init();
 });
-
 module.exports = {
   menu,
   search,

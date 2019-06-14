@@ -113,10 +113,11 @@ const applyThemebg = () => {
 applyThemebg();
 
 // IPC
-global.platform.ipc.on('search-cast', (event, pos) => {
-  requestSession();
-  appendMessage(event);
-  appendMessage(pos);
+global.platform.ipc.on('search-cast', () => {
+  if (!store.getUserPref('app.layout.presenter-view')) {
+    requestSession();
+    appendMessage();
+  }
 });
 
 global.platform.ipc.on('stop-cast', () => {
@@ -402,7 +403,7 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
-        /* if you click on verse when message is open (announcement, blank, waheguru) 
+        /* if you click on verse when message is open (announcement, blank, waheguru)
         it should hide the message deck and show the shabad deck */
         if ($message.classList.contains('active')) {
           $message.classList.remove('active');
