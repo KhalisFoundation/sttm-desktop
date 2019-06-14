@@ -575,18 +575,32 @@ module.exports = {
     }
   },
 
-  clickResult(e, ShabadID, LineID, Line) {
-    document.body.classList.remove('home');
-    this.closeGurmukhiKB();
+  addToHistory(SearchID, LineID, SearchTitle, type) {
     const sessionItem = h(
-      `li#session-${ShabadID}`,
+      `li#session-${type}-${SearchID}`,
       {},
       h(
         'a.panktee.current',
         {
-          onclick: ev => this.clickSession(ev, ShabadID, LineID),
+          onclick: ev => {
+            const $panktee = ev.target;
+            switch (type) {
+              case 'bani':
+                this.loadBani(SearchID, LineID, true);
+                break;
+              case 'ceremony':
+                this.loadCeremony(SearchID, true);
+                break;
+              default:
+                this.loadShabad(SearchID, LineID);
+            }
+            const sessionLines = this.$session.querySelectorAll('a.panktee');
+            Array.from(sessionLines).forEach(el => el.classList.remove('current'));
+            $panktee.classList.add('current');
+            this.navPage('shabad');
+          },
         },
-        Line.Gurmukhi,
+        SearchTitle,
       ),
     );
     // get all the lines in the session block and remove the .current class from them
@@ -594,16 +608,22 @@ module.exports = {
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
     // if the ShabadID of the clicked Panktee isn't in the sessionList variable,
     // add it to the variable
-    if (sessionList.indexOf(ShabadID) < 0) {
-      sessionList.push(ShabadID);
+    if (sessionList.indexOf(SearchID.toString()) < 0) {
+      sessionList.push(SearchID.toString());
     } else {
       // if the ShabadID is already in the session, just remove the HTMLElement,
       // and leave the sessionList
-      const line = this.$session.querySelector(`#session-${ShabadID}`);
+      const line = this.$session.querySelector(`#session-${type}-${SearchID}`);
       this.$session.removeChild(line);
     }
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
+  },
+
+  clickResult(e, ShabadID, LineID, Line) {
+    document.body.classList.remove('home');
+    this.closeGurmukhiKB();
+    this.addToHistory(ShabadID, LineID, Line.Gurmukhi);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -647,7 +667,7 @@ module.exports = {
     }
   },
 
-  async loadCeremony(ceremonyID) {
+  async loadCeremony(ceremonyID, historyReload = false) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
@@ -678,13 +698,17 @@ module.exports = {
         }),
       );
       const flatRows = [].concat(...rows);
+      const nameOfCeremony = rowsDb[0].Ceremony.Gurmukhi;
+      if (!historyReload) {
+        this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
+      }
       return this.printShabad(flatRows);
     } catch (error) {
       throw error;
     }
   },
 
-  loadBani(BaniID, LineID = null) {
+  loadBani(BaniID, LineID = null, historyReload = false) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
@@ -708,6 +732,10 @@ module.exports = {
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
       const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const nameOfBani = rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi;
+      if (!historyReload) {
+        this.addToHistory(BaniID, LineID, nameOfBani, 'bani');
+      }
       const rows = rowsDb
         .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
         .map(rowDb => {
@@ -919,15 +947,6 @@ module.exports = {
       this.$session.removeChild(this.$session.firstChild);
       sessionList.splice(0, sessionList.length);
     }
-  },
-
-  clickSession(e, ShabadID, LineID) {
-    const $panktee = e.target;
-    this.loadShabad(ShabadID, LineID);
-    const sessionLines = this.$session.querySelectorAll('a.panktee');
-    Array.from(sessionLines).forEach(el => el.classList.remove('current'));
-    $panktee.classList.add('current');
-    this.navPage('shabad');
   },
 
   checkAutoPlay(LineID = null) {
