@@ -160,15 +160,6 @@ if ($shabadPage) {
   $shabadPage.addEventListener('keypress', findLine);
 }
 
-global.platform.ipc.on('search-cast', () => {
-  if (store.getUserPref('app.layout.presenter-view')) {
-    cast.requestSession();
-    cast.appendMessage();
-    // eslint-disable-next-line no-console
-    console.log('ur a dum dum');
-  }
-});
-
 /**
  * Check if the platform has a method and call if it is does
  *
@@ -188,9 +179,17 @@ function platformMethod(method, args) {
 global.platform.ipc.on('sync-settings', () => {
   settings.init();
 });
+
+// global.platform.ipc.on('search-cast', () => {
+//   if (store.getUserPref('app.layout.presenter-view')) {
+//     cast.requestSession();
+//     cast.appendMessage();
+//   }
+// });
 module.exports = {
   menu,
   search,
+  cast,
   shareSync,
   platformMethod,
   toolbar,

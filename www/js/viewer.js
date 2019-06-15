@@ -117,6 +117,9 @@ global.platform.ipc.on('search-cast', () => {
   if (!store.getUserPref('app.layout.presenter-view')) {
     requestSession();
     appendMessage();
+  } else {
+    requestSession();
+    appendMessage();
   }
 });
 
