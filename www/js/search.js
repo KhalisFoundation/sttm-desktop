@@ -654,7 +654,12 @@ module.exports = {
 
   loadShabad(ShabadID, LineID, apv = false) {
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      window.socket.emit('data', {
+        type: 'shabad',
+        id: ShabadID,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
 
     // clear the Shabad controller and empty out the currentShabad array
@@ -720,6 +725,15 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+
+    if (window.socket !== undefined) {
+      window.socket.emit('data', {
+        type: 'bani',
+        id: BaniID,
+        baniLength,
+        highlight: LineID,
+      });
+    }
     let blackListedMangalPosition;
     if (mangalPosition === 'above') {
       blackListedMangalPosition = 'current';

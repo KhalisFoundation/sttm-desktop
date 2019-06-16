@@ -5,7 +5,9 @@ const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
 const copy = require('copy-to-clipboard');
+const isOnline = require('is-online');
 const strings = require('./strings');
+
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
@@ -324,45 +326,57 @@ const announcementSlideButton = h(
   ),
 );
 
+const createSyncModal = (content, code) => {
+  const syncModal = new tingle.Modal({
+    footer: true,
+    stickyFooter: false,
+    cssClass: ['sync-code-modal'],
+    closeMethods: ['overlay', 'button', 'escape'],
+  });
+  // open modal
+  syncModal.open();
+
+  if (code) {
+    syncModal.addFooterBtn('Copy', 'tingle-btn tingle-btn--primary', () => {
+      copy(code);
+      syncModal.close();
+      syncModal.destroy();
+    });
+  }
+
+  // set content
+  syncModal.setContent(content);
+  // add cancel button
+  const cancelTitle = 'Cancel';
+  syncModal.addFooterBtn(
+    cancelTitle,
+    'tingle-btn tingle-btn--pull-right tingle-btn--default',
+    () => {
+      syncModal.close();
+      syncModal.destroy();
+    },
+  );
+};
+
 const remoteSyncButton = h(
   'li',
   h(
     'a.remote-sync-button',
     {
       onclick: async () => {
-        const code = await tryConnection();
-        if (code) {
-          const syncModal = new tingle.Modal({
-            footer: true,
-            stickyFooter: false,
-            cssClass: ['sync-code-modal'],
-            closeMethods: ['overlay', 'button', 'escape'],
-          });
-          // open modal
-          syncModal.open();
-
-          syncModal.addFooterBtn('Copy', 'tingle-btn tingle-btn--primary', () => {
-            copy(code);
-            syncModal.close();
-            syncModal.destroy();
-          });
-
-          // set content
-          syncModal.setContent(`<h2>Sync code: ${code}</h2>`);
-          // add cancel button
-          const cancelTitle = 'Cancel';
-          syncModal.addFooterBtn(
-            cancelTitle,
-            'tingle-btn tingle-btn--pull-right tingle-btn--default',
-            () => {
-              syncModal.close();
-              syncModal.destroy();
-            },
-          );
+        const onlineVal = await isOnline();
+        if (onlineVal) {
+          const code = await tryConnection();
+          if (code) {
+            document.getElementById('remote-sync-icon').style.color = 'green';
+            createSyncModal(`<h2>Sync code: ${code}</h2>`, code);
+          }
+        } else {
+          createSyncModal(`<h2>Must be online to use this feature.</h2>`, '');
         }
       },
     },
-    h('i.fa.fa-desktop.list-icon'),
+    h(`i.fa.fa-desktop.list-icon#remote-sync-icon`),
     'Remote Sync',
   ),
 );
