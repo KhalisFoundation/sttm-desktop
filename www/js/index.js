@@ -91,8 +91,10 @@ function spaceBar(e) {
 }
 function copyPanktee(e) {
   e.preventDefault();
-  const $currentPanktee = search.$shabad.querySelector('a.panktee.current').parentNode;
-
+  const $viewer = document.getElementById('viewer');
+  const $line = search.$shabad.querySelector('a.panktee.current').parentNode;
+  const $lineID = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
+  // const $shabadID =
   // eslint-disable-next-line no-alert
   alert(anvaad.unicode($currentPanktee.innerText));
 }
