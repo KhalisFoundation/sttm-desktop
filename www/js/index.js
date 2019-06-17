@@ -4,6 +4,7 @@ const electron = require('electron');
 const { remote } = electron;
 const main = remote.require('./app');
 
+const anvaad = require('anvaad-js');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -88,7 +89,13 @@ function spaceBar(e) {
   highlightLine(newLineId);
   e.preventDefault();
 }
+function copyPanktee(e) {
+  e.preventDefault();
+  const $currentPanktee = search.$shabad.querySelector('a.panktee.current').parentNode;
 
+  // eslint-disable-next-line no-alert
+  alert(anvaad.unicode($currentPanktee.innerText));
+}
 function prevLine(e) {
   // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
@@ -152,6 +159,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
+  Mousetrap.bind('mod+c', copyPanktee);
 }
 
 const $shabadPage = document.getElementById('shabad-page');
