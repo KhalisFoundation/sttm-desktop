@@ -96,7 +96,7 @@ function copyPanktee(e) {
   const $lineID = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
   // const $shabadID =
   // eslint-disable-next-line no-alert
-  alert(anvaad.unicode($currentPanktee.innerText));
+  alert(anvaad.unicode($line.innerText));
 }
 function prevLine(e) {
   // Find selector of current line in Shabad
