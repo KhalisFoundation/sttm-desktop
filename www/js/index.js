@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* global Mousetrap */
 const electron = require('electron');
 
@@ -5,6 +6,7 @@ const { remote } = electron;
 const main = remote.require('./app');
 
 const anvaad = require('anvaad-js');
+const copy = require('copy-to-clipboard');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -91,12 +93,10 @@ function spaceBar(e) {
 }
 function copyPanktee(e) {
   e.preventDefault();
-  // const $viewer = document.getElementById('viewer');
-  const $line = search.$shabad.querySelector('a.panktee.current').parentNode;
-  // const $lineID = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
-  // const $shabadID =
-  // eslint-disable-next-line no-alert
-  alert(anvaad.unicode($line.innerText));
+  const Line = anvaad.unicode(
+    search.$shabad.querySelector('a.panktee.current').parentNode.innerText,
+  );
+  copy(Line);
 }
 function prevLine(e) {
   // Find selector of current line in Shabad
