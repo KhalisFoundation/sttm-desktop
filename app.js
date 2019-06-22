@@ -459,6 +459,18 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
+ipcMain.on('presenter-view', (event, arg) => {
+  if (viewerWindow) {
+    if (!arg) {
+      viewerWindow.setFullScreen(false);
+      viewerWindow.minimize();
+    } else {
+      viewerWindow.maximize();
+      viewerWindow.setFullScreen(true);
+    }
+  }
+});
+
 ipcMain.on('scroll-from-main', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('send-scroll', arg);
