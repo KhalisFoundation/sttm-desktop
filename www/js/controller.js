@@ -553,7 +553,7 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-    if (start === 0 || start === undefined) {
+    if (start === 0 || start === undefined || mode === 'append') {
       global.platform.ipc.send('show-line', showLinePayload);
     }
   },
