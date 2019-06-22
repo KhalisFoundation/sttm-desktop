@@ -463,7 +463,6 @@ ipcMain.on('presenter-view', (event, arg) => {
   if (viewerWindow) {
     if (!arg) {
       viewerWindow.hide();
-      //viewerWindow.setFullScreen(false);
     } else {
       viewerWindow.show();
       viewerWindow.setFullScreen(true);
