@@ -462,10 +462,10 @@ ipcMain.on('show-text', (event, arg) => {
 ipcMain.on('presenter-view', (event, arg) => {
   if (viewerWindow) {
     if (!arg) {
-      viewerWindow.setFullScreen(false);
-      viewerWindow.minimize();
+      viewerWindow.hide();
+      //viewerWindow.setFullScreen(false);
     } else {
-      viewerWindow.maximize();
+      viewerWindow.show();
       viewerWindow.setFullScreen(true);
     }
   }
