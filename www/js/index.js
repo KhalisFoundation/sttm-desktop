@@ -5,6 +5,7 @@ const { remote } = electron;
 const main = remote.require('./app');
 
 const search = require('./search');
+const strings = require('./slide-strings');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
@@ -16,44 +17,34 @@ const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
+const dhanGuruText = strings.slideStrings.dhanguruStrings;
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
   } */
 }
 
-function waheguruSlide() {
-  // waheguru slide shortcut
-  global.controller.sendText('vwihgurU', true);
-}
-function moolMantraSlide() {
-  // ik oankar slide shortcut
-  global.controller.sendText(
-    '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
-    true,
-  );
-}
-function emptySlide() {
-  // show Empty Slide
-  global.controller.sendText('');
-}
-function anandSahibBhog() {
-  // anand sahib (6 pauri) shortcut
-  global.core.search.loadCeremony(3).catch(error => {
-    analytics.trackEvent('ceremonyFailed', 3, error);
-  });
-}
-function helpGuideShortcut() {
-  // help window
-  main.openSecondaryWindow('helpWindow');
-}
-function legendShortcut() {
-  // shortcut legend window
-  main.openSecondaryWindow('shortcutLegend');
-}
-function searchBarShortcut() {
-  search.$search.focus();
-}
+const slideShortcuts = {
+  waheguru: () => global.controller.sendText(strings.slideStrings.waheguru, true),
+  empty: () => global.controller.sendText(' '),
+  moolMantra: () => {
+    global.controller.sendText(strings.slideStrings.moolMantra, true);
+  },
+};
+const ceremonyShortcuts = {
+  anandSahibBhog: () =>
+    global.core.search.loadCeremony(3).catch(error => {
+      analytics.trackEvent('ceremonyFailed', 3, error);
+    }),
+};
+const interfaceShortcuts = {
+  help: () => main.openSecondaryWindow('helpWindow'),
+  legend: () => main.openSecondaryWindow('shortcutLegend'),
+  searchBar: () => {
+    search.$search.focus();
+    search.$search.value = '';
+  },
+};
 function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
@@ -136,19 +127,31 @@ function findLine(e) {
     lineFound.click();
   }
 }
-
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
 
-  Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
-  Mousetrap.bindGlobal(['command+2', 'ctrl+2'], moolMantraSlide);
-  Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
-  Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
-  Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
-  Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
+  Mousetrap.bindGlobal(['fn+1'], slideShortcuts.waheguru);
+  Mousetrap.bindGlobal(['fn+2'], slideShortcuts.moolMantra);
+  Mousetrap.bindGlobal(['fn+3'], slideShortcuts.empty);
 
-  Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
+  Mousetrap.bindGlobal(['fn+4'], ceremonyShortcuts.anandSahibBhog);
+
+  Mousetrap.bindGlobal('fn+5', interfaceShortcuts.help);
+  Mousetrap.bindGlobal('fn+6', interfaceShortcuts.legend);
+  Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
+
+  for (let g = 0; g <= dhanGuruText.length - 1; g += 1) {
+    if (g <= 8) {
+      Mousetrap.bindGlobal([`mod+${g + 1}`], () =>
+        global.controller.sendText(dhanGuruText[g], true),
+      );
+    } else if (g === 9) {
+      Mousetrap.bindGlobal(['mod+0'], () => global.controller.sendText(dhanGuruText[g], true));
+    } else if (g === 10) {
+      Mousetrap.bindGlobal(['mod+-'], () => global.controller.sendText(dhanGuruText[10], true));
+    }
+  }
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
