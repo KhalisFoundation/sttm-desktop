@@ -15,7 +15,23 @@ const slideStrings = {
     'DMn gurU gRMQ swihb jI',
   ],
 };
+const dropdownStrings = {
+  gurus: [
+    'Nanak Dev Ji',
+    'Angad Dev Ji',
+    'Amar Das Ji',
+    'Ram Das Ji',
+    'Arjan Dev Ji',
+    'Hargobind Sahib Ji',
+    'Har Rai Sahib Ji',
+    'Har Krishan Sahib Ji',
+    'Teg Bhadur Sahib Ji',
+    'Gobind Singh Ji',
+    'Granth Sahib Ji',
+  ],
+};
 
 module.exports = {
   slideStrings,
+  dropdownStrings,
 };

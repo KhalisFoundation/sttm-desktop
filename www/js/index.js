@@ -5,7 +5,8 @@ const { remote } = electron;
 const main = remote.require('./app');
 
 const search = require('./search');
-const strings = require('./slide-strings');
+const strings = require('./strings');
+const dhanGuruModal = require('./insert-slide');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
@@ -17,7 +18,7 @@ const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
-const dhanGuruText = strings.slideStrings.dhanguruStrings;
+// const dhanGuruText = strings.slideStrings.dhanguruStrings;
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
@@ -141,17 +142,20 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('fn+6', interfaceShortcuts.legend);
   Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
 
-  for (let g = 0; g <= dhanGuruText.length - 1; g += 1) {
-    if (g <= 8) {
-      Mousetrap.bindGlobal([`mod+${g + 1}`], () =>
-        global.controller.sendText(dhanGuruText[g], true),
-      );
-    } else if (g === 9) {
-      Mousetrap.bindGlobal(['mod+0'], () => global.controller.sendText(dhanGuruText[g], true));
-    } else if (g === 10) {
-      Mousetrap.bindGlobal(['mod+-'], () => global.controller.sendText(dhanGuruText[10], true));
-    }
-  }
+  // for (let g = 0; g <= dhanGuruText.length - 1; g += 1) {
+  //   if (g <= 8) {
+  //     Mousetrap.bindGlobal([`mod+${g + 1}`], () =>
+  //       global.controller.sendText(dhanGuruText[g], true),
+  //     );
+  //   } else if (g === 9) {
+  //     Mousetrap.bindGlobal(['mod+0'], () => global.controller.sendText(dhanGuruText[g], true));
+  //   } else if (g === 10) {
+  //     Mousetrap.bindGlobal(['mod+-'], () => global.controller.sendText(dhanGuruText[10], true));
+  //   }
+  // }
+  Mousetrap.bindGlobal('mod+g', () => {
+    dhanGuruModal.openModal();
+  });
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
