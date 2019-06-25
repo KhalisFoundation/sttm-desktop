@@ -795,6 +795,7 @@ module.exports = {
   lineFactory(line, rows) {
     const mainLineExists = !!document.querySelector('.main');
     const englishHeadingEl = document.createElement('span');
+    const lineSessionID = `${line.ID}-${line.lineCount}`;
     englishHeadingEl.innerHTML = line.English;
     const englishHeading = englishHeadingEl.querySelector('h1')
       ? englishHeadingEl.querySelector('h1').innerText
@@ -812,10 +813,10 @@ module.exports = {
     let seenClasses = '';
     const shabadState = sessionStatesList[line.sessionKey || `shabad-${line.ShabadID}`];
     if (shabadState && shabadState.resumePanktee) {
-      if (shabadState.seenPanktees.has(line.ID)) {
+      if (shabadState.seenPanktees.has(lineSessionID) || shabadState.seenPanktees.has(line.ID)) {
         seenClasses = '.seen_check';
       }
-      if (shabadState.resumePanktee === line.ID) {
+      if (shabadState.resumePanktee === lineSessionID) {
         seenClasses += '.current';
       }
       if (shabadState.mainPanktee === line.ID && !mainLineExists) {
@@ -1019,7 +1020,7 @@ module.exports = {
       const $panktee = e.target.parentNode;
       Array.from(lines).forEach(el => el.classList.remove('main'));
       $panktee.classList.add('main', 'seen_check');
-      shabadState.seenPanktees.add(LineID);
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
     } else if (e.target.classList.contains('panktee')) {
       // Change line to click target
       const $panktee = e.target;
@@ -1029,8 +1030,8 @@ module.exports = {
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
       $panktee.classList.add('current', 'seen_check');
-      shabadState.seenPanktees.add(LineID);
-      shabadState.resumePanktee = LineID;
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
+      shabadState.resumePanktee = `${LineID}-${Line.lineCount}`;
     }
     this.checkAutoPlay(LineID);
   },
