@@ -121,7 +121,7 @@ const getEnglishExp = token => {
 
 const printCeremonies = rows => {
   rows.forEach(row => {
-    if (row.Token !== 'anand' && row.Token !== 'death') {
+    if (row.Token === 'anandkaraj') {
       const $ceremony = h(
         `div.ceremony-pane#${row.Token}`,
         {
