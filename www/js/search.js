@@ -587,15 +587,16 @@ module.exports = {
           onclick: ev => {
             const $panktee = ev.target;
             const { resumePanktee } = sessionStatesList[sessionKey];
+            const resumePankteeLineID = resumePanktee ? resumePanktee.split('-')[0] : null;
             switch (type) {
               case 'bani':
-                this.loadBani(SearchID, resumePanktee, true);
+                this.loadBani(SearchID, resumePankteeLineID, true);
                 break;
               case 'ceremony':
-                this.loadCeremony(SearchID, resumePanktee, true);
+                this.loadCeremony(SearchID, resumePankteeLineID, true);
                 break;
               default:
-                this.loadShabad(SearchID, resumePanktee);
+                this.loadShabad(SearchID, resumePankteeLineID);
             }
             const sessionLines = this.$session.querySelectorAll('a.panktee');
             Array.from(sessionLines).forEach(el => el.classList.remove('current'));
