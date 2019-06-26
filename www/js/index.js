@@ -137,7 +137,9 @@ function findLine(e) {
   }
 }
 function feelingLucky(e) {
-  document.getElementsByClassName('panktee search-result').click();
+  if (search.$results.childNodes.length === 1) {
+    alert(search.$results.childNodes.nodeName);
+  }
 }
 
 // Keyboard shortcuts
@@ -150,14 +152,19 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
   Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
-  Mousetrap.bindGlobal('mod+7', () => alert(document.activeElement.tagName));
 
+  Mousetrap.bindGlobal('mod+7', () => {
+    if (
+      document.activeElement.className === 'gurmukhi' ||
+      document.activeElement.className === 'roman'
+    ) {
+      feelingLucky();
+    }
+  });
   Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
-
-  Mousetrap.bindGlobal('enter', feelingLucky);
 }
 
 const $shabadPage = document.getElementById('shabad-page');
