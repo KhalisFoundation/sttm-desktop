@@ -136,7 +136,7 @@ function findLine(e) {
     lineFound.click();
   }
 }
-function feelingLucky(e) {
+function feelingLucky() {
   if (search.$results.childNodes.length === 1) {
     alert(search.$results.childNodes.nodeName);
   }
