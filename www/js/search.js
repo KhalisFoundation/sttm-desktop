@@ -743,8 +743,14 @@ module.exports = {
       // create a unique shabadID for whole bani, and append it with length
       const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
       const nameOfBani = rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi;
+      const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
-        this.addToHistory(BaniID, null, nameOfBani, 'bani');
+        if (thisBaniState && thisBaniState.resumePanktee) {
+          thisBaniState.resumePanktee = `${rowsDb[0].ID}-1`;
+          thisBaniState.seenPanktees = new Set(`${rowsDb[0].ID}-1`);
+        } else {
+          this.addToHistory(BaniID, null, nameOfBani, 'bani');
+        }
       }
       const rows = rowsDb
         .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
