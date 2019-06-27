@@ -587,7 +587,7 @@ module.exports = {
           onclick: ev => {
             const $panktee = ev.target;
             const { resumePanktee } = sessionStatesList[sessionKey];
-            const resumePankteeLineID = resumePanktee ? resumePanktee.split('-')[0] : null;
+            const resumePankteeLineID = resumePanktee ? resumePanktee.split('-')[0] : MainLineID;
             switch (type) {
               case 'bani':
                 this.loadBani(SearchID, resumePankteeLineID, true);
