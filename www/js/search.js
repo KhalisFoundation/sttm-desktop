@@ -745,7 +745,7 @@ module.exports = {
       const nameOfBani = rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
-        if (thisBaniState && thisBaniState.resumePanktee) {
+        if (thisBaniState && thisBaniState.resumePanktee && !LineID) {
           thisBaniState.resumePanktee = `${rowsDb[0].ID}-1`;
           thisBaniState.seenPanktees = new Set(`${rowsDb[0].ID}-1`);
         } else {
