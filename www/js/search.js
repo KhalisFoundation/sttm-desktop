@@ -587,15 +587,16 @@ module.exports = {
           onclick: ev => {
             const $panktee = ev.target;
             const { resumePanktee } = sessionStatesList[sessionKey];
+            const resumePankteeLineID = resumePanktee ? resumePanktee.split('-')[0] : MainLineID;
             switch (type) {
               case 'bani':
-                this.loadBani(SearchID, resumePanktee, true);
+                this.loadBani(SearchID, resumePankteeLineID, true);
                 break;
               case 'ceremony':
-                this.loadCeremony(SearchID, resumePanktee, true);
+                this.loadCeremony(SearchID, resumePankteeLineID, true);
                 break;
               default:
-                this.loadShabad(SearchID, resumePanktee);
+                this.loadShabad(SearchID, resumePankteeLineID);
             }
             const sessionLines = this.$session.querySelectorAll('a.panktee');
             Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -742,8 +743,14 @@ module.exports = {
       // create a unique shabadID for whole bani, and append it with length
       const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
       const nameOfBani = rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi;
+      const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
-        this.addToHistory(BaniID, null, nameOfBani, 'bani');
+        if (thisBaniState && thisBaniState.resumePanktee && !LineID) {
+          thisBaniState.resumePanktee = `${rowsDb[0].ID}-1`;
+          thisBaniState.seenPanktees = new Set(`${rowsDb[0].ID}-1`);
+        } else {
+          this.addToHistory(BaniID, null, nameOfBani, 'bani');
+        }
       }
       const rows = rowsDb
         .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
@@ -795,6 +802,7 @@ module.exports = {
   lineFactory(line, rows) {
     const mainLineExists = !!document.querySelector('.main');
     const englishHeadingEl = document.createElement('span');
+    const lineSessionID = `${line.ID}-${line.lineCount}`;
     englishHeadingEl.innerHTML = line.English;
     const englishHeading = englishHeadingEl.querySelector('h1')
       ? englishHeadingEl.querySelector('h1').innerText
@@ -812,10 +820,10 @@ module.exports = {
     let seenClasses = '';
     const shabadState = sessionStatesList[line.sessionKey || `shabad-${line.ShabadID}`];
     if (shabadState && shabadState.resumePanktee) {
-      if (shabadState.seenPanktees.has(line.ID)) {
+      if (shabadState.seenPanktees.has(lineSessionID) || shabadState.seenPanktees.has(line.ID)) {
         seenClasses = '.seen_check';
       }
-      if (shabadState.resumePanktee === line.ID) {
+      if (shabadState.resumePanktee === lineSessionID) {
         seenClasses += '.current';
       }
       if (shabadState.mainPanktee === line.ID && !mainLineExists) {
@@ -1019,7 +1027,7 @@ module.exports = {
       const $panktee = e.target.parentNode;
       Array.from(lines).forEach(el => el.classList.remove('main'));
       $panktee.classList.add('main', 'seen_check');
-      shabadState.seenPanktees.add(LineID);
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
     } else if (e.target.classList.contains('panktee')) {
       // Change line to click target
       const $panktee = e.target;
@@ -1029,8 +1037,8 @@ module.exports = {
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
       $panktee.classList.add('current', 'seen_check');
-      shabadState.seenPanktees.add(LineID);
-      shabadState.resumePanktee = LineID;
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
+      shabadState.resumePanktee = `${LineID}-${Line.lineCount}`;
     }
     this.checkAutoPlay(LineID);
   },
