@@ -138,7 +138,8 @@ function findLine(e) {
 }
 function feelingLucky() {
   if (search.$results.childNodes.length === 1) {
-    alert(search.$results.childNodes.nodeName);
+    const singleResult = document.getElementsByClassName('panktee search-result');
+    singleResult[0].click();
   }
 }
 
@@ -153,7 +154,11 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
   Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
 
-  Mousetrap.bindGlobal('mod+7', () => {
+  Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
+  Mousetrap.bind(['up', 'left'], prevLine);
+  Mousetrap.bind(['down', 'right'], nextLine);
+  Mousetrap.bind('space', spaceBar);
+  Mousetrap.bindGlobal('enter', () => {
     if (
       document.activeElement.className === 'gurmukhi' ||
       document.activeElement.className === 'roman'
@@ -161,10 +166,6 @@ if (typeof Mousetrap !== 'undefined') {
       feelingLucky();
     }
   });
-  Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
-  Mousetrap.bind(['up', 'left'], prevLine);
-  Mousetrap.bind(['down', 'right'], nextLine);
-  Mousetrap.bind('space', spaceBar);
 }
 
 const $shabadPage = document.getElementById('shabad-page');
