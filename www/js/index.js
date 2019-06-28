@@ -132,14 +132,14 @@ function findLine(e) {
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
 
-  Mousetrap.bindGlobal(['fn+1'], slideShortcuts.waheguru);
-  Mousetrap.bindGlobal(['fn+2'], slideShortcuts.moolMantra);
-  Mousetrap.bindGlobal(['fn+3'], slideShortcuts.empty);
+  Mousetrap.bindGlobal(['mod+1'], slideShortcuts.waheguru);
+  Mousetrap.bindGlobal(['mod+2'], slideShortcuts.moolMantra);
+  Mousetrap.bindGlobal(['mod+3'], slideShortcuts.empty);
 
-  Mousetrap.bindGlobal(['fn+4'], ceremonyShortcuts.anandSahibBhog);
+  Mousetrap.bindGlobal(['mod+4'], ceremonyShortcuts.anandSahibBhog);
 
-  Mousetrap.bindGlobal('fn+5', interfaceShortcuts.help);
-  Mousetrap.bindGlobal('fn+6', interfaceShortcuts.legend);
+  Mousetrap.bindGlobal('mod+5', interfaceShortcuts.help);
+  Mousetrap.bindGlobal('mod+6', interfaceShortcuts.legend);
   Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
 
   // for (let g = 0; g <= dhanGuruText.length - 1; g += 1) {
