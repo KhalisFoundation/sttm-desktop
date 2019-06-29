@@ -159,10 +159,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bindGlobal('enter', () => {
-    if (
-      document.activeElement.className === 'gurmukhi' ||
-      document.activeElement.className === 'roman'
-    ) {
+    if (document.activeElement.id === 'search') {
       feelingLucky();
     }
   });
