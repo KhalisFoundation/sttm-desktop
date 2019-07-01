@@ -136,10 +136,9 @@ function findLine(e) {
     lineFound.click();
   }
 }
-function feelingLucky() {
+function openSingularResult() {
   if (search.$results.childNodes.length === 1) {
-    const singleResult = document.getElementsByClassName('panktee search-result');
-    singleResult[0].click();
+    document.querySelector('#results .search-result').click();
   }
 }
 
@@ -160,7 +159,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bindGlobal('enter', () => {
     if (document.activeElement.id === 'search') {
-      feelingLucky();
+      openSingularResult();
     }
   });
 }
