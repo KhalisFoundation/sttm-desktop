@@ -24,17 +24,17 @@
 
 #### <a name="macos-slides">macOS:</a>:
 
-| Combination | Description                               |
-| ----------- | ----------------------------------------- |
-| cmd + 1     | Waheguru Slide                            |
-| cmd + 2     | Mool Mantra Slide                         |
-| cmd + 3     | Empty Slide                               |
-| cmd + 4     | Anand Sahib (Bhog)                        |
-| cmd + 5     | Help Guide                                |
-| cmd + 6     | Shortcut Legend                           |
-| cmd + /     | Jump to search bar                        |
-| ----------- | -----------                               |
-| cmd + g     | Add Dhan Guru**\_** slide or announcement |
+| Combination | Description                         |
+| ----------- | ----------------------------------- |
+| cmd + 1     | Waheguru Slide                      |
+| cmd + 2     | Mool Mantra Slide                   |
+| cmd + 3     | Empty Slide                         |
+| cmd + 4     | Anand Sahib (Bhog)                  |
+| cmd + 5     | Help Guide                          |
+| cmd + 6     | Shortcut Legend                     |
+| cmd + /     | Jump to search bar                  |
+| ----------- | -----------                         |
+| cmd + g     | Add Dhan Guru slide or announcement |
 
 #### <a name="windows-slides">Windows:</a>
 
@@ -56,7 +56,6 @@
 
 | Combination | Description       |
 | ----------- | ----------------- |
-| cmd + q     | close app         |
 | cmd + q     | close app         |
 | cmd + u     | check for updates |
 | cmd + h     | minimize window   |

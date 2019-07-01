@@ -141,18 +141,6 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('mod+5', interfaceShortcuts.help);
   Mousetrap.bindGlobal('mod+6', interfaceShortcuts.legend);
   Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
-
-  // for (let g = 0; g <= dhanGuruText.length - 1; g += 1) {
-  //   if (g <= 8) {
-  //     Mousetrap.bindGlobal([`mod+${g + 1}`], () =>
-  //       global.controller.sendText(dhanGuruText[g], true),
-  //     );
-  //   } else if (g === 9) {
-  //     Mousetrap.bindGlobal(['mod+0'], () => global.controller.sendText(dhanGuruText[g], true));
-  //   } else if (g === 10) {
-  //     Mousetrap.bindGlobal(['mod+-'], () => global.controller.sendText(dhanGuruText[10], true));
-  //   }
-  // }
   Mousetrap.bindGlobal('mod+g', () => {
     dhanGuruModal.openModal();
     dhanGuruModal.buttonOnClick();

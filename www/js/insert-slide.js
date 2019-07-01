@@ -30,11 +30,10 @@ const buttons = '<center><div class="btn-group" id = "btn-group">'.concat(
   '</center>',
 );
 // announcement modal body
-const announcementBox =
-  '<div class = "announcementBox" contentEditable="true" placeholder="Enter Text Here"></div>';
+const announcementHeader = '<h1 class="announcementHeader">Insert Announcement</h1>';
 
 /**
- * sets each dhan guru button an onclick that will send taht guru's name to the slide
+ * sets each dhan guru button an onclick that will send that guru's name to the slide
  */
 function buttonOnClick() {
   for (let i = 1; i <= 11; i += 1) {
@@ -44,7 +43,9 @@ function buttonOnClick() {
     };
   }
 }
+
 const slidePage = slideHeader + slideText + buttons;
+const announcementPage = announcementHeader;
 modal.setContent(slidePage);
 modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
   // here goes some logic
@@ -59,7 +60,7 @@ modal.addFooterBtn('Slides', 'tingle-btn tingle-btn-pull-left tingle-btn--defaul
   buttonOnClick();
 });
 modal.addFooterBtn('Announcement', 'tingle-btn tingle-btn-pull-left tingle-btn--default', () => {
-  modal.setContent(announcementBox);
+  modal.setContent(announcementPage);
 });
 
 function openModal() {
