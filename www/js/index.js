@@ -155,6 +155,7 @@ if (typeof Mousetrap !== 'undefined') {
   // }
   Mousetrap.bindGlobal('mod+g', () => {
     dhanGuruModal.openModal();
+    dhanGuruModal.buttonOnClick();
   });
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
