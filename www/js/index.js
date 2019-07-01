@@ -144,6 +144,10 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('mod+g', () => {
     dhanGuruModal.openModal();
     dhanGuruModal.buttonOnClick();
+    dhanGuruModal.isAnnouncementTab = false;
+  });
+  Mousetrap.bind('mod+t', () => {
+    alert(document.getElementsByClassName('modal-ann-box').content);
   });
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);

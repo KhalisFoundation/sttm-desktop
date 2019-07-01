@@ -24,6 +24,18 @@
   box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
   transform: translateY(1px);
 }
-.select-language {
-  padding-top: 5%;
+.lang-switch {
+  display: inline;
+}
+.box-container {
+  padding-top: 2.5%;
+}
+.modal-ann-box {
+  border: 1px solid gray;
+  border-radius: 10px;
+  display: inline-block;
+  min-height: 100px;
+  width: 100%;
+  outline: none;
+  padding: 10px;
 }
