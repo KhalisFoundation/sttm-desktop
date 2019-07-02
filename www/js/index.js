@@ -1,4 +1,9 @@
 /* global Mousetrap */
+const electron = require('electron');
+
+const { remote } = electron;
+const main = remote.require('./app');
+
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -7,6 +12,7 @@ const settings = require('../js/settings');
 const shortcutTray = require('./shortcut_tray');
 const toolbar = require('./toolbar');
 
+const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
@@ -16,15 +22,39 @@ function escKey() {
   } */
 }
 
-function hideSlide() {
+function waheguruSlide() {
+  // waheguru slide shortcut
+  global.controller.sendText('vwihgurU', true);
+}
+function moolMantraSlide() {
+  // ik oankar slide shortcut
+  global.controller.sendText(
+    '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
+    true,
+  );
+}
+function emptySlide() {
   // show Empty Slide
   global.controller.sendText('');
 }
-
-function highlightLine(newLine, nextLineCount = null) {
-  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
-  const $line = search.$shabad.querySelector(nextLineSelector);
-  $line.click();
+function anandSahibBhog() {
+  // anand sahib (6 pauri) shortcut
+  global.core.search.loadCeremony(3).catch(error => {
+    analytics.trackEvent('ceremonyFailed', 3, error);
+  });
+}
+function helpGuideShortcut() {
+  // help window
+  main.openSecondaryWindow('helpWindow');
+}
+function legendShortcut() {
+  // shortcut legend window
+  main.openSecondaryWindow('shortcutLegend');
+}
+function searchBarShortcut() {
+  search.$search.focus();
+}
+function maintainScroll($line) {
   const curPankteeTop = $line.parentNode.offsetTop;
   const curPankteeHeight = $line.parentNode.offsetHeight;
   const containerTop = search.$shabadContainer.scrollTop;
@@ -36,6 +66,13 @@ function highlightLine(newLine, nextLineCount = null) {
   if (containerTop + containerHeight < curPankteeTop + curPankteeHeight) {
     search.$shabadContainer.scrollTop = curPankteeTop - containerHeight + curPankteeHeight;
   }
+}
+
+function highlightLine(newLine, nextLineCount = null) {
+  const nextLineSelector = nextLineCount ? `#li_${nextLineCount} a.panktee` : `#line${newLine}`;
+  const $line = search.$shabad.querySelector(nextLineSelector);
+  $line.click();
+  maintainScroll($line);
 }
 
 function spaceBar(e) {
@@ -53,22 +90,27 @@ function spaceBar(e) {
 }
 
 function prevLine(e) {
-  // Find position of current line in Shabad
+  // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const prevLineCount = parseInt($currentLine.dataset.lineCount, 10) - 1;
-  if (prevLineCount > 0) {
-    highlightLine(null, prevLineCount);
+  const $prevLine = $currentLine.previousElementSibling;
+  // if its not at the topmost panktee
+  if ($prevLine && $prevLine.dataset.lineCount) {
+    const $prevPanktee = $prevLine.querySelector('a.panktee');
+    $prevPanktee.click();
+    maintainScroll($prevPanktee);
   }
   e.preventDefault();
 }
 
 function nextLine(e) {
-  // Find position of current line in Shabad
-  const pos = search.currentShabad.indexOf(search.currentLine);
+  // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
-  const nextLineCount = parseInt($currentLine.dataset.lineCount, 10) + 1;
-  if (pos < search.currentShabad.length - 1) {
-    highlightLine(search.currentShabad[pos + 1], nextLineCount);
+  const $nextLine = $currentLine.nextElementSibling;
+  // if its not at the last panktee
+  if ($nextLine && $nextLine.dataset.lineCount) {
+    const $nextPanktee = $nextLine.querySelector('a.panktee');
+    $nextPanktee.click();
+    maintainScroll($nextPanktee);
   }
   e.preventDefault();
 }
@@ -98,10 +140,17 @@ function findLine(e) {
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
-  Mousetrap.bindGlobal(['command+e', 'ctrl+e'], hideSlide);
+
+  Mousetrap.bindGlobal(['command+1', 'ctrl+1'], waheguruSlide);
+  Mousetrap.bindGlobal(['command+2', 'ctrl+2'], moolMantraSlide);
+  Mousetrap.bindGlobal(['command+3', 'ctrl+3'], emptySlide);
+  Mousetrap.bindGlobal(['command+4', 'ctrl+4'], anandSahibBhog);
+  Mousetrap.bindGlobal(['command+5', 'ctrl+5'], helpGuideShortcut);
+  Mousetrap.bindGlobal(['command+6', 'ctrl+6'], legendShortcut);
+
+  Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
-  Mousetrap.bind('/', () => search.$search.focus(), 'keyup');
   Mousetrap.bind('space', spaceBar);
 }
 
@@ -135,9 +184,9 @@ module.exports = {
   search,
   shareSync,
   platformMethod,
+  toolbar,
   themeEditor,
   shortcutTray,
-  toolbar,
   'custom-theme': () => {
     themeEditor.init();
   },

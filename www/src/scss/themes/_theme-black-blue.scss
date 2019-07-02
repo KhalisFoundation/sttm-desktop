@@ -1,0 +1,15 @@
+$themeBlackBlue: (
+  type: 'dark',
+  background-color: #05060b,
+  background-image: url('../../assets/img/custom_backgrounds/black.jpg'),
+  gurbani: #fff,
+  translation: #a3eafd,
+  teeka: #7a7a7c,
+  transliteration: #ededef,
+  visraam: #ff5e5e,
+  yamki: #fff600,
+);
+
+body.black-blue {
+  @include generateTheme($themeBlackBlue...);
+}

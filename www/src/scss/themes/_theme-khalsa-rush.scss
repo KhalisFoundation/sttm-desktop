@@ -1,0 +1,15 @@
+$themeKhalsaRush: (
+  type: 'light',
+  background-color: #fec43c,
+  background-image: url('../../assets/img/custom_backgrounds/orange.jpg'),
+  gurbani: #071f77,
+  translation: #001060,
+  teeka: #433e5d,
+  transliteration: #f7faf6,
+  visraam: #bd0d0d,
+  yamki: #9a6914,
+);
+
+body.khalsa-rush {
+  @include generateTheme($themeKhalsaRush...);
+}

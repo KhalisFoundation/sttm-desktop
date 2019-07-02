@@ -1,0 +1,20 @@
+$themeFloral: (
+  type: 'light',
+  background-color: #a4244e,
+  background-image: url('../../assets/img/custom_backgrounds/floral-bg.jpg'),
+  gurbani: #460a1e,
+  translation: #821d3e,
+  teeka: #484848,
+  transliteration: #a4244e,
+  visraam: #d90e0e,
+  yamki: #78770e,
+);
+
+body.floral {
+  #ribbon1,
+  #ribbon2 {
+    visibility: visible;
+  }
+
+  @include generateTheme($themeFloral...);
+}

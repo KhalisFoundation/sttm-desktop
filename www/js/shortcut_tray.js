@@ -20,7 +20,9 @@ const trayItemFactory = (trayItemKey, trayItem) =>
         } else if (trayItem.type === 'shabad') {
           global.core.search.loadShabad(trayItem.ref);
         } else if (trayItem.type === 'ceremony') {
-          global.core.search.loadCeremony(trayItem.ref);
+          global.core.search.loadCeremony(trayItem.ref).catch(error => {
+            analytics.trackEvent('ceremonyFailed', trayItem.ref, error);
+          });
         }
       },
     },
@@ -43,7 +45,7 @@ const shortcutsToggle = h(
         .classList.toggle('fa-caret-down', isShortcutTrayOn);
     },
   },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-times' : 'fa-th-large'}`),
+  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
 );
 
 module.exports = {

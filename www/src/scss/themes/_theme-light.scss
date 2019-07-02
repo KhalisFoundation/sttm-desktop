@@ -1,0 +1,15 @@
+$themeOptions: (
+  type: 'light',
+  background-color: #fff,
+  background-image: 'none',
+  gurbani: #01579b,
+  translation: #4e4e4e,
+  teeka: #5a5a5a,
+  transliteration: #666,
+  visraam: #c0392b,
+  yamki: #ffc500,
+);
+
+body.light-theme {
+  @include generateTheme($themeOptions...);
+}

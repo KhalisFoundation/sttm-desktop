@@ -1,0 +1,15 @@
+$themeLowLight: (
+  type: 'dark',
+  background-color: #000,
+  background-image: 'none',
+  gurbani: #98b1c5,
+  translation: #b1b1b1,
+  teeka: #b1b1b1,
+  transliteration: #b1b1b1,
+  visraam: #c0392b,
+  yamki: #ffc500,
+);
+
+body.low-light {
+  @include generateTheme($themeLowLight...);
+}

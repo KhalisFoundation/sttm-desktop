@@ -105,10 +105,7 @@
       "gurbani-options": {
         "type": "switch",
         "options": {
-          "display-visraams": {
-            "label": "Show Vishraams",
-            "subLabel": "Limited theme support"
-          }
+          "display-visraams": "Show Vishraams"
         }
       },
       "vishraam": {
@@ -127,7 +124,7 @@
             "options": {
               "sttm2": "STTM 2",
               "igurbani": "iGurbani",
-              "sttm": "STTM Living"
+              "sttm": "BaniDB Living"
             }
           }
         }

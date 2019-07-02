@@ -1,0 +1,15 @@
+$themeBaagiBlue: (
+  type: 'dark',
+  background-color: #7db6c7,
+  background-image: url('../../assets/img/custom_backgrounds/dark-blue.jpg'),
+  gurbani: #fff,
+  translation: #fbfbfb,
+  teeka: #a0d5fe,
+  transliteration: #f4f4f9,
+  visraam: #a70000,
+  yamki: #fff229,
+);
+
+body.baagi-blue {
+  @include generateTheme($themeBaagiBlue...);
+}

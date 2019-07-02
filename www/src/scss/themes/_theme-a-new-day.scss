@@ -1,0 +1,15 @@
+$themeNewDay: (
+  type: 'light',
+  background-color: #07ccf3,
+  background-image: url('../../assets/img/custom_backgrounds/clouds.jpg'),
+  gurbani: #0e2654,
+  translation: #003a8c,
+  teeka: #033780,
+  transliteration: #80878a,
+  visraam: #d20b0b,
+  yamki: #c2951a,
+);
+
+body.a-new-day {
+  @include generateTheme($themeNewDay...);
+}

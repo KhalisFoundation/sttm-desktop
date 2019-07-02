@@ -1,0 +1,15 @@
+$themeHighContrast: (
+  type: 'light',
+  background-color: #fff,
+  background-image: 'none',
+  gurbani: #000,
+  translation: #000,
+  teeka: #000,
+  transliteration: #000,
+  visraam: #c0392b,
+  yamki: #ffc500,
+);
+
+body.high-contrast {
+  @include generateTheme($themeHighContrast...);
+}

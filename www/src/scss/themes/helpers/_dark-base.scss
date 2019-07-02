@@ -1,65 +1,23 @@
-body.baagi-blue {
-  background-color: #7db6c7;
-  background-image: url("../../assets/img/custom_backgrounds/dark-blue.jpg");
-
-  .gurbani {
-    color: #fff;
-  }
-
-  .translation {
-    color: #fbfbfb;
-  }
-
-  .teeka {
-    color: #a0d5fe;
-  }
-
-  .transliteration {
-    color: #f4f4f9;
-  }
-
-  .logo {
-    path {
-      fill: #e0e0e0;
-    }
-  }
-
-  .controller.presenter-view {
-    #viewer {
-      border-color: #333;
-    }
-  }
-
-  .panktee.search-result {
-    .translation {
-      color: #e2e2e2;
-    }
-
-    .transliteration {
-      color: #ababab;
-    }
-  }
-}
-
-$bg-main: #212121;
-$bg-alt: #3a3a3a;
-$bg-bright: #424242;
-$text-base: #bdbdbd;
-$text-bright: #e0e0e0;
-$text-dim: #9e9e9e;
-$text-inactive: rgba(189, 189, 189, 0.5);
-$border: #424242;
-$scrollbar: #999;
-$white: #fff;
-$accent: #4fc3f7;
-$highlight-bg: #37474f;
-$highlight-text: #cfd8dc;
-
-.baagi-blue {
+@mixin dark-base() {
+  $bg-main: $black;
+  $bg-alt: $not-so-black;
+  $bg-bright: $dark-grey;
+  $text-base: $light-grey;
+  $text-bright: $not-so-white;
+  $text-dim: $alt-grey;
+  $text-inactive: $disabled;
+  $border: $dark-grey;
+  $scrollbar: $grey;
+  $white: $white;
+  $accent: $sky-blue;
+  $highlight-bg: $dull-blue;
+  $highlight-text: $transparent-blue;
   color: $text-base;
 
   #toolbar,
-  .bani-list {
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
     background-color: $bg-alt;
   }
 
@@ -84,10 +42,18 @@ $highlight-text: #cfd8dc;
     color: $text-base;
   }
 
-  .shortcut-tray { background: darken($bg-main, 10); }
-  .tray-item-icon { background: $text-bright; }
-  .tray-item-label { color: $bg-main; }
-  &.shortcut-tray-on .shortcut-toggle { background: darken($bg-main, 10); }
+  .shortcut-tray {
+    background: darken($bg-main, 10);
+  }
+  .tray-item-icon {
+    background: $text-bright;
+  }
+  .tray-item-label {
+    color: $bg-main;
+  }
+  &.shortcut-tray-on .shortcut-toggle {
+    background: darken($bg-main, 10);
+  }
 
   .nav-header-tab {
     color: $text-inactive;
@@ -111,7 +77,7 @@ $highlight-text: #cfd8dc;
   }
 
   #toolbar {
-    background-color: $bg-alt;
+    background: $bg-alt;
   }
 
   .nav-page,
@@ -130,7 +96,7 @@ $highlight-text: #cfd8dc;
 
   .nav-page {
     a.panktee.current {
-      background-color: #37474f !important;
+      background-color: $highlight-bg !important;
       color: $text-base !important;
     }
   }
@@ -156,6 +122,15 @@ $highlight-text: #cfd8dc;
   #search-container {
     input {
       color: $text-bright;
+
+      &[type='number'] {
+        background-color: $white;
+        color: $bg-main;
+
+        &::-webkit-input-placeholder {
+          color: $bg-main;
+        }
+      }
     }
 
     input:focus + div {

@@ -122,7 +122,7 @@ const recentSwatchFactory = backgroundPath =>
     ),
   );
 
-const swatchFactory = (themeInstance, isCustom) =>
+const swatchFactory = (themeInstance, isCustom, forceLabel = null) =>
   h(
     'li.theme-instance',
     {
@@ -145,6 +145,8 @@ const swatchFactory = (themeInstance, isCustom) =>
           document.body.classList.add(themeInstance.key);
           global.core.platformMethod('updateSettings');
           analytics.trackEvent('theme', themeInstance.key);
+          // eslint-disable-next-line no-use-before-define
+          updateCeremonyThemeTiles();
         } catch (error) {
           uploadErrorNotification(
             `There is an error parsing this theme.
@@ -162,7 +164,7 @@ const swatchFactory = (themeInstance, isCustom) =>
           color: themeInstance['gurbani-color'],
         },
       },
-      themeInstance.name,
+      forceLabel || themeInstance.name,
     ),
   );
 
@@ -208,6 +210,29 @@ const upsertCustomBackgrounds = themesContainer => {
     toggleRecentBgHeader();
     toggleFileInput();
   });
+};
+
+const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
+  themes.forEach(themeInstance => {
+    let themeTypeMatches = false;
+    if (Array.isArray(themeInstance.type)) {
+      themeTypeMatches = themeInstance.type.includes(themeType);
+    } else {
+      themeTypeMatches = themeInstance.type === themeType;
+    }
+    if (themeTypeMatches) {
+      themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
+    }
+  });
+};
+
+const updateCeremonyThemeTiles = () => {
+  const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+  document.querySelectorAll('.ceremony-pane-themes .theme-instance').forEach(el => el.remove());
+
+  const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
+  swatchGroupFactory('anandkaraj', anandKarajPane);
+  anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
 };
 
 const imageInput = themesContainer =>
@@ -265,16 +290,9 @@ const imageInput = themesContainer =>
     }),
   );
 
-const swatchGroupFactory = (themeType, themesContainer, isCustom) => {
-  themes.forEach(themeInstance => {
-    if (themeInstance.type === themeType) {
-      themesContainer.appendChild(swatchFactory(themeInstance, isCustom));
-    }
-  });
-};
-
 module.exports = {
   defaultTheme,
+  updateCeremonyThemeTiles,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
 

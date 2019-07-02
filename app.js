@@ -83,6 +83,10 @@ const secondaryWindows = {
     obj: false,
     url: `file://${__dirname}/www/overlay.html`,
   },
+  shortcutLegend: {
+    obj: false,
+    url: `file://${__dirname}/www/legend.html`,
+  },
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
@@ -298,7 +302,7 @@ const shouldQuit = app.makeSingleInstance(() => {
 });
 
 if (shouldQuit) {
-  app.quit();
+  app.exit();
 }
 
 app.on('ready', () => {
@@ -452,6 +456,17 @@ ipcMain.on('show-text', (event, arg) => {
   }
   if (arg.live) {
     createBroadcastFiles(arg);
+  }
+});
+
+ipcMain.on('presenter-view', (event, arg) => {
+  if (viewerWindow) {
+    if (!arg) {
+      viewerWindow.hide();
+    } else {
+      viewerWindow.show();
+      viewerWindow.setFullScreen(true);
+    }
   }
 });
 

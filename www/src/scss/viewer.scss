@@ -20,53 +20,6 @@ $viewer-padding: 30px;
   }
 }
 
-@mixin vishraamStyles() {
-  $visraam-main: #c0392b;
-  $visraam-yamki: #ffc500;
-  $visraam-sources: ('sttm', 'sttm2', 'igurbani');
-
-  @each $source in $visraam-sources {
-    &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
-      .gurbani {
-      .visraam-main.visraam-#{$source} {
-        color: $visraam-main;
-      }
-
-      .visraam-yamki.visraam-#{$source} {
-        color: $visraam-yamki;
-      }
-    }
-
-    &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
-      .gurbani {
-      span {
-        border-radius: 15px;
-      }
-
-      .padchhed .visraam-main.visraam-#{$source},
-      .padchhed .visraam-yamki.visraam-#{$source} {
-        padding-right: 5px;
-      }
-
-      .visraam-main.visraam-#{$source} {
-        background: linear-gradient(
-          to right,
-          rgba(229, 229, 229, 0) 20%,
-          rgba(255, 69, 0, 0.5) 100%
-        );
-      }
-
-      .visraam-yamki.visraam-#{$source} {
-        background: linear-gradient(
-          to right,
-          rgba(229, 229, 229, 0) 20%,
-          rgba(255, 197, 0, 0.5) 100%
-        );
-      }
-    }
-  }
-}
-
 @font-face {
   font-family: $viewer-gurmukhi-font-family;
   font-style: normal;
@@ -446,11 +399,4 @@ h2 {
   }
 }
 
-.light-theme,
-.dark-theme,
-.high-contrast,
-.low-light {
-  @include vishraamStyles();
-}
-
-@import 'display-next-line', 'theme-dark', 'theme-light', 'win32';
+@import 'display-next-line', 'win32';

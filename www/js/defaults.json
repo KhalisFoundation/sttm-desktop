@@ -63,7 +63,7 @@
   "changelog-seen": "0.0.0",
   "changelog-seen-count": 0,
   "searchOptions": {
-    "searchLanguage":"gr",
+    "searchLanguage": "gr",
     "searchType": 0,
     "searchSource": "all"
   },
@@ -79,7 +79,8 @@
         "gurbaniFontSize": 5,
         "gurbaniTextColor": "#EAC445",
         "showLogo": true,
-        "overlayLarivaar": false
+        "overlayLarivaar": false,
+        "theme": false
       },
       "gurbani": {
         "bottom": 156,

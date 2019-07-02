@@ -1,0 +1,19 @@
+$themeKhalsaGold: (
+  type: 'light',
+  background-color: #ffda39,
+  background-image: url('../../assets/img/custom_backgrounds/golden.jpg'),
+  gurbani: #fff,
+  translation: #4d2b00,
+  teeka: #723c03,
+  transliteration: #413b3d,
+  visraam: #c0392b,
+  yamki: #ffc500,
+);
+
+body.khalsa-gold {
+  @include generateTheme($themeKhalsaGold...);
+
+  .deck .gurbani {
+    -webkit-filter: drop-shadow(0 0 4px rgba(140, 81, 5, 1));
+  }
+}

@@ -31,10 +31,8 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'markdown', 'theme-dark', 'theme-light', 'theme-khalsa-gold',
-  'theme-baagi-blue', 'theme-khalsa-rush', 'theme-moody-blue', 'theme-a-new-day', 'theme-black-blue',
-  'theme-high-contrast', 'theme-low-light', 'theme-blue-darbar', 'theme-floral', 'update', 'viewer',
-  'window', 'akhandpaatt', 'overlay', 'animations', 'noty';
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
+  'overlay', 'animations', 'noty';
 
 a {
   cursor: default;
@@ -66,6 +64,7 @@ a {
   @extend .fullscreen-fixed;
 
   background: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
   z-index: 1200;
 
   &.hidden {
@@ -91,6 +90,7 @@ a {
     border-radius: 5px;
     cursor: pointer;
     height: 40px;
+    margin-bottom: 5px;
     transition: 0.5s all ease;
     width: 40px;
 
@@ -126,7 +126,8 @@ a {
     }
   }
 
-  .bani-list {
+  .bani-list,
+  .ceremonies-list {
     bottom: 0;
     height: 300px;
     overflow: hidden;
@@ -193,6 +194,64 @@ a {
     header {
       padding: 0.3rem 1rem;
     }
+
+    .ceremonies-header {
+      font-weight: bold;
+    }
+
+    .ceremony-pane.active {
+      .navigator-header {
+        border-bottom: 2px solid $tag-nitnem-color;
+      }
+    }
+
+    .ceremony-pane-content {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .ceremony-pane-themes {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-height: 200px;
+      padding: 10px;
+      width: 100%;
+
+      .theme-instance {
+        width: 27%;
+      }
+    }
+
+    .ceremony-pane-options {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      justify-content: center;
+      padding: 20px 10px;
+      text-align: center;
+
+      .switch {
+        margin-top: 5px;
+      }
+    }
+
+    .ceremony-theme-header {
+      font-size: 12px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  .ceremonies-list {
+    min-width: 500px;
+    overflow-y: auto;
+
+    .navigator-header {
+      cursor: pointer;
+    }
   }
 
   .bani-extras {
@@ -249,6 +308,14 @@ a {
   #tool-sunder-gutka {
     background-image: url('../../assets/img/icons/sunder_gutka.png');
   }
+
+  #tool-ceremonies {
+    background-color: rebeccapurple;
+    background-image: url('../../assets/img/icons/ceremonies.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 75%;
+  }
 }
 
 .presenter-view #toolbar {
@@ -262,11 +329,32 @@ a {
     width: 60px;
   }
 
-  .bani-list {
+  .bani-list,
+  .ceremonies-list {
     height: calc(100vh - #{$presenter-pane-gap * 2});
     left: $toolbar-offset + $presenter-pane-gap;
     top: $presenter-pane-gap;
     width: $bani-list-width;
+  }
+
+  .ceremonies-header {
+    width: 100%;
+  }
+
+  .ceremony-pane {
+    margin-bottom: 15px;
+  }
+
+  .ceremonies-list {
+    background: transparent;
+    height: 250px;
+  }
+
+  .ceremonies-list .ceremonies-header {
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    padding: 0;
   }
 
   .bani-extras {

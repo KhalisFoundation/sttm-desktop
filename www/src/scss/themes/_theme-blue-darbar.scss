@@ -1,0 +1,15 @@
+$themeBlueDarbar: (
+  type: 'dark',
+  background-color: #7db6c7,
+  background-image: url('../../assets/img/custom_backgrounds/blue-darbar.jpg'),
+  gurbani: #fff,
+  translation: #fbfbfb,
+  teeka: #a0d5fe,
+  transliteration: #f4f4f9,
+  visraam: #ff9595,
+  yamki: #f6ff00,
+);
+
+body.blue-darbar {
+  @include generateTheme($themeBlueDarbar...);
+}

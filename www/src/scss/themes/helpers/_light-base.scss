@@ -1,55 +1,58 @@
-body.khalsa-rush {
-  background-color: #fec43c;
-  background-image: url("../../assets/img/custom_backgrounds/orange.jpg");
-
-  .gurbani {
-    color: #071f77;
-  }
-
-  .translation {
-    color: #001060;
-  }
-
-  .teeka {
-    color: #433e5d;
-  }
-
-  .transliteration {
-    color: #f7faf6;
-  }
+@mixin light-base() {
+  $logo: $not-so-white;
+  $border: $dark-grey;
+  $statusbar-bg: $not-so-white;
+  $nav-bg: $extra-light-grey;
+  $alt-bg: $snow-white;
+  $dialog-bg: $white;
+  $base-text: $dark-grey;
+  $base-text-inactive: $disabled-dark;
+  $text-shadow: 1px 1px 2px rgba($black, 0.3);
+  $shadow-filter: drop-shadow(2px 2px 2px rgba($white, 0.7));
+  $current-focus: $transparent-blue;
+  $active-focus: $sky-blue;
+  $scrollbar-bg: $light-grey;
 
   .logo {
     path {
-      fill: #e0e0e0;
+      fill: $logo;
     }
   }
 
   .controller.presenter-view {
     #viewer {
-      border-color: #333;
+      border-color: $border;
     }
   }
-}
 
-$statusbar-bg: #e0e0e0;
-$nav-bg: #f5f5f5;
-$alt-bg: #fafafa;
-$dialog-bg: #fff;
-$base-text: #4e4e4e;
-$base-text-inactive: rgba(78, 78, 78, 0.5);
-
-.khalsa-rush {
   #toolbar,
-  .bani-list {
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
     background-color: $nav-bg;
-  }
-
-  .deck {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .viewer-controls {
     background-color: $nav-bg;
+  }
+
+  #toolbar,
+  .bani-list,
+  .ceremonies-list,
+  .ceremony-pane {
+    background-color: $nav-bg;
+  }
+
+  .viewer-controls {
+    background-color: $nav-bg;
+  }
+
+  .deck {
+    text-shadow: $text-shadow;
+  }
+
+  .deck .gurbani {
+    -webkit-filter: $shadow-filter;
   }
 
   #header {
@@ -69,10 +72,18 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
     color: $base-text;
   }
 
-  .shortcut-tray { background: $alt-bg; }
-  .tray-item-icon { background: lighten($base-text, 30); }
-  .tray-item-label { color: $nav-bg; }
-  &.shortcut-tray-on .shortcut-toggle { background: $alt-bg; }
+  .shortcut-tray {
+    background: $alt-bg;
+  }
+  .tray-item-icon {
+    background: lighten($base-text, 30);
+  }
+  .tray-item-label {
+    color: $nav-bg;
+  }
+  &.shortcut-tray-on .shortcut-toggle {
+    background: $alt-bg;
+  }
 
   .nav-header-tab {
     color: $base-text-inactive;
@@ -103,7 +114,7 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
     background-color: $nav-bg;
 
     a.panktee.current {
-      background-color: #c5deea !important;
+      background-color: $current-focus !important;
       color: $base-text !important;
     }
   }
@@ -115,6 +126,17 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
   #search-container {
     input {
       color: $base-text;
+
+      &[type='number'] {
+        background-color: $border;
+        color: $dialog-bg;
+
+        &::-webkit-input-placeholder {
+          color: $dialog-bg;
+
+          @extend .gurmukhi;
+        }
+      }
     }
 
     input:focus + div {
@@ -157,7 +179,7 @@ $base-text-inactive: rgba(78, 78, 78, 0.5);
       }
 
       &.active {
-        color: #0277bd;
+        color: $active-focus;
       }
     }
   }

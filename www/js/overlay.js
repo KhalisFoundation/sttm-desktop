@@ -215,6 +215,8 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
 const controlPanel = document.querySelector('.control-panel');
+const themeSelector = document.querySelector('.theme-selector');
+
 controlPanel.append(gurbaniColor);
 controlPanel.append(changeGurbanifontSizeButton);
 controlPanel.append(textColor);
@@ -232,6 +234,85 @@ controlPanel.append(splitLayoutBtn);
 controlPanel.append(separator.cloneNode(true));
 controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
+
+const themeObjects = {
+  aNewDay: {
+    label: 'a new day',
+    bgColor: '#97d6f7',
+    textColor: '#003a8c',
+    gurbaniTextColor: '#0e2654',
+  },
+  baagiBlue: {
+    label: 'baagi blue',
+    bgColor: '#274f69',
+    textColor: '#fff',
+    gurbaniTextColor: '#fff',
+  },
+  khalsaRush: {
+    label: 'khalsa rush',
+    bgColor: '#ffa61a',
+    textColor: '#071f77',
+    gurbaniTextColor: '#071f77',
+  },
+  moodyBlue: {
+    label: 'moody blue',
+    bgColor: '#2d73a7',
+    textColor: '#fff',
+    gurbaniTextColor: '#fff',
+  },
+  blackAndBlue: {
+    label: 'black and blue',
+    bgColor: '#000',
+    textColor: '#a3eafd',
+    gurbaniTextColor: '#fff',
+  },
+  floral: {
+    label: 'floral',
+    bgColor: '#f5b7d1',
+    textColor: '#a3eafd',
+    gurbaniTextColor: '#fff',
+  },
+  khalsaGold: {
+    label: 'khalsa gold',
+    bgColor: '#58330a',
+    textColor: '#ffba00',
+    gurbaniTextColor: '#ffba00',
+  },
+  neverForget: {
+    label: 'never forget',
+    bgColor: '#000',
+    textColor: '#f00',
+    gurbaniTextColor: '#f00',
+  },
+};
+
+const themeSwatchFactory = themeOptions => {
+  const themeClass = themeOptions.label
+    .toLowerCase()
+    .split(' ')
+    .join('-');
+
+  return h(
+    `div.overlay-theme-swatch.${themeClass}`,
+    {
+      onclick: () => {
+        overlayVars.theme = themeClass;
+        overlayVars.textColor = themeOptions.textColor;
+        overlayVars.gurbaniTextColor = themeOptions.gurbaniTextColor;
+        overlayVars.bgColor = themeOptions.bgColor;
+        savePrefs();
+      },
+    },
+    h('span', themeOptions.label),
+  );
+};
+
+themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
+
+Object.keys(themeObjects).forEach(themeObject => {
+  themeSelector.appendChild(themeSwatchFactory(themeObjects[themeObject]));
+});
+
 const webview = document.createElement('webview');
 webview.src = `${url}?preview`;
 webview.className = 'preview';
