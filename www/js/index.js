@@ -143,11 +143,8 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
   Mousetrap.bindGlobal('mod+g', () => {
     dhanGuruModal.openModal();
-    dhanGuruModal.buttonOnClick();
     dhanGuruModal.isAnnouncementTab = false;
-  });
-  Mousetrap.bind('mod+t', () => {
-    alert(document.getElementsByClassName('modal-ann-box').content);
+    dhanGuruModal.buttonOnClick();
   });
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);

@@ -24,11 +24,14 @@
   box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
   transform: translateY(1px);
 }
-.lang-switch {
-  display: inline;
+.lang-switch > td {
+  height: 50px;
 }
 .box-container {
   padding-top: 2.5%;
+}
+.modal-ann-box.gurmukhi {
+  font-family: 'gurbaniakhar';
 }
 .modal-ann-box {
   border: 1px solid gray;

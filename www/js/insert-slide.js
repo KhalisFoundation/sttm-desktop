@@ -1,7 +1,34 @@
+const sanitizeHtml = require('sanitize-html');
+const electron = require('electron');
+
+const analytics = electron.remote.getGlobal('analytics');
 const tingle = require('./vendor/tingle');
 const strings = require('./strings');
 
-let isAnnouncementTab;
+// allowed html tags inside announcement
+const allowedTags = [
+  'b',
+  'i',
+  'em',
+  'u',
+  'pre',
+  'strong',
+  'div',
+  'code',
+  'br',
+  'p',
+  'ul',
+  'li',
+  'ol',
+];
+
+/**
+ * boolean to check what modal page is asctive
+ * false = dhan guru slide page
+ * true = announcement page
+ * default to false b/c dhan guru slide page is default
+ */
+let isAnnouncementTab = false;
 const modal = new tingle.Modal({
   footer: true,
   stickyFooter: false,
@@ -39,8 +66,19 @@ const buttons = '<center><div class="btn-group" id = "btn-group">'.concat(
 const announcementHeader =
   '<center><h1 class="announcementHeader">Insert Announcement</h1></center>';
 const langSlider = '<div class="lang-switch">'.concat(
-  '<table width="120%"><tr><td><span class="lang-text">Announcement in Gurmukhi?</span></td>',
-  '<td class="switch" id = "modal-lang-slider" align="right"><input id="modal-lang-toggle" name="modal-lang-toggle" type="checkbox" value="gurmukhi"><label for="modal-lang-toggle"></label></td></tr></table>',
+  '<table width="120%">',
+  '<tr>',
+  '<td>',
+  '<span class="lang-text">Announcement in Gurmukhi?</span>',
+  '</td>',
+  '<td>',
+  '<div class="switch">',
+  '<input id="modal-ann-lang" name="modal-ann-lang" type="checkbox" value="gurmukhi">',
+  '<label for="modal-ann-lang"></label>',
+  '</div>',
+  '</td>',
+  '</tr>',
+  '</table>',
   '</div>',
 );
 const modalAnBox =
@@ -49,24 +87,44 @@ const modalAnBox =
  * sets each dhan guru button an onclick that will send that guru's name to the slide
  */
 function buttonOnClick() {
-  for (let i = 1; i <= 11; i += 1) {
-    document.getElementById(`guru${i}`).onclick = () => {
-      global.controller.sendText(strings.slideStrings.dhanguruStrings[i - 1], true);
-      modal.close();
-    };
+  if (!isAnnouncementTab) {
+    for (let i = 1; i <= 11; i += 1) {
+      document.getElementById(`guru${i}`).onclick = () => {
+        global.controller.sendText(strings.slideStrings.dhanguruStrings[i - 1], true);
+        modal.close();
+      };
+    }
   }
 }
+/**
+ * sets the onclick val for the slider
+ * appends class gurmukhi to the text box (changes font family to gurbaniakhar in css file)
+ * changes placeholder text
+ */
 function setLangSliderVal() {
-  const slider = document.getElementById('modal-lang-slider');
+  const slider = document.querySelector('#modal-ann-lang');
   slider.onclick = () => {
-    alert(slider);
-    const isGurmukhi = document.getElementById('modal-lang-slider').checked;
+    // is the slider checkd?
+    const isGurmukhi = slider.checked;
     const placeholderText = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
 
-    const $announcementText = document.querySelector('.modal-ann-box');
-    alert($announcementText);
-    $announcementText.classList.toggle('gurmukhi', isGurmukhi);
-    $announcementText.setAttribute('data-placeholder', placeholderText);
+    const $announcementBox = document.querySelector('.modal-ann-box');
+    $announcementBox.classList.toggle('gurmukhi', isGurmukhi);
+    $announcementBox.setAttribute('data-placeholder', placeholderText);
+  };
+}
+
+/**
+ * sanitize the html, allow only the permitted tage from allowedTags array above
+ */
+function boxInputFunctionality() {
+  const box = document.querySelector('.modal-ann-box');
+  box.oninput = () => {
+    const $announcementInput = document.querySelector('.announcement-text');
+    $announcementInput.innerHTML.replace(
+      /.*/g,
+      sanitizeHtml($announcementInput.innerHTML, { allowedTags }),
+    );
   };
 }
 // sets the first tab, with header, section title, and button group
@@ -78,27 +136,41 @@ modal.setContent(slidePage);
 
 // sets the first button (OK) which on click sends the announcement to the screen
 modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
-  global.controller.sendText('Hello There');
-  modal.close();
+  if (isAnnouncementTab) {
+    analytics.trackEvent('display', 'announcement-slide');
+    const isGurmukhi = document.querySelector('#modal-ann-lang').checked;
+    const announcementText = sanitizeHtml(document.querySelector('.modal-ann-box').innerHTML, {
+      allowedTags,
+    });
+    global.controller.sendText(announcementText, isGurmukhi);
+    document.querySelector('.modal-ann-box').innerHTML = '';
+    modal.close();
+  } else {
+    modal.close();
+  }
 });
+
 // close button
 modal.addFooterBtn('Close', 'tingle-btn tingle-btn--pull-right tingle-btn--danger', () => {
   modal.close();
 });
+
 // changes the tab to Dhan Guru Slides tab
 modal.addFooterBtn('Slides', 'tingle-btn tingle-btn-pull-left tingle-btn--default', () => {
   // sets up the modal content (buttons, etc)
   modal.setContent(slidePage);
   // adds functionality to the buttons
-  buttonOnClick();
   isAnnouncementTab = false;
+  buttonOnClick();
 });
+
 // change tab to announcements
 modal.addFooterBtn('Announcement', 'tingle-btn tingle-btn-pull-left tingle-btn--default', () => {
   // sets up modal content (box, etc)
   modal.setContent(announcementPage);
   isAnnouncementTab = true;
   setLangSliderVal();
+  boxInputFunctionality();
 });
 
 // open modal
