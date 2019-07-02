@@ -22,6 +22,7 @@ const allowedKeys = [
   46, // Delete
 ];
 const sessionList = [];
+const sessionStatesList = {};
 const currentShabad = [];
 const kbPages = [];
 let currentMeta = {};
@@ -575,18 +576,35 @@ module.exports = {
     }
   },
 
-  clickResult(e, ShabadID, LineID, Line) {
-    document.body.classList.remove('home');
-    this.closeGurmukhiKB();
+  addToHistory(SearchID, MainLineID, SearchTitle, type = 'shabad') {
+    const sessionKey = `${type}-${SearchID}`;
     const sessionItem = h(
-      `li#session-${ShabadID}`,
+      `li#session-${type}-${SearchID}`,
       {},
       h(
         'a.panktee.current',
         {
-          onclick: ev => this.clickSession(ev, ShabadID, LineID),
+          onclick: ev => {
+            const $panktee = ev.target;
+            const { resumePanktee } = sessionStatesList[sessionKey];
+            const resumePankteeLineID = resumePanktee ? resumePanktee.split('-')[0] : MainLineID;
+            switch (type) {
+              case 'bani':
+                this.loadBani(SearchID, resumePankteeLineID, true);
+                break;
+              case 'ceremony':
+                this.loadCeremony(SearchID, resumePankteeLineID, true);
+                break;
+              default:
+                this.loadShabad(SearchID, resumePankteeLineID);
+            }
+            const sessionLines = this.$session.querySelectorAll('a.panktee');
+            Array.from(sessionLines).forEach(el => el.classList.remove('current'));
+            $panktee.classList.add('current');
+            this.navPage('shabad');
+          },
         },
-        Line.Gurmukhi,
+        SearchTitle,
       ),
     );
     // get all the lines in the session block and remove the .current class from them
@@ -594,16 +612,27 @@ module.exports = {
     Array.from(sessionLines).forEach(el => el.classList.remove('current'));
     // if the ShabadID of the clicked Panktee isn't in the sessionList variable,
     // add it to the variable
-    if (sessionList.indexOf(ShabadID) < 0) {
-      sessionList.push(ShabadID);
+    if (sessionList.indexOf(sessionKey) < 0) {
+      sessionList.push(sessionKey);
+      sessionStatesList[sessionKey] = {
+        resumePanktee: null,
+        mainPanktee: MainLineID,
+        seenPanktees: new Set(),
+      };
     } else {
       // if the ShabadID is already in the session, just remove the HTMLElement,
       // and leave the sessionList
-      const line = this.$session.querySelector(`#session-${ShabadID}`);
+      const line = this.$session.querySelector(`#session-${type}-${SearchID}`);
       this.$session.removeChild(line);
     }
     // add the line to the top of the session block
     this.$session.insertBefore(sessionItem, this.$session.firstChild);
+  },
+
+  clickResult(e, ShabadID, LineID, Line) {
+    document.body.classList.remove('home');
+    this.closeGurmukhiKB();
+    this.addToHistory(ShabadID, LineID, Line.Gurmukhi);
     // are we in APV
     const apv = document.body.classList.contains('akhandpaatt');
     // load the Shabad into the controller
@@ -647,7 +676,7 @@ module.exports = {
     }
   },
 
-  async loadCeremony(ceremonyID) {
+  async loadCeremony(ceremonyID, LineID = null, historyReload = false) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
@@ -673,18 +702,22 @@ module.exports = {
           if (rowDb.VerseIDRangeStart && rowDb.VerseIDRangeEnd) {
             row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
           }
-
+          row.sessionKey = `ceremony-${ceremonyID}`;
           return row;
         }),
       );
       const flatRows = [].concat(...rows);
-      return this.printShabad(flatRows);
+      const nameOfCeremony = rowsDb[0].Ceremony.Gurmukhi;
+      if (!historyReload) {
+        this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
+      }
+      return this.printShabad(flatRows, null, LineID);
     } catch (error) {
       throw error;
     }
   },
 
-  loadBani(BaniID, LineID = null) {
+  loadBani(BaniID, LineID = null, historyReload = false) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
@@ -708,6 +741,16 @@ module.exports = {
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
       const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
+      const thisBaniState = sessionStatesList[`bani-${BaniID}`];
+      if (!historyReload) {
+        if (thisBaniState && thisBaniState.resumePanktee && !LineID) {
+          thisBaniState.resumePanktee = `${rowsDb[0].ID}-1`;
+          thisBaniState.seenPanktees = new Set(`${rowsDb[0].ID}-1`);
+        } else {
+          this.addToHistory(BaniID, null, nameOfBani, 'bani');
+        }
+      }
       const rows = rowsDb
         .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
         .map(rowDb => {
@@ -721,6 +764,8 @@ module.exports = {
             row = rowDb.Custom;
             row.shabadID = rowDb.Bani.Token;
           }
+
+          row.sessionKey = `bani-${BaniID}`;
 
           return row;
         });
@@ -756,6 +801,7 @@ module.exports = {
   lineFactory(line, rows) {
     const mainLineExists = !!document.querySelector('.main');
     const englishHeadingEl = document.createElement('span');
+    const lineSessionID = `${line.ID}-${line.lineCount}`;
     englishHeadingEl.innerHTML = line.English;
     const englishHeading = englishHeadingEl.querySelector('h1')
       ? englishHeadingEl.querySelector('h1').innerText
@@ -770,15 +816,29 @@ module.exports = {
       return false;
     }
 
+    let seenClasses = '';
+    const shabadState = sessionStatesList[line.sessionKey || `shabad-${line.ShabadID}`];
+    if (shabadState && shabadState.resumePanktee) {
+      if (shabadState.seenPanktees.has(lineSessionID) || shabadState.seenPanktees.has(line.ID)) {
+        seenClasses = '.seen_check';
+      }
+      if (shabadState.resumePanktee === lineSessionID) {
+        seenClasses += '.current';
+      }
+      if (shabadState.mainPanktee === line.ID && !mainLineExists) {
+        seenClasses += '.main.seen_check';
+      }
+    } else if (line.mainLine && !mainLineExists) {
+      seenClasses += '.main.current.seen_check';
+    }
+
     const shabadLine = h(
       `li#li_${line.lineCount}`,
       {
         'data-line-count': line.lineCount,
       },
       h(
-        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${
-          line.mainLine && !mainLineExists ? '.current.main.seen_check' : ''
-        }`,
+        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${seenClasses}`,
         {
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
@@ -791,6 +851,7 @@ module.exports = {
   },
 
   printShabad(rows, ShabadID, LineID, start = 0) {
+    const shabadState = sessionStatesList[rows[0].sessionKey || `shabad-${ShabadID}`];
     let lineID = LineID || rows[0].ID;
     const shabadID =
       ShabadID || rows[0].shabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
@@ -872,10 +933,17 @@ module.exports = {
       }
     });
 
+    if (shabadState && !shabadState.mainPanktee) {
+      shabadState.mainPanktee = mainLine.ID;
+    }
+
     // if there is a lineIDConflict make lineID the very first line in shabad.
     if (lineIDConflict) {
       lineID = document.querySelector(`#shabad > li:first-child > a`).dataset.lineId;
       shabad.querySelector(`#line${lineID}`).classList.add('current', 'main', 'seen_check');
+      if (sessionStatesList[shabadID]) {
+        sessionStatesList[shabadID].seenPanktees.add(lineID);
+      }
     }
 
     const totalLines = rows.length;
@@ -918,16 +986,11 @@ module.exports = {
     while (this.$session.firstChild) {
       this.$session.removeChild(this.$session.firstChild);
       sessionList.splice(0, sessionList.length);
+      // clear object and its properties
+      Object.getOwnPropertyNames(sessionStatesList).forEach(shabadID => {
+        delete sessionStatesList[shabadID];
+      });
     }
-  },
-
-  clickSession(e, ShabadID, LineID) {
-    const $panktee = e.target;
-    this.loadShabad(ShabadID, LineID);
-    const sessionLines = this.$session.querySelectorAll('a.panktee');
-    Array.from(sessionLines).forEach(el => el.classList.remove('current'));
-    $panktee.classList.add('current');
-    this.navPage('shabad');
   },
 
   checkAutoPlay(LineID = null) {
@@ -957,11 +1020,13 @@ module.exports = {
     }
     */
     const lines = this.$shabad.querySelectorAll('a.panktee');
+    const shabadState = sessionStatesList[Line.sessionKey || `shabad-${ShabadID}`];
     if (e.target.classList.contains('fa-home')) {
       // Change main line
       const $panktee = e.target.parentNode;
       Array.from(lines).forEach(el => el.classList.remove('main'));
       $panktee.classList.add('main', 'seen_check');
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
     } else if (e.target.classList.contains('panktee')) {
       // Change line to click target
       const $panktee = e.target;
@@ -971,6 +1036,8 @@ module.exports = {
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
       $panktee.classList.add('current', 'seen_check');
+      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
+      shabadState.resumePanktee = `${LineID}-${Line.lineCount}`;
     }
     this.checkAutoPlay(LineID);
   },

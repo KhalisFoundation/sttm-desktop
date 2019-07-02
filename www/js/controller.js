@@ -437,6 +437,7 @@ function checkPresenterView() {
   document.querySelector('#presenter-view-toggle').checked = inPresenterView;
   // hide header-tabs for non presenter view
   document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
+  global.platform.ipc.send('presenter-view', inPresenterView);
 }
 
 function reloadBani(resume = false) {
@@ -553,7 +554,7 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-    if (start === 0 || start === undefined) {
+    if (start === 0 || start === undefined || mode === 'append') {
       global.platform.ipc.send('show-line', showLinePayload);
     }
   },

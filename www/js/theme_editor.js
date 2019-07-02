@@ -231,8 +231,10 @@ const updateCeremonyThemeTiles = () => {
   document.querySelectorAll('.ceremony-pane-themes .theme-instance').forEach(el => el.remove());
 
   const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
-  swatchGroupFactory('anandkaraj', anandKarajPane);
-  anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+  if (anandKarajPane) {
+    swatchGroupFactory('anandkaraj', anandKarajPane);
+    anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+  }
 };
 
 const imageInput = themesContainer =>
