@@ -193,7 +193,7 @@ const loadCeremony = CeremonyID =>
     db.all(
       `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration,
       v.Visraam, v.Punjabi, v.SourceID, v.MainLetters,
-      c.Token, c.Gurmukhi as CeremonyGurmukhi,
+      c.Token, c.Gurmukhi as CeremonyGurmukhi, c.Transliteration as ceremonyTransliteration,
       cs.Custom, cs.VerseIDRangeEnd, cs.VerseIDRangeStart,
       cc.English AS ceremonyEnglish, v.PageNo 
       AS PageNo
@@ -211,7 +211,6 @@ const loadCeremony = CeremonyID =>
             const row = Object.assign({}, rawRow);
             row.Ceremony = {
               Token: row.Token,
-              Gurmukhi: row.CeremonyGurmukhi,
             };
             const customID = row.Custom;
             row.Custom = {
@@ -234,6 +233,10 @@ const loadCeremony = CeremonyID =>
 
             return row;
           });
+          if (!rowsMapped[0].Gurmukhi) {
+            rowsMapped[0].Custom.Gurmukhi = rows[0].CeremonyGurmukhi;
+            rowsMapped[0].Custom.Transliteration = rows[0].ceremonyTransliteration;
+          }
           resolve(rowsMapped);
         }
       },
@@ -326,7 +329,7 @@ const loadBani = (BaniID, BaniLength) =>
     }
     db.all(
       `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration,
-      v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, b.existsSGPC, b.existsMedium,
+      v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, c.Gurmukhi as nameOfBani, b.existsSGPC, b.existsMedium,
       b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
       FROM Verse v
       LEFT JOIN Banis_Shabad b ON v.ID = b.VerseID

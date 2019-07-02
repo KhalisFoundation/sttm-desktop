@@ -702,7 +702,6 @@ module.exports = {
           if (rowDb.VerseIDRangeStart && rowDb.VerseIDRangeEnd) {
             row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
           }
-
           row.sessionKey = `ceremony-${ceremonyID}`;
           return row;
         }),
@@ -742,7 +741,7 @@ module.exports = {
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
       const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
-      const nameOfBani = rowsDb[0].Gurmukhi || rowsDb[0].Bani.Gurmukhi;
+      const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
         if (thisBaniState && thisBaniState.resumePanktee && !LineID) {
