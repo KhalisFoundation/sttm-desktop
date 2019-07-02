@@ -554,7 +554,11 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-    if (start === 0 || start === undefined || mode === 'append') {
+
+    if (
+      (start === 0 || start === undefined || mode === 'append') &&
+      !(showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 && mode === 'append' && start > 0)
+    ) {
       global.platform.ipc.send('show-line', showLinePayload);
     }
   },
