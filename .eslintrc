@@ -1,5 +1,5 @@
 {
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb", "prettier"],
   "env": {
     "browser": true,
     "mocha": true,
@@ -7,8 +7,10 @@
   },
   "plugins": ["prettier"],
   "rules": {
+    "jsx-a11y/no-noninteractive-tabindex": "off",
     "no-mixed-operators": "off",
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "react/jsx-filename-extension": "off"
   },
   "settings": {
     "import/core-modules": "electron"

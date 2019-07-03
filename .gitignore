@@ -1,6 +1,9 @@
 node_modules
 builds
 www/assets/css/*.css
+www/assets/js/*.js
+www/main
+www/shared
 www/obs/bundle.css
 **/*.map
 packaging/aws.json
@@ -9,5 +12,4 @@ data.db
 *.provisionprofile
 npm-debug.log*
 .idea/
-.DS_Store/
-www/.DS_Store
+.DS_Store
