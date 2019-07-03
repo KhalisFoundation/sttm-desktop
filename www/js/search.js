@@ -28,6 +28,7 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+
 // Temp
 const infiniteScroll = false;
 
@@ -559,7 +560,10 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item),
+              onclick: ev => {
+                this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
+                global.core.search.clickedShabadID = item.Shabads[0].ShabadID;
+              },
             },
             resultNode,
           ),

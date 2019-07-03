@@ -1,13 +1,13 @@
-/* eslint-disable no-console */
 /* global Mousetrap */
 const electron = require('electron');
 
 const { remote } = electron;
 const main = remote.require('./app');
 
-const anvaad = require('anvaad-js');
 const copy = require('copy-to-clipboard');
+const anvaad = require('anvaad-js');
 const search = require('./search');
+const searchMethods = require('../js/banidb/index.js');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const shareSync = require('./share-sync');
@@ -91,12 +91,30 @@ function spaceBar(e) {
   highlightLine(newLineId);
   e.preventDefault();
 }
-function copyPanktee(e) {
-  e.preventDefault();
-  const Line = anvaad.unicode(
-    search.$shabad.querySelector('a.panktee.current').parentNode.innerText,
-  );
-  copy(Line);
+async function copyPanktee() {
+  const shabadID = global.core.search.clickedShabadID;
+  const linePos = search.currentShabad.indexOf(search.currentLine);
+  const result = await searchMethods.loadShabad(shabadID);
+  const remapped = global.controller.remapLine(result[linePos]);
+
+  // the two things that are always going to be in the line
+  const panktee = anvaad.unicode(remapped.Gurmukhi);
+  const translit = remapped.Transliteration;
+
+  // things that will change
+  let transEng;
+  let transPunjabi;
+  if (!remapped.Translatsions) {
+    copy(`${panktee}\n${translit}`);
+  } else {
+    transEng = remapped.English;
+    if (!remapped.Punjabi) {
+      copy(`${panktee}\n${transEng}\n${translit}`);
+    } else {
+      transPunjabi = anvaad.unicode(remapped.Punjabi);
+      copy(`${panktee}\n${transEng}\n${transPunjabi}\n${translit}`);
+    }
+  }
 }
 function prevLine(e) {
   // Find selector of current line in Shabad
@@ -159,9 +177,13 @@ if (typeof Mousetrap !== 'undefined') {
 
   Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
-  Mousetrap.bind(['down', 'right'], nextLine);
+  Mousetrap.bind(['rdown', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
-  Mousetrap.bind('mod+c', copyPanktee);
+  Mousetrap.bind('mod+c', () => {
+    if (document.activeElement.id === 'shabad-page') {
+      copyPanktee();
+    }
+  });
 }
 
 const $shabadPage = document.getElementById('shabad-page');
