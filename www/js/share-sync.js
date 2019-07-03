@@ -51,8 +51,9 @@ module.exports = {
     }
   },
   async onEnd(namespaceString) {
-    window.socket.disconnect();
     await request(`${SYNC_API_URL}/sync/end/${namespaceString}`);
+    window.socket.disconnect();
     window.socket = undefined;
+    window.namespaceString = undefined;
   },
 };

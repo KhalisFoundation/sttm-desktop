@@ -753,7 +753,9 @@ module.exports = {
     // load verses for bani based on baniID and the length that user has decided
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
-      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}-${
+        rowsDb[0].Bani.ID
+      }`;
       const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
@@ -1031,7 +1033,18 @@ module.exports = {
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      let shabadIdsplit = [ShabadID];
+      if (typeof ShabadID === 'string') {
+        shabadIdsplit = ShabadID.split('-');
+      }
+
+      window.socket.emit('data', {
+        type: shabadIdsplit.length > 1 ? 'bani' : 'shabad',
+        id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
+        baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
 
     const lines = this.$shabad.querySelectorAll('a.panktee');
