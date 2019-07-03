@@ -42,11 +42,11 @@ const modal = new tingle.Modal({
 // slide modal  body
 
 // title
-const slideHeader = '<h1 class = "modalTitle"> <center> Insert Slide </center></h1>';
+const slideHeader = '<h1 class = "modalTitle">  Insert Slide </h1>';
 // section title
 const slideText = '<h2 class ="dhanguru">Dhan Guru:</h2>';
 // button group
-const buttons = '<center><div class="btn-group" id = "btn-group">'.concat(
+const buttons = '<div class="btn-group" id = "btn-group">'.concat(
   '<button class= "guru" id = "guru1">Nanak Dev Ji</button>',
   '<button class= "guru" id = "guru2">Angad Dev Ji</button>',
   '<button class= "guru" id = "guru3">Amar Das Ji</button>',
@@ -59,12 +59,10 @@ const buttons = '<center><div class="btn-group" id = "btn-group">'.concat(
   '<button class= "guru" id = "guru10">Gobind Singh Ji</button>',
   '<button class= "guru" id = "guru11">Granth Sahib Ji</button>',
   '</div>',
-  '</center>',
 );
 // announcement modal body
 // announcement tab title
-const announcementHeader =
-  '<center><h1 class="announcementHeader">Insert Announcement</h1></center>';
+const announcementHeader = '<h1 class="modalTitle">Insert Announcement</h1>';
 const langSlider = '<div class="lang-switch">'.concat(
   '<table width="120%">',
   '<tr>',
@@ -104,9 +102,11 @@ function buttonOnClick() {
 function setLangSliderVal() {
   const slider = document.querySelector('#modal-ann-lang');
   slider.onclick = () => {
-    // is the slider checkd?
+    // is the slider checked?
     const isGurmukhi = slider.checked;
-    const placeholderText = isGurmukhi ? 'GoSxw ie`Qy ilKo ...' : 'Add announcement text here ..';
+    const placeholderText = isGurmukhi
+      ? strings.announcemenetPlaceholder.gurmukhi
+      : strings.announcemenetPlaceholder.english;
 
     const $announcementBox = document.querySelector('.modal-ann-box');
     $announcementBox.classList.toggle('gurmukhi', isGurmukhi);
@@ -144,10 +144,8 @@ modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default'
     });
     global.controller.sendText(announcementText, isGurmukhi);
     document.querySelector('.modal-ann-box').innerHTML = '';
-    modal.close();
-  } else {
-    modal.close();
   }
+  modal.close();
 });
 
 // close button

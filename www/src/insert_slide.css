@@ -1,11 +1,16 @@
+.modalTitle {
+  text-align: center;
+}
 .dhanguru {
   padding-top: 5%;
 }
 .btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   padding-top: 2%;
 }
 .guru {
-  display: inline-block;
   margin: 5px;
   background-color: rgb(155, 155, 155);
   color: white;
@@ -23,6 +28,9 @@
 .guru:active {
   box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
   transform: translateY(1px);
+}
+.lang-switch {
+  padding-top: 4.5%;
 }
 .lang-switch > td {
   height: 50px;

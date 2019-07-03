@@ -30,8 +30,13 @@ const dropdownStrings = {
     'Granth Sahib Ji',
   ],
 };
+const announcemenetPlaceholder = {
+  english: 'Add announcement text here ..',
+  gurmukhi: 'GoSxw ie`Qy ilKo ...',
+};
 
 module.exports = {
   slideStrings,
   dropdownStrings,
+  announcemenetPlaceholder,
 };

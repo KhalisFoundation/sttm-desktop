@@ -38,17 +38,17 @@
 
 #### <a name="windows-slides">Windows:</a>
 
-| Combination | Description                               |
-| ----------- | ----------------------------------------- |
-| ctrl + 1    | Waheguru Slide                            |
-| ctrl + 2    | Mool Mantra Slide                         |
-| ctrl + 3    | Empty Slide                               |
-| ctrl + 4    | Anand Sahib (Bhog)                        |
-| ctrl + 5    | Help Guide                                |
-| ctrl + 6    | Shortcut Legend                           |
-| ctrl + /    | Jump to search bar                        |
-| ----------- | -----------                               |
-| ctrl + g    | Add Dhan Guru**\_** slide or announcement |
+| Combination | Description                         |
+| ----------- | ----------------------------------- |
+| ctrl + 1    | Waheguru Slide                      |
+| ctrl + 2    | Mool Mantra Slide                   |
+| ctrl + 3    | Empty Slide                         |
+| ctrl + 4    | Anand Sahib (Bhog)                  |
+| ctrl + 5    | Help Guide                          |
+| ctrl + 6    | Shortcut Legend                     |
+| ctrl + /    | Jump to search bar                  |
+| ----------- | -----------                         |
+| ctrl + g    | Add Dhan Guru slide or announcement |
 
 ### <a name="others">Others</a>
 

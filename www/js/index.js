@@ -18,7 +18,6 @@ const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
-// const dhanGuruText = strings.slideStrings.dhanguruStrings;
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
