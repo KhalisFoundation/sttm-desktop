@@ -106,14 +106,14 @@ async function copyPanktee() {
   let transPunjabi;
   // if there are no english translations, then there will no punjabi translations either
   if (!remapped.English) {
-    copy(`${panktee}\n${translit}`);
+    copy(`${panktee}\n\n${translit}`);
   } else {
     transEng = remapped.English;
     if (!remapped.Punjabi) {
-      copy(`${panktee}\n${transEng}\n${translit}`);
+      copy(`${panktee}\n\n${transEng}\n\n${translit}`);
     } else {
       transPunjabi = anvaad.unicode(remapped.Punjabi);
-      copy(`${panktee}\n${transEng}\n${transPunjabi}\n${translit}`);
+      copy(`${panktee}\n\n${transEng}\n\n${transPunjabi}\n\n${translit}`);
     }
   }
 }
