@@ -104,7 +104,8 @@ async function copyPanktee() {
   // things that will change
   let transEng;
   let transPunjabi;
-  if (!remapped.Translatsions) {
+  // if there are no english translations, then there will no punjabi translations either
+  if (!remapped.English) {
     copy(`${panktee}\n${translit}`);
   } else {
     transEng = remapped.English;
