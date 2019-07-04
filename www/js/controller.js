@@ -554,7 +554,7 @@ module.exports = {
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
-
+    // when paging, the first line gets loaded again. this makes sure obs shows the correct line.
     if (
       (start === 0 || start === undefined || mode === 'append') &&
       !(showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 && mode === 'append' && start > 0)
