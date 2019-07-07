@@ -180,7 +180,7 @@ if (typeof Mousetrap !== 'undefined') {
 
   Mousetrap.bindGlobal(['command+/', 'ctrl+/'], searchBarShortcut);
   Mousetrap.bind(['up', 'left'], prevLine);
-  Mousetrap.bind(['rdown', 'right'], nextLine);
+  Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bind('mod+c', () => {
     if (document.activeElement.id === 'shabad-page') {
