@@ -39,18 +39,17 @@
 
 #### <a name="windows-slides">Windows:</a>
 
-| Combination                                                                      | Description                                 |
-| -------------------------------------------------------------------------------- | ------------------------------------------- |
-| CTRL + 1                                                                         | Waheguru Slide                              |
-| CTRL + 2                                                                         | Mool Mantra Slide                           |
-| CTRL + 3                                                                         | Empty Slide                                 |
-| CTRL + 4                                                                         | Anand Sahib (Bhog)                          |
-| CTRL + 5                                                                         | Help Guide                                  |
-| CTRL + 6                                                                         | Shortcut Legend                             |
-| CTRL + /                                                                         | Jump to search bar                          |
-| CTRL + G                                                                         | Add Dhan slide or announcement         |
-| Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
-| Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
+| Combination | Description                         |
+| ----------- | ----------------------------------- |
+| ctrl + 1    | Waheguru Slide                      |
+| ctrl + 2    | Mool Mantra Slide                   |
+| ctrl + 3    | Empty Slide                         |
+| ctrl + 4    | Anand Sahib (Bhog)                  |
+| ctrl + 5    | Help Guide                          |
+| ctrl + 6    | Shortcut Legend                     |
+| ctrl + /    | Jump to search bar                  |
+| ----------- | -----------                         |
+| ctrl + g    | Add Dhan Guru slide or announcement |
 
 ### <a name="others">Others</a>
 
