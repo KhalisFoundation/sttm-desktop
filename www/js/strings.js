@@ -34,9 +34,24 @@ const announcemenetPlaceholder = {
   english: 'Add announcement text here ..',
   gurmukhi: 'GoSxw ie`Qy ilKo ...',
 };
-
+const allowedAnnouncementTags = [
+  'b',
+  'i',
+  'em',
+  'u',
+  'pre',
+  'strong',
+  'div',
+  'code',
+  'br',
+  'p',
+  'ul',
+  'li',
+  'ol',
+];
 module.exports = {
   slideStrings,
   dropdownStrings,
   announcemenetPlaceholder,
+  allowedAnnouncementTags,
 };
