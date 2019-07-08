@@ -4,48 +4,67 @@
 
 [2. Slide Shortcuts](#slides)
 
+- [macOS](#macos-slides)
+
+- [Windows](#windows-slides)
+
 [3. Others](#others)
+
+- [macOS](#macos-others)
+
+- [Windows](#windows-others)
 
 ### <a name="mappings">Keyboard Mappings</a>
 
 ![](./assets/img/help_images/web-desktop-keyboard-map.png)
 
-- _Note that the chars on the top require shift + key._
+- _Note that the characters shown at the top of each key require a shift + key._
 
 ### <a name="slides">Slide Shortcuts</a>
 
-#### macOS:
+#### <a name="macos-slides">macOS:</a>:
 
-- Cmd + 1 = Waheguru Slide
-- Cmd + 2 = Mool Mantra Slide
-- Cmd + 3 = Empty Slide
-- Cmd + 4 = Anand Sahib (Bhog)
-- Cmd + 5 = Help Guide
-- Cmd + 6 = Shortcut Legend
-- Cmd + / = Jump to search
+| Combination | Description                         |
+| ----------- | ----------------------------------- |
+| cmd + 1     | Waheguru Slide                      |
+| cmd + 2     | Mool Mantra Slide                   |
+| cmd + 3     | Empty Slide                         |
+| cmd + 4     | Anand Sahib (Bhog)                  |
+| cmd + 5     | Help Guide                          |
+| cmd + 6     | Shortcut Legend                     |
+| cmd + /     | Jump to search bar                  |
+| ----------- | -----------                         |
+| cmd + g     | Add Dhan Guru slide or announcement |
 
-#### Windows:
+#### <a name="windows-slides">Windows:</a>
 
-- Ctrl + 1 = Waheguru Slide
-- Ctrl + 2 = Mool Mantra Slide
-- Ctrl + 3 = Empty Slide
-- Ctrl + 4 = Anand Sahib (Bhog)
-- Ctrl + 5 = Help Guide
-- Ctrl + 6 = Shortcut Legend
-- Cmd + / = Jump to search
+| Combination | Description                         |
+| ----------- | ----------------------------------- |
+| ctrl + 1    | Waheguru Slide                      |
+| ctrl + 2    | Mool Mantra Slide                   |
+| ctrl + 3    | Empty Slide                         |
+| ctrl + 4    | Anand Sahib (Bhog)                  |
+| ctrl + 5    | Help Guide                          |
+| ctrl + 6    | Shortcut Legend                     |
+| ctrl + /    | Jump to search bar                  |
+| ----------- | -----------                         |
+| ctrl + g    | Add Dhan Guru slide or announcement |
 
 ### <a name="others">Others</a>
 
-#### macOS:
+#### <a name ="macos-others">macOS:</a>
 
-- Cmd + q = Close app (shut down app)
-- Cmd w = Close app (shut down app)
-- Cmd + u = check for updates
-- Cmd + h = minimize window
-- Cmd + m = minimize window
+| Combination | Description       |
+| ----------- | ----------------- |
+| cmd + q     | close app         |
+| cmd + u     | check for updates |
+| cmd + h     | minimize window   |
+| cmd + m     | minimize window   |
 
-#### Windows:
+#### <a name ="windows-others">Windows:</a>
 
-- Ctrl + q = Close app (shut down app)
-- Ctrl + u = Check for update
-- Ctrl + m = minimize window
+| Combination | Description       |
+| ----------- | ----------------- |
+| ctrl + q    | close app         |
+| ctrl + u    | check for updates |
+| ctrl + m    | minimize window   |
