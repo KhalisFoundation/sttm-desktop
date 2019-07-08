@@ -275,7 +275,7 @@ const createCards = (rows, LineID) => {
     const taggedGurmukhi = [];
     gurmukhiShabads.forEach((val, index) => {
       const valHTML = typeof val === 'string' ? val : val.outerHTML;
-      if (valHTML.indexOf(']') !== -1) {
+      if (valHTML.indexOf(']') !== -1 && taggedGurmukhi.length > 0) {
         taggedGurmukhi[index - 1] = `<span>${taggedGurmukhi[index - 1]}<i> </i>${valHTML}</span>`;
       } else {
         taggedGurmukhi[index] = valHTML;
