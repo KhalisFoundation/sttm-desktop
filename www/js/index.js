@@ -136,10 +136,8 @@ function findLine(e) {
     lineFound.click();
   }
 }
-function openSingularResult() {
-  if (search.$results.childNodes.length === 1) {
-    document.querySelector('#results .search-result').click();
-  }
+function openFirstResult() {
+  document.querySelector('#results .search-result').click();
 }
 
 // Keyboard shortcuts
@@ -159,7 +157,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bindGlobal('enter', () => {
     if (document.activeElement.id === 'search') {
-      openSingularResult();
+      openFirstResult();
     }
   });
 }
