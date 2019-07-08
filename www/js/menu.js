@@ -4,6 +4,7 @@ const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
+const strings = require('./strings');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
@@ -272,8 +273,8 @@ const announcementSlideButton = h(
         onclick: () => {
           const isGurmukhi = document.querySelector('#announcement-language').checked;
           const placeholderText = isGurmukhi
-            ? 'GoSxw ie`Qy ilKo ...'
-            : 'Add announcement text here ..';
+            ? strings.announcemenetPlaceholder.gurmukhi
+            : strings.announcemenetPlaceholder.english;
 
           const $announcementText = document.querySelector('.announcement-text');
           $announcementText.classList.toggle('gurmukhi', isGurmukhi);
