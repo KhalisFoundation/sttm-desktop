@@ -127,6 +127,10 @@ function findLine(e) {
     lineFound.click();
   }
 }
+function openFirstResult() {
+  document.querySelector('#results .search-result').click();
+}
+
 // Keyboard shortcuts
 if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('esc', escKey);
@@ -148,6 +152,11 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
+  Mousetrap.bindGlobal('enter', () => {
+    if (document.activeElement.id === 'search') {
+      openFirstResult();
+    }
+  });
 }
 
 const $shabadPage = document.getElementById('shabad-page');
