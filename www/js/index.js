@@ -19,7 +19,7 @@ const analytics = remote.getGlobal('analytics');
 const settings = new Settings(platform.store); */
 
 // is the current slide of the shabad (= false) or an inserted slide (= true)
-let isSpecialSlide = false;
+let isInsertedSlide = false;
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
@@ -29,15 +29,15 @@ function escKey() {
 const slideShortcuts = {
   waheguru: () => {
     global.controller.sendText(strings.slideStrings.waheguru, true);
-    isSpecialSlide = true;
+    isInsertedSlide = true;
   },
   empty: () => {
     global.controller.sendText(' ');
-    isSpecialSlide = true;
+    isInsertedSlide = true;
   },
   moolMantra: () => {
     global.controller.sendText(strings.slideStrings.moolMantra, true);
-    isSpecialSlide = true;
+    isInsertedSlide = true;
   },
 };
 const ceremonyShortcuts = {
@@ -77,7 +77,7 @@ function highlightLine(newLine, nextLineCount = null) {
 
 function spaceBar(e) {
   const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
-  if (!isSpecialSlide) {
+  if (!isInsertedSlide) {
     const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
 
     let newLineId = mainLineID;
@@ -91,7 +91,7 @@ function spaceBar(e) {
   } else {
     highlightLine(currentLineId);
     document.getElementById('shabad-page').focus();
-    isSpecialSlide = false;
+    isInsertedSlide = false;
   }
 }
 
