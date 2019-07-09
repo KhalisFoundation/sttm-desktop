@@ -1,5 +1,18 @@
 ## New Updates
 
+### 5.3 - _1907XX_
+
+### Added:
+
+- 
+     
+### Improved:
+
+- 
+
+<br/>  
+<details><summary>See previous updates...</summary>
+
 ### 5.2 - _190702_
 
 ### Added:
@@ -24,11 +37,8 @@
 - Expanded Vishraams to be supported on all themes
 - Switching between Banis / Shabads is now much easier, history will remember where you left off
 - Fixed several bugs when using Chromecast
-- Bug fixes & UI enhancements 
+- Bug fixes & UI enhancements   
 
-<br/>  
-<details><summary>See previous updates...</summary>
-  
 ### 5.0 - _190506_
 
 ### Added:
