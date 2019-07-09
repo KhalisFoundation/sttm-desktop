@@ -41,12 +41,10 @@ const slideShortcuts = {
   },
 };
 const ceremonyShortcuts = {
-  anandSahibBhog: () => {
+  anandSahibBhog: () =>
     global.core.search.loadCeremony(3).catch(error => {
       analytics.trackEvent('ceremonyFailed', 3, error);
-    });
-    isSpecialSlide = true;
-  },
+    }),
 };
 const interfaceShortcuts = {
   help: () => main.openSecondaryWindow('helpWindow'),
