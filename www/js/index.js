@@ -90,6 +90,7 @@ function spaceBar(e) {
     e.preventDefault();
   } else {
     highlightLine(currentLineId);
+    isSpecialSlide = false;
   }
 }
 
