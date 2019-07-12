@@ -16,16 +16,6 @@ const allowedTags = strings.allowedAnnouncementTags;
  */
 let isAnnouncementTab = false;
 
-const modal = new tingle.Modal({
-  footer: true,
-  stickyFooter: false,
-  closeMethods: ['overlay', 'button', 'escape'],
-  onClose() {},
-  beforeClose() {
-    return true; // close the modal
-  },
-});
-
 // slide modal  body
 
 // title
@@ -68,6 +58,25 @@ const langSlider = '<div class="lang-switch">'.concat(
 );
 const modalAnBox =
   '<div class="box-container"><div class="modal-ann-box" contenteditable="true" data-placeholder="Add announcement text here ..."></div></div>';
+
+// sets the first tab, with header, section title, and button group
+const slidePage = slideHeader + slideText + buttons;
+// sets the second page with header, change language button, and content box
+const announcementPage = announcementHeader + langSlider + modalAnBox;
+
+// create modal
+const modal = new tingle.Modal({
+  footer: true,
+  stickyFooter: false,
+  closeMethods: ['overlay', 'button', 'escape'],
+  onClose() {},
+  beforeClose() {
+    modal.setContent(slidePage);
+    return true; // close the modal
+  },
+});
+// sets the default page to Dhan Guru slide page
+modal.setContent(slidePage);
 /**
  * sets each dhan guru button an onclick that will send that guru's name to the slide
  */
@@ -114,12 +123,6 @@ function boxInputFunctionality() {
     );
   };
 }
-// sets the first tab, with header, section title, and button group
-const slidePage = slideHeader + slideText + buttons;
-// sets the second page with header, change language button, and content box
-const announcementPage = announcementHeader + langSlider + modalAnBox;
-// sets the default page to Dhan Guru slide page
-modal.setContent(slidePage);
 
 // sets the first button (OK) which on click sends the announcement to the screen
 modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
