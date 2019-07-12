@@ -1,14 +1,16 @@
 ## New Updates
 
-### 5.3 - _1907XX_
+### 5.3 - _190715_
 
 ### Added:
 
-- 
+- New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G 
      
 ### Improved:
 
-- 
+- You can now press enter after searching and it will automatically open the first result
+- Fixed a bug with Bani Overlay and the Anand Karaj Ceremony
+- Bug fixes & UI enhancements   
 
 <br/>  
 <details><summary>See previous updates...</summary>
