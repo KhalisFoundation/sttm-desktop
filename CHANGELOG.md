@@ -4,7 +4,8 @@
 
 ### Added:
 
-- New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G 
+- New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G
+![](./assets/img/help_images/desktop-dhan-modal.jpg)
      
 ### Improved:
 
