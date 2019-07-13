@@ -6,21 +6,7 @@ const tingle = require('./vendor/tingle');
 const strings = require('./strings');
 
 // allowed html tags inside announcement
-const allowedTags = [
-  'b',
-  'i',
-  'em',
-  'u',
-  'pre',
-  'strong',
-  'div',
-  'code',
-  'br',
-  'p',
-  'ul',
-  'li',
-  'ol',
-];
+const allowedTags = strings.allowedAnnouncementTags;
 
 /**
  * boolean to check what modal page is asctive
@@ -29,15 +15,6 @@ const allowedTags = [
  * default to false b/c dhan guru slide page is default
  */
 let isAnnouncementTab = false;
-const modal = new tingle.Modal({
-  footer: true,
-  stickyFooter: false,
-  closeMethods: ['overlay', 'button', 'escape'],
-  onClose() {},
-  beforeClose() {
-    return true; // close the modal
-  },
-});
 
 // slide modal  body
 
@@ -81,6 +58,25 @@ const langSlider = '<div class="lang-switch">'.concat(
 );
 const modalAnBox =
   '<div class="box-container"><div class="modal-ann-box" contenteditable="true" data-placeholder="Add announcement text here ..."></div></div>';
+
+// sets the first tab, with header, section title, and button group
+const slidePage = slideHeader + slideText + buttons;
+// sets the second page with header, change language button, and content box
+const announcementPage = announcementHeader + langSlider + modalAnBox;
+
+// create modal
+const modal = new tingle.Modal({
+  footer: true,
+  stickyFooter: false,
+  closeMethods: ['overlay', 'button', 'escape'],
+  onClose() {},
+  beforeClose() {
+    modal.setContent(slidePage);
+    return true; // close the modal
+  },
+});
+// sets the default page to Dhan Guru slide page
+modal.setContent(slidePage);
 /**
  * sets each dhan guru button an onclick that will send that guru's name to the slide
  */
@@ -127,12 +123,6 @@ function boxInputFunctionality() {
     );
   };
 }
-// sets the first tab, with header, section title, and button group
-const slidePage = slideHeader + slideText + buttons;
-// sets the second page with header, change language button, and content box
-const announcementPage = announcementHeader + langSlider + modalAnBox;
-// sets the default page to Dhan Guru slide page
-modal.setContent(slidePage);
 
 // sets the first button (OK) which on click sends the announcement to the screen
 modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
@@ -153,24 +143,30 @@ modal.addFooterBtn('Close', 'tingle-btn tingle-btn--pull-right tingle-btn--dange
   modal.close();
 });
 
-// changes the tab to Dhan Guru Slides tab
-modal.addFooterBtn('Slides', 'tingle-btn tingle-btn-pull-left tingle-btn--default', () => {
-  // sets up the modal content (buttons, etc)
-  modal.setContent(slidePage);
-  // adds functionality to the buttons
-  isAnnouncementTab = false;
-  buttonOnClick();
-});
-
 // change tab to announcements
-modal.addFooterBtn('Announcement', 'tingle-btn tingle-btn-pull-left tingle-btn--default', () => {
-  // sets up modal content (box, etc)
-  modal.setContent(announcementPage);
-  isAnnouncementTab = true;
-  setLangSliderVal();
-  boxInputFunctionality();
+// changes to back when the tab is open
+// onclick is blank because it will change depending on what is being displayed
+modal.addFooterBtn(
+  'Announcement',
+  'tingle-btn tingle-btn-pull-left tingle-btn--default modal-tab-btn',
+  () => {},
+);
+const modalTabBtn = document.querySelector('.modal-tab-btn');
+modalTabBtn.addEventListener('click', () => {
+  if (!isAnnouncementTab) {
+    isAnnouncementTab = true;
+    // sets up modal content (box, etc)
+    modal.setContent(announcementPage);
+    setLangSliderVal();
+    boxInputFunctionality();
+    modalTabBtn.textContent = 'Back';
+  } else {
+    modalTabBtn.textContent = 'Announcement';
+    isAnnouncementTab = false;
+    modal.setContent(slidePage);
+    buttonOnClick();
+  }
 });
-
 // open modal
 function openModal() {
   modal.open();
