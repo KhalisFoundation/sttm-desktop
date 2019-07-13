@@ -145,8 +145,8 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bindGlobal('mod+6', interfaceShortcuts.legend);
   Mousetrap.bindGlobal('mod+/', interfaceShortcuts.searchBar);
   Mousetrap.bindGlobal('mod+g', () => {
-    dhanGuruModal.openModal();
     dhanGuruModal.isAnnouncementTab = false;
+    dhanGuruModal.openModal();
     dhanGuruModal.buttonOnClick();
   });
   Mousetrap.bind(['up', 'left'], prevLine);

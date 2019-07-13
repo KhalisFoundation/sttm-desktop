@@ -69,7 +69,9 @@ const modal = new tingle.Modal({
   footer: true,
   stickyFooter: false,
   closeMethods: ['overlay', 'button', 'escape'],
-  onClose() {},
+  onClose() {
+    modal.modal.classList.remove('tingle-modal--visible');
+  },
   beforeClose() {
     modal.setContent(slidePage);
     return true; // close the modal
@@ -169,7 +171,11 @@ modalTabBtn.addEventListener('click', () => {
 });
 // open modal
 function openModal() {
-  modal.open();
+  if (!modal.isOpen()) {
+    isAnnouncementTab = false;
+    modalTabBtn.textContent = 'Announcement';
+    modal.open();
+  }
 }
 
 /* export openModal and buttonOnClick(because the Dhan Guru slides page is default tab
