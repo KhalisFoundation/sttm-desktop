@@ -557,7 +557,12 @@ module.exports = {
     // when paging, the first line gets loaded again. this makes sure obs shows the correct line.
     if (
       (start === 0 || start === undefined || mode === 'append') &&
-      !(showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 && mode === 'append' && start > 0)
+      !(
+        showLinePayload.Line.sessionKey &&
+        showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 &&
+        mode === 'append' &&
+        start > 0
+      )
     ) {
       global.platform.ipc.send('show-line', showLinePayload);
     }
