@@ -18,6 +18,8 @@ const analytics = remote.getGlobal('analytics');
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
 
+// is the current slide of the shabad (= false) or an inserted slide (= true)
+let isInsertedSlide = false;
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
@@ -25,10 +27,17 @@ function escKey() {
 }
 
 const slideShortcuts = {
-  waheguru: () => global.controller.sendText(strings.slideStrings.waheguru, true),
-  empty: () => global.controller.sendText(' '),
+  waheguru: () => {
+    global.controller.sendText(strings.slideStrings.waheguru, true);
+    isInsertedSlide = true;
+  },
+  empty: () => {
+    global.controller.sendText(' ');
+    isInsertedSlide = true;
+  },
   moolMantra: () => {
     global.controller.sendText(strings.slideStrings.moolMantra, true);
+    isInsertedSlide = true;
   },
 };
 const ceremonyShortcuts = {
@@ -67,17 +76,23 @@ function highlightLine(newLine, nextLineCount = null) {
 }
 
 function spaceBar(e) {
-  const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
   const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
+  if (!isInsertedSlide) {
+    const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
 
-  let newLineId = mainLineID;
+    let newLineId = mainLineID;
 
-  if (mainLineID === currentLineId) {
-    newLineId = search.$shabad.querySelector('a.panktee:not(.seen_check)').dataset.lineId;
+    if (mainLineID === currentLineId) {
+      newLineId = search.$shabad.querySelector('a.panktee:not(.seen_check)').dataset.lineId;
+    }
+
+    highlightLine(newLineId);
+    e.preventDefault();
+  } else {
+    highlightLine(currentLineId);
+    document.getElementById('shabad-page').focus();
+    isInsertedSlide = false;
   }
-
-  highlightLine(newLineId);
-  e.preventDefault();
 }
 
 function prevLine(e) {
@@ -129,6 +144,7 @@ function findLine(e) {
 }
 function openFirstResult() {
   document.querySelector('#results .search-result').click();
+  document.getElementById('shabad-page').focus();
 }
 
 // Keyboard shortcuts
