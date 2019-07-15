@@ -1,0 +1,52 @@
+.modalTitle {
+  text-align: center;
+}
+.dhanguru {
+  padding-top: 5%;
+}
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 2%;
+}
+.guru {
+  margin: 5px;
+  background-color: rgb(155, 155, 155);
+  color: white;
+  font-size: 16px;
+  padding: 25px 25px;
+  cursor: pointer;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+  transition: 0.5s all ease;
+}
+.guru:hover {
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  background-color: gray;
+}
+.guru:active {
+  box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+.lang-switch {
+  padding-top: 4.5%;
+}
+.lang-switch > td {
+  height: 50px;
+}
+.box-container {
+  padding-top: 2.5%;
+}
+.modal-ann-box.gurmukhi {
+  font-family: 'gurbaniakhar';
+}
+.modal-ann-box {
+  border: 1px solid gray;
+  border-radius: 10px;
+  display: inline-block;
+  min-height: 100px;
+  width: 100%;
+  outline: none;
+  padding: 10px;
+}

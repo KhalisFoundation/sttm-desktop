@@ -1,5 +1,21 @@
 ## New Updates
 
+### 5.3 - _190715_
+
+### Added:
+
+- New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G
+![](./assets/img/help_images/desktop-dhan-modal.jpg)
+     
+### Improved:
+
+- You can now press enter after searching and it will automatically open the first result
+- Fixed a bug with Bani Overlay and the Anand Karaj Ceremony
+- Bug fixes & UI enhancements   
+
+<br/>  
+<details><summary>See previous updates...</summary>
+
 ### 5.2 - _190702_
 
 ### Added:
@@ -24,11 +40,8 @@
 - Expanded Vishraams to be supported on all themes
 - Switching between Banis / Shabads is now much easier, history will remember where you left off
 - Fixed several bugs when using Chromecast
-- Bug fixes & UI enhancements 
+- Bug fixes & UI enhancements   
 
-<br/>  
-<details><summary>See previous updates...</summary>
-  
 ### 5.0 - _190506_
 
 ### Added:

@@ -103,6 +103,21 @@
 .dark-theme .tingle-modal-box {
   background: #212121;
 }
+.baagi-blue .tingle-modal-box {
+  background: #212121;
+}
+.moody-blue .tingle-modal-box {
+  background: #212121;
+}
+.black-blue .tingle-modal-box {
+  background: #212121;
+}
+.blue-darbar .tingle-modal-box {
+  background: #212121;
+}
+.low-light .tingle-modal-box {
+  background: #212121;
+}
 
 .light-theme .tingle-modal-box {
   background: #fff;
@@ -124,7 +139,21 @@
 .dark-theme .tingle-modal-box__footer {
   background-color: #3a3a3a;
 }
-
+.baagi-blue .tingle-modal-box__footer {
+  background-color: #3a3a3a;
+}
+.moody-blue .tingle-modal-box__footer {
+  background-color: #3a3a3a;
+}
+.black-blue .tingle-modal-box__footer {
+  background-color: #3a3a3a;
+}
+.blue-darbar .tingle-modal-box__footer {
+  background-color: #3a3a3a;
+}
+.low-light .tingle-modal-box__footer {
+  background-color: #3a3a3a;
+}
 .light-theme .tingle-modal-box__footer {
   background-color: #f5f5f5;
 }
