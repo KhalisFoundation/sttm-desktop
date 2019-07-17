@@ -19,22 +19,21 @@ let isAnnouncementTab = false;
 // slide modal  body
 
 // title
-const slideHeader = '<h1 class = "modalTitle">  Insert Slide </h1>';
+const slideHeader = '<h1 class = "modalTitle">Insert Dhan Slide </h1>';
 // section title
-const slideText = '<h2 class ="dhanguru">Dhan Guru:</h2>';
 // button group
 const buttons = '<div class="btn-group" id = "btn-group">'.concat(
-  '<button class= "guru" id = "guru1">Nanak Dev Ji</button>',
-  '<button class= "guru" id = "guru2">Angad Dev Ji</button>',
-  '<button class= "guru" id = "guru3">Amar Das Ji</button>',
-  '<button class= "guru" id = "guru4">Ram Das Ji</button>',
-  '<button class= "guru" id = "guru5">Arjan Dev Ji</button>',
-  '<button class= "guru" id = "guru6">Hargobind Sahib Ji</button>',
-  '<button class= "guru" id = "guru7">Har Rai Sahib Ji</button>',
-  '<button class= "guru" id = "guru8">Har Krishan Sahib Ji</button>',
-  '<button class= "guru" id = "guru9">Teg Bahadur Sahib Ji</button>',
-  '<button class= "guru" id = "guru10">Gobind Singh Ji</button>',
-  '<button class= "guru" id = "guru11">Granth Sahib Ji</button>',
+  '<button class= "guru" id = "guru1">Guru Nanak Dev Ji</button>',
+  '<button class= "guru" id = "guru2">Guru Angad Dev Ji</button>',
+  '<button class= "guru" id = "guru3">Guru Amar Das Ji</button>',
+  '<button class= "guru" id = "guru4">Guru Ram Das Ji</button>',
+  '<button class= "guru" id = "guru5">Guru Arjan Dev Ji</button>',
+  '<button class= "guru" id = "guru6">Guru Hargobind Sahib Ji</button>',
+  '<button class= "guru" id = "guru7">Guru Har Rai Sahib Ji</button>',
+  '<button class= "guru" id = "guru8">Guru Har Krishan Sahib Ji</button>',
+  '<button class= "guru" id = "guru9">Guru Teg Bahadur Sahib Ji</button>',
+  '<button class= "guru" id = "guru10">Guru Gobind Singh Ji</button>',
+  '<button class= "guru" id = "guru11">Guru Granth Sahib Ji</button>',
   '</div>',
 );
 // announcement modal body
@@ -60,7 +59,7 @@ const modalAnBox =
   '<div class="box-container"><div class="modal-ann-box" contenteditable="true" data-placeholder="Add announcement text here ..."></div></div>';
 
 // sets the first tab, with header, section title, and button group
-const slidePage = slideHeader + slideText + buttons;
+const slidePage = slideHeader + buttons;
 // sets the second page with header, change language button, and content box
 const announcementPage = announcementHeader + langSlider + modalAnBox;
 
