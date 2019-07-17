@@ -17,17 +17,17 @@ const slideStrings = {
 };
 const dropdownStrings = {
   gurus: [
-    'Nanak Dev Ji',
-    'Angad Dev Ji',
-    'Amar Das Ji',
-    'Ram Das Ji',
-    'Arjan Dev Ji',
-    'Hargobind Sahib Ji',
-    'Har Rai Sahib Ji',
-    'Har Krishan Sahib Ji',
-    'Teg Bhadur Sahib Ji',
-    'Gobind Singh Ji',
-    'Granth Sahib Ji',
+    'Guru Nanak Dev Ji',
+    'Guru Angad Dev Ji',
+    'Guru Amar Das Ji',
+    'Guru Ram Das Ji',
+    'Guru Arjan Dev Ji',
+    'Guru Hargobind Sahib Ji',
+    'Guru Har Rai Sahib Ji',
+    'Guru Har Krishan Sahib Ji',
+    'Guru Teg Bhadur Sahib Ji',
+    'Guru Gobind Singh Ji',
+    'Guru Granth Sahib Ji',
   ],
 };
 const announcemenetPlaceholder = {
