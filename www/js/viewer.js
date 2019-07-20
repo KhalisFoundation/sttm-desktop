@@ -102,6 +102,7 @@ const castText = (text, isGurmukhi) => {
   castCur.showInEnglish = isGurmukhi !== true;
   castCur.gurmukhi = text;
   castCur.larivaar = text;
+  castCur.isText = true;
   castToReceiver();
 };
 
