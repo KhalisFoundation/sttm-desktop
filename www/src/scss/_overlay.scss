@@ -157,6 +157,50 @@ input[type='color'] {
   width: 60px;
 }
 
+.overlay-off {
+  .cp-icon,
+  .setting-label {
+    color: #ddd;
+    cursor: not-allowed;
+  }
+
+  input.color-input,
+  .export-btn,
+  .layout-btn,
+  .overlay-theme-swatch,
+  .preview {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+
+  .cast-toggle {
+    .fa-toggle-off {
+      color: #ee5253;
+      cursor: pointer;
+    }
+
+    .setting-label {
+      color: #666;
+    }
+  }
+}
+
+.cast-toggle {
+  cursor: pointer;
+  .cp-icon {
+    font-size: 28px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .fa-toggle-on {
+    color: #10ac84;
+  }
+
+  .fa-toggle-off {
+    color: #ee5253;
+  }
+}
+
 .setting-label {
   color: #333;
   font-size: 10px;
