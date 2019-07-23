@@ -68,6 +68,7 @@
     "searchSource": "all"
   },
   "obs": {
+    "overlayCast": false,
     "overlayPrefs": {
       "overlayVars": {
         "layout": "split",

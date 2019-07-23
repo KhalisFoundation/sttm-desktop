@@ -13,14 +13,19 @@ const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const { overlayVars } = store.get('obs').overlayPrefs;
+let { overlayCast } = store.get('obs').overlayCast;
 
-const url = `http://${host}:${overlayPort}/`;
+const controlPanel = document.querySelector('.control-panel');
+const webview = document.createElement('webview');
+
+let url = `http://${host}:${overlayPort}/`;
 
 const savePrefs = () => {
   store.set('obs', {
     overlayPrefs: {
       overlayVars,
     },
+    overlayCast,
   });
   ipcRenderer.send('update-overlay-vars');
 };
@@ -195,6 +200,31 @@ const toggleLarivaar = h(
   h('div.setting-label', `Use ${overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar'}`),
 );
 
+const toggleCast = h(
+  'div.input-wrap.cast-toggle',
+  {
+    onclick: evt => {
+      overlayCast = !overlayCast;
+      savePrefs();
+
+      ipcRenderer.send('toggle-obs-cast', overlayCast);
+
+      const $castIcon = evt.currentTarget.querySelector('.cp-icon');
+      $castIcon.classList.toggle('fa-toggle-on', overlayCast);
+      $castIcon.classList.toggle('fa-toggle-off', !overlayCast);
+      document.body.classList.toggle('overlay-off', !overlayCast);
+
+      const $castLabel = evt.currentTarget.querySelector('.setting-label');
+      $castLabel.innerText = `${overlayCast ? 'On' : 'Off'}`;
+
+      url = `http://${host}:${overlayPort}/`;
+      webview.src = `${url}?preview`;
+    },
+  },
+  h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
+  h('div.setting-label', `${overlayCast ? 'On' : 'Off'}`),
+);
+
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
@@ -214,9 +244,10 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
-const controlPanel = document.querySelector('.control-panel');
 const themeSelector = document.querySelector('.theme-selector');
 
+controlPanel.append(toggleCast);
+controlPanel.append(separator);
 controlPanel.append(gurbaniColor);
 controlPanel.append(changeGurbanifontSizeButton);
 controlPanel.append(textColor);
@@ -309,11 +340,12 @@ const themeSwatchFactory = themeOptions => {
 
 themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
 
+document.body.classList.toggle('overlay-off', !overlayCast);
+
 Object.keys(themeObjects).forEach(themeObject => {
   themeSelector.appendChild(themeSwatchFactory(themeObjects[themeObject]));
 });
 
-const webview = document.createElement('webview');
 webview.src = `${url}?preview`;
 webview.className = 'preview';
 document.querySelector('.canvas').appendChild(webview);

@@ -24,33 +24,14 @@ expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 
-op.find(
-  {
-    // Re: http://www.sikhiwiki.org/index.php/Gurgadi
-    ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
-    count: 1,
-  },
-  (err, port) => {
-    if (err) {
-      dialog.showErrorBox(
-        'Overlay Error',
-        'No free ports available. Close other applications and Reboot the machine',
-      );
-      app.exit(-1);
-      return;
-    }
-    global.overlayPort = port;
-    // console.log(`Overlay Port No ${port}`);
-    http.listen(port);
-  },
-);
-
 const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
 });
 
 const appVersion = app.getVersion();
+
+const { overlayCast } = store.get('obs').overlayCast;
 
 let mainWindow;
 let viewerWindow = false;
@@ -300,6 +281,41 @@ const shouldQuit = app.makeSingleInstance(() => {
     mainWindow.focus();
   }
 });
+
+const searchPorts = () => {
+  op.find(
+    {
+      // Re: http://www.sikhiwiki.org/index.php/Gurgadi
+      ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
+      count: 1,
+    },
+    (err, port) => {
+      if (err) {
+        dialog.showErrorBox(
+          'Overlay Error',
+          'No free ports available. Close other applications and Reboot the machine',
+        );
+        app.exit(-1);
+        return;
+      }
+      global.overlayPort = port;
+      // console.log(`Overlay Port No ${port}`);
+      http.listen(port);
+    },
+  );
+};
+
+ipcMain.on('toggle-obs-cast', (event, arg) => {
+  if (arg) {
+    searchPorts();
+  } else {
+    http.close();
+  }
+});
+
+if (overlayCast) {
+  searchPorts();
+}
 
 if (shouldQuit) {
   app.exit();
