@@ -1,13 +1,19 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
+const copy = require('copy-to-clipboard');
+const isOnline = require('is-online');
 const banidb = require('./banidb');
+const { tryConnection, onEnd } = require('./share-sync');
+
+let code = '...';
+let isPresenting = false;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { updateCeremonyThemeTiles } = require('./theme_editor');
 
-const toolbarItems = ['sunder-gutka', 'ceremonies'];
+const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button'];
 const navLinks = require('./search');
 
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
@@ -38,6 +44,18 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
+const remoteSyncInit = async () => {
+  const onlineVal = await isOnline();
+  if (onlineVal) {
+    code = await tryConnection();
+    if (code) {
+      document.querySelector('.sync-code-num').innerText = code;
+    }
+  } else {
+    document.querySelector('.sync-code-num').innerText = '...';
+  }
+};
+
 // factories
 const navigatorHeaderFactory = (id, content, lang) =>
   h(`header.toolbar-nh.navigator-header#${id}`, h(`span.${lang}`, content));
@@ -60,6 +78,51 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
       }),
     ]),
   ]);
+
+const syncContent = h('div.sync-content', [
+  h('div.left-sync-content', [
+    h('div.left-sync-icon'),
+    h('button.button.left-sync-button', 'Watch Video'),
+  ]),
+  h('div.right-sync-content', [
+    h('div.sync-code-label', 'Your unique sync code is'),
+    h('div.sync-code-num', code),
+    h(
+      'div.sync-code-desc',
+      'Share this code with anyone using a mobile device* and they can open their browser, go to sttm.co/sync and enter the code above to follow along with the desktop app on their device',
+    ),
+    h('div.button-wrap', [
+      h(
+        'button.button.copy-code-btn',
+        {
+          onclick: () => {
+            copy(code);
+          },
+        },
+        'Copy Code',
+      ),
+      h(
+        'button.button.present-btn',
+        {
+          onclick: () => {
+            if (isPresenting) {
+              isPresenting = false;
+              onEnd(code);
+              document.querySelector('.sync-code-num').innerText = '...';
+            } else {
+              isPresenting = true;
+              remoteSyncInit();
+            }
+            document.querySelector('.present-btn').innerText = isPresenting
+              ? 'Stop Session'
+              : 'Present';
+          },
+        },
+        isPresenting ? 'Stop Session' : 'Present',
+      ),
+    ]),
+  ]),
+]);
 
 const translitSwitch = h('div.translit-switch', [
   h('span', 'Abc'),
@@ -242,6 +305,8 @@ module.exports = {
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
+
+    document.querySelector('.sync-dialogue').appendChild(syncContent);
 
     $baniList.querySelector('header').appendChild(translitSwitch);
     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));

@@ -104,6 +104,20 @@ a {
     }
   }
 
+  .sync-button {
+    bottom: 10px;
+    cursor: pointer;
+    font-size: 48px;
+    height: 50px;
+    left: 10px;
+    position: fixed;
+    transition: 0.3s all ease;
+    width: 50px;
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
   .close-overlay-ui {
     border: 2px solid white;
     border-radius: 50%;
@@ -309,6 +323,16 @@ a {
     background-image: url('../../assets/img/icons/sunder_gutka.png');
   }
 
+  #tool-sync-button {
+    background-color: white;
+    background-image: url('../../assets/img/icons/sync_button.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 75%;
+    bottom: 10px;
+    position: fixed;
+  }
+
   #tool-ceremonies {
     background-color: rebeccapurple;
     background-image: url('../../assets/img/icons/ceremonies.svg');
@@ -316,6 +340,86 @@ a {
     background-repeat: no-repeat;
     background-size: auto 75%;
   }
+
+  .sync-header {
+    background: #e67e22;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: white;
+    letter-spacing: 1px;
+    line-height: 40px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .sync-dialogue {
+    background: white;
+    border-radius: 5px;
+    height: 500px;
+    margin: auto;
+    max-width: 800px;
+  }
+
+  .sync-content {
+    align-items: center;
+    display: flex;
+    height: 450px;
+    justify-content: space-around;
+
+    .left-sync-content {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+      width: 40%;
+    }
+
+    .left-sync-icon {
+      background-image: url('../../assets/img/icons/sync_button.svg');
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: auto 75%;
+      height: 300px;
+      width: 100%;
+    }
+
+    .right-sync-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+      text-align: center;
+      width: 40%;
+
+      .sync-code-label {
+        color: #e67e22;
+      }
+
+      .sync-code-num {
+        font-size: 60px;
+      }
+    }
+  }
+}
+
+.sync-dialogue-wrapper {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  left: 100px;
+  position: fixed;
+  top: 0;
+  width: calc(100% - 100px);
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.button-wrap {
+  padding: 10px;
 }
 
 .presenter-view #toolbar {
