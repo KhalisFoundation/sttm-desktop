@@ -3,6 +3,7 @@
     "app": {
       "theme": "light-theme",
       "themebg": "",
+      "overlay-cast": false,
       "layout": {
         "presenter-view": true
       },
@@ -68,7 +69,6 @@
     "searchSource": "all"
   },
   "obs": {
-    "overlayCast": false,
     "overlayPrefs": {
       "overlayVars": {
         "layout": "split",

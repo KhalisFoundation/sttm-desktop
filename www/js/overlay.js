@@ -13,7 +13,7 @@ const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const { overlayVars } = store.get('obs').overlayPrefs;
-let { overlayCast } = store.get('obs').overlayCast;
+let overlayCast = store.getUserPref('app.overlay-cast');
 
 const controlPanel = document.querySelector('.control-panel');
 const webview = document.createElement('webview');
@@ -25,7 +25,6 @@ const savePrefs = () => {
     overlayPrefs: {
       overlayVars,
     },
-    overlayCast,
   });
   ipcRenderer.send('update-overlay-vars');
 };
@@ -205,9 +204,9 @@ const toggleCast = h(
   {
     onclick: evt => {
       overlayCast = !overlayCast;
-      savePrefs();
-
+      store.setUserPref('app.overlay-cast', overlayCast);
       ipcRenderer.send('toggle-obs-cast', overlayCast);
+      ipcRenderer.send('update-settings');
 
       const $castIcon = evt.currentTarget.querySelector('.cp-icon');
       $castIcon.classList.toggle('fa-toggle-on', overlayCast);
@@ -349,7 +348,7 @@ Object.keys(themeObjects).forEach(themeObject => {
 webview.src = `${url}?preview`;
 webview.className = 'preview';
 document.querySelector('.canvas').appendChild(webview);
-
+remote.getCurrentWindow().toggleDevTools();
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
   if (typeof overlayVars.padding === 'undefined') {
