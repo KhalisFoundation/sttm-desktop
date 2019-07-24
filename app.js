@@ -31,7 +31,7 @@ const store = new Store({
 
 const appVersion = app.getVersion();
 
-const { overlayCast } = store.getUserPref('app.overlay-cast');
+const overlayCast = store.getUserPref('app.overlay-cast');
 
 let mainWindow;
 let viewerWindow = false;
