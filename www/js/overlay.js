@@ -348,7 +348,7 @@ Object.keys(themeObjects).forEach(themeObject => {
 webview.src = `${url}?preview`;
 webview.className = 'preview';
 document.querySelector('.canvas').appendChild(webview);
-remote.getCurrentWindow().toggleDevTools();
+
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
   if (typeof overlayVars.padding === 'undefined') {
