@@ -4,10 +4,8 @@ const electron = require('electron');
 const { remote } = electron;
 const main = remote.require('./app');
 
-const copy = require('copy-to-clipboard');
-const anvaad = require('anvaad-js');
+const copy = require('./copy');
 const search = require('./search');
-const searchMethods = require('../js/banidb/index.js');
 const strings = require('./strings');
 const dhanGuruModal = require('./insert-slide');
 const menu = require('./menu');
@@ -82,34 +80,7 @@ function spaceBar(e) {
   highlightLine(newLineId);
   e.preventDefault();
 }
-async function copyPanktee() {
-  const shabadID = global.core.search.clickedShabadID;
-  const linePos = search.currentShabad.indexOf(search.currentLine);
-  const result = await searchMethods.loadShabad(shabadID);
-  const remapped = global.controller.remapLine(result[linePos]);
 
-  // the two things that are always going to be in the line
-  const panktee = anvaad.unicode(remapped.Gurmukhi);
-  const translit = remapped.Transliteration;
-
-  // things that will change
-  let transEng;
-  let transPunjabi;
-  if (!remapped.English && !remapped.Punjabi) {
-    copy(`${panktee}\n\n${translit}`);
-  } else {
-    transEng = remapped.English;
-    if (!remapped.Punjabi) {
-      copy(`${panktee}\n\n${transEng}\n\n${translit}`);
-    } else if (!remapped.English) {
-      transPunjabi = anvaad.unicode(remapped.Punjabi);
-      copy(`${panktee}\n\n${transPunjabi}\n\n${translit}`);
-    } else {
-      transPunjabi = anvaad.unicode(remapped.Punjabi);
-      copy(`${panktee}\n\n${transEng}\n\n${transPunjabi}\n\n${translit}`);
-    }
-  }
-}
 function prevLine(e) {
   // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
@@ -184,7 +155,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bind('mod+c', () => {
     if (document.activeElement.id === 'shabad-page') {
-      copyPanktee();
+      copy.copyPanktee();
     }
   });
   Mousetrap.bindGlobal('enter', () => {
