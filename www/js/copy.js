@@ -1,7 +1,3 @@
-// electron and setting-related imports
-const electron = require('electron');
-
-const { remote } = electron;
 const { store } = require('electron').remote.require('./app');
 
 // other essential imports
