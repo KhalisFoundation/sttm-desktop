@@ -162,6 +162,7 @@ input[type='color'] {
   .setting-label {
     color: #ddd;
     cursor: not-allowed;
+    pointer-events: none;
   }
 
   input.color-input,
@@ -171,6 +172,7 @@ input[type='color'] {
   .preview {
     cursor: not-allowed;
     opacity: 0.3;
+    pointer-events: none;
   }
 
   .cast-toggle {
