@@ -33,6 +33,25 @@ const appVersion = app.getVersion();
 
 const overlayCast = store.getUserPref('app.overlay-cast');
 
+/* Enable the server to be destroyed */
+const enableDestroy = server => {
+  var connections = {};
+
+  server.on('connection', function(conn) {
+    var key = conn.remoteAddress + ':' + conn.remotePort;
+    connections[key] = conn;
+    conn.on('close', function() {
+      delete connections[key];
+    });
+  });
+
+  server.destroy = function(cb) {
+    server.close(cb);
+    for (var key in connections) connections[key].destroy();
+  };
+};
+enableDestroy(http);
+
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
@@ -309,7 +328,7 @@ ipcMain.on('toggle-obs-cast', (event, arg) => {
   if (arg) {
     searchPorts();
   } else {
-    http.close();
+    http.destroy();
   }
 });
 
