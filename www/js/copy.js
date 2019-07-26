@@ -46,13 +46,13 @@ async function copyPanktee() {
   checkDB(remapped);
   let toBeCopied = anvaad.unicode(remapped.Gurmukhi);
   if (copyEngTranslation) {
-    toBeCopied += `\n${remapped.English}`;
+    toBeCopied += `\n\n${remapped.English}`;
   }
   if (copyPunjabiTranslation) {
-    toBeCopied += `\n${anvaad.unicode(remapped.Punjabi)}`;
+    toBeCopied += `\n\n${anvaad.unicode(remapped.Punjabi)}`;
   }
   if (copyTranslit) {
-    toBeCopied += `\n${remapped.Transliteration}`;
+    toBeCopied += `\n\n${remapped.Transliteration}`;
   }
   copy(toBeCopied);
 }
