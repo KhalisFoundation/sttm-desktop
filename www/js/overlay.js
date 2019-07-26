@@ -3,11 +3,7 @@ const h = require('hyperscript');
 const ip = require('ip');
 const copy = require('copy-to-clipboard');
 
-const host = ip.address();
-
 const { ipcRenderer, remote } = electron;
-
-const overlayPort = remote.getGlobal('overlayPort');
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -18,13 +14,13 @@ let overlayCast = store.getUserPref('app.overlay-cast');
 const controlPanel = document.querySelector('.control-panel');
 const webview = document.createElement('webview');
 
-let url = `http://${host}:${overlayPort}/`;
-
 const getUrl = () => {
   const overlayPort = remote.getGlobal('overlayPort');
   const host = ip.address();
   return `http://${host}:${overlayPort}/`;
 };
+
+let url = getUrl();
 
 const savePrefs = () => {
   store.set('obs', {
@@ -223,8 +219,6 @@ const toggleCast = h(
       $castLabel.innerText = `${overlayCast ? 'On' : 'Off'}`;
 
       url = getUrl();
-      console.log(url);
-      remote.getCurrentWindow().toggleDevTools();
       webview.src = `${url}?preview`;
     },
   },
