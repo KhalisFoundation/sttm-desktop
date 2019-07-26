@@ -20,6 +20,12 @@ const webview = document.createElement('webview');
 
 let url = `http://${host}:${overlayPort}/`;
 
+const getUrl = () => {
+  const overlayPort = remote.getGlobal('overlayPort');
+  const host = ip.address();
+  return `http://${host}:${overlayPort}/`;
+};
+
 const savePrefs = () => {
   store.set('obs', {
     overlayPrefs: {
@@ -216,7 +222,9 @@ const toggleCast = h(
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
       $castLabel.innerText = `${overlayCast ? 'On' : 'Off'}`;
 
-      url = `http://${host}:${overlayPort}/`;
+      url = getUrl();
+      console.log(url);
+      remote.getCurrentWindow().toggleDevTools();
       webview.src = `${url}?preview`;
     },
   },
