@@ -68,6 +68,7 @@
     "express": "^4.15.2",
     "extract-zip": "^1.6.7",
     "get-json": "^1.0.0",
+    "http-shutdown": "^1.2.1",
     "hyperscript": "^2.0.2",
     "image-type": "^3.0.0",
     "imagemin": "^6.0.0",
