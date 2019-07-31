@@ -1,5 +1,11 @@
 ## New Updates
 
+### 5.3.2 - _190806_
+     
+### Improved:
+
+- Bug fixes & UI enhancements   
+
 ### 5.3 - _190715_
 
 ### Added:
