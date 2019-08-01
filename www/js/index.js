@@ -20,6 +20,10 @@ const settings = new Settings(platform.store); */
 
 // is the current slide of the shabad (= false) or an inserted slide (= true)
 let isInsertedSlide = false;
+const updateInsertedSlide = newValue => {
+  isInsertedSlide = newValue;
+};
+
 function escKey() {
   /* if (settings.$settings.classList.contains('animated')) {
     settings.closeSettings();
@@ -173,6 +177,9 @@ if (typeof Mousetrap !== 'undefined') {
       openFirstResult();
     }
   });
+  Mousetrap.bind('mod+t', () => {
+    console.log(isInsertedSlide);
+  });
 }
 
 const $shabadPage = document.getElementById('shabad-page');
@@ -199,7 +206,6 @@ function platformMethod(method, args) {
 global.platform.ipc.on('sync-settings', () => {
   settings.init();
 });
-
 module.exports = {
   menu,
   search,
@@ -207,6 +213,7 @@ module.exports = {
   platformMethod,
   toolbar,
   themeEditor,
+  updateInsertedSlide,
   shortcutTray,
   'custom-theme': () => {
     themeEditor.init();
