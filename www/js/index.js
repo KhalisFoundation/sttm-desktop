@@ -177,9 +177,6 @@ if (typeof Mousetrap !== 'undefined') {
       openFirstResult();
     }
   });
-  Mousetrap.bind('mod+t', () => {
-    console.log(isInsertedSlide);
-  });
 }
 
 const $shabadPage = document.getElementById('shabad-page');
