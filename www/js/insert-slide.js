@@ -86,6 +86,7 @@ function buttonOnClick() {
     for (let i = 1; i <= 11; i += 1) {
       document.getElementById(`guru${i}`).onclick = () => {
         global.controller.sendText(strings.slideStrings.dhanguruStrings[i - 1], true);
+        global.core.updateInsertedSlide(true);
         modal.close();
       };
     }
@@ -134,6 +135,7 @@ modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default'
       allowedTags,
     });
     global.controller.sendText(announcementText, isGurmukhi);
+    global.core.updateInsertedSlide(true);
     document.querySelector('.modal-ann-box').innerHTML = '';
   }
   modal.close();
