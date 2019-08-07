@@ -24,31 +24,33 @@
 
 #### <a name="macos-slides">macOS:</a>:
 
-| Combination | Description                         |
-| ----------- | ----------------------------------- |
-| cmd + 1     | Waheguru Slide                      |
-| cmd + 2     | Mool Mantra Slide                   |
-| cmd + 3     | Empty Slide                         |
-| cmd + 4     | Anand Sahib (Bhog)                  |
-| cmd + 5     | Help Guide                          |
-| cmd + 6     | Shortcut Legend                     |
-| cmd + /     | Jump to search bar                  |
-| ----------- | -----------                         |
-| cmd + g     | Add Dhan Guru slide or announcement |
+| Combination                                | Description                                 |
+| ------------------------------------------ | ------------------------------------------- |
+| cmd + 1                                    | Waheguru Slide                              |
+| cmd + 2                                    | Mool Mantra Slide                           |
+| cmd + 3                                    | Empty Slide                                 |
+| cmd + 4                                    | Anand Sahib (Bhog)                          |
+| cmd + 5                                    | Help Guide                                  |
+| cmd + 6                                    | Shortcut Legend                             |
+| cmd + /                                    | Jump to search bar                          |
+| cmd + g                                    | Add Dhan Guru slide or announcement         |
+| spacebar (when in a shabad)                | Switch between main line and unchecked line |
+| spacebar (when a waheguru slide is active) | switch back to shabad                       |
 
 #### <a name="windows-slides">Windows:</a>
 
-| Combination | Description                         |
-| ----------- | ----------------------------------- |
-| ctrl + 1    | Waheguru Slide                      |
-| ctrl + 2    | Mool Mantra Slide                   |
-| ctrl + 3    | Empty Slide                         |
-| ctrl + 4    | Anand Sahib (Bhog)                  |
-| ctrl + 5    | Help Guide                          |
-| ctrl + 6    | Shortcut Legend                     |
-| ctrl + /    | Jump to search bar                  |
-| ----------- | -----------                         |
-| ctrl + g    | Add Dhan Guru slide or announcement |
+| Combination                                | Description                                 |
+| ------------------------------------------ | ------------------------------------------- |
+| ctrl + 1                                   | Waheguru Slide                              |
+| ctrl + 2                                   | Mool Mantra Slide                           |
+| ctrl + 3                                   | Empty Slide                                 |
+| ctrl + 4                                   | Anand Sahib (Bhog)                          |
+| ctrl + 5                                   | Help Guide                                  |
+| ctrl + 6                                   | Shortcut Legend                             |
+| ctrl + /                                   | Jump to search bar                          |
+| ctrl + g                                   | Add Dhan Guru slide or announcement         |
+| spacebar (when in a shabad)                | Switch between main line and unchecked line |
+| spacebar (when a waheguru slide is active) | switch back to shabad                       |
 
 ### <a name="others">Others</a>
 
