@@ -211,6 +211,7 @@ const loadCeremony = CeremonyID =>
             const row = Object.assign({}, rawRow);
             row.Ceremony = {
               Token: row.Token,
+              Gurmukhi: row.CeremonyGurmukhi,
             };
             const customID = row.Custom;
             row.Custom = {

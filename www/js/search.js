@@ -855,7 +855,7 @@ module.exports = {
     let lineID = LineID || rows[0].ID;
     const shabadID =
       ShabadID || rows[0].shabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
-    const lineIndex = rows.findIndex(row => row.ID === lineID);
+    const lineIndex = rows.findIndex(row => row.ID === parseInt(lineID, 10));
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
