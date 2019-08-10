@@ -1,4 +1,3 @@
-/* eslint-disable arrow-parens */
 // HTMLElement builder
 const h = require('hyperscript');
 const { remote } = require('electron');
@@ -383,8 +382,7 @@ module.exports = {
     this.$dbDownloadProgress.style.width = `${state.percent * 100}%`;
   },
 
-  // eslint-disable-next-line no-unused-vars
-  focusSearch(e) {
+  focusSearch() {
     // open the Gurmukhi keyboard if it was previously open
     if (store.get('gurmukhiKB')) {
       this.openGurmukhiKB();
@@ -463,8 +461,7 @@ module.exports = {
     store.set('searchOptions.searchLanguage', value);
   },
 
-  // eslint-disable-next-line no-unused-vars
-  toggleGurmukhiKB(e) {
+  toggleGurmukhiKB() {
     const gurmukhiKBPref = store.get('gurmukhiKB');
     // no need to set a preference if user is just re-opening after KB was auto-closed
     if (!this.$navigator.classList.contains('kb-active') && gurmukhiKBPref) {
@@ -850,7 +847,7 @@ module.exports = {
     return shabadLine;
   },
 
-  printShabad(rows, ShabadID, LineID, start = 0) {
+  printShabad(rows, ShabadID, LineID, start = 0, fromScroll = false) {
     const shabadState = sessionStatesList[rows[0].sessionKey || `shabad-${ShabadID}`];
     let lineID = LineID || rows[0].ID;
     const shabadID =
@@ -893,12 +890,12 @@ module.exports = {
       // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
       if (tooFar) {
         while (tooFar) {
-          this.printShabad(rows, ShabadID, lineID, newStart);
+          this.printShabad(rows, ShabadID, lineID, newStart, true);
           newStart += throughput;
           tooFar = e.target.scrollTop > (newStart + throughput) * lineHeight;
         }
       } else if (e.target.scrollTop >= maxScrollSize) {
-        this.printShabad(rows, ShabadID, lineID, end);
+        this.printShabad(rows, ShabadID, lineID, end, true);
       }
     };
 
@@ -964,7 +961,7 @@ module.exports = {
       this.$shabadContainer.scrollTop = curPankteeTop;
     }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode, start);
+    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode, start, fromScroll);
 
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
