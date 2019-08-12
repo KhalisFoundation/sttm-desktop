@@ -538,7 +538,7 @@ module.exports = {
     return Line;
   },
 
-  sendLine(shabadID, lineID, rawLine, rawRows, mode, start) {
+  sendLine(shabadID, lineID, rawLine, rawRows, mode, start, fromScroll) {
     const Line = this.remapLine(rawLine);
     const rows = rawRows.map(row => this.remapLine(row));
     global.webview.send('show-line', { shabadID, lineID, rows, mode });
@@ -562,7 +562,8 @@ module.exports = {
         showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 &&
         mode === 'append' &&
         start > 0
-      )
+      ) &&
+      !fromScroll
     ) {
       global.platform.ipc.send('show-line', showLinePayload);
     }
