@@ -249,7 +249,9 @@ function createBroadcastFiles(arg) {
 const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const payload = Object.assign(line, overlayPrefs);
-  socket.emit('show-line', payload);
+  if (!line.fromScroll) {
+    socket.emit('show-line', payload);
+  }
 };
 
 const updateOverlayVars = () => {

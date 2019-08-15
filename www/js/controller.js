@@ -550,6 +550,7 @@ module.exports = {
       larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'),
       rows,
       mode,
+      fromScroll,
     };
     if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
@@ -562,8 +563,7 @@ module.exports = {
         showLinePayload.Line.sessionKey.indexOf('ceremony') > -1 &&
         mode === 'append' &&
         start > 0
-      ) &&
-      !fromScroll
+      )
     ) {
       global.platform.ipc.send('show-line', showLinePayload);
     }
