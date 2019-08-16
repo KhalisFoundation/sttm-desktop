@@ -3,6 +3,7 @@ const electron = require('electron');
 
 const { remote } = electron;
 const main = remote.require('./app');
+const { store } = require('electron').remote.require('./app');
 
 const copy = require('./copy');
 const search = require('./search');
@@ -24,7 +25,13 @@ function escKey() {
     settings.closeSettings();
   } */
 }
-
+// needed for copy function (did you click on shabad or bani)
+// false = shabad
+// true = bani
+let isCopyingBani;
+const clickedOnBani = value => {
+  isCopyingBani = value;
+};
 const slideShortcuts = {
   waheguru: () => global.controller.sendText(strings.slideStrings.waheguru, true),
   empty: () => global.controller.sendText(' '),
@@ -154,6 +161,7 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bind('mod+c', () => {
+    alert('active');
     if (document.activeElement.id === 'shabad-page') {
       copy.copyPanktee();
     }

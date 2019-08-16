@@ -11,13 +11,30 @@ let copyEngTranslation = true;
 let copyPunjabiTranslation = true;
 let copyTranslit = true;
 
+let baniLength;
+
 /**
+ * @param {Bool} isBani identify if you want to check for bani-related settings
  * check if any display settings are turned off
  */
-function checkDisplaySettings() {
-  copyEngTranslation = store.getUserPref('slide-layout.fields.display-translation');
-  copyPunjabiTranslation = store.getUserPref('slide-layout.fields.display-teeka');
-  copyTranslit = store.getUserPref('slide-layout.fields.display-transliteration');
+function checkDisplaySettings(isBani) {
+  if (isBani) {
+    baniLength = store.getUserPref('toolbar.gurbani.bani-length');
+  } else {
+    copyEngTranslation = store.getUserPref('slide-layout.fields.display-translation');
+    copyPunjabiTranslation = store.getUserPref('slide-layout.fields.display-teeka');
+    copyTranslit = store.getUserPref('slide-layout.fields.display-transliteration');
+  }
+}
+
+async function loadFromDB(isBani, baniID, shabadID) {
+  let result;
+  if (isBani) {
+    result = await searchMethods.loadBani(baniID);
+  } else {
+    result = await searchMethods.loadShabad(shabadID);
+  }
+  return result;
 }
 /**
  * @param {Object} remappedLine all the fields of the line from the DB
@@ -35,16 +52,21 @@ function checkDB(remappedLine) {
   }
 }
 
-async function copyPanktee() {
-  checkDisplaySettings();
+async function copyPanktee(clickedOnBani) {
+  checkDisplaySettings(true);
 
+  // for shabad
   const shabadID = global.core.search.clickedShabadID;
   const linePos = search.currentShabad.indexOf(search.currentLine);
   const result = await searchMethods.loadShabad(shabadID);
   const remapped = global.controller.remapLine(result[linePos]);
 
+  // bani
+  // const baniID =
+
   checkDB(remapped);
   let toBeCopied = anvaad.unicode(remapped.Gurmukhi);
+
   if (copyEngTranslation) {
     toBeCopied += `\n\n${remapped.English}`;
   }
