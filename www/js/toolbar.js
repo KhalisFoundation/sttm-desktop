@@ -1,6 +1,7 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
+const copy = require('./copy');
 const banidb = require('./banidb');
 
 const { store } = remote.require('./app');
@@ -193,6 +194,7 @@ const printBanis = rows => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
+          copy.loadFromDB(row.ID, 'bani');
           toggleOverlayUI(currentToolbarItem, false);
           navLinks.navPage('shabad');
         },

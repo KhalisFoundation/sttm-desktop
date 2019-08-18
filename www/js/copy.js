@@ -10,32 +10,42 @@ const searchMethods = require('../js/banidb/index.js');
 let copyEngTranslation = true;
 let copyPunjabiTranslation = true;
 let copyTranslit = true;
-
-let baniLength;
+const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
+// storing pulled shabad/bani from db in array to avoid calling db too much
+let pankteeArray = [];
 
 /**
- * @param {Bool} isBani identify if you want to check for bani-related settings
- * check if any display settings are turned off
+ *
+ * @param {number} id id given to the shabad/bani/ceremony in db
+ * @param {String} idType specifies if the gurbani is identified as a 'bani', 'shabad', or 'ceremony' in db
  */
-function checkDisplaySettings(isBani) {
-  if (isBani) {
-    baniLength = store.getUserPref('toolbar.gurbani.bani-length');
-  } else {
-    copyEngTranslation = store.getUserPref('slide-layout.fields.display-translation');
-    copyPunjabiTranslation = store.getUserPref('slide-layout.fields.display-teeka');
-    copyTranslit = store.getUserPref('slide-layout.fields.display-transliteration');
+async function loadFromDB(id, idType) {
+  let result;
+  let remappedLine;
+
+  if (idType === 'shabad') {
+    result = await searchMethods.loadShabad(id);
+    result.forEach(panktee => {
+      remappedLine = global.controller.remapLine(panktee);
+      pankteeArray.push(remappedLine);
+    });
+  } else if (idType === 'bani') {
+    result = await searchMethods.loadBani(id, baniLength);
+    result.forEach(panktee => {
+      remappedLine = global.controller.remapLine(panktee);
+      pankteeArray.push(remappedLine);
+    });
+  } else if (idType === 'ceremony') {
+    console.log('ceremony');
   }
 }
 
-async function loadFromDB(isBani, baniID, shabadID) {
-  let result;
-  if (isBani) {
-    result = await searchMethods.loadBani(baniID);
-  } else {
-    result = await searchMethods.loadShabad(shabadID);
-  }
-  return result;
+function checkDisplaySettings() {
+  copyEngTranslation = store.getUserPref('slide-layout.fields.display-translation');
+  copyPunjabiTranslation = store.getUserPref('slide-layout.fields.display-teeka');
+  copyTranslit = store.getUserPref('slide-layout.fields.display-transliteration');
 }
+
 /**
  * @param {Object} remappedLine all the fields of the line from the DB
  * check DB for fields that are selected to be displayed and check if they are null
@@ -52,33 +62,29 @@ function checkDB(remappedLine) {
   }
 }
 
-async function copyPanktee(clickedOnBani) {
-  checkDisplaySettings(true);
-
-  // for shabad
-  const shabadID = global.core.search.clickedShabadID;
+function copyPanktee() {
+  console.log(pankteeArray.length);
+  checkDisplaySettings();
   const linePos = search.currentShabad.indexOf(search.currentLine);
-  const result = await searchMethods.loadShabad(shabadID);
-  const remapped = global.controller.remapLine(result[linePos]);
-
-  // bani
-  // const baniID =
-
-  checkDB(remapped);
-  let toBeCopied = anvaad.unicode(remapped.Gurmukhi);
+  const panktee = pankteeArray[linePos];
+  console.log(linePos);
+  console.log(pankteeArray);
+  checkDB(panktee);
+  let toBeCopied = anvaad.unicode(panktee.Gurmukhi);
 
   if (copyEngTranslation) {
-    toBeCopied += `\n\n${remapped.English}`;
+    toBeCopied += `\n\n${panktee.English}`;
   }
   if (copyPunjabiTranslation) {
-    toBeCopied += `\n\n${anvaad.unicode(remapped.Punjabi)}`;
+    toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
   }
   if (copyTranslit) {
-    toBeCopied += `\n\n${remapped.Transliteration}`;
+    toBeCopied += `\n\n${panktee.Transliteration}`;
   }
   copy(toBeCopied);
 }
 
 module.exports = {
+  loadFromDB,
   copyPanktee,
 };
