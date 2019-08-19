@@ -1,7 +1,6 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
-const copy = require('./copy');
 const banidb = require('./banidb');
 
 const { store } = remote.require('./app');

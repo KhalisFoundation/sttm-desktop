@@ -14,7 +14,6 @@ const pageNavJSON = require('./footer-left.json');
 const { store } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
-const copy = require('./copy');
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
   8, // Backspace
