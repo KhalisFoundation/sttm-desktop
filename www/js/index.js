@@ -192,6 +192,7 @@ global.platform.ipc.on('sync-settings', () => {
 });
 
 module.exports = {
+  copy,
   menu,
   search,
   shareSync,

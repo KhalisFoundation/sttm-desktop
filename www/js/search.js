@@ -14,7 +14,7 @@ const pageNavJSON = require('./footer-left.json');
 const { store } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
-
+const copy = require('./copy');
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
   8, // Backspace
@@ -562,7 +562,7 @@ module.exports = {
             {
               onclick: ev => {
                 this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
-                global.core.search.clickedShabadID = item.Shabads[0].ShabadID;
+                global.core.copy.loadFromDB(item.Shabads[0].ShabadID, 'shabad');
               },
             },
             resultNode,

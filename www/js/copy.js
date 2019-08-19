@@ -4,7 +4,7 @@ const { store } = require('electron').remote.require('./app');
 const copy = require('copy-to-clipboard');
 const anvaad = require('anvaad-js');
 const search = require('./search');
-const searchMethods = require('../js/banidb/index.js');
+const baniDB = require('../js/banidb/index.js');
 
 // defualt these to true, so that we only need to change them if they are turned off
 let copyEngTranslation = true;
@@ -12,8 +12,14 @@ let copyPunjabiTranslation = true;
 let copyTranslit = true;
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
 // storing pulled shabad/bani from db in array to avoid calling db too much
-let pankteeArray = [];
+const pankteeArray = [];
 
+function remapShabad(unmapped) {
+  unmapped.forEach(row => {
+    const remappedRow = global.controller.remapLine(row);
+    pankteeArray.push(remappedRow);
+  });
+}
 /**
  *
  * @param {number} id id given to the shabad/bani/ceremony in db
@@ -21,19 +27,14 @@ let pankteeArray = [];
  */
 async function loadFromDB(id, idType) {
   let result;
-  let remappedLine;
 
   if (idType === 'shabad') {
-    result = await searchMethods.loadShabad(id);
-    result.forEach(panktee => {
-      remappedLine = global.controller.remapLine(panktee);
-      pankteeArray.push(remappedLine);
-    });
+    result = await baniDB.loadShabad(id);
+    remapShabad(result);
   } else if (idType === 'bani') {
-    result = await searchMethods.loadBani(id, baniLength);
-    result.forEach(panktee => {
-      remappedLine = global.controller.remapLine(panktee);
-      pankteeArray.push(remappedLine);
+    baniDB.loadBani(id, baniLength).then(row => {
+      const remappedRow = global.controller.remapLine(row);
+      pankteeArray.push(remappedRow);
     });
   } else if (idType === 'ceremony') {
     console.log('ceremony');
@@ -62,13 +63,10 @@ function checkDB(remappedLine) {
   }
 }
 
-function copyPanktee() {
-  console.log(pankteeArray.length);
+async function copyPanktee() {
   checkDisplaySettings();
   const linePos = search.currentShabad.indexOf(search.currentLine);
   const panktee = pankteeArray[linePos];
-  console.log(linePos);
-  console.log(pankteeArray);
   checkDB(panktee);
   let toBeCopied = anvaad.unicode(panktee.Gurmukhi);
 

@@ -194,7 +194,7 @@ const printBanis = rows => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
-          copy.loadFromDB(row.ID, 'bani');
+          global.core.copy.loadFromDB(row.ID, 'bani');
           toggleOverlayUI(currentToolbarItem, false);
           navLinks.navPage('shabad');
         },
