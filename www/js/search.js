@@ -292,6 +292,13 @@ const sources = {
   S: 'Vaaran',
 };
 
+const baniLengthCols = {
+  short: 'existsSGPC',
+  medium: 'existsMedium',
+  long: 'existsTaksal',
+  extralong: 'existsBuddhaDal',
+};
+
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -313,6 +320,7 @@ function akhandPaatt() {
 module.exports = {
   currentShabad,
   currentMeta,
+  baniLengthCols,
 
   init() {
     this.searchSource = store.get('searchOptions.searchSource');
@@ -731,12 +739,6 @@ module.exports = {
       blackListedMangalPosition = 'above';
     }
     // translate user settings into its respective database fields
-    const baniLengthCols = {
-      short: 'existsSGPC',
-      medium: 'existsMedium',
-      long: 'existsTaksal',
-      extralong: 'existsBuddhaDal',
-    };
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
