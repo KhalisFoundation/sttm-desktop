@@ -26,31 +26,31 @@
 
 | Combination                                | Description                                 |
 | ------------------------------------------ | ------------------------------------------- |
-| cmd + 1                                    | Waheguru Slide                              |
-| cmd + 2                                    | Mool Mantra Slide                           |
-| cmd + 3                                    | Empty Slide                                 |
-| cmd + 4                                    | Anand Sahib (Bhog)                          |
-| cmd + 5                                    | Help Guide                                  |
-| cmd + 6                                    | Shortcut Legend                             |
-| cmd + /                                    | Jump to search bar                          |
-| cmd + g                                    | Add Dhan Guru slide or announcement         |
-| spacebar (when in a shabad)                | Switch between main line and unchecked line |
-| spacebar (when a waheguru slide is active) | switch back to shabad                       |
+| CMD + 1                                    | Waheguru Slide                              |
+| CMD + 2                                    | Mool Mantra Slide                           |
+| CMD + 3                                    | Empty Slide                                 |
+| CMD + 4                                    | Anand Sahib (Bhog)                          |
+| CMD + 5                                    | Help Guide                                  |
+| CMD + 6                                    | Shortcut Legend                             |
+| CMD + /                                    | Jump to search bar                          |
+| CMD + g                                    | Add Dhan Guru slide or announcement         |
+| Spacebar (when in a shabad)                | Switch between main line and unchecked line |
+| Spacebar (when a special slide [ie waheguru slide, announcement, etc) is active] | Switch back to shabad                       |
 
 #### <a name="windows-slides">Windows:</a>
 
 | Combination                                                                      | Description                                 |
 | -------------------------------------------------------------------------------- | ------------------------------------------- |
-| ctrl + 1                                                                         | Waheguru Slide                              |
-| ctrl + 2                                                                         | Mool Mantra Slide                           |
-| ctrl + 3                                                                         | Empty Slide                                 |
-| ctrl + 4                                                                         | Anand Sahib (Bhog)                          |
-| ctrl + 5                                                                         | Help Guide                                  |
-| ctrl + 6                                                                         | Shortcut Legend                             |
-| ctrl + /                                                                         | Jump to search bar                          |
-| ctrl + g                                                                         | Add Dhan Guru slide or announcement         |
-| spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
-| spacebar (when a special slide (ie waheguru slide, announcement, etc) is active) | switch back to shabad                       |
+| CTRL + 1                                                                         | Waheguru Slide                              |
+| CTRL + 2                                                                         | Mool Mantra Slide                           |
+| CTRL + 3                                                                         | Empty Slide                                 |
+| CTRL + 4                                                                         | Anand Sahib (Bhog)                          |
+| CTRL + 5                                                                         | Help Guide                                  |
+| CTRL + 6                                                                         | Shortcut Legend                             |
+| CTRL + /                                                                         | Jump to search bar                          |
+| CTRL + g                                                                         | Add Dhan Guru slide or announcement         |
+| Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
+| Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
 ### <a name="others">Others</a>
 
@@ -58,15 +58,15 @@
 
 | Combination | Description       |
 | ----------- | ----------------- |
-| cmd + q     | close app         |
-| cmd + u     | check for updates |
-| cmd + h     | minimize window   |
-| cmd + m     | minimize window   |
+| CMD + q     | close app         |
+| CMD + u     | check for updates |
+| CMD + h     | minimize window   |
+| CMD + m     | minimize window   |
 
 #### <a name ="windows-others">Windows:</a>
 
 | Combination | Description       |
 | ----------- | ----------------- |
-| ctrl + q    | close app         |
-| ctrl + u    | check for updates |
-| ctrl + m    | minimize window   |
+| CTRL + q    | close app         |
+| CTRL + u    | check for updates |
+| CTRL + m    | minimize window   |
