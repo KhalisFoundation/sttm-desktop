@@ -295,6 +295,7 @@ const announcementSlideButton = h(
           { allowedTags },
         );
         global.controller.sendText(announcementText, isGurmukhi);
+        global.core.updateInsertedSlide(true);
       },
     },
     'Add Announcement',
