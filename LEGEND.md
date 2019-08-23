@@ -33,9 +33,9 @@
 | CMD + 5                                    | Help Guide                                  |
 | CMD + 6                                    | Shortcut Legend                             |
 | CMD + /                                    | Jump to search bar                          |
-| CMD + g                                    | Add Dhan Guru slide or announcement         |
+| CMD + G                                    | Add Dhan Guru slide or announcement         |
 | Spacebar (when in a shabad)                | Switch between main line and unchecked line |
-| Spacebar (when a special slide [ie waheguru slide, announcement, etc) is active] | Switch back to shabad                       |
+| Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
 #### <a name="windows-slides">Windows:</a>
 
@@ -48,7 +48,7 @@
 | CTRL + 5                                                                         | Help Guide                                  |
 | CTRL + 6                                                                         | Shortcut Legend                             |
 | CTRL + /                                                                         | Jump to search bar                          |
-| CTRL + g                                                                         | Add Dhan Guru slide or announcement         |
+| CTRL + G                                                                         | Add Dhan Guru slide or announcement         |
 | Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
@@ -58,15 +58,15 @@
 
 | Combination | Description       |
 | ----------- | ----------------- |
-| CMD + q     | close app         |
-| CMD + u     | check for updates |
-| CMD + h     | minimize window   |
-| CMD + m     | minimize window   |
+| CMD + Q     | Close app         |
+| CMD + U     | Check for updates |
+| CMD + H     | Minimize window   |
+| CMD + M     | Minimize window   |
 
 #### <a name ="windows-others">Windows:</a>
 
 | Combination | Description       |
 | ----------- | ----------------- |
-| CTRL + q    | close app         |
-| CTRL + u    | check for updates |
-| CTRL + m    | minimize window   |
+| CTRL + Q    | Close app         |
+| CTRL + U    | Check for updates |
+| CTRL + M    | Minimize window   |
