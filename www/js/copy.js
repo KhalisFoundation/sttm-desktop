@@ -6,6 +6,8 @@ const anvaad = require('anvaad-js');
 const search = require('./search');
 const baniDB = require('../js/banidb/index.js');
 
+const baniLengthMap = search.baniLengthCols;
+
 // defualt these to true, so that we only need to change them if they are turned off
 let copyEngTranslation = true;
 let copyPunjabiTranslation = true;
@@ -32,7 +34,7 @@ async function loadFromDB(id, idType) {
     result = await baniDB.loadShabad(id);
     remapShabad(result);
   } else if (idType === 'bani') {
-    baniDB.loadBani(id, baniLength).then(row => {
+    baniDB.loadBani(id, baniLengthMap[baniLength]).then(row => {
       const remappedRow = global.controller.remapLine(row);
       pankteeArray.push(remappedRow);
     });
@@ -66,7 +68,7 @@ function checkDB(remappedLine) {
 async function copyPanktee() {
   checkDisplaySettings();
   const linePos = search.currentShabad.indexOf(search.currentLine);
-  const panktee = pankteeArray[linePos];
+  const panktee = pankteeArray.length === 1 ? pankteeArray[0][linePos] : pankteeArray[linePos];
   checkDB(panktee);
   let toBeCopied = anvaad.unicode(panktee.Gurmukhi);
 
