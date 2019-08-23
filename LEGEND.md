@@ -33,7 +33,7 @@
 | CMD + 5                                    | Help Guide                                  |
 | CMD + 6                                    | Shortcut Legend                             |
 | CMD + /                                    | Jump to search bar                          |
-| CMD + G                                    | Add Dhan Guru slide or announcement         |
+| CMD + G                                    | Add Dhan slide or announcement         |
 | Spacebar (when in a shabad)                | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
@@ -48,7 +48,7 @@
 | CTRL + 5                                                                         | Help Guide                                  |
 | CTRL + 6                                                                         | Shortcut Legend                             |
 | CTRL + /                                                                         | Jump to search bar                          |
-| CTRL + G                                                                         | Add Dhan Guru slide or announcement         |
+| CTRL + G                                                                         | Add Dhan slide or announcement         |
 | Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
