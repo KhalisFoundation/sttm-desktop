@@ -1,5 +1,11 @@
 ## New Updates
 
+### 5.3.3 - _190822_
+     
+### Improved:
+
+- Fixed a bug when using BaniOverlay with longer Banis/Shabads
+
 ### 5.3.2 - _190806_
      
 ### Improved:
