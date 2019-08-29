@@ -465,7 +465,11 @@ ipcMain.on('show-text', (event, arg) => {
       Transliteration: '',
     },
   };
-  showLine(textLine);
+
+  const announcementOverlay = store.getUserPref('app.announcement-overlay');
+  if (arg.isAnnouncement && announcementOverlay) {
+    showLine(textLine);
+  }
 
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);

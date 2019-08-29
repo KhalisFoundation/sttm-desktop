@@ -15,6 +15,7 @@ const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
 const allowedTags = strings.allowedAnnouncementTags;
+let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -251,6 +252,26 @@ const announcementSlideButton = h(
   'li.announcement-box',
   h('header', h('i.fa.fa-bullhorn.list-icon'), 'Add announcement slide'),
   h('li', [
+    h('span', 'Show Announcement in Bani Overlay'),
+    h('div.switch', [
+      h('input#announcement-overlay', {
+        name: 'announcement-overlay',
+        type: 'checkbox',
+        checked: announcementOverlay,
+        onclick: () => {
+          announcementOverlay = !announcementOverlay;
+          store.setUserPref('app.announcement-overlay', announcementOverlay);
+          settings.init();
+          document.querySelector('button.announcement-slide-btn.button').click();
+        },
+        value: 'overlay',
+      }),
+      h('label', {
+        htmlFor: 'announcement-overlay',
+      }),
+    ]),
+  ]),
+  h('li', [
     h('span', 'Announcement in gurmukhi'),
     h('div.switch', [
       h('input#announcement-language', {
@@ -294,7 +315,7 @@ const announcementSlideButton = h(
           document.querySelector('.announcement-text').innerHTML,
           { allowedTags },
         );
-        global.controller.sendText(announcementText, isGurmukhi);
+        global.controller.sendText(announcementText, isGurmukhi, true);
         global.core.updateInsertedSlide(true);
       },
     },
