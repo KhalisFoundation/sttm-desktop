@@ -272,7 +272,7 @@ const announcementSlideButton = h(
     ]),
   ]),
   h('li', [
-    h('span', 'Announcement in gurmukhi'),
+    h('span', 'Announcement in Gurmukhi'),
     h('div.switch', [
       h('input#announcement-language', {
         name: 'announcement-language',
