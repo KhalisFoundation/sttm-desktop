@@ -12,11 +12,16 @@ const baniLengthMap = search.baniLengthCols;
 let copyEngTranslation = true;
 let copyPunjabiTranslation = true;
 let copyTranslit = true;
+
+let isCeremony;
+let isBani;
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
+
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
 
 function remapShabad(unmapped) {
+  pankteeArray.length = 0;
   unmapped.forEach(row => {
     const remappedRow = global.controller.remapLine(row);
     pankteeArray.push(remappedRow);
@@ -31,14 +36,20 @@ async function loadFromDB(id, idType) {
   let result;
 
   if (idType === 'shabad') {
+    isCeremony = false;
+    isBani = false;
     result = await baniDB.loadShabad(id);
     remapShabad(result);
   } else if (idType === 'bani') {
+    pankteeArray.length = 0;
+    isCeremony = false;
+    isBani = true;
     baniDB.loadBani(id, baniLengthMap[baniLength]).then(row => {
       const remappedRow = global.controller.remapLine(row);
       pankteeArray.push(remappedRow);
     });
   } else if (idType === 'ceremony') {
+    isCeremony = true;
     console.log('ceremony');
   }
 }
@@ -53,35 +64,73 @@ function checkDisplaySettings() {
  * @param {Object} remappedLine all the fields of the line from the DB
  * check DB for fields that are selected to be displayed and check if they are null
  */
-function checkDB(remappedLine) {
-  if (copyEngTranslation) {
-    copyEngTranslation = !(remappedLine.English === null);
-  }
-  if (copyPunjabiTranslation) {
-    copyPunjabiTranslation = !(remappedLine.Punjabi === null);
-  }
-  if (copyTranslit) {
-    copyTranslit = !(remappedLine.Transliteration === null);
+function checkDB(remappedLine, bani, ceremony) {
+  if (bani) {
+    if (copyEngTranslation) {
+      copyEngTranslation = !(remappedLine.Verse.English === null);
+    }
+    if (copyPunjabiTranslation) {
+      copyPunjabiTranslation = !(remappedLine.Verse.English === null);
+    }
+    if (copyTranslit) {
+      copyTranslit = !(remappedLine.Verse.English === null);
+    }
+  } else if (ceremony) {
+    console.log('ceremony');
+  } else {
+    if (copyEngTranslation) {
+      copyEngTranslation = !(remappedLine.English === null);
+    }
+    if (copyPunjabiTranslation) {
+      copyPunjabiTranslation = !(remappedLine.Punjabi === null);
+    }
+    if (copyTranslit) {
+      copyTranslit = !(remappedLine.Transliteration === null);
+    }
   }
 }
-
+function variablyCopy(panktee, bani, ceremony) {
+  let toBeCopied;
+  const elementsArray = [
+    [copyEngTranslation, 'English'],
+    [copyPunjabiTranslation, 'Punjabi'],
+    [copyTranslit, 'Transliteration'],
+  ];
+  if (bani) {
+    const newPanktee = global.controller.remapLine(panktee.Verse);
+    toBeCopied = anvaad.unicode(newPanktee.Gurmukhi);
+    if (copyEngTranslation) {
+      toBeCopied += `\n\n${newPanktee.Translations.English}`;
+    }
+    if (copyPunjabiTranslation) {
+      toBeCopied += `\n\n${anvaad.unicode(panktee.Verse.Translations.Punjabi)}`;
+    }
+    if (copyTranslit) {
+      toBeCopied += `\n\n${anvaad.translit(panktee.Verse.Gurmukhi)}`;
+    }
+  } else if (ceremony) {
+    console.log(ceremony);
+  } else {
+    toBeCopied = anvaad.unicode(panktee.Gurmukhi);
+    if (copyEngTranslation) {
+      toBeCopied += `\n\n${panktee.English}`;
+    }
+    if (copyPunjabiTranslation) {
+      toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
+    }
+    if (copyTranslit) {
+      toBeCopied += `\n\n${panktee.Transliteration}`;
+    }
+  }
+  return toBeCopied;
+}
 async function copyPanktee() {
   checkDisplaySettings();
   const linePos = search.currentShabad.indexOf(search.currentLine);
   const panktee = pankteeArray.length === 1 ? pankteeArray[0][linePos] : pankteeArray[linePos];
-  checkDB(panktee);
-  let toBeCopied = anvaad.unicode(panktee.Gurmukhi);
-
-  if (copyEngTranslation) {
-    toBeCopied += `\n\n${panktee.English}`;
-  }
-  if (copyPunjabiTranslation) {
-    toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
-  }
-  if (copyTranslit) {
-    toBeCopied += `\n\n${panktee.Transliteration}`;
-  }
-  copy(toBeCopied);
+  checkDB(panktee, isBani, isCeremony);
+  const final = variablyCopy(panktee, isBani, isCeremony);
+  copy(final);
 }
 
 module.exports = {
