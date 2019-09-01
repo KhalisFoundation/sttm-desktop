@@ -99,14 +99,10 @@ function variablyCopy(panktee, bani, ceremony) {
   if (bani) {
     const newPanktee = global.controller.remapLine(panktee.Verse);
     toBeCopied = anvaad.unicode(newPanktee.Gurmukhi);
-    if (copyEngTranslation) {
-      toBeCopied += `\n\n${newPanktee.Translations.English}`;
-    }
-    if (copyPunjabiTranslation) {
-      toBeCopied += `\n\n${anvaad.unicode(panktee.Verse.Translations.Punjabi)}`;
-    }
-    if (copyTranslit) {
-      toBeCopied += `\n\n${anvaad.translit(panktee.Verse.Gurmukhi)}`;
+    for (let i = 0; i < elementsArray.length; i += 1) {
+      if (elementsArray[i][0]) {
+        toBeCopied += panktee.Verse.indexOf(elementsArray[1][1]);
+      }
     }
   } else if (ceremony) {
     console.log(ceremony);
