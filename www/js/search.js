@@ -602,12 +602,15 @@ module.exports = {
             switch (type) {
               case 'bani':
                 this.loadBani(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'bani');
                 break;
               case 'ceremony':
                 this.loadCeremony(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'ceremony');
                 break;
               default:
                 this.loadShabad(SearchID, resumePankteeLineID);
+                global.core.copy.loadFromDB(SearchID, 'shabad');
             }
             const sessionLines = this.$session.querySelectorAll('a.panktee');
             Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -796,6 +799,7 @@ module.exports = {
       .getShabad(adjacentVerseID)
       .then(ShabadID => {
         adjacentShabadID = ShabadID;
+        global.core.copy.loadFromDB(ShabadID, 'shabad');
         return banidb.loadShabad(ShabadID);
       })
       .then(rows => {

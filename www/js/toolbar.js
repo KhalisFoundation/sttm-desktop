@@ -130,6 +130,7 @@ const printCeremonies = rows => {
             global.core.search.loadCeremony(row.ID).catch(error => {
               analytics.trackEvent('ceremonyFailed', row.ID, error);
             });
+            global.core.copy.loadFromDB(row.ID, 'ceremony');
             const currentCeremony = document.querySelector('div.ceremony-pane.active');
             if (currentCeremony) {
               currentCeremony.classList.remove('active');

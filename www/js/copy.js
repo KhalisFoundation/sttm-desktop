@@ -2,6 +2,7 @@ const { store } = require('electron').remote.require('./app');
 
 // other essential imports
 const copy = require('copy-to-clipboard');
+const sanitizeHtml = require('sanitize-html');
 const anvaad = require('anvaad-js');
 const search = require('./search');
 const baniDB = require('../js/banidb/index.js');
@@ -17,8 +18,23 @@ const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
 
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
-// const customTest = [];
 
+/**
+ *
+ * @param {String} htmlString explanation text from ceremonies
+ * uses sanitize html to remove all html tags from text
+ */
+function stripHTML(htmlString) {
+  const allowedTags = [];
+  const allowedAttributes = {};
+  const cleanText = sanitizeHtml(htmlString.English, { allowedTags, allowedAttributes });
+  return cleanText;
+}
+/**
+ *
+ * @param {Objects} unmapped rows from the DB
+ * remaps each row
+ */
 function remapShabad(unmapped) {
   pankteeArray.length = 0;
   unmapped.forEach(row => {
@@ -26,6 +42,13 @@ function remapShabad(unmapped) {
     pankteeArray.push(remappedRow);
   });
 }
+/**
+ *
+ * @param {Objects} unmapped rows fresh from DB
+ * for each row, it sees if row.Verse (normal panktees) row.Custom (custom symbols or text) is available
+ * if not, it just displays title (because those two will only not be available at the position of the title)
+ * Then, it remapps the correct part of the row Object
+ */
 function remapBani(unmapped) {
   pankteeArray.length = 0;
   for (let i = 0; i < unmapped.length; i += 1) {
@@ -44,12 +67,40 @@ function remapBani(unmapped) {
 }
 /**
  *
+ * @param {Objects} unmapped rows fresh from DB to be remapped
+ * similar to remapBani, except includes html stripping for explanation slides and looks for title at row.Ceremony
+ */
+function remapCeremony(unmapped) {
+  pankteeArray.length = 0;
+  let removeHTML;
+  for (let i = 0; i < unmapped.length; i += 1) {
+    const row = unmapped[i];
+    let toBeRemapped;
+    if (row.Verse) {
+      removeHTML = false;
+      toBeRemapped = row.Verse;
+    } else if (row.Custom) {
+      removeHTML = true;
+      toBeRemapped = row.Custom;
+    } else {
+      removeHTML = false;
+      toBeRemapped = row.Ceremony.Gurmukhi;
+    }
+    const remapped = global.controller.remapLine(toBeRemapped);
+    if (removeHTML) {
+      pankteeArray.push(stripHTML(remapped));
+    } else {
+      pankteeArray.push(remapped);
+    }
+  }
+}
+/**
+ *
  * @param {number} id id given to the shabad/bani/ceremony in db
  * @param {String} idType specifies if the gurbani is identified as a 'bani', 'shabad', or 'ceremony' in db
  */
 async function loadFromDB(id, idType) {
   let result;
-
   if (idType === 'shabad') {
     result = await baniDB.loadShabad(id);
     remapShabad(result);
@@ -58,7 +109,9 @@ async function loadFromDB(id, idType) {
       remapBani(rows);
     });
   } else if (idType === 'ceremony') {
-    console.log('ceremony');
+    baniDB.loadCeremony(id).then(rows => {
+      remapCeremony(rows);
+    });
   }
 }
 
@@ -83,6 +136,10 @@ function checkDB(remappedLine) {
     copyTranslit = !(remappedLine.Transliteration === null);
   }
 }
+/**
+ *
+ * @param {Object} panktee the remapped panktee currently sitting in the panktee array and/or and html sanitized text (in case of ceremony)
+ */
 function variablyCopy(panktee) {
   let toBeCopied;
   toBeCopied = anvaad.unicode(panktee.Gurmukhi);
@@ -95,15 +152,26 @@ function variablyCopy(panktee) {
   if (copyTranslit) {
     toBeCopied += `\n\n${panktee.Transliteration}`;
   }
+
+  /* case when the explanation text for ceremonies is the line to be copied because due to how the html is stripped
+  from the text, it leaves just the text, and no other properties of the object
+  */
+  if (!(panktee.English && panktee.Punjabi && panktee.Transliteration)) {
+    toBeCopied = panktee;
+  }
   return toBeCopied;
 }
+/**
+ * First checks display settings to see what the user wants
+ * Then it checks if those things are actually available in the DB
+ * Lastly, then it copies the relevant parts of the pankteee
+ */
 async function copyPanktee() {
   checkDisplaySettings();
   const linePos = search.currentShabad.indexOf(search.currentLine);
   const panktee = pankteeArray[linePos];
   checkDB(panktee);
-  const final = variablyCopy(panktee);
-  copy(final);
+  copy(variablyCopy(panktee));
 }
 
 module.exports = {
