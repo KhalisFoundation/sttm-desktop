@@ -17,8 +17,10 @@ const trayItemFactory = (trayItemKey, trayItem) =>
         analytics.trackEvent('shortcutTray', trayItemKey);
         if (trayItem.type === 'text') {
           global.controller.sendText(trayItem.ref, true);
+          global.core.updateInsertedSlide(true);
         } else if (trayItem.type === 'shabad') {
           global.core.search.loadShabad(trayItem.ref);
+          global.core.updateInsertedSlide(true);
         } else if (trayItem.type === 'ceremony') {
           global.core.search.loadCeremony(trayItem.ref).catch(error => {
             analytics.trackEvent('ceremonyFailed', trayItem.ref, error);

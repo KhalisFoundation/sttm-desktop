@@ -16,7 +16,8 @@ const maxChangeLogSeenCount = 5;
 
 const expressApp = express();
 /* eslint-disable import/order */
-const http = require('http').Server(expressApp);
+const httpBase = require('http').Server(expressApp);
+const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
 
@@ -24,33 +25,14 @@ expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 
-op.find(
-  {
-    // Re: http://www.sikhiwiki.org/index.php/Gurgadi
-    ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
-    count: 1,
-  },
-  (err, port) => {
-    if (err) {
-      dialog.showErrorBox(
-        'Overlay Error',
-        'No free ports available. Close other applications and Reboot the machine',
-      );
-      app.exit(-1);
-      return;
-    }
-    global.overlayPort = port;
-    // console.log(`Overlay Port No ${port}`);
-    http.listen(port);
-  },
-);
-
 const store = new Store({
   configName: 'user-preferences',
   defaults: defaultPrefs,
 });
 
 const appVersion = app.getVersion();
+
+const overlayCast = store.getUserPref('app.overlay-cast');
 
 let mainWindow;
 let viewerWindow = false;
@@ -209,6 +191,7 @@ function createViewer(ipcData) {
       show: false,
       titleBarStyle: 'hidden',
       frame: process.platform !== 'win32',
+      backgroundColor: '#000000',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
@@ -267,7 +250,9 @@ function createBroadcastFiles(arg) {
 const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const payload = Object.assign(line, overlayPrefs);
-  socket.emit('show-line', payload);
+  if (!line.fromScroll) {
+    socket.emit('show-line', payload);
+  }
 };
 
 const updateOverlayVars = () => {
@@ -301,6 +286,41 @@ const shouldQuit = app.makeSingleInstance(() => {
   }
 });
 
+const searchPorts = () => {
+  op.find(
+    {
+      // Re: http://www.sikhiwiki.org/index.php/Gurgadi
+      ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
+      count: 1,
+    },
+    (err, port) => {
+      if (err) {
+        dialog.showErrorBox(
+          'Overlay Error',
+          'No free ports available. Close other applications and Reboot the machine',
+        );
+        app.exit(-1);
+        return;
+      }
+      global.overlayPort = port;
+      // console.log(`Overlay Port No ${port}`);
+      http.listen(port);
+    },
+  );
+};
+
+ipcMain.on('toggle-obs-cast', (event, arg) => {
+  if (arg) {
+    searchPorts();
+  } else {
+    http.shutdown();
+  }
+});
+
+if (overlayCast) {
+  searchPorts();
+}
+
 if (shouldQuit) {
   app.exit();
 }
@@ -325,6 +345,7 @@ app.on('ready', () => {
     height,
     frame: process.platform !== 'win32',
     show: false,
+    backgroundColor: '#000000',
     titleBarStyle: 'hidden',
   });
   mainWindow.webContents.on('did-finish-load', () => {

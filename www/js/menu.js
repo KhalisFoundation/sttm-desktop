@@ -14,21 +14,7 @@ const search = require('./search');
 const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
-const allowedTags = [
-  'b',
-  'i',
-  'em',
-  'u',
-  'pre',
-  'strong',
-  'div',
-  'code',
-  'br',
-  'p',
-  'ul',
-  'li',
-  'ol',
-];
+const allowedTags = strings.allowedAnnouncementTags;
 
 const modal = new tingle.Modal({
   footer: true,
@@ -309,6 +295,7 @@ const announcementSlideButton = h(
           { allowedTags },
         );
         global.controller.sendText(announcementText, isGurmukhi);
+        global.core.updateInsertedSlide(true);
       },
     },
     'Add Announcement',

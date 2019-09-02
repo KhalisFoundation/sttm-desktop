@@ -1,4 +1,3 @@
-/* eslint-disable arrow-parens */
 // HTMLElement builder
 const h = require('hyperscript');
 const { remote } = require('electron');
@@ -391,8 +390,7 @@ module.exports = {
     this.$dbDownloadProgress.style.width = `${state.percent * 100}%`;
   },
 
-  // eslint-disable-next-line no-unused-vars
-  focusSearch(e) {
+  focusSearch() {
     // open the Gurmukhi keyboard if it was previously open
     if (store.get('gurmukhiKB')) {
       this.openGurmukhiKB();
@@ -471,8 +469,7 @@ module.exports = {
     store.set('searchOptions.searchLanguage', value);
   },
 
-  // eslint-disable-next-line no-unused-vars
-  toggleGurmukhiKB(e) {
+  toggleGurmukhiKB() {
     const gurmukhiKBPref = store.get('gurmukhiKB');
     // no need to set a preference if user is just re-opening after KB was auto-closed
     if (!this.$navigator.classList.contains('kb-active') && gurmukhiKBPref) {
@@ -570,6 +567,7 @@ module.exports = {
               onclick: ev => {
                 this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
                 global.core.copy.loadFromDB(item.Shabads[0].ShabadID, 'shabad');
+                global.core.updateInsertedSlide(false);
               },
             },
             resultNode,
@@ -851,7 +849,10 @@ module.exports = {
         {
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
-          onclick: e => this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click'),
+          onclick: e => {
+            this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click');
+            global.core.updateInsertedSlide(false);
+          },
         },
         [h('i.fa.fa-fw.fa-check'), h('i.fa.fa-fw.fa-home'), ' ', line.Gurmukhi || englishHeading],
       ),
@@ -859,12 +860,12 @@ module.exports = {
     return shabadLine;
   },
 
-  printShabad(rows, ShabadID, LineID, start = 0) {
+  printShabad(rows, ShabadID, LineID, start = 0, fromScroll = false) {
     const shabadState = sessionStatesList[rows[0].sessionKey || `shabad-${ShabadID}`];
     let lineID = LineID || rows[0].ID;
     const shabadID =
       ShabadID || rows[0].shabadID || (rows[0].Shabads ? rows[0].Shabads[0].ShabadID : '');
-    const lineIndex = rows.findIndex(row => row.ID === lineID);
+    const lineIndex = rows.findIndex(row => row.ID === parseInt(lineID, 10));
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
@@ -902,12 +903,12 @@ module.exports = {
       // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
       if (tooFar) {
         while (tooFar) {
-          this.printShabad(rows, ShabadID, lineID, newStart);
+          this.printShabad(rows, ShabadID, lineID, newStart, true);
           newStart += throughput;
           tooFar = e.target.scrollTop > (newStart + throughput) * lineHeight;
         }
       } else if (e.target.scrollTop >= maxScrollSize) {
-        this.printShabad(rows, ShabadID, lineID, end);
+        this.printShabad(rows, ShabadID, lineID, end, true);
       }
     };
 
@@ -973,7 +974,7 @@ module.exports = {
       this.$shabadContainer.scrollTop = curPankteeTop;
     }
     // send the line to app.js, which will send it to the viewer window as well as obs file
-    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode, start);
+    global.controller.sendLine(shabadID, lineID, mainLine, currentRows, mode, start, fromScroll);
 
     // Hide next and previous links before loading first and last shabad
     const $shabadNext = document.querySelector('#shabad-next');
