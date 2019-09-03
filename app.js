@@ -466,8 +466,19 @@ ipcMain.on('show-text', (event, arg) => {
     },
   };
 
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      Punjabi: '',
+      Transliteration: '',
+    },
+  };
+
   const announcementOverlay = store.getUserPref('app.announcement-overlay');
-  if (arg.isAnnouncement && announcementOverlay) {
+  if (arg.isAnnouncement && !announcementOverlay) {
+    showLine(emptyLine);
+  } else {
     showLine(textLine);
   }
 
