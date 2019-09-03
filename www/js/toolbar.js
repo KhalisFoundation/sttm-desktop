@@ -96,6 +96,7 @@ const extrasTileFactory = (tileType, row) =>
         toggleOverlayUI(currentToolbarItem, false);
         analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
         navLinks.navPage('shabad');
+        global.core.copy.loadFromDB(row.ID, 'bani');
       },
     },
     h('div.gurmukhi', row.Gurmukhi),

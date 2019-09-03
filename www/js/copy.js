@@ -93,7 +93,6 @@ function remapCeremony(unmapped) {
       pankteeArray.push(remapped);
     }
   }
-  console.log(unmapped);
 }
 /**
  *
@@ -154,7 +153,6 @@ function variablyCopy(panktee) {
     toBeCopied += `\n\n${panktee.Transliteration}`;
   }
 
-  console.log(toBeCopied);
   /* case when the explanation text for ceremonies is the line to be copied because due to how the html is stripped
   from the text, it leaves just the text, and no other properties of the object
   The gurmukhi element is used here because in the explanation slides, Gurmukhi is set to null
@@ -162,7 +160,7 @@ function variablyCopy(panktee) {
   if (!panktee.Gurmukhi) {
     toBeCopied = panktee;
   }
-  console.log(toBeCopied);
+
   return toBeCopied;
 }
 /**

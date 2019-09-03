@@ -175,7 +175,6 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind('space', spaceBar);
   Mousetrap.bind('mod+c', () => {
     if (document.activeElement.id === 'shabad-page') {
-      // copy.copyPanktee();
       copy.copyPanktee();
     }
   });
