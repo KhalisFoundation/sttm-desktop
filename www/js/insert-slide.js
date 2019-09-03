@@ -4,9 +4,10 @@ const electron = require('electron');
 const analytics = electron.remote.getGlobal('analytics');
 const tingle = require('./vendor/tingle');
 const strings = require('./strings');
+const settings = require('./settings');
+
 const { store } = electron.remote.require('./app');
 
-const settings = require('./settings');
 let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 // allowed html tags inside announcement
