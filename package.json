@@ -85,7 +85,7 @@
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
     "read-chunk": "^3.0.0",
-    "realm": "^2.18.0",
+    "realm": "2.18.0",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
