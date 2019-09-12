@@ -8,8 +8,6 @@ const settings = require('./settings');
 
 const { store } = electron.remote.require('./app');
 
-let announcementOverlay = store.getUserPref('app.announcement-overlay');
-
 // allowed html tags inside announcement
 const allowedTags = strings.allowedAnnouncementTags;
 
@@ -63,7 +61,7 @@ const langSlider = '<div class="lang-switch">'.concat(
   '</td>',
   '<td>',
   '<div class="switch">',
-  `<input id="modal-ann-overlay" name="modal-ann-overlay" type="checkbox" checked=${announcementOverlay} value="gurmukhi">`,
+  `<input id="modal-ann-overlay" name="modal-ann-overlay" type="checkbox" value="gurmukhi">`,
   '<label for="modal-ann-overlay"></label>',
   '</div>',
   '</td>',
@@ -133,10 +131,13 @@ function setLangSliderVal() {
  * changes announcement overlay slider
  */
 function setOverlaySliderVal() {
+  let announcementOverlay = store.getUserPref('app.announcement-overlay');
   const slider = document.querySelector('#modal-ann-overlay');
+  slider.checked = announcementOverlay;
   slider.onclick = () => {
     // is the slider checked?
     announcementOverlay = !announcementOverlay;
+    document.querySelector('input#announcement-overlay').checked = announcementOverlay;
     store.setUserPref('app.announcement-overlay', announcementOverlay);
     settings.init();
   };

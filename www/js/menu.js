@@ -15,7 +15,6 @@ const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
 const allowedTags = strings.allowedAnnouncementTags;
-let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 const modal = new tingle.Modal({
   footer: true,
@@ -257,9 +256,9 @@ const announcementSlideButton = h(
       h('input#announcement-overlay', {
         name: 'announcement-overlay',
         type: 'checkbox',
-        checked: announcementOverlay,
+        checked: store.getUserPref('app.announcement-overlay'),
         onclick: () => {
-          announcementOverlay = !announcementOverlay;
+          const announcementOverlay = !store.getUserPref('app.announcement-overlay');
           store.setUserPref('app.announcement-overlay', announcementOverlay);
           settings.init();
           document.querySelector('button.announcement-slide-btn.button').click();
