@@ -19,6 +19,13 @@ const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
 
+function findLinePosition() {
+  const navParent = document.querySelector('#shabad.gurmukhi');
+  const currentPanktee = document.querySelector('a.panktee.seen_check.current');
+  const arr = Array.from(navParent.childNodes);
+  const linePos = arr.indexOf(currentPanktee.parentNode);
+  return linePos;
+}
 /**
  *
  * @param {String} htmlString explanation text from ceremonies
@@ -170,7 +177,7 @@ function variablyCopy(panktee) {
  */
 async function copyPanktee() {
   checkDisplaySettings();
-  const linePos = search.currentShabad.indexOf(search.currentLine);
+  const linePos = findLinePosition();
   const panktee = pankteeArray[linePos];
   checkDB(panktee);
   copy(variablyCopy(panktee));
