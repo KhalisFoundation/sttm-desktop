@@ -34,8 +34,7 @@ function findLinePosition() {
 function stripHTML(htmlString) {
   const allowedTags = [];
   const allowedAttributes = {};
-  const cleanText = sanitizeHtml(htmlString.English, { allowedTags, allowedAttributes });
-  return cleanText;
+  return sanitizeHtml(htmlString, { allowedTags, allowedAttributes });
 }
 /**
  *
@@ -79,26 +78,19 @@ function remapBani(unmapped) {
  */
 function remapCeremony(unmapped) {
   pankteeArray.length = 0;
-  let removeHTML;
   for (let i = 0; i < unmapped.length; i += 1) {
     const row = unmapped[i];
     let toBeRemapped;
     if (row.Verse) {
-      removeHTML = false;
       toBeRemapped = row.Verse;
     } else if (row.Custom) {
-      removeHTML = true;
       toBeRemapped = row.Custom;
+      row.noHTML = true;
     } else {
-      removeHTML = false;
       toBeRemapped = row.Ceremony.Gurmukhi;
     }
     const remapped = global.controller.remapLine(toBeRemapped);
-    if (removeHTML) {
-      pankteeArray.push(stripHTML(remapped));
-    } else {
-      pankteeArray.push(remapped);
-    }
+    pankteeArray.push(remapped);
   }
 }
 /**
@@ -148,24 +140,18 @@ function checkDB(remappedLine) {
  * @param {Object} panktee the remapped panktee currently sitting in the panktee array and/or and html sanitized text (in case of ceremony)
  */
 function variablyCopy(panktee) {
-  let toBeCopied;
-  toBeCopied = anvaad.unicode(panktee.Gurmukhi);
+  let toBeCopied = '';
+  if (panktee.Gurmukhi) {
+    toBeCopied = anvaad.unicode(panktee.Gurmukhi);
+  }
   if (copyEngTranslation) {
-    toBeCopied += `\n\n${panktee.English}`;
+    toBeCopied += `\n\n${stripHTML(panktee.English)}`;
   }
   if (copyPunjabiTranslation) {
     toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
   }
   if (copyTranslit) {
     toBeCopied += `\n\n${panktee.Transliteration}`;
-  }
-
-  /* case when the explanation text for ceremonies is the line to be copied because due to how the html is stripped
-  from the text, it leaves just the text, and no other properties of the object
-  The gurmukhi element is used here because in the explanation slides, Gurmukhi is set to null
-  */
-  if (!panktee.Gurmukhi) {
-    toBeCopied = panktee;
   }
 
   return toBeCopied;
@@ -184,6 +170,7 @@ async function copyPanktee() {
 }
 
 module.exports = {
+  stripHTML,
   loadFromDB,
   copyPanktee,
 };
