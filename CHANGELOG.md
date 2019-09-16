@@ -1,6 +1,6 @@
 ## New Updates
 
-### 5.3.4 - _September 3, 2019_
+### 5.3.4 - _September 18, 2019_
      
 ### Improved:
 
