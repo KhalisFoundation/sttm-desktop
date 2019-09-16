@@ -6,6 +6,7 @@
 
 - Added the ability to choose if annoucements should appear in Bani Overlay
 - Fixed a bug that would cause annoucements to be hard to read when using dark themes
+- Fixed a bug that would cause the last line of Anand Sahib (Bhog) not to display properly
 - Fixed a bug that would cause a white screen to flash upon app launch
 - Fixed a bug that caused the spacebar not to function properly
 
