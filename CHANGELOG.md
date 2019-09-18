@@ -1,5 +1,18 @@
 ## New Updates
 
+### 5.3.4 - _September 18, 2019_
+     
+### Improved:
+
+- Added the ability to choose if annoucements should appear in Bani Overlay
+- Fixed a bug that would cause annoucements to be hard to read when using dark themes
+- Fixed a bug that would cause the last line of Anand Sahib (Bhog) not to display properly
+- Fixed a bug that would cause a white screen to flash upon app launch
+- Fixed a bug that caused the spacebar not to function properly
+
+<br/>  
+<details><summary>See previous updates...</summary>
+  
 ### 5.3.3 - _190822_
      
 ### Improved:
@@ -24,9 +37,6 @@
 - You can now press enter after searching and it will automatically open the first result
 - Fixed a bug with Bani Overlay and the Anand Karaj Ceremony
 - Bug fixes & UI enhancements   
-
-<br/>  
-<details><summary>See previous updates...</summary>
 
 ### 5.2 - _190702_
 

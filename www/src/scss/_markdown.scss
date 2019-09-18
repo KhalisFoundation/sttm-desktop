@@ -62,5 +62,15 @@ $vertical-rhythm: $base-font-size * $ratio;
   iframe {
     border-radius: $vertical-rhythm / 2;
   }
-}
+  table {
+    border: 1px solid #111;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
 
+  td,
+  th {
+    border: 1px solid #ddd;
+    padding: 5px;
+  }
+}
