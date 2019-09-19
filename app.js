@@ -191,6 +191,7 @@ function createViewer(ipcData) {
       show: false,
       titleBarStyle: 'hidden',
       frame: process.platform !== 'win32',
+      backgroundColor: '#000000',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
@@ -344,6 +345,7 @@ app.on('ready', () => {
     height,
     frame: process.platform !== 'win32',
     show: false,
+    backgroundColor: '#000000',
     titleBarStyle: 'hidden',
   });
   mainWindow.webContents.on('did-finish-load', () => {
@@ -463,7 +465,22 @@ ipcMain.on('show-text', (event, arg) => {
       Transliteration: '',
     },
   };
-  showLine(textLine);
+
+  const emptyLine = {
+    Line: {
+      Gurmukhi: '',
+      English: '',
+      Punjabi: '',
+      Transliteration: '',
+    },
+  };
+
+  const announcementOverlay = store.getUserPref('app.announcement-overlay');
+  if (arg.isAnnouncement && !announcementOverlay) {
+    showLine(emptyLine);
+  } else {
+    showLine(textLine);
+  }
 
   if (viewerWindow) {
     viewerWindow.webContents.send('show-text', arg);

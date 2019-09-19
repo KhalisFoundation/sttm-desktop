@@ -19,6 +19,11 @@
     }
   }
 
+  .announcement-text {
+    border: 1px solid $dark-grey;
+    color: $black;
+  }
+
   .controller.presenter-view {
     #viewer {
       border-color: $border;

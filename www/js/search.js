@@ -556,7 +556,10 @@ module.exports = {
           h(
             'a.panktee.search-result',
             {
-              onclick: ev => this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item),
+              onclick: ev => {
+                this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
+                global.core.updateInsertedSlide(false);
+              },
             },
             resultNode,
           ),
@@ -839,7 +842,10 @@ module.exports = {
         {
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
-          onclick: e => this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click'),
+          onclick: e => {
+            this.clickShabad(e, line.ShabadID, line.ID, line, rows, 'click');
+            global.core.updateInsertedSlide(false);
+          },
         },
         [h('i.fa.fa-fw.fa-check'), h('i.fa.fa-fw.fa-home'), ' ', line.Gurmukhi || englishHeading],
       ),
@@ -857,7 +863,7 @@ module.exports = {
     const apv = document.body.classList.contains('akhandpaatt');
 
     // if the line clicked is further than throughput (in searches) then load until that line
-    let throughput = 40;
+    let throughput = 50;
 
     if (start) {
       throughput = 10;
