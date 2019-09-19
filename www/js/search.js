@@ -696,7 +696,7 @@ module.exports = {
 
           if (rowDb.Custom && rowDb.Custom.ID) {
             row = rowDb.Custom;
-            row.shabadID = rowDb.Ceremony.Token;
+            row.shabadID = `ceremony-${rowDb.Ceremony.Token}`;
           }
 
           if (rowDb.VerseRange && rowDb.VerseRange.length) {
@@ -715,6 +715,11 @@ module.exports = {
       if (!historyReload) {
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'ceremony',
+        });
+      }
       return this.printShabad(flatRows, null, LineID);
     } catch (error) {
       throw error;
@@ -726,14 +731,6 @@ module.exports = {
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
 
-    if (window.socket !== undefined) {
-      window.socket.emit('data', {
-        type: 'bani',
-        id: BaniID,
-        baniLength,
-        highlight: LineID,
-      });
-    }
     let blackListedMangalPosition;
     if (mangalPosition === 'above') {
       blackListedMangalPosition = 'current';
@@ -783,6 +780,13 @@ module.exports = {
 
           return row;
         });
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'bani',
+          id: BaniID,
+          highlight: LineID || rows[0].ID,
+        });
+      }
       return this.printShabad(rows, shabadID, LineID);
     });
   },
@@ -1037,8 +1041,16 @@ module.exports = {
         shabadIdsplit = ShabadID.split('-');
       }
 
+      let shabadType;
+
+      if (shabadIdsplit.length > 1) {
+        shabadType = shabadIdsplit[0] === 'ceremony' ? 'ceremony' : 'bani';
+      } else {
+        shabadType = 'shabad';
+      }
+
       window.socket.emit('data', {
-        type: shabadIdsplit.length > 1 ? 'bani' : 'shabad',
+        type: shabadType,
         id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
         baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
         shabadid: ShabadID, // @deprecated
