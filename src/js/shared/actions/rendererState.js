@@ -4,4 +4,5 @@ export const updateSearchFocusStatusAction = status => ({
   payload: {
     status,
   },
+  meta: 'local',
 });

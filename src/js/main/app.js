@@ -1,10 +1,11 @@
+import 'babel-polyfill';
 import { app, BrowserWindow, screen as screens } from 'electron';
 /* eslint-disable no-unused-vars */
 import os from 'os';
 import path from 'path';
+// eslint-enable
 // Store
 import store from './store';
-// eslint-enable
 
 // Global variables
 let mainWindow;
@@ -64,3 +65,7 @@ if (!gotTheLock) {
     app.quit();
   });
 }
+
+store.subscribe(() => {
+  // Run the store through various checks
+});

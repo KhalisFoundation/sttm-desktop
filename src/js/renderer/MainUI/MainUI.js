@@ -2,6 +2,7 @@ import React from 'react';
 // Custom components
 import SearchInputs from './SearchInputs';
 import SearchOptions from './SearchOptions';
+import SearchResults from './SearchResults';
 
 export default () => (
   <div id="main-ui" className="base-ui">
@@ -20,7 +21,7 @@ export default () => (
         <SearchOptions />
       </div>
       <section className="block-list">
-        <ul id="results" className="gurmukhi" />
+        <SearchResults />
       </section>
     </div>
     <div className="nav-page" id="session-page">

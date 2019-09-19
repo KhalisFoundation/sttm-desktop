@@ -68,9 +68,9 @@
     "changelog-seen-count": 0
   },
   "searchOptions": {
-    "searchLanguage": "gr",
-    "searchType": 0,
-    "searchSource": "all"
+    "language": "gr",
+    "type": 0,
+    "source": "all"
   },
   "obs": {
     "overlayPrefs": {

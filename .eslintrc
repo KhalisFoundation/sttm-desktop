@@ -7,6 +7,7 @@
   },
   "plugins": ["prettier"],
   "rules": {
+    "jsx-a11y/label-has-for": "off", // deprecated
     "jsx-a11y/no-noninteractive-tabindex": "off",
     "no-mixed-operators": "off",
     "prettier/prettier": ["error"],

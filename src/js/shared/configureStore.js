@@ -3,8 +3,10 @@ import {
   forwardToRenderer,
   replayActionMain,
   replayActionRenderer,
+  triggerAlias,
 } from 'electron-redux';
 import { applyMiddleware, createStore, compose } from 'redux';
+import thunk from 'redux-thunk';
 
 import getRootReducer from './reducers';
 
@@ -19,7 +21,7 @@ export default (initialState, scope = 'main') => {
 
   let middleware;
   if (scope === 'main') {
-    middleware = [forwardToRenderer];
+    middleware = [triggerAlias, thunk, forwardToRenderer];
   } else {
     middleware = [forwardToMain];
   }

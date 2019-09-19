@@ -3,7 +3,7 @@ import throttle from 'lodash.throttle';
 import configureStore from '../shared/configureStore';
 
 const localStore = new LocalStore();
-const initialState = localStore.get('prefs');
+const initialState = localStore.get('state');
 
 const store = configureStore(initialState);
 
@@ -11,14 +11,10 @@ const store = configureStore(initialState);
 store.subscribe(
   throttle(() => {
     const state = store.getState();
-    delete state.search;
-    delete state.rendererState;
-    /* localStore.set('prefs', {
-      ...state,
-    }); */
     localStore.set('state', {
-      ...state.gurmukhiKB,
-      ...state.changelog,
+      changelog: state.changelog,
+      gurmukhiKB: state.gurmukhiKB,
+      searchOptions: state.searchOptions,
     });
   }, 500),
 );
