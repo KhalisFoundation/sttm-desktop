@@ -161,6 +161,10 @@ global.platform.ipc.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
 });
+global.platform.ipc.on('mimic-shabad', (event, data) => {
+  apv = document.body.classList.contains('akhandpaatt');
+  mimicShabad(data);
+});
 
 global.platform.ipc.on('send-scroll', (event, pos) => {
   $scroll.scrollTo(
@@ -405,7 +409,7 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
-        /* if you click on verse when message is open (announcement, blank, waheguru) 
+        /* if you click on verse when message is open (announcement, blank, waheguru)
         it should hide the message deck and show the shabad deck */
         if ($message.classList.contains('active')) {
           $message.classList.remove('active');
@@ -418,7 +422,33 @@ const showLine = (ShabadID, LineID, rows, mode) => {
     }
   }
 };
+const mimicShabad = mimicLine => {
+  hideDecks();
 
+  const parentElement = document.createElement('div');
+  parentElement.classList.add('slide');
+
+  const mainText = document.createElement('h1');
+  mainText.classList.add('.gurbani.gurmukhi');
+  mainText.innerHTML = mimicLine.Gurmukhi;
+
+  const engTranslation = document.createElement('h1');
+  engTranslation.classList.add('translation');
+  engTranslation.innerHTML = mimicLine.English;
+
+  const teeka = document.createElement('h1');
+  teeka.classList.add('teeka');
+  teeka.innerHTML = mimicLine.Punjabi;
+
+  const translit = document.createElement('h1');
+  translit.classList.add('transliteration');
+  const elements = [mainText, engTranslation, teeka, translit];
+  for (let i = 0; i < elements.length; i += 1) {
+    parentElement.appendChild(elements[i]);
+  }
+
+  $viewer.appendChild(parentElement);
+};
 const showText = (text, isGurmukhi = false) => {
   hideDecks();
 

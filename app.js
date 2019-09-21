@@ -194,6 +194,7 @@ function createViewer(ipcData) {
       backgroundColor: '#000000',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.webContents.openDevTools();
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -451,7 +452,21 @@ ipcMain.on('show-line', (event, arg) => {
     createBroadcastFiles(arg);
   }
 });
-
+ipcMain.on('mimic-shabad', (event, arg) => {
+  lastLine = arg;
+  showLine(arg);
+  if (viewerWindow) {
+    viewerWindow.webContents.send('mimic-shabad', arg);
+  } else {
+    createViewer({
+      send: 'mimic-shabad',
+      data: arg,
+    });
+  }
+  if (arg.live) {
+    createBroadcastFiles(arg);
+  }
+});
 ipcMain.on('show-empty-slide', () => {
   emptyOverlay();
 });

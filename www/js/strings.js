@@ -1,6 +1,11 @@
 const slideStrings = {
   waheguru: 'vwihgurU',
-  moolMantra: '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
+  moolMantra: {
+    Gurmukhi: '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
+    English: 'test',
+    Punjabi: 'test',
+    translit: 'test',
+  },
   dhanguruStrings: [
     'DMn gurU nwnk dyv jI',
     'DMn gurU AMgd dyv jI',

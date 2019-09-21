@@ -40,7 +40,7 @@ const slideShortcuts = {
     isInsertedSlide = true;
   },
   moolMantra: () => {
-    global.controller.sendText(strings.slideStrings.moolMantra, true);
+    global.controller.sendMimicShabad(strings.slideStrings.moolMantra);
     isInsertedSlide = true;
   },
 };
