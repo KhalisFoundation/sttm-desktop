@@ -36,7 +36,7 @@
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron": "^1.6.2",
-    "electron-builder": "^20.4.0",
+    "electron-builder": "20.8.1",
     "electron-publisher-s3": "^20.17.2",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "^13.1.0",
