@@ -6,6 +6,7 @@ const main = remote.require('./app');
 
 const search = require('./search');
 const strings = require('./strings');
+const newStrings = require('./strings.json');
 const dhanGuruModal = require('./insert-slide');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -40,7 +41,7 @@ const slideShortcuts = {
     isInsertedSlide = true;
   },
   moolMantra: () => {
-    global.controller.sendMimicShabad(strings.slideStrings.moolMantra);
+    global.controller.sendMimicShabad(newStrings.moolMantra);
     isInsertedSlide = true;
   },
 };

@@ -1,0 +1,82 @@
+{
+  "moolMantra": {
+    "gurmukhi": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]",
+    "english": "One Universal Creator God. The Name Is Truth. Creative Being Personified. No Fear. No Hatred. Image Of The Undying, Beyond Birth, Self-Existent. By Guru's Grace ~",
+    "punjabi": "ਅਕਾਲ ਪੁਰਖ ਇੱਕ ਹੈ, ਜਿਸ ਦਾ ਨਾਮ 'ਹੋਂਦ ਵਾਲਾ' ਹੈ ਜੋ ਸ੍ਰਿਸ਼ਟੀ ਦਾ ਰਚਨਹਾਰ ਹੈ, ਜੋ ਸਭ ਵਿਚ ਵਿਆਪਕ ਹੈ, ਭੈ ਤੋਂ ਰਹਿਤ ਹੈ, ਵੈਰ-ਰਹਿਤ ਹੈ, ਜਿਸ ਦਾ ਸਰੂਪ ਕਾਲ ਤੋਂ ਪਰੇ ਹੈ, (ਭਾਵ, ਜਿਸ ਦਾ ਸਰੀਰ ਨਾਸ-ਰਹਿਤ ਹੈ), ਜੋ ਜੂਨਾਂ ਵਿਚ ਨਹੀਂ ਆਉਂਦਾ, ਜਿਸ ਦਾ ਪ੍ਰਕਾਸ਼ ਆਪਣੇ ਆਪ ਤੋਂ ਹੋਇਆ ਹੈ ਅਤੇ ਜੋ ਸਤਿਗੁਰੂ ਦੀ ਕਿਰਪਾ ਨਾਲ ਮਿਲਦਾ ਹੈ।",
+    "translit": " ikOankaar sat naam karataa purakh nirabhau niravair akaal moorat ajoonee saibha(n) gur prasaadh ||"
+  },
+  "dhanSlides": [
+    {
+      "gurmukhi": "DMn gurU nwnk dyv jI",
+      "english": "Dhan Guru Nanak Dev Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU AMgd dyv jI",
+      "english": "Dhan Guru Angad Dev Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU Amrdwsu swihb jI",
+      "english": "Dhan Guru Amar Das Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU rwmdws swihb jI",
+      "english": "Dhan Guru Ram Das Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU Arjun dyv jI",
+      "english": "Dhan Guru Arjun Dev Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU hir goibMd swihb jI",
+      "english": "Dhan Guru Har Gobind Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU hir rwie swihb jI",
+      "english": "Dhan Guru Har Rai Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU hir ikRSx swihb jI",
+      "english": "Dhan Guru Har Krishan Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU qyg bhwdr swihb jI",
+      "english": "Dhan Guru Teg Bahadur Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU goibMd isMG swihb jI",
+      "english": "Dhan Guru Goind Singh Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    },
+    {
+      "gurmukhi": "DMn gurU gRMQ swihb jI",
+      "english": "Dhan Guru Granth Sahib Ji",
+      "punjabi": "",
+      "translit": ""
+    }
+  ],
+  "announcement": {
+    "placeholder": {
+      "english": "Add announcement text here ..",
+      "gurmukhi": "GoSxw ie`Qy ilKo ..."
+    }
+  }
+}
