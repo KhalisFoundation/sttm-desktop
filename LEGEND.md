@@ -22,20 +22,19 @@
 
 ### <a name="slides">Slide Shortcuts</a>
 
-<<<<<<< HEAD
 #### <a name="macos-slides">macOS:</a>:
 
-| Combination                                | Description                                 |
-| ------------------------------------------ | ------------------------------------------- |
-| CMD + 1                                    | Waheguru Slide                              |
-| CMD + 2                                    | Mool Mantra Slide                           |
-| CMD + 3                                    | Empty Slide                                 |
-| CMD + 4                                    | Anand Sahib (Bhog)                          |
-| CMD + 5                                    | Help Guide                                  |
-| CMD + 6                                    | Shortcut Legend                             |
-| CMD + /                                    | Jump to search bar                          |
-| CMD + G                                    | Add Dhan slide or announcement         |
-| Spacebar (when in a shabad)                | Switch between main line and unchecked line |
+| Combination                                                                      | Description                                 |
+| -------------------------------------------------------------------------------- | ------------------------------------------- |
+| CMD + 1                                                                          | Waheguru Slide                              |
+| CMD + 2                                                                          | Mool Mantra Slide                           |
+| CMD + 3                                                                          | Empty Slide                                 |
+| CMD + 4                                                                          | Anand Sahib (Bhog)                          |
+| CMD + 5                                                                          | Help Guide                                  |
+| CMD + 6                                                                          | Shortcut Legend                             |
+| CMD + /                                                                          | Jump to search bar                          |
+| CMD + G                                                                          | Add Dhan slide or announcement              |
+| Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
 #### <a name="windows-slides">Windows:</a>
@@ -51,27 +50,6 @@
 | ctrl + /    | Jump to search bar                  |
 | ----------- | -----------                         |
 | ctrl + g    | Add Dhan Guru slide or announcement |
-=======
-#### macOS:
-
-- Cmd + 1 = Waheguru Slide
-- Cmd + 2 = Mool Mantra Slide
-- Cmd + 3 = Empty Slide
-- Cmd + 4 = Anand Sahib (Bhog)
-- Cmd + 5 = Help Guide
-- Cmd + 6 = Shortcut Legend
-- Cmd + / = Jump to search
-
-#### Windows:
-
-- Ctrl + 1 = Waheguru Slide
-- Ctrl + 2 = Mool Mantra Slide
-- Ctrl + 3 = Empty Slide
-- Ctrl + 4 = Anand Sahib (Bhog)
-- Ctrl + 5 = Help Guide
-- Ctrl + 6 = Shortcut Legend
-- Cmd + / = Jump to search
->>>>>>> updating legend.md
 
 ### <a name="others">Others</a>
 
