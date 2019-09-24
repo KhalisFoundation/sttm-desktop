@@ -144,6 +144,11 @@
         "type": "radio",
         "options": {}
       },
+      "announcement-overlay": {
+        "title": "",
+        "type": "radio",
+        "options": {}
+      },
       "themebg": {
         "title": "",
         "type": "dynamic",

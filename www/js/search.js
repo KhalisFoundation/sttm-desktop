@@ -870,7 +870,7 @@ module.exports = {
     const apv = document.body.classList.contains('akhandpaatt');
 
     // if the line clicked is further than throughput (in searches) then load until that line
-    let throughput = 40;
+    let throughput = 50;
 
     if (start) {
       throughput = 10;

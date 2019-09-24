@@ -4,6 +4,7 @@
       "theme": "light-theme",
       "themebg": "",
       "overlay-cast": false,
+      "announcement-overlay": false,
       "layout": {
         "presenter-view": true
       },
