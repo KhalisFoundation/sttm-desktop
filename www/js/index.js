@@ -5,8 +5,7 @@ const { remote } = electron;
 const main = remote.require('./app');
 
 const search = require('./search');
-const strings = require('./strings');
-const newStrings = require('./strings.json');
+const strings = require('./strings.json');
 const dhanGuruModal = require('./insert-slide');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -33,7 +32,7 @@ function escKey() {
 
 const slideShortcuts = {
   waheguru: () => {
-    global.controller.sendText(strings.slideStrings.waheguru, true);
+    global.controller.sendText(strings.waheguru, true);
     isInsertedSlide = true;
   },
   empty: () => {
@@ -41,7 +40,7 @@ const slideShortcuts = {
     isInsertedSlide = true;
   },
   moolMantra: () => {
-    global.controller.sendMimicShabad(newStrings.moolMantra);
+    global.controller.sendMimicShabad(strings.moolMantra);
     isInsertedSlide = true;
   },
 };
