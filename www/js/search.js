@@ -653,11 +653,15 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    /*
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      window.socket.emit('data', {
+        type: 'shabad',
+        id: ShabadID,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
-    */
+
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.dataset.bani = '';
@@ -692,7 +696,7 @@ module.exports = {
 
           if (rowDb.Custom && rowDb.Custom.ID) {
             row = rowDb.Custom;
-            row.shabadID = rowDb.Ceremony.Token;
+            row.shabadID = `ceremony-${rowDb.Ceremony.Token}`;
           }
 
           if (rowDb.VerseRange && rowDb.VerseRange.length) {
@@ -711,6 +715,11 @@ module.exports = {
       if (!historyReload) {
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'ceremony',
+        });
+      }
       return this.printShabad(flatRows, null, LineID);
     } catch (error) {
       throw error;
@@ -721,6 +730,7 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+
     let blackListedMangalPosition;
     if (mangalPosition === 'above') {
       blackListedMangalPosition = 'current';
@@ -740,7 +750,8 @@ module.exports = {
     // load verses for bani based on baniID and the length that user has decided
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
-      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}-${rowsDb[0]
+        .BaniID || rowsDb[0].Bani.ID}`;
       const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
@@ -769,6 +780,13 @@ module.exports = {
 
           return row;
         });
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'bani',
+          id: BaniID,
+          highlight: LineID || rows[0].ID,
+        });
+      }
       return this.printShabad(rows, shabadID, LineID);
     });
   },
@@ -1017,11 +1035,29 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
-    /*
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      let shabadIdsplit = [ShabadID];
+      if (typeof ShabadID === 'string') {
+        shabadIdsplit = ShabadID.split('-');
+      }
+
+      let shabadType;
+
+      if (shabadIdsplit.length > 1) {
+        shabadType = shabadIdsplit[0] === 'ceremony' ? 'ceremony' : 'bani';
+      } else {
+        shabadType = 'shabad';
+      }
+
+      window.socket.emit('data', {
+        type: shabadType,
+        id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
+        baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
-    */
+
     const lines = this.$shabad.querySelectorAll('a.panktee');
     const shabadState = sessionStatesList[Line.sessionKey || `shabad-${ShabadID}`];
     if (e.target.classList.contains('fa-home')) {
