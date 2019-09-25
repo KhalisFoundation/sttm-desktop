@@ -425,34 +425,14 @@ const showLine = (ShabadID, LineID, rows, mode) => {
 const mimicShabad = mimicLine => {
   hideDecks();
 
-  const parentElement = document.createElement('div');
-  parentElement.classList.add('slide');
-
   const line = mimicLine.mimicShabad;
-  const mainText = document.createElement('h1');
-  mainText.classList.add('gurbani');
-  mainText.classList.add('gurmukhi');
-  mainText.innerHTML = line.gurmukhi;
-
-  const engTranslation = document.createElement('h1');
-  engTranslation.classList.add('translation');
-  engTranslation.innerHTML = line.english;
-
-  const teeka = document.createElement('h1');
-  teeka.classList.add('teeka');
-  teeka.innerHTML = line.punjabi;
-
-  const translit = document.createElement('h1');
-  translit.classList.add('transliteration');
-  translit.innerHTML = line.translit;
-
-  const elements = [mainText, engTranslation, teeka, translit];
-  for (let i = 0; i < elements.length; i += 1) {
-    parentElement.appendChild(elements[i]);
-  }
-
-  $viewer.appendChild(parentElement);
-  parentElement.classList.add('active');
+  const deck = h('div#shabad.mimic-shabad.deck.active', [
+    h('h1.gurbani.gurmukhi', line.gurmukhi),
+    h('h2.translation', line.english),
+    h('h2.teeka', line.punjabi || ''),
+    h('h2.transliteration', line.translit || ''),
+  ]);
+  $viewer.appendChild(deck);
 };
 const showText = (text, isGurmukhi = false) => {
   hideDecks();
