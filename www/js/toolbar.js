@@ -162,6 +162,7 @@ const extrasTileFactory = (tileType, row) =>
         toggleOverlayUI(currentToolbarItem, false);
         analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
         navLinks.navPage('shabad');
+        global.core.copy.loadFromDB(row.ID, 'bani');
       },
     },
     h('div.gurmukhi', row.Gurmukhi),
@@ -196,6 +197,7 @@ const printCeremonies = rows => {
             global.core.search.loadCeremony(row.ID).catch(error => {
               analytics.trackEvent('ceremonyFailed', row.ID, error);
             });
+            global.core.copy.loadFromDB(row.ID, 'ceremony');
             const currentCeremony = document.querySelector('div.ceremony-pane.active');
             if (currentCeremony) {
               currentCeremony.classList.remove('active');
@@ -259,6 +261,7 @@ const printBanis = rows => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
+          global.core.copy.loadFromDB(row.ID, 'bani');
           toggleOverlayUI(currentToolbarItem, false);
           navLinks.navPage('shabad');
         },

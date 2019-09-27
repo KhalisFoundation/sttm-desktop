@@ -13,7 +13,6 @@ const pageNavJSON = require('./footer-left.json');
 const { store } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
-
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
   8, // Backspace
@@ -27,6 +26,7 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+
 // Temp
 const infiniteScroll = false;
 
@@ -291,6 +291,13 @@ const sources = {
   S: 'Vaaran',
 };
 
+const baniLengthCols = {
+  short: 'existsSGPC',
+  medium: 'existsMedium',
+  long: 'existsTaksal',
+  extralong: 'existsBuddhaDal',
+};
+
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -312,6 +319,7 @@ function akhandPaatt() {
 module.exports = {
   currentShabad,
   currentMeta,
+  baniLengthCols,
 
   init() {
     this.searchSource = store.get('searchOptions.searchSource');
@@ -558,6 +566,7 @@ module.exports = {
             {
               onclick: ev => {
                 this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
+                global.core.copy.loadFromDB(item.Shabads[0].ShabadID, 'shabad');
                 global.core.updateInsertedSlide(false);
               },
             },
@@ -591,12 +600,15 @@ module.exports = {
             switch (type) {
               case 'bani':
                 this.loadBani(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'bani');
                 break;
               case 'ceremony':
                 this.loadCeremony(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'ceremony');
                 break;
               default:
                 this.loadShabad(SearchID, resumePankteeLineID);
+                global.core.copy.loadFromDB(SearchID, 'shabad');
             }
             const sessionLines = this.$session.querySelectorAll('a.panktee');
             Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -738,12 +750,6 @@ module.exports = {
       blackListedMangalPosition = 'above';
     }
     // translate user settings into its respective database fields
-    const baniLengthCols = {
-      short: 'existsSGPC',
-      medium: 'existsMedium',
-      long: 'existsTaksal',
-      extralong: 'existsBuddhaDal',
-    };
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
@@ -809,6 +815,7 @@ module.exports = {
       .getShabad(adjacentVerseID)
       .then(ShabadID => {
         adjacentShabadID = ShabadID;
+        global.core.copy.loadFromDB(ShabadID, 'shabad');
         return banidb.loadShabad(ShabadID);
       })
       .then(rows => {

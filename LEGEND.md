@@ -24,17 +24,17 @@
 
 #### <a name="macos-slides">macOS:</a>:
 
-| Combination                                | Description                                 |
-| ------------------------------------------ | ------------------------------------------- |
-| CMD + 1                                    | Waheguru Slide                              |
-| CMD + 2                                    | Mool Mantra Slide                           |
-| CMD + 3                                    | Empty Slide                                 |
-| CMD + 4                                    | Anand Sahib (Bhog)                          |
-| CMD + 5                                    | Help Guide                                  |
-| CMD + 6                                    | Shortcut Legend                             |
-| CMD + /                                    | Jump to search bar                          |
-| CMD + G                                    | Add Dhan slide or announcement         |
-| Spacebar (when in a shabad)                | Switch between main line and unchecked line |
+| Combination                                                                      | Description                                 |
+| -------------------------------------------------------------------------------- | ------------------------------------------- |
+| CMD + 1                                                                          | Waheguru Slide                              |
+| CMD + 2                                                                          | Mool Mantra Slide                           |
+| CMD + 3                                                                          | Empty Slide                                 |
+| CMD + 4                                                                          | Anand Sahib (Bhog)                          |
+| CMD + 5                                                                          | Help Guide                                  |
+| CMD + 6                                                                          | Shortcut Legend                             |
+| CMD + /                                                                          | Jump to search bar                          |
+| CMD + G                                                                          | Add Dhan slide or announcement              |
+| Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
 #### <a name="windows-slides">Windows:</a>
@@ -48,7 +48,7 @@
 | CTRL + 5                                                                         | Help Guide                                  |
 | CTRL + 6                                                                         | Shortcut Legend                             |
 | CTRL + /                                                                         | Jump to search bar                          |
-| CTRL + G                                                                         | Add Dhan slide or announcement         |
+| CTRL + G                                                                         | Add Dhan slide or announcement              |
 | Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
 
