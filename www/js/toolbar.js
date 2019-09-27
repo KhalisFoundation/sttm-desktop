@@ -88,7 +88,7 @@ const syncContent = h('div.sync-content', [
     h('div.sync-code-num', code),
     h(
       'div.sync-code-desc',
-      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on a mobile device (internet required). Press the "Present" button to display the pairing code for the sangat.',
+      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
     ),
     h('div.button-wrap', [
       h(
