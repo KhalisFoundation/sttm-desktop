@@ -1,5 +1,14 @@
 ## New Updates
 
+
+### 6.0 ALPHA - _September 26, 2019_
+
+### New:
+
+- Sangat Sync
+- Copy and paste
+
+
 ### 5.3.4 - _September 18, 2019_
      
 ### Improved:
