@@ -117,7 +117,9 @@ const syncContent = h('div.sync-content', [
         {
           onclick: () => {
             if (code !== '...') {
-              global.controller.sendText(code);
+              const syncString = `<p>Visit sttm.co/sync on your mobile 
+              device and enter the code below to follow along</p> <h1>${code} </h1>`;
+              global.controller.sendText(syncString);
             }
           },
         },
