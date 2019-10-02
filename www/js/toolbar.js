@@ -49,9 +49,11 @@ const remoteSyncInit = async () => {
     code = await tryConnection();
     if (code) {
       document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
     document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('#tool-sync-button').setAttribute('title', '...');
   }
 };
 
@@ -85,6 +87,7 @@ const syncToggle = async (forceConnect = false) => {
     code = '...';
     global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('#tool-sync-button').setAttribute('title', '...');
   } else {
     isConntected = true;
     await remoteSyncInit();
