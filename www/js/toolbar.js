@@ -78,6 +78,22 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
     ]),
   ]);
 
+const syncToggle = async (forceConnect = false) => {
+  if (isConntected && !forceConnect) {
+    isConntected = false;
+    onEnd(code);
+    code = '...';
+    global.controller.sendText('');
+    document.querySelector('.sync-code-num').innerText = '...';
+  } else {
+    isConntected = true;
+    await remoteSyncInit();
+  }
+  document.querySelector('.present-btn').innerText = isConntected
+    ? 'Stop Session'
+    : 'Start Session';
+};
+
 const syncContent = h('div.sync-content', [
   h('div.left-sync-content', [
     h(
@@ -92,20 +108,8 @@ const syncContent = h('div.sync-content', [
       h(
         'button.button.present-btn',
         {
-          onclick: async () => {
-            if (isConntected) {
-              isConntected = false;
-              onEnd(code);
-              code = '...';
-              global.controller.sendText('');
-              document.querySelector('.sync-code-num').innerText = '...';
-            } else {
-              isConntected = true;
-              await remoteSyncInit();
-            }
-            document.querySelector('.present-btn').innerText = isConntected
-              ? 'Stop Session'
-              : 'Start Session';
+          onclick: () => {
+            syncToggle();
           },
         },
         isConntected ? 'Stop Session' : 'Start Session',
@@ -311,6 +315,12 @@ module.exports = {
     });
 
     document.querySelector('.sync-dialogue').appendChild(syncContent);
+
+    const syncButton = document.querySelector('#tool-sync-button');
+
+    syncButton.addEventListener('click', () => {
+      syncToggle(true);
+    });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
