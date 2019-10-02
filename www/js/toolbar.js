@@ -80,16 +80,14 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
 
 const syncContent = h('div.sync-content', [
   h('div.left-sync-content', [
-    h('div.left-sync-icon'),
-    h('button.button.left-sync-button', 'Watch Video'),
-  ]),
-  h('div.right-sync-content', [
-    h('div.sync-code-label', 'Your unique sync code is'),
-    h('div.sync-code-num', code),
     h(
       'div.sync-code-desc',
       'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
     ),
+  ]),
+  h('div.right-sync-content', [
+    h('div.sync-code-label', 'Your unique sync code is'),
+    h('div.sync-code-num', code),
     h('div.button-wrap', [
       h(
         'button.button.present-btn',
