@@ -324,12 +324,11 @@ a {
   }
 
   #tool-sync-button {
-    background-color: white;
-    background-image: url('../../assets/img/icons/sync_button.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 75%;
     bottom: 10px;
+    -webkit-mask-image: url('../../assets/img/icons/sync_button.svg');
     position: fixed;
   }
 
@@ -342,72 +341,59 @@ a {
   }
 
   .sync-header {
-    background: #e67e22;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    color: white;
-    letter-spacing: 1px;
-    line-height: 40px;
-    text-align: center;
-    text-transform: uppercase;
+    color: $white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px 0;
   }
 
   .sync-dialogue {
-    background: white;
-    border-radius: 5px;
-    height: 500px;
-    margin: auto;
-    max-width: 800px;
+    height: 250px;
+    margin-top: 20px;
+    max-width: 600px;
   }
 
   .sync-content {
     align-items: center;
+    border-radius: 5px;
     display: flex;
-    height: 450px;
+    height: 160px;
     justify-content: space-around;
 
-    .left-sync-content {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      justify-content: center;
-      width: 40%;
+    .sync-code-desc {
+      line-height: 1.3;
     }
 
-    .left-sync-icon {
-      background-image: url('../../assets/img/icons/sync_button.svg');
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: auto 75%;
-      height: 300px;
-      width: 100%;
+    .left-sync-content {
+      height: 100%;
+      padding: 10px;
+      width: 45%;
     }
 
     .right-sync-content {
-      display: flex;
-      flex-direction: column;
       height: 100%;
-      justify-content: center;
+      padding: 10px;
       text-align: center;
-      width: 40%;
+      width: 50%;
 
       .sync-code-label {
         color: #e67e22;
+        padding: 5px;
       }
 
       .sync-code-num {
         font-size: 60px;
+        text-align: center;
       }
     }
   }
 }
 
 .sync-dialogue-wrapper {
-  align-items: center;
+  align-items: flex-end;
   display: flex;
   height: 100vh;
-  justify-content: center;
+  justify-content: flex-start;
   left: 100px;
   position: fixed;
   top: 0;

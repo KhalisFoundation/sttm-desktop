@@ -49,9 +49,11 @@ const remoteSyncInit = async () => {
     code = await tryConnection();
     if (code) {
       document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
-    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('.sync-code-num').innerText = ' ';
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   }
 };
 
@@ -78,36 +80,40 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
     ]),
   ]);
 
+const syncToggle = async (forceConnect = false) => {
+  if (isConntected && !forceConnect) {
+    isConntected = false;
+    onEnd(code);
+    code = '...';
+    global.controller.sendText('');
+    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    analytics.trackEvent('syncStopped', true);
+  } else {
+    isConntected = true;
+    await remoteSyncInit();
+  }
+  document.querySelector('.present-btn').innerText = isConntected
+    ? 'Stop Session'
+    : 'Start Session';
+};
+
 const syncContent = h('div.sync-content', [
   h('div.left-sync-content', [
-    h('div.left-sync-icon'),
-    h('button.button.left-sync-button', 'Watch Video'),
-  ]),
-  h('div.right-sync-content', [
-    h('div.sync-code-label', 'Your unique sync code is'),
-    h('div.sync-code-num', code),
     h(
       'div.sync-code-desc',
       'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
     ),
+  ]),
+  h('div.right-sync-content', [
+    h('div.sync-code-label', 'Your unique sync code is'),
+    h('div.sync-code-num', code),
     h('div.button-wrap', [
       h(
         'button.button.present-btn',
         {
-          onclick: async () => {
-            if (isConntected) {
-              isConntected = false;
-              onEnd(code);
-              code = '...';
-              global.controller.sendText('');
-              document.querySelector('.sync-code-num').innerText = '...';
-            } else {
-              isConntected = true;
-              await remoteSyncInit();
-            }
-            document.querySelector('.present-btn').innerText = isConntected
-              ? 'Stop Session'
-              : 'Start Session';
+          onclick: () => {
+            syncToggle();
           },
         },
         isConntected ? 'Stop Session' : 'Start Session',
@@ -315,6 +321,20 @@ module.exports = {
     });
 
     document.querySelector('.sync-dialogue').appendChild(syncContent);
+
+    const syncButton = document.querySelector('#tool-sync-button');
+
+    syncButton.addEventListener('click', () => {
+      analytics.trackEvent('syncStarted', true);
+      syncToggle(true);
+    });
+
+    const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
+    syncDialogueWrapper.addEventListener('click', event => {
+      if (event.target === event.currentTarget) {
+        toggleOverlayUI(currentToolbarItem, false);
+      }
+    });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
