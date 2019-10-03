@@ -88,6 +88,7 @@ const syncToggle = async (forceConnect = false) => {
     global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = '...';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    analytics.trackEvent('syncStopped', true);
   } else {
     isConntected = true;
     await remoteSyncInit();
@@ -322,12 +323,15 @@ module.exports = {
     const syncButton = document.querySelector('#tool-sync-button');
 
     syncButton.addEventListener('click', () => {
+      analytics.trackEvent('syncStarted', true);
       syncToggle(true);
     });
 
     const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
     syncDialogueWrapper.addEventListener('click', () => {
-      toggleOverlayUI(currentToolbarItem, false);
+      if (event.target === event.currentTarget) {
+        toggleOverlayUI(currentToolbarItem, false);
+      }
     });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
