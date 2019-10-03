@@ -328,7 +328,7 @@ module.exports = {
     });
 
     const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
-    syncDialogueWrapper.addEventListener('click', () => {
+    syncDialogueWrapper.addEventListener('click', event => {
       if (event.target === event.currentTarget) {
         toggleOverlayUI(currentToolbarItem, false);
       }
