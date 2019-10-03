@@ -324,12 +324,12 @@ a {
   }
 
   #tool-sync-button {
-    -webkit-mask-image: url('../../assets/img/icons/sync_button.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 75%;
     bottom: 10px;
     position: fixed;
+    -webkit-mask-image: url('../../assets/img/icons/sync_button.svg');
   }
 
   #tool-ceremonies {
