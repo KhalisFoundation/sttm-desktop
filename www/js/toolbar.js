@@ -52,8 +52,8 @@ const remoteSyncInit = async () => {
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
-    document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('#tool-sync-button').setAttribute('title', '...');
+    document.querySelector('.sync-code-num').innerText = ' ';
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   }
 };
 
@@ -87,7 +87,7 @@ const syncToggle = async (forceConnect = false) => {
     code = '...';
     global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('#tool-sync-button').setAttribute('title', '...');
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   } else {
     isConntected = true;
     await remoteSyncInit();
@@ -323,6 +323,11 @@ module.exports = {
 
     syncButton.addEventListener('click', () => {
       syncToggle(true);
+    });
+
+    const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
+    syncDialogueWrapper.addEventListener('click', () => {
+      toggleOverlayUI(currentToolbarItem, false);
     });
 
     $baniList.querySelector('header').appendChild(translitSwitch);
