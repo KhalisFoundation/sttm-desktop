@@ -194,7 +194,6 @@ function createViewer(ipcData) {
       backgroundColor: '#000000',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
-    viewerWindow.openDevTools();
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
