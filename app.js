@@ -194,6 +194,7 @@ function createViewer(ipcData) {
       backgroundColor: '#000000',
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.openDevTools();
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -451,14 +452,14 @@ ipcMain.on('show-line', (event, arg) => {
     createBroadcastFiles(arg);
   }
 });
-ipcMain.on('mimic-shabad', (event, arg) => {
+ipcMain.on('show-text-with-translations', (event, arg) => {
   lastLine = arg;
   showLine(arg);
   if (viewerWindow) {
-    viewerWindow.webContents.send('mimic-shabad', arg);
+    viewerWindow.webContents.send('show-text-with-translations', arg);
   } else {
     createViewer({
-      send: 'mimic-shabad',
+      send: 'show-text-with-translations',
       data: arg,
     });
   }

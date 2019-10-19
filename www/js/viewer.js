@@ -37,7 +37,7 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
-
+const anvaad = require('anvaad-js');
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
   'wheel',
@@ -161,9 +161,9 @@ global.platform.ipc.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
 });
-global.platform.ipc.on('mimic-shabad', (event, data) => {
+global.platform.ipc.on('show-text-with-translations', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
-  mimicShabad(data);
+  textWithTranslations(data);
 });
 
 global.platform.ipc.on('send-scroll', (event, pos) => {
@@ -422,16 +422,27 @@ const showLine = (ShabadID, LineID, rows, mode) => {
     }
   }
 };
-const mimicShabad = mimicLine => {
+const textWithTranslations = obj => {
   hideDecks();
 
-  const line = mimicLine.mimicShabad;
-  const deck = h('div#shabad.mimic-shabad.deck.active', [
-    h('h1.gurbani.gurmukhi', line.gurmukhi),
-    h('h2.translation', line.english),
-    h('h2.teeka', line.punjabi || ''),
-    h('h2.transliteration', line.translit || ''),
-  ]);
+  console.log(obj);
+  const line = obj.textWithTranslations;
+  console.log(line);
+  let deck;
+  if (line.punjabi) {
+    deck = h('div#shabad.textTranslations.deck.active', [
+      h('h1.gurbani.gurmukhi', line.gurmukhi),
+      h('h2.translation', line.english),
+      h('h2.teeka', line.punjabi || ''),
+      h('h2.transliteration', line.translit || anvaad.translit(line.gurmukhi)),
+    ]);
+  } else {
+    deck = h('div#shabad.textTranslations.deck.active', [
+      h('h1.gurbani.gurmukhi', line.gurmukhi),
+      h('h2.translation', line.english),
+      h('h2.transliteration', line.translit || anvaad.translit(line.gurmukhi)),
+    ]);
+  }
   $viewer.appendChild(deck);
 };
 const showText = (text, isGurmukhi = false) => {

@@ -26,7 +26,7 @@ const trayItemFactory = (trayItemKey, trayItem) =>
             analytics.trackEvent('ceremonyFailed', trayItem.ref, error);
           });
         } else if (trayItem.type === 'mimic-shabad') {
-          global.controller.sendMimicShabad(trayItem.ref);
+          global.controller.sendTextWithTranslations(trayItem.ref);
         }
       },
     },
