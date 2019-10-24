@@ -115,7 +115,6 @@ function buttonOnClick() {
     for (let i = 1; i <= 11; i += 1) {
       document.getElementById(`guru${i}`).onclick = () => {
         global.controller.sendTextWithTranslations(strings.dhanSlides[i - 1]);
-        console.log(strings.dhanSlides[i]);
         global.core.updateInsertedSlide(true);
         modal.close();
       };

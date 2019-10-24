@@ -425,9 +425,7 @@ const showLine = (ShabadID, LineID, rows, mode) => {
 const textWithTranslations = obj => {
   hideDecks();
 
-  console.log(obj);
   const line = obj.textWithTranslations;
-  console.log(line);
   let deck;
   if (line.punjabi) {
     deck = h('div#shabad.textTranslations.deck.active', [
