@@ -8,7 +8,7 @@
   "moolMantra": {
     "label": "Mool Mantra",
     "labelType": "roman",
-    "type": "mimic-shabad",
+    "type": "textWithTranslations",
     "ref": {
       "gurmukhi": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]",
       "english": "One Universal Creator God. The Name Is Truth. Creative Being Personified. No Fear. No Hatred. Image Of The Undying, Beyond Birth, Self-Existent. By Guru's Grace ~",
