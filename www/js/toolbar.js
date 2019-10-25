@@ -1,13 +1,18 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
+const isOnline = require('is-online');
 const banidb = require('./banidb');
+const { tryConnection, onEnd } = require('./share-sync');
+
+let code = '...';
+let isConntected = false;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { updateCeremonyThemeTiles } = require('./theme_editor');
 
-const toolbarItems = ['sunder-gutka', 'ceremonies'];
+const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button'];
 const navLinks = require('./search');
 
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
@@ -38,6 +43,20 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
+const remoteSyncInit = async () => {
+  const onlineVal = await isOnline();
+  if (onlineVal) {
+    code = await tryConnection();
+    if (code) {
+      document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('#tool-sync-button').setAttribute('title', code);
+    }
+  } else {
+    document.querySelector('.sync-code-num').innerText = ' ';
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+  }
+};
+
 // factories
 const navigatorHeaderFactory = (id, content, lang) =>
   h(`header.toolbar-nh.navigator-header#${id}`, h(`span.${lang}`, content));
@@ -60,6 +79,61 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
       }),
     ]),
   ]);
+
+const syncToggle = async (forceConnect = false) => {
+  if (isConntected && !forceConnect) {
+    isConntected = false;
+    onEnd(code);
+    code = '...';
+    global.controller.sendText('');
+    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    analytics.trackEvent('syncStopped', true);
+  } else {
+    isConntected = true;
+    await remoteSyncInit();
+  }
+  document.querySelector('.present-btn').innerText = isConntected
+    ? 'Stop Session'
+    : 'Start Session';
+};
+
+const syncContent = h('div.sync-content', [
+  h('div.left-sync-content', [
+    h(
+      'div.sync-code-desc',
+      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
+    ),
+  ]),
+  h('div.right-sync-content', [
+    h('div.sync-code-label', 'Your unique sync code is'),
+    h('div.sync-code-num', code),
+    h('div.button-wrap', [
+      h(
+        'button.button.present-btn',
+        {
+          onclick: () => {
+            syncToggle();
+          },
+        },
+        isConntected ? 'Stop Session' : 'Start Session',
+      ),
+      h(
+        'button.button.copy-code-btn',
+        {
+          onclick: () => {
+            if (code !== '...') {
+              const syncString = `<p>Visit sttm.co/sync on your mobile 
+              device and enter the code below to follow along</p> <h1>${code} </h1>`;
+              global.controller.sendText(syncString);
+            }
+          },
+        },
+        'Present',
+      ),
+    ]),
+  ]),
+]);
 
 const translitSwitch = h('div.translit-switch', [
   h('span', 'Abc'),
@@ -96,6 +170,7 @@ const extrasTileFactory = (tileType, row) =>
         toggleOverlayUI(currentToolbarItem, false);
         analytics.trackEvent('sunderGutkaBanis', tileType, row.Token);
         navLinks.navPage('shabad');
+        global.core.copy.loadFromDB(row.ID, 'bani');
       },
     },
     h('div.gurmukhi', row.Gurmukhi),
@@ -130,6 +205,7 @@ const printCeremonies = rows => {
             global.core.search.loadCeremony(row.ID).catch(error => {
               analytics.trackEvent('ceremonyFailed', row.ID, error);
             });
+            global.core.copy.loadFromDB(row.ID, 'ceremony');
             const currentCeremony = document.querySelector('div.ceremony-pane.active');
             if (currentCeremony) {
               currentCeremony.classList.remove('active');
@@ -193,6 +269,7 @@ const printBanis = rows => {
         onclick: () => {
           analytics.trackEvent('sunderGutkaBanis', row.Token);
           global.core.search.loadBani(row.ID);
+          global.core.copy.loadFromDB(row.ID, 'bani');
           toggleOverlayUI(currentToolbarItem, false);
           navLinks.navPage('shabad');
         },
@@ -241,6 +318,22 @@ module.exports = {
 
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
+    });
+
+    document.querySelector('.sync-dialogue').appendChild(syncContent);
+
+    const syncButton = document.querySelector('#tool-sync-button');
+
+    syncButton.addEventListener('click', () => {
+      analytics.trackEvent('syncStarted', true);
+      syncToggle(true);
+    });
+
+    const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
+    syncDialogueWrapper.addEventListener('click', event => {
+      if (event.target === event.currentTarget) {
+        toggleOverlayUI(currentToolbarItem, false);
+      }
     });
 
     $baniList.querySelector('header').appendChild(translitSwitch);

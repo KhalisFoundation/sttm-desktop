@@ -5,11 +5,15 @@ const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
 const strings = require('./strings.json');
+const copy = require('copy-to-clipboard');
+const isOnline = require('is-online');
+const strings = require('./strings');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
 const tingle = require('./vendor/tingle');
 const search = require('./search');
+const { tryConnection, onEnd } = require('./share-sync');
 
 const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
@@ -337,6 +341,68 @@ const announcementSlideButton = h(
   ),
 );
 
+const createSyncModal = (content, code) => {
+  const syncModal = new tingle.Modal({
+    footer: true,
+    stickyFooter: false,
+    cssClass: ['sync-code-modal'],
+    closeMethods: ['overlay', 'button', 'escape'],
+  });
+  // open modal
+  syncModal.open();
+
+  if (code) {
+    syncModal.addFooterBtn('Copy', 'tingle-btn tingle-btn--primary', () => {
+      copy(code);
+      syncModal.close();
+      syncModal.destroy();
+    });
+    syncModal.addFooterBtn('End Session', 'tingle-btn tingle-btn--primary', () => {
+      onEnd(code);
+      syncModal.close();
+      syncModal.destroy();
+      document.getElementById('remote-sync-icon').style.color = '#424242';
+    });
+    global.controller.sendText(code);
+  }
+
+  // set content
+  syncModal.setContent(content);
+  // add cancel button
+  const cancelTitle = 'Cancel';
+  syncModal.addFooterBtn(
+    cancelTitle,
+    'tingle-btn tingle-btn--pull-right tingle-btn--default',
+    () => {
+      syncModal.close();
+      syncModal.destroy();
+    },
+  );
+};
+
+const remoteSyncButton = h(
+  'li',
+  h(
+    'a.remote-sync-button',
+    {
+      onclick: async () => {
+        const onlineVal = await isOnline();
+        if (onlineVal) {
+          const code = await tryConnection();
+          if (code) {
+            document.getElementById('remote-sync-icon').style.color = 'green';
+            createSyncModal(`<h2>Sync code: ${code}</h2>`, code);
+          }
+        } else {
+          createSyncModal(`<h2>Must be online to use this feature.</h2>`, '');
+        }
+      },
+    },
+    h(`i.fa.fa-desktop.list-icon#remote-sync-icon`),
+    'Remote Sync',
+  ),
+);
+
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -368,6 +434,7 @@ module.exports = {
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(notificationButton);
+    $listOfShabadOptions.appendChild(remoteSyncButton);
 
     // when the app is reloaded, enable the control for akhandpaatt
     store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);

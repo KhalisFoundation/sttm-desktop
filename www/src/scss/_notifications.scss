@@ -2,6 +2,11 @@
   z-index: 1400;
 }
 
+.sync-code-modal {
+  .tingle-modal-box__content {
+    color: #000;
+  }
+}
 .notifications-modal {
   .tingle-modal-box__content {
     color: #000;
@@ -41,7 +46,8 @@
 }
 
 .dark-theme {
-  .notifications-modal {
+  .notifications-modal,
+  .sync-code-modal {
     .tingle-modal-box__content {
       color: #fff;
 

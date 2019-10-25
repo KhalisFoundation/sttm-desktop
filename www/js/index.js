@@ -4,6 +4,7 @@ const electron = require('electron');
 const { remote } = electron;
 const main = remote.require('./app');
 
+const copy = require('./copy');
 const search = require('./search');
 const strings = require('./strings.json');
 const dhanGuruModal = require('./insert-slide');
@@ -172,6 +173,11 @@ if (typeof Mousetrap !== 'undefined') {
   Mousetrap.bind(['up', 'left'], prevLine);
   Mousetrap.bind(['down', 'right'], nextLine);
   Mousetrap.bind('space', spaceBar);
+  Mousetrap.bind('mod+c', () => {
+    if (document.activeElement.id === 'shabad-page') {
+      copy.copyPanktee();
+    }
+  });
   Mousetrap.bindGlobal('enter', () => {
     if (document.activeElement.id === 'search') {
       openFirstResult();
@@ -204,6 +210,7 @@ global.platform.ipc.on('sync-settings', () => {
   settings.init();
 });
 module.exports = {
+  copy,
   menu,
   search,
   shareSync,
