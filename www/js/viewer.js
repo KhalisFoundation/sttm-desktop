@@ -10,6 +10,7 @@ const h = require('hyperscript');
 const scroll = require('scroll');
 const { remote } = require('electron');
 const { store } = require('electron').remote.require('./app');
+const anvaad = require('anvaad-js');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const themes = require('./js/themes.json');
@@ -37,7 +38,6 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
-const anvaad = require('anvaad-js');
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
   'wheel',
