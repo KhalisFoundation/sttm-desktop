@@ -104,6 +104,18 @@ a {
     }
   }
 
+  .beta-label {
+    background: #de636f;
+    color: #fff;
+    position: fixed;
+    letter-spacing: 1px;
+    font-size: 10px;
+    padding: 4px;
+    bottom: 60px;
+    left: 32px;
+    border-radius: 5px;
+  }
+
   .sync-button {
     bottom: 10px;
     cursor: pointer;
