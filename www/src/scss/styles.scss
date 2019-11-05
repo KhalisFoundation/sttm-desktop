@@ -105,15 +105,15 @@ a {
   }
 
   .beta-label {
-    background: #de636f;
-    color: #fff;
-    position: fixed;
-    letter-spacing: 1px;
-    font-size: 10px;
-    padding: 4px;
-    bottom: 60px;
-    left: 32px;
+    background: $red;
     border-radius: 5px;
+    bottom: 60px;
+    color: $white;
+    font-size: 10px;
+    left: 32px;
+    letter-spacing: 1px;
+    padding: 4px;
+    position: fixed;
   }
 
   .sync-button {
