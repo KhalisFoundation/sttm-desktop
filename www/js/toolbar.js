@@ -322,7 +322,7 @@ module.exports = {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
 
-    $toolbar.appendChild(betaLabel);
+    document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
     document.querySelector('.sync-dialogue').appendChild(syncContent);
 
