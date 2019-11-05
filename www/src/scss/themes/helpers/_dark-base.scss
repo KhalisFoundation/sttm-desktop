@@ -14,6 +14,10 @@
   $highlight-text: $transparent-blue;
   color: $text-base;
 
+  #tool-sync-button {
+    background-image: url('../../assets/img/icons/sync_button_white.svg');
+  }
+
   #toolbar,
   .bani-list,
   .ceremonies-list,
