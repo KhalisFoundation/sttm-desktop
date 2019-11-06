@@ -26,6 +26,8 @@ const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
 let currentToolbarItem;
 
+const betaLabel = h('div.beta-label', 'BETA');
+
 // helper functions
 const toggleOverlayUI = (toolbarItem, show) => {
   if (currentToolbarItem !== toolbarItem) {
@@ -319,6 +321,8 @@ module.exports = {
     toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
     });
+
+    document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
     document.querySelector('.sync-dialogue').appendChild(syncContent);
 

@@ -104,6 +104,20 @@ a {
     }
   }
 
+  .beta-label {
+    background: $red;
+    border-radius: 5px;
+    color: $white;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px;
+    position: absolute;
+    right: -3px;
+    text-align: center;
+    top: -3px;
+    width: 35px;
+  }
+
   .sync-button {
     bottom: 10px;
     cursor: pointer;
@@ -324,11 +338,11 @@ a {
   }
 
   #tool-sync-button {
+    background-image: url('../../assets/img/icons/sync_button_white.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 75%;
     bottom: 10px;
-    -webkit-mask-image: url('../../assets/img/icons/sync_button.svg');
     position: fixed;
   }
 
