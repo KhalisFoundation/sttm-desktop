@@ -26,6 +26,8 @@ install:
   - bonjoursdksetup.exe /quiet
   - del bonjoursdksetup.exe
   - npm install -g npm@latest
+  - npm install -g node-gyp
+  - npm set config node_gyp
   - set PATH=%APPDATA%\npm;%PATH%
   - npm ci
 matrix:
