@@ -152,7 +152,8 @@
     "linux": {
       "target": "deb",
       "icon": "assets"
-    }
+    },
+    "nodeGypRebuild": true
   },
   "husky": {
     "hooks": {
