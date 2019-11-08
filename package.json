@@ -82,6 +82,7 @@
     "lodash.set": "^4.3.2",
     "marked": "^0.6.1",
     "moment": "^2.22.1",
+    "node-gyp": "^6.0.1",
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
     "read-chunk": "^3.0.0",
