@@ -56,6 +56,9 @@ body {
 
   &.dhan-guru-nanak {
     background-position: left center;
+    .slide {
+      padding-left: 35%;
+    }
   }
 }
 
@@ -132,7 +135,6 @@ body {
   height: calc(100% - 250px);
   justify-content: flex-start;
   opacity: 0;
-  padding-left: 35%;
   position: absolute;
   width: 100%;
   z-index: 10;
