@@ -20,6 +20,18 @@
     "key": "dark-theme"
   },
   {
+    "name": "Dhan Guru Nanak",
+    "background-color": "#000",
+    "gurbani-color": "#fcfefe",
+    "translation-color": "#fde5ab",
+    "transliteration-color": "#f1f5f4",
+    "teeka-color": "#d1dbe2",
+    "background-image": "thumbnails/dhanGuruNanak.jpg",
+    "background-image-full": "dhanGuruNanak.jpg",
+    "type": "BACKGROUND",
+    "key": "dhan-guru-nanak"
+  },
+  {
     "name": "Khalsa Gold",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
@@ -68,18 +80,6 @@
     "background-image-full": "blue.jpg",
     "type": ["BACKGROUND", "death"],
     "key": "moody-blue"
-  },
-  {
-    "name": "Dhan Guru Nanak",
-    "background-color": "#000",
-    "gurbani-color": "#fcfefe",
-    "translation-color": "#fde5ab",
-    "transliteration-color": "#f1f5f4",
-    "teeka-color": "#d1dbe2",
-    "background-image": "thumbnails/dhanGuruNanak.jpg",
-    "background-image-full": "dhanGuruNanak.jpg",
-    "type": "BACKGROUND",
-    "key": "dhan-guru-nanak"
   },
   {
     "name": "A New Day",
