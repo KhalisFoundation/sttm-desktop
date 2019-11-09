@@ -70,6 +70,18 @@
     "key": "moody-blue"
   },
   {
+    "name": "Dhan Guru Nanak",
+    "background-color": "#000",
+    "gurbani-color": "#fcfefe",
+    "translation-color": "#fde5ab",
+    "transliteration-color": "#f1f5f4",
+    "teeka-color": "#d1dbe2",
+    "background-image": "thumbnails/dhanGuruNanak.jpg",
+    "background-image-full": "dhanGuruNanak.jpg",
+    "type": "BACKGROUND",
+    "key": "dhan-guru-nanak"
+  },
+  {
     "name": "A New Day",
     "background-color": "#7ccf3",
     "gurbani-color": "#0e2654",
