@@ -13,7 +13,6 @@ const pageNavJSON = require('./footer-left.json');
 const { store } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
-
 // the non-character keys that will register as a keypress when searching
 const allowedKeys = [
   8, // Backspace
@@ -27,6 +26,7 @@ const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
 let autoplaytimer;
+
 // Temp
 const infiniteScroll = false;
 
@@ -291,6 +291,13 @@ const sources = {
   S: 'Vaaran',
 };
 
+const baniLengthCols = {
+  short: 'existsSGPC',
+  medium: 'existsMedium',
+  long: 'existsTaksal',
+  extralong: 'existsBuddhaDal',
+};
+
 // Close the KB if anywhere is clicked besides anything in .search-div
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -312,6 +319,7 @@ function akhandPaatt() {
 module.exports = {
   currentShabad,
   currentMeta,
+  baniLengthCols,
 
   init() {
     this.searchSource = store.get('searchOptions.searchSource');
@@ -558,6 +566,7 @@ module.exports = {
             {
               onclick: ev => {
                 this.clickResult(ev, item.Shabads[0].ShabadID, item.ID, item);
+                global.core.copy.loadFromDB(item.Shabads[0].ShabadID, 'shabad');
                 global.core.updateInsertedSlide(false);
               },
             },
@@ -591,12 +600,15 @@ module.exports = {
             switch (type) {
               case 'bani':
                 this.loadBani(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'bani');
                 break;
               case 'ceremony':
                 this.loadCeremony(SearchID, resumePankteeLineID, true);
+                global.core.copy.loadFromDB(SearchID, 'ceremony');
                 break;
               default:
                 this.loadShabad(SearchID, resumePankteeLineID);
+                global.core.copy.loadFromDB(SearchID, 'shabad');
             }
             const sessionLines = this.$session.querySelectorAll('a.panktee');
             Array.from(sessionLines).forEach(el => el.classList.remove('current'));
@@ -653,11 +665,15 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    /*
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      window.socket.emit('data', {
+        type: 'shabad',
+        id: ShabadID,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
-    */
+
     // clear the Shabad controller and empty out the currentShabad array
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.dataset.bani = '';
@@ -692,7 +708,7 @@ module.exports = {
 
           if (rowDb.Custom && rowDb.Custom.ID) {
             row = rowDb.Custom;
-            row.shabadID = rowDb.Ceremony.Token;
+            row.shabadID = `ceremony-${rowDb.Ceremony.Token}`;
           }
 
           if (rowDb.VerseRange && rowDb.VerseRange.length) {
@@ -711,6 +727,11 @@ module.exports = {
       if (!historyReload) {
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'ceremony',
+        });
+      }
       return this.printShabad(flatRows, null, LineID);
     } catch (error) {
       throw error;
@@ -721,6 +742,7 @@ module.exports = {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+
     let blackListedMangalPosition;
     if (mangalPosition === 'above') {
       blackListedMangalPosition = 'current';
@@ -728,19 +750,14 @@ module.exports = {
       blackListedMangalPosition = 'above';
     }
     // translate user settings into its respective database fields
-    const baniLengthCols = {
-      short: 'existsSGPC',
-      medium: 'existsMedium',
-      long: 'existsTaksal',
-      extralong: 'existsBuddhaDal',
-    };
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = BaniID;
     currentShabad.splice(0, currentShabad.length);
     // load verses for bani based on baniID and the length that user has decided
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
       // create a unique shabadID for whole bani, and append it with length
-      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}`;
+      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}-${rowsDb[0]
+        .BaniID || rowsDb[0].Bani.ID}`;
       const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
@@ -769,6 +786,13 @@ module.exports = {
 
           return row;
         });
+      if (window.socket !== undefined) {
+        window.socket.emit('data', {
+          type: 'bani',
+          id: BaniID,
+          highlight: LineID || rows[0].ID,
+        });
+      }
       return this.printShabad(rows, shabadID, LineID);
     });
   },
@@ -791,6 +815,7 @@ module.exports = {
       .getShabad(adjacentVerseID)
       .then(ShabadID => {
         adjacentShabadID = ShabadID;
+        global.core.copy.loadFromDB(ShabadID, 'shabad');
         return banidb.loadShabad(ShabadID);
       })
       .then(rows => {
@@ -1017,11 +1042,29 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
-    /*
     if (window.socket !== undefined) {
-      window.socket.emit('data', { shabadid: ShabadID, highlight: LineID });
+      let shabadIdsplit = [ShabadID];
+      if (typeof ShabadID === 'string') {
+        shabadIdsplit = ShabadID.split('-');
+      }
+
+      let shabadType;
+
+      if (shabadIdsplit.length > 1) {
+        shabadType = shabadIdsplit[0] === 'ceremony' ? 'ceremony' : 'bani';
+      } else {
+        shabadType = 'shabad';
+      }
+
+      window.socket.emit('data', {
+        type: shabadType,
+        id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
+        baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
+        shabadid: ShabadID, // @deprecated
+        highlight: LineID,
+      });
     }
-    */
+
     const lines = this.$shabad.querySelectorAll('a.panktee');
     const shabadState = sessionStatesList[Line.sessionKey || `shabad-${ShabadID}`];
     if (e.target.classList.contains('fa-home')) {

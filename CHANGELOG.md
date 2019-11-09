@@ -1,5 +1,21 @@
 ## New Updates
 
+
+### 6.0 - _November 12, 2019_
+
+### New:
+
+- Sangat Sync! An amazing new way to have sangat follow along what is being shown on SikhiToTheMax. Just visit sttm.co/sync and enter the pairing code to get started. Note: This feature is still in beta, please send us your feedback at sttm.co/feedback! 
+ ![](./assets/img/help_images/desktop-sangat-sync.png)
+ 
+ 
+ - Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab! 
+  ![](./assets/img/help_images/desktop-550-theme.png)
+ 
+ 
+- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations! 
+
+
 ### 5.3.4 - _September 18, 2019_
      
 ### Improved:
@@ -14,29 +30,29 @@
 <details><summary>See previous updates...</summary>
   
 ### 5.3.3 - _190822_
-     
+
 ### Improved:
 
 - Fixed a bug when using BaniOverlay with longer Banis/Shabads
 
 ### 5.3.2 - _190806_
-     
+
 ### Improved:
 
-- Bug fixes & UI enhancements   
+- Bug fixes & UI enhancements
 
 ### 5.3 - _190715_
 
 ### Added:
 
 - New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G
-![](./assets/img/help_images/desktop-dhan-modal.jpg)
-     
+  ![](./assets/img/help_images/desktop-dhan-modal.jpg)
+
 ### Improved:
 
 - You can now press enter after searching and it will automatically open the first result
 - Fixed a bug with Bani Overlay and the Anand Karaj Ceremony
-- Bug fixes & UI enhancements   
+- Bug fixes & UI enhancements
 
 ### 5.2 - _190702_
 
@@ -44,25 +60,24 @@
 
 - Check out the new Ceremonies tab - we've put every Shabad you need for an Anand Kaaraj in one place!
   ![](./assets/img/help_images/desktop-ceremonies.png)
-  
-  
+
 - Make your live streams stand out with all new Bani Overlay themes!
-  
+
 - Did you know SikhiToTheMax has keyboard shortcuts?
-     - CTRL (or CMD for Mac) + / = Search bar
-     - CTRL (or CMD for Mac) + 1 = Waheguru Slide
-     - CTRL (or CMD for Mac) + 2 = Mool Mantra
-     - CTRL (or CMD for Mac) + 3 = Blank Slide
-     - CTRL (or CMD for Mac) + 4 = Anand Sahib (Bhog)
-     - CTRL (or CMD for Mac) + 5 = Help Menu
-     - CTRL (or CMD for Mac) + 6 = Shortcut Legend 
-     
+  - CTRL (or CMD for Mac) + / = Search bar
+  - CTRL (or CMD for Mac) + 1 = Waheguru Slide
+  - CTRL (or CMD for Mac) + 2 = Mool Mantra
+  - CTRL (or CMD for Mac) + 3 = Blank Slide
+  - CTRL (or CMD for Mac) + 4 = Anand Sahib (Bhog)
+  - CTRL (or CMD for Mac) + 5 = Help Menu
+  - CTRL (or CMD for Mac) + 6 = Shortcut Legend
+
 ### Improved:
 
 - Expanded Vishraams to be supported on all themes
 - Switching between Banis / Shabads is now much easier, history will remember where you left off
 - Fixed several bugs when using Chromecast
-- Bug fixes & UI enhancements   
+- Bug fixes & UI enhancements
 
 ### 5.0 - _190506_
 
