@@ -87,8 +87,12 @@ function openSecondaryWindow(windowName) {
     });
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
+      window.obj.focus();
       if (window.show) {
         window.show();
+      }
+      if (window.focus) {
+        window.focus();
       }
     });
     window.obj.loadURL(window.url);
@@ -368,6 +372,9 @@ app.on('ready', () => {
 
     if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
       openSecondaryWindow('changelogWindow');
+      if (lastSeen !== appVersion) {
+        store.set('changelog-seen-count', 1);
+      }
     }
     if (!viewerWindow) {
       createViewer();
