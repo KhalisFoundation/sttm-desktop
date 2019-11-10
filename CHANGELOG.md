@@ -1,7 +1,7 @@
 ## New Updates
 
 
-### 6.0 - _November 12, 2019_
+### 6.0 - _November 9, 2019_
 
 ### New:
 
