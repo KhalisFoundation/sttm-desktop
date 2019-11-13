@@ -189,7 +189,7 @@ const closeOverlayUI = h(
 );
 
 const getEnglishExp = token => {
-  const englishExpVal = store.getUserPref(`gurbani.ceremonies.${token}-english`);
+  const englishExpVal = store.getUserPref(`gurbani.ceremonies.ceremony-${token}-english`);
   if (englishExpVal === undefined) {
     return true;
   }
@@ -226,7 +226,10 @@ const printCeremonies = rows => {
               `${row.Token}-english-exp`,
               () => {
                 const englishExpVal = getEnglishExp(row.Token);
-                store.setUserPref(`gurbani.ceremonies.${row.Token}-english`, !englishExpVal);
+                store.setUserPref(
+                  `gurbani.ceremonies.ceremony-${row.Token}-english`,
+                  !englishExpVal,
+                );
                 global.platform.updateSettings();
               },
               getEnglishExp(row.Token),
