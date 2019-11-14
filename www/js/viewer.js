@@ -104,6 +104,14 @@ const castText = (text, isGurmukhi) => {
   castCur.larivaar = text;
   castCur.isText = true;
   castToReceiver();
+
+  const activeSlide = document.querySelector('.deck.active .slide.active');
+  if (activeSlide) {
+    Array.prototype.forEach.call(activeSlide.children, element => {
+      const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
+      if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+    });
+  }
 };
 
 const applyThemebg = () => {
@@ -428,11 +436,15 @@ const showText = (text, isGurmukhi = false) => {
   }
 
   const $textIs = document.createElement('div');
-  $textIs.classList.add('gurbani');
+  $textIs.classList.add('announcements');
   if (isGurmukhi) {
     $textIs.classList.add('gurmukhi');
   }
   $textIs.innerHTML = text;
+
+  /* If slide is not empty, show quick tools */
+  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
+  $vcToggleIcon.style.left = text ? '0vh' : '-28vh';
 
   $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
   castText(text, isGurmukhi);
