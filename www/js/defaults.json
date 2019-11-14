@@ -46,7 +46,8 @@
         "gurbani": 9,
         "translation": 5,
         "transliteration": 4,
-        "teeka": 4
+        "teeka": 4,
+        "announcement": 4
       },
       "autoplay-options": {
         "autoplayTimer": 10

@@ -428,7 +428,7 @@ const showText = (text, isGurmukhi = false) => {
   }
 
   const $textIs = document.createElement('div');
-  $textIs.classList.add('gurbani');
+  $textIs.classList.add('ann-text');
   if (isGurmukhi) {
     $textIs.classList.add('gurmukhi');
   }

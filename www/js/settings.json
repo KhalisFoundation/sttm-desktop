@@ -29,6 +29,12 @@
             "max": 20,
             "min": 1,
             "step": 1
+          },
+          "announcement": {
+            "title": "Announcements",
+            "max": 20,
+            "min": 1,
+            "step": 1
           }
         }
       },
