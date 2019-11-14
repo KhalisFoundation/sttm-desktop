@@ -8,7 +8,7 @@
 - Fixed various UI bugs relating to Sangat Sync
 
 
-Have an idea for a new feature or question? Send us your feedback at [sttm.com/feedback](sttm.co/feedback).
+Have an idea for a new feature or question? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
 
 
 ### 6.0 - _November 9, 2019_
