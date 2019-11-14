@@ -5,8 +5,6 @@ const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
 const strings = require('./strings.json');
-const copy = require('copy-to-clipboard');
-const isOnline = require('is-online');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
