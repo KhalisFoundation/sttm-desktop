@@ -43,11 +43,11 @@
         "display-next-line": false
       },
       "font-sizes": {
+        "announcements": 4,
         "gurbani": 9,
         "translation": 5,
         "transliteration": 4,
-        "teeka": 4,
-        "announcements": 4
+        "teeka": 4
       },
       "autoplay-options": {
         "autoplayTimer": 10
