@@ -238,10 +238,11 @@ const dhanGuruSlideButton = h(
     'a.dhanguru-slide-button',
     {
       onclick: () => {
-        const guruJi = document.querySelector('#dhan-guru').value;
+        const guruJi = document.querySelector('#dhan-guru').selectedIndex;
         analytics.trackEvent('display', 'dhanguru-slide', guruJi);
-        global.controller.sendTextWithTranslations(guruJi);
-        console.log(Object.keys(guruJi));
+        if (guruJi - 1 >= 0) {
+          global.controller.sendTextWithTranslations(strings.dhanSlides[guruJi - 1]);
+        }
       },
     },
     h('i.fa.fa-circle-o.list-icon'),
@@ -249,7 +250,7 @@ const dhanGuruSlideButton = h(
       h('label', { htmlFor: 'dhan-guru' }, 'Add Dhan Guru '),
       h('select#dhan-guru', { value: ' ' }, [
         h('option', { value: ' ' }, 'Select'),
-        h('option', { value: strings.dhanSlides[0] }, 'Nanak Dev Ji'),
+        h('option', { value: `${strings.dhanSlides[0]}` }, 'Nanak Dev Ji'),
         h('option', { value: `${strings.dhanSlides[1]}` }, 'Angad Dev Ji'),
         h('option', { value: `${strings.dhanSlides[2]}` }, 'Amardas Sahib Ji'),
         h('option', { value: `${strings.dhanSlides[3]}` }, 'Ramdas Sahib Ji'),
