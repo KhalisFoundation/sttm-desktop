@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
