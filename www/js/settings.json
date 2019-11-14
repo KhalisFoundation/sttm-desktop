@@ -30,7 +30,7 @@
             "min": 1,
             "step": 1
           },
-          "announcement": {
+          "announcements": {
             "title": "Announcements",
             "max": 20,
             "min": 1,
