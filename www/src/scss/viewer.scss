@@ -251,6 +251,7 @@ h2 {
   .gurbani-#{$i} .gurbani,
   .translation-#{$i} .translation,
   .transliteration-#{$i} .transliteration,
+  .announcements-#{$i} .announcements,
   .teeka-#{$i} .teeka {
     font-size: #{$i}vh;
   }
@@ -297,7 +298,7 @@ h2 {
   display: none;
   font-size: 5vh;
   justify-content: space-around;
-  left: -30vh;
+  left: -28vh;
   padding-bottom: 6px;
   padding-top: 12px;
   position: absolute;
@@ -378,8 +379,11 @@ h2 {
     width: 6vh;
   }
 
-  &.icons-gurbani .visibility {
-    display: none;
+  &.icons-gurbani,
+  &.icons-announcements {
+    .visibility {
+      display: none;
+    }
   }
 }
 
@@ -389,7 +393,7 @@ h2 {
 
     .iconset {
       p {
-        font-size: 4vh;
+        font-size: 3.5vh;
         font-weight: bold;
       }
 
