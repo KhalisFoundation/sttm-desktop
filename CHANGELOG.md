@@ -4,7 +4,7 @@
 
 ### Improved:
 
-- We've added a dedicated font size slider for annoucements (incluides Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
+- We've added a dedicated font size slider for announcements (includes Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
 - Fixed various UI bugs relating to Sangat Sync
 
 
