@@ -1,6 +1,6 @@
 const h = require('hyperscript');
 const getJSON = require('get-json');
-const request = require('request');>>
+const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
