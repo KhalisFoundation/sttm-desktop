@@ -7,8 +7,9 @@
 - We've added a dedicated font size slider for annoucements (incluides Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
 - Fixed various UI bugs relating to Sangat Sync
 
+</br>
 
-Have an idea for a new feature or question? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
+Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
 
 
 ### 6.0 - _November 9, 2019_
