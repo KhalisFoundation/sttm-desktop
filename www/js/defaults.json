@@ -43,6 +43,7 @@
         "display-next-line": false
       },
       "font-sizes": {
+        "announcements": 7,
         "gurbani": 9,
         "translation": 5,
         "transliteration": 4,

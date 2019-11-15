@@ -6,6 +6,12 @@
         "title": "Font Sizes",
         "type": "range",
         "options": {
+          "announcements": {
+            "title": "Announcements",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
           "gurbani": {
             "title": "Bani",
             "max": 20,

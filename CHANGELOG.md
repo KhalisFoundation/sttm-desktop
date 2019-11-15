@@ -1,5 +1,18 @@
 ## New Updates
 
+### 6.1 - _November 14, 2019_
+
+### Improved:
+
+- We've added a dedicated font size slider for announcements (includes Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
+- Fixed various UI bugs relating to Sangat Sync
+
+
+
+</br>
+
+Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
+
 
 ### 6.0 - _November 9, 2019_
 
@@ -15,7 +28,9 @@
  
 - Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations! 
 
-
+<br/>  
+<details><summary>See previous updates...</summary>
+  
 ### 5.3.4 - _September 18, 2019_
      
 ### Improved:
@@ -25,9 +40,6 @@
 - Fixed a bug that would cause the last line of Anand Sahib (Bhog) not to display properly
 - Fixed a bug that would cause a white screen to flash upon app launch
 - Fixed a bug that caused the spacebar not to function properly
-
-<br/>  
-<details><summary>See previous updates...</summary>
   
 ### 5.3.3 - _190822_
 
