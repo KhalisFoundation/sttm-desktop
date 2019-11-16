@@ -4,7 +4,7 @@ const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
-const strings = require('./strings.json');
+const strings = require('./strings');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
@@ -14,21 +14,7 @@ const search = require('./search');
 const { store } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
-const allowedTags = [
-  'b',
-  'i',
-  'em',
-  'u',
-  'pre',
-  'strong',
-  'div',
-  'code',
-  'br',
-  'p',
-  'ul',
-  'li',
-  'ol',
-];
+const allowedTags = strings.allowedAnnouncementTags;
 
 const modal = new tingle.Modal({
   footer: true,
@@ -236,11 +222,9 @@ const dhanGuruSlideButton = h(
     'a.dhanguru-slide-button',
     {
       onclick: () => {
-        const guruJi = document.querySelector('#dhan-guru').selectedIndex;
+        const guruJi = document.querySelector('#dhan-guru').value;
         analytics.trackEvent('display', 'dhanguru-slide', guruJi);
-        if (guruJi - 1 >= 0) {
-          global.controller.sendTextWithTranslations(strings.dhanSlides[guruJi - 1]);
-        }
+        global.controller.sendText(guruJi, true);
       },
     },
     h('i.fa.fa-circle-o.list-icon'),
@@ -248,17 +232,17 @@ const dhanGuruSlideButton = h(
       h('label', { htmlFor: 'dhan-guru' }, 'Add Dhan Guru '),
       h('select#dhan-guru', { value: ' ' }, [
         h('option', { value: ' ' }, 'Select'),
-        h('option', { value: `${strings.dhanSlides[0]}` }, 'Nanak Dev Ji'),
-        h('option', { value: `${strings.dhanSlides[1]}` }, 'Angad Dev Ji'),
-        h('option', { value: `${strings.dhanSlides[2]}` }, 'Amardas Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[3]}` }, 'Ramdas Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[4]}` }, 'Arjun Dev Ji'),
-        h('option', { value: `${strings.dhanSlides[5]}` }, 'Har Gobind Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[6]}` }, 'Har Rai Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[7]}` }, 'Har Krishan Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[8]}` }, 'Teg Bahadur Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[9]}` }, 'Gobind Singh Sahib Ji'),
-        h('option', { value: `${strings.dhanSlides[10]}` }, 'Granth Sahib Ji'),
+        h('option', { value: 'DMn gurU nwnk dyv jI' }, 'Nanak Dev Ji'),
+        h('option', { value: 'DMn gurU AMgd dyv jI' }, 'Angad Dev Ji'),
+        h('option', { value: 'DMn gurU Amrdwsu swihb jI' }, 'Amardas Sahib Ji'),
+        h('option', { value: 'DMn gurU rwmdws swihb jI' }, 'Ramdas Sahib Ji'),
+        h('option', { value: 'DMn gurU Arjun dyv jI' }, 'Arjun Dev Ji'),
+        h('option', { value: 'DMn gurU hir goibMd swihb jI' }, 'Har Gobind Sahib Ji'),
+        h('option', { value: 'DMn gurU hir rwie swihb jI' }, 'Har Rai Sahib Ji'),
+        h('option', { value: 'DMn gurU hir ikRSx swihb jI' }, 'Har Krishan Sahib Ji'),
+        h('option', { value: 'DMn gurU qyg bhwdr swihb jI' }, 'Teg Bahadur Sahib Ji'),
+        h('option', { value: 'DMn gurU goibMd isMG swihb jI' }, 'Gobind Singh Sahib Ji'),
+        h('option', { value: 'DMn gurU gRMQ swihb jI' }, 'Granth Sahib Ji'),
       ]),
     ],
   ),
@@ -295,8 +279,8 @@ const announcementSlideButton = h(
         onclick: () => {
           const isGurmukhi = document.querySelector('#announcement-language').checked;
           const placeholderText = isGurmukhi
-            ? strings.announcement.placeholder.gurmukhi
-            : strings.announcement.placeholder.english;
+            ? strings.announcemenetPlaceholder.gurmukhi
+            : strings.announcemenetPlaceholder.english;
 
           const $announcementText = document.querySelector('.announcement-text');
           $announcementText.classList.toggle('gurmukhi', isGurmukhi);

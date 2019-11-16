@@ -3,28 +3,13 @@ const electron = require('electron');
 
 const analytics = electron.remote.getGlobal('analytics');
 const tingle = require('./vendor/tingle');
-const strings = require('./strings.json');
+const strings = require('./strings');
 const settings = require('./settings');
 
 const { store } = electron.remote.require('./app');
 
 // allowed html tags inside announcement
-// eslint-disable-next-line prefer-destructuring
-const allowedTags = [
-  'b',
-  'i',
-  'em',
-  'u',
-  'pre',
-  'strong',
-  'div',
-  'code',
-  'br',
-  'p',
-  'ul',
-  'li',
-  'ol',
-];
+const allowedTags = strings.allowedAnnouncementTags;
 
 /**
  * boolean to check what modal page is asctive
@@ -114,7 +99,7 @@ function buttonOnClick() {
   if (!isAnnouncementTab) {
     for (let i = 1; i <= 11; i += 1) {
       document.getElementById(`guru${i}`).onclick = () => {
-        global.controller.sendTextWithTranslations(strings.dhanSlides[i - 1]);
+        global.controller.sendText(strings.slideStrings.dhanguruStrings[i - 1], true, false);
         global.core.updateInsertedSlide(true);
         modal.close();
       };
