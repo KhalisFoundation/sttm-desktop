@@ -6,7 +6,7 @@ const main = remote.require('./app');
 
 const copy = require('./copy');
 const search = require('./search');
-const strings = require('./strings');
+const strings = require('./strings.json');
 const dhanGuruModal = require('./insert-slide');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
@@ -33,7 +33,7 @@ function escKey() {
 
 const slideShortcuts = {
   waheguru: () => {
-    global.controller.sendText(strings.slideStrings.waheguru, true);
+    global.controller.sendText(strings.waheguru, true);
     isInsertedSlide = true;
   },
   empty: () => {
@@ -41,7 +41,7 @@ const slideShortcuts = {
     isInsertedSlide = true;
   },
   moolMantra: () => {
-    global.controller.sendText(strings.slideStrings.moolMantra, true);
+    global.controller.sendTextWithTranslations(strings.moolMantra);
     isInsertedSlide = true;
   },
 };

@@ -10,6 +10,7 @@ const h = require('hyperscript');
 const scroll = require('scroll');
 const { remote } = require('electron');
 const { store } = require('electron').remote.require('./app');
+const anvaad = require('anvaad-js');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const themes = require('./js/themes.json');
@@ -37,7 +38,6 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
-
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
   'wheel',
@@ -168,6 +168,10 @@ global.platform.ipc.on('show-ang', (event, data) => {
 global.platform.ipc.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
   showText(data.text, data.isGurmukhi);
+});
+global.platform.ipc.on('show-text-with-translations', (event, data) => {
+  apv = document.body.classList.contains('akhandpaatt');
+  textWithTranslations(data);
 });
 
 global.platform.ipc.on('send-scroll', (event, pos) => {
@@ -413,7 +417,7 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
-        /* if you click on verse when message is open (announcement, blank, waheguru) 
+        /* if you click on verse when message is open (announcement, blank, waheguru)
         it should hide the message deck and show the shabad deck */
         if ($message.classList.contains('active')) {
           $message.classList.remove('active');
@@ -426,7 +430,27 @@ const showLine = (ShabadID, LineID, rows, mode) => {
     }
   }
 };
+const textWithTranslations = obj => {
+  hideDecks();
 
+  const line = obj.textWithTranslations;
+  let deck;
+  if (line.punjabi) {
+    deck = h('div#shabad.textTranslations.deck.active', [
+      h('h1.gurbani.gurmukhi', line.gurmukhi),
+      h('h2.translation', line.english),
+      h('h2.teeka', line.punjabi || ''),
+      h('h2.transliteration', line.translit || anvaad.translit(line.gurmukhi)),
+    ]);
+  } else {
+    deck = h('div#shabad.textTranslations.deck.active', [
+      h('h1.gurbani.gurmukhi', line.gurmukhi),
+      h('h2.translation', line.english),
+      h('h2.transliteration', line.translit || anvaad.translit(line.gurmukhi)),
+    ]);
+  }
+  $viewer.appendChild(deck);
+};
 const showText = (text, isGurmukhi = false) => {
   hideDecks();
 

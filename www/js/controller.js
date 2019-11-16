@@ -575,6 +575,12 @@ module.exports = {
     global.platform.ipc.send('show-empty-slide');
     global.platform.ipc.send('show-text', { text, isGurmukhi, isAnnouncement });
   },
+  sendTextWithTranslations(textWithTranslations) {
+    global.webview.send('show-empty-slide');
+    global.webview.send('show-text-with-translations', { textWithTranslations });
+    global.platform.ipc.send('show-empty-slide');
+    global.platform.ipc.send('show-text-with-translations', { textWithTranslations });
+  },
   sendScroll(pos) {
     global.platform.ipc.send('send-scroll', { pos });
   },
