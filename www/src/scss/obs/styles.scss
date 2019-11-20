@@ -110,7 +110,10 @@ body {
   }
 
   .content-bars-bottom {
-    margin-right: 16vw;
+    bottom: 0;
+    padding-right: 16vw;
+    position: absolute;
+    width: 100vw;
   }
 
   .content-top {
@@ -118,17 +121,13 @@ body {
   }
 
   .content-bottom {
+    position: static;
     padding-bottom: 3vh;
   }
 
   .o-teeka,
   .o-transliteration {
     display: block;
-  }
-
-  .content-bottom {
-    bottom: 0;
-    position: absolute;
   }
 
   .logo-wrapper {
@@ -257,11 +256,21 @@ body {
   display: inline-flex;
   justify-content: center;
   opacity: 0.85;
-  padding: 2vh;
+  padding: 2vh 2vw;
   position: fixed;
   right: 2vh;
 
   .sttm-logo {
     width: 12vw;
+  }
+}
+
+.logo-off {
+  .content-bars-bottom {
+    padding-right: 0;
+  }
+  
+  .logo-wrapper{
+  display: none;
   }
 }

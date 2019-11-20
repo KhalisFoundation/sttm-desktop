@@ -185,9 +185,20 @@ input[type='color'] {
       color: #666;
     }
   }
+
+  .logo-toggle {
+    .fa-toggle-off,
+    .fa-toggle-on {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+
 }
 
-.cast-toggle {
+.cast-toggle,
+.logo-toggle {
   cursor: pointer;
   .cp-icon {
     font-size: 28px;

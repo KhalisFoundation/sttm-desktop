@@ -61,6 +61,8 @@
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
+        document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
+
         const $gurbani = document.querySelector('.o-gurbani');
         if (overlayPrefs.overlayVars.overlayLarivaar) {
           $gurbani.innerHTML = $gurbani.innerHTML.replace(/ /g, '<wbr>');
@@ -89,11 +91,13 @@
         <div class="content-bar o-teeka"></div>
       </div>
       <div class="content-bars-bottom">
-        <div class="content-bar o-transliteration"></div>
-        <div class="content-bar o-translation"></div>
-      </div>
-      <div class="logo-wrapper">
-        <img src="./sikhi-max-logo.png" class="sttm-logo">
+        <div class="content-bottom">
+          <div class="content-bar o-transliteration"></div>
+          <div class="content-bar o-translation"></div>
+        </div>
+        <div class="logo-wrapper">
+          <img src="./sikhi-max-logo.png" class="sttm-logo">
+        </div>
       </div>
     </section>
     <script type="text/javascript">

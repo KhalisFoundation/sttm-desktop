@@ -226,6 +226,28 @@ const toggleCast = h(
   h('div.setting-label', `${overlayCast ? 'On' : 'Off'}`),
 );
 
+const toggleLogo = h(
+  'div.input-wrap.logo-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.overlayLogo = !overlayVars.overlayLogo;
+        savePrefs();
+        const { overlayLogo } = overlayVars;
+
+        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
+        $logoIcon.classList.toggle('fa-toggle-on', overlayLogo);
+        $logoIcon.classList.toggle('fa-toggle-off', !overlayLogo);
+      }
+    },
+  },
+  h(
+    'div#logo-btn',
+    h(`i.fa.cp-icon.${overlayVars.overlayLogo ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', 'Logo'),
+);
+
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
@@ -248,6 +270,7 @@ const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity
 const themeSelector = document.querySelector('.theme-selector');
 
 controlPanel.append(toggleCast);
+controlPanel.append(toggleLogo);
 controlPanel.append(separator);
 controlPanel.append(gurbaniColor);
 controlPanel.append(changeGurbanifontSizeButton);

@@ -81,7 +81,7 @@
         "fontSize": 3,
         "gurbaniFontSize": 5,
         "gurbaniTextColor": "#EAC445",
-        "showLogo": true,
+        "overlayLogo": true,
         "overlayLarivaar": false,
         "theme": false
       },
