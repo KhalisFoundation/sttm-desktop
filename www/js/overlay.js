@@ -10,6 +10,7 @@ const analytics = remote.getGlobal('analytics');
 
 const { overlayVars } = store.get('obs').overlayPrefs;
 let overlayCast = store.getUserPref('app.overlay-cast');
+let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 const controlPanel = document.querySelector('.control-panel');
 const webview = document.createElement('webview');
@@ -226,6 +227,28 @@ const toggleCast = h(
   h('div.setting-label', `${overlayCast ? 'On' : 'Off'}`),
 );
 
+const toggleAnnouncements = h(
+  'div.input-wrap.announcement-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        announcementOverlay = !announcementOverlay;
+        store.setUserPref('app.announcement-overlay', announcementOverlay);
+        ipcRenderer.send('update-settings');
+
+        const $announcementIcon = evt.currentTarget.querySelector('.cp-icon');
+        $announcementIcon.classList.toggle('fa-toggle-on', announcementOverlay);
+        $announcementIcon.classList.toggle('fa-toggle-off', !announcementOverlay);
+      }
+    },
+  },
+  h(
+    'div#announcement-btn',
+    h(`i.fa.cp-icon.${announcementOverlay ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', { style: 'font-size: 9px' }, ['Announce', h('wbr'), 'ment']),
+);
+
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
@@ -248,6 +271,7 @@ const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity
 const themeSelector = document.querySelector('.theme-selector');
 
 controlPanel.append(toggleCast);
+controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
 controlPanel.append(gurbaniColor);
 controlPanel.append(changeGurbanifontSizeButton);
