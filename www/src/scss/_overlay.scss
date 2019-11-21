@@ -186,7 +186,8 @@ input[type='color'] {
     }
   }
 
-  .logo-toggle {
+  .logo-toggle,
+  .announcement-toggle {
     .fa-toggle-off,
     .fa-toggle-on {
       cursor: not-allowed;
@@ -197,7 +198,8 @@ input[type='color'] {
 }
 
 .cast-toggle,
-.logo-toggle {
+.logo-toggle,
+.announcement-toggle {
   cursor: pointer;
   .cp-icon {
     font-size: 28px;
