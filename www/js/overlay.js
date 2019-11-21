@@ -139,7 +139,8 @@ const layoutButtonFactory = layoutName =>
     {
       onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
-          bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
+          const newBar = bar;
+          newBar.style.transform = 'none';
         });
         overlayVars.layout = layoutName;
         savePrefs();
