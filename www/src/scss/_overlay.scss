@@ -15,10 +15,8 @@
   border-radius: 15px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
   height: 450px;
-  margin: auto;
+  max-width: 800px;
   overflow: hidden;
-  position: relative;
-  width: 800px;
 }
 
 .control-panel {
@@ -29,6 +27,45 @@
   position: fixed;
   top: 0;
   width: 80px;
+}
+
+.preview-container {
+  overflow: hidden;
+  text-align: center;
+  width: 805px; //accomodate shadows
+}
+
+.separator-y {
+  border-right: 1px solid #ccc;
+  height: 48px;
+  margin-right: 10px;
+  width: 10px;
+}
+
+.text-controls {
+  background: #ebebeb;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: inline-block;
+  margin-top: 4vh;
+  padding: 12px;
+  text-align: center;
+
+  & > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .input-wrap {
+    margin: 0 6px;
+    width: auto;
+  }
+}
+
+.toggle-text > .layout-btn,
+.toggle-text > .input-wrap {
+  display: inline-block;
+  margin: 0 5px;
 }
 
 .theme-selector {
@@ -280,12 +317,12 @@ input[type='color'] {
   @extend .color-input;
 
   background: #ddd;
-  margin: auto;
+  display: inline-block;
+  margin: 2px;
 }
 
 .resize-btn {
   display: flex;
-  margin-top: 10px;
 }
 
 .size-btn {

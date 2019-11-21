@@ -13,6 +13,7 @@ let overlayCast = store.getUserPref('app.overlay-cast');
 let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 const controlPanel = document.querySelector('.control-panel');
+const textControls = document.querySelector('.text-controls');
 const webview = document.createElement('webview');
 
 const getUrl = () => {
@@ -32,7 +33,7 @@ const savePrefs = () => {
   ipcRenderer.send('update-overlay-vars');
 };
 
-const colorInputFactory = (inputName, label, defaultColor, onchangeAction) =>
+const colorInputFactory = (inputName, defaultColor, onchangeAction) =>
   h(
     `div.${inputName}.input-wrap`,
     h(`input.${inputName}.color-input`, {
@@ -40,6 +41,12 @@ const colorInputFactory = (inputName, label, defaultColor, onchangeAction) =>
       onchange: onchangeAction,
       value: defaultColor,
     }),
+  );
+
+const controlsFactory = (controls, label) =>
+  h(
+    'div.toggle-text',
+    Array.isArray(controls) ? controls.map(c => c) : controls,
     h('div.setting-label', label),
   );
 
@@ -120,27 +127,25 @@ const decreaseOpacity = () => {
 };
 
 const separator = h('div.separator');
+const separatorY = () => h('div.separator-y').cloneNode(true);
 
 const layoutButtonFactory = layoutName =>
   h(
-    'div.input-wrap',
-    h(
-      `div.layout-btn.${layoutName}`,
-      h('div.layout-bar.layout-bar-1'),
-      h('div.layout-bar.layout-bar-2'),
-      h('div.layout-bar.layout-bar-3'),
-      h('div.layout-bar.layout-bar-4'),
-      {
-        onclick: () => {
-          document.querySelectorAll('.content-bar').forEach(bar => {
-            bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
-          });
-          overlayVars.layout = layoutName;
-          savePrefs();
-          analytics.trackEvent('overlay', 'layout', layoutName);
-        },
+    `div.layout-btn.${layoutName}`,
+    h('div.layout-bar.layout-bar-1'),
+    h('div.layout-bar.layout-bar-2'),
+    h('div.layout-bar.layout-bar-3'),
+    h('div.layout-bar.layout-bar-4'),
+    {
+      onclick: () => {
+        document.querySelectorAll('.content-bar').forEach(bar => {
+          bar.style.transform = 'none'; // eslint-disable-line no-param-reassign
+        });
+        overlayVars.layout = layoutName;
+        savePrefs();
+        analytics.trackEvent('overlay', 'layout', layoutName);
       },
-    ),
+    },
   );
 
 const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
@@ -271,17 +276,25 @@ const toggleAnnouncements = h(
   h('div.setting-label', { style: 'font-size: 9px' }, ['Announce', h('wbr'), 'ment']),
 );
 
+/** Main Control Bar Items */
+controlPanel.append(toggleCast);
+controlPanel.append(toggleLogo);
+controlPanel.append(toggleAnnouncements);
+controlPanel.append(separator);
+controlPanel.append(copyURLButton);
+controlPanel.append(toggleLarivaar);
+
+/** Text Control Bar Items */
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
 const gurbaniColor = colorInputFactory(
   'toggle-text',
-  'Gurbani',
   overlayVars.gurbaniTextColor,
   changeGurbaniColor,
 );
-const textColor = colorInputFactory('toggle-text', 'Text', overlayVars.textColor, changeColor);
-const backgroundColor = colorInputFactory('background', 'BG', overlayVars.bgColor, changeBg);
+const textColor = colorInputFactory('toggle-text', overlayVars.textColor, changeColor);
+const backgroundColor = colorInputFactory('background', overlayVars.bgColor, changeBg);
 const changeBarSizeButton = resizeButtonFactory(increaseBarSize, decreaseBarSize);
 const changefontSizeButton = resizeButtonFactory(increasefontSize, decreasefontSize);
 const changeGurbanifontSizeButton = resizeButtonFactory(
@@ -290,29 +303,18 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
-const themeSelector = document.querySelector('.theme-selector');
+textControls.append(controlsFactory([gurbaniColor, changeGurbanifontSizeButton], 'Gurbani'));
+textControls.append(separatorY());
+textControls.append(controlsFactory([textColor, changefontSizeButton], 'Text'));
+textControls.append(separatorY());
+textControls.append(controlsFactory(backgroundColor, 'BG'));
+textControls.append(separatorY());
+textControls.append(controlsFactory(changeBarSizeButton, 'Size'));
+textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
+textControls.append(separatorY());
+textControls.append(controlsFactory([topLayoutBtn, bottomLayoutBtn, splitLayoutBtn], 'Layout'));
 
-controlPanel.append(toggleCast);
-controlPanel.append(toggleLogo);
-controlPanel.append(toggleAnnouncements);
-controlPanel.append(separator);
-controlPanel.append(gurbaniColor);
-controlPanel.append(changeGurbanifontSizeButton);
-controlPanel.append(textColor);
-controlPanel.append(changefontSizeButton);
-controlPanel.append(separator);
-controlPanel.append(backgroundColor);
-controlPanel.append(changeBarSizeButton);
-controlPanel.append(h('div.setting-label', 'Size'));
-controlPanel.append(changeOpacityButton);
-controlPanel.append(h('div.setting-label', 'Opacity'));
-controlPanel.append(separator.cloneNode(true));
-controlPanel.append(bottomLayoutBtn);
-controlPanel.append(topLayoutBtn);
-controlPanel.append(splitLayoutBtn);
-controlPanel.append(separator.cloneNode(true));
-controlPanel.append(copyURLButton);
-controlPanel.append(toggleLarivaar);
+const themeSelector = document.querySelector('.theme-selector');
 
 const themeObjects = {
   aNewDay: {
@@ -396,7 +398,7 @@ Object.keys(themeObjects).forEach(themeObject => {
 
 webview.src = `${url}?preview`;
 webview.className = 'preview';
-document.querySelector('.canvas').appendChild(webview);
+document.querySelector('.preview-container').prepend(webview);
 
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
