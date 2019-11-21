@@ -12,6 +12,12 @@
     display: block;
     opacity: 0.4;
     position: relative;
+    .gurmukhi,
+    .translation,
+    .teeka,
+    .transliteration {
+      font-size: #{(font-size * 0.7)};
+    }
 
     &.active {
       opacity: 1;
