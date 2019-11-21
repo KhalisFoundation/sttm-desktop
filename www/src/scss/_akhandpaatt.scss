@@ -10,7 +10,11 @@
 
   .slide {
     display: block;
-    opacity: 1;
+    opacity: 0.4;
     position: relative;
+
+    &.active {
+      opacity: 1;
+    }
   }
 }
