@@ -44,11 +44,7 @@ const colorInputFactory = (inputName, defaultColor, onchangeAction) =>
   );
 
 const controlsFactory = (controls, label) =>
-  h(
-    'div.toggle-text',
-    Array.isArray(controls) ? controls.map(c => c) : controls,
-    h('div.setting-label', label),
-  );
+  h('div.toggle-text', controls, h('div.setting-label', label));
 
 const changeColor = e => {
   const color = e.target.value;
@@ -139,8 +135,7 @@ const layoutButtonFactory = layoutName =>
     {
       onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
-          const newBar = bar;
-          newBar.style.transform = 'none';
+          bar.setAttribute('style', 'transform:none');
         });
         overlayVars.layout = layoutName;
         savePrefs();
@@ -178,6 +173,7 @@ const copyURLButton = h(
     title: `${url}`,
     onclick: () => {
       copy(url);
+      analytics.trackEvent('overlay', 'urlCopied', url);
     },
   },
   h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
@@ -224,6 +220,7 @@ const toggleCast = h(
 
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
       $castLabel.innerText = `${overlayCast ? 'On' : 'Off'}`;
+      analytics.trackEvent('overlay', 'toggleCast', overlayCast);
 
       url = getUrl();
       webview.src = `${url}?preview`;
@@ -245,6 +242,8 @@ const toggleLogo = h(
         const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
         $logoIcon.classList.toggle('fa-toggle-on', overlayLogo);
         $logoIcon.classList.toggle('fa-toggle-off', !overlayLogo);
+
+        analytics.trackEvent('overlay', 'toggleLogo', overlayLogo);
       }
     },
   },
@@ -267,6 +266,8 @@ const toggleAnnouncements = h(
         const $announcementIcon = evt.currentTarget.querySelector('.cp-icon');
         $announcementIcon.classList.toggle('fa-toggle-on', announcementOverlay);
         $announcementIcon.classList.toggle('fa-toggle-off', !announcementOverlay);
+
+        analytics.trackEvent('overlay', 'toggleAnnouncements', announcementOverlay);
       }
     },
   },
@@ -383,6 +384,8 @@ const themeSwatchFactory = themeOptions => {
         overlayVars.gurbaniTextColor = themeOptions.gurbaniTextColor;
         overlayVars.bgColor = themeOptions.bgColor;
         savePrefs();
+
+        analytics.trackEvent('overlay', 'theme', overlayVars.theme);
       },
     },
     h('span', themeOptions.label),
