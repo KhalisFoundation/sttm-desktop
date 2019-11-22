@@ -134,7 +134,6 @@ body {
     border-radius: 0;
     bottom: 0;
     height: 100%;
-    opacity: 1;
     position: absolute;
     right: 0;
   }
@@ -255,7 +254,6 @@ body {
   border-radius: 5px;
   display: inline-flex;
   justify-content: center;
-  opacity: 0.85;
   padding: 2vh 2vw;
   position: fixed;
   right: 2vh;
@@ -269,8 +267,8 @@ body {
   .content-bars-bottom {
     padding-right: 0;
   }
-  
-  .logo-wrapper{
-  display: none;
+
+  .logo-wrapper {
+    display: none;
   }
 }

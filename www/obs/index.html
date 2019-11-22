@@ -51,6 +51,8 @@
             overlayPrefs.overlayVars.bgOpacity
           })`;
         });
+
+        document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.overlayVars.bgOpacity;
         document.querySelector(
           '.o-gurbani',
         ).style.fontSize = `${overlayPrefs.overlayVars.gurbaniFontSize}vh`;
