@@ -3,7 +3,7 @@
   display: flex;
   height: 100vh;
   justify-content: center;
-  margin-left: 80px;
+  margin-left: 120px;
   margin-right: 180px;
 }
 
@@ -26,7 +26,7 @@
   padding: 10px;
   position: fixed;
   top: 0;
-  width: 80px;
+  width: 120px;
 }
 
 .preview-container {
@@ -191,7 +191,7 @@ input[type='color'] {
 .input-wrap {
   margin-bottom: 10px;
   text-align: center;
-  width: 60px;
+  width: 100px;
 }
 
 .overlay-off {
@@ -239,7 +239,7 @@ input[type='color'] {
 .announcement-toggle {
   cursor: pointer;
   .cp-icon {
-    font-size: 28px;
+    font-size: 34px;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
   }
 
@@ -256,7 +256,7 @@ input[type='color'] {
   color: #333;
   font-size: 10px;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-top: 5px;
   text-align: center;
   text-transform: uppercase;

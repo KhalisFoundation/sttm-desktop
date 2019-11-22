@@ -219,7 +219,7 @@ const toggleCast = h(
       document.body.classList.toggle('overlay-off', !overlayCast);
 
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
-      $castLabel.innerText = `${overlayCast ? 'On' : 'Off'}`;
+      $castLabel.innerText = `${overlayCast ? 'Casting On' : 'Casting Off'}`;
       analytics.trackEvent('overlay', 'toggleCast', overlayCast);
 
       url = getUrl();
@@ -227,7 +227,7 @@ const toggleCast = h(
     },
   },
   h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
-  h('div.setting-label', `${overlayCast ? 'On' : 'Off'}`),
+  h('div.setting-label', `${overlayCast ? 'Casting On' : 'Casting Off'}`),
 );
 
 const toggleLogo = h(
@@ -275,7 +275,7 @@ const toggleAnnouncements = h(
     'div#announcement-btn',
     h(`i.fa.cp-icon.${announcementOverlay ? 'fa-toggle-on' : 'fa-toggle-off'}`),
   ),
-  h('div.setting-label', { style: 'font-size: 9px' }, ['Announce', h('wbr'), 'ment']),
+  h('div.setting-label', 'Announcement'),
 );
 
 /** Main Control Bar Items */
