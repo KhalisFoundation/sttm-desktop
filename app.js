@@ -81,8 +81,8 @@ function openSecondaryWindow(windowName) {
     openWindow[0].show();
   } else {
     window.obj = new BrowserWindow({
-      width: 725,
-      height: 800,
+      width: 1366,
+      height: 768,
       show: false,
     });
     window.obj.webContents.on('did-finish-load', () => {
