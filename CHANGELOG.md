@@ -1,11 +1,14 @@
 ## New Updates
 
-### 6.1 - _November 14, 2019_
+### 6.2 - _November 26, 2019_
 
 ### Improved:
 
-- We've added a dedicated font size slider for announcements (includes Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
-- Fixed various UI bugs relating to Sangat Sync
+- BaniOverlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
+- The SikhiToTheMax logo has been added to BaniOvery as default and can be turned off with the new "Logo" toggle
+- The "Show Annoucements in Overlay" toggle has been moved to the BaniOverlay  toolbar
+- We fixed a bug that was causing the Anand Karaj ceremony not to display correctly
+ ![](./assets/img/help_images/desktop-new-overlay.png)
 
 
 
@@ -13,6 +16,13 @@
 
 Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
 
+
+### 6.1 - _November 14, 2019_
+
+### Improved:
+
+- We've added a dedicated font size slider for announcements (includes Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
+- Fixed various UI bugs relating to Sangat Sync
 
 ### 6.0 - _November 9, 2019_
 
