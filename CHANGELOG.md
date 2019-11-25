@@ -16,6 +16,7 @@
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
+</br>
 
 ### 6.1 - _November 14, 2019_
 
