@@ -6,7 +6,7 @@
 
 - Bani Overlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
 - The SikhiToTheMax logo has been added to Bani Overlay as default and can be turned off with the new "Logo" toggle
-- The "Show Annoucements in Overlay" toggle has been moved to the BaniOverlay toolbar
+- The "Show Annoucements in Overlay" toggle has been moved to the Bani Overlay toolbar
 - We fixed a bug that was causing the Anand Karaj ceremony not to display correctly
 - The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future! 
  ![](./assets/img/help_images/desktop-new-overlay.png)
