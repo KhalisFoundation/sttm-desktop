@@ -4,8 +4,8 @@
 
 ### Improved:
 
-- BaniOverlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
-- The SikhiToTheMax logo has been added to BaniOvery as default and can be turned off with the new "Logo" toggle
+- Bani Overlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
+- The SikhiToTheMax logo has been added to Bani Overlay as default and can be turned off with the new "Logo" toggle
 - The "Show Annoucements in Overlay" toggle has been moved to the BaniOverlay toolbar
 - We fixed a bug that was causing the Anand Karaj ceremony not to display correctly
  ![](./assets/img/help_images/desktop-new-overlay.png)
@@ -14,7 +14,7 @@
 
 </br>
 
-Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 
 ### 6.1 - _November 14, 2019_
@@ -55,7 +55,7 @@ Have a question or an idea for a new feature? Send us your feedback at [sttm.co/
 
 ### Improved:
 
-- Fixed a bug when using BaniOverlay with longer Banis/Shabads
+- Fixed a bug when using Bani Overlay with longer Banis/Shabads
 
 ### 5.3.2 - _190806_
 
