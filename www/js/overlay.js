@@ -219,7 +219,7 @@ const toggleCast = h(
       document.body.classList.toggle('overlay-off', !overlayCast);
 
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
-      $castLabel.innerText = `${overlayCast ? 'Casting On' : 'Casting Off'}`;
+      $castLabel.innerText = `${overlayCast ? 'Overlay On' : 'Overlay Off'}`;
       analytics.trackEvent('overlay', 'toggleCast', overlayCast);
 
       url = getUrl();
@@ -227,7 +227,7 @@ const toggleCast = h(
     },
   },
   h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
-  h('div.setting-label', `${overlayCast ? 'Casting On' : 'Casting Off'}`),
+  h('div.setting-label', `${overlayCast ? 'Overlay On' : 'Overlay Off'}`),
 );
 
 const toggleLogo = h(
