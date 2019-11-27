@@ -88,6 +88,7 @@ function openSecondaryWindow(windowName) {
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();
+      window.obj.openDevTools();
       if (window.show) {
         window.show();
       }
@@ -253,8 +254,13 @@ function createBroadcastFiles(arg) {
 
 const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
-  const payload = Object.assign(line, overlayPrefs);
-  if (!line.fromScroll) {
+  const lineWithSettings = line;
+  lineWithSettings.languageSettings = {
+    translation: store.getUserPref('toolbar.gurbani.translation-language'),
+    transliteration: store.getUserPref('toolbar.gurbani.transliteration-language'),
+  };
+  const payload = Object.assign(lineWithSettings, overlayPrefs);
+  if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
   }
 };
