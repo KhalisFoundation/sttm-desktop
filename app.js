@@ -35,10 +35,10 @@ const appVersion = app.getVersion();
 
 const overlayCast = store.getUserPref('app.overlay-cast');
 
-//Reset to default theme if theme not found
+// Reset to default theme if theme not found
 const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
 if (currentTheme === undefined) {
-  store.setUserPref('app.theme', defaultTheme.key);
+  store.setUserPref('app.theme', themes[0]);
 }
 
 let mainWindow;
