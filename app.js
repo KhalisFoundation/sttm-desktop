@@ -8,6 +8,7 @@ const uuid = require('uuid/v4');
 const op = require('openport');
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
+const themes = require('./www/js/themes.json');
 const Analytics = require('./analytics');
 
 // Are we packaging for a platform's app store?
@@ -33,6 +34,12 @@ const store = new Store({
 const appVersion = app.getVersion();
 
 const overlayCast = store.getUserPref('app.overlay-cast');
+
+//Reset to default theme if theme not found
+const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+if (currentTheme === undefined) {
+  store.setUserPref('app.theme', defaultTheme.key);
+}
 
 let mainWindow;
 let viewerWindow = false;
@@ -543,5 +550,6 @@ module.exports = {
   checkForUpdates,
   autoUpdater,
   store,
+  themes,
   appstore,
 };
