@@ -1,6 +1,7 @@
 /* global Mousetrap */
 const electron = require('electron');
 const anvaad = require('anvaad-js');
+
 const { remote } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
