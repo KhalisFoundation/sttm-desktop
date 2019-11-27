@@ -298,21 +298,35 @@ const createCards = (rows, LineID) => {
     gurmukhiContainer.innerHTML = `<span class="padchhed">${padched}</span>
                                     <span class="larivaar">${larivaar}</span>`;
 
-    const englishContainer = document.createElement('div');
-    englishContainer.innerHTML = row.English || '';
+    const enTranslation = h('div.english-translation', row.English || '');
+    const esTranslation = h('div.spanish-translation', row.Spanish || '');
+    const translationsContainer = h('div', enTranslation, esTranslation);
+
+    const shTransliteration = h('div.shahmukhi-transliterations', row.Transliteration.sh || '');
+    const dnTransliteration = h('div.devnagri-transliterations', row.Transliteration.dn || '');
+    const enTransliteration = h('div.english-transliterations', row.Transliteration.en || '');
+    const transliterationsContainer = h(
+      'div',
+      enTransliteration,
+      shTransliteration,
+      dnTransliteration,
+    );
 
     cards.push(
       h(`div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`, [
         h('h1.gurbani.gurmukhi', gurmukhiContainer),
-        h('h2.translation', englishContainer),
+        h('h2.translation', translationsContainer),
         h('h2.teeka', row.Punjabi || ''),
-        h('h2.transliteration', row.Transliteration || ''),
+        h('h2.transliteration', transliterationsContainer || ''),
       ]),
     );
     shabad[row.ID] = {
       gurmukhi: padched || row.Gurmukhi || row.PunjabiUni,
       larivaar,
-      translation: row.English || '',
+      translation: {
+        es: row.Spanish || '',
+        en: row.English || '',
+      },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
     };

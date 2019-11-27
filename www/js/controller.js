@@ -1,7 +1,7 @@
 /* global Mousetrap */
 const electron = require('electron');
 const anvaad = require('anvaad-js');
-
+console.log(anvaad);
 const { remote } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
@@ -533,8 +533,13 @@ module.exports = {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;
       Line.Punjabi = lineTranslations.pu.ss;
+      Line.Spanish = lineTranslations.es.sn;
     }
-    Line.Transliteration = anvaad.translit(Line.Gurmukhi);
+    Line.Transliteration = {
+      en: anvaad.translit(Line.Gurmukhi),
+      sh: anvaad.translit.shahmukhi(Line.Gurmukhi),
+      dn: anvaad.translit.devnagri(Line.Gurmukhi),
+    };
     return Line;
   },
 

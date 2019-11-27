@@ -105,6 +105,20 @@
               "current": "Current Saroops (default)",
               "above": "Above Raag Headings"
             }
+          },
+          "translation-language": {
+            "title": "Translation Language",
+            "options": {
+              "english": "English",
+              "spanish": "Spanish"
+            }
+          },
+          "transliteration-language": {
+            "title": "Transliteration Language",
+            "options": {
+              "english": "English",
+              "shahmukhi": "Shahmukhi"
+            }
           }
         }
       },

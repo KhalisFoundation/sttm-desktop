@@ -28,7 +28,9 @@
       },
       "gurbani": {
         "bani-length": "short",
-        "mangal-position": "current"
+        "mangal-position": "current",
+        "translation-language": "english",
+        "transliteration-language": "english"
       },
       "vishraam": {
         "vishraam-options": "colored-words",
