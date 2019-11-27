@@ -19,7 +19,7 @@
             "step": 1
           },
           "translation": {
-            "title": "English Translation",
+            "title": "Translation",
             "max": 20,
             "min": 1,
             "step": 1
