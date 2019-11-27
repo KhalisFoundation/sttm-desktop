@@ -109,15 +109,16 @@
           "translation-language": {
             "title": "Translation Language",
             "options": {
-              "english": "English",
-              "spanish": "Spanish"
+              "English": "English",
+              "Spanish": "Spanish"
             }
           },
           "transliteration-language": {
             "title": "Transliteration Language",
             "options": {
-              "english": "English",
-              "shahmukhi": "Shahmukhi"
+              "English": "English",
+              "Shahmukhi": "Shahmukhi",
+              "Devnagri": "Devnagri"
             }
           }
         }

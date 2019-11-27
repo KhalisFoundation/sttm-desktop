@@ -37,18 +37,15 @@
 
         let translation = '';
         if (languageSettings) {
-          if (languageSettings.translation == 'english') {
-            translation = Line.English || '';
-          } else if (languageSettings.translation == 'spanish') {
-            translation = Line.Spanish || '';
-          }
+          translation = Line[languageSettings.translation] || '';
+          transliteration = Line.Transliteration[languageSettings.transliteration] || '';
         } else {
           translation = Line.English || '';
         }
 
         document.querySelector('.o-translation').innerHTML = translation;
         document.querySelector('.o-teeka').innerHTML = Line.Punjabi || '';
-        document.querySelector('.o-transliteration').innerHTML = Line.Transliteration.en || '';
+        document.querySelector('.o-transliteration').innerHTML = transliteration;
 
         document.querySelector('.overlay-wrapper').hidden =
           Line.Gurmukhi === '' && Line.English === '';

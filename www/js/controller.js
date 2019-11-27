@@ -536,10 +536,9 @@ module.exports = {
       Line.Spanish = lineTranslations.es.sn;
     }
     Line.Transliteration = {
-      en: anvaad.translit(Line.Gurmukhi),
-      /* Waiting for anvaad-js support on this
-      sh: anvaad.translit.shahmukhi(Line.Gurmukhi),
-      dn: anvaad.translit.devnagri(Line.Gurmukhi), */
+      English: anvaad.translit(Line.Gurmukhi),
+      Shahmukhi: anvaad.translit(Line.Gurmukhi, 'shahmukhi'),
+      Devnagri: anvaad.translit(Line.Gurmukhi, 'devnagri'),
     };
     return Line;
   },

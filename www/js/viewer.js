@@ -298,18 +298,27 @@ const createCards = (rows, LineID) => {
     gurmukhiContainer.innerHTML = `<span class="padchhed">${padched}</span>
                                     <span class="larivaar">${larivaar}</span>`;
 
-    const enTranslation = h('div.english-translation', row.English || '');
-    const esTranslation = h('div.spanish-translation', row.Spanish || '');
+    const enTranslation = h('div.english-translation.transtext', row.English || '');
+    const esTranslation = h('div.spanish-translation.transtext', row.Spanish || '');
     const translationsContainer = h('div', enTranslation, esTranslation);
 
-    /* const shTransliteration = h('div.shahmukhi-transliterations', row.Transliteration.sh || '');
-    const dnTransliteration = h('div.devnagri-transliterations', row.Transliteration.dn || ''); */
-    const enTransliteration = h('div.english-transliterations', row.Transliteration.en || '');
+    const shTransliteration = h(
+      'div.shahmukhi-transliteration.translittext',
+      row.Transliteration.Shahmukhi || '',
+    );
+    const dnTransliteration = h(
+      'div.devnagri-transliteration.translittext',
+      row.Transliteration.Devnagri || '',
+    );
+    const enTransliteration = h(
+      'div.english-transliteration.translittext',
+      row.Transliteration.English || '',
+    );
     const transliterationsContainer = h(
       'div',
       enTransliteration,
-      /*  shTransliteration,
-      dnTransliteration, */
+      shTransliteration,
+      dnTransliteration,
     );
 
     cards.push(
@@ -324,8 +333,8 @@ const createCards = (rows, LineID) => {
       gurmukhi: padched || row.Gurmukhi || row.PunjabiUni,
       larivaar,
       translation: {
-        es: row.Spanish || '',
-        en: row.English || '',
+        Spanish: row.Spanish || '',
+        English: row.English || '',
       },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
