@@ -537,8 +537,9 @@ module.exports = {
     }
     Line.Transliteration = {
       en: anvaad.translit(Line.Gurmukhi),
+      /* Waiting for anvaad-js support on this
       sh: anvaad.translit.shahmukhi(Line.Gurmukhi),
-      dn: anvaad.translit.devnagri(Line.Gurmukhi),
+      dn: anvaad.translit.devnagri(Line.Gurmukhi), */
     };
     return Line;
   },

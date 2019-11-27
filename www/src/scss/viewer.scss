@@ -191,6 +191,24 @@ h2 {
   line-height: 1.5;
 }
 
+.gurbani-translation-language-english {
+  .english-translation {
+    display: block;
+  }
+  .spanish-translation {
+    display: none;
+  }
+}
+
+.gurbani-translation-language-spanish {
+  .spanish-translation {
+    display: block;
+  }
+  .english-translation {
+    display: none;
+  }
+}
+
 .transliteration {
   text-transform: lowercase;
 }

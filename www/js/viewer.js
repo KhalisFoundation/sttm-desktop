@@ -302,14 +302,14 @@ const createCards = (rows, LineID) => {
     const esTranslation = h('div.spanish-translation', row.Spanish || '');
     const translationsContainer = h('div', enTranslation, esTranslation);
 
-    const shTransliteration = h('div.shahmukhi-transliterations', row.Transliteration.sh || '');
-    const dnTransliteration = h('div.devnagri-transliterations', row.Transliteration.dn || '');
+    /* const shTransliteration = h('div.shahmukhi-transliterations', row.Transliteration.sh || '');
+    const dnTransliteration = h('div.devnagri-transliterations', row.Transliteration.dn || ''); */
     const enTransliteration = h('div.english-transliterations', row.Transliteration.en || '');
     const transliterationsContainer = h(
       'div',
       enTransliteration,
-      shTransliteration,
-      dnTransliteration,
+      /*  shTransliteration,
+      dnTransliteration, */
     );
 
     cards.push(
