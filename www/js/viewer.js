@@ -298,9 +298,15 @@ const createCards = (rows, LineID) => {
     gurmukhiContainer.innerHTML = `<span class="padchhed">${padched}</span>
                                     <span class="larivaar">${larivaar}</span>`;
 
-    const enTranslation = h('div.english-translation.transtext', row.English || '');
-    const esTranslation = h('div.spanish-translation.transtext', row.Spanish || '');
-    const translationsContainer = h('div', enTranslation, esTranslation);
+    const enTranslation = h('div.english-translation.transtext');
+    enTranslation.innerHTML = row.English || '';
+    const esTranslation = h('div.spanish-translation.transtext');
+    // If spanish translation is not available fall back to english
+    esTranslation.innerHTML = row.Spanish || row.English;
+
+    const translationsContainer = document.createElement('div');
+    translationsContainer.appendChild(enTranslation);
+    translationsContainer.appendChild(esTranslation);
 
     const shTransliteration = h(
       'div.shahmukhi-transliteration.translittext',

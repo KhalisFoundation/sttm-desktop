@@ -164,7 +164,7 @@ const loadShabad = ShabadID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
+      `SELECT v.ID, v.Gurmukhi, v.MainLetters, v.Visraam, v.English,  v.Translations, v.Transliteration, v.punjabi, v.SourceID, v.PageNo AS PageNo FROM Verse v LEFT JOIN Shabad s ON v.ID = s.VerseID WHERE s.ShabadID = '${ShabadID}' ORDER BY v.ID`,
       (err, rows) => {
         if (err) {
           reject(err);
@@ -191,7 +191,7 @@ const loadCeremony = CeremonyID =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration,
+      `SELECT v.ID, v.Gurmukhi, v.LineNo, v.English, v.Transliteration, v.Translations,
       v.Visraam, v.Punjabi, v.SourceID, v.MainLetters,
       c.Token, c.Gurmukhi as CeremonyGurmukhi, c.Transliteration as ceremonyTransliteration,
       cs.Custom, cs.VerseIDRangeEnd, cs.VerseIDRangeStart,

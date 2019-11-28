@@ -536,9 +536,9 @@ module.exports = {
       Line.Spanish = lineTranslations.es.sn;
     }
     Line.Transliteration = {
-      English: anvaad.translit(Line.Gurmukhi),
-      Shahmukhi: anvaad.translit(Line.Gurmukhi, 'shahmukhi'),
-      Devnagri: anvaad.translit(Line.Gurmukhi, 'devnagri'),
+      English: anvaad.translit(Line.Gurmukhi || ''),
+      Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
+      Devnagri: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
     };
     return Line;
   },

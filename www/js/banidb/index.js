@@ -12,7 +12,7 @@ if (platform === 'win32') {
   }
 }
 if (!search) {
-  search = require('./realm-search');
+  search = require('./sqlite-search');
 }
 
 const {
