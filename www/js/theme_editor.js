@@ -297,11 +297,6 @@ module.exports = {
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
 
-    const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
-    if (currentTheme === undefined) {
-      store.setUserPref('app.theme', defaultTheme.key);
-    }
-
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
     swatchGroupFactory('COLOR', themeOptions);
 
