@@ -3,7 +3,7 @@
   display: flex;
   height: 100vh;
   justify-content: center;
-  margin-left: 80px;
+  margin-left: 120px;
   margin-right: 180px;
 }
 
@@ -15,10 +15,8 @@
   border-radius: 15px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
   height: 450px;
-  margin: auto;
+  max-width: 800px;
   overflow: hidden;
-  position: relative;
-  width: 800px;
 }
 
 .control-panel {
@@ -28,7 +26,46 @@
   padding: 10px;
   position: fixed;
   top: 0;
-  width: 80px;
+  width: 120px;
+}
+
+.preview-container {
+  overflow: hidden;
+  text-align: center;
+  width: 805px; //accomodate shadows
+}
+
+.separator-y {
+  border-right: 1px solid #ccc;
+  height: 48px;
+  margin-right: 10px;
+  width: 10px;
+}
+
+.text-controls {
+  background: #ebebeb;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: inline-block;
+  margin-top: 4vh;
+  padding: 12px;
+  text-align: center;
+
+  & > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .input-wrap {
+    margin: 0 6px;
+    width: auto;
+  }
+}
+
+.toggle-text > .layout-btn,
+.toggle-text > .input-wrap {
+  display: inline-block;
+  margin: 0 5px;
 }
 
 .theme-selector {
@@ -154,7 +191,7 @@ input[type='color'] {
 .input-wrap {
   margin-bottom: 10px;
   text-align: center;
-  width: 60px;
+  width: 100px;
 }
 
 .overlay-off {
@@ -185,12 +222,24 @@ input[type='color'] {
       color: #666;
     }
   }
+
+  .logo-toggle,
+  .announcement-toggle {
+    .fa-toggle-off,
+    .fa-toggle-on {
+      cursor: not-allowed;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
 }
 
-.cast-toggle {
+.cast-toggle,
+.logo-toggle,
+.announcement-toggle {
   cursor: pointer;
   .cp-icon {
-    font-size: 28px;
+    font-size: 34px;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
   }
 
@@ -207,7 +256,7 @@ input[type='color'] {
   color: #333;
   font-size: 10px;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-top: 5px;
   text-align: center;
   text-transform: uppercase;
@@ -268,12 +317,12 @@ input[type='color'] {
   @extend .color-input;
 
   background: #ddd;
-  margin: auto;
+  display: inline-block;
+  margin: 2px;
 }
 
 .resize-btn {
   display: flex;
-  margin-top: 10px;
 }
 
 .size-btn {

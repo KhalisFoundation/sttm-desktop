@@ -4,9 +4,6 @@ const electron = require('electron');
 const analytics = electron.remote.getGlobal('analytics');
 const tingle = require('./vendor/tingle');
 const strings = require('./strings');
-const settings = require('./settings');
-
-const { store } = electron.remote.require('./app');
 
 // allowed html tags inside announcement
 const allowedTags = strings.allowedAnnouncementTags;
@@ -52,17 +49,6 @@ const langSlider = '<div class="lang-switch">'.concat(
   '<div class="switch">',
   '<input id="modal-ann-lang" name="modal-ann-lang" type="checkbox" value="gurmukhi">',
   '<label for="modal-ann-lang"></label>',
-  '</div>',
-  '</td>',
-  '</tr>',
-  '<tr>',
-  '<td>',
-  '<span class="lang-text">Show Announcement in Overlay</span>',
-  '</td>',
-  '<td>',
-  '<div class="switch">',
-  `<input id="modal-ann-overlay" name="modal-ann-overlay" type="checkbox" value="gurmukhi">`,
-  '<label for="modal-ann-overlay"></label>',
   '</div>',
   '</td>',
   '</tr>',
@@ -127,23 +113,6 @@ function setLangSliderVal() {
 }
 
 /**
- * sets the onclick val for the slider
- * changes announcement overlay slider
- */
-function setOverlaySliderVal() {
-  let announcementOverlay = store.getUserPref('app.announcement-overlay');
-  const slider = document.querySelector('#modal-ann-overlay');
-  slider.checked = announcementOverlay;
-  slider.onclick = () => {
-    // is the slider checked?
-    announcementOverlay = !announcementOverlay;
-    document.querySelector('input#announcement-overlay').checked = announcementOverlay;
-    store.setUserPref('app.announcement-overlay', announcementOverlay);
-    settings.init();
-  };
-}
-
-/**
  * sanitize the html, allow only the permitted tage from allowedTags array above
  */
 function boxInputFunctionality() {
@@ -192,7 +161,6 @@ modalTabBtn.addEventListener('click', () => {
     // sets up modal content (box, etc)
     modal.setContent(announcementPage);
     setLangSliderVal();
-    setOverlaySliderVal();
     boxInputFunctionality();
     modalTabBtn.textContent = 'Back';
   } else {

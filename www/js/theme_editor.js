@@ -8,7 +8,6 @@ const { remote } = require('electron');
 const readChunk = require('read-chunk');
 const imageType = require('image-type');
 
-const themes = require('./themes.json');
 const slash = require('./slash');
 
 const analytics = remote.getGlobal('analytics');
@@ -17,7 +16,7 @@ const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
-const { store } = remote.require('./app');
+const { store, themes } = remote.require('./app');
 
 const defaultTheme = themes[0];
 
@@ -297,6 +296,11 @@ module.exports = {
   updateCeremonyThemeTiles,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
+
+    const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+    if (currentTheme === undefined) {
+      store.setUserPref('app.theme', defaultTheme.key);
+    }
 
     themeOptions.appendChild(swatchHeaderFactory('Colours'));
     swatchGroupFactory('COLOR', themeOptions);
