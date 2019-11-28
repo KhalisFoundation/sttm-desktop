@@ -53,13 +53,6 @@ body {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-
-  &.dhan-guru-nanak {
-    background-position: left center;
-    .slide {
-      padding-left: 35%;
-    }
-  }
 }
 
 [contenteditable='true']:empty:not(:focus)::before {

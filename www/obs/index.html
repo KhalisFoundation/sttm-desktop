@@ -51,15 +51,19 @@
             overlayPrefs.overlayVars.bgOpacity
           })`;
         });
-        document.querySelector('.o-gurbani').style.fontSize = `${
-          overlayPrefs.overlayVars.gurbaniFontSize
-        }vh`;
+
+        document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.overlayVars.bgOpacity;
+        document.querySelector(
+          '.o-gurbani',
+        ).style.fontSize = `${overlayPrefs.overlayVars.gurbaniFontSize}vh`;
         document.querySelector('.o-gurbani').style.color =
           overlayPrefs.overlayVars.gurbaniTextColor;
 
         document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
+
+        document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
 
         const $gurbani = document.querySelector('.o-gurbani');
         if (overlayPrefs.overlayVars.overlayLarivaar) {
@@ -88,9 +92,14 @@
         <div class="content-bar gurmukhi o-gurbani"></div>
         <div class="content-bar o-teeka"></div>
       </div>
-      <div class="content-bottom">
-        <div class="content-bar o-transliteration"></div>
-        <div class="content-bar o-translation"></div>
+      <div class="content-bars-bottom">
+        <div class="content-bottom">
+          <div class="content-bar o-transliteration"></div>
+          <div class="content-bar o-translation"></div>
+        </div>
+        <div class="logo-wrapper">
+          <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
+        </div>
       </div>
     </section>
     <script type="text/javascript">

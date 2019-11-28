@@ -1,18 +1,29 @@
 ## New Updates
 
+### 6.2 - _November 26, 2019_
+
+### Improved:
+
+- Bani Overlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
+- The SikhiToTheMax logo has been added to Bani Overlay as default and can be turned off with the new "Logo" toggle
+- The "Show Annoucements in Overlay" toggle has been moved to the Bani Overlay toolbar
+- The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future! 
+ ![](./assets/img/help_images/desktop-new-overlay.png)
+
+
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 6.1 - _November 14, 2019_
 
 ### Improved:
 
 - We've added a dedicated font size slider for announcements (includes Mool Mantra, Waheguru, Dhan Guru, and Sangat Sync slides as well)
 - Fixed various UI bugs relating to Sangat Sync
-
-
-
-</br>
-
-Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).
-
 
 ### 6.0 - _November 9, 2019_
 
@@ -45,7 +56,7 @@ Have a question or an idea for a new feature? Send us your feedback at [sttm.co/
 
 ### Improved:
 
-- Fixed a bug when using BaniOverlay with longer Banis/Shabads
+- Fixed a bug when using Bani Overlay with longer Banis/Shabads
 
 ### 5.3.2 - _190806_
 

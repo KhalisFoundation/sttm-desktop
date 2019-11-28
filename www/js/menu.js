@@ -251,26 +251,6 @@ const announcementSlideButton = h(
   'li.announcement-box',
   h('header', h('i.fa.fa-bullhorn.list-icon'), 'Add announcement slide'),
   h('li', [
-    h('span', 'Show Announcement in Bani Overlay'),
-    h('div.switch', [
-      h('input#announcement-overlay', {
-        name: 'announcement-overlay',
-        type: 'checkbox',
-        checked: store.getUserPref('app.announcement-overlay'),
-        onclick: () => {
-          const announcementOverlay = !store.getUserPref('app.announcement-overlay');
-          store.setUserPref('app.announcement-overlay', announcementOverlay);
-          settings.init();
-          document.querySelector('button.announcement-slide-btn.button').click();
-        },
-        value: 'overlay',
-      }),
-      h('label', {
-        htmlFor: 'announcement-overlay',
-      }),
-    ]),
-  ]),
-  h('li', [
     h('span', 'Announcement in Gurmukhi'),
     h('div.switch', [
       h('input#announcement-language', {

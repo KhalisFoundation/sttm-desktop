@@ -83,6 +83,10 @@ body {
   .content-top {
     padding-top: 3vh;
   }
+
+  .logo-wrapper {
+    bottom: 2vh;
+  }
 }
 
 .layout-bottom {
@@ -94,6 +98,10 @@ body {
   .content-bottom {
     padding-bottom: 3vh;
   }
+
+  .logo-wrapper {
+    top: 2vh;
+  }
 }
 
 .layout-split {
@@ -101,11 +109,19 @@ body {
     height: 100%;
   }
 
+  .content-bars-bottom {
+    bottom: 0;
+    padding-right: 16vw;
+    position: absolute;
+    width: 100vw;
+  }
+
   .content-top {
     padding-top: 3vh;
   }
 
   .content-bottom {
+    position: static;
     padding-bottom: 3vh;
   }
 
@@ -114,9 +130,12 @@ body {
     display: block;
   }
 
-  .content-bottom {
+  .logo-wrapper {
+    border-radius: 0;
     bottom: 0;
+    height: 100%;
     position: absolute;
+    right: 0;
   }
 }
 
@@ -226,5 +245,30 @@ body {
     .o-translation {
       color: #821d3e;
     }
+  }
+}
+
+.logo-wrapper {
+  align-items: center;
+  background: #fff;
+  border-radius: 5px;
+  display: inline-flex;
+  justify-content: center;
+  padding: 2vh 2vw;
+  position: fixed;
+  right: 2vh;
+
+  .sttm-logo {
+    width: 12vw;
+  }
+}
+
+.logo-off {
+  .content-bars-bottom {
+    padding-right: 0;
+  }
+
+  .logo-wrapper {
+    display: none;
   }
 }
