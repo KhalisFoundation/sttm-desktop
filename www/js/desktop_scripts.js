@@ -25,7 +25,7 @@ const database = {
   },
 };
 
-let dbPlatform = 'sqlite';
+let dbPlatform = 'realm';
 
 const platform = os.platform();
 if (platform === 'win32') {
