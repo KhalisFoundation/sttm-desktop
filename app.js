@@ -88,7 +88,6 @@ function openSecondaryWindow(windowName) {
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();
-      window.obj.openDevTools();
       if (window.show) {
         window.show();
       }
