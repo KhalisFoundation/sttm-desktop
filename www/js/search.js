@@ -843,6 +843,7 @@ module.exports = {
 
     let seenClasses = '';
     const shabadState = sessionStatesList[line.sessionKey || `shabad-${line.ShabadID}`];
+
     if (shabadState && shabadState.resumePanktee) {
       if (shabadState.seenPanktees.has(lineSessionID) || shabadState.seenPanktees.has(line.ID)) {
         seenClasses = '.seen_check';
@@ -1082,8 +1083,10 @@ module.exports = {
       Array.from(lines).forEach(el => el.classList.remove('current'));
       // Add 'current' and 'seen-check' to selected Panktee
       $panktee.classList.add('current', 'seen_check');
-      shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
-      shabadState.resumePanktee = `${LineID}-${Line.lineCount}`;
+      if (shabadState) {
+        shabadState.seenPanktees.add(`${LineID}-${Line.lineCount}`);
+        shabadState.resumePanktee = `${LineID}-${Line.lineCount}`;
+      }
     }
     this.checkAutoPlay(LineID);
   },
