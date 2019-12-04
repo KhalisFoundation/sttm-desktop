@@ -319,6 +319,7 @@ h2 {
   &.webview .vc-toggle-icon {
     display: flex;
     opacity: 0.9;
+    position: fixed;
   }
 }
 
@@ -331,7 +332,7 @@ h2 {
   justify-content: space-around;
   left: 0;
   overflow: hidden;
-  position: absolute;
+  position: fixed;
   top: 0;
   transition: all $transition-time $transition-easing;
   width: 28vh;
