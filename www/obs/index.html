@@ -13,7 +13,7 @@
         English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
         Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
         Transliteration: {
-          en: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
+          English: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
         },
         Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
       };
@@ -86,10 +86,8 @@
       };
 
       socket.on('show-line', function(request) {
-        if (!preview) {
-          overlayPrefs = request.overlayPrefs;
-          writeLine(request.Line, overlayPrefs.overlayVars.larivaar, request.languageSettings);
-        }
+        overlayPrefs = request.overlayPrefs;
+        writeLine(request.Line, overlayPrefs.overlayVars.larivaar, request.languageSettings);
       });
 
       socket.on('update-prefs', function(request) {
