@@ -302,7 +302,12 @@ const createCards = (rows, LineID) => {
     enTranslation.innerHTML = row.English || '';
     const esTranslation = h('div.spanish-translation.transtext');
     // If spanish translation is not available fall back to english
-    esTranslation.innerHTML = row.Spanish || row.English;
+    esTranslation.innerHTML = row.Spanish || '';
+    /* Show English if spanish not available in ceremonies explanation slides
+    so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
+    if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
+      esTranslation.innerHTML = row.Spanish || row.English;
+    }
 
     const translationsContainer = document.createElement('div');
     translationsContainer.appendChild(enTranslation);
