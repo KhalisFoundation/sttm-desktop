@@ -86,8 +86,10 @@
       };
 
       socket.on('show-line', function(request) {
-        overlayPrefs = request.overlayPrefs;
-        writeLine(request.Line, overlayPrefs.overlayVars.larivaar, request.languageSettings);
+        if (!preview) {
+          overlayPrefs = request.overlayPrefs;
+          writeLine(request.Line, overlayPrefs.overlayVars.larivaar, request.languageSettings);
+        }
       });
 
       socket.on('update-prefs', function(request) {
