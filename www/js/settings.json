@@ -42,7 +42,7 @@
         "title": "Fields to Display",
         "type": "checkbox",
         "options": {
-          "display-translation": "English Translation",
+          "display-translation": "Translation",
           "display-teeka": "Punjabi Teeka",
           "display-transliteration": "Transliteration",
           "display-next-line": "Next Line"
@@ -86,6 +86,26 @@
   "toolbar": {
     "title": "Toolbar",
     "settings": {
+      "language-settings": {
+        "title": "Language Settings",
+        "type": "dropdown",
+        "options": {
+          "translation-language": {
+            "title": "Translation Language",
+            "options": {
+              "English": "English",
+              "Spanish": "Spanish"
+            }
+          },
+          "transliteration-language": {
+            "title": "Transliteration Language",
+            "options": {
+              "English": "English",
+              "Devanagri": "Devanagri"
+            }
+          }
+        }
+      },
       "gurbani": {
         "title": "Bani Settings",
         "type": "dropdown",
@@ -104,20 +124,6 @@
             "options": {
               "current": "Current Saroops (default)",
               "above": "Above Raag Headings"
-            }
-          },
-          "translation-language": {
-            "title": "Translation Language",
-            "options": {
-              "English": "English",
-              "Spanish": "Spanish"
-            }
-          },
-          "transliteration-language": {
-            "title": "Transliteration Language",
-            "options": {
-              "English": "English",
-              "Devnagri": "Devnagri"
             }
           }
         }
