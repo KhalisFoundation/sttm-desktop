@@ -1,5 +1,19 @@
 ## New Updates
 
+### 6.3 - _December 13, 2019_
+
+### Added:
+
+ ![](./assets/img/help_images/desktop-spanish-hindi.png)
+
+- Added Spanish translations and Devanagari transliterations! Choose your language preference in the new options in the Settings menu
+
+### Improved:
+
+- Added a hover effect when using the Gurmukhi keyboard to make it easier to see which letter you are pressing
+- Fixed a bug with quick tools not appearing
+
+
 ### 6.2.1 - _December 3, 2019_
 
 ### Improved:
