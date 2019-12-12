@@ -4,14 +4,14 @@
 
 ### Added:
 
- ![](./assets/img/help_images/desktop-spanish-hindi.png)
+- Added Spanish translations and Devanagari transliterations! Choose your language preference in the Settings menu
 
-- Added Spanish translations and Devanagari transliterations! Choose your language preference in the new options in the Settings menu
+ ![](./assets/img/help_images/desktop-spanish-hindi.png)
 
 ### Improved:
 
-- Added a hover effect when using the Gurmukhi keyboard to make it easier to see which letter you are pressing
-- Fixed a bug with quick tools not appearing
+- Added a hover effect when using the Gurmukhi keyboard to make it easier to see which letter you are clicking
+- Fixed a bug with Quick Tools not appearing
 
 
 ### 6.2.1 - _December 3, 2019_
