@@ -19,7 +19,7 @@
             "step": 1
           },
           "translation": {
-            "title": "English Translation",
+            "title": "Translation",
             "max": 20,
             "min": 1,
             "step": 1
@@ -104,6 +104,20 @@
             "options": {
               "current": "Current Saroops (default)",
               "above": "Above Raag Headings"
+            }
+          },
+          "translation-language": {
+            "title": "Translation Language",
+            "options": {
+              "English": "English",
+              "Spanish": "Spanish"
+            }
+          },
+          "transliteration-language": {
+            "title": "Transliteration Language",
+            "options": {
+              "English": "English",
+              "Devnagri": "Devnagri"
             }
           }
         }

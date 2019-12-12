@@ -298,21 +298,55 @@ const createCards = (rows, LineID) => {
     gurmukhiContainer.innerHTML = `<span class="padchhed">${padched}</span>
                                     <span class="larivaar">${larivaar}</span>`;
 
-    const englishContainer = document.createElement('div');
-    englishContainer.innerHTML = row.English || '';
+    const enTranslation = h('div.english-translation.transtext');
+    enTranslation.innerHTML = row.English || '';
+    const esTranslation = h('div.spanish-translation.transtext');
+    // If spanish translation is not available fall back to english
+    esTranslation.innerHTML = row.Spanish || '';
+    /* Show English if spanish not available in ceremonies explanation slides
+    so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
+    if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
+      esTranslation.innerHTML = row.Spanish || row.English;
+    }
+
+    const translationsContainer = document.createElement('div');
+    translationsContainer.appendChild(enTranslation);
+    translationsContainer.appendChild(esTranslation);
+
+    const shTransliteration = h(
+      'div.shahmukhi-transliteration.translittext',
+      row.Transliteration.Shahmukhi || '',
+    );
+    const dnTransliteration = h(
+      'div.devnagri-transliteration.translittext',
+      row.Transliteration.Devnagri || '',
+    );
+    const enTransliteration = h(
+      'div.english-transliteration.translittext',
+      row.Transliteration.English || '',
+    );
+    const transliterationsContainer = h(
+      'div',
+      enTransliteration,
+      shTransliteration,
+      dnTransliteration,
+    );
 
     cards.push(
       h(`div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`, [
         h('h1.gurbani.gurmukhi', gurmukhiContainer),
-        h('h2.translation', englishContainer),
+        h('h2.translation', translationsContainer),
         h('h2.teeka', row.Punjabi || ''),
-        h('h2.transliteration', row.Transliteration || ''),
+        h('h2.transliteration', transliterationsContainer || ''),
       ]),
     );
     shabad[row.ID] = {
       gurmukhi: padched || row.Gurmukhi || row.PunjabiUni,
       larivaar,
-      translation: row.English || '',
+      translation: {
+        Spanish: row.Spanish || '',
+        English: row.English || '',
+      },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
     };

@@ -191,6 +191,19 @@ h2 {
   line-height: 1.5;
 }
 
+.transtext,
+.translittext {
+  display: none;
+}
+
+.gurbani-translation-language-English .english-translation,
+.gurbani-translation-language-Spanish .spanish-translation,
+.gurbani-transliteration-language-Shahmukhi .shahmukhi-transliteration,
+.gurbani-transliteration-language-Devnagri .devnagri-transliteration,
+.gurbani-transliteration-language-English .english-transliteration {
+  display: block;
+}
+
 .transliteration {
   text-transform: lowercase;
 }
