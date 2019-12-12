@@ -14,6 +14,13 @@
 - Fixed a bug with Quick Tools not appearing
 
 
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 6.2.1 - _December 3, 2019_
 
 ### Improved:
@@ -30,13 +37,6 @@
 - The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future! 
  ![](./assets/img/help_images/desktop-new-overlay.png)
 
-
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 6.1 - _November 14, 2019_
 
