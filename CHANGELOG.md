@@ -1,5 +1,11 @@
 ## New Updates
 
+### 6.3 - _December 13, 2019_
+
+### Added:
+
+- We fixed a bug that was causing the Anand Karaj ceremony not to display correctly
+
 ### 6.2.1 - _December 3, 2019_
 
 ### Improved:
