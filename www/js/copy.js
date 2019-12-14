@@ -41,11 +41,14 @@ async function loadFromDB(id, idType) {
       for (let i = 0; i < rows.length; i += 1) {
         const row = rows[i];
         let toBeRemapped;
+        // if the obj has panktees
         if (row.Verse) {
           toBeRemapped = row.Verse;
+          // or if it doesnt and has a custom item, like the flower thing is asa di vaar
         } else if (row.Custom) {
           toBeRemapped = row.Custom;
           row.noHTML = true;
+          // otherwise, both being false means that we are looking at the bani header, so we should copy the name/header value
         } else {
           toBeRemapped = isCeremony ? row.Ceremony.Gurmukhi : rows.Bani.Gurmukhi;
         }
