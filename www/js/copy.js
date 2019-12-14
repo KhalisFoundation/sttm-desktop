@@ -9,12 +9,9 @@ const baniDB = require('../js/banidb/index.js');
 
 const baniLengthMap = search.baniLengthCols;
 
-// defualt these to true, so that we only need to change them if they are turned off
-let copyEngTranslation = true;
-let copyPunjabiTranslation = true;
-let copyTranslit = true;
-
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
+const translationLang = store.getUserPref('toolbar.gurbani.translation-language');
+const translitLang = store.getUserPref('toolbar.gurbani.transliteration-language');
 
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
@@ -114,59 +111,38 @@ async function loadFromDB(id, idType) {
   }
 }
 
-function checkDisplaySettings() {
-  copyEngTranslation = store.getUserPref('slide-layout.fields.display-translation');
-  copyPunjabiTranslation = store.getUserPref('slide-layout.fields.display-teeka');
-  copyTranslit = store.getUserPref('slide-layout.fields.display-transliteration');
-}
-
-/**
- * @param {Object} remappedLine all the fields of the line from the DB
- * check DB for fields that are selected to be displayed and check if they are null
- */
-function checkDB(remappedLine) {
-  if (copyEngTranslation) {
-    copyEngTranslation = !(remappedLine.English === null);
-  }
-  if (copyPunjabiTranslation) {
-    copyPunjabiTranslation = !(remappedLine.Punjabi === null);
-  }
-  if (copyTranslit) {
-    copyTranslit = !(remappedLine.Transliteration === null);
-  }
-}
-/**
- *
- * @param {Object} panktee the remapped panktee currently sitting in the panktee array and/or and html sanitized text (in case of ceremony)
- */
-function variablyCopy(panktee) {
-  let toBeCopied = '';
-  if (panktee.Gurmukhi) {
-    toBeCopied = anvaad.unicode(panktee.Gurmukhi);
-  }
-  if (copyEngTranslation) {
-    toBeCopied += `\n\n${stripHTML(panktee.English)}`;
-  }
-  if (copyPunjabiTranslation) {
-    toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
-  }
-  if (copyTranslit) {
-    toBeCopied += `\n\n${panktee.Transliteration}`;
-  }
-
-  return toBeCopied;
-}
 /**
  * First checks display settings to see what the user wants
  * Then it checks if those things are actually available in the DB
  * Lastly, then it copies the relevant parts of the pankteee
  */
 async function copyPanktee() {
-  checkDisplaySettings();
+  // find the position of the panktee from the lines pulled from DB
   const linePos = findLinePosition();
   const panktee = pankteeArray[linePos];
-  checkDB(panktee);
-  copy(variablyCopy(panktee));
+
+  // check all properties
+  const copyTranslation =
+    store.getUserPref('slide-layout.fields.display-translation') &&
+    !(panktee[`${translationLang}`] === null);
+  const copyTeeka =
+    store.getUserPref('slide-layout.fields.display-teeka') &&
+    !(panktee[`${translationLang}`] === null);
+  const copyTranslit =
+    store.getUserPref('slide-layout.fields.display-transliteration') && !(panktee.Punjabi === null);
+
+  let toBeCopied = anvaad.unicode(panktee.Punjabi);
+
+  if (copyTranslation) {
+    toBeCopied += `\n\n${panktee[`${translationLang}`]}`;
+  }
+  if (copyTeeka) {
+    toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
+  }
+  if (copyTranslit) {
+    toBeCopied += `\n\n${panktee.Transliteration[`${translitLang}`]}`;
+  }
+  copy(toBeCopied);
 }
 
 module.exports = {
