@@ -8,11 +8,8 @@ const search = require('./search');
 const baniDB = require('../js/banidb/index.js');
 
 const baniLengthMap = search.baniLengthCols;
-
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
-const translationLang = store.getUserPref('toolbar.gurbani.translation-language');
-const translitLang = store.getUserPref('toolbar.gurbani.transliteration-language');
-
+let isCeremony;
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
 
@@ -98,13 +95,16 @@ function remapCeremony(unmapped) {
 async function loadFromDB(id, idType) {
   let result;
   if (idType === 'shabad') {
+    isCeremony = false;
     result = await baniDB.loadShabad(id);
     remapShabad(result);
   } else if (idType === 'bani') {
+    isCeremony = false;
     baniDB.loadBani(id, baniLengthMap[baniLength]).then(rows => {
       remapBani(rows);
     });
   } else if (idType === 'ceremony') {
+    isCeremony = true;
     baniDB.loadCeremony(id).then(rows => {
       remapCeremony(rows);
     });
@@ -117,6 +117,9 @@ async function loadFromDB(id, idType) {
  * Lastly, then it copies the relevant parts of the pankteee
  */
 async function copyPanktee() {
+  const translationLang = store.getUserPref('toolbar.gurbani.translation-language');
+  const translitLang = store.getUserPref('toolbar.gurbani.transliteration-language');
+
   // find the position of the panktee from the lines pulled from DB
   const linePos = findLinePosition();
   const panktee = pankteeArray[linePos];
@@ -134,7 +137,11 @@ async function copyPanktee() {
   let toBeCopied = anvaad.unicode(panktee.Punjabi);
 
   if (copyTranslation) {
-    toBeCopied += `\n\n${panktee[`${translationLang}`]}`;
+    if (isCeremony && panktee.Gurmukhi === null) {
+      toBeCopied += `\n\n${stripHTML(panktee.English)}`;
+    } else {
+      toBeCopied += `\n\n${panktee[`${translationLang}`]}`;
+    }
   }
   if (copyTeeka) {
     toBeCopied += `\n\n${anvaad.unicode(panktee.Punjabi)}`;
