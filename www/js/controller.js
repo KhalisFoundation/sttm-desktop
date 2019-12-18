@@ -533,8 +533,13 @@ module.exports = {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;
       Line.Punjabi = lineTranslations.pu.ss;
+      Line.Spanish = lineTranslations.es.sn;
     }
-    Line.Transliteration = anvaad.translit(Line.Gurmukhi);
+    Line.Transliteration = {
+      English: anvaad.translit(Line.Gurmukhi || ''),
+      Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
+      Devanagri: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
+    };
     return Line;
   },
 

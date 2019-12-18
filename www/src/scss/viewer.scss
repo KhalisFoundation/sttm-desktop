@@ -191,6 +191,19 @@ h2 {
   line-height: 1.5;
 }
 
+.transtext,
+.translittext {
+  display: none;
+}
+
+.language-settings-translation-language-English .english-translation,
+.language-settings-translation-language-Spanish .spanish-translation,
+.language-settings-transliteration-language-Shahmukhi .shahmukhi-transliteration,
+.language-settings-transliteration-language-Devanagri .devanagri-transliteration,
+.language-settings-transliteration-language-English .english-transliteration {
+  display: block;
+}
+
 .transliteration {
   text-transform: lowercase;
 }
@@ -319,6 +332,7 @@ h2 {
   &.webview .vc-toggle-icon {
     display: flex;
     opacity: 0.9;
+    position: fixed;
   }
 }
 

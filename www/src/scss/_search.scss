@@ -104,6 +104,12 @@
     line-height: 2;
     text-align: center;
     width: 20%;
+
+    &:hover {
+      background-blend-mode: exclusion;
+      background-color: white;
+      mix-blend-mode: difference;
+    }
   }
 }
 
