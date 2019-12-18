@@ -305,8 +305,10 @@ const createCards = (rows, LineID) => {
     esTranslation.innerHTML = row.Spanish || '';
     /* Show English if spanish not available in ceremonies explanation slides
     so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
+    let esText = row.Spanish;
     if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
-      esTranslation.innerHTML = row.Spanish || row.English;
+      esText = row.Spanish || row.English;
+      esTranslation.innerHTML = esText;
     }
 
     const translationsContainer = document.createElement('div');
@@ -318,8 +320,8 @@ const createCards = (rows, LineID) => {
       row.Transliteration.Shahmukhi || '',
     );
     const dnTransliteration = h(
-      'div.devnagri-transliteration.translittext',
-      row.Transliteration.Devnagri || '',
+      'div.devanagri-transliteration.translittext',
+      row.Transliteration.Devanagri || '',
     );
     const enTransliteration = h(
       'div.english-transliteration.translittext',
@@ -344,7 +346,7 @@ const createCards = (rows, LineID) => {
       gurmukhi: padched || row.Gurmukhi || row.PunjabiUni,
       larivaar,
       translation: {
-        Spanish: row.Spanish || '',
+        Spanish: esText || '',
         English: row.English || '',
       },
       teeka: row.Punjabi || '',
