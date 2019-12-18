@@ -262,8 +262,8 @@ const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
-    translation: store.getUserPref('toolbar.gurbani.translation-language'),
-    transliteration: store.getUserPref('toolbar.gurbani.transliteration-language'),
+    translation: store.getUserPref('toolbar.language-settings.translation-language'),
+    transliteration: store.getUserPref('toolbar.language-settings.transliteration-language'),
   };
   const payload = Object.assign(lineWithSettings, overlayPrefs);
   if (!lineWithSettings.fromScroll) {

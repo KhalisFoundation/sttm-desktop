@@ -26,11 +26,13 @@
       "gurbani-options": {
         "display-visraams": false
       },
+      "language-settings": {
+        "translation-language": "English",
+        "transliteration-language": "English"
+      },
       "gurbani": {
         "bani-length": "short",
-        "mangal-position": "current",
-        "translation-language": "english",
-        "transliteration-language": "english"
+        "mangal-position": "current"
       },
       "vishraam": {
         "vishraam-options": "colored-words",

@@ -538,7 +538,7 @@ module.exports = {
     Line.Transliteration = {
       English: anvaad.translit(Line.Gurmukhi || ''),
       Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
-      Devnagri: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
+      Devanagri: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
     };
     return Line;
   },
