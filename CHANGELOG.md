@@ -6,7 +6,7 @@
 
 - Added Spanish translations and Devanagari transliterations! Choose your language preference in the Settings menu
 
- ![](./assets/img/help_images/desktop-spanish-hindi.png)
+ ![](./assets/img/help_images/desktop-dev-spanish.png)
 
 ### Improved:
 

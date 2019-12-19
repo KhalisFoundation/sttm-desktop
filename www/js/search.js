@@ -64,7 +64,6 @@ const searchInputs = h('div#search-container', [
 Object.keys(keyboardLayout).forEach(i => {
   const klPage = keyboardLayout[i];
   const page = [];
-
   Object.keys(klPage).forEach(j => {
     const klRow = klPage[j];
     const row = [];
