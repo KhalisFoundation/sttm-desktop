@@ -65,7 +65,7 @@ function remapBani(unmapped) {
     } else if (row.Custom) {
       toBeRemapped = row.Custom;
     } else {
-      toBeRemapped = row.Bani.Gurmukhi;
+      toBeRemapped = row.Bani ? row.Bani.Gurmukhi : row.nameOfBani;
     }
     const remapped = global.controller.remapLine(toBeRemapped);
     pankteeArray.push(remapped);

@@ -49,6 +49,10 @@
         "transliteration": 4,
         "teeka": 4
       },
+      "language-settings": {
+        "translation-language": "English",
+        "transliteration-language": "English"
+      },
       "autoplay-options": {
         "autoplayTimer": 10
       },

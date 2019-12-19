@@ -260,8 +260,13 @@ function createBroadcastFiles(arg) {
 
 const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
-  const payload = Object.assign(line, overlayPrefs);
-  if (!line.fromScroll) {
+  const lineWithSettings = line;
+  lineWithSettings.languageSettings = {
+    translation: store.getUserPref('toolbar.language-settings.translation-language'),
+    transliteration: store.getUserPref('toolbar.language-settings.transliteration-language'),
+  };
+  const payload = Object.assign(lineWithSettings, overlayPrefs);
+  if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
   }
 };
@@ -476,7 +481,14 @@ ipcMain.on('show-text', (event, arg) => {
       Gurmukhi: arg.isGurmukhi ? arg.text : '',
       English: !arg.isGurmukhi ? arg.text : '',
       Punjabi: '',
-      Transliteration: '',
+      Transliteration: {
+        devanagari: '',
+        English: '',
+      },
+      Translation: {
+        Spanish: '',
+        English: '',
+      },
     },
   };
 
@@ -485,7 +497,14 @@ ipcMain.on('show-text', (event, arg) => {
       Gurmukhi: '',
       English: '',
       Punjabi: '',
-      Transliteration: '',
+      Transliteration: {
+        devanagari: '',
+        English: '',
+      },
+      Translation: {
+        Spanish: '',
+        English: '',
+      },
     },
   };
 
