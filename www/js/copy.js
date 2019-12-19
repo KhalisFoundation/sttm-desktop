@@ -59,13 +59,14 @@ function remapBani(unmapped) {
   pankteeArray.length = 0;
   for (let i = 0; i < unmapped.length; i += 1) {
     const row = unmapped[i];
+    console.log(row);
     let toBeRemapped;
     if (row.Verse) {
       toBeRemapped = row.Verse;
     } else if (row.Custom) {
       toBeRemapped = row.Custom;
     } else {
-      toBeRemapped = row.Bani.Gurmukhi;
+      toBeRemapped = row.Bani ? row.Bani.Gurmukhi : row.nameOfBani;
     }
     const remapped = global.controller.remapLine(toBeRemapped);
     pankteeArray.push(remapped);
