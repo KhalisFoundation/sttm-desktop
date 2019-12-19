@@ -101,7 +101,7 @@
             "title": "Transliteration Language",
             "options": {
               "English": "English",
-              "Devanagri": "Devanagri"
+              "devanagari": "devanagari"
             }
           }
         }

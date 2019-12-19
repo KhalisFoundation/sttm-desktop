@@ -481,7 +481,14 @@ ipcMain.on('show-text', (event, arg) => {
       Gurmukhi: arg.isGurmukhi ? arg.text : '',
       English: !arg.isGurmukhi ? arg.text : '',
       Punjabi: '',
-      Transliteration: '',
+      Transliteration: {
+        devanagari: '',
+        English: '',
+      },
+      Translation: {
+        Spanish: '',
+        English: '',
+      },
     },
   };
 
@@ -490,7 +497,14 @@ ipcMain.on('show-text', (event, arg) => {
       Gurmukhi: '',
       English: '',
       Punjabi: '',
-      Transliteration: '',
+      Transliteration: {
+        devanagari: '',
+        English: '',
+      },
+      Translation: {
+        Spanish: '',
+        English: '',
+      },
     },
   };
 
