@@ -26,10 +26,6 @@
       "gurbani-options": {
         "display-visraams": false
       },
-      "language-settings": {
-        "translation-language": "English",
-        "transliteration-language": "English"
-      },
       "gurbani": {
         "bani-length": "short",
         "mangal-position": "current"
@@ -52,6 +48,10 @@
         "translation": 5,
         "transliteration": 4,
         "teeka": 4
+      },
+      "language-settings": {
+        "translation-language": "English",
+        "transliteration-language": "English"
       },
       "autoplay-options": {
         "autoplayTimer": 10
