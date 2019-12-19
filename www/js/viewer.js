@@ -321,7 +321,7 @@ const createCards = (rows, LineID) => {
     );
     const dnTransliteration = h(
       'div.devanagari-transliteration.translittext',
-      row.Transliteration.devanagari || '',
+      row.Transliteration.Devanagari || '',
     );
     const enTransliteration = h(
       'div.english-transliteration.translittext',

@@ -38,6 +38,26 @@
           }
         }
       },
+      "language-settings": {
+        "title": "Language Settings",
+        "type": "dropdown",
+        "options": {
+          "translation-language": {
+            "title": "Translation Language",
+            "options": {
+              "English": "English",
+              "Spanish": "Spanish"
+            }
+          },
+          "transliteration-language": {
+            "title": "Transliteration Language",
+            "options": {
+              "English": "English",
+              "Devanagari": "Devanagari"
+            }
+          }
+        }
+      },
       "fields": {
         "title": "Fields to Display",
         "type": "checkbox",
@@ -86,26 +106,6 @@
   "toolbar": {
     "title": "Toolbar",
     "settings": {
-      "language-settings": {
-        "title": "Language Settings",
-        "type": "dropdown",
-        "options": {
-          "translation-language": {
-            "title": "Translation Language",
-            "options": {
-              "English": "English",
-              "Spanish": "Spanish"
-            }
-          },
-          "transliteration-language": {
-            "title": "Transliteration Language",
-            "options": {
-              "English": "English",
-              "devanagari": "devanagari"
-            }
-          }
-        }
-      },
       "gurbani": {
         "title": "Bani Settings",
         "type": "dropdown",
