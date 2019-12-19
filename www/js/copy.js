@@ -59,7 +59,6 @@ function remapBani(unmapped) {
   pankteeArray.length = 0;
   for (let i = 0; i < unmapped.length; i += 1) {
     const row = unmapped[i];
-    console.log(row);
     let toBeRemapped;
     if (row.Verse) {
       toBeRemapped = row.Verse;
