@@ -320,8 +320,8 @@ const createCards = (rows, LineID) => {
       row.Transliteration.Shahmukhi || '',
     );
     const dnTransliteration = h(
-      'div.devanagri-transliteration.translittext',
-      row.Transliteration.Devanagri || '',
+      'div.devanagari-transliteration.translittext',
+      row.Transliteration.Devanagari || '',
     );
     const enTransliteration = h(
       'div.english-transliteration.translittext',

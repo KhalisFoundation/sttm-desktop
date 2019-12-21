@@ -329,7 +329,7 @@ const loadBani = (BaniID, BaniLength) =>
       init();
     }
     db.all(
-      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration, v.Translations
+      `SELECT v.ID, v.Gurmukhi, v.Visraam, v.MainLetters, v.English, v.Transliteration, v.Translations,
       v.punjabiUni, v.punjabi,  v.SourceID, v.PageNo AS PageNo, c.Token, c.Gurmukhi as nameOfBani,
       c.ID as BaniID, b.existsSGPC, b.existsMedium,
       b.existsTaksal, b.existsBuddhaDal, b.MangalPosition
