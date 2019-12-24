@@ -422,6 +422,10 @@ a {
 
 .button-wrap {
   padding: 10px;
+
+  .button:only-child {
+    margin: 0;
+  }
 }
 
 .presenter-view #toolbar {
