@@ -5,8 +5,11 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
-let code = '...';
-let adminCode = '...';
+let codes = {
+  sync: '...',
+  admin: '...',
+};
+
 let isConntected = false;
 
 const { store } = remote.require('./app');
@@ -49,10 +52,13 @@ const toggleOverlayUI = (toolbarItem, show) => {
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
   if (onlineVal) {
-    code = await tryConnection();
-    if (code) {
-      document.querySelector('.sync-dialogue .controller-code-num').innerText = code;
-      document.querySelector('#tool-sync-button').setAttribute('title', code);
+    codes = await tryConnection();
+    if (codes) {
+      document.querySelector('.sync-dialogue .controller-code-num').innerText = codes.sync;
+      document.querySelector('.remote-dialogue .controller-code-num').innerText = codes.admin;
+      document
+        .querySelector('#tool-sync-button')
+        .setAttribute('title', `sync:${codes.sync} | admin:${codes.admin}`);
     }
   } else {
     document.querySelector('.sync-dialogue .controller-code-num').innerText = ' ';
@@ -86,8 +92,8 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
 const syncToggle = async (forceConnect = false) => {
   if (isConntected && !forceConnect) {
     isConntected = false;
-    onEnd(code);
-    code = '...';
+    onEnd(codes.sync);
+    codes.sync = '...';
     global.controller.sendText('');
     document.querySelector('.sync-dialogue .controller-code-num').innerText = '...';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
@@ -120,7 +126,7 @@ const controllerFactory = (description, codeLabel, codeNum, buttons) => {
 const syncContent = controllerFactory(
   'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
   'Your unique sync code is',
-  code,
+  codes.sync,
   [
     {
       classes: '.present-btn',
@@ -130,9 +136,9 @@ const syncContent = controllerFactory(
     {
       classes: '.copy-code-btn',
       action: () => {
-        if (code !== '...') {
+        if (codes.sync !== '...') {
           const syncString = `<p>Visit sttm.co/sync on your mobile 
-            device and enter the code below to follow along</p> <h1>${code} </h1>`;
+            device and enter the code below to follow along</p> <h1>${codes.sync} </h1>`;
           global.controller.sendText(syncString);
         }
       },

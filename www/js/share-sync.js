@@ -4,8 +4,20 @@ const { store } = require('electron').remote.require('./app');
 const SYNC_API_URL = 'https://api.sikhitothemax.org';
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 
-function onConnect(namespaceString) {
-  window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
+function onConnect(syncCode) {
+  window.socket = window.io(`${SYNC_API_URL}/${syncCode}`);
+}
+
+function generateCode(len) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < len; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    if (i === len / 2 - 1) {
+      code += '-';
+    }
+  }
+  return code;
 }
 
 module.exports = {
@@ -25,17 +37,18 @@ module.exports = {
     }
     try {
       const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
-      const {
-        data: { namespaceString },
-      } = JSON.parse(result);
+      const codes = {
+        sync: JSON.parse(result).data.namespaceString,
+        admin: generateCode(6),
+      };
 
       if (window.io !== undefined) {
-        window.namespaceString = namespaceString;
-        onConnect(namespaceString);
+        window.codes = codes;
+        onConnect(codes.syncCode);
       } else {
         // TODO: Wait for io or something
       }
-      return namespaceString;
+      return codes;
     } catch (e) {
       return false;
     }
