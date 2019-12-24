@@ -6,6 +6,7 @@ const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
 let code = '...';
+let adminCode = '...';
 let isConntected = false;
 
 const { store } = remote.require('./app');
@@ -50,11 +51,11 @@ const remoteSyncInit = async () => {
   if (onlineVal) {
     code = await tryConnection();
     if (code) {
-      document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('.sync-dialogue .controller-code-num').innerText = code;
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
-    document.querySelector('.sync-code-num').innerText = ' ';
+    document.querySelector('.sync-dialogue .controller-code-num').innerText = ' ';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   }
 };
@@ -88,7 +89,7 @@ const syncToggle = async (forceConnect = false) => {
     onEnd(code);
     code = '...';
     global.controller.sendText('');
-    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('.sync-dialogue .controller-code-num').innerText = '...';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
@@ -100,42 +101,55 @@ const syncToggle = async (forceConnect = false) => {
     : 'Start Session';
 };
 
-const syncContent = h('div.sync-content', [
-  h('div.left-sync-content', [
-    h(
-      'div.sync-code-desc',
-      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
-    ),
-  ]),
-  h('div.right-sync-content', [
-    h('div.sync-code-label', 'Your unique sync code is'),
-    h('div.sync-code-num', code),
-    h('div.button-wrap', [
+const controllerFactory = (description, codeLabel, codeNum, buttons) => {
+  return h('div.controller-content', [
+    h('div.left-controller-content', [h('div.controller-code-desc', description)]),
+    h('div.right-controller-content', [
+      h('div.controller-code-label', codeLabel),
+      h('div.controller-code-num', codeNum),
       h(
-        'button.button.present-btn',
-        {
-          onclick: () => {
-            syncToggle();
-          },
-        },
-        isConntected ? 'Stop Session' : 'Start Session',
-      ),
-      h(
-        'button.button.copy-code-btn',
-        {
-          onclick: () => {
-            if (code !== '...') {
-              const syncString = `<p>Visit sttm.co/sync on your mobile 
-              device and enter the code below to follow along</p> <h1>${code} </h1>`;
-              global.controller.sendText(syncString);
-            }
-          },
-        },
-        'Present',
+        'div.button-wrap',
+        buttons.map(btn =>
+          h(`button.button${btn.classes || ''}`, { onclick: btn.action || null }, btn.text || ''),
+        ),
       ),
     ]),
-  ]),
-]);
+  ]);
+};
+
+const syncContent = controllerFactory(
+  'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
+  'Your unique sync code is',
+  code,
+  [
+    {
+      classes: '.present-btn',
+      action: syncToggle,
+      text: isConntected ? 'Stop Session' : 'Start Session',
+    },
+    {
+      classes: '.copy-code-btn',
+      action: () => {
+        if (code !== '...') {
+          const syncString = `<p>Visit sttm.co/sync on your mobile 
+            device and enter the code below to follow along</p> <h1>${code} </h1>`;
+          global.controller.sendText(syncString);
+        }
+      },
+      text: 'Present',
+    },
+  ],
+);
+
+const remoteContent = controllerFactory(
+  [
+    'This allows you to control sttm desktop from sttm site or a 3rd app etc etc.',
+    switchFactory('remote-switch', 'Allow Control', 'remote-check', null),
+  ],
+  'Your admin pin code is',
+  '...',
+  [{ text: 'Allow Control' }],
+);
 
 const translitSwitch = h('div.translit-switch', [
   h('span', 'Abc'),
@@ -329,6 +343,8 @@ module.exports = {
 
     document.querySelector('.sync-dialogue').appendChild(syncContent);
 
+    document.querySelector('.remote-dialogue').appendChild(remoteContent);
+
     const syncButton = document.querySelector('#tool-sync-button');
 
     syncButton.addEventListener('click', () => {
@@ -336,8 +352,8 @@ module.exports = {
       syncToggle(true);
     });
 
-    const syncDialogueWrapper = document.querySelector('.sync-dialogue-wrapper');
-    syncDialogueWrapper.addEventListener('click', event => {
+    const controllerDialogueWrapper = document.querySelector('.controller-dialogue-wrapper');
+    controllerDialogueWrapper.addEventListener('click', event => {
       if (event.target === event.currentTarget) {
         toggleOverlayUI(currentToolbarItem, false);
       }
