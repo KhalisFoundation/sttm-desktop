@@ -124,13 +124,16 @@ const controllerFactory = (description, codeLabel, codeNum, buttons) => {
 };
 
 const syncContent = controllerFactory(
-  'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
+  `Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). 
+  Press the "Present" button to display the pairing code for the sangat.`,
   'Your unique sync code is',
   codes.sync,
   [
     {
       classes: '.present-btn',
-      action: syncToggle,
+      action: () => {
+        syncToggle();
+      },
       text: isConntected ? 'Stop Session' : 'Start Session',
     },
     {

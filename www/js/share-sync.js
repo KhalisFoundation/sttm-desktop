@@ -11,7 +11,7 @@ function onConnect(syncCode) {
 function generateCode(len) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let code = '';
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
     if (i === len / 2 - 1) {
       code += '-';
