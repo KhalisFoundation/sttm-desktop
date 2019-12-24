@@ -1,4 +1,6 @@
 const request = require('request-promise');
+const md5 = require('md5');
+
 const { store } = require('electron').remote.require('./app');
 
 const SYNC_API_URL = 'https://api.sikhitothemax.org';
@@ -48,6 +50,8 @@ module.exports = {
       } else {
         // TODO: Wait for io or something
       }
+      store.set('sync.codes', codes);
+      store.set('sync.token', md5(codes.admin));
       return codes;
     } catch (e) {
       return false;
