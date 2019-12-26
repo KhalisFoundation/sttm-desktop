@@ -292,15 +292,7 @@ const emptyOverlay = () => {
   }
 };
 
-const shouldQuit = app.makeSingleInstance(() => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
-    }
-    mainWindow.focus();
-  }
-});
+const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
   op.find(
@@ -337,8 +329,18 @@ if (overlayCast) {
   searchPorts();
 }
 
-if (shouldQuit) {
-  app.exit();
+if (!singleInstanceLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+      mainWindow.focus();
+    }
+  });
 }
 
 app.on('ready', () => {
@@ -364,7 +366,7 @@ app.on('ready', () => {
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
   });
-  mainWindow.webContents.on('did-finish-load', () => {
+  mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send('external-display', {
         width: viewerWindowPos.w,
