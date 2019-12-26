@@ -87,13 +87,12 @@ async function copyPanktee() {
     store.getUserPref('slide-layout.fields.display-translation') &&
     !(panktee[`${translationLang}`] === null);
   const copyTeeka =
-    store.getUserPref('slide-layout.fields.display-teeka') &&
-    !(panktee[`${translationLang}`] === null);
+    store.getUserPref('slide-layout.fields.display-teeka') && !(panktee.Punjabi === null);
   const copyTranslit =
     store.getUserPref('slide-layout.fields.display-transliteration') && !(panktee.Punjabi === null);
 
   // start asigning the props from Object based on if they are to be copied
-  let toBeCopied;
+  let toBeCopied = '';
   if (panktee.Gurmukhi != null) {
     toBeCopied = anvaad.unicode(panktee.Gurmukhi);
   }
