@@ -69,6 +69,14 @@
   "gurmukhiKB": false,
   "changelog-seen": "0.0.0",
   "changelog-seen-count": 0,
+  "sync": {
+    "allow-control": false,
+    "codes": {
+      "sync": "...",
+      "admin": "..."
+    },
+    "token": "..."
+  },
   "searchOptions": {
     "searchLanguage": "gr",
     "searchType": 0,

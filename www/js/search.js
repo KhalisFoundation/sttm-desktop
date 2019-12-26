@@ -664,8 +664,8 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    if (window.socket !== undefined) {
-      window.socket.emit('data', {
+    if (window.socket.sync !== undefined) {
+      window.socket.sync.emit('data', {
         type: 'shabad',
         id: ShabadID,
         shabadid: ShabadID, // @deprecated
@@ -726,8 +726,8 @@ module.exports = {
       if (!historyReload) {
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
-      if (window.socket !== undefined) {
-        window.socket.emit('data', {
+      if (window.socket.sync !== undefined) {
+        window.socket.sync.emit('data', {
           type: 'ceremony',
         });
       }
@@ -785,8 +785,8 @@ module.exports = {
 
           return row;
         });
-      if (window.socket !== undefined) {
-        window.socket.emit('data', {
+      if (window.socket.sync !== undefined) {
+        window.socket.sync.emit('data', {
           type: 'bani',
           id: BaniID,
           highlight: LineID || rows[0].ID,
@@ -1042,7 +1042,7 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
-    if (window.socket !== undefined) {
+    if (window.socket.sync !== undefined) {
       let shabadIdsplit = [ShabadID];
       if (typeof ShabadID === 'string') {
         shabadIdsplit = ShabadID.split('-');
@@ -1056,7 +1056,7 @@ module.exports = {
         shabadType = 'shabad';
       }
 
-      window.socket.emit('data', {
+      window.socket.sync.emit('data', {
         type: shabadType,
         id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
         baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,

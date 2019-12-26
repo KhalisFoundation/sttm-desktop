@@ -5,11 +5,6 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
-let codes = {
-  sync: '...',
-  admin: '...',
-};
-
 let isConntected = false;
 
 const { store } = remote.require('./app');
@@ -29,6 +24,8 @@ const $baniList = document.querySelector('.bani-list');
 const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
 let currentToolbarItem;
+
+let codes = store.get('sync.codes');
 
 const betaLabel = h('div.beta-label', 'BETA');
 
@@ -92,10 +89,13 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
 const syncToggle = async (forceConnect = false) => {
   if (isConntected && !forceConnect) {
     isConntected = false;
-    onEnd(codes.sync);
+    onEnd(codes.sync, 'sync');
     codes.sync = '...';
+    onEnd(codes.admin, 'admin');
+    codes.admin = '...';
     global.controller.sendText('');
     document.querySelector('.sync-dialogue .controller-code-num').innerText = '...';
+    document.querySelector('.remote-dialogue .controller-code-num').innerText = '...';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
@@ -153,11 +153,18 @@ const syncContent = controllerFactory(
 const remoteContent = controllerFactory(
   [
     'This allows you to control sttm desktop from sttm site or a 3rd app etc etc.',
-    switchFactory('remote-switch', 'Allow Control', 'remote-check', null),
+    switchFactory('remote-switch', 'Allow Control', 'remote-check', () => {
+      const allowControl = store.get('sync.allow-control');
+      store.set('sync.allow-control', !allowControl);
+    }),
   ],
   'Your admin pin code is',
-  '...',
-  [{ text: 'Allow Control' }],
+  codes.admin,
+  [
+    {
+      text: 'Allow Control',
+    },
+  ],
 );
 
 const translitSwitch = h('div.translit-switch', [
