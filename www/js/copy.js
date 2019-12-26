@@ -9,6 +9,12 @@ const baniDB = require('../js/banidb/index.js');
 
 const baniLengthMap = search.baniLengthCols;
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
+const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+let mangalPosString = '';
+
+if (mangalPosition === 'above') mangalPosString = 'above';
+else mangalPosString = 'current';
+
 let isCeremony;
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
@@ -37,24 +43,26 @@ async function loadFromDB(id, idType) {
   } else {
     isCeremony = idType === 'ceremony';
     result = isCeremony ? baniDB.loadCeremony(id) : baniDB.loadBani(id, baniLengthMap[baniLength]);
-    result.then(rows => {
-      for (let i = 0; i < rows.length; i += 1) {
-        const row = rows[i];
-        let toBeRemapped;
-        // if the obj has panktees
-        if (row.Verse) {
-          toBeRemapped = row.Verse;
-          // or if it doesnt and has a custom item, like the flower thing is asa di vaar
-        } else if (row.Custom) {
-          toBeRemapped = row.Custom;
-          row.noHTML = true;
-          // otherwise, both being false means that we are looking at the bani header, so we should copy the name/header value
-        } else {
-          toBeRemapped = isCeremony ? row.Ceremony.Gurmukhi : rows.Bani.Gurmukhi;
-        }
-        const remapped = global.controller.remapLine(toBeRemapped);
-        pankteeArray.push(remapped);
-      }
+    result.then(rowsDb => {
+      const rows = rowsDb
+        .filter(rowDb => rowDb.MangalPosition !== mangalPosString)
+        .map(rowDb => {
+          const row = rowDb;
+          let toBeRemapped;
+          // if the obj has panktees
+          if (row.Verse) {
+            toBeRemapped = row.Verse;
+            // or if it doesnt and has a custom item, like the flower thing is asa di vaar
+          } else if (row.Custom) {
+            toBeRemapped = row.Custom;
+            // otherwise, both being false means that we are looking at the bani header, so we should copy the name/header value
+          } else {
+            toBeRemapped = isCeremony ? row.Ceremony.Gurmukhi : rows.Bani.Gurmukhi;
+          }
+          const remapped = global.controller.remapLine(toBeRemapped);
+          pankteeArray.push(remapped);
+          return row;
+        });
     });
   }
 }
