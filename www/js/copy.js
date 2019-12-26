@@ -12,9 +12,11 @@ const baniLength = store.getUserPref('toolbar.gurbani.bani-length');
 const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
 let mangalPosString = '';
 
-if (mangalPosition === 'above') mangalPosString = 'above';
-else mangalPosString = 'current';
-
+if (mangalPosition === 'above') {
+  mangalPosString = 'above';
+} else {
+  mangalPosString = 'current';
+}
 let isCeremony;
 // storing pulled shabad/bani from db in array to avoid calling db too much
 const pankteeArray = [];
