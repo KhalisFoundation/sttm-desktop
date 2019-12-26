@@ -6,14 +6,12 @@
 
 - Added Spanish translations and Devanagari transliterations! Choose your language preference in the Settings menu
 
- ![](./assets/img/help_images/desktop-dev-spanish.png)
+![](./assets/img/help_images/desktop-dev-spanish.png)
 
 ### Improved:
 
 - Added a hover effect when using the Gurmukhi keyboard to make it easier to see which letter you are clicking
 - Fixed a bug with Quick Tools not appearing
-
-
 
 </br>
 
@@ -34,9 +32,8 @@
 - Bani Overlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
 - The SikhiToTheMax logo has been added to Bani Overlay as default and can be turned off with the new "Logo" toggle
 - The "Show Annoucements in Overlay" toggle has been moved to the Bani Overlay toolbar
-- The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future! 
- ![](./assets/img/help_images/desktop-new-overlay.png)
-
+- The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future!
+  ![](./assets/img/help_images/desktop-new-overlay.png)
 
 ### 6.1 - _November 14, 2019_
 
@@ -49,15 +46,13 @@
 
 ### New:
 
-- Sangat Sync! An amazing new way to have sangat follow along what is being shown on SikhiToTheMax. Just visit sttm.co/sync and enter the pairing code to get started. Note: This feature is still in beta, please send us your feedback at sttm.co/feedback! 
- ![](./assets/img/help_images/desktop-sangat-sync.png)
- 
- 
- - Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab! 
+- Sangat Sync! An amazing new way to have sangat follow along what is being shown on SikhiToTheMax. Just visit sttm.co/sync and enter the pairing code to get started. Note: This feature is still in beta, please send us your feedback at sttm.co/feedback!
+  ![](./assets/img/help_images/desktop-sangat-sync.png)
+
+* Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab!
   ![](./assets/img/help_images/desktop-550-theme.png)
- 
- 
-- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations! 
+
+- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!
 
 <br/>  
 <details><summary>See previous updates...</summary>
@@ -71,7 +66,7 @@
 - Fixed a bug that would cause the last line of Anand Sahib (Bhog) not to display properly
 - Fixed a bug that would cause a white screen to flash upon app launch
 - Fixed a bug that caused the spacebar not to function properly
-  
+
 ### 5.3.3 - _190822_
 
 ### Improved:
