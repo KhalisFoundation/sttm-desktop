@@ -76,8 +76,8 @@ function stripHTML(htmlString) {
  * Lastly, then it copies the relevant parts of the pankteee
  */
 async function copyPanktee() {
-  const translationLang = store.getUserPref('toolbar.language-settings.translation-language');
-  const translitLang = store.getUserPref('toolbar.language-settings.transliteration-language');
+  const translationLang = store.getUserPref('slide-layout.language-settings.translation-language');
+  const translitLang = store.getUserPref('slide-layout.language-settings.transliteration-language');
 
   // find the position of the panktee from the lines pulled from DB
   const linePos = findLinePosition();
