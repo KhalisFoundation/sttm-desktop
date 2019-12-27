@@ -20,4 +20,3 @@ before_install:
 script:
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then npm test; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN; fi'
-  - 'cat /Users/travis/.npm/_logs/*-debug.log'
