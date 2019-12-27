@@ -135,8 +135,7 @@
       "category": "public.app-category.reference",
       "icon": "assets/STTM.icns",
       "target": [
-        "dmg",
-        "zip"
+        "default"
       ]
     },
     "nsis": {
