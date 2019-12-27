@@ -1,5 +1,18 @@
 ## New Updates
 
+### 6.3.1 - _December 27, 2019_
+
+### Improved:
+
+- Fixed copy & paste support for new languages 
+- Various code enhancements
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 6.3 - _December 13, 2019_
 
 ### Added:
@@ -12,12 +25,6 @@
 
 - Added a hover effect when using the Gurmukhi keyboard to make it easier to see which letter you are clicking
 - Fixed a bug with Quick Tools not appearing
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 6.2.1 - _December 3, 2019_
 
