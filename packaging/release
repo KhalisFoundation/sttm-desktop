@@ -4,7 +4,9 @@
 const git = require('simple-git/promise');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
-const { argv: { branch, platform, token } } = require('yargs');
+const {
+  argv: { branch, platform, token },
+} = require('yargs');
 const checkVersion = require('./check-version');
 const updateRemoteVersion = require('./update-remote');
 
@@ -31,8 +33,12 @@ const release = async () => {
 
   console.log('TODO: stream output for the next command');
   console.log(`npm run dist:${platform}`);
-  const { stdout1 } = await exec(`npm run dist:${platform}`);
-  console.log(stdout1);
+  try {
+    const { stdout1 } = await exec(`npm run dist:${platform}`);
+    console.log(stdout1);
+  } catch (e) {
+    console.log(e);
+  }
 
   // Only push git tag if on Travis
   if (platform === 'mac') {
