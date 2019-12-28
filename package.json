@@ -13,10 +13,10 @@
     "test:lint:css": "stylelint \"www/src/scss/*.scss\" --syntax scss --fix",
     "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css",
-    "pack:mac": "npm run build && build --mac",
-    "pack:win": "npm run build && build --win --x64",
-    "pack:win32": "npm run build && build --win --ia32",
-    "pack:linux": "npm run build && build --linux --x64",
+    "pack:mac": "npm run build && electron-builder --mac",
+    "pack:win": "npm run build && electron-builder --win --x64",
+    "pack:win32": "npm run build && electron-builder --win --ia32",
+    "pack:linux": "npm run build && electron-builder --linux --x64",
     "dist:mac": "npm run build && electron-builder --mac --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
@@ -25,7 +25,7 @@
     "build-css:obs": "node-sass --output-style compressed --include-path www/src/scss/obs www/src/scss/obs/styles.scss www/obs/bundle.css",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron": "^4.2.12",
-    "electron-builder": "20.8.1",
+    "electron-builder": "^21.2.0",
     "electron-publisher-s3": "^20.17.2",
     "electron-rebuild": "^1.8.8",
     "eslint": "^5.3.0",
@@ -66,7 +66,7 @@
     "copy-to-clipboard": "^3.0.8",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
-    "electron-updater": "^2.21.0",
+    "electron-updater": "^4.2.0",
     "express": "^4.15.2",
     "extract-zip": "^1.6.7",
     "get-json": "^1.0.0",
@@ -135,8 +135,7 @@
       "category": "public.app-category.reference",
       "icon": "assets/STTM.icns",
       "target": [
-        "dmg",
-        "zip"
+        "default"
       ]
     },
     "nsis": {
@@ -160,5 +159,9 @@
       "pre-commit": "pretty-quick --staged",
       "pre-push": "npm test"
     }
+  },
+  "optionalDependencies": {
+    "react": "^16.12.0",
+    "react-native": "^0.61.5"
   }
 }
