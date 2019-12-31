@@ -1,5 +1,5 @@
 const request = require('request-promise');
-const md5 = require('md5');
+// const md5 = require('md5'); To be used when web is ready
 
 const { store } = require('electron').remote.require('./app');
 
@@ -38,30 +38,33 @@ module.exports = {
       document.body.appendChild(script);
     }
   },
-  async tryConnection() {
+  async tryConnection(syncType) {
     const host = store.get('userId');
 
-    if (window.codes && (window.codes.sync || window.codes.admin)) {
-      return window.codes;
+    if (!window.codes) {
+      // initialize empty codes object on first start
+      window.codes = {
+        sync: undefined,
+        admin: undefined,
+      };
+      store.set('sync.codes', window.codes);
+    } else if (window.codes[syncType]) {
+      return window.codes[syncType];
     }
 
     try {
       const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
-      const codes = {
-        sync: JSON.parse(result).data.namespaceString,
-        admin: generateCode(6),
-      };
+
+      const code = syncType === 'sync' ? JSON.parse(result).data.namespaceString : generateCode(6);
 
       if (window.io !== undefined) {
-        window.codes = codes;
-        onConnect(codes.sync, 'sync');
-        onConnect(codes.admin, 'admin');
+        window.codes[syncType] = code;
+        onConnect(window.codes[syncType], syncType);
       } else {
         // TODO: Wait for io or something
       }
-      store.set('sync.codes', codes);
-      store.set('sync.token', md5(codes.admin));
-      return codes;
+      store.set(`sync.codes.${syncType}`, code);
+      return code;
     } catch (e) {
       return false;
     }

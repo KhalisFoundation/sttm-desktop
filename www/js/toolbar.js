@@ -28,7 +28,7 @@ const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
 let currentToolbarItem;
 
-let codes = {
+const codes = {
   sync: '...',
   admin: '...',
 };
@@ -52,13 +52,14 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
-const remoteSyncInit = async () => {
+const remoteSyncInit = async syncType => {
   const onlineVal = await isOnline();
+  const syncTypeContainer = syncType === 'sync' ? '.sync-dialogue' : '.remote-dialogue';
   if (onlineVal) {
-    codes = await tryConnection();
-    if (codes) {
-      document.querySelector('.sync-dialogue .controller-code-num').innerText = codes.sync;
-      document.querySelector('.remote-dialogue .controller-code-num').innerText = codes.admin;
+    const code = await tryConnection(syncType);
+    if (code) {
+      document.querySelector(`${syncTypeContainer} .controller-code-num`).innerText = code;
+      codes[syncType] = code;
       document
         .querySelector('#tool-sync-button')
         .setAttribute('title', `sync:${codes.sync} | admin:${codes.admin}`);
@@ -92,23 +93,22 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
     ]),
   ]);
 
-const syncToggle = async (forceConnect = false) => {
-  if (isConnected.sync && !forceConnect) {
-    isConnected.sync = false;
-    onEnd(codes.sync, 'sync');
-    codes.sync = '...';
-    onEnd(codes.admin, 'admin');
-    codes.admin = '...';
+const syncToggle = async (syncType, forceConnect = false) => {
+  if (isConnected[syncType] && !forceConnect) {
+    isConnected[syncType] = false;
+    onEnd(codes[syncType], syncType);
+    codes[syncType] = '...';
     global.controller.sendText('');
-    document.querySelector('.sync-dialogue .controller-code-num').innerText = '...';
-    document.querySelector('.remote-dialogue .controller-code-num').innerText = '...';
+    const syncTypeContainer = syncType === 'sync' ? '.sync-dialogue' : '.remote-dialogue';
+    document.querySelector(`${syncTypeContainer} .controller-code-num`).innerText = '...';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
-    isConnected.sync = true;
-    await remoteSyncInit();
+    isConnected[syncType] = true;
+    await remoteSyncInit(syncType);
   }
-  document.querySelector('.present-btn').innerText = isConnected.sync
+  const presentBtnClass = syncType === 'sync' ? '.present-btn' : '.admin-present-btn';
+  document.querySelector(presentBtnClass).innerText = isConnected[syncType]
     ? 'Stop Session'
     : 'Start Session';
 };
@@ -138,7 +138,7 @@ const syncContent = controllerFactory(
     {
       classes: '.present-btn',
       action: () => {
-        syncToggle();
+        syncToggle('sync');
       },
       text: isConnected.sync ? 'Stop Session' : 'Start Session',
     },
@@ -162,7 +162,11 @@ const remoteContent = controllerFactory(
   codes.admin,
   [
     {
-      text: 'Allow Control',
+      classes: '.admin-present-btn',
+      action: () => {
+        syncToggle('admin');
+      },
+      text: isConnected.admin ? 'Stop Session' : 'Start Session',
     },
   ],
 );
@@ -365,7 +369,7 @@ module.exports = {
 
     syncButton.addEventListener('click', () => {
       analytics.trackEvent('syncStarted', true);
-      syncToggle(true);
+      syncToggle('sync', true);
     });
 
     const controllerDialogueWrapper = document.querySelector('.controller-dialogue-wrapper');
