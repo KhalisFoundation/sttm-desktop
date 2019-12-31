@@ -5,7 +5,10 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
-let isConntected = false;
+let isConnected = {
+  admin: false,
+  sync: false,
+};
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -25,7 +28,10 @@ const $ceremoniesList = document.querySelector('.ceremonies-list');
 const $baniExtras = document.querySelector('.bani-extras');
 let currentToolbarItem;
 
-let codes = store.get('sync.codes');
+let codes = {
+  sync: '...',
+  admin: '...',
+};
 
 const betaLabel = h('div.beta-label', 'BETA');
 
@@ -87,8 +93,8 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
   ]);
 
 const syncToggle = async (forceConnect = false) => {
-  if (isConntected && !forceConnect) {
-    isConntected = false;
+  if (isConnected.sync && !forceConnect) {
+    isConnected.sync = false;
     onEnd(codes.sync, 'sync');
     codes.sync = '...';
     onEnd(codes.admin, 'admin');
@@ -99,10 +105,10 @@ const syncToggle = async (forceConnect = false) => {
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
-    isConntected = true;
+    isConnected.sync = true;
     await remoteSyncInit();
   }
-  document.querySelector('.present-btn').innerText = isConntected
+  document.querySelector('.present-btn').innerText = isConnected.sync
     ? 'Stop Session'
     : 'Start Session';
 };
@@ -134,7 +140,7 @@ const syncContent = controllerFactory(
       action: () => {
         syncToggle();
       },
-      text: isConntected ? 'Stop Session' : 'Start Session',
+      text: isConnected.sync ? 'Stop Session' : 'Start Session',
     },
     {
       classes: '.copy-code-btn',
@@ -151,13 +157,7 @@ const syncContent = controllerFactory(
 );
 
 const remoteContent = controllerFactory(
-  [
-    'This allows you to control sttm desktop from sttm site or a 3rd app etc etc.',
-    switchFactory('remote-switch', 'Allow Control', 'remote-check', () => {
-      const allowControl = store.get('sync.allow-control');
-      store.set('sync.allow-control', !allowControl);
-    }),
-  ],
+  ['This allows you to control sttm desktop from sttm site or a 3rd app etc etc.'],
   'Your admin pin code is',
   codes.admin,
   [
