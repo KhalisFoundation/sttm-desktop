@@ -5,7 +5,7 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
-let isConnected = {
+const isConnected = {
   admin: false,
   sync: false,
 };
