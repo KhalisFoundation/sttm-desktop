@@ -17,7 +17,7 @@ function onConnect(code, syncType) {
   window.socket[syncType] = window.io(`${SYNC_API_URL}/${code}`);
 }
 
-function generateCode(len) {
+/* function generateCode(len) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let code = '';
   for (let i = 0; i < len; i += 1) {
@@ -27,7 +27,7 @@ function generateCode(len) {
     }
   }
   return code;
-}
+} */
 
 module.exports = {
   init() {
@@ -39,7 +39,7 @@ module.exports = {
     }
   },
   async tryConnection(syncType) {
-    const host = store.get('userId');
+    const host = `${store.get('userId')}-${syncType}`;
 
     if (!window.codes) {
       // initialize empty codes object on first start
@@ -55,7 +55,8 @@ module.exports = {
     try {
       const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
 
-      const code = syncType === 'sync' ? JSON.parse(result).data.namespaceString : generateCode(6);
+      // const code = syncType === 'sync' ? JSON.parse(result).data.namespaceString : generateCode(6);
+      const code = JSON.parse(result).data.namespaceString;
 
       if (window.io !== undefined) {
         window.codes[syncType] = code;
