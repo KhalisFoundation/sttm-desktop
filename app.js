@@ -41,6 +41,8 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
+store.setUserPref('toolbar.language-settings', null);
+
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
