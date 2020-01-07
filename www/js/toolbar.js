@@ -82,6 +82,12 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
     ]),
   ]);
 
+const syncItemFactory = (title, description, controls) =>
+  h('div.sync-item', [
+    h('div.sync-item-left', [h('div.sync-item-head', title), h('div.sync-item-desc', description)]),
+    h('div.sync-item-right', controls),
+  ]);
+
 const syncToggle = async (forceConnect = false) => {
   if (isConntected && !forceConnect) {
     isConntected = false;
@@ -95,45 +101,45 @@ const syncToggle = async (forceConnect = false) => {
     isConntected = true;
     await remoteSyncInit();
   }
-  document.querySelector('.present-btn').innerText = isConntected
-    ? 'Stop Session'
-    : 'Start Session';
+  document.querySelector('#connection-toggle').checked = isConntected;
 };
 
 const syncContent = h('div.sync-content', [
-  h('div.left-sync-content', [
+  h('div.sync-code-label', 'Your unique sync code is:'),
+  h('div.sync-code-num', code),
+  syncItemFactory(
+    'Sangat Sync',
+    'Allow the Sangat to visit sttm.co/sync to enter a code and view the Shabad being presented in real-time.',
     h(
-      'div.sync-code-desc',
-      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
+      'button.button.copy-code-btn',
+      {
+        onclick: () => {
+          if (code !== '...') {
+            const syncString = `<p>Visit sttm.co/sync on your mobile 
+            device and enter the code below to follow along</p> <h1>${code} </h1>`;
+            global.controller.sendText(syncString);
+          }
+        },
+      },
+      'Present Code to Sangat',
     ),
-  ]),
-  h('div.right-sync-content', [
-    h('div.sync-code-label', 'Your unique sync code is'),
-    h('div.sync-code-num', code),
-    h('div.button-wrap', [
-      h(
-        'button.button.present-btn',
-        {
-          onclick: () => {
-            syncToggle();
-          },
-        },
-        isConntected ? 'Stop Session' : 'Start Session',
-      ),
-      h(
-        'button.button.copy-code-btn',
-        {
-          onclick: () => {
-            if (code !== '...') {
-              const syncString = `<p>Visit sttm.co/sync on your mobile 
-              device and enter the code below to follow along</p> <h1>${code} </h1>`;
-              global.controller.sendText(syncString);
-            }
-          },
-        },
-        'Present',
-      ),
-    ]),
+  ),
+  syncItemFactory(
+    'Remote Control',
+    'Connect to SikhiToTheMax by visiting sttm.co/control from a mobile device to search, navigate, and control the entire app',
+    h('div', [h('div.large-text', 'Pin: 1234'), h('button.button.hide-btn', 'Hide Pin')]),
+  ),
+  h('div.connection-switch-container', [
+    h('p', 'Disable all the remote connections to SikhiToTheMax'),
+    switchFactory(
+      'connection-switch',
+      '',
+      'connection',
+      () => {
+        syncToggle();
+      },
+      isConntected,
+    ),
   ]),
 ]);
 
