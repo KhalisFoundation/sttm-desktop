@@ -41,6 +41,8 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
+store.setUserPref('toolbar.language-settings', null);
+
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
@@ -262,9 +264,10 @@ const showLine = (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
-    translation: store.getUserPref('toolbar.language-settings.translation-language'),
-    transliteration: store.getUserPref('toolbar.language-settings.transliteration-language'),
+    translation: store.getUserPref('slide-layout.language-settings.translation-language'),
+    transliteration: store.getUserPref('slide-layout.language-settings.transliteration-language'),
   };
+
   const payload = Object.assign(lineWithSettings, overlayPrefs);
   if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
