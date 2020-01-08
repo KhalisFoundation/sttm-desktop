@@ -1,6 +1,6 @@
 ## New Updates
 
-### 6.3.2 - _January 7, 2019_
+### 6.3.2 - _January 7, 2020_
 
 ### Improved:
 
