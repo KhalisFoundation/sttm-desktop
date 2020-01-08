@@ -1,15 +1,24 @@
 ## New Updates
 
+### 6.3.2 - _January 7, 2019_
+
+### Improved:
+
+- Fixed a bug that was causing Chromecast not to work as expected 
+- Fixed a bug that was causing translations not to appear in Bani Overlay
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 6.3.1 - _December 27, 2019_
 
 ### Improved:
 
 - Fixed copy & paste support for new languages 
 - Various code enhancements
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
 
