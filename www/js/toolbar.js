@@ -5,7 +5,10 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
+// State Variables
 let code = '...';
+let adminPin = '...';
+let adminPinVisible = true;
 let isConntected = false;
 
 const { store } = remote.require('./app');
@@ -49,12 +52,15 @@ const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
   if (onlineVal) {
     code = await tryConnection();
+    adminPin = Math.floor(1000 + Math.random() * 8999);
     if (code) {
       document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
     document.querySelector('.sync-code-num').innerText = ' ';
+    document.querySelector('.admin-pin').innerText = ' ';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   }
 };
@@ -93,8 +99,10 @@ const syncToggle = async (forceConnect = false) => {
     isConntected = false;
     onEnd(code);
     code = '...';
+    adminPin = '...';
     global.controller.sendText('');
-    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('.sync-code-num').innerText = code;
+    document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
@@ -103,6 +111,29 @@ const syncToggle = async (forceConnect = false) => {
   }
   document.querySelector('#connection-toggle').checked = isConntected;
 };
+
+const toggleAdminPin = () => {
+  if (adminPinVisible) {
+    document.querySelector('.admin-pin').innerText = '';
+    document.querySelector('.hide-btn').innerText = 'Show Pin';
+    adminPinVisible = false;
+  } else {
+    document.querySelector('.admin-pin').innerText = `Pin: ${adminPin}`;
+    document.querySelector('.hide-btn').innerText = 'Hide Pin';
+    adminPinVisible = true;
+  }
+};
+
+const adminContent = h('div', [
+  h('div.large-text.admin-pin', `Pin: ${adminPin}`),
+  h(
+    'button.button.hide-btn',
+    {
+      onclick: toggleAdminPin,
+    },
+    'Hide Pin',
+  ),
+]);
 
 const syncContent = h('div.sync-content', [
   h('div.sync-code-label', 'Your unique sync code is:'),
@@ -127,7 +158,7 @@ const syncContent = h('div.sync-content', [
   syncItemFactory(
     'Remote Control',
     'Connect to SikhiToTheMax by visiting sttm.co/control from a mobile device to search, navigate, and control the entire app',
-    h('div', [h('div.large-text', 'Pin: 1234'), h('button.button.hide-btn', 'Hide Pin')]),
+    adminContent,
   ),
   h('div.connection-switch-container', [
     h('p', 'Disable all the remote connections to SikhiToTheMax'),
