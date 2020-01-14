@@ -22,6 +22,7 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
+let currentShabadID = 0;
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
@@ -315,8 +316,15 @@ function akhandPaatt() {
   // global.controller.clearAPV();
 }
 
+const currentShabadState = () => ({
+  currentShabad,
+  currentShabadID,
+  sessionStatesList,
+});
+
 module.exports = {
   currentShabad,
+  currentShabadState,
   currentMeta,
   baniLengthCols,
 
@@ -664,6 +672,7 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
+    currentShabadID = ShabadID;
     if (window.socket !== undefined) {
       window.socket.emit('data', {
         type: 'shabad',

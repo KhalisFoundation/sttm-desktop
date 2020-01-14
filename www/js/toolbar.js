@@ -51,14 +51,14 @@ const toggleOverlayUI = (toolbarItem, show) => {
 const setListeners = () => {
   if (window.socket !== undefined) {
     window.socket.on('data', data => {
-      const search = global.core.search;
+      const { search } = global.core.search;
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
       const loadShabad = (shabadId, verseId, gurmukhi) => {
-        const currentShabadID = search.currentShabadState().currentShabadID;
+        const { currentShabadID } = search.currentShabadState().currentShabadID;
         const currentVerse = document.querySelector(`#line${verseId}`);
-        if (currentShabadID === shabadId) {
-          currentVerse && currentVerse.click();
+        if (currentShabadID === shabadId && currentVerse) {
+          currentVerse.click();
         } else {
           global.core.search.loadShabad(shabadId, verseId);
           search.addToHistory(shabadId, verseId, gurmukhi);
