@@ -168,13 +168,13 @@ const syncContent = h('div.sync-content', [
   h('div.sync-code-num', code),
   syncItemFactory(
     'Sangat Sync',
-    'Allow the Sangat to visit sttm.co/sync to enter a code and view the Shabad being presented in real-time.',
+    'Allow the Sangat to visit <strong> sttm.co/sync </strong> to enter a code and view the Shabad being presented in real-time.',
     h(
       'button.button.copy-code-btn',
       {
         onclick: () => {
           if (code !== '...') {
-            const syncString = `<p>Visit sttm.co/sync on your mobile 
+            const syncString = `<p>Visit <strong> sttm.co/sync </strong> on your mobile 
             device and enter the code below to follow along</p> <h1>${code} </h1>`;
             global.controller.sendText(syncString);
           }
@@ -185,7 +185,7 @@ const syncContent = h('div.sync-content', [
   ),
   syncItemFactory(
     'Remote Control',
-    'Connect to SikhiToTheMax by visiting sttm.co/control from a mobile device to search, navigate, and control the entire app',
+    'Connect to SikhiToTheMax by visiting <strong> sttm.co/control </strong> from a mobile device to search, navigate, and control the entire app',
     adminContent,
   ),
   h('div.connection-switch-container', [
