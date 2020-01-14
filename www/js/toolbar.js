@@ -51,25 +51,40 @@ const toggleOverlayUI = (toolbarItem, show) => {
 const setListeners = () => {
   if (window.socket !== undefined) {
     window.socket.on('data', data => {
+      const search = global.core.search;
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
-      const listenerActions = payload => ({
-        shabad: global.core.search.loadShabad(payload.shabadId, payload.verseId),
-        text: global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
-        'request-control': window.socket.emit('data', {
-          host: 'sttm-desktop',
-          type: 'response-control',
-          success: isPinCorrect,
-        }),
+      const loadShabad = (shabadId, verseId, gurmukhi) => {
+        const currentShabadID = search.currentShabadState().currentShabadID;
+        const currentVerse = document.querySelector(`#line${verseId}`);
+        if (currentShabadID === shabadId) {
+          currentVerse && currentVerse.click();
+        } else {
+          global.core.search.loadShabad(shabadId, verseId);
+          search.addToHistory(shabadId, verseId, gurmukhi);
+        }
+      };
+
+      const listenerActions = {
+        shabad: payload => loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi),
+        text: payload =>
+          global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
+        'request-control': () => {
+          window.socket.emit('data', {
+            host: 'sttm-desktop',
+            type: 'response-control',
+            success: isPinCorrect,
+          });
+        },
         /* Coming soon
         'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
         'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
         */
-      });
+      };
 
       // if its an event from web and not from desktop itself
       if (data.host === 'sttm-web') {
-        listenerActions(data)[isPinCorrect ? data.type : 'request-control'];
+        listenerActions[isPinCorrect ? data.type : 'request-control'](data);
       }
     });
   }
