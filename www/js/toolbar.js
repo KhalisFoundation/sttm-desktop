@@ -48,12 +48,38 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
+const setListeners = () => {
+  if (window.socket !== undefined) {
+    window.socket.on('data', data => {
+      const isPinCorrect = parseInt(data.pin) === adminPin;
+
+      const listenerActions = payload => ({
+        shabad: global.core.search.loadShabad(payload.shabadId, payload.verseId),
+        text: global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
+        'request-control': window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'response-control',
+          success: isPinCorrect,
+        }),
+        /* Coming soon
+        'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
+        'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
+        */
+      });
+
+      // if its an event from web and not from desktop itself
+      data.host === 'sttm-web' &&
+        listenerActions(data)[isPinCorrect ? data.type : 'request-control'];
+    });
+  }
+};
+
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
   if (onlineVal) {
     code = await tryConnection();
-    adminPin = Math.floor(1000 + Math.random() * 8999);
     if (code) {
+      adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
       document.querySelector('.sync-code-num').innerText = code;
       document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
@@ -63,6 +89,7 @@ const remoteSyncInit = async () => {
     document.querySelector('.admin-pin').innerText = ' ';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
   }
+  setListeners();
 };
 
 // factories
@@ -109,7 +136,7 @@ const syncToggle = async (forceConnect = false) => {
     isConntected = true;
     await remoteSyncInit();
   }
-  document.querySelector('#connection-toggle').checked = isConntected;
+  document.querySelector('#connection-toggle').checked = !isConntected;
 };
 
 const toggleAdminPin = () => {
@@ -169,7 +196,7 @@ const syncContent = h('div.sync-content', [
       () => {
         syncToggle();
       },
-      isConntected,
+      false,
     ),
   ]),
 ]);
