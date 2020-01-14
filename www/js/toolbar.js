@@ -51,7 +51,7 @@ const toggleOverlayUI = (toolbarItem, show) => {
 const setListeners = () => {
   if (window.socket !== undefined) {
     window.socket.on('data', data => {
-      const isPinCorrect = parseInt(data.pin) === adminPin;
+      const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
       const listenerActions = payload => ({
         shabad: global.core.search.loadShabad(payload.shabadId, payload.verseId),
@@ -68,8 +68,9 @@ const setListeners = () => {
       });
 
       // if its an event from web and not from desktop itself
-      data.host === 'sttm-web' &&
+      if (data.host === 'sttm-web') {
         listenerActions(data)[isPinCorrect ? data.type : 'request-control'];
+      }
     });
   }
 };
