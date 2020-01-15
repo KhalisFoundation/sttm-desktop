@@ -316,7 +316,7 @@ function akhandPaatt() {
   // global.controller.clearAPV();
 }
 
-const currentShabadID = () => currentShabadID;
+const getCurrentShabadID = () => currentShabadID;
 
 module.exports = {
   currentShabad,

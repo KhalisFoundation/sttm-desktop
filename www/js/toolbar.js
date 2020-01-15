@@ -55,7 +55,7 @@ const setListeners = () => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
       const loadShabad = (shabadId, verseId, gurmukhi) => {
-        const { currentShabadID } = search.currentShabadID();
+        const currentShabadID = search.getCurrentShabadID();
         const currentVerse = document.querySelector(`#line${verseId}`);
         if (currentShabadID === shabadId && currentVerse) {
           currentVerse.click();
@@ -183,7 +183,11 @@ const syncContent = h('div.sync-content', [
   h('div.sync-code-num', code),
   syncItemFactory(
     'Sangat Sync',
-    'Allow the Sangat to visit <strong> sttm.co/sync </strong> to enter a code and view the Shabad being presented in real-time.',
+    h('span', [
+      'Allow the Sangat to visit ',
+      h('strong', 'sttm.co/sync'),
+      ' to enter a code and view the Shabad being presented in real-time.',
+    ]),
     h(
       'button.button.copy-code-btn',
       {
@@ -200,7 +204,11 @@ const syncContent = h('div.sync-content', [
   ),
   syncItemFactory(
     'Bani Controller',
-    'Connect to SikhiToTheMax by visiting <strong> sttm.co/control </strong> from a mobile device to search, navigate, and control the entire app',
+    h('span', [
+      'Connect to SikhiToTheMax by visiting ',
+      h('strong', 'sttm.co/control'),
+      ' from a mobile device to search, navigate, and control the entire app.',
+    ]),
     adminContent,
   ),
   h('div.connection-switch-container', [
