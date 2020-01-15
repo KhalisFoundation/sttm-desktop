@@ -22,6 +22,7 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
+let currentShabadId = 0;
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
@@ -364,6 +365,10 @@ module.exports = {
     this.changeSearchLanguage(this.searchLanguage);
   },
 
+  getCurrentShabadId() {
+    return currentShabadId;
+  },
+
   offline(seconds) {
     this.$search.placeholder = `Offline. Retrying database download in ${seconds}s`;
     const newSeconds = seconds - 1;
@@ -664,6 +669,7 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
+    currentShabadId = ShabadID;
     if (window.socket !== undefined) {
       window.socket.emit('data', {
         type: 'shabad',
