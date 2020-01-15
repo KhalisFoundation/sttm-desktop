@@ -101,14 +101,14 @@ const remoteSyncInit = async () => {
       adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
       document.querySelector('.sync-code-label').innerText = 'Your unique sync code is:';
       document.querySelector('.sync-code-num').innerText = code;
-      document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '...';
+      document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
     document.querySelector('.sync-code-label').innerText =
       'Sorry! you seem to be offline. Sync only works when you are connected to the internet.';
     document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('.admin-pin').innerText = 'Pin:...';
+    document.querySelector('.admin-pin').innerText = 'PIN:...';
     document.querySelector('#tool-sync-button').setAttribute('title', '...');
   }
   setListeners();
@@ -151,7 +151,7 @@ const syncToggle = async (forceConnect = false) => {
     adminPin = '...';
     global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = code;
-    document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '';
+    document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     analytics.trackEvent('syncStopped', true);
   } else {
@@ -164,23 +164,23 @@ const syncToggle = async (forceConnect = false) => {
 const toggleAdminPin = () => {
   if (adminPinVisible) {
     document.querySelector('.admin-pin').innerText = '';
-    document.querySelector('.hide-btn').innerText = 'Show Pin';
+    document.querySelector('.hide-btn').innerText = 'Show PIN';
     adminPinVisible = false;
   } else {
-    document.querySelector('.admin-pin').innerText = `Pin: ${adminPin}`;
-    document.querySelector('.hide-btn').innerText = 'Hide Pin';
+    document.querySelector('.admin-pin').innerText = `PIN: ${adminPin}`;
+    document.querySelector('.hide-btn').innerText = 'Hide PIN';
     adminPinVisible = true;
   }
 };
 
 const adminContent = h('div', [
-  h('div.large-text.admin-pin', `Pin: ${adminPin}`),
+  h('div.large-text.admin-pin', `PIN: ${adminPin}`),
   h(
     'button.button.hide-btn',
     {
       onclick: toggleAdminPin,
     },
-    'Hide Pin',
+    'Hide PIN',
   ),
 ]);
 
