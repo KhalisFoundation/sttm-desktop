@@ -55,7 +55,7 @@ const setListeners = () => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
       const loadShabad = (shabadId, verseId, gurmukhi) => {
-        const { currentShabadID } = search.currentShabadState().currentShabadID;
+        const { currentShabadID } = search.currentShabadID();
         const currentVerse = document.querySelector(`#line${verseId}`);
         if (currentShabadID === shabadId && currentVerse) {
           currentVerse.click();
@@ -199,7 +199,7 @@ const syncContent = h('div.sync-content', [
     ),
   ),
   syncItemFactory(
-    'Remote Control',
+    'Bani Controller',
     'Connect to SikhiToTheMax by visiting <strong> sttm.co/control </strong> from a mobile device to search, navigate, and control the entire app',
     adminContent,
   ),

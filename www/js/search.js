@@ -316,15 +316,11 @@ function akhandPaatt() {
   // global.controller.clearAPV();
 }
 
-const currentShabadState = () => ({
-  currentShabad,
-  currentShabadID,
-  sessionStatesList,
-});
+const currentShabadID = () => currentShabadID;
 
 module.exports = {
   currentShabad,
-  currentShabadState,
+  currentShabadID,
   currentMeta,
   baniLengthCols,
 
