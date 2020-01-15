@@ -22,7 +22,7 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
-let currentShabadID = 0;
+let currentShabadId = 0;
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
@@ -316,11 +316,8 @@ function akhandPaatt() {
   // global.controller.clearAPV();
 }
 
-const getCurrentShabadID = () => currentShabadID;
-
 module.exports = {
   currentShabad,
-  getCurrentShabadID,
   currentMeta,
   baniLengthCols,
 
@@ -366,6 +363,10 @@ module.exports = {
     this.searchLanguage = store.get('searchOptions.searchLanguage');
     searchLanguage.querySelector(`input[value=${this.searchLanguage}]`).checked = true;
     this.changeSearchLanguage(this.searchLanguage);
+  },
+
+  getCurrentShabadId() {
+    return currentShabadId;
   },
 
   offline(seconds) {
@@ -668,7 +669,7 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    currentShabadID = ShabadID;
+    currentShabadId = ShabadID;
     if (window.socket !== undefined) {
       window.socket.emit('data', {
         type: 'shabad',
