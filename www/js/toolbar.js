@@ -96,6 +96,7 @@ const remoteSyncInit = async () => {
     code = await tryConnection();
     if (code) {
       adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
+      document.querySelector('.sync-code-label').innerText = 'Your unique sync code is:';
       document.querySelector('.sync-code-num').innerText = code;
       document.querySelector('.admin-pin').innerText = adminPinVisible ? `Pin: ${adminPin}` : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
@@ -104,7 +105,7 @@ const remoteSyncInit = async () => {
     document.querySelector('.sync-code-label').innerText =
       'Sorry! you seem to be offline. Sync only works when you are connected to the internet.';
     document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('.admin-pin').innerText = '...';
+    document.querySelector('.admin-pin').innerText = 'Pin:...';
     document.querySelector('#tool-sync-button').setAttribute('title', '...');
   }
   setListeners();
