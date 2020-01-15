@@ -320,7 +320,7 @@ const getCurrentShabadID = () => currentShabadID;
 
 module.exports = {
   currentShabad,
-  currentShabadID,
+  getCurrentShabadID,
   currentMeta,
   baniLengthCols,
 
