@@ -192,8 +192,17 @@ function checkForExternalDisplay() {
   return false;
 }
 
+function showChangelog() {
+  const lastSeen = store.get('changelog-seen');
+  const lastSeenCount = store.get('changelog-seen-count');
+  const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
+
+  return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
+}
+
 function createViewer(ipcData) {
   const isExternal = checkForExternalDisplay();
+
   if (isExternal) {
     viewerWindow = new BrowserWindow({
       width: 800,
@@ -215,6 +224,9 @@ function createViewer(ipcData) {
         height,
       });
       mainWindow.focus();
+      if (showChangelog() && secondaryWindows.changelogWindow.obj) {
+        secondaryWindows.changelogWindow.obj.focus();
+      }
       viewerWindow.setFullScreen(true);
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
@@ -222,6 +234,9 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('enter-full-screen', () => {
       mainWindow.focus();
+      if (showChangelog() && secondaryWindows.changelogWindow.obj) {
+        secondaryWindows.changelogWindow.obj.focus();
+      }
     });
     viewerWindow.on('focus', () => {
       // mainWindow.focus();
@@ -384,10 +399,8 @@ app.on('ready', () => {
     }
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
-    const lastSeenCount = store.get('changelog-seen-count');
-    const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
 
-    if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
+    if (showChangelog()) {
       openSecondaryWindow('changelogWindow');
       if (lastSeen !== appVersion) {
         store.set('changelog-seen-count', 1);
