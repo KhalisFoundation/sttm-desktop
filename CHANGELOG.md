@@ -12,6 +12,11 @@
 
 ![](./assets/img/help_images/desktop-bani-controller.jpg)
 
+### Improved:
+
+- Fixed an issue with live feed text files not working
+- Fixed an issue with the changelog getting stuck behind the app
+
 </br>
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
