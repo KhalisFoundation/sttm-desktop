@@ -6,7 +6,7 @@
 
 - Bani Controller is here! You can now control SikhiToTheMax from your mobile device! Just open the SikhiToTheMax website from your phone (or any other device), enter the sync code/PIN, and you're connected! Here are some cool things to try: 
   - Give multiple people the ability to control, so searching can be a team effort
-  - You don't need to be on the same WiFi network for Bani Controller to work (any internet connection will work!), have a friend who is somewhere else in the world control your SikhiToTheMax
+  - You don't need to be on the same WiFi network for Bani Controller to work (any internet connection will work), have a friend who is somewhere else in the world control your SikhiToTheMax
   - Sitting on stage with the Raagi doing Keertan? Use Bani Controller in combination with Sangat Sync for the ultimate experience
 
 ![](./assets/img/help_images/desktop-bani-controller.jpg)
