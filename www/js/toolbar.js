@@ -73,6 +73,7 @@ const setListeners = () => {
         text: payload =>
           global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
         'request-control': () => {
+          document.body.classList.toggle(`controller-on`, isPinCorrect);
           window.socket.emit('data', {
             host: 'sttm-desktop',
             type: 'response-control',
@@ -96,7 +97,11 @@ const setListeners = () => {
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
   if (onlineVal) {
-    code = await tryConnection();
+    const newCode = await tryConnection();
+    if (newCode !== code) {
+      document.body.classList.remove('controller-on');
+    }
+    code = newCode;
     if (code) {
       adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
       document.querySelector('.sync-code-label').innerText = 'Your unique sync code is:';
@@ -153,6 +158,7 @@ const syncToggle = async (forceConnect = false) => {
     document.querySelector('.sync-code-num').innerText = code;
     document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    document.body.classList.remove('controller-on');
     analytics.trackEvent('syncStopped', true);
   } else {
     isConntected = true;
