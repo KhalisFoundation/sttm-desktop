@@ -1,6 +1,8 @@
 ## New Updates
 
-### 7.0 - _January 21, 2020_
+### 7.0 - _January 22, 2020_
+
+![](./assets/img/help_images/desktop-bani-controller.jpg)
 
 ### Added:
 
@@ -10,7 +12,10 @@
   - You don't need to be on the same WiFi network for Bani Controller to work (any internet connection will work), have a friend who is somewhere else in the world control your SikhiToTheMax
   - Sitting on stage with the Raagi doing Keertan? Use Bani Controller in combination with Sangat Sync for the ultimate experience
 
-![](./assets/img/help_images/desktop-bani-controller.jpg)
+### Improved:
+
+- Fixed an issue with live feed text files not working
+- Fixed an issue with the changelog getting stuck behind the app
 
 </br>
 
