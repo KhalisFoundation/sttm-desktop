@@ -5,14 +5,17 @@ const isOnline = require('is-online');
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
+// State Variables
 let code = '...';
+let adminPin = '...';
+let adminPinVisible = true;
 let isConntected = false;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { updateCeremonyThemeTiles } = require('./theme_editor');
 
-const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button'];
+const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen'];
 const navLinks = require('./search');
 
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
@@ -45,18 +48,75 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
+const setListeners = () => {
+  if (window.socket !== undefined) {
+    window.socket.on('data', data => {
+      const isPinCorrect = parseInt(data.pin, 10) === adminPin;
+
+      /* We need gurmukhi here to add for history support.
+      Will no longer be needed when we move to better state management */
+      const loadShabad = (shabadId, verseId, gurmukhi) => {
+        const currentShabadID = global.core.search.getCurrentShabadId();
+        const currentVerse = document.querySelector(`#line${verseId}`);
+        // If its not new shabad but just a verse change in current shabad
+        if (currentShabadID === shabadId && currentVerse) {
+          currentVerse.click();
+        } else {
+          // if its a new shabad load it and add it to history
+          global.core.search.loadShabad(shabadId, verseId);
+          global.core.search.addToHistory(shabadId, verseId, gurmukhi);
+        }
+      };
+
+      const listenerActions = {
+        shabad: payload => loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi),
+        text: payload =>
+          global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
+        'request-control': () => {
+          document.body.classList.toggle(`controller-on`, isPinCorrect);
+          window.socket.emit('data', {
+            host: 'sttm-desktop',
+            type: 'response-control',
+            success: isPinCorrect,
+          });
+        },
+        /* Coming soon
+        'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
+        'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
+        */
+      };
+
+      // if its an event from web and not from desktop itself
+      if (data.host === 'sttm-web') {
+        listenerActions[isPinCorrect ? data.type : 'request-control'](data);
+      }
+    });
+  }
+};
+
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
   if (onlineVal) {
-    code = await tryConnection();
+    const newCode = await tryConnection();
+    if (newCode !== code) {
+      document.body.classList.remove('controller-on');
+    }
+    code = newCode;
     if (code) {
+      adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
+      document.querySelector('.sync-code-label').innerText = 'Your unique sync code is:';
       document.querySelector('.sync-code-num').innerText = code;
+      document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
-    document.querySelector('.sync-code-num').innerText = ' ';
-    document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    document.querySelector('.sync-code-label').innerText =
+      'Sorry! you seem to be offline. Sync only works when you are connected to the internet.';
+    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('.admin-pin').innerText = 'PIN:...';
+    document.querySelector('#tool-sync-button').setAttribute('title', '...');
   }
+  setListeners();
 };
 
 // factories
@@ -82,58 +142,111 @@ const switchFactory = (id, label, inputId, clickEvent, defaultValue = true) =>
     ]),
   ]);
 
+const syncItemFactory = (title, description, controls) =>
+  h('div.sync-item', [
+    h('div.sync-item-left', [h('div.sync-item-head', title), h('div.sync-item-desc', description)]),
+    h('div.sync-item-right', controls),
+  ]);
+
 const syncToggle = async (forceConnect = false) => {
   if (isConntected && !forceConnect) {
     isConntected = false;
     onEnd(code);
     code = '...';
+    adminPin = '...';
     global.controller.sendText('');
-    document.querySelector('.sync-code-num').innerText = '...';
+    document.querySelector('.sync-code-num').innerText = code;
+    document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
+    document.body.classList.remove('controller-on');
     analytics.trackEvent('syncStopped', true);
   } else {
     isConntected = true;
     await remoteSyncInit();
   }
-  document.querySelector('.present-btn').innerText = isConntected
-    ? 'Stop Session'
-    : 'Start Session';
+  document.querySelector('#connection-toggle').checked = !isConntected;
 };
 
-const syncContent = h('div.sync-content', [
-  h('div.left-sync-content', [
+const toggleAdminPin = () => {
+  if (adminPinVisible) {
+    document.querySelector('.admin-pin').innerText = 'PIN:...';
+    document.querySelector('.hide-btn i').classList.replace('fa-eye', 'fa-eye-slash');
+    adminPinVisible = false;
+  } else {
+    document.querySelector('.admin-pin').innerText = `PIN: ${adminPin}`;
+    document.querySelector('.hide-btn i').classList.replace('fa-eye-slash', 'fa-eye');
+    adminPinVisible = true;
+  }
+};
+
+const toggleLockScreen = () => {
+  toggleOverlayUI('lock-screen', true);
+};
+
+const adminContent = h('div', [
+  h('div.large-text', [
+    h('span.admin-pin', `PIN: ${adminPin}`),
     h(
-      'div.sync-code-desc',
-      'Enter this code on sttm.co/sync to follow along SikhiToTheMax on any web browser (including mobile). Press the "Present" button to display the pairing code for the sangat.',
+      'span.hide-btn',
+      {
+        onclick: toggleAdminPin,
+      },
+      h('i.fa.fa-eye'),
     ),
   ]),
-  h('div.right-sync-content', [
-    h('div.sync-code-label', 'Your unique sync code is'),
-    h('div.sync-code-num', code),
-    h('div.button-wrap', [
-      h(
-        'button.button.present-btn',
-        {
-          onclick: () => {
-            syncToggle();
-          },
-        },
-        isConntected ? 'Stop Session' : 'Start Session',
-      ),
-      h(
-        'button.button.copy-code-btn',
-        {
-          onclick: () => {
-            if (code !== '...') {
-              const syncString = `<p>Visit sttm.co/sync on your mobile 
-              device and enter the code below to follow along</p> <h1>${code} </h1>`;
-              global.controller.sendText(syncString);
-            }
-          },
-        },
-        'Present',
-      ),
+  h(
+    'button.button.lock-screen-btn',
+    {
+      onclick: toggleLockScreen,
+    },
+    'Lock Screen',
+  ),
+]);
+
+const syncContent = h('div.sync-content', [
+  h('div.sync-code-label', 'Your unique sync code is:'),
+  h('div.sync-code-num', code),
+  syncItemFactory(
+    'Sangat Sync',
+    h('span', [
+      'Allow the Sangat to visit ',
+      h('strong', 'sttm.co/sync'),
+      ' to enter a code and view the Shabad being presented in real-time.',
     ]),
+    h(
+      'button.button.copy-code-btn',
+      {
+        onclick: () => {
+          if (code !== '...') {
+            const syncString = `<p>Visit <strong> sttm.co/sync </strong> on your mobile 
+            device and enter the code below to follow along</p> <h1>${code} </h1>`;
+            global.controller.sendText(syncString);
+          }
+        },
+      },
+      'Present Code to Sangat',
+    ),
+  ),
+  syncItemFactory(
+    'Bani Controller',
+    h('span', [
+      'Connect to SikhiToTheMax by visiting ',
+      h('strong', 'sttm.co/control'),
+      ' from a mobile device to search, navigate, and control the entire app.',
+    ]),
+    adminContent,
+  ),
+  h('div.connection-switch-container', [
+    h('p', 'Disable all the remote connections to SikhiToTheMax'),
+    switchFactory(
+      'connection-switch',
+      '',
+      'connection',
+      () => {
+        syncToggle();
+      },
+      false,
+    ),
   ]),
 ]);
 

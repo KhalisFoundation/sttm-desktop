@@ -1,17 +1,38 @@
 ## New Updates
 
-### 6.3.2 - _January 7, 2019_
+### 7.0 - _January 23, 2020_
+
+![](./assets/img/help_images/desktop-bani-controller.jpg)
+
+### Added:
+
+- Bani Controller is here! You can now control SikhiToTheMax from your mobile device! Just open the SikhiToTheMax website from your phone (or any other device), enter the sync code/PIN, and you're connected! Here are some cool things to try:
+
+  - Give multiple people the ability to control, so searching can be a team effort
+  - You don't need to be on the same WiFi network for Bani Controller to work (any internet connection will work), have a friend who is somewhere else in the world control your SikhiToTheMax
+  - Sitting on stage with the Raagi doing Keertan? Use Bani Controller in combination with Sangat Sync for the ultimate experience
+  - For a tutorial and full video on how to use this new feature visit [sttm.co/help](https://www.sttm.co/help)
 
 ### Improved:
 
-- Fixed a bug that was causing Chromecast not to work as expected 
-- Fixed a bug that was causing translations not to appear in Bani Overlay
+- Fixed an issue with live feed text files not working
+- Fixed an issue with the changelog getting stuck behind the app
 
 </br>
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
+
+<br/>  
+<details><summary>See previous updates...</summary>
+  
+### 6.3.2 - _January 7, 2020_
+
+### Improved:
+
+- Fixed a bug that was causing Chromecast not to work as expected 
+- Fixed a bug that was causing translations not to appear in Bani Overlay
 
 ### 6.3.1 - _December 27, 2019_
 
@@ -68,10 +89,7 @@
 * Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab!
   ![](./assets/img/help_images/desktop-550-theme.png)
 
-- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!
-
-<br/>  
-<details><summary>See previous updates...</summary>
+- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!  
   
 ### 5.3.4 - _September 18, 2019_
      

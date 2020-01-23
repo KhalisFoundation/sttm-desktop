@@ -192,8 +192,17 @@ function checkForExternalDisplay() {
   return false;
 }
 
+function showChangelog() {
+  const lastSeen = store.get('changelog-seen');
+  const lastSeenCount = store.get('changelog-seen-count');
+  const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
+
+  return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
+}
+
 function createViewer(ipcData) {
   const isExternal = checkForExternalDisplay();
+
   if (isExternal) {
     viewerWindow = new BrowserWindow({
       width: 800,
@@ -215,6 +224,9 @@ function createViewer(ipcData) {
         height,
       });
       mainWindow.focus();
+      if (showChangelog() && secondaryWindows.changelogWindow.obj) {
+        secondaryWindows.changelogWindow.obj.focus();
+      }
       viewerWindow.setFullScreen(true);
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
@@ -222,6 +234,9 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('enter-full-screen', () => {
       mainWindow.focus();
+      if (showChangelog() && secondaryWindows.changelogWindow.obj) {
+        secondaryWindows.changelogWindow.obj.focus();
+      }
     });
     viewerWindow.on('focus', () => {
       // mainWindow.focus();
@@ -241,6 +256,12 @@ function createViewer(ipcData) {
   mainWindow.webContents.send('presenter-view');
 }
 
+function writeFileCallback(err) {
+  if (err) {
+    throw err;
+  }
+}
+
 function createBroadcastFiles(arg) {
   const liveFeedLocation = store.get('userPrefs.app.live-feed-location');
   const userDataPath =
@@ -249,11 +270,12 @@ function createBroadcastFiles(arg) {
       : liveFeedLocation;
   const gurbaniFile = `${userDataPath}/sttm-Gurbani.txt`;
   const englishFile = `${userDataPath}/sttm-English.txt`;
+
   try {
-    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim());
-    fs.appendFile(gurbaniFile, '\n');
-    fs.writeFile(englishFile, arg.Line.English.trim());
-    fs.appendFile(englishFile, '\n');
+    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim(), writeFileCallback);
+    fs.appendFile(gurbaniFile, '\n', writeFileCallback);
+    fs.writeFile(englishFile, arg.Line.English.trim(), writeFileCallback);
+    fs.appendFile(englishFile, '\n', writeFileCallback);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err);
@@ -384,10 +406,8 @@ app.on('ready', () => {
     }
     // Show changelog if last version wasn't seen
     const lastSeen = store.get('changelog-seen');
-    const lastSeenCount = store.get('changelog-seen-count');
-    const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
 
-    if (lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog)) {
+    if (showChangelog()) {
       openSecondaryWindow('changelogWindow');
       if (lastSeen !== appVersion) {
         store.set('changelog-seen-count', 1);
