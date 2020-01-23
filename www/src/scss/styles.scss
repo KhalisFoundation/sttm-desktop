@@ -337,6 +337,22 @@ a {
     background-image: url('../../assets/img/icons/sunder_gutka.png');
   }
 
+  #tool-lock-screen {
+    display: none;
+  }
+
+  .lock-screen-message {
+    align-items: center;
+    display: flex;
+    font-size: 32px;
+    height: 100vh;
+    justify-content: center;
+    left: 40px;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+  }
+
   #tool-sync-button {
     background-position: center center;
     background-repeat: no-repeat;
@@ -420,8 +436,20 @@ a {
     }
 
     .large-text {
-      font-size: 32px;
-      padding: 12px 8px;
+      font-size: 28px;
+      padding: 12px 0;
+      position: relative;
+      width: 150px;
+
+      .hide-btn {
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        i {
+          font-size: 18px;
+          padding-left: 2px;
+        }
+      }
     }
   }
 }
