@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.0 - _January 22, 2020_
+### 7.0 - _January 23, 2020_
 
 ![](./assets/img/help_images/desktop-bani-controller.jpg)
 
@@ -11,6 +11,7 @@
   - Give multiple people the ability to control, so searching can be a team effort
   - You don't need to be on the same WiFi network for Bani Controller to work (any internet connection will work), have a friend who is somewhere else in the world control your SikhiToTheMax
   - Sitting on stage with the Raagi doing Keertan? Use Bani Controller in combination with Sangat Sync for the ultimate experience
+  - For a tutorial and full video on how to use this new feature visit [sttm.co/help](https://www.sttm.co/help)
 
 ### Improved:
 
