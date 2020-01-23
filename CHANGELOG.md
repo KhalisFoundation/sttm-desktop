@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.0 - _January 22, 2020_
+### 7.0 - _January 23, 2020_
 
 ![](./assets/img/help_images/desktop-bani-controller.jpg)
 
