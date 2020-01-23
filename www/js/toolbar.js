@@ -15,7 +15,7 @@ const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { updateCeremonyThemeTiles } = require('./theme_editor');
 
-const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button'];
+const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen'];
 const navLinks = require('./search');
 
 const nitnemBanis = [2, 4, 6, 9, 10, 20, 21, 23];
@@ -169,24 +169,37 @@ const syncToggle = async (forceConnect = false) => {
 
 const toggleAdminPin = () => {
   if (adminPinVisible) {
-    document.querySelector('.admin-pin').innerText = '';
-    document.querySelector('.hide-btn').innerText = 'Show PIN';
+    document.querySelector('.admin-pin').innerText = 'PIN:...';
+    document.querySelector('.hide-btn i').classList.replace('fa-eye', 'fa-eye-slash');
     adminPinVisible = false;
   } else {
     document.querySelector('.admin-pin').innerText = `PIN: ${adminPin}`;
-    document.querySelector('.hide-btn').innerText = 'Hide PIN';
+    document.querySelector('.hide-btn i').classList.replace('fa-eye-slash', 'fa-eye');
     adminPinVisible = true;
   }
 };
 
+const toggleLockScreen = () => {
+  toggleOverlayUI('lock-screen', true);
+};
+
 const adminContent = h('div', [
-  h('div.large-text.admin-pin', `PIN: ${adminPin}`),
+  h('div.large-text', [
+    h('span.admin-pin', `PIN: ${adminPin}`),
+    h(
+      'span.hide-btn',
+      {
+        onclick: toggleAdminPin,
+      },
+      h('i.fa.fa-eye'),
+    ),
+  ]),
   h(
-    'button.button.hide-btn',
+    'button.button.lock-screen-btn',
     {
-      onclick: toggleAdminPin,
+      onclick: toggleLockScreen,
     },
-    'Hide PIN',
+    'Lock Screen',
   ),
 ]);
 
