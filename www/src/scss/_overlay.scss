@@ -77,8 +77,10 @@
   }
   .copy-text {
     border: 1px dashed #000;
+    padding-right: 5px;
     .url {
       margin: 15px;
+      font-size: 20px;
     }
   }
 }
