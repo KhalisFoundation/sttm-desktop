@@ -14,6 +14,7 @@ let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
 const controlPanel = document.querySelector('.control-panel');
 const textControls = document.querySelector('.text-controls');
+const urlContainer = document.querySelector('.url-container');
 const webview = document.createElement('webview');
 
 const getUrl = () => {
@@ -167,19 +168,6 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
     ),
   );
 
-const copyURLButton = h(
-  'div.input-wrap',
-  {
-    title: `${url}`,
-    onclick: () => {
-      copy(url);
-      analytics.trackEvent('overlay', 'urlCopied', url);
-    },
-  },
-  h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
-  h('div.setting-label', 'Copy URL'),
-);
-
 const toggleLarivaar = h(
   'div.input-wrap',
   {
@@ -278,12 +266,29 @@ const toggleAnnouncements = h(
   h('div.setting-label', 'Announcement'),
 );
 
+const urlText = h(
+  'div.copy-text',
+  h('text.url', {
+    innerText: `${url}`,
+  }),
+);
+const copyURLButton = h(
+  'div.input-wrap',
+  {
+    title: `${url}`,
+    onclick: () => {
+      copy(url);
+      analytics.trackEvent('overlay', 'urlCopied', url);
+    },
+  },
+  h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
+  h('text.setting-label', 'Copy URL'),
+);
 /** Main Control Bar Items */
 controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
-controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
 
 /** Text Control Bar Items */
@@ -316,6 +321,8 @@ textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
 textControls.append(separatorY());
 textControls.append(controlsFactory([topLayoutBtn, bottomLayoutBtn, splitLayoutBtn], 'Layout'));
 
+urlContainer.append(urlText);
+urlContainer.append(copyURLButton);
 const themeSelector = document.querySelector('.theme-selector');
 
 const themeObjects = {

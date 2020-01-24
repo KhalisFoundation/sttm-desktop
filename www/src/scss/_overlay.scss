@@ -61,6 +61,27 @@
     width: auto;
   }
 }
+.url-container {
+  display: inline-flex;
+  margin-top: 1vh;
+  padding: 8px;
+
+  & > div {
+    display: inline-block;
+  }
+  .input-wrap {
+    align-items: center;
+    .setting-label {
+      padding-left: 5px;
+    }
+  }
+  .copy-text {
+    border: 1px dashed #000;
+    .url {
+      margin: 15px;
+    }
+  }
+}
 
 .toggle-text > .layout-btn,
 .toggle-text > .input-wrap {

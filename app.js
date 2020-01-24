@@ -105,7 +105,7 @@ function openSecondaryWindow(windowName) {
       }
     });
     window.obj.loadURL(window.url);
-
+    window.obj.openDevTools();
     window.obj.on('close', () => {
       window.obj = false;
       if (window.onClose) {
