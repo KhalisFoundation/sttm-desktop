@@ -282,7 +282,6 @@ const copyURLButton = h(
     },
   },
   h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
-  h('text.setting-label', 'Copy URL'),
 );
 /** Main Control Bar Items */
 controlPanel.append(toggleCast);
