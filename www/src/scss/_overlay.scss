@@ -68,6 +68,8 @@
 
   & > div {
     display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
   }
   .input-wrap {
     align-items: center;
@@ -77,7 +79,6 @@
   }
   .copy-text {
     border: 1px dashed #000;
-    padding-right: 5px;
     .url {
       margin: 15px;
       font-size: 20px;
