@@ -185,6 +185,12 @@ h2 {
   }
 }
 
+.larivaar.larivaar-assist {
+  .gurbani .larivaar span:nth-of-type(even) {
+    color: #c2951a;
+  }
+}
+
 .translation,
 .transliteration {
   font-weight: 700;

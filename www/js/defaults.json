@@ -60,6 +60,7 @@
         "disable-akhandpaatt": false,
         "akhandpaatt": false,
         "larivaar": false,
+        "larivaar-assist": false,
         "left-align": false,
         "quick-tools": true,
         "shortcut-tray-on": true
