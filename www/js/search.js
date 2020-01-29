@@ -537,7 +537,7 @@ module.exports = {
     if (searchQuery.length >= 1) {
       banidb
         .query(searchQuery, searchType, this.searchSource)
-        .then(rows => this.printResults(rows));
+        .then(rows => this.printResults(rows, searchType, searchQuery));
     } else {
       this.$results.innerHTML = '';
     }
@@ -545,13 +545,67 @@ module.exports = {
 
   akhandPaatt,
 
-  printResults(rows) {
+  /* Taken from https://github.com/KhalisFoundation/sttm-web/blob/dev/src/js/util/index.js
+   * Line no. 271
+   */
+
+  getHighlightIndices(baani, query, type) {
+    let start = -1;
+    let end = -1;
+
+    if (baani === null) {
+      return [start, end];
+    }
+
+    let baaniWords = baani.split(' ');
+
+    switch (type) {
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // eslint-disable-line no-fallthrough
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE:
+      default: {
+        // remove i from start of words
+        baaniWords = baaniWords.map(w => (w.startsWith('i') ? w.slice(1) : w));
+
+        start = baaniWords
+          .map(word => word[0])
+          .join('')
+          .indexOf(query);
+        end = start + query.length;
+        break;
+      }
+      case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: {
+        const q = query.split(' ');
+        start = baaniWords.indexOf(q[0]);
+        start = start === -1 ? baaniWords.findIndex(w => w.includes(q[0])) : start;
+        end = start + q.length;
+        break;
+      }
+    }
+
+    return [start, start === -1 ? 0 : end];
+  },
+
+  printResults(rows, searchType, searchQuery) {
     if (rows.length > 0) {
       document.getElementById('search-options').style.display = 'block';
       this.$results.innerHTML = '';
       rows.forEach(item => {
         const resultNode = [];
-        resultNode.push(h('span.gurmukhi', item.Gurmukhi));
+        // Highlighting search query
+        const gurmukhiHarfs = item.Gurmukhi.split(' ');
+        const [highlightStartIndex, highlightEndIndex] = this.getHighlightIndices(
+          item.Gurmukhi,
+          searchQuery,
+          searchType,
+        );
+        gurmukhiHarfs[
+          highlightStartIndex
+        ] = `<span class="highlight"> ${gurmukhiHarfs[highlightStartIndex]}`;
+        gurmukhiHarfs[highlightEndIndex] = `${gurmukhiHarfs[highlightEndIndex]} </span>`;
+        // Pushing the highlighted panktee to results
+        const gurmukhiElement = h('span.gurmukhi');
+        gurmukhiElement.innerHTML = gurmukhiHarfs.join(' ');
+        resultNode.push(gurmukhiElement);
         resultNode.push(h('span.transliteration.roman', item.Transliteration));
         resultNode.push(h('span.translation.english.roman', item.English));
         resultNode.push(

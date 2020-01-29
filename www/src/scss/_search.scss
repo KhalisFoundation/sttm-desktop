@@ -213,12 +213,16 @@ button {
     line-height: normal;
   }
 
-  .gurmukhi {
+  span.gurmukhi {
     display: block;
-    font-weight: bold;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    span.highlight {
+      display: inline;
+      font-weight: bold;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
+    }
   }
 
   .translation,
