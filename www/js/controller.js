@@ -532,7 +532,10 @@ module.exports = {
     if (Line.Translations) {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;
-      Line.Punjabi = lineTranslations.pu.ss;
+      Line.Punjabi = {
+        ss: lineTranslations.pu.ss,
+        ft: lineTranslations.pu.ft,
+      };
       Line.Spanish = lineTranslations.es.sn;
     }
     Line.Transliteration = {

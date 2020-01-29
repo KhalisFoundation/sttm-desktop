@@ -55,6 +55,13 @@
               "English": "English",
               "Devanagari": "Devanagari"
             }
+          },
+          "teeka-source": {
+            "title": "Teeka Source",
+            "options": {
+              "ss": "Sahib Singh",
+              "ft": "Faridkot Tika"
+            }
           }
         }
       },

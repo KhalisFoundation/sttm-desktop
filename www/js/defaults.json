@@ -51,7 +51,8 @@
       },
       "language-settings": {
         "translation-language": "English",
-        "transliteration-language": "English"
+        "transliteration-language": "English",
+        "teeka-source": "ss"
       },
       "autoplay-options": {
         "autoplayTimer": 10

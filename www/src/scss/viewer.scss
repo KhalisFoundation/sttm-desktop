@@ -230,6 +230,18 @@ h2 {
   opacity: 1;
 }
 
+.teeka {
+  .teeka-ss,
+  .teeka-ft {
+    display: none;
+  }
+}
+
+.language-settings-teeka-source-ss .teeka-ss,
+.language-settings-teeka-source-ft .teeka-ft {
+  display: block;
+}
+
 .icons-translation .size,
 .icons-transliteration .size,
 .icons-teeka .size {

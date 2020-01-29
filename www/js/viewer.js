@@ -334,11 +334,15 @@ const createCards = (rows, LineID) => {
       dnTransliteration,
     );
 
+    const ssTeeka = h('span.teeka-ss', row.Punjabi.ss || '');
+    const ftTeeka = h('span.teeka-ft', row.Punjabi.ft || '');
+    const teekaContainer = h('span', [ssTeeka, ftTeeka]);
+
     cards.push(
       h(`div#slide${row.ID}.slide${row.ID === LineID ? '.active' : ''}`, [
         h('h1.gurbani.gurmukhi', gurmukhiContainer),
         h('h2.translation', translationsContainer),
-        h('h2.teeka', row.Punjabi || ''),
+        h('h2.teeka', teekaContainer),
         h('h2.transliteration', transliterationsContainer || ''),
       ]),
     );
@@ -349,7 +353,10 @@ const createCards = (rows, LineID) => {
         Spanish: esText || '',
         English: row.English || '',
       },
-      teeka: row.Punjabi || '',
+      teeka: {
+        ss: row.Punjabi.ss || '',
+        ft: row.Punjabi.ft || '',
+      },
       transliteration: row.Transliteration || '',
     };
   });
