@@ -45,6 +45,12 @@
         );
       }
     }
+
+    &.larivaar.larivaar-assist {
+      .gurbani .larivaar span:nth-of-type(even) {
+        color: $visraam-yamki;
+      }
+    }
   }
 }
 
