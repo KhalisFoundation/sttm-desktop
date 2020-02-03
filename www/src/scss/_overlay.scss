@@ -62,15 +62,12 @@
   }
 }
 .url-container {
-  display: inline-block;
-  margin-top: 1vh;
-  padding: 8px;
+  margin-top: 9px;
 
   & > div {
     display: inline-block;
   }
   .input-wrap {
-    align-items: center;
     width: 50px;
     .setting-label {
       padding-left: 5px;
