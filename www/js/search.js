@@ -564,7 +564,9 @@ module.exports = {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE:
       default: {
         // remove i from start of words
-        baaniWords = baaniWords.map(w => (w.startsWith('i') ? w.slice(1) : w));
+        baaniWords = baaniWords.map(baaniWord =>
+          baaniWord.startsWith('i') ? baaniWord.slice(1) : baaniWord,
+        );
 
         start = baaniWords
           .map(word => word[0])
@@ -574,10 +576,15 @@ module.exports = {
         break;
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: {
-        const q = query.split(' ');
-        start = baaniWords.indexOf(q[0]);
-        start = start === -1 ? baaniWords.findIndex(w => w.includes(q[0])) : start;
-        end = start + q.length;
+        const queryParts = query.split(' ');
+        start = baaniWords.indexOf(queryParts[0]);
+        start =
+          start === -1
+            ? baaniWords.findIndex(baaniWord => baaniWord.includes(queryParts[0]))
+            : start;
+        end = start + queryParts.length;
+        // end should not be greater than number of items in array
+        end = end > baaniWords.length - 1 ? baaniWords.length : end;
         break;
       }
     }
