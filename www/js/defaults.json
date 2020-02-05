@@ -53,6 +53,9 @@
         "translation-language": "English",
         "transliteration-language": "English"
       },
+      "larivaar-settings": {
+        "assist-type": "single-color"
+      },
       "autoplay-options": {
         "autoplayTimer": 10
       },

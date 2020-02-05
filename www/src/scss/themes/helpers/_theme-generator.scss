@@ -46,9 +46,15 @@
       }
     }
 
-    &.larivaar.larivaar-assist {
+    &.larivaar.larivaar-assist.larivaar-settings-assist-type-single-color {
       .gurbani .larivaar span:nth-of-type(even) {
-        color: $visraam-yamki;
+        opacity: 0.75;
+      }
+    }
+
+    &.larivaar.larivaar-assist.larivaar-settings-assist-type-multi-color {
+      .gurbani .larivaar span:nth-of-type(even) {
+        color: $yamki;
       }
     }
   }

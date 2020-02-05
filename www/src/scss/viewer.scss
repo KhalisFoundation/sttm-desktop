@@ -1,15 +1,20 @@
 $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
 
-/* Toggle vishraam settings based on if vishraams are visible */
+/* Toggle vishraam settings and larivaar settings based on if vishraams/larivaar are visible */
 #settings {
   .block-list {
     overflow-y: hidden;
   }
 
   #setting-container-toolbar-vishraam-vishraam-options,
-  #setting-container-toolbar-vishraam-vishraam-source {
+  #setting-container-toolbar-vishraam-vishraam-source,
+  #setting-container-slide-layout-larivaar-settings-assist-type,
+  #setting-container-slide-layout-display-options-larivaar-assist {
     display: none;
+    & + .sub-label {
+      display: none;
+    }
   }
 }
 
@@ -17,6 +22,19 @@ $viewer-padding: 30px;
   #setting-container-toolbar-vishraam-vishraam-options,
   #setting-container-toolbar-vishraam-vishraam-source {
     display: flex;
+    & + .sub-label {
+      display: block;
+    }
+  }
+}
+
+.larivaar #settings {
+  #setting-container-slide-layout-display-options-larivaar-assist,
+  #setting-container-slide-layout-larivaar-settings-assist-type {
+    display: flex;
+    & + .sub-label {
+      display: block;
+    }
   }
 }
 
