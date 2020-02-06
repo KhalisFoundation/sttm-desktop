@@ -1,5 +1,20 @@
 ## New Updates
 
+### 7.1 - February 7, 2020_
+
+![](./assets/img/help_images/desktop-larivaar-highlight.jpg)
+
+### Improved:
+
+- The words you search for will now be highlighted to make it easier to find Shabads in the results
+- Larivaar now has an assist toggle with two different style options
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.0 - _January 23, 2020_
 
 ![](./assets/img/help_images/desktop-bani-controller.jpg)
@@ -17,12 +32,6 @@
 
 - Fixed an issue with live feed text files not working
 - Fixed an issue with the changelog getting stuck behind the app
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 <br/>  
 <details><summary>See previous updates...</summary>
