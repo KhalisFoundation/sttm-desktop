@@ -10,7 +10,7 @@
     /* If its on larivaar assist do not show vishraams
     If larivaar is off, but larivaar assist is on, then do show vishraams */
     &.larivaar-assist:not(.larivaar),
-    &.larivaar:not(.larivaar-assist) {
+    &:not(.larivaar-assist) {
       &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
         .gurbani {
         .visraam-main.visraam-#{$source} {
