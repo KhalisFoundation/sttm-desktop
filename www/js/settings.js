@@ -254,7 +254,7 @@ function createSettingsPage(userPrefs) {
             }
 
             switchList.appendChild(
-              h('li', [
+              h(`li.setting-container#setting-container-${catKey}-${settingKey}-${option}`, [
                 h('span', optionLabel),
                 h('div.switch', [
                   h(`input#${optionId}`, switchListAttrs),

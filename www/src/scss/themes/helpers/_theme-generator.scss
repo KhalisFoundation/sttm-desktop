@@ -7,42 +7,59 @@
   $visraam-sources: ('sttm', 'sttm2', 'igurbani');
 
   @each $source in $visraam-sources {
-    &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
-      .gurbani {
-      .visraam-main.visraam-#{$source} {
-        color: $visraam-main;
+    /* If its on larivaar assist do not show vishraams
+    If larivaar is off, but larivaar assist is on, then do show vishraams */
+    &.larivaar-assist:not(.larivaar),
+    &:not(.larivaar-assist) {
+      &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
+        .gurbani {
+        .visraam-main.visraam-#{$source} {
+          color: $visraam-main;
+        }
+
+        .visraam-yamki.visraam-#{$source} {
+          color: $visraam-yamki;
+        }
       }
 
-      .visraam-yamki.visraam-#{$source} {
-        color: $visraam-yamki;
+      &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
+        .gurbani {
+        span {
+          border-radius: 15px;
+        }
+
+        .padchhed .visraam-main.visraam-#{$source},
+        .padchhed .visraam-yamki.visraam-#{$source} {
+          padding-right: 5px;
+        }
+
+        .visraam-main.visraam-#{$source} {
+          background: linear-gradient(
+            to right,
+            rgba(229, 229, 229, 0) 20%,
+            rgba($visraam-main, 0.7) 100%
+          );
+        }
+
+        .visraam-yamki.visraam-#{$source} {
+          background: linear-gradient(
+            to right,
+            rgba(229, 229, 229, 0) 20%,
+            rgba($visraam-yamki, 0.7) 100%
+          );
+        }
       }
     }
 
-    &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
-      .gurbani {
-      span {
-        border-radius: 15px;
+    &.larivaar.larivaar-assist.larivaar-settings-assist-type-single-color {
+      .gurbani .larivaar span:nth-of-type(even) {
+        opacity: 0.75;
       }
+    }
 
-      .padchhed .visraam-main.visraam-#{$source},
-      .padchhed .visraam-yamki.visraam-#{$source} {
-        padding-right: 5px;
-      }
-
-      .visraam-main.visraam-#{$source} {
-        background: linear-gradient(
-          to right,
-          rgba(229, 229, 229, 0) 20%,
-          rgba($visraam-main, 0.7) 100%
-        );
-      }
-
-      .visraam-yamki.visraam-#{$source} {
-        background: linear-gradient(
-          to right,
-          rgba(229, 229, 229, 0) 20%,
-          rgba($visraam-yamki, 0.7) 100%
-        );
+    &.larivaar.larivaar-assist.larivaar-settings-assist-type-multi-color {
+      .gurbani .larivaar span:nth-of-type(even) {
+        color: $yamki;
       }
     }
   }
