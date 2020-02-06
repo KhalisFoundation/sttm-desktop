@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.1 - February 7, 2020_
+### 7.1 - _February 7, 2020_
 
 ![](./assets/img/help_images/desktop-larivaar-highlight.jpg)
 
