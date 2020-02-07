@@ -165,6 +165,9 @@
 
   .panktee.search-result .gurmukhi {
     color: $base-text;
+    .highlight {
+      color: $black;
+    }
   }
 
   .block-list {

@@ -76,7 +76,6 @@
             "label": "Akhand Paatth View (Beta)",
             "subLabel": "(Google ChromeCast Unavailable)"
           },
-          "larivaar": "Larivaar",
           "left-align": "Left-Align",
           "quick-tools": "Quick Tools",
           "shortcut-tray-on": "Shortcut Tray",
@@ -86,7 +85,24 @@
               "storepref": "userPrefs.app.live-feed-location"
             }
           },
-          "autoplay": "Auto Play"
+          "autoplay": "Auto Play",
+          "larivaar": "Larivaar",
+          "larivaar-assist": {
+            "label": "Larivaar Assist",
+            "subLabel": "(This will disable vishraams.)"
+          }
+        }
+      },
+      "larivaar-settings": {
+        "type": "dropdown",
+        "options": {
+          "assist-type": {
+            "title": "Assist Type",
+            "options": {
+              "single-color": "Single Color",
+              "multi-color": "Multi Color"
+            }
+          }
         }
       },
       "autoplay-options": {
