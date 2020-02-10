@@ -154,7 +154,6 @@ const syncToggle = async (forceConnect = false) => {
     onEnd(code);
     code = '...';
     adminPin = '...';
-    global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = code;
     document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
