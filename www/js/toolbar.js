@@ -33,9 +33,6 @@ const betaLabel = h('div.beta-label', 'BETA');
 
 // helper functions
 const toggleOverlayUI = (toolbarItem, show) => {
-  if (currentToolbarItem !== toolbarItem) {
-    toggleOverlayUI(currentToolbarItem, false);
-  }
   currentToolbarItem = toolbarItem;
   document.querySelectorAll('.base-ui').forEach(uiElement => {
     uiElement.classList.toggle('blur', show);
@@ -403,6 +400,9 @@ const printBanis = rows => {
 const toolbarItemFactory = toolbarItem =>
   h(`div.toolbar-item#tool-${toolbarItem}`, {
     onclick: () => {
+      if (currentToolbarItem) {
+        toggleOverlayUI(currentToolbarItem, false);
+      }
       const { databaseState } = global.core.search.$search.dataset;
       if (databaseState === 'loaded') {
         toggleOverlayUI(toolbarItem, true);
