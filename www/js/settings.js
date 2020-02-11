@@ -350,10 +350,10 @@ module.exports = {
 
     let newSize;
 
-    if (operation === 'plus' && existingSize < range.max) {
-      newSize = existingSize + range.step;
-    } else if (operation === 'minus' && existingSize > range.min) {
-      newSize = existingSize - range.step;
+    if (operation === 'plus') {
+      newSize = existingSize >= range.max ? range.max : existingSize + range.step;
+    } else if (operation === 'minus') {
+      newSize = existingSize <= range.min ? range.min : existingSize - range.step;
     }
     document.body.classList.add(`${iconType}-${newSize}`);
     store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
