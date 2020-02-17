@@ -7,7 +7,7 @@ const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore } = main;
 const analytics = remote.getGlobal('analytics');
-const shortcutFunctions = require('./shortcut-functions');
+const shortcutFunctions = require('./shortcuts/shortcut-functions');
 
 global.webview = document.querySelector('webview');
 

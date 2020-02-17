@@ -6,8 +6,8 @@ const shareSync = require('./share-sync');
 const settings = require('../js/settings');
 const shortcutTray = require('./shortcut_tray');
 const toolbar = require('./toolbar');
-const { applyShortcuts } = require('./shortcuts');
-const { updateInsertedSlide } = require('./shortcut-functions');
+const { applyShortcuts } = require('./shortcuts/shortcuts');
+const { updateInsertedSlide } = require('./shortcuts/shortcut-functions');
 
 /* const Settings = require('../../js/settings');
 const settings = new Settings(platform.store); */
