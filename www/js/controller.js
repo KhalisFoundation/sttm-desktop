@@ -7,6 +7,7 @@ const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore } = main;
 const analytics = remote.getGlobal('analytics');
+const shortcutFunctions = require('./shortcut-functions');
 
 global.webview = document.querySelector('webview');
 
@@ -498,6 +499,11 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
 global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(arg.PageNo, arg.SourceID);
 });
+
+global.platform.ipc.on('shortcuts', (event, arg) => {
+  shortcutFunctions[arg]();
+});
+
 global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
