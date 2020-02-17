@@ -1,7 +1,7 @@
 const electron = require('electron');
 
 const { remote } = electron;
-const main = remote.require('../app');
+const main = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 const search = require('../search');
