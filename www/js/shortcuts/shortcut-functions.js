@@ -1,13 +1,13 @@
 const electron = require('electron');
 
 const { remote } = electron;
-const main = remote.require('./app');
+const main = remote.require('../app');
 
 const analytics = remote.getGlobal('analytics');
-const search = require('./search');
-const strings = require('./strings');
-const dhanGuruModal = require('./insert-slide');
-const copy = require('./copy');
+const search = require('../search');
+const strings = require('.../strings');
+const dhanGuruModal = require('../insert-slide');
+const copy = require('../copy');
 
 /* NOTE:
  * All these functions are mapped to keys in shortcuts-map.json
