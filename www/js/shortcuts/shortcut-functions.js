@@ -5,7 +5,7 @@ const main = remote.require('../app');
 
 const analytics = remote.getGlobal('analytics');
 const search = require('../search');
-const strings = require('.../strings');
+const strings = require('../strings');
 const dhanGuruModal = require('../insert-slide');
 const copy = require('../copy');
 
