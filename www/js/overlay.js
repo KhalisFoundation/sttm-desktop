@@ -168,7 +168,7 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
   );
 
 const copyURLButton = h(
-  'div.input-wrap',
+  'span.input-wrap',
   {
     title: `${url}`,
     onclick: () => {
@@ -176,9 +176,16 @@ const copyURLButton = h(
       analytics.trackEvent('overlay', 'urlCopied', url);
     },
   },
-  h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
-  h('div.setting-label', 'Copy URL'),
+  h('span.export-btn', h('i.fa.fa-files-o.cp-icon')),
+  h('span.setting-label', 'Copy URL'),
 );
+
+const overlayUrl = () =>
+  h(
+    'div.url-container',
+    h('input', { type: 'text', readOnly: true, value: getUrl() }),
+    copyURLButton,
+  );
 
 const toggleLarivaar = h(
   'div.input-wrap',
@@ -283,7 +290,6 @@ controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
-controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
 
 /** Text Control Bar Items */
@@ -402,7 +408,9 @@ Object.keys(themeObjects).forEach(themeObject => {
 
 webview.src = `${url}?preview`;
 webview.className = 'preview';
-document.querySelector('.preview-container').prepend(webview);
+const preview = document.querySelector('.preview-container');
+preview.prepend(webview);
+preview.append(overlayUrl());
 
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
