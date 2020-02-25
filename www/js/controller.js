@@ -501,7 +501,7 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 });
 
 global.platform.ipc.on('shortcuts', (event, arg) => {
-  shortcutFunctions[arg]();
+  shortcutFunctions[arg](event);
 });
 
 global.platform.ipc.on('cast-session-active', () => {
