@@ -64,6 +64,16 @@
 
 .url-container {
   margin: 16px 8px;
+
+  input[type=text] {
+    background: #ebebeb;
+    border: 1px solid #ddd;
+    border-radius: 2rem;
+    color: #333;
+    margin: 0 10px;
+    padding: 10px;
+    text-align: center;
+  }
 }
 
 .toggle-text > .layout-btn,
