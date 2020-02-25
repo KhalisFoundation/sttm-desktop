@@ -35,7 +35,7 @@ function findLine(e) {
   }
 }
 
-applyShortcuts();
+applyShortcuts('non-viewer');
 
 const $shabadPage = document.getElementById('shabad-page');
 if ($shabadPage) {

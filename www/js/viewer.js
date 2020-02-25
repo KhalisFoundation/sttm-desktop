@@ -55,7 +55,7 @@ $scroll.addEventListener(
   },
 );
 
-shortcuts.applyShortcuts();
+shortcuts.applyShortcuts('viewer');
 
 const hideDecks = () => {
   Array.from(document.querySelectorAll('.deck')).forEach(el => {
