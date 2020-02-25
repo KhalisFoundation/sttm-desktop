@@ -88,7 +88,7 @@ const openFirstResult = () => {
   }
 };
 
-const spaceBar = e => {
+const homePanktee = e => {
   const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
   if (!isInsertedSlide) {
     const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
@@ -160,7 +160,7 @@ module.exports = {
   highlightLine,
   openFirstResult,
   updateInsertedSlide,
-  spaceBar,
+  homePanktee,
   showDhanGuruModal,
   copyPanktee,
 };

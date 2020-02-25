@@ -15,7 +15,7 @@ const slash = require('./js/slash');
 const core = require('./js/index');
 const themes = require('./js/themes.json');
 
-const shortcuts = require('./js/shortcuts/shortcuts');
+const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
 const analytics = remote.getGlobal('analytics');
 let prefs = store.get('userPrefs');

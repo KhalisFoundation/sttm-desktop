@@ -9,7 +9,7 @@
   "showDhanGuruModal": ["mod+g"],
   "prevLine": ["up", "left"],
   "nextLine": ["down", "right"],
-  "spaceBar": ["space"],
+  "homePanktee": ["space"],
   "copyPanktee": ["mod+c"],
   "openFirstResult": ["enter"]
 }
