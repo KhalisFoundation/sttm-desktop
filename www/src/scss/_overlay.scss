@@ -65,13 +65,15 @@
 .url-container {
   margin: 16px 8px;
 
-  input[type=text] {
+  input[type='text'] {
     background: #ebebeb;
     border: 1px solid #ddd;
     border-radius: 2rem;
     color: #333;
+    font-size: 12px;
     margin: 0 10px;
     padding: 10px;
+    width: 300px;
     text-align: center;
   }
 }
