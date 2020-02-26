@@ -88,7 +88,7 @@ const openFirstResult = () => {
   }
 };
 
-const homePanktee = e => {
+const homePanktee = () => {
   const currentLineId = search.$shabad.querySelector('a.panktee.current').dataset.lineId;
   if (!isInsertedSlide) {
     const mainLineID = search.$shabad.querySelector('a.panktee.main').dataset.lineId;
@@ -107,7 +107,7 @@ const homePanktee = e => {
   }
 };
 
-const prevLine = e => {
+const prevLine = () => {
   // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
   const $prevLine = $currentLine.previousElementSibling;
@@ -119,7 +119,7 @@ const prevLine = e => {
   }
 };
 
-const nextLine = e => {
+const nextLine = () => {
   // Find selector of current line in Shabad
   const $currentLine = search.$shabad.querySelector('a.panktee.current').parentNode;
   const $nextLine = $currentLine.nextElementSibling;
