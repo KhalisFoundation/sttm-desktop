@@ -100,7 +100,6 @@ const homePanktee = e => {
     }
 
     highlightLine(newLineId);
-    e.preventDefault();
   } else {
     highlightLine(currentLineId);
     document.getElementById('shabad-page').focus();
@@ -118,7 +117,6 @@ const prevLine = e => {
     $prevPanktee.click();
     maintainScroll($prevPanktee);
   }
-  e.preventDefault();
 };
 
 const nextLine = e => {
@@ -131,7 +129,6 @@ const nextLine = e => {
     $nextPanktee.click();
     maintainScroll($nextPanktee);
   }
-  e.preventDefault();
 };
 
 const showDhanGuruModal = () => {
