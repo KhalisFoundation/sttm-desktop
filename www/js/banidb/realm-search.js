@@ -98,7 +98,7 @@ const query = (searchQuery, searchType, searchSource) =>
         if (searchType === 2) {
           searchCol = 'Gurmukhi';
         } else {
-          searchCol = 'English';
+          searchCol = 'Translations';
           caseInsensitive = true;
         }
         const words = saniQuery

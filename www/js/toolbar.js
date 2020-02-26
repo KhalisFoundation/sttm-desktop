@@ -33,10 +33,11 @@ const betaLabel = h('div.beta-label', 'BETA');
 
 // helper functions
 const toggleOverlayUI = (toolbarItem, show) => {
-  if (currentToolbarItem !== toolbarItem) {
-    toggleOverlayUI(currentToolbarItem, false);
+  if (show) {
+    currentToolbarItem = toolbarItem;
+  } else {
+    currentToolbarItem = null;
   }
-  currentToolbarItem = toolbarItem;
   document.querySelectorAll('.base-ui').forEach(uiElement => {
     uiElement.classList.toggle('blur', show);
   });
@@ -154,7 +155,6 @@ const syncToggle = async (forceConnect = false) => {
     onEnd(code);
     code = '...';
     adminPin = '...';
-    global.controller.sendText('');
     document.querySelector('.sync-code-num').innerText = code;
     document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
@@ -403,26 +403,31 @@ const printBanis = rows => {
 const toolbarItemFactory = toolbarItem =>
   h(`div.toolbar-item#tool-${toolbarItem}`, {
     onclick: () => {
-      const { databaseState } = global.core.search.$search.dataset;
-      if (databaseState === 'loaded') {
-        toggleOverlayUI(toolbarItem, true);
-        if (!banisLoaded) {
-          banidb.loadBanis().then(rows => {
-            printBanis(rows);
-            banisLoaded = !!rows;
-          });
+      if (currentToolbarItem === toolbarItem) {
+        toggleOverlayUI(currentToolbarItem, false);
+      } else {
+        toggleOverlayUI(currentToolbarItem, false);
+        const { databaseState } = global.core.search.$search.dataset;
+        if (databaseState === 'loaded') {
+          toggleOverlayUI(toolbarItem, true);
+          if (!banisLoaded) {
+            banidb.loadBanis().then(rows => {
+              printBanis(rows);
+              banisLoaded = !!rows;
+            });
 
-          analytics.trackEvent('banisLoaded', true);
-        }
+            analytics.trackEvent('banisLoaded', true);
+          }
 
-        if (!ceremoniesLoaded) {
-          banidb.loadCeremonies().then(rows => {
-            printCeremonies(rows);
-            updateCeremonyThemeTiles();
-            ceremoniesLoaded = !!rows;
-          });
+          if (!ceremoniesLoaded) {
+            banidb.loadCeremonies().then(rows => {
+              printCeremonies(rows);
+              updateCeremonyThemeTiles();
+              ceremoniesLoaded = !!rows;
+            });
 
-          analytics.trackEvent('ceremoniesLoaded', true);
+            analytics.trackEvent('ceremoniesLoaded', true);
+          }
         }
       }
     },
