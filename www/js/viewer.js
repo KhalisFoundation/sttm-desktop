@@ -5,6 +5,7 @@
   no-use-before-define: 0,
   no-undef: 0
 */
+
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -13,6 +14,8 @@ const { store } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const themes = require('./js/themes.json');
+
+const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
 const analytics = remote.getGlobal('analytics');
 let prefs = store.get('userPrefs');
@@ -51,6 +54,8 @@ $scroll.addEventListener(
     passive: true,
   },
 );
+
+shortcuts.applyShortcuts('viewer');
 
 const hideDecks = () => {
   Array.from(document.querySelectorAll('.deck')).forEach(el => {
