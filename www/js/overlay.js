@@ -176,8 +176,7 @@ const copyURLButton = h(
       analytics.trackEvent('overlay', 'urlCopied', url);
     },
   },
-  h('span.export-btn', h('i.fa.fa-files-o.cp-icon')),
-  h('span.setting-label', 'Copy URL'),
+  h('span.export-btn', { title: 'Copy URL' }, h('i.fa.fa-files-o.cp-icon')),
 );
 
 const overlayUrl = () =>
