@@ -180,6 +180,7 @@ const toggleAdminPin = () => {
 };
 
 const toggleLockScreen = () => {
+  toggleOverlayUI(currentToolbarItem, false);
   toggleOverlayUI('lock-screen', true);
 };
 
