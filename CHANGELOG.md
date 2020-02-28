@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.1.1 - _February 14, 2020_
+### 7.1.1 - _February 28, 2020_
 
 ### Improved:
 
