@@ -1,5 +1,19 @@
 ## New Updates
 
+### 7.1.1 - _February 28, 2020_
+
+### Improved:
+
+- Fixed a bug that was causing English search not to work
+- Fixed a bug that was causing keyboard shortcuts not to work all the time
+- Various other bug fixes across the app
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.1 - _February 7, 2020_
 
 ![](./assets/img/help_images/desktop-larivaar-highlight.jpg)
@@ -8,12 +22,6 @@
 
 - The words you search for will now be highlighted to make it easier to find Shabads in the results
 - Larivaar now has an assist toggle with two different style options
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.0 - _January 23, 2020_
 
