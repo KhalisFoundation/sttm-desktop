@@ -501,7 +501,8 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 });
 
 global.platform.ipc.on('shortcuts', (event, arg) => {
-  shortcutFunctions[arg.actionName](arg.event);
+  console.log(arg, 'arg inside controller');
+  shortcutFunctions[arg.actionName](arg.keyEvent);
 });
 
 global.platform.ipc.on('cast-session-active', () => {

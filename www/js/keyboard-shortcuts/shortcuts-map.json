@@ -11,5 +11,6 @@
   "nextLine": ["down", "right"],
   "homePanktee": ["space"],
   "copyPanktee": ["mod+c"],
-  "openFirstResult": ["enter"]
+  "openFirstResult": ["enter"],
+  "findLine": ["*"]
 }

@@ -14,8 +14,8 @@ const settings = new Settings(platform.store); */
 
 // is the current slide of the shabad (= false) or an inserted slide (= true)
 function findLine(e) {
-  e.preventDefault();
   const filterKey = e.key;
+  console.log(filterKey, e, 'is event');
 
   // Find position of current line in shabad
   const pos = search.currentShabad.indexOf(search.currentLine);
@@ -37,10 +37,10 @@ function findLine(e) {
 
 applyShortcuts('non-viewer');
 
-const $shabadPage = document.getElementById('shabad-page');
+/*const $shabadPage = document.getElementById('shabad-page');
 if ($shabadPage) {
   $shabadPage.addEventListener('keypress', findLine);
-}
+}*/
 
 /**
  * Check if the platform has a method and call if it is does
@@ -68,6 +68,7 @@ module.exports = {
   shareSync,
   platformMethod,
   toolbar,
+  findLine,
   themeEditor,
   updateInsertedSlide,
   shortcutTray,

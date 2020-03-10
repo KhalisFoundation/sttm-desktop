@@ -7,10 +7,31 @@ const shortcutsApplied = {
 };
 
 const shortcutFactory = (keys, actionName) => {
-  Mousetrap.bindGlobal(keys, event => {
-    global.platform.ipc.send('shortcuts', { actionName, event });
-    event.preventDefault();
-  });
+  if (actionName === 'findLine') {
+    const $shabadPage = document.getElementById('shabad-page');
+    const $viewer = document.querySelector('.viewer');
+    const findLineMiddleware = e => {
+      e.preventDefault();
+      const shortObj = { actionName: 'findLine', keyEvent: e };
+      global.platform.ipc.send('shortcuts', shortObj);
+    };
+
+    if ($shabadPage) {
+      $shabadPage.addEventListener('keypress', event => {
+        findLineMiddleware(event);
+      });
+    }
+    if ($viewer) {
+      $viewer.addEventListener('keypress', event => {
+        findLineMiddleware(event);
+      });
+    }
+  } else {
+    Mousetrap.bind(keys, event => {
+      global.platform.ipc.send('shortcuts', { actionName, keyEvent: event });
+      event.preventDefault();
+    });
+  }
 };
 
 const applyShortcuts = source => {

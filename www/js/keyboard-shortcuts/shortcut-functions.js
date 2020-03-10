@@ -143,6 +143,10 @@ const copyPanktee = () => {
   }
 };
 
+const findLine = event => {
+  global.core.findLine(event);
+};
+
 module.exports = {
   waheguru,
   empty,
@@ -160,4 +164,5 @@ module.exports = {
   homePanktee,
   showDhanGuruModal,
   copyPanktee,
+  findLine,
 };
