@@ -37,10 +37,10 @@ function findLine(e) {
 
 applyShortcuts('non-viewer');
 
-/*const $shabadPage = document.getElementById('shabad-page');
+/* const $shabadPage = document.getElementById('shabad-page');
 if ($shabadPage) {
   $shabadPage.addEventListener('keypress', findLine);
-}*/
+} */
 
 /**
  * Check if the platform has a method and call if it is does

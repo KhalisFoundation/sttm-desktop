@@ -501,7 +501,7 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 });
 
 global.platform.ipc.on('shortcuts', (event, arg) => {
-  console.log(arg, 'arg inside controller');
+  // console.log(arg, 'arg inside controller');
   shortcutFunctions[arg.actionName](arg.keyEvent);
 });
 
