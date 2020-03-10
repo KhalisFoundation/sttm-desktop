@@ -582,7 +582,7 @@ module.exports = {
           start === -1
             ? baaniWords.findIndex(baaniWord => baaniWord.includes(queryParts[0]))
             : start;
-        end = start + queryParts.length;
+        end = start + (queryParts.length - 1);
         // end should not be greater than number of items in array
         end = end > baaniWords.length - 1 ? baaniWords.length : end;
         break;
