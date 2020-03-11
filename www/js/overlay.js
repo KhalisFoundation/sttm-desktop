@@ -182,7 +182,7 @@ const copyURLButton = h(
 const overlayUrl = () =>
   h(
     'div.url-container',
-    h('input', { type: 'text', readOnly: true, value: getUrl() }),
+    h('input.url-text', { type: 'text', readOnly: true, value: `${overlayCast ? getUrl() : ''}` }),
     copyURLButton,
   );
 
@@ -228,8 +228,12 @@ const toggleCast = h(
       $castLabel.innerText = `${overlayCast ? 'Overlay On' : 'Overlay Off'}`;
       analytics.trackEvent('overlay', 'toggleCast', overlayCast);
 
+      const $copyURLText = document.querySelector('.url-text');
+
       url = getUrl();
       webview.src = `${url}?preview`;
+      console.log(overlayCast);
+      $copyURLText.value = overlayCast ? url : '';
     },
   },
   h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
