@@ -232,7 +232,6 @@ const toggleCast = h(
 
       url = getUrl();
       webview.src = `${url}?preview`;
-      console.log(overlayCast);
       $copyURLText.value = overlayCast ? url : '';
     },
   },
