@@ -168,7 +168,7 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
   );
 
 const copyURLButton = h(
-  'div.input-wrap',
+  'span.input-wrap',
   {
     title: `${url}`,
     onclick: () => {
@@ -176,9 +176,15 @@ const copyURLButton = h(
       analytics.trackEvent('overlay', 'urlCopied', url);
     },
   },
-  h('div.export-btn', h('i.fa.fa-files-o.cp-icon')),
-  h('div.setting-label', 'Copy URL'),
+  h('span.export-btn', { title: 'Copy URL' }, h('i.fa.fa-files-o.cp-icon')),
 );
+
+const overlayUrl = () =>
+  h(
+    'div.url-container',
+    h('input.url-text', { type: 'text', readOnly: true, value: `${overlayCast ? getUrl() : ''}` }),
+    copyURLButton,
+  );
 
 const toggleLarivaar = h(
   'div.input-wrap',
@@ -222,8 +228,11 @@ const toggleCast = h(
       $castLabel.innerText = `${overlayCast ? 'Overlay On' : 'Overlay Off'}`;
       analytics.trackEvent('overlay', 'toggleCast', overlayCast);
 
+      const $copyURLText = document.querySelector('.url-text');
+
       url = getUrl();
       webview.src = `${url}?preview`;
+      $copyURLText.value = overlayCast ? url : '';
     },
   },
   h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
@@ -283,7 +292,6 @@ controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
-controlPanel.append(copyURLButton);
 controlPanel.append(toggleLarivaar);
 
 /** Text Control Bar Items */
@@ -402,7 +410,9 @@ Object.keys(themeObjects).forEach(themeObject => {
 
 webview.src = `${url}?preview`;
 webview.className = 'preview';
-document.querySelector('.preview-container').prepend(webview);
+const preview = document.querySelector('.preview-container');
+preview.prepend(webview);
+preview.append(overlayUrl());
 
 // Migrate older preferences
 if (!overlayVars.padding || overlayVars.fontSize > 14 || overlayVars.gurbaniFontSize > 15) {
