@@ -94,7 +94,6 @@ function openSecondaryWindow(windowName) {
       height: 768,
       show: false,
     });
-    window.obj.webContents.openDevTools();
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();
