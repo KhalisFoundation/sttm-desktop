@@ -132,12 +132,18 @@ const layoutButtonFactory = layoutName =>
     h('div.layout-bar.layout-bar-2'),
     h('div.layout-bar.layout-bar-3'),
     h('div.layout-bar.layout-bar-4'),
+    h('div.layout-vertical-bar'),
+    h('div.layout-classic-bar'),
     {
       onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
           bar.setAttribute('style', 'transform:none');
         });
+        const prevLayout = overlayVars.layout;
         overlayVars.layout = layoutName;
+        if (layoutName === 'vertical' && prevLayout === 'vertical') {
+          overlayVars.layout = 'vertical-left';
+        }
         savePrefs();
         analytics.trackEvent('overlay', 'layout', layoutName);
       },
@@ -290,6 +296,8 @@ controlPanel.append(toggleLarivaar);
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
+const verticalLayoutBtn = layoutButtonFactory('vertical');
+const classicLayoutBtn = layoutButtonFactory('classic');
 const gurbaniColor = colorInputFactory(
   'toggle-text',
   overlayVars.gurbaniTextColor,
@@ -314,7 +322,12 @@ textControls.append(separatorY());
 textControls.append(controlsFactory(changeBarSizeButton, 'Size'));
 textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
 textControls.append(separatorY());
-textControls.append(controlsFactory([topLayoutBtn, bottomLayoutBtn, splitLayoutBtn], 'Layout'));
+textControls.append(
+  controlsFactory(
+    [topLayoutBtn, bottomLayoutBtn, splitLayoutBtn, verticalLayoutBtn, classicLayoutBtn],
+    'Layout',
+  ),
+);
 
 const themeSelector = document.querySelector('.theme-selector');
 

@@ -48,8 +48,7 @@ body {
   color: rgba(241, 196, 15, 1);
   left: 0;
   margin: auto;
-  padding-left: 3vw;
-  padding-right: 3vw;
+  padding: 0 3vw;
   position: relative;
   text-align: center;
   width: 100%;
@@ -84,6 +83,11 @@ body {
     padding-top: 3vh;
   }
 
+  .o-gurbani,
+  .o-translation {
+    padding: 0.5% 3vw;
+  }
+
   .logo-wrapper {
     bottom: 2vh;
   }
@@ -99,8 +103,96 @@ body {
     padding-bottom: 3vh;
   }
 
+  .o-gurbani,
+  .o-translation {
+    padding: 0.5% 3vw;
+  }
+
   .logo-wrapper {
     top: 2vh;
+  }
+}
+
+.layout-classic {
+  .overlay-wrapper {
+    background: transparent;
+    bottom: 10%;
+    left: 5%;
+    position: absolute;
+    width: 90%;
+  }
+  .content-bar {
+    background: transparent;
+    padding: 0;
+    width: auto;
+  }
+  .logo-wrapper {
+    border-radius: 2px;
+    top: 2vh;
+  }
+
+  .o-gurbani,
+  .o-translation {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    display: inline-table;
+    margin: 0;
+    padding: 5px;
+  }
+
+  .o-teeka,
+  .o-transliteration {
+    display: none;
+  }
+}
+
+.layout-vertical {
+  .overlay-wrapper {
+    background-color: rgba(44, 62, 80, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-evenly;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 50%;
+  }
+
+  .content-top,
+  .content-bottom {
+    display: flex;
+    flex-direction: column;
+    height: 45vh;
+    justify-content: space-evenly;
+  }
+
+  .logo-wrapper {
+    background: transparent;
+    display: block;
+    height: 100px;
+    position: relative;
+    width: 100%;
+    .sttm-logo {
+      display: none;
+    }
+    .sttm-logo-white {
+      display: block;
+      margin: auto;
+    }
+  }
+
+  .o-teeka,
+  .o-transliteration {
+    display: block;
+  }
+}
+
+.layout-vertical-left {
+  @extend .layout-vertical;
+
+  .overlay-wrapper {
+    left: 0;
   }
 }
 
@@ -128,6 +220,10 @@ body {
   .o-teeka,
   .o-transliteration {
     display: block;
+  }
+
+  .content-bar {
+    padding: 0.5% 3vw;
   }
 
   .logo-wrapper {
@@ -258,8 +354,13 @@ body {
   position: fixed;
   right: 2vh;
 
-  .sttm-logo {
+  .sttm-logo,
+  .sttm-logo-white {
     width: 12vw;
+  }
+
+  .sttm-logo-white {
+    display: none;
   }
 }
 

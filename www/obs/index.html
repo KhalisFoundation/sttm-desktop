@@ -12,9 +12,7 @@
         Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
         English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
         Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
-        Transliteration: {
-          English: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
-        },
+        Transliteration: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
         Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
       };
       var socket = io();
@@ -41,6 +39,7 @@
           transliteration = Line.Transliteration[languageSettings.transliteration] || '';
         } else {
           translation = Line.English || '';
+          transliteration = Line.Transliteration || '';
         }
 
         document.querySelector('.o-translation').innerHTML = translation;
@@ -55,8 +54,6 @@
         document.querySelectorAll('.content-bar').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
-          el.style.paddingTop = `${overlayPrefs.overlayVars.padding}%`;
-          el.style.paddingBottom = `${overlayPrefs.overlayVars.padding}%`;
         });
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
@@ -71,11 +68,35 @@
         document.querySelector('.o-gurbani').style.color =
           overlayPrefs.overlayVars.gurbaniTextColor;
 
-        document.body.classList.remove('layout-top', 'layout-bottom', 'layout-split');
+        document.body.classList.remove(
+          'layout-top',
+          'layout-bottom',
+          'layout-split',
+          'layout-classic',
+          'layout-vertical',
+          'layout-vertical-left',
+        );
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
         document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
+
+        const overrideTheme = function(selector) {
+          const $layoutBody = document.querySelector(selector);
+          if ($layoutBody) {
+            $layoutBody
+              .querySelectorAll('.content-top, .content-bottom, .content-bar')
+              .forEach(el => {
+                el.style.backgroundColor = 'transparent';
+                el.style.color = '#fff';
+                document.querySelector('.o-gurbani').style.color = '#fff';
+              });
+          }
+        };
+
+        overrideTheme('.layout-classic');
+        overrideTheme('.layout-vertical');
+        overrideTheme('.layout-vertical-left');
 
         const $gurbani = document.querySelector('.o-gurbani');
         if (overlayPrefs.overlayVars.overlayLarivaar) {
@@ -101,16 +122,17 @@
   <body class="layout-bottom bani-overlay-page">
     <section class="overlay-wrapper">
       <div class="content-top">
-        <div class="content-bar gurmukhi o-gurbani"></div>
-        <div class="content-bar o-teeka"></div>
+        <div class="content-bar "><span class="gurmukhi o-gurbani"> </span></div>
+        <div class="content-bar"><span class=" o-teeka"> </span></div>
       </div>
       <div class="content-bars-bottom">
         <div class="content-bottom">
-          <div class="content-bar o-transliteration"></div>
-          <div class="content-bar o-translation"></div>
+          <div class="content-bar"><span class="o-transliteration"> </span></div>
+          <div class="content-bar"><span class="o-translation"> </span></div>
         </div>
         <div class="logo-wrapper">
           <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
+          <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
         </div>
       </div>
     </section>
