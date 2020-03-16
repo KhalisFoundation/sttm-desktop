@@ -5,7 +5,7 @@
 ### Improved:
 
 - Made the Bani Overlay URL easier to find
-- Fixed a bug that was causing annoucements not to work properly
+- Fixed a bug that was causing announcements not to work properly
 - Fixed a bug that was showing undefined search results
 - Fixed a bug that was causing Punjabi Teeka not to appear
 
