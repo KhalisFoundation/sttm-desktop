@@ -198,6 +198,11 @@ const resetButton = h(
   'div.input-wrap',
   {
     onclick: () => {
+      console.log(
+        overlayVars.textColor,
+        overlayVars.gurbaniTextColor,
+        document.querySelector('input.toggle-gurbani-text').value,
+      );
       const { overlayVars: defaultVars } = defaultPrefs.overlayPrefs;
       Object.assign(overlayVars, defaultVars);
       savePrefs();
@@ -205,6 +210,10 @@ const resetButton = h(
       const { overlayLogo, overlayLarivaar } = overlayVars;
       const $logoEl = document.querySelector('div.input-wrap.logo-toggle');
       const $larivaarEl = document.querySelector('div.input-wrap.larivaar');
+
+      document.querySelector('input.toggle-gurbani-text').value = overlayVars.textColor;
+      document.querySelector('input.toggle-text').value = overlayVars.gurbaniTextColor;
+      document.querySelector('input.background').value = overlayVars.bgColor;
 
       setToggleIcon($logoEl, overlayLogo);
       setToggleIcon($larivaarEl, overlayLarivaar, ['fa-link', 'fa-unlink']);
@@ -322,7 +331,7 @@ const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
 const gurbaniColor = colorInputFactory(
-  'toggle-text',
+  'toggle-gurbani-text',
   overlayVars.gurbaniTextColor,
   changeGurbaniColor,
 );
