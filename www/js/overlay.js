@@ -198,11 +198,6 @@ const resetButton = h(
   'div.input-wrap',
   {
     onclick: () => {
-      console.log(
-        overlayVars.textColor,
-        overlayVars.gurbaniTextColor,
-        document.querySelector('input.toggle-gurbani-text').value,
-      );
       const { overlayVars: defaultVars } = defaultPrefs.overlayPrefs;
       Object.assign(overlayVars, defaultVars);
       savePrefs();
