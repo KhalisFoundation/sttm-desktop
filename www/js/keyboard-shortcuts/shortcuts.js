@@ -7,7 +7,7 @@ const shortcutsApplied = {
 };
 
 const shortcutFactory = (keys, actionName) => {
-  Mousetrap.bindGlobal(keys, event => {
+  Mousetrap.bind(keys, event => {
     global.platform.ipc.send('shortcuts', { actionName, event });
     event.preventDefault();
   });

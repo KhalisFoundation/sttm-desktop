@@ -1,5 +1,20 @@
 ## New Updates
 
+### 7.2 - _March 16, 2020_
+
+### Improved:
+
+- Made the Bani Overlay URL easier to find
+- Fixed a bug that was causing announcements not to work properly
+- Fixed a bug that was showing undefined search results
+- Fixed a bug that was causing Punjabi Teeka not to appear
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.1.1 - _February 28, 2020_
 
 ### Improved:
@@ -7,12 +22,6 @@
 - Fixed a bug that was causing English search not to work
 - Fixed a bug that was causing keyboard shortcuts not to work all the time
 - Various other bug fixes across the app
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.1 - _February 7, 2020_
 

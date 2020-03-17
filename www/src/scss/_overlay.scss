@@ -62,6 +62,22 @@
   }
 }
 
+.url-container {
+  margin: 16px 8px;
+
+  input[type='text'] {
+    background: #ebebeb;
+    border: 1px solid #ddd;
+    border-radius: 32px;
+    color: #333;
+    font-size: 12px;
+    margin: 0 10px;
+    padding: 10px;
+    text-align: center;
+    width: 300px;
+  }
+}
+
 .toggle-text > .layout-btn,
 .toggle-text > .input-wrap {
   display: inline-block;
@@ -202,7 +218,7 @@ input[type='color'] {
     pointer-events: none;
   }
 
-  input.color-input,
+  input,
   .export-btn,
   .layout-btn,
   .overlay-theme-swatch,
