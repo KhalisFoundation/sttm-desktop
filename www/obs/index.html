@@ -10,7 +10,7 @@
     <script>
       var previewData = {
         Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
-        English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
+        English: '',
         Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
         Transliteration: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
         Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
@@ -52,7 +52,7 @@
       };
 
       var applyOverlayPrefs = function() {
-        document.querySelectorAll('.content-bar').forEach(el => {
+        document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
@@ -97,14 +97,39 @@
         overrideTheme('.layout-vertical');
         overrideTheme('.layout-vertical-left');*/
 
+        document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
+          document.querySelector('span.o-gurbani').style.backgroundColor = `transparent`;
+          document.querySelector('span.o-translation').style.backgroundColor = `transparent`;
+          el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
+            overlayPrefs.overlayVars.bgOpacity
+          })`;
+          document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
+        });
+
         document
           .querySelectorAll(
-            '.content-top, .content-bottom, .layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
+            '.layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
           )
           .forEach(el => {
+            document.querySelectorAll('.content-top, .content-bottom').forEach(content => {
+              content.style.backgroundColor = 'transparent';
+            });
             el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
               overlayPrefs.overlayVars.bgOpacity
             })`;
+          });
+
+        document
+          .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
+          .forEach(el => {
+            el.style.backgroundColor = 'transparent';
+            document.querySelector('span.o-gurbani').style.backgroundColor = `rgba(${hexToRgb(
+              overlayPrefs.overlayVars.bgColor,
+            )}, ${overlayPrefs.overlayVars.bgOpacity})`;
+            document.querySelector('span.o-translation').style.backgroundColor = `rgba(${hexToRgb(
+              overlayPrefs.overlayVars.bgColor,
+            )}, ${overlayPrefs.overlayVars.bgOpacity})`;
+            document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           });
 
         const $gurbani = document.querySelector('.o-gurbani');
