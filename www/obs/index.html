@@ -80,32 +80,19 @@
 
         document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
 
-        /* const overrideTheme = function(selector) {
-          const $layoutBody = document.querySelector(selector);
-          if ($layoutBody) {
-            $layoutBody
-              .querySelectorAll('.content-top, .content-bottom, .content-bar')
-              .forEach(el => {
-                el.style.backgroundColor = 'transparent';
-                el.style.color = '#fff';
-                document.querySelector('.o-gurbani').style.color = '#fff';
-              });
-          }
-        };
-
-        overrideTheme('.layout-classic');
-        overrideTheme('.layout-vertical');
-        overrideTheme('.layout-vertical-left');*/
-
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
-          document.querySelector('span.o-gurbani').style.backgroundColor = `transparent`;
-          document.querySelector('span.o-translation').style.backgroundColor = `transparent`;
+          // Clear styles added by other overrides
+          document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
+            spaneEl.style.backgroundColor = 'transparent';
+          });
+          document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
+          // Apply the background color from theme
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
             overlayPrefs.overlayVars.bgOpacity
           })`;
-          document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
         });
 
+        // Special style overrides for vertical layout
         document
           .querySelectorAll(
             '.layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
@@ -119,16 +106,17 @@
             })`;
           });
 
+        // Special style overrides for classic layout
         document
           .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
           .forEach(el => {
             el.style.backgroundColor = 'transparent';
-            document.querySelector('span.o-gurbani').style.backgroundColor = `rgba(${hexToRgb(
-              overlayPrefs.overlayVars.bgColor,
-            )}, ${overlayPrefs.overlayVars.bgOpacity})`;
-            document.querySelector('span.o-translation').style.backgroundColor = `rgba(${hexToRgb(
-              overlayPrefs.overlayVars.bgColor,
-            )}, ${overlayPrefs.overlayVars.bgOpacity})`;
+            const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
+              overlayPrefs.overlayVars.bgOpacity
+            })`;
+            document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
+              spaneEl.style.backgroundColor = overlayBgColor;
+            });
             document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           });
 
