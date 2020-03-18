@@ -142,9 +142,7 @@ const layoutButtonFactory = layoutName =>
         const prevLayout = overlayVars.layout;
         overlayVars.layout = layoutName;
         if (layoutName === 'vertical') {
-          if (prevLayout === 'vertical') {
-            overlayVars.layout = 'vertical-left';
-          }
+          overlayVars.layout = prevLayout === 'vertical' ? 'vertical-left' : 'vertical';
           document
             .querySelector('.layout-btn.vertical')
             .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
