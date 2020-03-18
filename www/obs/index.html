@@ -9,11 +9,32 @@
 
     <script>
       var previewData = {
+        English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
         Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
-        English: '',
+        PageNo: 589,
         Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
-        Transliteration: 'kirapaa kare je aapanee taa har rakhaa aur dhaar ||1||',
+        Raag: {
+          RaagEnglish: 'Raag Vadhans',
+          RaagGurmukhi: 'rwgu vfhMsu',
+          RaagWithPage: 'Vadhans (557-594)',
+        },
+        Source: {
+          SourceEnglish: 'Sri Guru Granth Sahib Ji',
+          SourceGurmukhi: 'sRI gurU gRMQ swihb jI',
+        },
         Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
+        Translations:
+          '{"en":{"bdb":"If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||"},"pu":{"ss":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[","ft":"jy hrI ApnI ikRpw kry qW mYN iqs hir ky nwm ko aur myN Dwrn kr rKW]1]","bdb":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1["},"puu":{"ss":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।","ft":"ਜੇ ਹਰੀ ਅਪਨੀ ਕ੍ਰਿਪਾ ਕਰੇ ਤਾਂ ਮੈਂ ਤਿਸ ਹਰਿ ਕੇ ਨਾਮ ਕੋ ਉਰ ਮੇਂ ਧਾਰਨ ਕਰ ਰਖਾਂ॥੧॥","bdb":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।"},"es":{"sn":"Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)"}}',
+        Transliteration: {
+          Devanagari: 'कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥',
+          English: 'kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||',
+          Shahmukhi: 'کِ®پا کرے جے آپنی تا هر رکھا اُر دھار ۔۔۱۔۔',
+        },
+        Visraam: '{"sttm": [], "igurbani": [], "sttm2": [{"p": 3, "t": "v"}]}',
+        Writer: {
+          WriterEnglish: 'Guru Amar Daas Ji',
+          WriterGurmukhi: 'mÚ 3',
+        },
       };
       var socket = io();
       var preview = document.location.href.indexOf('preview') > -1;
@@ -40,7 +61,7 @@
           transliteration = Line.Transliteration[languageSettings.transliteration] || '';
         } else {
           translation = Line.English || '';
-          transliteration = Line.Transliteration || '';
+          transliteration = Line.Transliteration['English'] || '';
         }
 
         document.querySelector('.o-translation').innerHTML = translation;
