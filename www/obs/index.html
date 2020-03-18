@@ -34,6 +34,7 @@
           : Line.Gurmukhi || '';
 
         let translation = '';
+        let transliteration = '';
         if (languageSettings) {
           translation = Line[languageSettings.translation] || '';
           transliteration = Line.Transliteration[languageSettings.transliteration] || '';
@@ -54,8 +55,6 @@
         document.querySelectorAll('.content-bar').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
-        });
-        document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
             overlayPrefs.overlayVars.bgOpacity
           })`;
@@ -81,7 +80,7 @@
 
         document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
 
-        const overrideTheme = function(selector) {
+        /* const overrideTheme = function(selector) {
           const $layoutBody = document.querySelector(selector);
           if ($layoutBody) {
             $layoutBody
@@ -96,7 +95,17 @@
 
         overrideTheme('.layout-classic');
         overrideTheme('.layout-vertical');
-        overrideTheme('.layout-vertical-left');
+        overrideTheme('.layout-vertical-left');*/
+
+        document
+          .querySelectorAll(
+            '.content-top, .content-bottom, .layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
+          )
+          .forEach(el => {
+            el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
+              overlayPrefs.overlayVars.bgOpacity
+            })`;
+          });
 
         const $gurbani = document.querySelector('.o-gurbani');
         if (overlayPrefs.overlayVars.overlayLarivaar) {
