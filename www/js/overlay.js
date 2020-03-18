@@ -135,7 +135,7 @@ const layoutButtonFactory = layoutName =>
     h('div.layout-vertical-bar'),
     h('div.layout-classic-bar'),
     {
-      onclick: e => {
+      onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
           bar.setAttribute('style', 'transform:none');
         });
