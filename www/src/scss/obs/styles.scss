@@ -137,6 +137,10 @@ body {
     display: inline-table;
     margin: 0;
     padding: 5px;
+
+    &:empty {
+      display: none;
+    }
   }
 
   .o-teeka,
