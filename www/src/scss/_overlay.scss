@@ -408,6 +408,13 @@ input[type='color'] {
     right: 0;
     top: 0;
   }
+
+  &.vertical-left .layout-vertical-bar {
+    opacity: 1;
+    left: 0;
+    position: absolute;
+    top: 0;
+  }
 }
 
 .layout-btn.classic {

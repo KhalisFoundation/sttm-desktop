@@ -135,14 +135,19 @@ const layoutButtonFactory = layoutName =>
     h('div.layout-vertical-bar'),
     h('div.layout-classic-bar'),
     {
-      onclick: () => {
+      onclick: e => {
         document.querySelectorAll('.content-bar').forEach(bar => {
           bar.setAttribute('style', 'transform:none');
         });
         const prevLayout = overlayVars.layout;
         overlayVars.layout = layoutName;
-        if (layoutName === 'vertical' && prevLayout === 'vertical') {
-          overlayVars.layout = 'vertical-left';
+        if (layoutName === 'vertical') {
+          if (prevLayout === 'vertical') {
+            overlayVars.layout = 'vertical-left';
+          }
+          document
+            .querySelector('.layout-btn.vertical')
+            .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
         }
         savePrefs();
         analytics.trackEvent('overlay', 'layout', layoutName);
@@ -298,6 +303,7 @@ const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
 const verticalLayoutBtn = layoutButtonFactory('vertical');
 const classicLayoutBtn = layoutButtonFactory('classic');
+
 const gurbaniColor = colorInputFactory(
   'toggle-text',
   overlayVars.gurbaniTextColor,
@@ -328,6 +334,10 @@ textControls.append(
     'Layout',
   ),
 );
+
+document
+  .querySelector('.layout-btn.vertical')
+  .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
 
 const themeSelector = document.querySelector('.theme-selector');
 
