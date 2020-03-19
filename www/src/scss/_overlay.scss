@@ -408,13 +408,14 @@ input[type='color'] {
     position: absolute;
     top: 0;
   }
+}
 
-  &.vertical-left .layout-vertical-bar {
-    opacity: 1;
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
+.layout-btn.vertical-left .layout-vertical-bar {
+  left: auto;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .layout-btn.classic {
