@@ -76,6 +76,7 @@
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
+          el.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
             overlayPrefs.overlayVars.bgOpacity
           })`;
@@ -121,7 +122,9 @@
           .forEach(el => {
             document.querySelectorAll('.content-top, .content-bottom').forEach(content => {
               content.style.backgroundColor = 'transparent';
+              content.style.padding = '0';
             });
+            el.style.width = `${overlayPrefs.overlayVars.padding} * 10%`;
             el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
               overlayPrefs.overlayVars.bgOpacity
             })`;
@@ -135,8 +138,10 @@
             const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
               overlayPrefs.overlayVars.bgOpacity
             })`;
+            el.style.padding = '0';
             document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
               spanEl.style.backgroundColor = overlayBgColor;
+              spanEl.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
             });
             document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           });
