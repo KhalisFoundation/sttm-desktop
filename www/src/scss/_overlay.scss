@@ -403,16 +403,16 @@ input[type='color'] {
   }
 
   .layout-vertical-bar {
+    left: 0;
     opacity: 1;
     position: absolute;
-    right: 0;
     top: 0;
   }
 
   &.vertical-left .layout-vertical-bar {
-    left: 0;
     opacity: 1;
     position: absolute;
+    right: 0;
     top: 0;
   }
 }
