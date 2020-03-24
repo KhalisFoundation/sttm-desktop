@@ -227,11 +227,7 @@ const toggleLarivaar = h(
       savePrefs();
 
       const isLarivaar = overlayVars.overlayLarivaar;
-      if (isLarivaar) {
-        controlPanel.appendChild(toggleLarivaarAssist);
-      } else {
-        controlPanel.removeChild(toggleLarivaarAssist);
-      }
+      controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
       $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
