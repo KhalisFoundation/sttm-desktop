@@ -97,6 +97,23 @@
           'layout-vertical',
           'layout-vertical-left',
         );
+        let { gurbaniFont, translationFont } = overlayPrefs.overlayVars;
+        const result = gurbaniFont.match(/bold|heavy/);
+        const fontWeight = result ? 'bold' : 'normal';
+        gurbaniFont = gurbaniFont.slice(0, result ? -result[0].length : undefined);
+
+        document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
+        document.querySelector('.o-gurbani').style.fontWeight = fontWeight;
+        document.querySelector('.o-translation').style.fontFamily = translationFont;
+
+        document.body.classList.remove(
+          'layout-top',
+          'layout-bottom',
+          'layout-split',
+          'layout-classic',
+          'layout-vertical',
+          'layout-vertical-left',
+        );
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
