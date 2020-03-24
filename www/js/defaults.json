@@ -91,6 +91,7 @@
         "gurbaniTextColor": "#EAC445",
         "overlayLogo": true,
         "overlayLarivaar": false,
+        "larivaarAssist": false,
         "theme": false
       },
       "gurbani": {
