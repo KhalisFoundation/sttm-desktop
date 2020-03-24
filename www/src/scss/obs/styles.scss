@@ -1,4 +1,46 @@
 @font-face {
+  font-family: 'muli';
+  src: url('english/Muli.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'caveat';
+  src: url('english/Caveat.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ptserif';
+  src: url('english/PT-Serif.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'anmollipi';
+  src: url('AnmolLipiSG.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'anmollipi';
+  font-weight: bold;
+  src: url('AnmolLipiBoldTrue.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'notosans';
+  src: url('NotoSansGurmukhiTrue.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'notosans';
+  font-weight: bold;
+  src: url('NotoSansGurmukhiBoldTrue.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'prabhki';
+  src: url('Prabhki.ttf') format('truetype');
+}
+
+@font-face {
   font-family: 'gurbaniakhar';
   font-style: normal;
   font-weight: normal;

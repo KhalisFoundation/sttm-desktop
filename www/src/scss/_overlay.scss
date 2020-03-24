@@ -53,6 +53,7 @@
 
   & > div {
     display: inline-block;
+    margin: 2px 0;
     vertical-align: middle;
   }
 
@@ -454,4 +455,69 @@ input[type='color'] {
   letter-spacing: 2px;
   line-height: 24px;
   text-transform: uppercase;
+}
+
+.custom-select {
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  text-align: left;
+  -webkit-user-select: none;
+  vertical-align: middle;
+
+  .select-value {
+    background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.06));
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 100px;
+    padding: 6px 25px 6px 6px;
+    text-align: left;
+    white-space: nowrap;
+
+    &:hover {
+      border: 1px solid #aaa;
+    }
+
+    &::after {
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid #555;
+      content: '';
+      height: 0;
+      position: absolute;
+      right: 10px;
+      top: 12px;
+      width: 0;
+    }
+
+    &.gurbaniFont {
+      width: 165px;
+    }
+  }
+
+  .options-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    display: none;
+    position: absolute;
+    width: 100%;
+    z-index: 3;
+
+    &.visible {
+      display: block;
+    }
+
+    .option {
+      cursor: pointer;
+      padding: 8px 12px;
+      white-space: nowrap;
+
+      &:hover {
+        background: #e9e9e9;
+      }
+    }
+  }
 }
