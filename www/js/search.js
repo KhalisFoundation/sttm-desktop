@@ -33,7 +33,7 @@ const infiniteScroll = false;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
-  h('input#search.gurmukhi', {
+  h('input#search.gurmukhi.mousetrap', {
     disabled: 'disabled',
     type: 'search',
     onfocus: e => module.exports.focusSearch(e),
