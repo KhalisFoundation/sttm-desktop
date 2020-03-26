@@ -195,6 +195,30 @@ const overlayUrl = () =>
     copyURLButton,
   );
 
+const toggleLarivaarAssist = h(
+  'div.input-wrap.larivaar-assist-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.larivaarAssist = !overlayVars.larivaarAssist;
+        savePrefs();
+        const { larivaarAssist } = overlayVars;
+
+        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
+        $logoIcon.classList.toggle('fa-toggle-on', larivaarAssist);
+        $logoIcon.classList.toggle('fa-toggle-off', !larivaarAssist);
+
+        analytics.trackEvent('overlay', 'toggleLogo', larivaarAssist);
+      }
+    },
+  },
+  h(
+    'div#logo-btn',
+    h(`i.fa.cp-icon.${overlayVars.larivaarAssist ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', 'Larivaar Assist'),
+);
+
 const toggleLarivaar = h(
   'div.input-wrap',
   {
@@ -203,6 +227,7 @@ const toggleLarivaar = h(
       savePrefs();
 
       const isLarivaar = overlayVars.overlayLarivaar;
+      controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
       $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
@@ -302,6 +327,9 @@ controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
 controlPanel.append(toggleLarivaar);
+if (overlayVars.overlayLarivaar) {
+  controlPanel.appendChild(toggleLarivaarAssist);
+}
 
 /** Text Control Bar Items */
 const topLayoutBtn = layoutButtonFactory('top');
