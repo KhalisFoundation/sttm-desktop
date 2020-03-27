@@ -106,6 +106,7 @@
         "overlayLarivaar": false,
         "translationFont": "muli",
         "gurbaniFont": "gurbaniakhar",
+        "larivaarAssist": false,
         "theme": false
       },
       "gurbani": {

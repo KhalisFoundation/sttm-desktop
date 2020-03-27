@@ -49,10 +49,26 @@
           ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
           : null;
       }
-      var writeLine = function(Line, larivaar, languageSettings) {
-        document.querySelector('.o-gurbani').innerHTML = larivaar
-          ? Line.Gurmukhi.replace(/ /g, '')
-          : Line.Gurmukhi || '';
+
+      var assist = (line, overlayLarivaar, larivaarAssist) => {
+        return line
+          .split(' ')
+          .map((word, index) => {
+            let className = 'normal';
+            if (overlayLarivaar && larivaarAssist) {
+              className = index % 2 == 0 ? 'normal' : 'light';
+            }
+            return `<span class="${className}-word">${word}</span>`;
+          })
+          .join(overlayLarivaar ? '' : ' ');
+      };
+
+      var writeLine = function(Line, larivaar, larivaarAssist, languageSettings) {
+        document.querySelector('.o-gurbani').innerHTML = assist(
+          Line.Gurmukhi,
+          larivaar,
+          larivaarAssist,
+        );
 
         let translation = '';
         let transliteration = '';
@@ -164,17 +180,19 @@
           });
 
         const $gurbani = document.querySelector('.o-gurbani');
-        if (overlayPrefs.overlayVars.overlayLarivaar) {
-          $gurbani.innerHTML = $gurbani.innerHTML.replace(/ /g, '<wbr>');
-        } else {
-          $gurbani.innerHTML = $gurbani.innerHTML.replace(/<wbr>/g, ' ');
+        const { overlayLarivaar, larivaarAssist } = overlayPrefs.overlayVars;
+        let line = '';
+        if ($gurbani.children.length) {
+          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
         }
+        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
       };
 
       socket.on('show-line', function(request) {
         if (!preview) {
           overlayPrefs = request.overlayPrefs;
-          writeLine(request.Line, overlayPrefs.overlayVars.larivaar, request.languageSettings);
+          const { overlayLarivaar, larivaarAssist } = overlayPrefs.overlayVars;
+          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
         }
       });
 

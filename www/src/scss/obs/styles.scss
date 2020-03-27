@@ -93,6 +93,15 @@ body {
   position: relative;
   text-align: center;
   width: 100%;
+
+  span.normal-word,
+  span.light-word {
+    word-break: break-word;
+  }
+
+  span.light-word {
+    opacity: 0.5;
+  }
 }
 
 .content-top,
