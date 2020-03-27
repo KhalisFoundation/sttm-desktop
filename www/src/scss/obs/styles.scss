@@ -1,65 +1,4 @@
-@font-face {
-  font-family: 'muli';
-  src: url('english/Muli.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'caveat';
-  src: url('english/Caveat.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'ptserif';
-  src: url('english/PT-Serif.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'anmollipi';
-  src: url('AnmolLipiSG.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'anmollipi';
-  font-weight: bold;
-  src: url('AnmolLipiBoldTrue.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'notosans';
-  src: url('NotoSansGurmukhiTrue.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'notosans';
-  font-weight: bold;
-  src: url('NotoSansGurmukhiBoldTrue.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'prabhki';
-  src: url('Prabhki.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'gurbaniakhar';
-  font-style: normal;
-  font-weight: normal;
-  src: url('gurbaniakhartrue-webfont.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'gurbaniakhar';
-  font-style: normal;
-  font-weight: bold;
-  src: url('gurbaniakharheavytrue-webfont.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'gurbaniakharthick';
-  font-style: normal;
-  font-weight: normal;
-  src: url('gurbaniakharthicktrue-webfont.ttf') format('truetype');
-}
+@import 'fonts';
 
 * {
   box-sizing: border-box;
@@ -83,25 +22,18 @@ body {
 }
 
 .gurmukhi {
-  font-family: 'gurbaniakhar';
+  font-family: 'Gurbani Akhar';
 }
 
 .content-bar {
+  color: rgba(241, 196, 15, 1);
   left: 0;
   margin: auto;
-  padding: 0 3vw;
+  padding-left: 3vw;
+  padding-right: 3vw;
   position: relative;
   text-align: center;
   width: 100%;
-
-  span.normal-word,
-  span.light-word {
-    word-break: break-word;
-  }
-
-  span.light-word {
-    opacity: 0.5;
-  }
 }
 
 .content-top,
@@ -111,11 +43,11 @@ body {
 }
 
 .o-gurbani {
-  font-family: 'gurbaniakharthick';
+  font-family: 'Gurbani Akhar Thick';
 }
 
 .o-teeka {
-  font-family: 'gurbaniakhar';
+  font-family: 'Gurbani Akhar';
 }
 
 .o-transliteration,
@@ -133,11 +65,6 @@ body {
     padding-top: 3vh;
   }
 
-  .o-gurbani,
-  .o-translation {
-    padding: 0.5% 3vw;
-  }
-
   .logo-wrapper {
     bottom: 2vh;
   }
@@ -153,99 +80,8 @@ body {
     padding-bottom: 3vh;
   }
 
-  .o-gurbani,
-  .o-translation {
-    padding: 0.5% 3vw;
-  }
-
   .logo-wrapper {
     top: 2vh;
-  }
-}
-
-.layout-classic {
-  .overlay-wrapper {
-    background: transparent;
-    bottom: 10%;
-    left: 5%;
-    position: absolute;
-    width: 90%;
-  }
-  .content-bar {
-    background: transparent;
-    padding: 0;
-    width: auto;
-  }
-  .logo-wrapper {
-    border-radius: 2px;
-    top: 2vh;
-  }
-
-  .o-gurbani,
-  .o-translation {
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 5px;
-    display: inline-table;
-    margin: 0;
-    padding: 5px;
-
-    &:empty {
-      display: none;
-    }
-  }
-
-  .o-teeka,
-  .o-transliteration {
-    display: none;
-  }
-}
-
-.layout-vertical {
-  .overlay-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: space-evenly;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 50%;
-  }
-
-  .content-top,
-  .content-bottom {
-    display: flex;
-    flex-direction: column;
-    height: 45vh;
-    justify-content: space-evenly;
-  }
-
-  .logo-wrapper {
-    background: transparent;
-    display: block;
-    height: 100px;
-    position: relative;
-    width: 100%;
-    .sttm-logo {
-      display: none;
-    }
-    .sttm-logo-white {
-      display: block;
-      margin: auto;
-    }
-  }
-
-  .o-teeka,
-  .o-transliteration {
-    display: block;
-  }
-}
-
-.layout-vertical-left {
-  @extend .layout-vertical;
-
-  .overlay-wrapper {
-    left: 0;
   }
 }
 
@@ -275,10 +111,6 @@ body {
     display: block;
   }
 
-  .content-bar {
-    padding: 0.5% 3vw;
-  }
-
   .logo-wrapper {
     border-radius: 0;
     bottom: 0;
@@ -291,6 +123,7 @@ body {
 .content-top,
 .content-bottom {
   &.never-forget {
+    background: #000;
     color: #f00;
     .o-translation,
     .o-teeka,
@@ -301,6 +134,7 @@ body {
   }
 
   &.khalsa-gold {
+    background: #58330a;
     color: #ffba00;
 
     .o-translation,
@@ -312,6 +146,7 @@ body {
   }
 
   &.baagi-blue {
+    background: #274f69;
     color: #fff;
 
     .o-translation,
@@ -326,6 +161,7 @@ body {
   }
 
   &.khalsa-rush {
+    background: #ffa61a;
     color: #071f77;
 
     .o-translation,
@@ -337,6 +173,7 @@ body {
   }
 
   &.moody-blue {
+    background: #2d73a7;
     color: #fff;
 
     .o-translation,
@@ -348,6 +185,7 @@ body {
   }
 
   &.a-new-day {
+    background: #97d6f7;
     color: #0e2654;
 
     .o-translation,
@@ -361,6 +199,7 @@ body {
   }
 
   &.black-and-blue {
+    background: #000;
     color: #fff;
 
     .o-gurbani,
@@ -375,6 +214,7 @@ body {
   }
 
   &.floral {
+    background: #f5b7d1;
     color: #460a1e;
 
     .o-gurbani,
@@ -399,13 +239,8 @@ body {
   position: fixed;
   right: 2vh;
 
-  .sttm-logo,
-  .sttm-logo-white {
+  .sttm-logo {
     width: 12vw;
-  }
-
-  .sttm-logo-white {
-    display: none;
   }
 }
 
