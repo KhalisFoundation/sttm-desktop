@@ -114,17 +114,9 @@
           'layout-vertical-left',
         );
 
+        const { gurbaniFont, translationFont } = overlayPrefs.overlayVars;
         document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
         document.querySelector('.o-translation').style.fontFamily = translationFont;
-
-        document.body.classList.remove(
-          'layout-top',
-          'layout-bottom',
-          'layout-split',
-          'layout-classic',
-          'layout-vertical',
-          'layout-vertical-left',
-        );
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
