@@ -202,16 +202,15 @@ window.addEventListener('click', e => {
 });
 
 const fontListFactory = (list, propName) => {
-  const lowerize = str => str.replace(/ /g, '').toLowerCase();
   const onClickOption = (e, font) => {
     e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
-    overlayVars[propName] = lowerize(font);
+    overlayVars[propName] = font;
     savePrefs();
   };
   const options = list.map(font => h(`div.option`, { onclick: e => onClickOption(e, font) }, font));
   return h(
     'div.custom-select',
-    h(`div.select-value.${propName}`, list.find(f => lowerize(f) === overlayVars[propName])),
+    h(`div.select-value.${propName}`, overlayVars[propName]),
     h('div.options-container', options),
   );
 };
