@@ -104,8 +104,8 @@
         "gurbaniTextColor": "#EAC445",
         "overlayLogo": true,
         "overlayLarivaar": false,
-        "translationFont": "muli",
-        "gurbaniFont": "gurbaniakhar",
+        "translationFont": "Muli",
+        "gurbaniFont": "Gurbani Akhar",
         "larivaarAssist": false,
         "theme": false
       },
