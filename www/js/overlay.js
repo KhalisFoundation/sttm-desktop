@@ -201,13 +201,16 @@ window.addEventListener('click', e => {
   }
 });
 
+const fontSwitch = (e, font, propName) => {
+  e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
+  overlayVars[propName] = font;
+  savePrefs();
+};
+
 const fontListFactory = (list, propName) => {
-  const onClickOption = (e, font) => {
-    e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
-    overlayVars[propName] = font;
-    savePrefs();
-  };
-  const options = list.map(font => h(`div.option`, { onclick: e => onClickOption(e, font) }, font));
+  const options = list.map(font =>
+    h(`div.option`, { onclick: e => fontSwitch(e, font, propName) }, font),
+  );
   return h(
     'div.custom-select',
     h(`div.select-value.${propName}`, overlayVars[propName]),
