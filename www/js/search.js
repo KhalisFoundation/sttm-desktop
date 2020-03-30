@@ -33,7 +33,7 @@ const infiniteScroll = false;
 
 // build the search bar and toggles and append to HTML
 const searchInputs = h('div#search-container', [
-  h('input#search.gurmukhi', {
+  h('input#search.gurmukhi.mousetrap', {
     disabled: 'disabled',
     type: 'search',
     onfocus: e => module.exports.focusSearch(e),
@@ -572,7 +572,8 @@ module.exports = {
           .map(word => word[0])
           .join('')
           .indexOf(query);
-        end = start + query.length;
+        end = start + (query.length - 1);
+        end = end > baaniWords.length - 1 ? baaniWords.length : end;
         break;
       }
       case CONSTS.SEARCH_TYPES.GURMUKHI_WORD: {

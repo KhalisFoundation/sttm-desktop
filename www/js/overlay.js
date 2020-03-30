@@ -10,7 +10,7 @@ const { ipcRenderer, remote } = electron;
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const { overlayVars } = store.get('obs').overlayPrefs;
+const { fonts, overlayVars } = store.get('obs').overlayPrefs;
 let overlayCast = store.getUserPref('app.overlay-cast');
 let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
@@ -140,12 +140,21 @@ const layoutButtonFactory = layoutName =>
     h('div.layout-bar.layout-bar-2'),
     h('div.layout-bar.layout-bar-3'),
     h('div.layout-bar.layout-bar-4'),
+    h('div.layout-vertical-bar'),
+    h('div.layout-classic-bar'),
     {
       onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
           bar.setAttribute('style', 'transform:none');
         });
+        const prevLayout = overlayVars.layout;
         overlayVars.layout = layoutName;
+        if (layoutName === 'vertical') {
+          overlayVars.layout = prevLayout === 'vertical' ? 'vertical-left' : 'vertical';
+          document
+            .querySelector('.layout-btn.vertical')
+            .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
+        }
         savePrefs();
         analytics.trackEvent('overlay', 'layout', layoutName);
       },
@@ -175,6 +184,48 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
     ),
   );
 
+const closeAllDropDowns = () => {
+  document
+    .querySelectorAll('.options-container.visible')
+    .forEach(el => el.classList.remove('visible'));
+};
+
+const toggleDropDown = $select => {
+  closeAllDropDowns();
+  const $options = $select.querySelector('.options-container');
+  $options.classList.add('visible');
+  $options.style.top = `${
+    window.innerHeight < $options.offsetHeight + $select.offsetTop
+      ? -$options.offsetHeight
+      : $select.querySelector('.select-value').offsetHeight
+  }px`;
+};
+
+window.addEventListener('click', e => {
+  if (!e.target.classList.contains('select-value')) {
+    closeAllDropDowns();
+  } else {
+    toggleDropDown(e.target.parentElement);
+  }
+});
+
+const fontSwitch = (e, font, propName) => {
+  e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
+  overlayVars[propName] = font;
+  savePrefs();
+};
+
+const fontListFactory = (list, propName) => {
+  const options = list.map(font =>
+    h(`div.option`, { onclick: e => fontSwitch(e, font, propName) }, font),
+  );
+  return h(
+    'div.custom-select',
+    h(`div.select-value.${propName}`, overlayVars[propName]),
+    h('div.options-container', options),
+  );
+};
+
 const copyURLButton = h(
   'span.input-wrap',
   {
@@ -193,6 +244,30 @@ const overlayUrl = () =>
     h('input.url-text', { type: 'text', readOnly: true, value: `${overlayCast ? getUrl() : ''}` }),
     copyURLButton,
   );
+
+const toggleLarivaarAssist = h(
+  'div.input-wrap.larivaar-assist-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.larivaarAssist = !overlayVars.larivaarAssist;
+        savePrefs();
+        const { larivaarAssist } = overlayVars;
+
+        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
+        $logoIcon.classList.toggle('fa-toggle-on', larivaarAssist);
+        $logoIcon.classList.toggle('fa-toggle-off', !larivaarAssist);
+
+        analytics.trackEvent('overlay', 'toggleLogo', larivaarAssist);
+      }
+    },
+  },
+  h(
+    'div#logo-btn',
+    h(`i.fa.cp-icon.${overlayVars.larivaarAssist ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', 'Larivaar Assist'),
+);
 
 const resetButton = h(
   'div.input-wrap',
@@ -230,6 +305,11 @@ const toggleLarivaar = h(
 
       const isLarivaar = overlayVars.overlayLarivaar;
       setToggleIcon(evt.currentTarget, isLarivaar, ['fa-link', 'fa-unlink']);
+      controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
+
+      const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
+      $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
+      $larivaarIcon.classList.toggle('fa-link', !isLarivaar);
 
       const $larivaarLabel = evt.currentTarget.querySelector('.setting-label');
       $larivaarLabel.innerText = `Use ${isLarivaar ? 'Padched' : 'Larivaar'}`;
@@ -318,13 +398,19 @@ controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
-controlPanel.append(toggleLarivaar);
 controlPanel.append(resetButton);
+controlPanel.append(toggleLarivaar);
+if (overlayVars.overlayLarivaar) {
+  controlPanel.appendChild(toggleLarivaarAssist);
+}
 
 /** Text Control Bar Items */
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
+const verticalLayoutBtn = layoutButtonFactory('vertical');
+const classicLayoutBtn = layoutButtonFactory('classic');
+
 const gurbaniColor = colorInputFactory(
   'toggle-gurbani-text',
   overlayVars.gurbaniTextColor,
@@ -340,16 +426,30 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
-textControls.append(controlsFactory([gurbaniColor, changeGurbanifontSizeButton], 'Gurbani'));
+const translationFonts = fontListFactory(fonts.translation, 'translationFont');
+const gurbaniFonts = fontListFactory(fonts.gurbani, 'gurbaniFont');
+
+textControls.append(
+  controlsFactory([gurbaniColor, gurbaniFonts, changeGurbanifontSizeButton], 'Gurbani'),
+);
 textControls.append(separatorY());
-textControls.append(controlsFactory([textColor, changefontSizeButton], 'Text'));
+textControls.append(controlsFactory([textColor, translationFonts, changefontSizeButton], 'Text'));
 textControls.append(separatorY());
 textControls.append(controlsFactory(backgroundColor, 'BG'));
 textControls.append(separatorY());
 textControls.append(controlsFactory(changeBarSizeButton, 'Size'));
 textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
 textControls.append(separatorY());
-textControls.append(controlsFactory([topLayoutBtn, bottomLayoutBtn, splitLayoutBtn], 'Layout'));
+textControls.append(
+  controlsFactory(
+    [topLayoutBtn, bottomLayoutBtn, splitLayoutBtn, verticalLayoutBtn, classicLayoutBtn],
+    'Layout',
+  ),
+);
+
+document
+  .querySelector('.layout-btn.vertical')
+  .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
 
 const themeSelector = document.querySelector('.theme-selector');
 
