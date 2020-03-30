@@ -80,6 +80,19 @@
   },
   "obs": {
     "overlayPrefs": {
+      "fonts": {
+        "gurbani": [
+          "Anmol Lipi",
+          "Anmol Lipi Bold",
+          "Noto Sans",
+          "Noto Sans Bold",
+          "Gurbani Akhar",
+          "Gurbani Akhar Heavy",
+          "Gurbani Akhar Thick",
+          "Prabhki"
+        ],
+        "translation": ["Muli", "Caveat", "PT Serif"]
+      },
       "overlayVars": {
         "layout": "split",
         "bgColor": "#2c3e50",
@@ -91,6 +104,9 @@
         "gurbaniTextColor": "#EAC445",
         "overlayLogo": true,
         "overlayLarivaar": false,
+        "translationFont": "Muli",
+        "gurbaniFont": "Gurbani Akhar",
+        "larivaarAssist": false,
         "theme": false
       },
       "gurbani": {

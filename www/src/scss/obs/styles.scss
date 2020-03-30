@@ -1,23 +1,4 @@
-@font-face {
-  font-family: 'gurbaniakhar';
-  font-style: normal;
-  font-weight: normal;
-  src: url('gurbaniakhartrue-webfont.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'gurbaniakhar';
-  font-style: normal;
-  font-weight: bold;
-  src: url('gurbaniakharheavytrue-webfont.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'gurbaniakharthick';
-  font-style: normal;
-  font-weight: normal;
-  src: url('gurbaniakharthicktrue-webfont.ttf') format('truetype');
-}
+@import 'fonts';
 
 * {
   box-sizing: border-box;
@@ -41,7 +22,7 @@ body {
 }
 
 .gurmukhi {
-  font-family: 'gurbaniakhar';
+  font-family: 'Gurbani Akhar';
 }
 
 .content-bar {
@@ -51,6 +32,15 @@ body {
   position: relative;
   text-align: center;
   width: 100%;
+
+  span.normal-word,
+  span.light-word {
+    word-break: break-word;
+  }
+
+  span.light-word {
+    opacity: 0.5;
+  }
 }
 
 .content-top,
@@ -60,11 +50,11 @@ body {
 }
 
 .o-gurbani {
-  font-family: 'gurbaniakharthick';
+  font-family: 'Gurbani Akhar Thick';
 }
 
 .o-teeka {
-  font-family: 'gurbaniakhar';
+  font-family: 'Gurbani Akhar';
 }
 
 .o-transliteration,
@@ -134,7 +124,6 @@ body {
   .o-translation {
     background: rgba(0, 0, 0, 0.8);
     border-radius: 5px;
-    display: inline-table;
     margin: 0;
     padding: 5px;
 

@@ -8,7 +8,7 @@ const { ipcRenderer, remote } = electron;
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const { overlayVars } = store.get('obs').overlayPrefs;
+const { fonts, overlayVars } = store.get('obs').overlayPrefs;
 let overlayCast = store.getUserPref('app.overlay-cast');
 let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
@@ -176,6 +176,48 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
     ),
   );
 
+const closeAllDropDowns = () => {
+  document
+    .querySelectorAll('.options-container.visible')
+    .forEach(el => el.classList.remove('visible'));
+};
+
+const toggleDropDown = $select => {
+  closeAllDropDowns();
+  const $options = $select.querySelector('.options-container');
+  $options.classList.add('visible');
+  $options.style.top = `${
+    window.innerHeight < $options.offsetHeight + $select.offsetTop
+      ? -$options.offsetHeight
+      : $select.querySelector('.select-value').offsetHeight
+  }px`;
+};
+
+window.addEventListener('click', e => {
+  if (!e.target.classList.contains('select-value')) {
+    closeAllDropDowns();
+  } else {
+    toggleDropDown(e.target.parentElement);
+  }
+});
+
+const fontSwitch = (e, font, propName) => {
+  e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
+  overlayVars[propName] = font;
+  savePrefs();
+};
+
+const fontListFactory = (list, propName) => {
+  const options = list.map(font =>
+    h(`div.option`, { onclick: e => fontSwitch(e, font, propName) }, font),
+  );
+  return h(
+    'div.custom-select',
+    h(`div.select-value.${propName}`, overlayVars[propName]),
+    h('div.options-container', options),
+  );
+};
+
 const copyURLButton = h(
   'span.input-wrap',
   {
@@ -195,6 +237,30 @@ const overlayUrl = () =>
     copyURLButton,
   );
 
+const toggleLarivaarAssist = h(
+  'div.input-wrap.larivaar-assist-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.larivaarAssist = !overlayVars.larivaarAssist;
+        savePrefs();
+        const { larivaarAssist } = overlayVars;
+
+        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
+        $logoIcon.classList.toggle('fa-toggle-on', larivaarAssist);
+        $logoIcon.classList.toggle('fa-toggle-off', !larivaarAssist);
+
+        analytics.trackEvent('overlay', 'toggleLogo', larivaarAssist);
+      }
+    },
+  },
+  h(
+    'div#logo-btn',
+    h(`i.fa.cp-icon.${overlayVars.larivaarAssist ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', 'Larivaar Assist'),
+);
+
 const toggleLarivaar = h(
   'div.input-wrap',
   {
@@ -203,6 +269,7 @@ const toggleLarivaar = h(
       savePrefs();
 
       const isLarivaar = overlayVars.overlayLarivaar;
+      controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
       $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
@@ -312,6 +379,9 @@ controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
 controlPanel.append(toggleLarivaar);
+if (overlayVars.overlayLarivaar) {
+  controlPanel.appendChild(toggleLarivaarAssist);
+}
 
 /** Text Control Bar Items */
 const topLayoutBtn = layoutButtonFactory('top');
@@ -335,12 +405,18 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
+const translationFonts = fontListFactory(fonts.translation, 'translationFont');
+const gurbaniFonts = fontListFactory(fonts.gurbani, 'gurbaniFont');
+
 textControls.append(
-  controlsFactory([gurbaniColor, changeGurbanifontSizeButton], i18n.t('BANI_OVERLAY.GURBANI')),
+  controlsFactory(
+    [gurbaniColor, gurbaniFonts, changeGurbanifontSizeButton],
+    i18n.t('BANI_OVERLAY.GURBANI'),
+  ),
 );
 textControls.append(separatorY());
 textControls.append(
-  controlsFactory([textColor, changefontSizeButton], i18n.t('BANI_OVERLAY.TEXT')),
+  controlsFactory([textColor, translationFonts, changefontSizeButton], i18n.t('BANI_OVERLAY.TEXT')),
 );
 textControls.append(separatorY());
 textControls.append(controlsFactory(backgroundColor, i18n.t('BANI_OVERLAY.BG')));
