@@ -46,10 +46,12 @@ const receiverFn = receivers =>
 
     // set content
     const message =
-      numReceivers === 0 ? 'No compatible Chromecast devices found.' : 'Select Cast device';
+      numReceivers === 0
+        ? i18n.t('CHROMECAST.NO_DEVICES_FOUND')
+        : i18n.t('CHROMECAST.SELECT_DEVICE');
     modal.setContent('<h2>' + message + '</h2>');
     // add cancel button
-    const cancelTitle = numReceivers === 0 ? 'OK' : 'Cancel';
+    const cancelTitle = numReceivers === 0 ? i18n.t('OK') : i18n.t('CHROMECAST.CANCEL');
     modal.addFooterBtn(cancelTitle, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
       modal.close();
     });
@@ -106,7 +108,9 @@ function requestSession() {
  * listener for session updates
  */
 function sessionUpdateListener(isAlive) {
-  let message = isAlive ? 'Session Updated' : 'Session Removed';
+  let message = isAlive
+    ? i18n.t('CHROMECAST.SESSION_UPDATED')
+    : i18n.t('CHROMECAST.SESSION_REMOVED');
   message += ': ' + session.sessionId;
   appendMessage(message);
   if (!isAlive) {
@@ -128,7 +132,7 @@ function receiverMessage(namespace, message) {
  * session listener during initialization
  */
 function sessionListener(e) {
-  appendMessage('New session ID:' + e.sessionId);
+  appendMessage(i18n.t('CHROMECAST.NEW_SESSION_ID') + e.sessionId);
   session = e;
   session.addUpdateListener(sessionUpdateListener);
   session.addMessageListener(namespace, receiverMessage);
@@ -139,9 +143,9 @@ function sessionListener(e) {
  */
 function receiverListener(e) {
   if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
-    appendMessage('receiver found');
+    appendMessage(i18n.t('CHROMECAST.RECEIVER_FOUND'));
   } else {
-    appendMessage('receiver list empty: ' + e);
+    appendMessage(i18n.t('CHROMECAST.RECEIVER_LIST_EMPTY') + e);
   }
 }
 
@@ -153,10 +157,10 @@ function onError(message) {
 
   switch (message.code) {
     case 'RECEIVER_UNAVAILABLE':
-      displayError('No Chromecast devices detected.');
+      displayError(i18n.t('CHROMECAST.NO_DEVICES_DETECTED'));
       break;
     default:
-      displayError('An error occured. Please try again.');
+      displayError(i18n.t('CHROMECAST.TRY_AGAIN'));
       break;
   }
 }
@@ -170,7 +174,7 @@ function displayError(errorMessage) {
 
   modal.setContent('<h2>' + errorMessage + '</h2>');
   // add ok button
-  modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+  modal.addFooterBtn(i18n.t('OK'), 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
     modal.close();
   });
 
@@ -213,10 +217,10 @@ function sendMessage(message) {
     session.sendMessage(
       namespace,
       message,
-      onSuccess.bind(this, 'Message sent: ' + message),
+      onSuccess.bind(this, i18n.t('CHROMECAST.MSG_SENT') + message),
       onError,
     );
   } else {
-    appendMessage('Cannot send because session is null');
+    appendMessage(i18n.t('CHROMECAST.SESSION_IS_NULL'));
   }
 }
