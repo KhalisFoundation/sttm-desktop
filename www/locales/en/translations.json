@@ -1,0 +1,326 @@
+{
+  "APPNAME": "SikhiToTheMax",
+  "CHANGELOG": "Changelog",
+  "DISMISS": "Dismiss",
+  "HELP": "Help",
+  "INSTALL_N_RESTART": "Install and Restart",
+  "LATEST_VERSION": "Version {{appVersion}} is the latest version.",
+  "LEGEND": "Legend",
+  "NO_UPDATE_AVAILABLE": "No update available.",
+  "NO_PORTS_AVAILABLE": "No free ports available. Close other applications and Reboot the machine",
+  "OK": "OK",
+  "OVERLAY_ERR": "Overlay Error",
+  "UPDATE_AVAILABLE": "Update avialable.",
+  "UPDATE_DOWNLOADED": "Update downloaded and ready to install",
+  "VIEWER_TITLE": "{{appName}} Viewer",
+
+  "BANI_OVERLAY": {
+    "ANNOUNCEMENT": "Announcement",
+    "BG": "BG",
+    "COPY_URL": "Copy URL",
+    "GURBANI": "Gurbani",
+    "LARIVAAR": "Larivaar",
+    "LAYOUT": "Layout",
+    "LOGO": "Logo",
+    "OPACITY": "Opacity",
+    "OVERLAY_OFF": "Overlay Off",
+    "OVERLAY_ON": "Overlay",
+    "PADCHED": "Padched",
+    "PRESETS": "Presets",
+    "SIZE": "Size",
+    "TEXT": "Text"
+  },
+
+  "CHROMECAST": {
+    "CANCEL": "Cancel",
+    "MSG_SENT": "Message sent: ",
+    "NEW_SESSION_ID": "New Session ID:",
+    "NO_DEVICES_DETECTED": "No Chromecast devices detected.",
+    "NO_DEVICES_FOUND": "No compatible Chromecast devices found.",
+    "RECEIVER_FOUND": "receiver found",
+    "RECEIVER_LIST_EMPTY": "receiver list empty: ",
+    "SELECT_DEVICE": "Select Cast device",
+    "SESSION_IS_NULL": "Cannot send because session is null",
+    "SESSION_REMOVED": "Session Removed",
+    "SESSION_UPDATED": "Session Updated",
+    "TRY_AGAIN": "An error occured. Please try again."
+  },
+
+  "DATABASE": {
+    "COULDNT_DELETE": "Could not delete old database {{oldDB}}: {{err1}}",
+    "DOWNLOADING": "Downloading database..."
+  },
+
+  "INSERT": {
+    "ADD_ANNOUNCEMENT": "Add Announcement",
+    "ADD_ANNOUNCEMENT_SLIDE": "Add Announcement Slide",
+    "ADD_ANNOUNCEMENT_TEXT": "Add announcement text here ...",
+    "ADD_DHAN_GURU": "Add Dhan Guru",
+    "ADD_EMPTY_SLIDE": "Add Empty Slide",
+    "ADD_WAHEGURU_SLIDE": "Add Waheguru Slide",
+    "ANNOUNCEMENT": "Announcement",
+    "ANNOUNCEMENT_IN_GURMUKHI": "Announcement in Gurmukhi",
+    "BACK": "Back",
+    "CLOSE": "Close",
+    "INSERT_ANNOUNCEMENT": "Insert Announcement",
+    "INSERT_DHAN_SLIDE": "Insert Dhan Slide",
+    "SELECT": "Select",
+    "DHAN_GURU": {
+      "AMARDAS_SAHIB_JI": "Guru Amardas Ji",
+      "ANGAD_DEV_JI": "Guru Angad Dev Ji",
+      "ARJUN_DEV_JI": "Guru Arjun Dev Ji",
+      "GOBIND_SINGH_SAHIB_JI": "Guru Gobind Singh Ji",
+      "GRANTH_SAHIB_JI": "Guru Granth Sahib Ji",
+      "HAR_GOBIND_SAHIB_JI": "Guru Har Gobind Ji",
+      "HAR_KRISHAN_SAHIB_JI": "Guru Har Krishan Ji",
+      "HAR_RAI_SAHIB_JI": "Guru Har Rai Ji",
+      "NANAK_DEV_JI": "Guru Nanak Dev Ji",
+      "RAMDAS_SAHIB_JI": "Guru Ramdas Ji",
+      "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
+    }
+  },
+
+  "MENU": {
+    "APP": {
+      "ABOUT": "About {{appName}}",
+      "HIDE": "Hide {{appName}}",
+      "HIDE_OTHERS": "Hide Others",
+      "PREFERENCES": "Preferences",
+      "QUIT": "Quit {{appName}}",
+      "SERVICES": "Services",
+      "VERSION": "Version {{version}}"
+    },
+    "CAST": {
+      "SEARCH": "Search for Google Cast device",
+      "SELF": "Cast",
+      "STOP": "Stop Casting"
+    },
+    "DEV": {
+      "DEVELOPER_TOOLS": "Toggle Developer Tools",
+      "RELOAD": "Reload",
+      "SELF": "Dev"
+    },
+    "EDIT": {
+      "COPY": "Copy",
+      "CUT": "Cut",
+      "PASTE": "Paste",
+      "REDO": "Redo",
+      "SELECT_ALL": "Select All",
+      "SELF": "Edit",
+      "UNDO": "Undo"
+    },
+    "FILE": "File",
+    "HELP": {
+      "CHANGELOG": "Changelog...",
+      "DONATE": "Donate...",
+      "GUIDE": "Guide...",
+      "SELF": "Help",
+      "SHORTCUT_LEGEND": "Shortcut Legend..."
+    },
+    "UPDATE": {
+      "CHECK": "Check for Update",
+      "CHECKING": "Checking for Updates",
+      "DOWNLOADING": "Dowloading Update",
+      "INSTALL_AND_RESTART": "Install and Restart"
+    },
+    "WINDOW": {
+      "BANI_OVERLAY": "Bani Overlay",
+      "CLOSE": "Close",
+      "MINIMIZE": "Minimize",
+      "SELF": "Window"
+    }
+  },
+
+  "OTHERS": {
+    "DAILY_HUKAMNAMA": "Daily Hukamnama",
+    "SHOW_RANDOM_SHABAD": "Show Random Shabad",
+    "WHATS_NEW": "What's New"
+  },
+
+  "QUICK_TOOLS": {
+    "ANNOUNCEMENTS": "Announcements",
+    "BANI": "Bani",
+    "SELF": "Quick Tools",
+    "TEEKA": "Teeka",
+    "TRANSLATION": "Translation",
+    "TRANSLITERATION": "Transliteration"
+  },
+
+  "SEARCH": {
+    "ANG": "Ang",
+    "FIRST_LETTER_ANYWHERE": "First Letter (Anywhere)",
+    "FIRST_LETTER_START": "First Letter (Start)",
+    "FULL_WORDS": "Full Word(s)",
+    "FULL_WORDS_ENGLISH": "Full Word(s) - English",
+    "FULL_WORDS_GURMUKHI": "Full Word(s) - Gurmukhi",
+    "SOURCES": {
+      "ALL_SOURCES": "All sources",
+      "AMRIT_KEERTAN": "Amrit Keertan",
+      "DASAM_GRANTH": "Dasam Granth Sahib",
+      "GURDAS_SINGH_JI_VAARAN": "Bhai Gurdas Singh Ji Vaaran",
+      "GURDAS_JI_VAARAN": "Bhai Gurdas Ji Vaaran",
+      "GURU_GRANTH_SAHIB": "Guru Granth Sahib Ji",
+      "NAND_LAL_VAARAN": "Bhai Nand Lal Ji Vaaran",
+      "REHATNAMAS": "Rehatnamas & Panthic sources"
+    }
+  },
+
+  "SETTINGS": {
+    "APP_SETTINGS": "App Settings",
+    "ASSIST_TYPE": "Assist Type",
+    "COLORED_WORDS": "Colored Words",
+    "DEFAULT": "Default",
+    "GRADIENT_BG": "Gradient Background",
+    "I_GURBANI": "iGurbani",
+    "MULTI_COLOR": "Multi Color",
+    "SHOW_VISHRAAMS": "Show Vishraams",
+    "SINGLE_COLOR": "Single Color",
+    "SLIDE_LAYOUT": "Slide Layout",
+    "STTM": "BaniDB Living",
+    "STTM2": "STTM 2",
+    "TOOLBAR": "Toolbar",
+    "VISHRAAM_OPTIONS": "Vishraam Options",
+    "VISHRAAM_SOURCE": "Vishraam Source",
+
+    "APP_LAYOUT": {
+      "PRESENTER_VIEW": "Presenter View",
+      "SELF": "App Layout"
+    },
+    "AUTOPLAY_OPTIONS": {
+      "DELAY": "Delay (Seconds)",
+      "SELF": "Autoplay Options"
+    },
+    "BANI_SETTINGS": {
+      "ABOVE": "Above Raag Headings",
+      "CURRENT": "Current Saroops (default)",
+      "EXTRA_LONG": "Extra Long",
+      "LENGTH": "Bani Length",
+      "LONG": "Long",
+      "MANGAL_POSITION": "Mangal Position",
+      "MEDIUM": "Medium",
+      "SELF": "Bani Settings",
+      "SHORT": "Short"
+    },
+    "DISPLAY_OPTIONS": {
+      "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
+      "AUTO_PLAY": "Auto Play",
+      "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
+      "LARIVAAR": "Larivaar",
+      "LARIVAAR_ASSIST": "Larivaar Assist",
+      "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
+      "LEFT_ALIGN": "Left-Align",
+      "LIVE_FEED": "Live Feed Text Files",
+      "QUICK_TOOLS": "Quick Tools",
+      "SELF": "Display Options",
+      "SHORTCUT_TRAY": "Shortcut Tray"
+    },
+    "FIELDS_TO_DISPLAY": {
+      "NEXT_LINE": "Next Line",
+      "PUNJABI_TEEKA": "Punjabi Teeka",
+      "SELF": "Fields to Display",
+      "TRANSLATION": "Translation",
+      "TRANSLITERATION": "Transliteration"
+    },
+    "FONT_SIZES": {
+      "ANNOUNCEMENTS": "Announcements",
+      "BANI": "Bani",
+      "PUNJABI_TEEKA": "Punjabi Teeka",
+      "SELF": "Font Sizes",
+      "TRANSLATION": "Translation",
+      "TRANSLITERATION": "Transliteration"
+    },
+    "LANGUAGE": {
+      "DEVANAGARI": "Devanagari",
+      "ENGLISH": "English",
+      "SELF": "Language Settings",
+      "SPANISH": "Spanish",
+      "TRANSLATION": "Translation Language",
+      "TRANSLITERATION": "Transliteration Language"
+    },
+    "OTHER_OPTIONS": {
+      "COLLECT_STATISTICS": "Collect Statistics",
+      "LIMIT_CHANGELOG": "Limit Changelog",
+      "LIMIT_CHANGELOG_MSG": "Only see changelog once per version",
+      "SELF": "Other Options"
+    }
+  },
+
+  "SHORTCUT_TRAY": {
+    "ANAND_SAHIB": "Anand Sahib (Bhog)",
+    "BLANK": "Blank",
+    "MOOL_MANTRA": "Mool Mantra"
+  },
+
+  "THEMES": {
+    "A_NEW_DAY": "A New Day",
+    "BAAGI_BLUE": "Baagi Blue",
+    "BLACK_&_BLUE": "Black & Blue",
+    "DARBAR_BLUE": "Darbar Blue",
+    "DARK": "Dark",
+    "FLORAL": "floral",
+    "HIGH_CONTRAST": "High Contrast",
+    "KHALSA_GOLD": "Khalsa Gold",
+    "KHALSA_RUSH": "Khalsa Rush",
+    "LIGHT": "Light",
+    "LOW_LIGHT": "Low Light",
+    "MOODY_BLUE": "Moody Blue",
+    "NEVER_FORGET": "Never Forget",
+
+    "BACKGROUNDS": "Backgrounds",
+    "COLORS": "Colours",
+    "CURRENT_THEME": "Current Theme",
+    "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
+    "SPECIAL_CONDITIONS": "Special Conditions",
+
+    "ALLOWED_IMGS_MSG": "Only .png and .jpg images are allowed.",
+    "DELETE_ERR": "Unable to delete that image. - {{error}}",
+    "DIR_CREATE_ERR": " Error creating directory for user backgrounds. {{error}} - If error persists, report it at www.sttm.co:",
+    "DIR_CREATE_ERR2": "Error Creating Directory. {{error}} - If error persists, report it at www.sttm.co:",
+    "FILE_VALIDATE_ERR": "Failed to validate this file as an image.\nError: {{error}}. If error presists file a bug report at sttm.co",
+    "IMG_IN_USE_ERR": "This image is being used, please switch to another image or theme before deleting this image.",
+    "LIMIT_ERR": "Five custom backgrounds limit reached. Please delete one or more before adding another custom background.",
+    "PARSE_ERR": "There is an error parsing this theme.\nTry checking theme file for error. {{error}} - If error persists,\nreport it at www.sttm.co",
+    "RECENT_CUSTOM_BGS": "Recent Custom Backgrounds",
+    "RECOMMENDED": "Recommended 1920x1080",
+    "UNABLE_TO_DEL": "Unable to delete a file. - {{deleteError}}",
+    "UNABLE_TO_GET": "Unable to get existing custom background files - {{error}}",
+    "USING_ERR": "There was an error using this file. {{error}} -\nIf error persists, report it at www.sttm.co"
+  },
+
+  "TOOLBAR": {
+    "BANI_CONTROLLER": "Bani Controller",
+    "CEREMONIES": "Ceremonies",
+    "CHOOSE_THEME": "Choose a Theme to launch",
+    "CURRENT_SHABAD": "Current Shabad",
+    "DISABLE_CONNECTIONS_MSG": "Disable all the remote connections to {{appName}}",
+    "ENG_EXPLANATIONS": "English Explanations",
+    "HISTORY": "History",
+    "INSERT": "Insert",
+    "LOCKED_SCREEN": "SikhiToTheMax is being controlled remotely.",
+    "MOBILE_DEVICE_SYNC": "Mobile Device Sync",
+    "NITNEM_BANIS": "Nitnem Banis",
+    "OTHERS": "Others",
+    "POPULAR_BANIS": "Popular Banis",
+    "SEARCH": "Search",
+    "SETTINGS": "Settings",
+    "SUNDAR_GUTKA": "Sundar Gutka",
+    "THEMES": "Themes",
+
+    "BANI_DESC": {
+      "1": "Connect to SikhiToTheMax by visiting ",
+      "2": " from a mobile device to search, navigate, and control the entire app."
+    },
+    "SYNC_CONTROLLER": {
+      "INTERNET_ERR": "Sorry! you seem to be offline. Sync only works when you are connected to the internet.",
+      "PIN": "Pin",
+      "PRESENT_CODE": "Present Code to Sangat",
+      "SANGAT_SYNC": "Sangat Sync",
+      "SYNC_STRING": "<p>Visit <strong>sttm.co/sync</strong> on your mobile device and enter the code below to follow along</p><h1>{{code}}</h1>",
+      "UNIQUE_CODE_LABEL": "Your unique sync code is:",
+      "SYNC_DESC": {
+        "1": "Allow the Sangat to visit ",
+        "2": " to enter a code and view the Shabad being presented in real-time."
+      }
+    }
+  }
+}
