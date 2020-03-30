@@ -22,7 +22,7 @@
           <rect fill="#ffffff" width="10" height="1" x="0" y="8"></rect>
         </svg>
       </a>
-      <span class="title">SikhiToTheMax</span>
+      <span class="title" data-key="APPNAME">SikhiToTheMax</span>
       <ul class="controls">
         <li>
           <a href="#" data-window-action="minimize">
@@ -71,25 +71,25 @@
         <div class="focus-overlay hidden overlay-ui common-overlay"></div>
         <div id="toolbar">
           <div class="bani-list hidden overlay-ui ui-sunder-gutka">
-            <header class="navigator-header"><span> Sundar Gutka </span></header>
+            <header class="navigator-header"><span data-key="SUNDAR_GUTKA"></span></header>
           </div>
           <div class="bani-extras hidden overlay-ui ui-sunder-gutka"></div>
 
           <div class="ceremonies-list hidden overlay-ui ui-ceremonies">
-            <header class="navigator-header ceremonies-header"><span> Ceremonies </span></header>
+            <header class="navigator-header ceremonies-header">
+              <span data-key="CEREMONIES"></span>
+            </header>
           </div>
 
           <div class="sync-dialogue-wrapper hidden overlay-ui ui-sync-button">
             <div class="sync-dialogue hidden overlay-ui ui-sync-button">
-              <header class="sync-header">Mobile Device Sync</header>
+              <header class="sync-header" data-key="MOBILE_DEVICE_SYNC"></header>
             </div>
           </div>
 
           <div class="lock-screen hidden overlay-ui ui-lock-screen">
             <div class="lock-screen-content">
-              <div class="lock-screen-message">
-                SikhiToTheMax is being controlled remotely.
-              </div>
+              <div class="lock-screen-message" data-key="LOCKED_SCREEN"></div>
             </div>
           </div>
         </div>
@@ -101,7 +101,7 @@
                 <i class="fa fa-window-minimize"></i>
                 <i class="fa fa-window-maximize disabled"></i>
               </div>
-              <span class="nav-header-text">Search</span>
+              <span class="nav-header-text" data-key="SEARCH"></span>
               <div id="search-type"></div>
             </div>
             <div class="search-div"></div>
@@ -123,23 +123,23 @@
                   id="history-tab"
                   data-title="history"
                 >
-                  <i class="fa fa-clock-o"></i> History
+                  <i class="fa fa-clock-o"></i> <span data-key="HISTORY"></span>
                 </span>
                 <span class="nav-header-tab nav-header-text" id="themes-tab" data-title="themes">
-                  <i class="fa fa-paint-brush"></i> Themes
+                  <i class="fa fa-paint-brush"></i> <span data-key="THEMES"></span>
                 </span>
                 <span class="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
-                  <i class="fa fa-desktop"></i> Insert
+                  <i class="fa fa-desktop"></i> <span data-key="INSERT"></span>
                 </span>
                 <span
                   class="nav-header-tab nav-header-text"
                   id="settings-tab"
                   data-title="settings"
                 >
-                  <i class="fa fa-cogs"></i> Settings
+                  <i class="fa fa-cogs"></i> <span data-key="SETTINGS"></span>
                 </span>
                 <span class="nav-header-tab nav-header-text" id="others-tab" data-title="others">
-                  <i class="fa fa-ellipsis-h"></i> Others
+                  <i class="fa fa-ellipsis-h"></i> <span data-key="OTHERS"></span>
                 </span>
               </div>
             </div>
@@ -168,7 +168,7 @@
               </div>
               <div class="current-shabad-header">
                 <div class="shabad-prev"></div>
-                <span class="nav-header-text">Current Shabad</span>
+                <span class="nav-header-text" data-key="CURRENT_SHABAD"></span>
                 <div class="shabad-next"></div>
               </div>
               <div id="current-shabad-menu"></div>
@@ -187,7 +187,7 @@
                 <i class="fa fa-window-minimize"></i>
                 <i class="fa fa-window-maximize disabled"></i>
               </div>
-              <span class="nav-header-text">Settings</span>
+              <span class="nav-header-text" data-key="SETTINGS"></span>
             </div>
           </div>
         </div>
@@ -203,5 +203,12 @@
     <script src="assets/js/vendor/mousetrap.min.js"></script>
     <script src="js/desktop_index.js"></script>
     <script type="text/javascript" src="js/vendor/tingle.js"></script>
+    <script>
+      const { remote } = require('electron');
+      const { i18n } = remote.require('./app');
+      document.querySelectorAll('[data-key]').forEach(el => {
+        el.innerHTML = i18n.t(`TOOLBAR.${el.getAttribute('data-key')}`, i18n.t('APPNAME'));
+      });
+    </script>
   </body>
 </html>
