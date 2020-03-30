@@ -15,6 +15,7 @@
   border-radius: 15px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
   height: 450px;
+  margin: 0 auto;
   max-width: 800px;
   overflow: hidden;
 }
@@ -32,14 +33,13 @@
 .preview-container {
   overflow: hidden;
   text-align: center;
-  width: 805px; //accomodate shadows
 }
 
 .separator-y {
   border-right: 1px solid #ccc;
   height: 48px;
-  margin-right: 10px;
-  width: 10px;
+  margin-right: 5px;
+  width: 5px;
 }
 
 .text-controls {
@@ -53,8 +53,11 @@
 
   & > div {
     display: inline-block;
-    margin: 2px 0;
     vertical-align: middle;
+  }
+
+  & > .toggle-text {
+    margin: 8px 0;
   }
 
   .input-wrap {
