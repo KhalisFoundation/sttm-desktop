@@ -1,7 +1,9 @@
+/* eslint-disable import/no-unresolved */
 const electron = require('electron');
 const h = require('hyperscript');
 const ip = require('ip');
 const copy = require('copy-to-clipboard');
+const { obs: defaultPrefs } = require('./js/defaults.json');
 
 const { ipcRenderer, remote } = electron;
 
@@ -120,6 +122,12 @@ const decreaseOpacity = () => {
 
   overlayVars.bgOpacity = newSize;
   savePrefs();
+};
+
+const setToggleIcon = (el, flag, classes = ['fa-toggle-on', 'fa-toggle-off']) => {
+  const $icon = el.querySelector('.cp-icon');
+  $icon.classList.toggle(classes[0], flag);
+  $icon.classList.toggle(classes[1], !flag);
 };
 
 const separator = h('div.separator');
@@ -261,14 +269,42 @@ const toggleLarivaarAssist = h(
   h('div.setting-label', 'Larivaar Assist'),
 );
 
-const toggleLarivaar = h(
+const resetButton = h(
   'div.input-wrap',
+  {
+    onclick: () => {
+      const { overlayVars: defaultVars } = defaultPrefs.overlayPrefs;
+      Object.assign(overlayVars, defaultVars);
+      savePrefs();
+
+      const { overlayLogo, overlayLarivaar } = overlayVars;
+      const $logoEl = document.querySelector('div.input-wrap.logo-toggle');
+      const $larivaarEl = document.querySelector('div.input-wrap.larivaar');
+
+      document.querySelector('input.toggle-gurbani-text').value = overlayVars.textColor;
+      document.querySelector('input.toggle-text').value = overlayVars.gurbaniTextColor;
+      document.querySelector('input.background').value = overlayVars.bgColor;
+
+      setToggleIcon($logoEl, overlayLogo);
+      setToggleIcon($larivaarEl, overlayLarivaar, ['fa-link', 'fa-unlink']);
+
+      const $larivaarLabel = $larivaarEl.querySelector('.setting-label');
+      $larivaarLabel.innerText = `Use ${overlayLarivaar ? 'Padched' : 'Larivaar'}`;
+    },
+  },
+  h('div.export-btn', h('i.fa.fa-refresh.cp-icon')),
+  h('div.setting-label', 'Reset Settings'),
+);
+
+const toggleLarivaar = h(
+  'div.input-wrap.larivaar',
   {
     onclick: evt => {
       overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
       savePrefs();
 
       const isLarivaar = overlayVars.overlayLarivaar;
+      setToggleIcon(evt.currentTarget, isLarivaar, ['fa-link', 'fa-unlink']);
       controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
@@ -295,9 +331,7 @@ const toggleCast = h(
       ipcRenderer.send('toggle-obs-cast', overlayCast);
       ipcRenderer.send('update-settings');
 
-      const $castIcon = evt.currentTarget.querySelector('.cp-icon');
-      $castIcon.classList.toggle('fa-toggle-on', overlayCast);
-      $castIcon.classList.toggle('fa-toggle-off', !overlayCast);
+      setToggleIcon(evt.currentTarget, overlayCast);
       document.body.classList.toggle('overlay-off', !overlayCast);
 
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
@@ -324,9 +358,7 @@ const toggleLogo = h(
         savePrefs();
         const { overlayLogo } = overlayVars;
 
-        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
-        $logoIcon.classList.toggle('fa-toggle-on', overlayLogo);
-        $logoIcon.classList.toggle('fa-toggle-off', !overlayLogo);
+        setToggleIcon(evt.currentTarget, overlayLogo);
 
         analytics.trackEvent('overlay', 'toggleLogo', overlayLogo);
       }
@@ -348,9 +380,7 @@ const toggleAnnouncements = h(
         store.setUserPref('app.announcement-overlay', announcementOverlay);
         ipcRenderer.send('update-settings');
 
-        const $announcementIcon = evt.currentTarget.querySelector('.cp-icon');
-        $announcementIcon.classList.toggle('fa-toggle-on', announcementOverlay);
-        $announcementIcon.classList.toggle('fa-toggle-off', !announcementOverlay);
+        setToggleIcon(evt.currentTarget, announcementOverlay);
 
         analytics.trackEvent('overlay', 'toggleAnnouncements', announcementOverlay);
       }
@@ -368,6 +398,7 @@ controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
+controlPanel.append(resetButton);
 controlPanel.append(toggleLarivaar);
 if (overlayVars.overlayLarivaar) {
   controlPanel.appendChild(toggleLarivaarAssist);
@@ -381,7 +412,7 @@ const verticalLayoutBtn = layoutButtonFactory('vertical');
 const classicLayoutBtn = layoutButtonFactory('classic');
 
 const gurbaniColor = colorInputFactory(
-  'toggle-text',
+  'toggle-gurbani-text',
   overlayVars.gurbaniTextColor,
   changeGurbaniColor,
 );

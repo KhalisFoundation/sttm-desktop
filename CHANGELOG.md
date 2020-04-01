@@ -57,14 +57,14 @@
 
 ### Improved:
 
-- Fixed a bug that was causing Chromecast not to work as expected 
+- Fixed a bug that was causing Chromecast not to work as expected
 - Fixed a bug that was causing translations not to appear in Bani Overlay
 
 ### 6.3.1 - _December 27, 2019_
 
 ### Improved:
 
-- Fixed copy & paste support for new languages 
+- Fixed copy & paste support for new languages
 - Various code enhancements
 
 </br>
@@ -115,10 +115,10 @@
 * Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab!
   ![](./assets/img/help_images/desktop-550-theme.png)
 
-- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!  
-  
+- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!
+
 ### 5.3.4 - _September 18, 2019_
-     
+
 ### Improved:
 
 - Added the ability to choose if annoucements should appear in Bani Overlay
