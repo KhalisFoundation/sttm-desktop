@@ -1,5 +1,27 @@
 ## New Updates
 
+### 7.3 - _April 5, 2020_
+
+![](./assets/img/help_images/desktop-bani-overlay-font.jpg)
+
+### Added:
+
+- New vertical and classic layout options for Bani Overlay
+- New font options for Bani Overlay
+- Larviaar Assist for Bani Overlay
+- Reset settings option for Bani Overlay
+
+### Improved:
+
+- Removed a transition that was appearing with "Next Line" enabaled
+- Fixed a bug that was causing the "Enter" keyboard shortcut not to work when opening a search result
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.2 - _March 16, 2020_
 
 ### Improved:
@@ -8,12 +30,6 @@
 - Fixed a bug that was causing announcements not to work properly
 - Fixed a bug that was showing undefined search results
 - Fixed a bug that was causing Punjabi Teeka not to appear
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.1.1 - _February 28, 2020_
 
