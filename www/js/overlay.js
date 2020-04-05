@@ -2,13 +2,15 @@ const electron = require('electron');
 const h = require('hyperscript');
 const ip = require('ip');
 const copy = require('copy-to-clipboard');
+// eslint-disable-next-line import/no-unresolved
+const { obs: defaultPrefs } = require('./js/defaults.json');
 
 const { ipcRenderer, remote } = electron;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const { overlayVars } = store.get('obs').overlayPrefs;
+const { fonts, overlayVars } = store.get('obs').overlayPrefs;
 let overlayCast = store.getUserPref('app.overlay-cast');
 let announcementOverlay = store.getUserPref('app.announcement-overlay');
 
@@ -122,6 +124,12 @@ const decreaseOpacity = () => {
   savePrefs();
 };
 
+const setToggleIcon = (el, flag, classes = ['fa-toggle-on', 'fa-toggle-off']) => {
+  const $icon = el.querySelector('.cp-icon');
+  $icon.classList.toggle(classes[0], flag);
+  $icon.classList.toggle(classes[1], !flag);
+};
+
 const separator = h('div.separator');
 const separatorY = () => h('div.separator-y').cloneNode(true);
 
@@ -132,12 +140,21 @@ const layoutButtonFactory = layoutName =>
     h('div.layout-bar.layout-bar-2'),
     h('div.layout-bar.layout-bar-3'),
     h('div.layout-bar.layout-bar-4'),
+    h('div.layout-vertical-bar'),
+    h('div.layout-classic-bar'),
     {
       onclick: () => {
         document.querySelectorAll('.content-bar').forEach(bar => {
           bar.setAttribute('style', 'transform:none');
         });
+        const prevLayout = overlayVars.layout;
         overlayVars.layout = layoutName;
+        if (layoutName === 'vertical') {
+          overlayVars.layout = prevLayout === 'vertical' ? 'vertical-left' : 'vertical';
+          document
+            .querySelector('.layout-btn.vertical')
+            .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
+        }
         savePrefs();
         analytics.trackEvent('overlay', 'layout', layoutName);
       },
@@ -167,6 +184,48 @@ const resizeButtonFactory = (increaseFunc, decreaseFunc) =>
     ),
   );
 
+const closeAllDropDowns = () => {
+  document
+    .querySelectorAll('.options-container.visible')
+    .forEach(el => el.classList.remove('visible'));
+};
+
+const toggleDropDown = $select => {
+  closeAllDropDowns();
+  const $options = $select.querySelector('.options-container');
+  $options.classList.add('visible');
+  $options.style.top = `${
+    window.innerHeight < $options.offsetHeight + $select.offsetTop
+      ? -$options.offsetHeight
+      : $select.querySelector('.select-value').offsetHeight
+  }px`;
+};
+
+window.addEventListener('click', e => {
+  if (!e.target.classList.contains('select-value')) {
+    closeAllDropDowns();
+  } else {
+    toggleDropDown(e.target.parentElement);
+  }
+});
+
+const fontSwitch = (e, font, propName) => {
+  e.target.parentElement.parentElement.querySelector('.select-value').innerHTML = font;
+  overlayVars[propName] = font;
+  savePrefs();
+};
+
+const fontListFactory = (list, propName) => {
+  const options = list.map(font =>
+    h(`div.option`, { onclick: e => fontSwitch(e, font, propName) }, font),
+  );
+  return h(
+    'div.custom-select',
+    h(`div.select-value.${propName}`, overlayVars[propName]),
+    h('div.options-container', options),
+  );
+};
+
 const copyURLButton = h(
   'span.input-wrap',
   {
@@ -186,14 +245,67 @@ const overlayUrl = () =>
     copyURLButton,
   );
 
-const toggleLarivaar = h(
+const toggleLarivaarAssist = h(
+  'div.input-wrap.larivaar-assist-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.larivaarAssist = !overlayVars.larivaarAssist;
+        savePrefs();
+        const { larivaarAssist } = overlayVars;
+
+        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
+        $logoIcon.classList.toggle('fa-toggle-on', larivaarAssist);
+        $logoIcon.classList.toggle('fa-toggle-off', !larivaarAssist);
+
+        analytics.trackEvent('overlay', 'toggleLogo', larivaarAssist);
+      }
+    },
+  },
+  h(
+    'div#logo-btn',
+    h(`i.fa.cp-icon.${overlayVars.larivaarAssist ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', 'Larivaar Assist'),
+);
+
+const resetButton = h(
   'div.input-wrap',
+  {
+    onclick: () => {
+      const { overlayVars: defaultVars } = defaultPrefs.overlayPrefs;
+      Object.assign(overlayVars, defaultVars);
+      savePrefs();
+
+      const { overlayLogo, overlayLarivaar } = overlayVars;
+      const $logoEl = document.querySelector('div.input-wrap.logo-toggle');
+      const $larivaarEl = document.querySelector('div.input-wrap.larivaar');
+
+      document.querySelector('input.toggle-gurbani-text').value = overlayVars.textColor;
+      document.querySelector('input.toggle-text').value = overlayVars.gurbaniTextColor;
+      document.querySelector('input.background').value = overlayVars.bgColor;
+
+      setToggleIcon($logoEl, overlayLogo);
+      setToggleIcon($larivaarEl, overlayLarivaar, ['fa-link', 'fa-unlink']);
+
+      const $larivaarLabel = $larivaarEl.querySelector('.setting-label');
+      $larivaarLabel.innerText = `Use ${overlayLarivaar ? 'Padched' : 'Larivaar'}`;
+    },
+  },
+  h('div.export-btn', h('i.fa.fa-refresh.cp-icon')),
+  h('div.setting-label', 'Reset Settings'),
+);
+
+const toggleLarivaar = h(
+  'div.input-wrap.larivaar',
   {
     onclick: evt => {
       overlayVars.overlayLarivaar = !overlayVars.overlayLarivaar;
       savePrefs();
 
       const isLarivaar = overlayVars.overlayLarivaar;
+      setToggleIcon(evt.currentTarget, isLarivaar, ['fa-link', 'fa-unlink']);
+      controlPanel[isLarivaar ? 'appendChild' : 'removeChild'](toggleLarivaarAssist);
 
       const $larivaarIcon = evt.currentTarget.querySelector('.cp-icon');
       $larivaarIcon.classList.toggle('fa-unlink', isLarivaar);
@@ -219,9 +331,7 @@ const toggleCast = h(
       ipcRenderer.send('toggle-obs-cast', overlayCast);
       ipcRenderer.send('update-settings');
 
-      const $castIcon = evt.currentTarget.querySelector('.cp-icon');
-      $castIcon.classList.toggle('fa-toggle-on', overlayCast);
-      $castIcon.classList.toggle('fa-toggle-off', !overlayCast);
+      setToggleIcon(evt.currentTarget, overlayCast);
       document.body.classList.toggle('overlay-off', !overlayCast);
 
       const $castLabel = evt.currentTarget.querySelector('.setting-label');
@@ -248,9 +358,7 @@ const toggleLogo = h(
         savePrefs();
         const { overlayLogo } = overlayVars;
 
-        const $logoIcon = evt.currentTarget.querySelector('.cp-icon');
-        $logoIcon.classList.toggle('fa-toggle-on', overlayLogo);
-        $logoIcon.classList.toggle('fa-toggle-off', !overlayLogo);
+        setToggleIcon(evt.currentTarget, overlayLogo);
 
         analytics.trackEvent('overlay', 'toggleLogo', overlayLogo);
       }
@@ -272,9 +380,7 @@ const toggleAnnouncements = h(
         store.setUserPref('app.announcement-overlay', announcementOverlay);
         ipcRenderer.send('update-settings');
 
-        const $announcementIcon = evt.currentTarget.querySelector('.cp-icon');
-        $announcementIcon.classList.toggle('fa-toggle-on', announcementOverlay);
-        $announcementIcon.classList.toggle('fa-toggle-off', !announcementOverlay);
+        setToggleIcon(evt.currentTarget, announcementOverlay);
 
         analytics.trackEvent('overlay', 'toggleAnnouncements', announcementOverlay);
       }
@@ -292,14 +398,21 @@ controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
 controlPanel.append(separator);
+controlPanel.append(resetButton);
 controlPanel.append(toggleLarivaar);
+if (overlayVars.overlayLarivaar) {
+  controlPanel.appendChild(toggleLarivaarAssist);
+}
 
 /** Text Control Bar Items */
 const topLayoutBtn = layoutButtonFactory('top');
 const bottomLayoutBtn = layoutButtonFactory('bottom');
 const splitLayoutBtn = layoutButtonFactory('split');
+const verticalLayoutBtn = layoutButtonFactory('vertical');
+const classicLayoutBtn = layoutButtonFactory('classic');
+
 const gurbaniColor = colorInputFactory(
-  'toggle-text',
+  'toggle-gurbani-text',
   overlayVars.gurbaniTextColor,
   changeGurbaniColor,
 );
@@ -313,16 +426,30 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
 );
 const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
-textControls.append(controlsFactory([gurbaniColor, changeGurbanifontSizeButton], 'Gurbani'));
+const translationFonts = fontListFactory(fonts.translation, 'translationFont');
+const gurbaniFonts = fontListFactory(fonts.gurbani, 'gurbaniFont');
+
+textControls.append(
+  controlsFactory([gurbaniColor, gurbaniFonts, changeGurbanifontSizeButton], 'Gurbani'),
+);
 textControls.append(separatorY());
-textControls.append(controlsFactory([textColor, changefontSizeButton], 'Text'));
+textControls.append(controlsFactory([textColor, translationFonts, changefontSizeButton], 'Text'));
 textControls.append(separatorY());
 textControls.append(controlsFactory(backgroundColor, 'BG'));
 textControls.append(separatorY());
 textControls.append(controlsFactory(changeBarSizeButton, 'Size'));
 textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
 textControls.append(separatorY());
-textControls.append(controlsFactory([topLayoutBtn, bottomLayoutBtn, splitLayoutBtn], 'Layout'));
+textControls.append(
+  controlsFactory(
+    [topLayoutBtn, bottomLayoutBtn, splitLayoutBtn, verticalLayoutBtn, classicLayoutBtn],
+    'Layout',
+  ),
+);
+
+document
+  .querySelector('.layout-btn.vertical')
+  .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
 
 const themeSelector = document.querySelector('.theme-selector');
 

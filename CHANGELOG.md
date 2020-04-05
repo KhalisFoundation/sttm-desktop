@@ -1,5 +1,27 @@
 ## New Updates
 
+### 7.3 - _April 5, 2020_
+
+![](./assets/img/help_images/desktop-bani-overlay-font.jpg)
+
+### Added:
+
+- New vertical and classic layout options for Bani Overlay
+- New font options for Bani Overlay
+- Larviaar Assist for Bani Overlay
+- Reset settings option for Bani Overlay
+
+### Improved:
+
+- Removed a transition that was appearing with "Next Line" enabaled
+- Fixed a bug that was causing the "Enter" keyboard shortcut not to work when opening a search result
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.2 - _March 16, 2020_
 
 ### Improved:
@@ -8,12 +30,6 @@
 - Fixed a bug that was causing announcements not to work properly
 - Fixed a bug that was showing undefined search results
 - Fixed a bug that was causing Punjabi Teeka not to appear
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.1.1 - _February 28, 2020_
 
@@ -57,14 +73,14 @@
 
 ### Improved:
 
-- Fixed a bug that was causing Chromecast not to work as expected 
+- Fixed a bug that was causing Chromecast not to work as expected
 - Fixed a bug that was causing translations not to appear in Bani Overlay
 
 ### 6.3.1 - _December 27, 2019_
 
 ### Improved:
 
-- Fixed copy & paste support for new languages 
+- Fixed copy & paste support for new languages
 - Various code enhancements
 
 </br>
@@ -115,10 +131,10 @@
 * Special new theme! We have added a new theme to celebrate Guru Nanak Dev Jee's 550th Gurpurab!
   ![](./assets/img/help_images/desktop-550-theme.png)
 
-- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!  
-  
+- Copy and paste! You can now copy a line from within SikhiToTheMax and paste it outside the app! Click a line from the shabad, and press CTRL (or CMD for Mac) + C to copy it. It will copy everything that is being shown on the slide, including translations!
+
 ### 5.3.4 - _September 18, 2019_
-     
+
 ### Improved:
 
 - Added the ability to choose if annoucements should appear in Bani Overlay
