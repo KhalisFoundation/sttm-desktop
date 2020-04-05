@@ -21,6 +21,10 @@
     opacity: 1;
     position: initial;
     width: initial;
+
+    .gurbani {
+      transition: none;
+    }
   }
 
   .slide.active {
