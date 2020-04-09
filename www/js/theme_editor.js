@@ -16,7 +16,7 @@ const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
-const { store, themes } = remote.require('./app');
+const { store, themes, i18n } = remote.require('./app');
 
 const defaultTheme = themes[0];
 
@@ -48,8 +48,7 @@ const imageCheck = filePath => {
       return acceptedExtensions.includes(fileMeta.ext) && acceptedMimeTypes.includes(fileMeta.mime);
     }
   } catch (error) {
-    uploadErrorNotification(`Failed to validate this file as an image.
-      Error: ${error}. If error presists file a bug report at sttm.co`);
+    uploadErrorNotification(i18n.t('THEMES.FILE_VALIDATE_ERR', { error }));
   }
 
   return false;
@@ -66,10 +65,7 @@ const toggleFileInput = (showError = false) => {
   document.querySelector('.file-input-label').classList.toggle('disabled', isLimitReached);
   document.querySelector('#themebg-upload').disabled = isLimitReached;
   if (isLimitReached && showError) {
-    uploadErrorNotification(
-      'Five custom backgrounds limit reached. Please delete one or more before adding another custom background.',
-      5000,
-    );
+    uploadErrorNotification(i18n.t('THEMES.LIMIT_ERR'), 5000);
   }
 };
 
@@ -100,14 +96,11 @@ const recentSwatchFactory = backgroundPath =>
           evt.stopPropagation();
           const currentBg = store.getUserPref('app.themebg');
           if (currentBg.url === backgroundPath.replace(/(\s)/g, '\\ ')) {
-            uploadErrorNotification(
-              'This image is being used, please switch to another image or theme before deleting this image.',
-              5000,
-            );
+            uploadErrorNotification(i18n.t('THEMES.DELETE_ERR'), 5000);
           } else {
             fs.unlink(backgroundPath, error => {
               if (error) {
-                uploadErrorNotification(`Unable to delete that image. - ${error}`);
+                uploadErrorNotification(i18n.t('THEMES.DELETE_ERR', { error }));
               } else {
                 evt.target.closest('.custom-bg').classList.add('delete-animate');
                 toggleRecentBgHeader();
@@ -147,12 +140,7 @@ const swatchFactory = (themeInstance, isCustom, forceLabel = null) =>
           // eslint-disable-next-line no-use-before-define
           updateCeremonyThemeTiles();
         } catch (error) {
-          uploadErrorNotification(
-            `There is an error parsing this theme.
-            Try checking theme file for error. ${error} - If error persists,
-            report it at www.sttm.co`,
-            5000,
-          );
+          uploadErrorNotification(i18n.t('THEMES.PARSE_ERR', { error }), 5000);
         }
       },
     },
@@ -163,7 +151,7 @@ const swatchFactory = (themeInstance, isCustom, forceLabel = null) =>
           color: themeInstance['gurbani-color'],
         },
       },
-      forceLabel || themeInstance.name,
+      forceLabel || i18n.t(`THEMES.${themeInstance.name}`),
     ),
   );
 
@@ -178,14 +166,12 @@ const upsertCustomBackgrounds = themesContainer => {
   try {
     if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
   } catch (error) {
-    uploadErrorNotification(
-      ` Error creating directory for user backgrounds. ${error} - If error persists, report it at www.sttm.co:`,
-    );
+    uploadErrorNotification(i18n.t('THEMES.DIR_CREATE_ERR', { error }));
   }
 
   fs.readdir(userBackgroundsPath, (error, files) => {
     if (error) {
-      uploadErrorNotification(`Unable to get existing custom background files - ${error}`);
+      uploadErrorNotification(i18n.t('THEMES.UNABLE_TO_GET', { error }));
     } else {
       const sortedFiles = files
         .map(fileName => ({
@@ -201,7 +187,8 @@ const upsertCustomBackgrounds = themesContainer => {
           recentBgsContainer.appendChild(recentSwatchFactory(fullPath));
         } else {
           fs.unlink(fullPath, deleteError => {
-            if (deleteError) uploadErrorNotification(`Unable to delete a file. - ${deleteError}`);
+            if (deleteError)
+              uploadErrorNotification(i18n.t('THEMES.UNABLE_TO_DEL', { deleteError }));
           });
         }
       });
@@ -232,7 +219,7 @@ const updateCeremonyThemeTiles = () => {
   const anandKarajPane = document.querySelector('.ceremony-pane-themes#anandkaraj');
   if (anandKarajPane) {
     swatchGroupFactory('anandkaraj', anandKarajPane);
-    anandKarajPane.appendChild(swatchFactory(currentTheme, false, 'Current Theme'));
+    anandKarajPane.appendChild(swatchFactory(currentTheme, false, i18n.t('THEMES.CURRENT_THEME')));
   }
 };
 
@@ -254,9 +241,7 @@ const imageInput = themesContainer =>
         try {
           if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
         } catch (error) {
-          uploadErrorNotification(
-            `Error Creating Directory. ${error} - If error persists, report it at www.sttm.co:`,
-          );
+          uploadErrorNotification(i18n.t('THEMES.DIR_CREATE_ERR2'));
         }
 
         try {
@@ -278,14 +263,10 @@ const imageInput = themesContainer =>
               global.core.platformMethod('updateSettings');
             }
           } else {
-            throw new Error('Only .png and .jpg images are allowed.');
+            throw new Error(i18n.t('THEMES.ALLOWED_IMGS_MSG'));
           }
         } catch (error) {
-          uploadErrorNotification(
-            `There was an error using this file. ${error} -
-            If error persists, report it at www.sttm.co`,
-            5000,
-          );
+          uploadErrorNotification(i18n.t('THEMES.USING_ERR'), 5000);
         }
       },
     }),
@@ -297,21 +278,21 @@ module.exports = {
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
 
-    themeOptions.appendChild(swatchHeaderFactory('Colours'));
+    themeOptions.appendChild(swatchHeaderFactory(i18n.t('THEMES.COLORS')));
     swatchGroupFactory('COLOR', themeOptions);
 
-    themeOptions.appendChild(swatchHeaderFactory('Backgrounds'));
+    themeOptions.appendChild(swatchHeaderFactory(i18n.t('THEMES.BACKGROUNDS')));
     swatchGroupFactory('BACKGROUND', themeOptions);
 
-    themeOptions.appendChild(swatchHeaderFactory('Special Conditions'));
+    themeOptions.appendChild(swatchHeaderFactory(i18n.t('THEMES.SPECIAL_CONDITIONS')));
     swatchGroupFactory('SPECIAL', themeOptions);
 
-    themeOptions.appendChild(swatchHeaderFactory('Custom backgrounds'));
+    themeOptions.appendChild(swatchHeaderFactory(i18n.t('THEMES.CUSTOM_BACKGROUNDS')));
     themeOptions.appendChild(imageInput(themeOptions));
-    themeOptions.appendChild(h('p.helper-text', 'Recommended 1920x1080'));
+    themeOptions.appendChild(h('p.helper-text', i18n.t('THEMES.RECOMMENDED')));
 
     const recentBgHeader = themeOptions.appendChild(
-      swatchHeaderFactory('Recent Custom backgrounds'),
+      swatchHeaderFactory(i18n.t('THEMES.RECENT_CUSTOM_BGS')),
     );
     recentBgHeader.classList.add('recentbg-header');
     upsertCustomBackgrounds(themeOptions);

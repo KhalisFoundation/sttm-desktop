@@ -17,21 +17,21 @@ const slideStrings = {
 };
 const dropdownStrings = {
   gurus: [
-    'Guru Nanak Dev Ji',
-    'Guru Angad Dev Ji',
-    'Guru Amar Das Ji',
-    'Guru Ram Das Ji',
-    'Guru Arjan Dev Ji',
-    'Guru Hargobind Sahib Ji',
-    'Guru Har Rai Sahib Ji',
-    'Guru Har Krishan Sahib Ji',
-    'Guru Teg Bhadur Sahib Ji',
-    'Guru Gobind Singh Ji',
-    'Guru Granth Sahib Ji',
+    'NANAK_DEV_JI',
+    'ANGAD_DEV_JI',
+    'AMARDAS_SAHIB_JI',
+    'RAMDAS_SAHIB_JI',
+    'ARJUN_DEV_JI',
+    'HAR_GOBIND_SAHIB_JI',
+    'HAR_RAI_SAHIB_JI',
+    'HAR_KRISHAN_SAHIB_JI',
+    'TEG_BAHADUR_SAHIB_JI',
+    'GOBIND_SINGH_SAHIB_JI',
+    'GRANTH_SAHIB_JI',
   ],
 };
 const announcemenetPlaceholder = {
-  english: 'Add announcement text here ..',
+  english: 'ADD_ANNOUNCEMENT_TEXT',
   gurmukhi: 'GoSxw ie`Qy ilKo ...',
 };
 const allowedAnnouncementTags = [

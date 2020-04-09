@@ -7,7 +7,7 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 
-const { remote } = electron;
+const { remote, i18n } = electron;
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
@@ -113,7 +113,7 @@ module.exports = {
     const { $search } = global.core.search;
 
     if (force) {
-      $search.placeholder = 'Downloading database...';
+      $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
       $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
@@ -128,7 +128,7 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
-                $search.placeholder = 'Downloading database...';
+                $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
                 $search.dataset.databaseState = 'loading';
                 progress(
                   request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),

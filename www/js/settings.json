@@ -1,37 +1,37 @@
 {
   "slide-layout": {
-    "title": "Slide Layout",
+    "title": "SLIDE_LAYOUT",
     "settings": {
       "font-sizes": {
-        "title": "Font Sizes",
+        "title": "FONT_SIZES",
         "type": "range",
         "options": {
           "announcements": {
-            "title": "Announcements",
+            "title": "ANNOUNCEMENTS",
             "max": 20,
             "min": 1,
             "step": 1
           },
           "gurbani": {
-            "title": "Bani",
+            "title": "BANI",
             "max": 20,
             "min": 1,
             "step": 1
           },
           "translation": {
-            "title": "Translation",
+            "title": "TRANSLATION",
             "max": 20,
             "min": 1,
             "step": 1
           },
           "teeka": {
-            "title": "Punjabi Teeka",
+            "title": "PUNJABI_TEEKA",
             "max": 20,
             "min": 1,
             "step": 1
           },
           "transliteration": {
-            "title": "Transliteration",
+            "title": "TRANSLITERATION",
             "max": 20,
             "min": 1,
             "step": 1
@@ -39,57 +39,57 @@
         }
       },
       "language-settings": {
-        "title": "Language Settings",
+        "title": "LANGUAGE",
         "type": "dropdown",
         "options": {
           "translation-language": {
-            "title": "Translation Language",
+            "title": "TRANSLATION",
             "options": {
-              "English": "English",
-              "Spanish": "Spanish"
+              "English": "ENGLISH",
+              "Spanish": "SPANISH"
             }
           },
           "transliteration-language": {
-            "title": "Transliteration Language",
+            "title": "TRANSLITERATION",
             "options": {
-              "English": "English",
-              "Devanagari": "Devanagari"
+              "English": "ENGLISH",
+              "Devanagari": "DEVANAGARI"
             }
           }
         }
       },
       "fields": {
-        "title": "Fields to Display",
+        "title": "FIELDS_TO_DISPLAY",
         "type": "checkbox",
         "options": {
-          "display-translation": "Translation",
-          "display-teeka": "Punjabi Teeka",
-          "display-transliteration": "Transliteration",
-          "display-next-line": "Next Line"
+          "display-translation": "TRANSLATION",
+          "display-teeka": "PUNJABI_TEEKA",
+          "display-transliteration": "TRANSLITERATION",
+          "display-next-line": "NEXT_LINE"
         }
       },
       "display-options": {
-        "title": "Display Options",
+        "title": "DISPLAY_OPTIONS",
         "type": "switch",
         "options": {
           "akhandpaatt": {
-            "label": "Akhand Paatth View (Beta)",
-            "subLabel": "(Google ChromeCast Unavailable)"
+            "label": "AKHAND_PATH_VIEW",
+            "subLabel": "CHROMECAST_UNAVAILABLE"
           },
-          "left-align": "Left-Align",
-          "quick-tools": "Quick Tools",
-          "shortcut-tray-on": "Shortcut Tray",
+          "left-align": "LEFT_ALIGN",
+          "quick-tools": "QUICK_TOOLS",
+          "shortcut-tray-on": "SHORTCUT_TRAY",
           "livefeed": {
-            "label": "Live Feed Text Files",
+            "label": "LIVE_FEED",
             "subLabel": {
               "storepref": "userPrefs.app.live-feed-location"
             }
           },
-          "autoplay": "Auto Play",
-          "larivaar": "Larivaar",
+          "autoplay": "AUTO_PLAY",
+          "larivaar": "LARIVAAR",
           "larivaar-assist": {
-            "label": "Larivaar Assist",
-            "subLabel": "(This will disable vishraams.)"
+            "label": "LARIVAAR_ASSIST",
+            "subLabel": "LARIVAAR_ASSIST_MSG"
           }
         }
       },
@@ -97,20 +97,20 @@
         "type": "dropdown",
         "options": {
           "assist-type": {
-            "title": "Assist Type",
+            "title": "ASSIST_TYPE",
             "options": {
-              "single-color": "Single Color",
-              "multi-color": "Multi Color"
+              "single-color": "SINGLE_COLOR",
+              "multi-color": "MULTI_COLOR"
             }
           }
         }
       },
       "autoplay-options": {
-        "title": "Autoplay Options",
+        "title": "AUTOPLAY_OPTIONS",
         "type": "range",
         "options": {
           "autoplayTimer": {
-            "title": "Delay (Seconds)",
+            "title": "DELAY",
             "max": 20,
             "min": 1,
             "step": 1
@@ -120,26 +120,26 @@
     }
   },
   "toolbar": {
-    "title": "Toolbar",
+    "title": "TOOLBAR",
     "settings": {
       "gurbani": {
-        "title": "Bani Settings",
+        "title": "BANI_SETTINGS",
         "type": "dropdown",
         "options": {
           "bani-length": {
-            "title": "Bani Length",
+            "title": "LENGTH",
             "options": {
-              "short": "Short",
-              "medium": "Medium",
-              "long": "Long",
-              "extralong": "Extra Long"
+              "short": "SHORT",
+              "medium": "MEDIUM",
+              "long": "LONG",
+              "extralong": "EXTRA_LONG"
             }
           },
           "mangal-position": {
-            "title": "Mangal Position",
+            "title": "MANGAL_POSITION",
             "options": {
-              "current": "Current Saroops (default)",
-              "above": "Above Raag Headings"
+              "current": "CURRENT",
+              "above": "ABOVE"
             }
           }
         }
@@ -147,7 +147,7 @@
       "gurbani-options": {
         "type": "switch",
         "options": {
-          "display-visraams": "Show Vishraams"
+          "display-visraams": "SHOW_VISHRAAMS"
         }
       },
       "vishraam": {
@@ -155,18 +155,18 @@
         "type": "dropdown",
         "options": {
           "vishraam-options": {
-            "title": "Vishraam Options",
+            "title": "VISHRAAM_OPTIONS",
             "options": {
-              "colored-words": "Colored Words",
-              "gradient-bg": "Gradient Background"
+              "colored-words": "COLORED_WORDS",
+              "gradient-bg": "GRADIENT_BG"
             }
           },
           "vishraam-source": {
-            "title": "Vishraam Source",
+            "title": "VISHRAAM_SOURCE",
             "options": {
-              "sttm2": "STTM 2",
-              "igurbani": "iGurbani",
-              "sttm": "BaniDB Living"
+              "sttm2": "STTM2",
+              "igurbani": "I_GURBANI",
+              "sttm": "STTM"
             }
           }
         }
@@ -174,7 +174,7 @@
     }
   },
   "app": {
-    "title": "App Settings",
+    "title": "APP_SETTINGS",
     "settings": {
       "theme": {
         "title": "",
@@ -197,21 +197,21 @@
         "options": {}
       },
       "layout": {
-        "title": "App Layout",
+        "title": "APP_LAYOUT",
         "type": "switch",
         "options": {
-          "presenter-view": "Presenter View"
+          "presenter-view": "PRESENTER_VIEW"
         }
       },
       "analytics": {
-        "title": "Other Options",
+        "title": "OTHER_OPTIONS",
         "type": "switch",
         "options": {
           "limit-changelog": {
-            "label": "Limit Changelog",
-            "subLabel": "Only see changelog once per version"
+            "label": "LIMIT_CHANGELOG",
+            "subLabel": "LIMIT_CHANGELOG_MSG"
           },
-          "collect-statistics": "Collect Statistics"
+          "collect-statistics": "COLLECT_STATISTICS"
         }
       }
     }

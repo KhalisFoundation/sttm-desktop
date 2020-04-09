@@ -10,7 +10,7 @@ global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
 const { remote } = require('electron');
-const { store } = require('electron').remote.require('./app');
+const { store, i18n } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
 const themes = require('./js/themes.json');
@@ -56,6 +56,13 @@ $scroll.addEventListener(
 );
 
 shortcuts.applyShortcuts('viewer');
+
+(() => {
+  const viewerTitle = i18n.t('VIEWER_TITLE', { appName: i18n.t('APPNAME') });
+  document.body.title = viewerTitle;
+  document.querySelector('span.title').innerHTML = viewerTitle;
+  document.querySelector('.vc-label').innerHTML = i18n.t('QUICK_TOOLS.SELF');
+})();
 
 const hideDecks = () => {
   Array.from(document.querySelectorAll('.deck')).forEach(el => {
@@ -222,9 +229,11 @@ const createAPVContainer = () => {
 const iconsetHtml = (classname, content) => {
   let icons;
   const iconType = classname.split('-')[1];
+  const key = iconType === 'gurbani' ? 'bani' : iconType;
+  const tagline = i18n.t(`QUICK_TOOLS.${key.toUpperCase()}`);
   if (content) {
     icons = h(`span.${classname}.iconset`, [
-      h('p.tagline', iconType === 'gurbani' ? 'bani' : iconType),
+      h('p.tagline', tagline),
       h(
         'span.visibility',
         {
