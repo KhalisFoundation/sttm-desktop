@@ -132,7 +132,7 @@ function receiverMessage(namespace, message) {
  * session listener during initialization
  */
 function sessionListener(e) {
-  appendMessage(i18n.t('CHROMECAST.NEW_SESSION_ID') + e.sessionId);
+  appendMessage('New session ID:' + e.sessionId);
   session = e;
   session.addUpdateListener(sessionUpdateListener);
   session.addMessageListener(namespace, receiverMessage);
@@ -143,9 +143,9 @@ function sessionListener(e) {
  */
 function receiverListener(e) {
   if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
-    appendMessage(i18n.t('CHROMECAST.RECEIVER_FOUND'));
+    appendMessage('receiver found');
   } else {
-    appendMessage(i18n.t('CHROMECAST.RECEIVER_LIST_EMPTY') + e);
+    appendMessage('receiver list empty: ' + e);
   }
 }
 
@@ -221,6 +221,6 @@ function sendMessage(message) {
       onError,
     );
   } else {
-    appendMessage(i18n.t('CHROMECAST.SESSION_IS_NULL'));
+    appendMessage('Cannot send because session is null');
   }
 }

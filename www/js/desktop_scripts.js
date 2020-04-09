@@ -167,7 +167,7 @@ module.exports = {
                             fs.unlink(oldDBPath, err1 => {
                               if (err1) {
                                 // eslint-disable-next-line no-console
-                                console.log(i18n.t('DATABASE.COULDNT_DELETE', { oldDB, err1 }));
+                                console.log(`Could not delete old database ${oldDB}: ${err1}`);
                               }
                             });
                           }
