@@ -7,7 +7,7 @@ const { obs: defaultPrefs } = require('./js/defaults.json');
 
 const { ipcRenderer, remote } = electron;
 
-const { store } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const { fonts, overlayVars } = store.get('obs').overlayPrefs;
@@ -235,7 +235,7 @@ const copyURLButton = h(
       analytics.trackEvent('overlay', 'urlCopied', url);
     },
   },
-  h('span.export-btn', { title: 'Copy URL' }, h('i.fa.fa-files-o.cp-icon')),
+  h('span.export-btn', { title: i18n.t('BANI_OVERLAY.COPY_URL') }, h('i.fa.fa-files-o.cp-icon')),
 );
 
 const overlayUrl = () =>
@@ -312,14 +312,21 @@ const toggleLarivaar = h(
       $larivaarIcon.classList.toggle('fa-link', !isLarivaar);
 
       const $larivaarLabel = evt.currentTarget.querySelector('.setting-label');
-      $larivaarLabel.innerText = `Use ${isLarivaar ? 'Padched' : 'Larivaar'}`;
+      $larivaarLabel.innerText = `Use ${
+        isLarivaar ? i18n.t('BANI_OVERLAY.PADCHED') : i18n.t('BANI_OVERLAY.LARIVAAR')
+      }`;
     },
   },
   h(
     'div.export-btn#larivaar-btn',
     h(`i.fa.cp-icon.${overlayVars.overlayLarivaar ? 'fa-unlink' : 'fa-link'}`),
   ),
-  h('div.setting-label', `Use ${overlayVars.overlayLarivaar ? 'Padched' : 'Larivaar'}`),
+  h(
+    'div.setting-label',
+    `Use ${
+      overlayVars.overlayLarivaar ? i18n.t('BANI_OVERLAY.PADCHED') : i18n.t('BANI_OVERLAY.LARIVAAR')
+    }`,
+  ),
 );
 
 const toggleCast = h(
@@ -346,7 +353,10 @@ const toggleCast = h(
     },
   },
   h('div#cast-btn', h(`i.fa.cp-icon.${overlayCast ? 'fa-toggle-on' : 'fa-toggle-off'}`)),
-  h('div.setting-label', `${overlayCast ? 'Overlay On' : 'Overlay Off'}`),
+  h(
+    'div.setting-label',
+    `${overlayCast ? i18n.t('BANI_OVERLAY.OVERLAY_ON') : i18n.t('BANI_OVERLAY.OVERLAY_OFF')}`,
+  ),
 );
 
 const toggleLogo = h(
@@ -368,7 +378,7 @@ const toggleLogo = h(
     'div#logo-btn',
     h(`i.fa.cp-icon.${overlayVars.overlayLogo ? 'fa-toggle-on' : 'fa-toggle-off'}`),
   ),
-  h('div.setting-label', 'Logo'),
+  h('div.setting-label', i18n.t('BANI_OVERLAY.LOGO')),
 );
 
 const toggleAnnouncements = h(
@@ -390,7 +400,7 @@ const toggleAnnouncements = h(
     'div#announcement-btn',
     h(`i.fa.cp-icon.${announcementOverlay ? 'fa-toggle-on' : 'fa-toggle-off'}`),
   ),
-  h('div.setting-label', 'Announcement'),
+  h('div.setting-label', i18n.t('BANI_OVERLAY.ANNOUNCEMENT')),
 );
 
 /** Main Control Bar Items */
@@ -430,20 +440,25 @@ const translationFonts = fontListFactory(fonts.translation, 'translationFont');
 const gurbaniFonts = fontListFactory(fonts.gurbani, 'gurbaniFont');
 
 textControls.append(
-  controlsFactory([gurbaniColor, gurbaniFonts, changeGurbanifontSizeButton], 'Gurbani'),
+  controlsFactory(
+    [gurbaniColor, gurbaniFonts, changeGurbanifontSizeButton],
+    i18n.t('BANI_OVERLAY.GURBANI'),
+  ),
 );
 textControls.append(separatorY());
-textControls.append(controlsFactory([textColor, translationFonts, changefontSizeButton], 'Text'));
+textControls.append(
+  controlsFactory([textColor, translationFonts, changefontSizeButton], i18n.t('BANI_OVERLAY.TEXT')),
+);
 textControls.append(separatorY());
-textControls.append(controlsFactory(backgroundColor, 'BG'));
+textControls.append(controlsFactory(backgroundColor, i18n.t('BANI_OVERLAY.BG')));
 textControls.append(separatorY());
-textControls.append(controlsFactory(changeBarSizeButton, 'Size'));
-textControls.append(controlsFactory(changeOpacityButton, 'Opacity'));
+textControls.append(controlsFactory(changeBarSizeButton, i18n.t('BANI_OVERLAY.SIZE')));
+textControls.append(controlsFactory(changeOpacityButton, i18n.t('BANI_OVERLAY.OPACITY')));
 textControls.append(separatorY());
 textControls.append(
   controlsFactory(
     [topLayoutBtn, bottomLayoutBtn, splitLayoutBtn, verticalLayoutBtn, classicLayoutBtn],
-    'Layout',
+    i18n.t('BANI_OVERLAY.LAYOUT'),
   ),
 );
 
@@ -455,49 +470,49 @@ const themeSelector = document.querySelector('.theme-selector');
 
 const themeObjects = {
   aNewDay: {
-    label: 'a new day',
+    label: 'A_NEW_DAY',
     bgColor: '#97d6f7',
     textColor: '#003a8c',
     gurbaniTextColor: '#0e2654',
   },
   baagiBlue: {
-    label: 'baagi blue',
+    label: 'BAAGI_BLUE',
     bgColor: '#274f69',
     textColor: '#fff',
     gurbaniTextColor: '#fff',
   },
   khalsaRush: {
-    label: 'khalsa rush',
+    label: 'KHALSA_RUSH',
     bgColor: '#ffa61a',
     textColor: '#071f77',
     gurbaniTextColor: '#071f77',
   },
   moodyBlue: {
-    label: 'moody blue',
+    label: 'MOODY_BLUE',
     bgColor: '#2d73a7',
     textColor: '#fff',
     gurbaniTextColor: '#fff',
   },
   blackAndBlue: {
-    label: 'black and blue',
+    label: 'BLACK_&_BLUE',
     bgColor: '#000',
     textColor: '#a3eafd',
     gurbaniTextColor: '#fff',
   },
   floral: {
-    label: 'floral',
+    label: 'FLORAL',
     bgColor: '#f5b7d1',
     textColor: '#a3eafd',
     gurbaniTextColor: '#fff',
   },
   khalsaGold: {
-    label: 'khalsa gold',
+    label: 'KHALSA_GOLD',
     bgColor: '#58330a',
     textColor: '#ffba00',
     gurbaniTextColor: '#ffba00',
   },
   neverForget: {
-    label: 'never forget',
+    label: 'NEVER_FORGET',
     bgColor: '#000',
     textColor: '#f00',
     gurbaniTextColor: '#f00',
@@ -505,7 +520,8 @@ const themeObjects = {
 };
 
 const themeSwatchFactory = themeOptions => {
-  const themeClass = themeOptions.label
+  const themeClass = i18n
+    .t(`THEMES.${themeOptions.label}`)
     .toLowerCase()
     .split(' ')
     .join('-');
@@ -523,11 +539,11 @@ const themeSwatchFactory = themeOptions => {
         analytics.trackEvent('overlay', 'theme', overlayVars.theme);
       },
     },
-    h('span', themeOptions.label),
+    h('span', i18n.t(`THEMES.${themeOptions.label}`)),
   );
 };
 
-themeSelector.appendChild(h('div.theme-selector-header', 'Presets'));
+themeSelector.appendChild(h('div.theme-selector-header', i18n.t('BANI_OVERLAY.PRESETS')));
 
 document.body.classList.toggle('overlay-off', !overlayCast);
 

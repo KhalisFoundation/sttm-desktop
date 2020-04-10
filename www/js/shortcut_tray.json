@@ -1,26 +1,26 @@
 {
-    "anandSahib": {
-        "label": "Anand Sahib (Bhog)",
-        "labelType": "roman",
-        "type": "ceremony",
-        "ref": 3
-    },
-    "moolMantra": {
-        "label": "Mool Mantra",
-        "labelType": "roman",
-        "type": "text",
-        "ref": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]"
-    },
-    "waheguru": {
-        "label": "vwihgurU",
-        "labelType": "gurmukhi",
-        "type": "text",
-        "ref": "vwihgurU"
-    },
-    "blank": {
-        "label": "Blank",
-        "labelType": "roman",
-        "type": "text",
-        "ref": ""
-    }
+  "anandSahib": {
+    "label": "ANAND_SAHIB",
+    "labelType": "roman",
+    "type": "ceremony",
+    "ref": 3
+  },
+  "moolMantra": {
+    "label": "MOOL_MANTRA",
+    "labelType": "roman",
+    "type": "text",
+    "ref": "<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]"
+  },
+  "waheguru": {
+    "label": "vwihgurU",
+    "labelType": "gurmukhi",
+    "type": "text",
+    "ref": "vwihgurU"
+  },
+  "blank": {
+    "label": "BLANK",
+    "labelType": "roman",
+    "type": "text",
+    "ref": ""
+  }
 }

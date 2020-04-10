@@ -10,7 +10,7 @@ const { CONSTS } = banidb;
 const keyboardLayout = require('./keyboard.json');
 const pageNavJSON = require('./footer-left.json');
 
-const { store } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 // the non-character keys that will register as a keypress when searching
@@ -40,7 +40,7 @@ const searchInputs = h('div#search-container', [
     onkeyup: e => module.exports.typeSearch(e),
     onpaste: e => module.exports.search(e, true),
   }),
-  h('span', 'Ang'),
+  h('span', i18n.t('SEARCH.ANG')),
   h('input#ang-input.gurmukhi', {
     type: 'number',
     disabled: 'disabled',
@@ -123,11 +123,11 @@ const sourceTexts = CONSTS.SOURCE_TEXTS;
 const sourceKeys = Object.keys(sourceTexts);
 
 const gurmukhiSearchOptions = gurmukhiSearchTypes.map(value =>
-  h('option', { value }, gurmukhiSearchText[value]),
+  h('option', { value }, i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)),
 );
 
 const englishSearchOptions = englishSearchTypes.map(value =>
-  h('option', { value }, englishSearchText[value]),
+  h('option', { value }, i18n.t(`SEARCH.${englishSearchText[value]}`)),
 );
 
 const gurmukhiInputs = h(
@@ -181,7 +181,9 @@ const searchLanguage = h(
   h('label', { htmlFor: 'english-language' }, 'ABC'),
 );
 
-const sourceOptions = sourceKeys.map(key => h('option', { value: key }, sourceTexts[key]));
+const sourceOptions = sourceKeys.map(key =>
+  h('option', { value: key }, i18n.t(`SEARCH.SOURCES.${sourceTexts[key]}`)),
+);
 
 const shabadNavFwd = h(
   'div#shabad-next.navigator-button',
@@ -207,7 +209,9 @@ const searchOptions = h(
     {
       onchange() {
         module.exports.changeSearchSource(this.value);
-        document.getElementById('source-selection').innerText = CONSTS.SOURCE_TEXTS[this.value];
+        document.getElementById('source-selection').innerText = i18n.t(
+          `SEARCH.SOURCES.${CONSTS.SOURCE_TEXTS[this.value]}`,
+        );
       },
     },
     sourceOptions,
@@ -215,7 +219,7 @@ const searchOptions = h(
   h(
     'label.filter-text#source-selection',
     { htmlFor: 'search-source' },
-    CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')],
+    i18n.t(`SEARCH.SOURCES.${CONSTS.SOURCE_TEXTS[store.get('searchOptions.searchSource')]}`),
   ),
 );
 
@@ -258,7 +262,7 @@ document.querySelectorAll('.nav-header-tab').forEach(element => {
 });
 
 const presenterSwitch = h('li', [
-  h('span', 'Presenter View'),
+  h('span', i18n.t('SETTINGS.APP_LAYOUT.PRESENTER_VIEW')),
   h('div.switch', [
     h('input#presenter-view-toggle', {
       name: 'presenter-view-toggle',
@@ -438,11 +442,11 @@ module.exports = {
     }
     const currentSearchType = gurmukhiSearchText[value] || englishSearchText[value];
     if (currentSearchType === 'FLS') {
-      this.$search.placeholder = 'First Letter (Start)';
+      this.$search.placeholder = i18n.t('SEARCH.FIRST_LETTER_START');
     } else if (currentSearchType === 'FLA') {
-      this.$search.placeholder = 'First Letter (Anywhere)';
+      this.$search.placeholder = i18n.t('SEARCH.FIRST_LETTER_ANYWHERE');
     } else {
-      this.$search.placeholder = currentSearchType;
+      this.$search.placeholder = i18n.t(`SEARCH.${currentSearchType}`);
     }
     this.$search.focus();
   },

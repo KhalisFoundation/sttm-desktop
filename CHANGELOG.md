@@ -1,5 +1,11 @@
 ## New Updates
 
+### 7.3.1 - _April 9, 2020_
+
+### Improved:
+
+- Code enhancements
+
 ### 7.3 - _April 5, 2020_
 
 ![](./assets/img/help_images/desktop-bani-overlay-font.jpg)

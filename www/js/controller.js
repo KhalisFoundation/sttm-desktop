@@ -5,9 +5,11 @@ const anvaad = require('anvaad-js');
 const { remote } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
-const { store, appstore } = main;
+const { store, appstore, i18n } = main;
 const analytics = remote.getGlobal('analytics');
 const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
+
+const appName = i18n.t('APPNAME');
 
 global.webview = document.querySelector('webview');
 
@@ -29,11 +31,11 @@ global.webview.addEventListener('ipc-message', event => {
 
 const updateMenu = [
   {
-    label: `Version ${main.appVersion}`,
+    label: i18n.t('MENU.APP.VERSION', { version: main.appVersion }),
     enabled: false,
   },
   {
-    label: 'Check for Update',
+    label: i18n.t('MENU.UPDATE.CHECK'),
     accelerator: 'CmdOrCtrl+U',
     click: () => {
       analytics.trackEvent('menu', 'check-update');
@@ -43,17 +45,17 @@ const updateMenu = [
     visible: !appstore,
   },
   {
-    label: 'Checking for Updates',
+    label: i18n.t('MENU.UPDATE.CHECKING'),
     enabled: false,
     visible: false,
   },
   {
-    label: 'Downloading Update',
+    label: i18n.t('MENU.UPDATE.DOWNLOADING'),
     enabled: false,
     visible: false,
   },
   {
-    label: 'Install and Restart',
+    label: i18n.t('MENU.UPDATE.INSTALL_AND_RESTART'),
     click: () => {
       analytics.trackEvent('menu', 'install-restart');
       main.autoUpdater.quitAndInstall();
@@ -64,15 +66,15 @@ const updateMenu = [
 
 const menuTemplate = [
   {
-    label: 'Edit',
+    label: i18n.t('MENU.EDIT.SELF'),
     submenu: [
       {
-        label: 'Undo',
+        label: i18n.t('MENU.EDIT.UNDO'),
         accelerator: 'CmdOrCtrl+Z',
         role: 'undo',
       },
       {
-        label: 'Redo',
+        label: i18n.t('MENU.EDIT.REDO'),
         accelerator: 'CmdOrCtrl+Shift+Z',
         role: 'redo',
       },
@@ -80,60 +82,60 @@ const menuTemplate = [
         type: 'separator',
       },
       {
-        label: 'Cut',
+        label: i18n.t('MENU.EDIT.CUT'),
         accelerator: 'CmdOrCtrl+X',
         role: 'cut',
       },
       {
-        label: 'Copy',
+        label: i18n.t('MENU.EDIT.COPY'),
         accelerator: 'CmdOrCtrl+C',
         role: 'copy',
       },
       {
-        label: 'Paste',
+        label: i18n.t('MENU.EDIT.PASTE'),
         accelerator: 'CmdOrCtrl+V',
         role: 'paste',
       },
       {
-        label: 'Select All',
+        label: i18n.t('MENU.EDIT.SELECT_ALL'),
         accelerator: 'CmdOrCtrl+A',
         role: 'selectall',
       },
     ],
   },
   {
-    label: 'Window',
+    label: i18n.t('MENU.WINDOW.SELF'),
     role: 'window',
     submenu: [
       {
-        label: 'Bani Overlay',
+        label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
         click: () => {
           main.openSecondaryWindow('overlayWindow');
         },
       },
       {
-        label: 'Minimize',
+        label: i18n.t('MENU.WINDOW.MINIMIZE'),
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize',
       },
       {
-        label: 'Close',
+        label: i18n.t('MENU.WINDOW.CLOSE'),
         accelerator: 'CmdOrCtrl+W',
         role: 'close',
       },
     ],
   },
   {
-    label: 'Cast',
+    label: i18n.t('MENU.CAST.SELF'),
     submenu: [
       {
-        label: 'Search for Google Cast device',
+        label: i18n.t('MENU.CAST.SEARCH'),
         click: () => {
           global.webview.send('search-cast');
         },
       },
       {
-        label: 'Stop Casting',
+        label: i18n.t('MENU.CAST.STOP'),
         visible: false,
         click: () => {
           global.webview.send('stop-cast');
@@ -147,17 +149,17 @@ const devMenu = [];
 
 if (process.env.NODE_ENV === 'development') {
   devMenu.push({
-    label: 'Dev',
+    label: i18n.t('MENU.DEV.SELF'),
     submenu: [
       {
-        label: 'Toggle Developer Tools',
+        label: i18n.t('MENU.DEV.DEVELOPER_TOOLS'),
         accelerator: 'CmdOrCtrl+Alt+I',
         click: () => {
           remote.getCurrentWindow().toggleDevTools();
         },
       },
       {
-        label: 'Reload',
+        label: i18n.t('MENU.DEV.RELOAD'),
         accelerator: 'CmdOrCtrl+R',
         click: () => {
           remote.getCurrentWindow().reload();
@@ -169,10 +171,10 @@ if (process.env.NODE_ENV === 'development') {
 
 const winMenu = [
   {
-    label: 'File',
+    label: i18n.t('MENU.FILE'),
     submenu: [
       {
-        label: 'Preferences',
+        label: i18n.t('MENU.APP.PREFERENCES'),
         accelerator: 'Ctrl+,',
         click: () => {
           analytics.trackEvent('menu', 'preferences');
@@ -183,7 +185,7 @@ const winMenu = [
         type: 'separator',
       },
       {
-        label: 'Quit',
+        label: i18n.t('MENU.APP.QUIT'),
         accelerator: 'Ctrl+Q',
         click: () => {
           analytics.trackEvent('menu', 'quit');
@@ -194,7 +196,7 @@ const winMenu = [
   },
   ...menuTemplate,
   {
-    label: 'Help',
+    label: i18n.t('MENU.HELP.SELF'),
     submenu: [
       {
         label: '',
@@ -202,21 +204,21 @@ const winMenu = [
       },
       ...updateMenu,
       {
-        label: 'Guide...',
+        label: i18n.t('MENU.HELP.GUIDE'),
         click: () => {
           analytics.trackEvent('menu', 'guide');
           main.openSecondaryWindow('helpWindow');
         },
       },
       {
-        label: 'Shorcut Legend...',
+        label: i18n.t('MENU.HELP.SHORTCUT_LEGEND'),
         click: () => {
           analytics.trackEvent('menu', 'shortcut-legend');
           main.openSecondaryWindow('shortcutLegend');
         },
       },
       {
-        label: 'Changelog...',
+        label: i18n.t('MENU.HELP.CHANGELOG'),
         click: () => {
           analytics.trackEvent('menu', 'changelog');
           main.openSecondaryWindow('changelogWindow');
@@ -226,14 +228,14 @@ const winMenu = [
   },
   ...devMenu,
   {
-    label: 'Donate...',
+    label: i18n.t('MENU.HELP.DONATE'),
     click: () => {
       analytics.trackEvent('menu', 'donate');
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
   {
-    label: 'Bani Overlay',
+    label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
     click: () => {
       main.openSecondaryWindow('overlayWindow');
     },
@@ -242,10 +244,10 @@ const winMenu = [
 
 const macMenu = [
   {
-    label: 'SikhiToTheMax',
+    label: appName,
     submenu: [
       {
-        label: 'About SikhiToTheMax',
+        label: i18n.t('MENU.APP.ABOUT', { appName }),
         role: 'about',
       },
       ...updateMenu,
@@ -253,7 +255,7 @@ const macMenu = [
         type: 'separator',
       },
       {
-        label: 'Preferences',
+        label: i18n.t('MENU.APP.PREFERENCES'),
         accelerator: 'Cmd+,',
         click: () => {
           global.core.menu.showSettingsTab(true);
@@ -263,7 +265,7 @@ const macMenu = [
         type: 'separator',
       },
       {
-        label: 'Services',
+        label: i18n.t('MENU.APP.SERVICES'),
         role: 'services',
         submenu: [],
       },
@@ -271,12 +273,12 @@ const macMenu = [
         type: 'separator',
       },
       {
-        label: 'Hide SikhiToTheMax',
+        label: i18n.t('MENU.APP.HIDE', { appName }),
         accelerator: 'Cmd+H',
         role: 'hide',
       },
       {
-        label: 'Hide Others',
+        label: i18n.t('MENU.APP.HIDE_OTHERS'),
         accelerator: 'Cmd+Alt+H',
         role: 'hideothers',
       },
@@ -284,7 +286,7 @@ const macMenu = [
         type: 'separator',
       },
       {
-        label: 'Quit SikhiToTheMax',
+        label: i18n.t('MENU.APP.QUIT', { appName }),
         accelerator: 'CmdOrCtrl+Q',
         click: () => {
           app.quit();
@@ -294,29 +296,29 @@ const macMenu = [
   },
   ...menuTemplate,
   {
-    label: 'Help',
+    label: i18n.t('MENU.HELP.SELF'),
     submenu: [
       {
-        label: 'Guide...',
+        label: i18n.t('MENU.HELP.GUIDE'),
         click: () => {
           main.openSecondaryWindow('helpWindow');
         },
       },
       {
-        label: 'Shorcut Legend...',
+        label: i18n.t('MENU.HELP.SHORTCUT_LEGEND'),
         click: () => {
           analytics.trackEvent('menu', 'shortcut-legend');
           main.openSecondaryWindow('shortcutLegend');
         },
       },
       {
-        label: 'Changelog...',
+        label: i18n.t('MENU.HELP.CHANGELOG'),
         click: () => {
           main.openSecondaryWindow('changelogWindow');
         },
       },
       {
-        label: 'Donate...',
+        label: i18n.t('MENU.HELP.DONATE'),
         click: () => {
           electron.shell.openExternal('https://khalisfoundation.org/donate/');
         },
