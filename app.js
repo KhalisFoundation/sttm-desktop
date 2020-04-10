@@ -28,7 +28,7 @@ const io = require('socket.io')(http);
 i18n.use(i18nBackend);
 i18n.init({
   backend: {
-    loadPath: './www/locales/{{lng}}.json',
+    loadPath: path.join(__dirname, './www/locales/{{lng}}.json'),
     jsonIndent: 2,
   },
   fallbackLng: 'en',
