@@ -1,6 +1,6 @@
 [
   {
-    "name": "Light",
+    "name": "LIGHT",
     "background-color": "#fff",
     "gurbani-color": "#000000",
     "translation-color": "#353535",
@@ -10,7 +10,7 @@
     "key": "light-theme"
   },
   {
-    "name": "Dark",
+    "name": "DARK",
     "background-color": "#000",
     "gurbani-color": "#c9e7ff",
     "translation-color": "#fff",
@@ -20,7 +20,7 @@
     "key": "dark-theme"
   },
   {
-    "name": "Khalsa Gold",
+    "name": "KHALSA_GOLD",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
     "gurbani-shadow": "0 0 4px rgba(140,81,5,1)",
@@ -33,7 +33,7 @@
     "key": "khalsa-gold"
   },
   {
-    "name": "Baagi Blue",
+    "name": "BAAGI_BLUE",
     "background-color": "#7db6c7",
     "gurbani-color": "#ffffff",
     "gurbani-shadow": "5px 5px 1px rgba(0,0,0,0.7)",
@@ -46,7 +46,7 @@
     "key": "baagi-blue"
   },
   {
-    "name": "Khalsa Rush",
+    "name": "KHALSA_RUSH",
     "background-color": "#fec43c",
     "gurbani-color": "#071f77",
     "translation-color": "#001060",
@@ -58,7 +58,7 @@
     "key": "khalsa-rush"
   },
   {
-    "name": "Moody Blue",
+    "name": "MOODY_BLUE",
     "background-color": "#38987b7",
     "gurbani-color": "#fcfefe",
     "translation-color": "#fde5ab",
@@ -70,7 +70,7 @@
     "key": "moody-blue"
   },
   {
-    "name": "A New Day",
+    "name": "A_NEW_DAY",
     "background-color": "#7ccf3",
     "gurbani-color": "#0e2654",
     "gurbani-shadow": "2px 2px 2px rgba(255,255,255,0.7)",
@@ -83,7 +83,7 @@
     "key": "a-new-day"
   },
   {
-    "name": "Black & Blue",
+    "name": "BLACK_&_BLUE",
     "background-color": "#05060b",
     "gurbani-color": "#ffffff",
     "translation-color": "#a3eafd",
@@ -95,7 +95,7 @@
     "key": "black-blue"
   },
   {
-    "name": "floral",
+    "name": "FLORAL",
     "background-color": "#ffd3e0",
     "gurbani-color": "#440a1d",
     "translation-color": "#821d3e",
@@ -107,7 +107,7 @@
     "key": "floral"
   },
   {
-    "name": "Darbar Blue",
+    "name": "DARBAR_BLUE",
     "background-color": "#05060b",
     "gurbani-color": "#ffffff",
     "translation-color": "#a3eafd",
@@ -119,7 +119,7 @@
     "key": "blue-darbar"
   },
   {
-    "name": "High Contrast",
+    "name": "HIGH_CONTRAST",
     "background-color": "#fff",
     "gurbani-color": "#000",
     "translation-color": "#000",
@@ -129,7 +129,7 @@
     "key": "high-contrast"
   },
   {
-    "name": "Low Light",
+    "name": "LOW_LIGHT",
     "background-color": "#000",
     "gurbani-color": "#98b1c5",
     "translation-color": "#b1b1b1",

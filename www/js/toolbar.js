@@ -11,7 +11,7 @@ let adminPin = '...';
 let adminPinVisible = true;
 let isConntected = false;
 
-const { store } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { updateCeremonyThemeTiles } = require('./theme_editor');
 
@@ -105,16 +105,23 @@ const remoteSyncInit = async () => {
     code = newCode;
     if (code) {
       adminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
-      document.querySelector('.sync-code-label').innerText = 'Your unique sync code is:';
+      document.querySelector('.sync-code-label').innerText = i18n.t(
+        'TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL',
+      );
       document.querySelector('.sync-code-num').innerText = code;
-      document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '...';
+      document.querySelector('.admin-pin').innerText = adminPinVisible
+        ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
+        : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
   } else {
-    document.querySelector('.sync-code-label').innerText =
-      'Sorry! you seem to be offline. Sync only works when you are connected to the internet.';
+    document.querySelector('.sync-code-label').innerText = i18n.t(
+      'TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR',
+    );
     document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('.admin-pin').innerText = 'PIN:...';
+    document.querySelector('.admin-pin').innerText = `${i18n.t(
+      'TOOLBAR.SYNC_CONTROLLER.PIN',
+    )}: ...`;
     document.querySelector('#tool-sync-button').setAttribute('title', '...');
   }
   setListeners();
@@ -156,7 +163,9 @@ const syncToggle = async (forceConnect = false) => {
     code = '...';
     adminPin = '...';
     document.querySelector('.sync-code-num').innerText = code;
-    document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '';
+    document.querySelector('.admin-pin').innerText = adminPinVisible
+      ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
+      : '';
     document.querySelector('#tool-sync-button').setAttribute('title', ' ');
     document.body.classList.remove('controller-on');
     analytics.trackEvent('syncStopped', true);
@@ -169,11 +178,15 @@ const syncToggle = async (forceConnect = false) => {
 
 const toggleAdminPin = () => {
   if (adminPinVisible) {
-    document.querySelector('.admin-pin').innerText = 'PIN:...';
+    document.querySelector('.admin-pin').innerText = `${i18n.t(
+      'TOOLBAR.SYNC_CONTROLLER.PIN',
+    )}: ...`;
     document.querySelector('.hide-btn i').classList.replace('fa-eye', 'fa-eye-slash');
     adminPinVisible = false;
   } else {
-    document.querySelector('.admin-pin').innerText = `PIN: ${adminPin}`;
+    document.querySelector('.admin-pin').innerText = `${i18n.t(
+      'TOOLBAR.SYNC_CONTROLLER.PIN',
+    )}: ${adminPin}`;
     document.querySelector('.hide-btn i').classList.replace('fa-eye-slash', 'fa-eye');
     adminPinVisible = true;
   }
@@ -186,7 +199,7 @@ const toggleLockScreen = () => {
 
 const adminContent = h('div', [
   h('div.large-text', [
-    h('span.admin-pin', `PIN: ${adminPin}`),
+    h('span.admin-pin', `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`),
     h(
       'span.hide-btn',
       {
@@ -205,40 +218,39 @@ const adminContent = h('div', [
 ]);
 
 const syncContent = h('div.sync-content', [
-  h('div.sync-code-label', 'Your unique sync code is:'),
+  h('div.sync-code-label', i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')),
   h('div.sync-code-num', code),
   syncItemFactory(
-    'Sangat Sync',
+    i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
     h('span', [
-      'Allow the Sangat to visit ',
+      i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.1'),
       h('strong', 'sttm.co/sync'),
-      ' to enter a code and view the Shabad being presented in real-time.',
+      i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.2'),
     ]),
     h(
       'button.button.copy-code-btn',
       {
         onclick: () => {
           if (code !== '...') {
-            const syncString = `<p>Visit <strong> sttm.co/sync </strong> on your mobile 
-            device and enter the code below to follow along</p> <h1>${code} </h1>`;
+            const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
             global.controller.sendText(syncString);
           }
         },
       },
-      'Present Code to Sangat',
+      i18n.t('TOOLBAR.SYNC_CONTROLLER.PRESENT_CODE'),
     ),
   ),
   syncItemFactory(
-    'Bani Controller',
+    i18n.t('TOOLBAR.BANI_CONTROLLER'),
     h('span', [
-      'Connect to SikhiToTheMax by visiting ',
+      i18n.t('TOOLBAR.BANI_DESC.1'),
       h('strong', 'sttm.co/control'),
-      ' from a mobile device to search, navigate, and control the entire app.',
+      i18n.t('TOOLBAR.BANI_DESC.2'),
     ]),
     adminContent,
   ),
   h('div.connection-switch-container', [
-    h('p', 'Disable all the remote connections to SikhiToTheMax'),
+    h('p', i18n.t('TOOLBAR.DISABLE_CONNECTIONS_MSG', { appName: i18n.t('APPNAME') })),
     switchFactory(
       'connection-switch',
       '',
@@ -270,9 +282,10 @@ const translitSwitch = h('div.translit-switch', [
 
 const baniGroupFactory = baniGroupName => {
   const baniGroupClass = baniGroupName.replace(/ /g, '-');
+  const heading = i18n.t(`TOOLBAR.${baniGroupName.replace(/ /g, '_').toUpperCase()}`);
   return h(
     'div.bani-group-container',
-    h(`header.bani-group-heading.${baniGroupClass}-heading`, baniGroupName),
+    h(`header.bani-group-heading.${baniGroupClass}-heading`, heading),
     h(`div.bani-group.${baniGroupClass}`),
   );
 };
@@ -336,7 +349,7 @@ const printCeremonies = rows => {
             `div.ceremony-pane-options#cpo-${row.Token}`,
             switchFactory(
               `${row.Token}-english-exp-switch`,
-              'English Explanations',
+              i18n.t('TOOLBAR.ENG_EXPLANATIONS'),
               `${row.Token}-english-exp`,
               () => {
                 const englishExpVal = getEnglishExp(row.Token);
@@ -356,7 +369,7 @@ const printCeremonies = rows => {
                 toggleOverlayUI(currentToolbarItem, false);
               },
             },
-            h('div.ceremony-theme-header', 'Choose a Theme to launch'),
+            h('div.ceremony-theme-header', i18n.t('TOOLBAR.CHOOSE_THEME')),
           ),
         ),
       );

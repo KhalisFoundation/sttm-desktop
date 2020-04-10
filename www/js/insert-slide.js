@@ -1,6 +1,7 @@
 const sanitizeHtml = require('sanitize-html');
 const electron = require('electron');
 
+const { i18n } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 const tingle = require('./vendor/tingle');
 const strings = require('./strings');
@@ -19,31 +20,31 @@ let isAnnouncementTab = false;
 // slide modal  body
 
 // title
-const slideHeader = '<h1 class = "modalTitle">Insert Dhan Slide </h1>';
+const slideHeader = `<h1 class = "modalTitle">${i18n.t('INSERT.INSERT_DHAN_SLIDE')}</h1>`;
 // section title
 // button group
-const buttons = '<div class="btn-group" id = "btn-group">'.concat(
-  '<button class= "guru" id = "guru1">Guru Nanak Dev Ji</button>',
-  '<button class= "guru" id = "guru2">Guru Angad Dev Ji</button>',
-  '<button class= "guru" id = "guru3">Guru Amar Das Ji</button>',
-  '<button class= "guru" id = "guru4">Guru Ram Das Ji</button>',
-  '<button class= "guru" id = "guru5">Guru Arjan Dev Ji</button>',
-  '<button class= "guru" id = "guru6">Guru Hargobind Sahib Ji</button>',
-  '<button class= "guru" id = "guru7">Guru Har Rai Sahib Ji</button>',
-  '<button class= "guru" id = "guru8">Guru Har Krishan Sahib Ji</button>',
-  '<button class= "guru" id = "guru9">Guru Teg Bahadur Sahib Ji</button>',
-  '<button class= "guru" id = "guru10">Guru Gobind Singh Ji</button>',
-  '<button class= "guru" id = "guru11">Guru Granth Sahib Ji</button>',
-  '</div>',
-);
+const buttons = `<div class="btn-group" id = "btn-group">
+  <button class= "guru" id = "guru1">${i18n.t('INSERT.DHAN_GURU.NANAK_DEV_JI')}</button>
+  <button class= "guru" id = "guru2">${i18n.t('INSERT.DHAN_GURU.ANGAD_DEV_JI')}</button>
+  <button class= "guru" id = "guru3">${i18n.t('INSERT.DHAN_GURU.AMARDAS_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru4">${i18n.t('INSERT.DHAN_GURU.RAMDAS_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru5">${i18n.t('INSERT.DHAN_GURU.ARJUN_DEV_JI')}</button>
+  <button class= "guru" id = "guru6">${i18n.t('INSERT.DHAN_GURU.HAR_GOBIND_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru7">${i18n.t('INSERT.DHAN_GURU.HAR_RAI_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru8">${i18n.t('INSERT.DHAN_GURU.HAR_KRISHAN_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru9">${i18n.t('INSERT.DHAN_GURU.TEG_BAHADUR_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru10">${i18n.t('INSERT.DHAN_GURU.GOBIND_SINGH_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru11">${i18n.t('INSERT.DHAN_GURU.GRANTH_SAHIB_JI')}</button>
+  </div>`;
+
 // announcement modal body
 // announcement tab title
-const announcementHeader = '<h1 class="modalTitle">Insert Announcement</h1>';
+const announcementHeader = `<h1 class="modalTitle">${i18n.t('INSERT.INSERT_ANNOUNCEMENT')}</h1>`;
 const langSlider = '<div class="lang-switch">'.concat(
   '<table width="120%">',
   '<tr>',
   '<td>',
-  '<span class="lang-text">Announcement in Gurmukhi?</span>',
+  `<span class="lang-text">${i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')}?</span>`,
   '</td>',
   '<td>',
   '<div class="switch">',
@@ -55,8 +56,9 @@ const langSlider = '<div class="lang-switch">'.concat(
   '</table>',
   '</div>',
 );
-const modalAnBox =
-  '<div class="box-container"><div class="modal-ann-box" contenteditable="true" data-placeholder="Add announcement text here ..."></div></div>';
+const modalAnBox = `<div class="box-container"><div class="modal-ann-box" contenteditable="true" data-placeholder="${i18n.t(
+  'INSERT.ADD_ANNOUNCEMENT_TEXT',
+)}"></div></div>`;
 
 // sets the first tab, with header, section title, and button group
 const slidePage = slideHeader + buttons;
@@ -104,7 +106,7 @@ function setLangSliderVal() {
     const isGurmukhi = slider.checked;
     const placeholderText = isGurmukhi
       ? strings.announcemenetPlaceholder.gurmukhi
-      : strings.announcemenetPlaceholder.english;
+      : i18n.t(`INSERT.${strings.announcemenetPlaceholder.english}`);
 
     const $announcementBox = document.querySelector('.modal-ann-box');
     $announcementBox.classList.toggle('gurmukhi', isGurmukhi);
@@ -127,7 +129,7 @@ function boxInputFunctionality() {
 }
 
 // sets the first button (OK) which on click sends the announcement to the screen
-modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+modal.addFooterBtn(i18n.t('OK'), 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
   if (isAnnouncementTab) {
     analytics.trackEvent('display', 'announcement-slide');
     const isGurmukhi = document.querySelector('#modal-ann-lang').checked;
@@ -142,15 +144,19 @@ modal.addFooterBtn('Ok', 'tingle-btn tingle-btn--pull-right tingle-btn--default'
 });
 
 // close button
-modal.addFooterBtn('Close', 'tingle-btn tingle-btn--pull-right tingle-btn--danger', () => {
-  modal.close();
-});
+modal.addFooterBtn(
+  i18n.t('INSERT.CLOSE'),
+  'tingle-btn tingle-btn--pull-right tingle-btn--danger',
+  () => {
+    modal.close();
+  },
+);
 
 // change tab to announcements
 // changes to back when the tab is open
 // onclick is blank because it will change depending on what is being displayed
 modal.addFooterBtn(
-  'Announcement',
+  i18n.t('INSERT.ANNOUNCEMENT'),
   'tingle-btn tingle-btn-pull-left tingle-btn--default modal-tab-btn',
   () => {},
 );
@@ -162,9 +168,9 @@ modalTabBtn.addEventListener('click', () => {
     modal.setContent(announcementPage);
     setLangSliderVal();
     boxInputFunctionality();
-    modalTabBtn.textContent = 'Back';
+    modalTabBtn.textContent = i18n.t('INSERT.BACK');
   } else {
-    modalTabBtn.textContent = 'Announcement';
+    modalTabBtn.textContent = i18n.t('INSERT.ANNOUNCEMENT');
     isAnnouncementTab = false;
     modal.setContent(slidePage);
     buttonOnClick();
@@ -174,7 +180,7 @@ modalTabBtn.addEventListener('click', () => {
 function openModal() {
   if (!modal.isOpen()) {
     isAnnouncementTab = false;
-    modalTabBtn.textContent = 'Announcement';
+    modalTabBtn.textContent = i18n.t('INSERT.ANNOUNCEMENT');
     modal.open();
   }
 }
