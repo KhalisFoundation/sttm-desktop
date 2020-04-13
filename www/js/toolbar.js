@@ -10,6 +10,7 @@ let code = '...';
 let adminPin = '...';
 let adminPinVisible = true;
 let isConntected = false;
+let isRequestSent = false;
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -97,7 +98,11 @@ const setListeners = () => {
 
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
+  if (isRequestSent) {
+    return;
+  }
   if (onlineVal) {
+    isRequestSent = true;
     const newCode = await tryConnection();
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
@@ -110,6 +115,7 @@ const remoteSyncInit = async () => {
       document.querySelector('.admin-pin').innerText = adminPinVisible ? `PIN: ${adminPin}` : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
+    isRequestSent = false;
   } else {
     document.querySelector('.sync-code-label').innerText =
       'Sorry! you seem to be offline. Sync only works when you are connected to the internet.';
