@@ -1,5 +1,13 @@
 ## New Updates
 
+### 7.3.2 - _April 14, 2020_
+
+### Improved:
+
+- Fixed a bug that was causing new installations not to work correctly
+- Added tool tip for Bani Controller icon
+- Added analytics for Bani Controller
+
 ### 7.3.1 - _April 9, 2020_
 
 ### Improved:
