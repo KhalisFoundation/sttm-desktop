@@ -1,5 +1,19 @@
 ## New Updates
 
+### 7.3.2 - _April 14, 2020_
+
+### Improved:
+
+- Fixed a bug that was causing new installations not to work correctly
+- Added tool tip for Bani Controller icon
+- Added analytics for Bani Controller
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.3.1 - _April 9, 2020_
 
 ### Improved:
@@ -21,12 +35,6 @@
 
 - Removed a transition that was appearing with "Next Line" enabaled
 - Fixed a bug that was causing the "Enter" keyboard shortcut not to work when opening a search result
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.2 - _March 16, 2020_
 

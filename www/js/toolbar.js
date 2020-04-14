@@ -70,7 +70,10 @@ const setListeners = () => {
       };
 
       const listenerActions = {
-        shabad: payload => loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi),
+        shabad: payload => {
+          loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
+          analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
+        },
         text: payload =>
           global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
         'request-control': () => {
@@ -80,6 +83,11 @@ const setListeners = () => {
             type: 'response-control',
             success: isPinCorrect,
           });
+          analytics.trackEvent(
+            'controller',
+            'connection',
+            isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
+          );
         },
         /* Coming soon
         'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
@@ -190,11 +198,13 @@ const toggleAdminPin = () => {
     document.querySelector('.hide-btn i').classList.replace('fa-eye-slash', 'fa-eye');
     adminPinVisible = true;
   }
+  analytics.trackEvent('controller', 'pinVisibility', adminPinVisible);
 };
 
 const toggleLockScreen = () => {
   toggleOverlayUI(currentToolbarItem, false);
   toggleOverlayUI('lock-screen', true);
+  analytics.trackEvent('controller', 'screenLock', true);
 };
 
 const adminContent = h('div', [
@@ -234,6 +244,7 @@ const syncContent = h('div.sync-content', [
           if (code !== '...') {
             const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
             global.controller.sendText(syncString);
+            analytics.trackEvent('controller', 'codePresented', true);
           }
         },
       },
@@ -257,6 +268,7 @@ const syncContent = h('div.sync-content', [
       'connection',
       () => {
         syncToggle();
+        analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
       },
       false,
     ),
