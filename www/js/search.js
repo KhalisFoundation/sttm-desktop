@@ -1120,9 +1120,9 @@ module.exports = {
       }
 
       let shabadType;
-      let sessionKeyExists = sessionKeySplit && sessionKeySplit.length > 1;
+      const sessionKeyExists = sessionKeySplit && sessionKeySplit.length > 1;
       if (sessionKeySplit) {
-        shabadType = sessionKeySplit[0];
+        [shabadType] = sessionKeySplit;
       } else {
         shabadType = 'shabad';
       }
