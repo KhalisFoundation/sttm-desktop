@@ -53,8 +53,6 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
-store.setUserPref('toolbar.language-settings', null);
-
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
@@ -381,6 +379,7 @@ app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
 
+  store.setUserPref('toolbar.language-settings', null);
   if (!userId) {
     userId = uuid();
     store.set('userId', userId);
