@@ -797,6 +797,9 @@ module.exports = {
       if (window.socket !== undefined) {
         window.socket.emit('data', {
           type: 'ceremony',
+          id: ceremonyID,
+          shabadid: ceremonyID, // @deprecated
+          highlight: LineID,
         });
       }
       return this.printShabad(flatRows, null, LineID);
@@ -1111,23 +1114,22 @@ module.exports = {
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
     if (window.socket !== undefined) {
-      let shabadIdsplit = [ShabadID];
-      if (typeof ShabadID === 'string') {
-        shabadIdsplit = ShabadID.split('-');
+      let sessionKeySplit;
+      if (typeof Line.sessionKey === 'string') {
+        sessionKeySplit = Line.sessionKey.split('-');
       }
 
       let shabadType;
-
-      if (shabadIdsplit.length > 1) {
-        shabadType = shabadIdsplit[0] === 'ceremony' ? 'ceremony' : 'bani';
+      let sessionKeyExists = sessionKeySplit && sessionKeySplit.length > 1;
+      if (sessionKeySplit) {
+        shabadType = sessionKeySplit[0];
       } else {
         shabadType = 'shabad';
       }
 
       window.socket.emit('data', {
         type: shabadType,
-        id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
-        baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
+        id: sessionKeyExists ? parseInt(sessionKeySplit[1], 10) : ShabadID,
         shabadid: ShabadID, // @deprecated
         highlight: LineID,
       });
