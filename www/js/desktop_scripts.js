@@ -7,7 +7,8 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 
-const { remote, i18n } = electron;
+const { remote } = electron;
+const { i18n } = remote.require('./app');
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
