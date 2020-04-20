@@ -759,11 +759,12 @@ module.exports = {
     }
   },
 
-  async loadCeremony(ceremonyID, LineID = null, historyReload = false) {
+  async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
     try {
+      let currentRow;
       const rowsDb = await banidb.loadCeremony(ceremonyID);
       const rows = await Promise.all(
         rowsDb.map(rowDb => {
@@ -786,6 +787,10 @@ module.exports = {
             row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
           }
           row.sessionKey = `ceremony-${ceremonyID}`;
+          row.crossPlatformID = rowDb.ID;
+          if (row.crossPlatformID == crossPlatformID || row.ID == LineID) {
+            currentRow = row;
+          }
           return row;
         }),
       );
@@ -799,7 +804,7 @@ module.exports = {
           type: 'ceremony',
           id: ceremonyID,
           shabadid: ceremonyID, // @deprecated
-          highlight: LineID,
+          highlight: currentRow ? currentRow.crossPlatformID : LineID,
         });
       }
       return this.printShabad(flatRows, null, LineID);
@@ -1131,7 +1136,7 @@ module.exports = {
         type: shabadType,
         id: sessionKeyExists ? parseInt(sessionKeySplit[1], 10) : ShabadID,
         shabadid: ShabadID, // @deprecated
-        highlight: LineID,
+        highlight: Line.crossPlatformID || LineID,
       });
     }
 

@@ -84,7 +84,8 @@ const setListeners = () => {
         /* Coming soon
         'bani' : global.core.search.loadBani(data.baniId, data.verseId);
         */
-        ceremony: payload => global.core.search.loadCeremony(payload.ceremonyId, payload.verseId),
+        ceremony: payload =>
+          global.core.search.loadCeremony(payload.ceremonyId, null, false, payload.verseId),
       };
 
       // if its an event from web and not from desktop itself
