@@ -788,7 +788,7 @@ module.exports = {
           }
           row.sessionKey = `ceremony-${ceremonyID}`;
           row.crossPlatformID = rowDb.ID;
-          if (row.crossPlatformID == crossPlatformID || row.ID == LineID) {
+          if (row.crossPlatformID === crossPlatformID || row.ID === LineID) {
             currentRow = row;
           }
           return row;
