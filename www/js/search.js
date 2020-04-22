@@ -760,7 +760,7 @@ module.exports = {
   },
 
   async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
-    const lineID = LineID;
+    let lineID = LineID;
     currentShabadId = ceremonyID;
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';

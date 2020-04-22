@@ -100,7 +100,6 @@ const setListeners = () => {
       // if its an event from web and not from desktop itself
       if (data.host === 'sttm-web') {
         listenerActions[isPinCorrect ? data.type : 'request-control'](data);
-        console.log(data);
       }
     });
   }
