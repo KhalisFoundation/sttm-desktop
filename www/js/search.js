@@ -760,6 +760,8 @@ module.exports = {
   },
 
   async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
+    const lineID = LineID;
+    currentShabadId = ceremonyID;
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
@@ -790,6 +792,9 @@ module.exports = {
           row.crossPlatformID = rowDb.ID;
           if (row.crossPlatformID === crossPlatformID || row.ID === LineID) {
             currentRow = row;
+            if (LineID === null) {
+              lineID = row.ID;
+            }
           }
           return row;
         }),
@@ -804,10 +809,10 @@ module.exports = {
           type: 'ceremony',
           id: ceremonyID,
           shabadid: ceremonyID, // @deprecated
-          highlight: currentRow ? currentRow.crossPlatformID : LineID,
+          highlight: currentRow ? currentRow.crossPlatformID : lineID,
         });
       }
-      return this.printShabad(flatRows, null, LineID);
+      return this.printShabad(flatRows, null, lineID);
     } catch (error) {
       throw error;
     }
@@ -939,7 +944,9 @@ module.exports = {
         'data-line-count': line.lineCount,
       },
       h(
-        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${seenClasses}`,
+        `a#line${line.ID}.cpid-${line.crossPlatformID}.panktee.${
+          englishHeading ? 'roman' : 'gurmukhi'
+        }${seenClasses}`,
         {
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
