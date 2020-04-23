@@ -789,9 +789,17 @@ module.exports = {
             row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
           }
           row.sessionKey = `ceremony-${ceremonyID}`;
+          /* 1. crossPlatformID: It is the id that's common between web and desktop for ceremonies, 
+          so we add that to row here for sync 
+          2. LineID: is the id that's used on desktop (might differ on web for ceremonies)
+          */
           row.crossPlatformID = rowDb.ID;
+          /* If current row is the verse that needs to be highlighted (home verse) 
+           Then mark that row as current row  */
           if (row.crossPlatformID === crossPlatformID || row.ID === LineID) {
             currentRow = row;
+            /* Find LineID for current crossPlatformID (when we recieve crossplatform ID from web) 
+             Whenever we get crossPlatform ID from web, LineID would be null */
             if (LineID === null) {
               lineID = row.ID;
             }
