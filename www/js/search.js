@@ -948,6 +948,7 @@ module.exports = {
           englishHeading ? 'roman' : 'gurmukhi'
         }${seenClasses}`,
         {
+          'data-cp-id': line.crossPlatformID,
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
           onclick: e => {

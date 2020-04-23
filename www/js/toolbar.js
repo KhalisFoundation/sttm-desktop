@@ -71,7 +71,7 @@ const setListeners = () => {
 
       const loadCeremony = (ceremonyId, crossPlatformId) => {
         const currentCeremonyID = global.core.search.getCurrentShabadId();
-        const currentVerse = document.querySelector(`.cpid-${crossPlatformId}`);
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
         if (currentCeremonyID === ceremonyId && currentVerse) {
           currentVerse.click();
         } else {
