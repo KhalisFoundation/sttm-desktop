@@ -102,8 +102,8 @@ const remoteSyncInit = async () => {
     return;
   }
   if (onlineVal) {
-    isRequestSent = true;
     const newCode = await tryConnection();
+    isRequestSent = true;
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
     }
