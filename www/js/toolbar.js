@@ -70,6 +70,16 @@ const setListeners = () => {
         }
       };
 
+      const loadCeremony = (ceremonyId, crossPlatformId) => {
+        const currentCeremonyID = global.core.search.getCurrentShabadId();
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentCeremonyID === ceremonyId && currentVerse) {
+          currentVerse.click();
+        } else {
+          global.core.search.loadCeremony(ceremonyId, null, false, crossPlatformId);
+        }
+      };
+
       const listenerActions = {
         shabad: payload => {
           loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
@@ -91,9 +101,9 @@ const setListeners = () => {
           );
         },
         /* Coming soon
-        'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
-        'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
+        'bani' : global.core.search.loadBani(data.baniId, data.verseId);
         */
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
       };
 
       // if its an event from web and not from desktop itself
