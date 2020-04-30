@@ -952,9 +952,7 @@ module.exports = {
         'data-line-count': line.lineCount,
       },
       h(
-        `a#line${line.ID}.cpid-${line.crossPlatformID}.panktee.${
-          englishHeading ? 'roman' : 'gurmukhi'
-        }${seenClasses}`,
+        `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${seenClasses}`,
         {
           'data-cp-id': line.crossPlatformID,
           'data-line-id': line.ID,
