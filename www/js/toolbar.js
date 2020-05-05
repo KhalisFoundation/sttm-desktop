@@ -10,6 +10,7 @@ let code = '...';
 let adminPin = '...';
 let adminPinVisible = true;
 let isConntected = false;
+let isRequestSent = false;
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -69,6 +70,16 @@ const setListeners = () => {
         }
       };
 
+      const loadCeremony = (ceremonyId, crossPlatformId) => {
+        const currentCeremonyID = global.core.search.getCurrentShabadId();
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentCeremonyID === ceremonyId && currentVerse) {
+          currentVerse.click();
+        } else {
+          global.core.search.loadCeremony(ceremonyId, null, false, crossPlatformId);
+        }
+      };
+
       const listenerActions = {
         shabad: payload => {
           loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
@@ -90,9 +101,9 @@ const setListeners = () => {
           );
         },
         /* Coming soon
-        'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
-        'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
+        'bani' : global.core.search.loadBani(data.baniId, data.verseId);
         */
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
       };
 
       // if its an event from web and not from desktop itself
@@ -105,8 +116,12 @@ const setListeners = () => {
 
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
+  if (isRequestSent) {
+    return;
+  }
   if (onlineVal) {
     const newCode = await tryConnection();
+    isRequestSent = true;
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
     }
@@ -122,6 +137,7 @@ const remoteSyncInit = async () => {
         : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
+    isRequestSent = false;
   } else {
     document.querySelector('.sync-code-label').innerText = i18n.t(
       'TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR',
