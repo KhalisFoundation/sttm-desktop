@@ -1,5 +1,19 @@
 ## New Updates
 
+### 7.4 - _May 7, 2020_
+
+### Improved:
+
+- Added Anand Sahib (Bhog) support for Bani Controller
+- Enhanced sync between SikhiToTheMax and your phone when using Bani Controller
+- Fixed a bug that caused the sync code to change multiple times
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.3.2 - _April 14, 2020_
 
 ### Improved:
@@ -7,12 +21,6 @@
 - Fixed a bug that was causing new installations not to work correctly
 - Added tool tip for Bani Controller icon
 - Added analytics for Bani Controller
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.3.1 - _April 9, 2020_
 
