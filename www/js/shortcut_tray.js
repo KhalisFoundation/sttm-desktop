@@ -2,7 +2,7 @@ const h = require('hyperscript');
 const { remote } = require('electron');
 const shortcutItemsJSON = require('./shortcut_tray.json');
 
-const { store } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 
@@ -28,7 +28,10 @@ const trayItemFactory = (trayItemKey, trayItem) =>
         }
       },
     },
-    h('div.tray-item-icon', h('div.tray-item-label', trayItem.label)),
+    h(
+      'div.tray-item-icon',
+      h('div.tray-item-label', i18n.t(`SHORTCUT_TRAY.${trayItem.label}`, trayItem.label)),
+    ),
   );
 
 const shortcutsToggle = h(

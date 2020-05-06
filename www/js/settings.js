@@ -3,7 +3,7 @@ const ldGet = require('lodash.get');
 const { remote } = require('electron');
 const settings = require('./settings.json');
 
-const { store } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const defaultPrefs = store.getDefaults().userPrefs;
@@ -52,12 +52,14 @@ function createSettingsPage(userPrefs) {
   const settingsPage = h('div#settings');
   Object.keys(settings).forEach(catKey => {
     const cat = settings[catKey];
-    settingsPage.appendChild(h('h2', cat.title));
+    const catTitle = i18n.t(`SETTINGS.${cat.title}`);
+    settingsPage.appendChild(h('h2', catTitle));
     const settingCat = h('section.block-list');
 
     Object.keys(cat.settings).forEach(settingKey => {
       const setting = cat.settings[settingKey];
-      settingCat.appendChild(h('header', setting.title));
+      const settingTitle = setting.title ? `.${setting.title}` : '';
+      settingCat.appendChild(h('header', i18n.t(`SETTINGS${settingTitle}.SELF`, '')));
       switch (setting.type) {
         case 'checkbox': {
           const checkboxList = h('ul');
@@ -84,7 +86,7 @@ function createSettingsPage(userPrefs) {
                   {
                     htmlFor: optionId,
                   },
-                  setting.options[option],
+                  i18n.t(`SETTINGS${settingTitle}.${setting.options[option]}`),
                 ),
               ]),
             );
@@ -96,7 +98,8 @@ function createSettingsPage(userPrefs) {
           const dropdownList = h('ul');
           Object.keys(setting.options).forEach(dropdown => {
             const dropdownId = `setting-${catKey}-${settingKey}-${dropdown}`;
-
+            const dropdownTitle = setting.options[dropdown].title;
+            const dropdownOptions = setting.options[dropdown].options;
             const dropdownListAttrs = {
               name: `setting-${catKey}.${settingKey}`,
               onchange: evt => {
@@ -119,7 +122,7 @@ function createSettingsPage(userPrefs) {
 
             const dropdownListItem = h(
               `span.setting-container#setting-container-${catKey}-${settingKey}-${dropdown}`,
-              [setting.options[dropdown].title, selectBox],
+              [i18n.t(`SETTINGS${settingTitle}.${dropdownTitle}`), selectBox],
             );
 
             dropdownList.appendChild(h('li', dropdownListItem));
@@ -135,7 +138,11 @@ function createSettingsPage(userPrefs) {
               }
 
               selectBox.appendChild(
-                h('option', selectOptionAttrs, setting.options[dropdown].options[option]),
+                h(
+                  'option',
+                  selectOptionAttrs,
+                  i18n.t(`SETTINGS${settingTitle}.${dropdownOptions[option]}`),
+                ),
               );
             });
           });
@@ -197,8 +204,13 @@ function createSettingsPage(userPrefs) {
             rangeList.appendChild(
               h('li', [
                 h('span', [
-                  option.title,
-                  h('i', `(Default: ${defaultPrefs[catKey][settingKey][optionKey]})`),
+                  i18n.t(`SETTINGS${settingTitle}.${option.title}`),
+                  h(
+                    'i',
+                    `(${i18n.t('SETTINGS.DEFAULT')}: ${
+                      defaultPrefs[catKey][settingKey][optionKey]
+                    })`,
+                  ),
                 ]),
                 h('div.range', [
                   h(`input#${optionId}`, switchListAttrs),
@@ -242,15 +254,16 @@ function createSettingsPage(userPrefs) {
             if (userPrefs[catKey][settingKey][option]) {
               switchListAttrs.checked = true;
             }
-
-            let optionLabel = setting.options[option];
+            const settingName = `SETTINGS${settingTitle}.`;
+            let optionLabel = i18n.t(settingName + setting.options[option]);
             let subLabel = false;
             if (typeof setting.options[option] === 'object') {
-              optionLabel = setting.options[option].label;
-              ({ subLabel } = setting.options[option]);
-              if (typeof subLabel === 'object') {
-                subLabel = store.get(subLabel.storepref);
-              }
+              const { label, subLabel: subLbl } = { ...setting.options[option] };
+              optionLabel = i18n.t(settingName + label);
+              subLabel =
+                typeof subLbl === 'object'
+                  ? store.get(subLbl.storepref)
+                  : i18n.t(settingName + subLbl);
             }
 
             switchList.appendChild(

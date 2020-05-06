@@ -1,6 +1,9 @@
 const marked = require('marked');
 const fs = require('fs');
 const path = require('path');
+const { remote } = require('electron');
+
+const { i18n } = remote.require('./app');
 
 const markdownFiles = {
   changelog: '../CHANGELOG.md',
@@ -15,5 +18,8 @@ function markdownToHTML(file) {
     $file.innerHTML = marked(fileMD);
   }
 }
+
+const key = document.querySelector('h1').innerHTML;
+document.querySelector('h1').innerHTML = i18n.t(key);
 
 Object.keys(markdownFiles).forEach(markdownToHTML);

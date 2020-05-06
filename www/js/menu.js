@@ -11,7 +11,7 @@ const settings = require('./settings');
 const tingle = require('./vendor/tingle');
 const search = require('./search');
 
-const { store } = electron.remote.require('./app');
+const { store, i18n } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
 const allowedTags = strings.allowedAnnouncementTags;
@@ -83,7 +83,7 @@ const parseContent = contentString => {
 };
 
 const createNotificationContent = msgList => {
-  let html = '<h1 class="model-title">What\'s New</h1> <div class="messages">';
+  let html = `<h1 class="model-title">${i18n.t('OTHERS.WHATS_NEW')}</h1> <div class="messages">`;
 
   msgList.forEach(item => {
     html += '<div class="row">';
@@ -151,7 +151,7 @@ const randomShabadButton = h(
       },
     },
     h('i.fa.fa-random.list-icon'),
-    'Show Random Shabad',
+    i18n.t('OTHERS.SHOW_RANDOM_SHABAD'),
   ),
 );
 
@@ -163,7 +163,7 @@ const notificationButton = h(
       onclick: notificationsBellClickHandler,
     },
     h('i.fa.fa-bell.list-icon'),
-    "What's New",
+    i18n.t('OTHERS.WHATS_NEW'),
   ),
 );
 const hukamnamaButton = h(
@@ -183,7 +183,7 @@ const hukamnamaButton = h(
       },
     },
     h('i.fa.fa-gavel.list-icon'),
-    'Daily Hukamnama',
+    i18n.t('OTHERS.DAILY_HUKAMNAMA'),
   ),
 );
 
@@ -199,7 +199,7 @@ const emptySlideButton = h(
       },
     },
     h('i.fa.fa-eye-slash.list-icon'),
-    'Add Empty Slide',
+    i18n.t('INSERT.ADD_EMPTY_SLIDE'),
   ),
 );
 const waheguruSlideButton = h(
@@ -213,7 +213,7 @@ const waheguruSlideButton = h(
       },
     },
     h('i.fa.fa-circle.list-icon'),
-    'Add Waheguru Slide',
+    i18n.t('INSERT.ADD_WAHEGURU_SLIDE'),
   ),
 );
 const dhanGuruSlideButton = h(
@@ -229,29 +229,25 @@ const dhanGuruSlideButton = h(
     },
     h('i.fa.fa-circle-o.list-icon'),
     [
-      h('label', { htmlFor: 'dhan-guru' }, 'Add Dhan Guru '),
+      h('label', { htmlFor: 'dhan-guru' }, i18n.t('INSERT.ADD_DHAN_GURU')),
       h('select#dhan-guru', { value: ' ' }, [
-        h('option', { value: ' ' }, 'Select'),
-        h('option', { value: 'DMn gurU nwnk dyv jI' }, 'Nanak Dev Ji'),
-        h('option', { value: 'DMn gurU AMgd dyv jI' }, 'Angad Dev Ji'),
-        h('option', { value: 'DMn gurU Amrdwsu swihb jI' }, 'Amardas Sahib Ji'),
-        h('option', { value: 'DMn gurU rwmdws swihb jI' }, 'Ramdas Sahib Ji'),
-        h('option', { value: 'DMn gurU Arjun dyv jI' }, 'Arjun Dev Ji'),
-        h('option', { value: 'DMn gurU hir goibMd swihb jI' }, 'Har Gobind Sahib Ji'),
-        h('option', { value: 'DMn gurU hir rwie swihb jI' }, 'Har Rai Sahib Ji'),
-        h('option', { value: 'DMn gurU hir ikRSx swihb jI' }, 'Har Krishan Sahib Ji'),
-        h('option', { value: 'DMn gurU qyg bhwdr swihb jI' }, 'Teg Bahadur Sahib Ji'),
-        h('option', { value: 'DMn gurU goibMd isMG swihb jI' }, 'Gobind Singh Sahib Ji'),
-        h('option', { value: 'DMn gurU gRMQ swihb jI' }, 'Granth Sahib Ji'),
+        h('option', { value: ' ' }, i18n.t('INSERT.SELECT')),
+        strings.dropdownStrings.gurus.map((value, index) =>
+          h(
+            'option',
+            { value: strings.slideStrings.dhanguruStrings[index] },
+            i18n.t(`INSERT.DHAN_GURU.${value}`),
+          ),
+        ),
       ]),
     ],
   ),
 );
 const announcementSlideButton = h(
   'li.announcement-box',
-  h('header', h('i.fa.fa-bullhorn.list-icon'), 'Add announcement slide'),
+  h('header', h('i.fa.fa-bullhorn.list-icon'), i18n.t('INSERT.ADD_ANNOUNCEMENT_SLIDE')),
   h('li', [
-    h('span', 'Announcement in Gurmukhi'),
+    h('span', i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')),
     h('div.switch', [
       h('input#announcement-language', {
         name: 'announcement-language',
@@ -260,7 +256,7 @@ const announcementSlideButton = h(
           const isGurmukhi = document.querySelector('#announcement-language').checked;
           const placeholderText = isGurmukhi
             ? strings.announcemenetPlaceholder.gurmukhi
-            : strings.announcemenetPlaceholder.english;
+            : i18n.t(`INSERT.${strings.announcemenetPlaceholder.english}`);
 
           const $announcementText = document.querySelector('.announcement-text');
           $announcementText.classList.toggle('gurmukhi', isGurmukhi);
@@ -275,7 +271,7 @@ const announcementSlideButton = h(
   ]),
   h('div.announcement-text', {
     contentEditable: true,
-    'data-placeholder': 'Add announcement text here ...',
+    'data-placeholder': i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT'),
     oninput: () => {
       const $announcementInput = document.querySelector('.announcement-text');
       $announcementInput.innerHTML.replace(
@@ -298,7 +294,7 @@ const announcementSlideButton = h(
         global.core.updateInsertedSlide(true);
       },
     },
-    'Add Announcement',
+    i18n.t('INSERT.ADD_ANNOUNCEMENT'),
   ),
 );
 
@@ -345,7 +341,7 @@ module.exports = {
 
   showSettingsTab(fromMainMenu) {
     search.activateNavLink('settings', true);
-    search.activateNavPage('session', { id: 'settings', label: 'Settings' });
+    search.activateNavPage('session', { id: 'settings', label: i18n.t('TOOLBAR.SETTINGS') });
 
     const isPresenterView = document.body.classList.contains('presenter-view');
     const settingsViewType = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';

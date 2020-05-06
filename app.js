@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const uuid = require('uuid/v4');
 const op = require('openport');
+const i18n = require('i18next');
+const i18nBackend = require('i18next-node-fs-backend');
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
 const themes = require('./www/js/themes.json');
@@ -21,6 +23,16 @@ const httpBase = require('http').Server(expressApp);
 const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
+
+// Configuring the i18n
+i18n.use(i18nBackend);
+i18n.init({
+  backend: {
+    loadPath: path.join(__dirname, './www/locales/{{lng}}.json'),
+    jsonIndent: 2,
+  },
+  fallbackLng: 'en',
+});
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
@@ -40,8 +52,6 @@ const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.t
 if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
-
-store.setUserPref('toolbar.language-settings', null);
 
 let mainWindow;
 let viewerWindow = false;
@@ -130,11 +140,11 @@ autoUpdater.on('update-not-available', () => {
   if (manualUpdate) {
     dialog.showMessageBox({
       type: 'info',
-      buttons: ['OK'],
+      buttons: [i18n.t('OK')],
       defaultId: 0,
-      title: 'No update available.',
-      message: 'No update available.',
-      detail: `Version ${appVersion} is the latest version.`,
+      title: i18n.t('NO_UPDATE_AVAILABLE'),
+      message: i18n.t('NO_UPDATE_AVAILABLE'),
+      detail: i18n.t('LATEST_VERSION', { appVersion }),
     });
   }
 });
@@ -143,11 +153,11 @@ autoUpdater.on('update-downloaded', () => {
   dialog.showMessageBox(
     {
       type: 'info',
-      buttons: ['Dismiss', 'Install and Restart'],
+      buttons: [i18n.t('DISMISS'), i18n.t('INSTALL_N_RESTART')],
       defaultId: 1,
-      title: 'Update available.',
-      message: 'Update available.',
-      detail: 'Update downloaded and ready to install',
+      title: i18n.t('UPDATE_AVAILABLE'),
+      message: i18n.t('UPDATE_AVAILABLE'),
+      detail: i18n.t('UPDATE_DOWNLOADED'),
       cancelId: 0,
     },
     response => {
@@ -328,10 +338,7 @@ const searchPorts = () => {
     },
     (err, port) => {
       if (err) {
-        dialog.showErrorBox(
-          'Overlay Error',
-          'No free ports available. Close other applications and Reboot the machine',
-        );
+        dialog.showErrorBox(i18n.t('OVERLAY_ERR'), i18n.t('NO_PORTS_AVAILABLE'));
         app.exit(-1);
         return;
       }
@@ -372,6 +379,7 @@ app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
 
+  store.setUserPref('toolbar.language-settings', null);
   if (!userId) {
     userId = uuid();
     store.set('userId', userId);
@@ -600,4 +608,5 @@ module.exports = {
   store,
   themes,
   appstore,
+  i18n,
 };
