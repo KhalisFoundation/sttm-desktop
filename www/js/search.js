@@ -22,7 +22,10 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
-let currentShabadId = 0;
+let currentShabadState = {
+  id: null,
+  type: null,
+};
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
@@ -370,7 +373,7 @@ module.exports = {
   },
 
   getCurrentShabadId() {
-    return currentShabadId;
+    return currentShabadState;
   },
 
   offline(seconds) {
@@ -735,13 +738,18 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    currentShabadId = ShabadID;
+    currentShabadState = {
+      id: ShabadID,
+      type: 'shabad',
+    };
     if (window.socket !== undefined) {
       window.socket.emit('data', {
         type: 'shabad',
+        host: 'sttm-desktop',
         id: ShabadID,
         shabadid: ShabadID, // @deprecated
         highlight: LineID,
+        homeId: LineID,
       });
     }
 
@@ -765,7 +773,10 @@ module.exports = {
 
   async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
     let lineID = LineID;
-    currentShabadId = ceremonyID;
+    currentShabadState = {
+      id: ceremonyID,
+      type: 'ceremony',
+    };
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
@@ -818,6 +829,7 @@ module.exports = {
       }
       if (window.socket !== undefined) {
         window.socket.emit('data', {
+          host: 'sttm-desktop',
           type: 'ceremony',
           id: ceremonyID,
           shabadid: ceremonyID, // @deprecated
@@ -880,6 +892,7 @@ module.exports = {
         });
       if (window.socket !== undefined) {
         window.socket.emit('data', {
+          host: 'sttm-desktop',
           type: 'bani',
           id: BaniID,
           highlight: LineID || rows[0].ID,
@@ -1151,6 +1164,7 @@ module.exports = {
       }
 
       window.socket.emit('data', {
+        host: 'sttm-desktop',
         type: shabadType,
         id: sessionKeyExists ? parseInt(sessionKeySplit[1], 10) : ShabadID,
         shabadid: ShabadID, // @deprecated

@@ -58,7 +58,7 @@ const setListeners = () => {
       /* We need gurmukhi here to add for history support.
       Will no longer be needed when we move to better state management */
       const loadShabad = (shabadId, verseId, gurmukhi) => {
-        const currentShabadID = global.core.search.getCurrentShabadId();
+        const currentShabadID = global.core.search.getCurrentShabadId().id;
         const currentVerse = document.querySelector(`#line${verseId}`);
         // If its not new shabad but just a verse change in current shabad
         if (currentShabadID === shabadId && currentVerse) {
@@ -71,7 +71,7 @@ const setListeners = () => {
       };
 
       const loadCeremony = (ceremonyId, crossPlatformId) => {
-        const currentCeremonyID = global.core.search.getCurrentShabadId();
+        const currentCeremonyID = global.core.search.getCurrentShabadId().id;
         const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
         if (currentCeremonyID === ceremonyId && currentVerse) {
           currentVerse.click();
@@ -94,6 +94,34 @@ const setListeners = () => {
             type: 'response-control',
             success: isPinCorrect,
           });
+
+          // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
+          if (isPinCorrect) {
+            const currentShabad = global.core.search.getCurrentShabadId();
+            const currentVerse = document.querySelector(`#shabad .panktee.current`);
+            const homeVerse = document.querySelector(`#shabad .panktee.main`);
+            let homeId;
+            let highlight;
+
+            if (currentShabad.id && currentVerse) {
+              if (currentShabad.type === 'shabad') {
+                highlight = currentVerse.dataset.lineId;
+                homeId = homeVerse.dataset.lineId;
+              } else {
+                highlight = currentVerse.dataset.cpId;
+                homeId = homeVerse.dataset.cpId;
+              }
+
+              window.socket.emit('data', {
+                type: currentShabad.type,
+                host: 'sttm-desktop',
+                id: currentShabad.id,
+                shabadid: currentShabad.id, // @deprecated
+                highlight: parseInt(highlight, 10),
+                homeId: parseInt(homeId, 10),
+              });
+            }
+          }
           analytics.trackEvent(
             'controller',
             'connection',
@@ -107,7 +135,7 @@ const setListeners = () => {
       };
 
       // if its an event from web and not from desktop itself
-      if (data.host === 'sttm-web') {
+      if (data.host !== 'sttm-desktop') {
         listenerActions[isPinCorrect ? data.type : 'request-control'](data);
       }
     });
