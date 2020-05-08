@@ -22,7 +22,10 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
-let currentShabadState = 0;
+let currentShabadState = {
+  id: null,
+  type: null,
+};
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
