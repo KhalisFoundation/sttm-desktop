@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.4 - _May 7, 2020_
+### 7.4 - _May 11, 2020_
 
 ### Improved:
 
