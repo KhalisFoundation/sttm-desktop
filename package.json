@@ -3,7 +3,7 @@
   "name": "sttm-desktop",
   "version": "7.2.1",
   "description": "The SikhiToTheMax desktop app",
-  "main": "app.js",
+  "main": ".webpack/main",
   "scripts": {
     "precommit": "npm test",
     "test": "run-p test:*",
@@ -12,6 +12,7 @@
     "test:lint:js": "eslint app.js packaging www/js",
     "test:lint:css": "stylelint \"www/src/scss/*.scss\" --syntax scss --fix",
     "start": "concurrently --kill-others \"npm run watch-css\" \"cross-env NODE_ENV=development electron .\"",
+    "forge-start": "concurrently --kill-others \"cross-env NODE_ENV=development electron-forge start\"",
     "build": "npm run build-css",
     "pack:mac": "npm run build && electron-builder --mac",
     "pack:win": "npm run build && electron-builder --win --x64",
@@ -25,7 +26,9 @@
     "build-css:obs": "node-sass --output-style compressed --include-path www/src/scss/obs www/src/scss/obs/styles.scss www/obs/bundle.css",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "forge-package": "electron-forge package",
+    "forge-make": "electron-forge make"
   },
   "repository": {
     "type": "git",
@@ -34,6 +37,16 @@
   "author": "Khalis, Inc. <techsupport@khalisfoundation.org>",
   "license": "OSL-3.0",
   "devDependencies": {
+    "@electron-forge/cli": "6.0.0-beta.50",
+    "@electron-forge/maker-deb": "6.0.0-beta.50",
+    "@electron-forge/maker-rpm": "6.0.0-beta.50",
+    "@electron-forge/maker-squirrel": "6.0.0-beta.50",
+    "@electron-forge/maker-zip": "6.0.0-beta.50",
+    "@electron-forge/plugin-webpack": "6.0.0-beta.50",
+    "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "css-loader": "^3.0.0",
+    "node-loader": "^0.6.0",
+    "style-loader": "^0.23.1",
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
     "electron": "^4.2.12",
@@ -59,13 +72,16 @@
     "stylelint": "^7.9.0",
     "stylelint-config-prettier": "^5.0.0",
     "stylelint-config-standard": "^16.0.0",
-    "stylelint-order": "^0.4.1"
+    "stylelint-order": "^0.4.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
     "anvaad-js": "^1.4.0",
     "copy-to-clipboard": "^3.0.8",
     "electron-chromecast": "^1.1.0",
     "electron-log": "^2.0.2",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^4.2.5",
     "express": "^4.15.2",
     "extract-zip": "^1.6.7",
@@ -166,5 +182,55 @@
   "optionalDependencies": {
     "react": "^16.12.0",
     "react-native": "^0.61.5"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "sttm_desktop"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "mainConfig": "./webpack.main.config.js",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./www/index.html",
+                  "js": "./www/js/index.js",
+                  "name": "main_window"
+                },
+                {
+                  "html": "./www/src/viewer.html",
+                  "js": "./www/js/viewer.js",
+                  "name": "viewer_window"
+                }
+              ]
+            }
+          }
+        ]
+      ]
+    }
   }
 }

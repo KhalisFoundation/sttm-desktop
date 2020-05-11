@@ -215,7 +215,7 @@ function createViewer(ipcData) {
       frame: process.platform !== 'win32',
       backgroundColor: '#000000',
     });
-    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    viewerWindow.loadURL(VIEWER_WINDOW_WEBPACK_ENTRY);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -417,7 +417,7 @@ app.on('ready', () => {
       createViewer();
     }
   });
-  mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   if (!store.get('user-agent')) {
     store.set('user-agent', mainWindow.webContents.getUserAgent());
