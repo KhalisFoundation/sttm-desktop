@@ -10,6 +10,7 @@ let code = '...';
 let adminPin = '...';
 let adminPinVisible = true;
 let isConntected = false;
+let isRequestSent = false;
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -57,7 +58,7 @@ const setListeners = () => {
       /* We need gurmukhi here to add for history support.
       Will no longer be needed when we move to better state management */
       const loadShabad = (shabadId, verseId, gurmukhi) => {
-        const currentShabadID = global.core.search.getCurrentShabadId();
+        const currentShabadID = global.core.search.getCurrentShabadId().id;
         const currentVerse = document.querySelector(`#line${verseId}`);
         // If its not new shabad but just a verse change in current shabad
         if (currentShabadID === shabadId && currentVerse) {
@@ -69,8 +70,21 @@ const setListeners = () => {
         }
       };
 
+      const loadCeremony = (ceremonyId, crossPlatformId) => {
+        const currentCeremonyID = global.core.search.getCurrentShabadId().id;
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentCeremonyID === ceremonyId && currentVerse) {
+          currentVerse.click();
+        } else {
+          global.core.search.loadCeremony(ceremonyId, null, false, crossPlatformId);
+        }
+      };
+
       const listenerActions = {
-        shabad: payload => loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi),
+        shabad: payload => {
+          loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
+          analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
+        },
         text: payload =>
           global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
         'request-control': () => {
@@ -80,15 +94,48 @@ const setListeners = () => {
             type: 'response-control',
             success: isPinCorrect,
           });
+
+          // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
+          if (isPinCorrect) {
+            const currentShabad = global.core.search.getCurrentShabadId();
+            const currentVerse = document.querySelector(`#shabad .panktee.current`);
+            const homeVerse = document.querySelector(`#shabad .panktee.main`);
+            let homeId;
+            let highlight;
+
+            if (currentShabad.id && currentVerse) {
+              if (currentShabad.type === 'shabad') {
+                highlight = currentVerse.dataset.lineId;
+                homeId = homeVerse.dataset.lineId;
+              } else {
+                highlight = currentVerse.dataset.cpId;
+                homeId = homeVerse.dataset.cpId;
+              }
+
+              window.socket.emit('data', {
+                type: currentShabad.type,
+                host: 'sttm-desktop',
+                id: currentShabad.id,
+                shabadid: currentShabad.id, // @deprecated
+                highlight: parseInt(highlight, 10),
+                homeId: parseInt(homeId, 10),
+              });
+            }
+          }
+          analytics.trackEvent(
+            'controller',
+            'connection',
+            isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
+          );
         },
         /* Coming soon
-        'bani' : global.core.search.loadBani(data.baniId, data.verseId); 
-        'ceremony' : global.core.search.loadCeremony(data.ceremonyId, data.verseId); 
+        'bani' : global.core.search.loadBani(data.baniId, data.verseId);
         */
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
       };
 
       // if its an event from web and not from desktop itself
-      if (data.host === 'sttm-web') {
+      if (data.host !== 'sttm-desktop') {
         listenerActions[isPinCorrect ? data.type : 'request-control'](data);
       }
     });
@@ -97,8 +144,12 @@ const setListeners = () => {
 
 const remoteSyncInit = async () => {
   const onlineVal = await isOnline();
+  if (isRequestSent) {
+    return;
+  }
   if (onlineVal) {
     const newCode = await tryConnection();
+    isRequestSent = true;
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
     }
@@ -114,6 +165,7 @@ const remoteSyncInit = async () => {
         : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
     }
+    isRequestSent = false;
   } else {
     document.querySelector('.sync-code-label').innerText = i18n.t(
       'TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR',
@@ -190,11 +242,13 @@ const toggleAdminPin = () => {
     document.querySelector('.hide-btn i').classList.replace('fa-eye-slash', 'fa-eye');
     adminPinVisible = true;
   }
+  analytics.trackEvent('controller', 'pinVisibility', adminPinVisible);
 };
 
 const toggleLockScreen = () => {
   toggleOverlayUI(currentToolbarItem, false);
   toggleOverlayUI('lock-screen', true);
+  analytics.trackEvent('controller', 'screenLock', true);
 };
 
 const adminContent = h('div', [
@@ -234,6 +288,7 @@ const syncContent = h('div.sync-content', [
           if (code !== '...') {
             const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
             global.controller.sendText(syncString);
+            analytics.trackEvent('controller', 'codePresented', true);
           }
         },
       },
@@ -257,6 +312,7 @@ const syncContent = h('div.sync-content', [
       'connection',
       () => {
         syncToggle();
+        analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
       },
       false,
     ),

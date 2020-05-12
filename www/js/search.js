@@ -22,7 +22,10 @@ const allowedKeys = [
 const sessionList = [];
 const sessionStatesList = {};
 const currentShabad = [];
-let currentShabadId = 0;
+let currentShabadState = {
+  id: null,
+  type: null,
+};
 const kbPages = [];
 let currentMeta = {};
 let newSearchTimeout;
@@ -370,7 +373,7 @@ module.exports = {
   },
 
   getCurrentShabadId() {
-    return currentShabadId;
+    return currentShabadState;
   },
 
   offline(seconds) {
@@ -735,13 +738,18 @@ module.exports = {
   },
 
   loadShabad(ShabadID, LineID, apv = false) {
-    currentShabadId = ShabadID;
+    currentShabadState = {
+      id: ShabadID,
+      type: 'shabad',
+    };
     if (window.socket !== undefined) {
       window.socket.emit('data', {
         type: 'shabad',
+        host: 'sttm-desktop',
         id: ShabadID,
         shabadid: ShabadID, // @deprecated
         highlight: LineID,
+        homeId: LineID,
       });
     }
 
@@ -763,11 +771,17 @@ module.exports = {
     }
   },
 
-  async loadCeremony(ceremonyID, LineID = null, historyReload = false) {
+  async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
+    let lineID = LineID;
+    currentShabadState = {
+      id: ceremonyID,
+      type: 'ceremony',
+    };
     const $shabadList = this.$shabad || document.getElementById('shabad');
     $shabadList.innerHTML = '';
     $shabadList.dataset.bani = '';
     try {
+      let currentRow;
       const rowsDb = await banidb.loadCeremony(ceremonyID);
       const rows = await Promise.all(
         rowsDb.map(rowDb => {
@@ -790,6 +804,21 @@ module.exports = {
             row = banidb.loadVerses(rowDb.VerseIDRangeStart, rowDb.VerseIDRangeEnd);
           }
           row.sessionKey = `ceremony-${ceremonyID}`;
+          /* 1. crossPlatformID: It is the id that's common between web and desktop for ceremonies, 
+          so we add that to row here for sync 
+          2. LineID: is the id that's used on desktop (might differ on web for ceremonies)
+          */
+          row.crossPlatformID = rowDb.ID;
+          /* If current row is the verse that needs to be highlighted (home verse) 
+           Then mark that row as current row  */
+          if (row.crossPlatformID === crossPlatformID || row.ID === LineID) {
+            currentRow = row;
+            /* Find LineID for current crossPlatformID (when we recieve crossplatform ID from web) 
+             Whenever we get crossPlatform ID from web, LineID would be null */
+            if (LineID === null) {
+              lineID = row.ID;
+            }
+          }
           return row;
         }),
       );
@@ -800,10 +829,14 @@ module.exports = {
       }
       if (window.socket !== undefined) {
         window.socket.emit('data', {
+          host: 'sttm-desktop',
           type: 'ceremony',
+          id: ceremonyID,
+          shabadid: ceremonyID, // @deprecated
+          highlight: currentRow ? currentRow.crossPlatformID : lineID,
         });
       }
-      return this.printShabad(flatRows, null, LineID);
+      return this.printShabad(flatRows, null, lineID);
     } catch (error) {
       throw error;
     }
@@ -859,6 +892,7 @@ module.exports = {
         });
       if (window.socket !== undefined) {
         window.socket.emit('data', {
+          host: 'sttm-desktop',
           type: 'bani',
           id: BaniID,
           highlight: LineID || rows[0].ID,
@@ -937,6 +971,7 @@ module.exports = {
       h(
         `a#line${line.ID}.panktee.${englishHeading ? 'roman' : 'gurmukhi'}${seenClasses}`,
         {
+          'data-cp-id': line.crossPlatformID,
           'data-line-id': line.ID,
           'data-main-letters': line.MainLetters,
           onclick: e => {
@@ -1115,25 +1150,25 @@ module.exports = {
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
     if (window.socket !== undefined) {
-      let shabadIdsplit = [ShabadID];
-      if (typeof ShabadID === 'string') {
-        shabadIdsplit = ShabadID.split('-');
+      let sessionKeySplit;
+      if (typeof Line.sessionKey === 'string') {
+        sessionKeySplit = Line.sessionKey.split('-');
       }
 
       let shabadType;
-
-      if (shabadIdsplit.length > 1) {
-        shabadType = shabadIdsplit[0] === 'ceremony' ? 'ceremony' : 'bani';
+      const sessionKeyExists = sessionKeySplit && sessionKeySplit.length > 1;
+      if (sessionKeySplit) {
+        [shabadType] = sessionKeySplit;
       } else {
         shabadType = 'shabad';
       }
 
       window.socket.emit('data', {
+        host: 'sttm-desktop',
         type: shabadType,
-        id: shabadIdsplit.length > 1 ? parseInt(shabadIdsplit[2], 10) : ShabadID,
-        baniLength: shabadIdsplit.length > 1 ? shabadIdsplit[1] : undefined,
+        id: sessionKeyExists ? parseInt(sessionKeySplit[1], 10) : ShabadID,
         shabadid: ShabadID, // @deprecated
-        highlight: LineID,
+        highlight: Line.crossPlatformID || LineID,
       });
     }
 
