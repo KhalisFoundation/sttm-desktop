@@ -148,7 +148,8 @@
     "win": {
       "icon": "assets/STTM.ico",
       "publisherName": [
-        "KHALIS, INC"
+        "KHALIS FOUNDATION (KHALIS, INC.)",
+        "KHALIS INC"
       ],
       "target": [
         "nsis"
