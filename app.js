@@ -175,7 +175,7 @@ autoUpdater.on('error', () => {
       defaultId: 0,
       title: i18n.t('SOMETHING_WENT_WRONG_UPDATE_TITLE'),
       message: i18n.t('SOMETHING_WENT_WRONG_UPDATE_BODY'),
-      detail: i18n.t('LATEST_VERSION', { appVersion }),
+      detail: i18n.t('CURRENT_VERSION', { appVersion }),
     });
   }
 });
