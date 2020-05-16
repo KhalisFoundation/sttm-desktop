@@ -8,6 +8,8 @@
   "LEGEND": "Legend",
   "NO_UPDATE_AVAILABLE": "No update available.",
   "NO_PORTS_AVAILABLE": "No free ports available. Close other applications and Reboot the machine",
+  "SOMETHING_WENT_WRONG_UPDATE_TITLE": "Something went wrong",
+  "SOMETHING_WENT_WRONG_UPDATE_BODY": "Try checking sttm.co/download for the latest version of SikhiToTheMax.",
   "OK": "OK",
   "OVERLAY_ERR": "Overlay Error",
   "UPDATE_AVAILABLE": "Update avialable.",
