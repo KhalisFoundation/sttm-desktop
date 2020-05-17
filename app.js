@@ -103,6 +103,10 @@ function openSecondaryWindow(windowName) {
       width: 1366,
       height: 768,
       show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+      },
     });
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
@@ -231,6 +235,10 @@ function createViewer(ipcData) {
       titleBarStyle: 'hidden',
       frame: process.platform !== 'win32',
       backgroundColor: '#000000',
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+      },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
@@ -405,6 +413,10 @@ app.on('ready', () => {
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true,
+    },
   });
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
