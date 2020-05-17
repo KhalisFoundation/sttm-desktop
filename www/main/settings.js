@@ -1,7 +1,7 @@
 const h = require('hyperscript');
 const ldGet = require('lodash.get');
 const { remote } = require('electron');
-const settings = require('./settings.json');
+const settings = require('../configs/settings.json');
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');

@@ -1,6 +1,6 @@
 const h = require('hyperscript');
 const { remote } = require('electron');
-const shortcutItemsJSON = require('./shortcut_tray.json');
+const shortcutItemsJSON = require('../configs/shortcut_tray.json');
 
 const { store, i18n } = remote.require('./app');
 

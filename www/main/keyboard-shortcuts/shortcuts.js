@@ -1,5 +1,5 @@
 /* global Mousetrap */
-const shortcutsMap = require('./shortcuts-map.json');
+const shortcutsMap = require('../../configs/shortcuts-map.json');
 
 const shortcutsApplied = {
   viewer: false,

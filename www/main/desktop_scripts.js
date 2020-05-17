@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
-const tingle = require('./vendor/tingle');
+const tingle = require('../assets/js/vendor/tingle');
 
 const { remote } = electron;
 const { i18n, isUnsupportedWindow } = remote.require('./app');
