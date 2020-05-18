@@ -25,6 +25,8 @@ const currentShabad = [];
 let currentShabadState = {
   id: null,
   type: null,
+  baniLength: null,
+  mangalPosition: null,
 };
 const kbPages = [];
 let currentMeta = {};
@@ -739,7 +741,7 @@ module.exports = {
 
   loadShabad(ShabadID, LineID, apv = false) {
     currentShabadState = {
-      id: ShabadID,
+      id: parseInt(ShabadID, 10),
       type: 'shabad',
     };
     if (window.socket !== undefined) {
@@ -750,6 +752,7 @@ module.exports = {
         shabadid: ShabadID, // @deprecated
         highlight: LineID,
         homeId: LineID,
+        verseChange: false,
       });
     }
 
@@ -774,7 +777,7 @@ module.exports = {
   async loadCeremony(ceremonyID, LineID = null, historyReload = false, crossPlatformID = null) {
     let lineID = LineID;
     currentShabadState = {
-      id: ceremonyID,
+      id: parseInt(ceremonyID, 10),
       type: 'ceremony',
     };
     const $shabadList = this.$shabad || document.getElementById('shabad');
@@ -834,6 +837,7 @@ module.exports = {
           id: ceremonyID,
           shabadid: ceremonyID, // @deprecated
           highlight: currentRow ? currentRow.crossPlatformID : lineID,
+          verseChange: false,
         });
       }
       return this.printShabad(flatRows, null, lineID);
@@ -842,10 +846,17 @@ module.exports = {
     }
   },
 
-  loadBani(BaniID, LineID = null, historyReload = false) {
+  loadBani(BaniID, LineID = null, historyReload = false, crossPlatformID = null) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
     const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
     const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+    let lineID = LineID;
+    currentShabadState = {
+      id: parseInt(BaniID, 10),
+      type: 'bani',
+      baniLength,
+      mangalPosition,
+    };
 
     let blackListedMangalPosition;
     if (mangalPosition === 'above') {
@@ -872,6 +883,7 @@ module.exports = {
           this.addToHistory(BaniID, null, nameOfBani, 'bani');
         }
       }
+      let currentRow;
       const rows = rowsDb
         .filter(rowDb => rowDb.MangalPosition !== blackListedMangalPosition)
         .map(rowDb => {
@@ -887,18 +899,33 @@ module.exports = {
           }
 
           row.sessionKey = `bani-${BaniID}`;
+          row.crossPlatformID = rowDb.ID;
+          if (row.crossPlatformID === crossPlatformID || row.ID === parseInt(LineID)) {
+            console.log(row);
+            currentRow = row;
+            /* Find LineID for current crossPlatformID (when we recieve crossplatform ID from web) 
+             Whenever we get crossPlatform ID from web, LineID would be null */
+            if (LineID === null) {
+              lineID = row.ID;
+            }
+          }
 
           return row;
         });
+
       if (window.socket !== undefined) {
         window.socket.emit('data', {
           host: 'sttm-desktop',
           type: 'bani',
           id: BaniID,
-          highlight: LineID || rows[0].ID,
+          shabadid: BaniID, // @deprecated
+          highlight: parseInt(currentRow ? currentRow.crossPlatformID : lineID),
+          baniLength,
+          mangalPosition,
+          verseChange: false,
         });
       }
-      return this.printShabad(rows, shabadID, LineID);
+      return this.printShabad(rows, null, lineID);
     });
   },
 
@@ -1169,6 +1196,7 @@ module.exports = {
         id: sessionKeyExists ? parseInt(sessionKeySplit[1], 10) : ShabadID,
         shabadid: ShabadID, // @deprecated
         highlight: Line.crossPlatformID || LineID,
+        verseChange: true,
       });
     }
 
