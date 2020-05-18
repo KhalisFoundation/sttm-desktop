@@ -870,6 +870,9 @@ module.exports = {
     currentShabad.splice(0, currentShabad.length);
     // load verses for bani based on baniID and the length that user has decided
     banidb.loadBani(BaniID, baniLengthCols[baniLength]).then(rowsDb => {
+      // create a unique shabadID for whole bani, and append it with length
+      const shabadID = `${rowsDb[0].Token || rowsDb[0].Bani.Token}-${baniLength}-${rowsDb[0]
+        .BaniID || rowsDb[0].Bani.ID}`;
       const nameOfBani = rowsDb[0].nameOfBani || rowsDb[0].Bani.Gurmukhi;
       const thisBaniState = sessionStatesList[`bani-${BaniID}`];
       if (!historyReload) {
@@ -921,7 +924,7 @@ module.exports = {
           verseChange: false,
         });
       }
-      return this.printShabad(rows, null, lineID);
+      return this.printShabad(rows, shabadID, lineID);
     });
   },
 
