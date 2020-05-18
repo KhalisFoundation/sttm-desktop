@@ -169,7 +169,14 @@ autoUpdater.on('update-downloaded', () => {
 });
 autoUpdater.on('error', () => {
   if (manualUpdate) {
-    // showUpdate('update-error');
+    dialog.showMessageBox({
+      type: 'error',
+      buttons: [i18n.t('OK')],
+      defaultId: 0,
+      title: i18n.t('SOMETHING_WENT_WRONG_UPDATE_TITLE'),
+      message: i18n.t('SOMETHING_WENT_WRONG_UPDATE_BODY'),
+      detail: i18n.t('CURRENT_VERSION', { appVersion }),
+    });
   }
 });
 
@@ -178,7 +185,7 @@ function checkForUpdates(manual = false) {
     if (manual) {
       manualUpdate = true;
     }
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
