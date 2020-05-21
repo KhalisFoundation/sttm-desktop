@@ -51,6 +51,7 @@ body {
 
 .o-gurbani {
   font-family: 'Gurbani Akhar Thick';
+  display: inline-flex;
 }
 
 .o-teeka {
@@ -64,6 +65,7 @@ body {
 
 .o-transliteration,
 .o-translation {
+  display: inline-block;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
