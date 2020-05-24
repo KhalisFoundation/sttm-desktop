@@ -1,10 +1,11 @@
 ## New Updates
 
-### 7.5 - _May 21, 2020_
+### 7.5 - _May 26, 2020_
 
 ### Improved:
 
-- 
+- Further sync enhancements between SikhiToTheMax and your phone when using Bani Controller
+- UI fixes for Bani Overlay
 
 </br>
 
