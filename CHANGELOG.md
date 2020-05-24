@@ -4,7 +4,7 @@
 
 ### Improved:
 
-- Further sync enhancements between SikhiToTheMax and your phone when using Bani Controller
+- Sync enhancements between SikhiToTheMax and your phone when using Bani Controller
 - UI fixes for Bani Overlay
 
 </br>
