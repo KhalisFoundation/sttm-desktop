@@ -107,7 +107,8 @@
         "translationFont": "Muli",
         "gurbaniFont": "Gurbani Akhar Thick",
         "larivaarAssist": false,
-        "theme": false
+        "theme": false,
+        "greenScreen": false
       },
       "gurbani": {
         "bottom": 156,

@@ -245,6 +245,10 @@ const overlayUrl = () =>
     copyURLButton,
   );
 
+const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
+const opacityControls = controlsFactory(changeOpacityButton, i18n.t('BANI_OVERLAY.OPACITY'));
+opacityControls.style.display = overlayVars.greenScreen ? 'none' : 'inline-block';
+
 const toggleLarivaarAssist = h(
   'div.input-wrap.larivaar-assist-toggle',
   {
@@ -403,10 +407,33 @@ const toggleAnnouncements = h(
   h('div.setting-label', i18n.t('BANI_OVERLAY.ANNOUNCEMENT')),
 );
 
+const toggleGreenScreen = h(
+  'div.input-wrap.green-screen-toggle',
+  {
+    onclick: evt => {
+      if (overlayCast) {
+        overlayVars.greenScreen = !overlayVars.greenScreen;
+        savePrefs();
+        const { greenScreen } = overlayVars;
+
+        setToggleIcon(evt.currentTarget, greenScreen);
+        opacityControls.style.display = greenScreen ? 'none' : 'inline-block';
+        analytics.trackEvent('overlay', 'toggleGreenScreen', greenScreen);
+      }
+    },
+  },
+  h(
+    'div#green-screen-btn',
+    h(`i.fa.cp-icon.${overlayVars.greenScreen ? 'fa-toggle-on' : 'fa-toggle-off'}`),
+  ),
+  h('div.setting-label', i18n.t('BANI_OVERLAY.GREEN_SCREEN')),
+);
+
 /** Main Control Bar Items */
 controlPanel.append(toggleCast);
 controlPanel.append(toggleLogo);
 controlPanel.append(toggleAnnouncements);
+controlPanel.append(toggleGreenScreen);
 controlPanel.append(separator);
 controlPanel.append(resetButton);
 controlPanel.append(toggleLarivaar);
@@ -434,7 +461,6 @@ const changeGurbanifontSizeButton = resizeButtonFactory(
   increaseGurbanifontSize,
   decreaseGurbanifontSize,
 );
-const changeOpacityButton = resizeButtonFactory(increaseOpacity, decreaseOpacity);
 
 const translationFonts = fontListFactory(fonts.translation, 'translationFont');
 const gurbaniFonts = fontListFactory(fonts.gurbani, 'gurbaniFont');
@@ -453,7 +479,7 @@ textControls.append(separatorY());
 textControls.append(controlsFactory(backgroundColor, i18n.t('BANI_OVERLAY.BG')));
 textControls.append(separatorY());
 textControls.append(controlsFactory(changeBarSizeButton, i18n.t('BANI_OVERLAY.SIZE')));
-textControls.append(controlsFactory(changeOpacityButton, i18n.t('BANI_OVERLAY.OPACITY')));
+textControls.append(opacityControls);
 textControls.append(separatorY());
 textControls.append(
   controlsFactory(
