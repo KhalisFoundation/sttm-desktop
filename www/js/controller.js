@@ -5,7 +5,7 @@ const anvaad = require('anvaad-js');
 const { remote } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
-const { store, appstore, i18n } = main;
+const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
 const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
 
@@ -29,40 +29,44 @@ global.webview.addEventListener('ipc-message', event => {
   }
 });
 
-const updateMenu = [
-  {
-    label: i18n.t('MENU.APP.VERSION', { version: main.appVersion }),
-    enabled: false,
-  },
-  {
-    label: i18n.t('MENU.UPDATE.CHECK'),
-    accelerator: 'CmdOrCtrl+U',
-    click: () => {
-      analytics.trackEvent('menu', 'check-update');
-      main.checkForUpdates(true);
+const updateMenu = [];
+
+if (!isUnsupportedWindow) {
+  updateMenu.push(
+    {
+      label: i18n.t('MENU.APP.VERSION', { version: main.appVersion }),
+      enabled: false,
     },
-    // Only show if not in a platform-specific app store
-    visible: !appstore,
-  },
-  {
-    label: i18n.t('MENU.UPDATE.CHECKING'),
-    enabled: false,
-    visible: false,
-  },
-  {
-    label: i18n.t('MENU.UPDATE.DOWNLOADING'),
-    enabled: false,
-    visible: false,
-  },
-  {
-    label: i18n.t('MENU.UPDATE.INSTALL_AND_RESTART'),
-    click: () => {
-      analytics.trackEvent('menu', 'install-restart');
-      main.autoUpdater.quitAndInstall();
+    {
+      label: i18n.t('MENU.UPDATE.CHECK'),
+      accelerator: 'CmdOrCtrl+U',
+      click: () => {
+        analytics.trackEvent('menu', 'check-update');
+        main.checkForUpdates(true);
+      },
+      // Only show if not in a platform-specific app store
+      visible: !appstore,
     },
-    visible: false,
-  },
-];
+    {
+      label: i18n.t('MENU.UPDATE.CHECKING'),
+      enabled: false,
+      visible: false,
+    },
+    {
+      label: i18n.t('MENU.UPDATE.DOWNLOADING'),
+      enabled: false,
+      visible: false,
+    },
+    {
+      label: i18n.t('MENU.UPDATE.INSTALL_AND_RESTART'),
+      click: () => {
+        analytics.trackEvent('menu', 'install-restart');
+        main.autoUpdater.quitAndInstall();
+      },
+      visible: false,
+    },
+  );
+}
 
 const menuTemplate = [
   {
