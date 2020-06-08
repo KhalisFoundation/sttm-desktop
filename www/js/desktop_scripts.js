@@ -6,9 +6,10 @@ const os = require('os');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
+const tingle = require('./vendor/tingle');
 
 const { remote } = electron;
-const { i18n } = remote.require('./app');
+const { i18n, isUnsupportedWindow } = remote.require('./app');
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
@@ -108,6 +109,16 @@ module.exports = {
       this.downloadLatestDB(true);
     }
     checkForNotifcations();
+
+    if (isUnsupportedWindow) {
+      const modal = new tingle.Modal({
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+      });
+
+      modal.setContent(`<h1 class="model-title">${i18n.t('UNSUPPORT_OS')}</h1>`);
+      modal.open();
+    }
   },
 
   downloadLatestDB(force = false) {

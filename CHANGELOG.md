@@ -26,7 +26,6 @@
 - Enhanced sync between SikhiToTheMax and your phone when using Bani Controller
 - Fixed a bug that caused the sync code to change multiple times
 
-
 ### 7.3.2 - _April 14, 2020_
 
 ### Improved:

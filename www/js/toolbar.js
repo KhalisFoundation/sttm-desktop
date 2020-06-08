@@ -80,6 +80,16 @@ const setListeners = () => {
         }
       };
 
+      const loadBani = (BaniId, crossPlatformId) => {
+        const currentBaniID = global.core.search.getCurrentShabadId().id;
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentBaniID === BaniId && currentVerse) {
+          currentVerse.click();
+        } else {
+          global.core.search.loadBani(BaniId, null, false, crossPlatformId);
+        }
+      };
+
       const listenerActions = {
         shabad: payload => {
           loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
@@ -119,6 +129,8 @@ const setListeners = () => {
                 shabadid: currentShabad.id, // @deprecated
                 highlight: parseInt(highlight, 10),
                 homeId: parseInt(homeId, 10),
+                baniLength: currentShabad.baniLength,
+                mangalPosition: currentShabad.mangalPosition,
               });
             }
           }
@@ -128,9 +140,7 @@ const setListeners = () => {
             isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
           );
         },
-        /* Coming soon
-        'bani' : global.core.search.loadBani(data.baniId, data.verseId);
-        */
+        bani: payload => loadBani(payload.baniId, payload.verseId),
         ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
       };
 
