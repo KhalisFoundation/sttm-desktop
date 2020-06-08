@@ -519,6 +519,12 @@ const themeObjects = {
   },
 };
 
+const updateColorInputs = () => {
+  document.querySelector('input.toggle-gurbani-text').value = overlayVars.gurbaniTextColor;
+  document.querySelector('input.toggle-text').value = overlayVars.textColor;
+  document.querySelector('input.background').value = overlayVars.bgColor;
+};
+
 const themeSwatchFactory = themeOptions => {
   const themeClass = i18n
     .t(`THEMES.${themeOptions.label}`)
@@ -535,6 +541,7 @@ const themeSwatchFactory = themeOptions => {
         overlayVars.gurbaniTextColor = themeOptions.gurbaniTextColor;
         overlayVars.bgColor = themeOptions.bgColor;
         savePrefs();
+        updateColorInputs();
 
         analytics.trackEvent('overlay', 'theme', overlayVars.theme);
       },
