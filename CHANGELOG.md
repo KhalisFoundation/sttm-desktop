@@ -4,7 +4,9 @@
 
 ### Improved:
 
-- SikhiToTheMax will no longer be supported on Windows 7 - please update your Windows version to receive new updates
+- SikhiToTheMax will no longer be supported on Windows 7, please update your Windows version to receive new updates
+- Added support for Sundar Gutka in Bani Controller
+- Small fixes for Bani Overlay
 
 </br>
 
