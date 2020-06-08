@@ -1,11 +1,10 @@
 ## New Updates
 
-### 7.5 - _May 26, 2020_
+### 7.4.3 - _June 8, 2020_
 
 ### Improved:
 
-- Sync enhancements between SikhiToTheMax and your phone when using Bani Controller
-- UI fixes for Bani Overlay
+- SikhiToTheMax will no longer be supported on Windows 7 - please update your Windows version to receive new updates
 
 </br>
 
