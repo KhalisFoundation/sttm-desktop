@@ -1020,18 +1020,21 @@ module.exports = {
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
-    // if the line clicked is further than throughput (in searches) then load until that line
-    let throughput = 50;
+    const quickThroughput = 10;
+    const longThroughput = 50;
 
+    let throughput = longThroughput;
+
+    // if the line clicked is further than throughput (in searches) then load until that line
     if (start) {
-      throughput = 10;
+      throughput = quickThroughput;
     } else if (lineIndex > throughput) {
       throughput = lineIndex + 1;
     }
 
     const end = start + throughput;
 
-    const lineHeight = 27;
+    const lineHeight = 35.6; // height of single line
     // max scroll size, after which we would load the next part of bani
     const maxScrollSize = end * lineHeight * 0.75;
     // mode in which bani is printed, can be append, replace and click
@@ -1050,13 +1053,21 @@ module.exports = {
     // print the next set of banis on scroll
     shabad.parentNode.onscroll = e => {
       let newStart = end;
-      let tooFar = e.target.scrollTop > (end + throughput) * lineHeight;
+      let tooFar = e.target.scrollTop > end * lineHeight;
       // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
       if (tooFar) {
         while (tooFar) {
           this.printShabad(rows, ShabadID, lineID, newStart, true);
-          newStart += throughput;
-          tooFar = e.target.scrollTop > (newStart + throughput) * lineHeight;
+          newStart += quickThroughput;
+          tooFar = e.target.scrollTop > newStart * lineHeight;
+          if (store.get('GlobalState.currentVerseSelector')) {
+            const currentVerse = document.querySelector(
+              store.get('GlobalState.currentVerseSelector'),
+            );
+            if (currentVerse) {
+              currentVerse.click();
+            }
+          }
         }
       } else if (e.target.scrollTop >= maxScrollSize) {
         this.printShabad(rows, ShabadID, lineID, end, true);

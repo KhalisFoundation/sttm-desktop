@@ -52,6 +52,7 @@ const toggleOverlayUI = (toolbarItem, show) => {
 
 const setListeners = () => {
   if (window.socket !== undefined) {
+    const $shabad = document.getElementById('shabad');
     window.socket.on('data', data => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
 
@@ -80,11 +81,18 @@ const setListeners = () => {
         }
       };
 
-      const loadBani = (BaniId, crossPlatformId) => {
+      const loadBani = (BaniId, crossPlatformId, lineCount) => {
         const currentBaniID = global.core.search.getCurrentShabadId().id;
-        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
-        if (currentBaniID === BaniId && currentVerse) {
-          currentVerse.click();
+        if (currentBaniID === BaniId) {
+          $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1) * 35.6);
+          let currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+          if (currentVerse) {
+            currentVerse.click();
+          } else {
+            store.set('GlobalState', {
+              currentVerseSelector: `[data-cp-id = "${crossPlatformId}"]`,
+            });
+          }
         } else {
           global.core.search.loadBani(BaniId, null, false, crossPlatformId);
         }
@@ -140,12 +148,13 @@ const setListeners = () => {
             isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
           );
         },
-        bani: payload => loadBani(payload.baniId, payload.verseId),
+        bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
         ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
       };
 
       // if its an event from web and not from desktop itself
       if (data.host !== 'sttm-desktop') {
+        console.log(data);
         listenerActions[isPinCorrect ? data.type : 'request-control'](data);
       }
     });
