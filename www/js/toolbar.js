@@ -84,8 +84,8 @@ const setListeners = () => {
       const loadBani = (BaniId, crossPlatformId, lineCount) => {
         const currentBaniID = global.core.search.getCurrentShabadId().id;
         if (currentBaniID === BaniId) {
-          $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1) * 35.6);
-          let currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+          $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1, 10) * 35.6);
+          const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
           if (currentVerse) {
             currentVerse.click();
           } else {
