@@ -1,11 +1,12 @@
 ## New Updates
 
-### 7.5 - _June 8, 2020_
+### 7.5 - _June 10, 2020_
 
 ### Improved:
 
 - SikhiToTheMax will no longer be supported on Windows 7, please update your Windows version to receive new updates
-- Added support for Sundar Gutka in Bani Controller
+- Fixed a bug where history was not working in Bani Controller
+- Added green screen option to Bani Overlay
 - Small fixes for Bani Overlay
 
 </br>

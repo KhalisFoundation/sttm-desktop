@@ -244,7 +244,8 @@ input[type='color'] {
 
   .logo-toggle,
   .announcement-toggle,
-  .larivaar-assist-toggle {
+  .larivaar-assist-toggle,
+  .green-screen-toggle {
     .fa-toggle-off,
     .fa-toggle-on {
       cursor: not-allowed;
@@ -257,7 +258,8 @@ input[type='color'] {
 .cast-toggle,
 .logo-toggle,
 .announcement-toggle,
-.larivaar-assist-toggle {
+.larivaar-assist-toggle,
+.green-screen-toggle {
   cursor: pointer;
   .cp-icon {
     font-size: 34px;
