@@ -115,6 +115,9 @@ body {
   .content-bar {
     background: transparent;
     padding: 0;
+    /*  HACK: remove the gap because of inline-block nature of content-bar
+    this hack can be removed by changing how we deal with larivaar in overlay.js */
+    margin-bottom: -0.5vh;
     width: auto;
   }
   .logo-wrapper {
@@ -332,7 +335,7 @@ body {
   align-items: center;
   background: #fff;
   border-radius: 5px;
-  display: inline-flex;
+  display: inline-block;
   justify-content: center;
   padding: 2vh 2vw;
   position: fixed;
