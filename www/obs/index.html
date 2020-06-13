@@ -164,9 +164,11 @@
               overlayPrefs.overlayVars.bgColor,
             )}, ${bgOpacity})`;
             el.style.padding = '0';
+
             document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
               spanEl.style.backgroundColor = overlayBgColor;
               spanEl.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
+              spanEl.style.lineHeight = '1.5em';
             });
             document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           });
