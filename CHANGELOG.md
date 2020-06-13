@@ -1,5 +1,16 @@
 ## New Updates
 
+### 7.5.1 - _June 15, 2020_
+
+### Improved:
+- Code enhancements
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 7.5 - _June 10, 2020_
 
 ### Improved:
@@ -8,12 +19,6 @@
 - Fixed a bug where history was not working in Bani Controller
 - Added green screen option to Bani Overlay
 - Small fixes for Bani Overlay
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.4.2 - _May 18, 2020_
 
