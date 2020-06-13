@@ -51,7 +51,7 @@ body {
 
 .o-gurbani {
   font-family: 'Gurbani Akhar Thick';
-  display: inline-flex;
+  display: inline-block;
 }
 
 .o-teeka {
@@ -335,7 +335,7 @@ body {
   align-items: center;
   background: #fff;
   border-radius: 5px;
-  display: inline-block;
+  display: inline-flex;
   justify-content: center;
   padding: 2vh 2vw;
   position: fixed;
