@@ -8,6 +8,7 @@ const uuid = require('uuid/v4');
 const op = require('openport');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
+const os = require('os');
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/js/defaults.json');
 const themes = require('./www/js/themes.json');
@@ -23,6 +24,15 @@ const httpBase = require('http').Server(expressApp);
 const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
+
+const platform = os.platform();
+let isUnsupportedWindow = false;
+if (platform === 'win32') {
+  const version = /\d+\.\d/.exec(os.release())[0];
+  if (version !== '6.3' && version !== '10.0') {
+    isUnsupportedWindow = true;
+  }
+}
 
 // Configuring the i18n
 i18n.use(i18nBackend);
@@ -130,53 +140,63 @@ autoUpdater.logger.transports.file.level = 'info';
 
 // autoUpdater events
 autoUpdater.on('checking-for-update', () => {
-  mainWindow.webContents.send('checking-for-update');
+  if (!isUnsupportedWindow) {
+    mainWindow.webContents.send('checking-for-update');
+  }
 });
 autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('update-available');
+  if (!isUnsupportedWindow) {
+    mainWindow.webContents.send('update-available');
+  }
 });
 autoUpdater.on('update-not-available', () => {
-  mainWindow.webContents.send('update-not-available');
-  if (manualUpdate) {
-    dialog.showMessageBox({
-      type: 'info',
-      buttons: [i18n.t('OK')],
-      defaultId: 0,
-      title: i18n.t('NO_UPDATE_AVAILABLE'),
-      message: i18n.t('NO_UPDATE_AVAILABLE'),
-      detail: i18n.t('LATEST_VERSION', { appVersion }),
-    });
+  if (!isUnsupportedWindow) {
+    mainWindow.webContents.send('update-not-available');
+    if (manualUpdate) {
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: [i18n.t('OK')],
+        defaultId: 0,
+        title: i18n.t('NO_UPDATE_AVAILABLE'),
+        message: i18n.t('NO_UPDATE_AVAILABLE'),
+        detail: i18n.t('LATEST_VERSION', { appVersion }),
+      });
+    }
   }
 });
 autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update-downloaded');
-  dialog.showMessageBox(
-    {
-      type: 'info',
-      buttons: [i18n.t('DISMISS'), i18n.t('INSTALL_N_RESTART')],
-      defaultId: 1,
-      title: i18n.t('UPDATE_AVAILABLE'),
-      message: i18n.t('UPDATE_AVAILABLE'),
-      detail: i18n.t('UPDATE_DOWNLOADED'),
-      cancelId: 0,
-    },
-    response => {
-      if (response === 1) {
-        autoUpdater.quitAndInstall();
-      }
-    },
-  );
+  if (!isUnsupportedWindow) {
+    mainWindow.webContents.send('update-downloaded');
+    dialog.showMessageBox(
+      {
+        type: 'info',
+        buttons: [i18n.t('DISMISS'), i18n.t('INSTALL_N_RESTART')],
+        defaultId: 1,
+        title: i18n.t('UPDATE_AVAILABLE'),
+        message: i18n.t('UPDATE_AVAILABLE'),
+        detail: i18n.t('UPDATE_DOWNLOADED'),
+        cancelId: 0,
+      },
+      response => {
+        if (response === 1) {
+          autoUpdater.quitAndInstall();
+        }
+      },
+    );
+  }
 });
 autoUpdater.on('error', () => {
-  if (manualUpdate) {
-    dialog.showMessageBox({
-      type: 'error',
-      buttons: [i18n.t('OK')],
-      defaultId: 0,
-      title: i18n.t('SOMETHING_WENT_WRONG_UPDATE_TITLE'),
-      message: i18n.t('SOMETHING_WENT_WRONG_UPDATE_BODY'),
-      detail: i18n.t('CURRENT_VERSION', { appVersion }),
-    });
+  if (!isUnsupportedWindow) {
+    if (manualUpdate) {
+      dialog.showMessageBox({
+        type: 'error',
+        buttons: [i18n.t('OK')],
+        defaultId: 0,
+        title: i18n.t('SOMETHING_WENT_WRONG_UPDATE_TITLE'),
+        message: i18n.t('SOMETHING_WENT_WRONG_UPDATE_BODY'),
+        detail: i18n.t('CURRENT_VERSION', { appVersion }),
+      });
+    }
   }
 });
 
@@ -185,7 +205,9 @@ function checkForUpdates(manual = false) {
     if (manual) {
       manualUpdate = true;
     }
-    autoUpdater.checkForUpdatesAndNotify();
+    if (!isUnsupportedWindow) {
+      autoUpdater.checkForUpdatesAndNotify();
+    }
   }
 }
 
@@ -416,7 +438,7 @@ app.on('ready', () => {
     mainWindow.show();
     // Platform-specific app stores have their own update mechanism
     // so only check if we're not in one
-    if (!appstore) {
+    if (!appstore && !isUnsupportedWindow) {
       checkForUpdates();
     }
     // Show changelog if last version wasn't seen
@@ -616,4 +638,5 @@ module.exports = {
   themes,
   appstore,
   i18n,
+  isUnsupportedWindow,
 };

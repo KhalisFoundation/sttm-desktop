@@ -89,13 +89,17 @@
       };
 
       var applyOverlayPrefs = function() {
+        const overlayColor = overlayPrefs.overlayVars.greenScreen ? '#0f0' : 'transparent';
+        const bgOpacity =
+          Number(overlayPrefs.overlayVars.greenScreen) || overlayPrefs.overlayVars.bgOpacity;
+
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
           el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
           el.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
-          el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
-            overlayPrefs.overlayVars.bgOpacity
-          })`;
+          el.style.backgroundColor = `rgba(${hexToRgb(
+            overlayPrefs.overlayVars.bgColor,
+          )}, ${bgOpacity})`;
         });
 
         document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.overlayVars.bgOpacity;
@@ -130,9 +134,9 @@
           });
           document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           // Apply the background color from theme
-          el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
-            overlayPrefs.overlayVars.bgOpacity
-          })`;
+          el.style.backgroundColor = `rgba(${hexToRgb(
+            overlayPrefs.overlayVars.bgColor,
+          )}, ${bgOpacity})`;
         });
 
         // Special style overrides for vertical layout
@@ -146,9 +150,9 @@
               content.style.padding = '0';
             });
             el.style.width = `${overlayPrefs.overlayVars.padding} * 10%`;
-            el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
-              overlayPrefs.overlayVars.bgOpacity
-            })`;
+            el.style.backgroundColor = `rgba(${hexToRgb(
+              overlayPrefs.overlayVars.bgColor,
+            )}, ${bgOpacity})`;
           });
 
         // Special style overrides for classic layout
@@ -156,16 +160,20 @@
           .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
           .forEach(el => {
             el.style.backgroundColor = 'transparent';
-            const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.overlayVars.bgColor)}, ${
-              overlayPrefs.overlayVars.bgOpacity
-            })`;
+            const overlayBgColor = `rgba(${hexToRgb(
+              overlayPrefs.overlayVars.bgColor,
+            )}, ${bgOpacity})`;
             el.style.padding = '0';
+
             document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
               spanEl.style.backgroundColor = overlayBgColor;
               spanEl.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
+              spanEl.style.lineHeight = '1.5em';
             });
             document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
           });
+
+        document.body.style.backgroundColor = overlayColor;
 
         const $gurbani = document.querySelector('.o-gurbani');
         const { overlayLarivaar, larivaarAssist } = overlayPrefs.overlayVars;

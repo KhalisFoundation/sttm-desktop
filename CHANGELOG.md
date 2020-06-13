@@ -1,5 +1,26 @@
 ## New Updates
 
+### 7.5 - _June 10, 2020_
+
+### Improved:
+
+- SikhiToTheMax will no longer be supported on Windows 7, please update your Windows version to receive new updates
+- Fixed a bug where history was not working in Bani Controller
+- Added green screen option to Bani Overlay
+- Small fixes for Bani Overlay
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
+### 7.4.2 - _May 18, 2020_
+
+### Improved:
+
+- The auto-updater for Windows will now tell you when new updates are downloading
+
 ### 7.4 - _May 11, 2020_
 
 ### Improved:
@@ -7,12 +28,6 @@
 - Added Anand Sahib (Bhog) support for Bani Controller
 - Enhanced sync between SikhiToTheMax and your phone when using Bani Controller
 - Fixed a bug that caused the sync code to change multiple times
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.3.2 - _April 14, 2020_
 

@@ -16,6 +16,7 @@
   "UPDATE_AVAILABLE": "Update avialable.",
   "UPDATE_DOWNLOADED": "Update downloaded and ready to install",
   "VIEWER_TITLE": "{{appName}} Viewer",
+  "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
 
   "BANI_OVERLAY": {
     "ANNOUNCEMENT": "Announcement",
@@ -31,7 +32,8 @@
     "PADCHED": "Padched",
     "PRESETS": "Presets",
     "SIZE": "Size",
-    "TEXT": "Text"
+    "TEXT": "Text",
+    "GREEN_SCREEN": "Green Screen"
   },
 
   "CHROMECAST": {
