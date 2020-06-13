@@ -504,8 +504,8 @@ const themeObjects = {
   baagiBlue: {
     label: 'BAAGI_BLUE',
     bgColor: '#274f69',
-    textColor: '#fff',
-    gurbaniTextColor: '#fff',
+    textColor: '#ffffff',
+    gurbaniTextColor: '#ffffff',
   },
   khalsaRush: {
     label: 'KHALSA_RUSH',
@@ -516,20 +516,20 @@ const themeObjects = {
   moodyBlue: {
     label: 'MOODY_BLUE',
     bgColor: '#2d73a7',
-    textColor: '#fff',
-    gurbaniTextColor: '#fff',
+    textColor: '#ffffff',
+    gurbaniTextColor: '#ffffff',
   },
   blackAndBlue: {
     label: 'BLACK_&_BLUE',
-    bgColor: '#000',
+    bgColor: '#000000',
     textColor: '#a3eafd',
-    gurbaniTextColor: '#fff',
+    gurbaniTextColor: '#ffffff',
   },
   floral: {
     label: 'FLORAL',
     bgColor: '#f5b7d1',
     textColor: '#a3eafd',
-    gurbaniTextColor: '#fff',
+    gurbaniTextColor: '#ffffff',
   },
   khalsaGold: {
     label: 'KHALSA_GOLD',
@@ -539,9 +539,9 @@ const themeObjects = {
   },
   neverForget: {
     label: 'NEVER_FORGET',
-    bgColor: '#000',
-    textColor: '#f00',
-    gurbaniTextColor: '#f00',
+    bgColor: '#000000',
+    textColor: '#ff0000',
+    gurbaniTextColor: '#ff0000',
   },
 };
 
