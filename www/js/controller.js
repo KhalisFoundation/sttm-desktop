@@ -540,7 +540,7 @@ module.exports = {
   },
 
   remapLine(rawLine) {
-    const Line = Object.assign(rawLine, {});
+    const Line = { ...rawLine.toJSON() };
     if (Line.Translations) {
       const lineTranslations = JSON.parse(Line.Translations);
       Line.English = lineTranslations.en.bdb;

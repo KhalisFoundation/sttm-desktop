@@ -14,6 +14,7 @@ const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json'
 // https://github.com/KhalisFoundation/sttm-desktop/pull/517#discussion_r261644205
 const realmConfig = {
   path: realmPath,
+  readOnly: true,
 };
 
 let initialized = false;
