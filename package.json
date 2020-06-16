@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "7.5.0",
+  "version": "7.5.1",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -36,7 +36,7 @@
   "devDependencies": {
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
-    "electron": "^4.2.12",
+    "electron": "^7.2.3",
     "electron-builder": "^22.4.1",
     "electron-publisher-s3": "^20.17.2",
     "electron-rebuild": "^1.8.8",
@@ -89,7 +89,7 @@
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
     "read-chunk": "^3.0.0",
-    "realm": "^3.5.0",
+    "realm": "^5.0.5",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
