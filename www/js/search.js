@@ -1050,16 +1050,16 @@ module.exports = {
       }
     }
 
-    // print the next set of banis on scroll
+    // print the next set of verses on scroll
     shabad.parentNode.onscroll = e => {
       let newStart = end;
-      let tooFar = e.target.scrollTop > end * lineHeight;
+      let tooFar = e.target.scrollTop > (end - quickThroughput) * lineHeight;
       // if scrolled too far, too fast, then load all the verses to fill the area scrolled.
       if (tooFar) {
         while (tooFar) {
           this.printShabad(rows, ShabadID, lineID, newStart, true);
           newStart += quickThroughput;
-          tooFar = e.target.scrollTop > newStart * lineHeight;
+          tooFar = e.target.scrollTop > (newStart - quickThroughput) * lineHeight;
           if (store.get('GlobalState.currentVerseSelector')) {
             const currentVerse = document.querySelector(
               store.get('GlobalState.currentVerseSelector'),
