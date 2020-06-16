@@ -1020,7 +1020,7 @@ module.exports = {
     const shabad = this.$shabad;
     const apv = document.body.classList.contains('akhandpaatt');
 
-    const quickThroughput = 10;
+    const quickThroughput = 20;
     const longThroughput = 50;
 
     let throughput = longThroughput;
