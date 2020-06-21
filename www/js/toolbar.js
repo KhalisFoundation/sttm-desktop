@@ -55,9 +55,10 @@ const setListeners = () => {
     const $shabad = document.getElementById('shabad');
     window.socket.on('data', data => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
+      const lineHeight = 35.6;
 
       const loadVerse = (crossPlatformId, lineCount) => {
-        $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1, 10) * 35.6);
+        $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1, 10) * lineHeight);
         const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
         if (currentVerse) {
           currentVerse.click();
