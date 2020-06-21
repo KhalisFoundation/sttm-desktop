@@ -388,6 +388,7 @@ a {
     flex-direction: column;
     max-width: 500px;
     padding: 15px;
+    position: relative;
 
     .sync-code-label {
       font-size: 28px;
@@ -450,6 +451,35 @@ a {
           padding-left: 2px;
         }
       }
+    }
+  }
+
+  .qr-container {
+    align-items: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 468px;
+    justify-content: center;
+    position: absolute;
+    right: -220px;
+    text-align: center;
+    width: 200px;
+
+    .qr-desc {
+      padding: 20px;
+    }
+
+    .qr-bani-ctrl {
+      background: #fff;
+      height: 148px;
+      width: 148px;
+    }
+
+    .qr-title {
+      font-size: 21px;
+      font-weight: bold;
+      padding: 20px;
     }
   }
 }

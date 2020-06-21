@@ -88,6 +88,7 @@
     "moment": "^2.22.1",
     "noty": "^3.2.0-beta",
     "openport": "0.0.5",
+    "qrcode": "^1.4.4",
     "read-chunk": "^3.0.0",
     "realm": "^5.0.5",
     "request": "^2.81.0",
