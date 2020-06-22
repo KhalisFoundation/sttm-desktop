@@ -67,142 +67,16 @@
     </div>
     <div id="app-frame">
       <webview id="main-viewer" src="viewer.html" nodeintegration class="base-ui"></webview>
-      <div id="navigator" class="noselect">
-        <div class="focus-overlay hidden overlay-ui common-overlay"></div>
-        <div id="toolbar">
-          <div class="bani-list hidden overlay-ui ui-sunder-gutka">
-            <header class="navigator-header"><span data-key="SUNDAR_GUTKA"></span></header>
-          </div>
-          <div class="bani-extras hidden overlay-ui ui-sunder-gutka"></div>
-
-          <div class="ceremonies-list hidden overlay-ui ui-ceremonies">
-            <header class="navigator-header ceremonies-header">
-              <span data-key="CEREMONIES"></span>
-            </header>
-          </div>
-
-          <div class="sync-dialogue-wrapper hidden overlay-ui ui-sync-button">
-            <div class="sync-dialogue hidden overlay-ui ui-sync-button">
-              <header class="sync-header" data-key="MOBILE_DEVICE_SYNC"></header>
-            </div>
-          </div>
-
-          <div class="lock-screen hidden overlay-ui ui-lock-screen">
-            <div class="lock-screen-content">
-              <div class="lock-screen-message" data-key="LOCKED_SCREEN"></div>
-            </div>
-          </div>
-        </div>
-        <div id="main-ui" class="base-ui">
-          <div class="nav-page" id="search-page">
-            <div class="navigator-header">
-              <div class="preferences-open"></div>
-              <div class="toggle-minimize">
-                <i class="fa fa-window-minimize"></i>
-                <i class="fa fa-window-maximize disabled"></i>
-              </div>
-              <span class="nav-header-text" data-key="SEARCH"></span>
-              <div id="search-type"></div>
-            </div>
-            <div class="search-div"></div>
-            <section class="block-list">
-              <ul id="results" class="gurmukhi"></ul>
-            </section>
-          </div>
-          <div class="nav-page" id="session-page">
-            <div class="navigator-header navigator-header-tabs">
-              <div class="preferences-open"></div>
-              <div class="toggle-minimize">
-                <i class="fa fa-window-minimize"></i>
-                <i class="fa fa-window-maximize disabled"></i>
-              </div>
-              <span class="nav-header-text"> </span>
-              <div class="nav-header-tabs">
-                <span
-                  class="nav-header-tab nav-header-text active"
-                  id="history-tab"
-                  data-title="history"
-                >
-                  <i class="fa fa-clock-o"></i> <span data-key="HISTORY"></span>
-                </span>
-                <span class="nav-header-tab nav-header-text" id="themes-tab" data-title="themes">
-                  <i class="fa fa-paint-brush"></i> <span data-key="THEMES"></span>
-                </span>
-                <span class="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
-                  <i class="fa fa-desktop"></i> <span data-key="INSERT"></span>
-                </span>
-                <span
-                  class="nav-header-tab nav-header-text"
-                  id="settings-tab"
-                  data-title="settings"
-                >
-                  <i class="fa fa-cogs"></i> <span data-key="SETTINGS"></span>
-                </span>
-                <span class="nav-header-tab nav-header-text" id="others-tab" data-title="others">
-                  <i class="fa fa-ellipsis-h"></i> <span data-key="OTHERS"></span>
-                </span>
-              </div>
-            </div>
-            <section class="block-list">
-              <div class="tab-content active" id="history-tab-content">
-                <ul id="session" class="gurmukhi"></ul>
-              </div>
-              <div class="tab-content" id="themes-tab-content">
-                <ul class="options-list" id="custom-theme-options"></ul>
-              </div>
-              <div class="tab-content" id="insert-tab-content">
-                <ul id="list-of-custom-slides"></ul>
-              </div>
-              <div class="tab-content" id="settings-tab-content"></div>
-              <div class="tab-content" id="others-tab-content">
-                <ul id="list-of-shabad-options"></ul>
-              </div>
-            </section>
-          </div>
-          <div class="nav-page" id="shabad-page" tabindex="0">
-            <div class="navigator-header">
-              <div class="preferences-open"></div>
-              <div class="toggle-minimize">
-                <i class="fa fa-window-minimize"></i>
-                <i class="fa fa-window-maximize disabled"></i>
-              </div>
-              <div class="current-shabad-header">
-                <div class="shabad-prev"></div>
-                <span class="nav-header-text" data-key="CURRENT_SHABAD"></span>
-                <div class="shabad-next"></div>
-              </div>
-              <div id="current-shabad-menu"></div>
-            </div>
-            <section class="block-list">
-              <ul id="shabad" class="gurmukhi"></ul>
-            </section>
-            <div class="controller-signal" title="Bani Controller currently in use">
-              <img alt="sync" src="assets/img/icons/sync.svg" />
-            </div>
-          </div>
-          <div class="takeover-page" id="menu-page">
-            <div class="navigator-header">
-              <div class="preferences-close"></div>
-              <div class="toggle-minimize">
-                <i class="fa fa-window-minimize"></i>
-                <i class="fa fa-window-maximize disabled"></i>
-              </div>
-              <span class="nav-header-text" data-key="SETTINGS"></span>
-            </div>
-          </div>
-        </div>
-        <div id="footer" class="base-ui">
-          <div class="menu-group">
-            <div class="menu-group-left"></div>
-            <div class="presenter-switch"></div>
-          </div>
-        </div>
-        <section class="shortcut-tray base-ui"></section>
-      </div>
+      <div id="navigator" class="noselect"></div>
     </div>
+    <script>
+      const Navigator = require('./js/navigator.js');
+      const { render } = require('react-dom');
+      render(Navigator.Navigator(), document.getElementById('navigator'));
+    </script>
     <script src="assets/js/vendor/mousetrap.min.js"></script>
     <script src="js/desktop_index.js"></script>
-    <script type="text/javascript" src="js/vendor/tingle.js"></script>
+    <script type="text/javascript" src="assets/js/vendor/tingle.js"></script>
     <script>
       const { remote } = require('electron');
       const { i18n } = remote.require('./app');
