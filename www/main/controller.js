@@ -614,20 +614,17 @@ module.exports = {
 
   livefeed(val) {
     if (val) {
-      dialog.showOpenDialog(
-        {
-          defaultPath: remote.app.getPath('desktop'),
-          properties: ['openDirectory'],
-        },
-        path => {
-          store.set('userPrefs.app.live-feed-location', path[0]);
-          const locationLabel = document.getElementsByClassName('sub-label livefeed');
-
-          for (let i = 0, len = locationLabel.length; i < len; i += 1) {
-            locationLabel[i].innerText = path;
-          }
-        },
-      );
+      const path = dialog.showOpenDialogSync({
+        defaultPath: remote.app.getPath('desktop'),
+        properties: ['openDirectory'],
+      });
+      if (path) {
+        store.set('userPrefs.app.live-feed-location', path[0]);
+        const locationLabel = document.getElementsByClassName('sub-label livefeed');
+        for (let i = 0, len = locationLabel.length; i < len; i += 1) {
+          locationLabel[i].innerText = path;
+        }
+      }
     }
   },
 };
