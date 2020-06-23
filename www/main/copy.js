@@ -5,7 +5,7 @@ const copy = require('copy-to-clipboard');
 const sanitizeHtml = require('sanitize-html');
 const anvaad = require('anvaad-js');
 const search = require('./search');
-const baniDB = require('../js/banidb/index.js');
+const baniDB = require('.//banidb/index.js');
 
 const baniLengthMap = search.baniLengthCols;
 const baniLength = store.getUserPref('toolbar.gurbani.bani-length');

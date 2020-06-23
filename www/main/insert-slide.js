@@ -3,7 +3,7 @@ const electron = require('electron');
 
 const { i18n } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
-const tingle = require('./vendor/tingle');
+const tingle = require('../assets/js/vendor/tingle');
 const strings = require('./strings');
 
 // allowed html tags inside announcement
