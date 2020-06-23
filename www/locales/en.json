@@ -48,7 +48,7 @@
     "SESSION_IS_NULL": "Cannot send because session is null",
     "SESSION_REMOVED": "Session Removed",
     "SESSION_UPDATED": "Session Updated",
-    "TRY_AGAIN": "An error occured. Please try again."
+    "TRY_AGAIN": "An error occurred. Please try again."
   },
 
   "DATABASE": {
@@ -125,7 +125,7 @@
     "UPDATE": {
       "CHECK": "Check for Update",
       "CHECKING": "Checking for Updates",
-      "DOWNLOADING": "Dowloading Update",
+      "DOWNLOADING": "Downloading Update",
       "INSTALL_AND_RESTART": "Install and Restart"
     },
     "WINDOW": {
@@ -281,7 +281,7 @@
     "DELETE_ERR": "Unable to delete that image. - {{error}}",
     "DIR_CREATE_ERR": " Error creating directory for user backgrounds. {{error}} - If error persists, report it at www.sttm.co:",
     "DIR_CREATE_ERR2": "Error Creating Directory. {{error}} - If error persists, report it at www.sttm.co:",
-    "FILE_VALIDATE_ERR": "Failed to validate this file as an image.\nError: {{error}}. If error presists file a bug report at sttm.co",
+    "FILE_VALIDATE_ERR": "Failed to validate this file as an image.\nError: {{error}}. If error persists file a bug report at sttm.co",
     "IMG_IN_USE_ERR": "This image is being used, please switch to another image or theme before deleting this image.",
     "LIMIT_ERR": "Five custom backgrounds limit reached. Please delete one or more before adding another custom background.",
     "PARSE_ERR": "There is an error parsing this theme.\nTry checking theme file for error. {{error}} - If error persists,\nreport it at www.sttm.co",
