@@ -159,14 +159,14 @@
     "FULL_WORDS_ENGLISH": "Full Word(s) - English",
     "FULL_WORDS_GURMUKHI": "Full Word(s) - Gurmukhi",
     "SOURCES": {
-      "ALL_SOURCES": "All sources",
+      "ALL_SOURCES": "All Sources",
       "AMRIT_KEERTAN": "Amrit Keertan",
       "DASAM_GRANTH": "Dasam Granth Sahib",
       "GURDAS_JI_VAARAN": "Bhai Gurdas Singh Ji Vaaran",
       "GURDAS_VAARAN": "Bhai Gurdas Ji Vaaran",
       "GURU_GRANTH_SAHIB": "Guru Granth Sahib Ji",
       "NAND_LAL_VAARAN": "Bhai Nand Lal Ji Vaaran",
-      "REHATNAMAS": "Rehatnamas & Panthic sources"
+      "REHATNAMAS": "Rehatnamas & Panthic Sources"
     }
   },
 
@@ -253,7 +253,7 @@
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (Bhog)",
     "BLANK": "Blank",
-    "MOOL_MANTRA": "Mool Mantra"
+    "MOOL_MANTRA": "Mool Mantr"
   },
 
   "THEMES": {
@@ -262,7 +262,7 @@
     "BLACK_&_BLUE": "Black & Blue",
     "DARBAR_BLUE": "Darbar Blue",
     "DARK": "Dark",
-    "FLORAL": "floral",
+    "FLORAL": "Floral",
     "HIGH_CONTRAST": "High Contrast",
     "KHALSA_GOLD": "Khalsa Gold",
     "KHALSA_RUSH": "Khalsa Rush",
@@ -272,7 +272,7 @@
     "NEVER_FORGET": "Never Forget",
 
     "BACKGROUNDS": "Backgrounds",
-    "COLORS": "Colours",
+    "COLORS": "Colors",
     "CURRENT_THEME": "Current Theme",
     "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
     "SPECIAL_CONDITIONS": "Special Conditions",
@@ -316,7 +316,7 @@
       "2": " from a mobile device to search, navigate, and control the entire app."
     },
     "SYNC_CONTROLLER": {
-      "INTERNET_ERR": "Sorry! you seem to be offline. Sync only works when you are connected to the internet.",
+      "INTERNET_ERR": "Sorry! You seem to be offline. Sync only works when you are connected to the internet.",
       "PIN": "Pin",
       "PRESENT_CODE": "Present Code to Sangat",
       "SANGAT_SYNC": "Sangat Sync",
