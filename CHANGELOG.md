@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.5.1 - _June 15, 2020_
+### 7.5.2 - _June 23, 2020_
 
 ### Improved:
 - Code enhancements
@@ -10,6 +10,11 @@
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
+
+### 7.5.1 - _June 15, 2020_
+
+### Improved:
+- Code enhancements
 
 ### 7.5 - _June 10, 2020_
 
