@@ -3,7 +3,7 @@ const h = require('hyperscript');
 const ip = require('ip');
 const copy = require('copy-to-clipboard');
 // eslint-disable-next-line import/no-unresolved
-const { obs: defaultPrefs } = require('./js/defaults.json');
+const { obs: defaultPrefs } = require('../configs/defaults.json');
 
 const { ipcRenderer, remote } = electron;
 
