@@ -172,7 +172,7 @@ const hukamnamaButton = h(
     'a.hukamnama-button',
     {
       onclick: () => {
-        getJSON('https://api.banidb.com/v2/hukamnamas ', (error, response) => {
+        getJSON('https://api.banidb.com/v2/hukamnamas/today ', (error, response) => {
           if (!error) {
             const hukamShabadID = parseInt(response.shabadIds[0], 10);
             analytics.trackEvent('display', 'hukamnama', hukamShabadID);
