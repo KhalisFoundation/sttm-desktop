@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.5.2 - _June 23, 2020_
+### 7.5.2 - _June 26, 2020_
 
 ### Improved:
 - Code enhancements
