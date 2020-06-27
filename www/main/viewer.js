@@ -13,7 +13,7 @@ const { remote } = require('electron');
 const { store, i18n } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
-const themes = require('./js/themes.json');
+const themes = require('./configs/themes.json');
 
 const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
@@ -463,7 +463,7 @@ const showLine = (ShabadID, LineID, rows, mode) => {
         Object.assign(decks[ShabadID], shabad);
         break;
       case 'click':
-        /* if you click on verse when message is open (announcement, blank, waheguru) 
+        /* if you click on verse when message is open (announcement, blank, waheguru)
         it should hide the message deck and show the shabad deck */
         if ($message.classList.contains('active')) {
           $message.classList.remove('active');

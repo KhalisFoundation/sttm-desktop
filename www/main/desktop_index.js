@@ -1,4 +1,5 @@
 /* eslint import/no-unresolved: 0 */
+
 global.platform = require('./js/desktop_scripts');
 global.controller = require('./js/controller');
 global.core = require('./js/index');

@@ -9,9 +9,11 @@ const op = require('openport');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
+
+// eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
-const defaultPrefs = require('./www/js/defaults.json');
-const themes = require('./www/js/themes.json');
+const defaultPrefs = require('./www/configs/defaults.json');
+const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
 
 // Are we packaging for a platform's app store?

@@ -8,7 +8,7 @@ const strings = require('./strings');
 
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
-const tingle = require('./vendor/tingle');
+const tingle = require('../assets/js/vendor/tingle');
 const search = require('./search');
 
 const { store, i18n } = electron.remote.require('./app');

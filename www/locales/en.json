@@ -13,7 +13,7 @@
   "SOMETHING_WENT_WRONG_UPDATE_BODY": "Try checking sttm.co/download for the latest version of SikhiToTheMax.",
   "OK": "OK",
   "OVERLAY_ERR": "Overlay Error",
-  "UPDATE_AVAILABLE": "Update avialable.",
+  "UPDATE_AVAILABLE": "Update available.",
   "UPDATE_DOWNLOADED": "Update downloaded and ready to install",
   "VIEWER_TITLE": "{{appName}} Viewer",
   "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
@@ -48,7 +48,7 @@
     "SESSION_IS_NULL": "Cannot send because session is null",
     "SESSION_REMOVED": "Session Removed",
     "SESSION_UPDATED": "Session Updated",
-    "TRY_AGAIN": "An error occured. Please try again."
+    "TRY_AGAIN": "An error occurred. Please try again."
   },
 
   "DATABASE": {
@@ -125,7 +125,7 @@
     "UPDATE": {
       "CHECK": "Check for Update",
       "CHECKING": "Checking for Updates",
-      "DOWNLOADING": "Dowloading Update",
+      "DOWNLOADING": "Downloading Update",
       "INSTALL_AND_RESTART": "Install and Restart"
     },
     "WINDOW": {
@@ -159,14 +159,14 @@
     "FULL_WORDS_ENGLISH": "Full Word(s) - English",
     "FULL_WORDS_GURMUKHI": "Full Word(s) - Gurmukhi",
     "SOURCES": {
-      "ALL_SOURCES": "All sources",
+      "ALL_SOURCES": "All Sources",
       "AMRIT_KEERTAN": "Amrit Keertan",
       "DASAM_GRANTH": "Dasam Granth Sahib",
       "GURDAS_JI_VAARAN": "Bhai Gurdas Singh Ji Vaaran",
       "GURDAS_VAARAN": "Bhai Gurdas Ji Vaaran",
       "GURU_GRANTH_SAHIB": "Guru Granth Sahib Ji",
       "NAND_LAL_VAARAN": "Bhai Nand Lal Ji Vaaran",
-      "REHATNAMAS": "Rehatnamas & Panthic sources"
+      "REHATNAMAS": "Rehatnamas & Panthic Sources"
     }
   },
 
@@ -253,7 +253,7 @@
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (Bhog)",
     "BLANK": "Blank",
-    "MOOL_MANTRA": "Mool Mantra"
+    "MOOL_MANTRA": "Mool Mantr"
   },
 
   "THEMES": {
@@ -262,7 +262,7 @@
     "BLACK_&_BLUE": "Black & Blue",
     "DARBAR_BLUE": "Darbar Blue",
     "DARK": "Dark",
-    "FLORAL": "floral",
+    "FLORAL": "Floral",
     "HIGH_CONTRAST": "High Contrast",
     "KHALSA_GOLD": "Khalsa Gold",
     "KHALSA_RUSH": "Khalsa Rush",
@@ -272,7 +272,7 @@
     "NEVER_FORGET": "Never Forget",
 
     "BACKGROUNDS": "Backgrounds",
-    "COLORS": "Colours",
+    "COLORS": "Colors",
     "CURRENT_THEME": "Current Theme",
     "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
     "SPECIAL_CONDITIONS": "Special Conditions",
@@ -281,7 +281,7 @@
     "DELETE_ERR": "Unable to delete that image. - {{error}}",
     "DIR_CREATE_ERR": " Error creating directory for user backgrounds. {{error}} - If error persists, report it at www.sttm.co:",
     "DIR_CREATE_ERR2": "Error Creating Directory. {{error}} - If error persists, report it at www.sttm.co:",
-    "FILE_VALIDATE_ERR": "Failed to validate this file as an image.\nError: {{error}}. If error presists file a bug report at sttm.co",
+    "FILE_VALIDATE_ERR": "Failed to validate this file as an image.\nError: {{error}}. If error persists file a bug report at sttm.co",
     "IMG_IN_USE_ERR": "This image is being used, please switch to another image or theme before deleting this image.",
     "LIMIT_ERR": "Five custom backgrounds limit reached. Please delete one or more before adding another custom background.",
     "PARSE_ERR": "There is an error parsing this theme.\nTry checking theme file for error. {{error}} - If error persists,\nreport it at www.sttm.co",
@@ -316,7 +316,7 @@
       "2": " from a mobile device to search, navigate, and control the entire app."
     },
     "SYNC_CONTROLLER": {
-      "INTERNET_ERR": "Sorry! you seem to be offline. Sync only works when you are connected to the internet.",
+      "INTERNET_ERR": "Sorry! You seem to be offline. Sync only works when you are connected to the internet.",
       "PIN": "Pin",
       "PRESENT_CODE": "Present Code to Sangat",
       "SANGAT_SYNC": "Sangat Sync",
