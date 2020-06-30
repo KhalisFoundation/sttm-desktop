@@ -2,6 +2,9 @@ const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
 const isOnline = require('is-online');
+const Noty = require('noty');
+const qrCode = require('qrcode');
+
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
@@ -47,6 +50,20 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
   document.querySelectorAll(`.overlay-ui.ui-${toolbarItem}, .common-overlay`).forEach(uiElement => {
     uiElement.classList.toggle('hidden', !show);
+  });
+};
+
+const qrCodeGenerator = syncCode => {
+  const canvas = document.querySelector('canvas.qr-bani-ctrl');
+  qrCode.toCanvas(canvas, `https:/sttm.co/control/${syncCode}`, error => {
+    if (error) {
+      new Noty({
+        type: 'error',
+        text: `${i18n.t('TOOLBAR.QR_CODE.ERROR')} : ${error}`,
+        timeout: 5000,
+        modal: true,
+      }).show();
+    }
   });
 };
 
@@ -174,6 +191,7 @@ const remoteSyncInit = async () => {
         ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
         : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
+      qrCodeGenerator(code);
     }
     isRequestSent = false;
   } else {
@@ -224,6 +242,9 @@ const syncToggle = async (forceConnect = false) => {
     onEnd(code);
     code = '...';
     adminPin = '...';
+    const canvas = document.querySelector('.qr-bani-ctrl');
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     document.querySelector('.sync-code-num').innerText = code;
     document.querySelector('.admin-pin').innerText = adminPinVisible
       ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
@@ -326,6 +347,11 @@ const syncContent = h('div.sync-content', [
       },
       false,
     ),
+  ]),
+  h('div.qr-container', [
+    h('div.qr-desc', i18n.t('TOOLBAR.QR_CODE.DESC')),
+    h('canvas.qr-bani-ctrl'),
+    h('div.qr-title', i18n.t('TOOLBAR.BANI_CONTROLLER')),
   ]),
 ]);
 

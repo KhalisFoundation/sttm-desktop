@@ -3,6 +3,7 @@
 ### 7.5.2 - _June 26, 2020_
 
 ### Improved:
+
 - Code enhancements
 
 </br>
@@ -14,6 +15,7 @@
 ### 7.5.1 - _June 15, 2020_
 
 ### Improved:
+
 - Code enhancements
 
 ### 7.5 - _June 10, 2020_
