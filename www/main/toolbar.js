@@ -69,8 +69,22 @@ const qrCodeGenerator = syncCode => {
 
 const setListeners = () => {
   if (window.socket !== undefined) {
+    const $shabad = document.getElementById('shabad');
     window.socket.on('data', data => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
+      const lineHeight = 35.6; // height of verse in shabad pane, unit: pixels
+
+      const loadVerse = (crossPlatformId, lineCount) => {
+        $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1, 10) * lineHeight);
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentVerse) {
+          currentVerse.click();
+        } else {
+          store.set('GlobalState', {
+            currentVerseSelector: `[data-cp-id = "${crossPlatformId}"]`,
+          });
+        }
+      };
 
       /* We need gurmukhi here to add for history support.
       Will no longer be needed when we move to better state management */
@@ -87,21 +101,19 @@ const setListeners = () => {
         }
       };
 
-      const loadCeremony = (ceremonyId, crossPlatformId) => {
+      const loadCeremony = (ceremonyId, crossPlatformId, lineCount) => {
         const currentCeremonyID = global.core.search.getCurrentShabadId().id;
-        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
-        if (currentCeremonyID === ceremonyId && currentVerse) {
-          currentVerse.click();
+        if (currentCeremonyID === ceremonyId) {
+          loadVerse(crossPlatformId, lineCount);
         } else {
           global.core.search.loadCeremony(ceremonyId, null, false, crossPlatformId);
         }
       };
 
-      const loadBani = (BaniId, crossPlatformId) => {
+      const loadBani = (BaniId, crossPlatformId, lineCount) => {
         const currentBaniID = global.core.search.getCurrentShabadId().id;
-        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
-        if (currentBaniID === BaniId && currentVerse) {
-          currentVerse.click();
+        if (currentBaniID === BaniId) {
+          loadVerse(crossPlatformId, lineCount);
         } else {
           global.core.search.loadBani(BaniId, null, false, crossPlatformId);
         }
@@ -157,8 +169,8 @@ const setListeners = () => {
             isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
           );
         },
-        bani: payload => loadBani(payload.baniId, payload.verseId),
-        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
+        bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
       };
 
       // if its an event from web and not from desktop itself
