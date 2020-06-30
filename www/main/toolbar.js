@@ -153,12 +153,19 @@ const setListeners = () => {
 };
 
 const remoteSyncInit = async () => {
+  const $syncConent = document.querySelector('.sync-content-wrapper');
+  $syncConent.classList.add('loading');
   const onlineVal = await isOnline();
   if (isRequestSent) {
     return;
   }
   if (onlineVal) {
     const newCode = await tryConnection();
+    if (newCode) {
+      $syncConent.classList.remove('loading');
+    } else {
+      remoteSyncInit();
+    }
     isRequestSent = true;
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
@@ -281,51 +288,54 @@ const adminContent = h('div', [
   ),
 ]);
 
-const syncContent = h('div.sync-content', [
-  h('div.sync-code-label', i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')),
-  h('div.sync-code-num', code),
-  syncItemFactory(
-    i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
-    h('span', [
-      i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.1'),
-      h('strong', 'sttm.co/sync'),
-      i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.2'),
-    ]),
-    h(
-      'button.button.copy-code-btn',
-      {
-        onclick: () => {
-          if (code !== '...') {
-            const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
-            global.controller.sendText(syncString);
-            analytics.trackEvent('controller', 'codePresented', true);
-          }
+const syncContent = h('div.sync-content-wrapper', [
+  h('div.sttm-loader'),
+  h('div.sync-content', [
+    h('div.sync-code-label', i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')),
+    h('div.sync-code-num', code),
+    syncItemFactory(
+      i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
+      h('span', [
+        i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.1'),
+        h('strong', 'sttm.co/sync'),
+        i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.2'),
+      ]),
+      h(
+        'button.button.copy-code-btn',
+        {
+          onclick: () => {
+            if (code !== '...') {
+              const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
+              global.controller.sendText(syncString);
+              analytics.trackEvent('controller', 'codePresented', true);
+            }
+          },
         },
-      },
-      i18n.t('TOOLBAR.SYNC_CONTROLLER.PRESENT_CODE'),
+        i18n.t('TOOLBAR.SYNC_CONTROLLER.PRESENT_CODE'),
+      ),
     ),
-  ),
-  syncItemFactory(
-    i18n.t('TOOLBAR.BANI_CONTROLLER'),
-    h('span', [
-      i18n.t('TOOLBAR.BANI_DESC.1'),
-      h('strong', 'sttm.co/control'),
-      i18n.t('TOOLBAR.BANI_DESC.2'),
+    syncItemFactory(
+      i18n.t('TOOLBAR.BANI_CONTROLLER'),
+      h('span', [
+        i18n.t('TOOLBAR.BANI_DESC.1'),
+        h('strong', 'sttm.co/control'),
+        i18n.t('TOOLBAR.BANI_DESC.2'),
+      ]),
+      adminContent,
+    ),
+    h('div.connection-switch-container', [
+      h('p', i18n.t('TOOLBAR.DISABLE_CONNECTIONS_MSG', { appName: i18n.t('APPNAME') })),
+      switchFactory(
+        'connection-switch',
+        '',
+        'connection',
+        () => {
+          syncToggle();
+          analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
+        },
+        false,
+      ),
     ]),
-    adminContent,
-  ),
-  h('div.connection-switch-container', [
-    h('p', i18n.t('TOOLBAR.DISABLE_CONNECTIONS_MSG', { appName: i18n.t('APPNAME') })),
-    switchFactory(
-      'connection-switch',
-      '',
-      'connection',
-      () => {
-        syncToggle();
-        analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
-      },
-      false,
-    ),
   ]),
 ]);
 

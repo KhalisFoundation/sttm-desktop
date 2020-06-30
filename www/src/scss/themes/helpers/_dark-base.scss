@@ -22,8 +22,12 @@
   .bani-list,
   .ceremonies-list,
   .ceremony-pane,
-  .sync-content {
+  .sync-content-wrapper {
     background-color: $bg-alt;
+    .sttm-loader {
+      border-color: $bg-bright;
+      border-top-color: $accent;
+    }
   }
 
   .viewer-controls {

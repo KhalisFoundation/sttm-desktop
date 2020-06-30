@@ -72,6 +72,23 @@ a {
   }
 }
 
+.sttm-loader {
+  animation: spin 2s linear infinite;
+  border: 6px solid;
+  border-radius: 50%;
+  height: 60px;
+  width: 60px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 #toolbar {
   align-items: center;
   display: flex;
@@ -381,13 +398,36 @@ a {
     max-width: 600px;
   }
 
+  .sync-content-wrapper {
+    border-radius: 5px;
+    .sync-content {
+      opacity: 1;
+    }
+    .sttm-loader {
+      display: none;
+    }
+    &.loading {
+      align-items: center;
+      display: flex;
+      height: 468px;
+      justify-content: center;
+      width: 500px;
+      .sync-content {
+        display: none;
+      }
+      .sttm-loader {
+        display: block;
+      }
+    }
+  }
+
   .sync-content {
     align-items: center;
-    border-radius: 5px;
     display: flex;
     flex-direction: column;
     max-width: 500px;
     padding: 15px;
+    position: relative;
 
     .sync-code-label {
       font-size: 28px;

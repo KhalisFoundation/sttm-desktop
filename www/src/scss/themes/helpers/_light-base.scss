@@ -46,20 +46,12 @@
   .bani-list,
   .ceremonies-list,
   .ceremony-pane,
-  .sync-content {
+  .sync-content-wrapper {
     background-color: $nav-bg;
-  }
-
-  .viewer-controls {
-    background-color: $nav-bg;
-  }
-
-  #toolbar,
-  .bani-list,
-  .ceremonies-list,
-  .ceremony-pane,
-  .sync-content {
-    background-color: $nav-bg;
+    .sttm-loader {
+      border-color: $alt-bg;
+      border-top-color: $active-focus;
+    }
   }
 
   .viewer-controls {
