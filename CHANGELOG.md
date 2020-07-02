@@ -1,16 +1,23 @@
 ## New Updates
 
-### 7.5.2 - _June 26, 2020_
+### 7.6 - _July 7, 2020_
 
 ### Improved:
 
-- Code enhancements
+- Added QR code for Bani Controller
+- Added Sundar Gutka support for Bani Controller
 
 </br>
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
+
+### 7.5.2 - _June 26, 2020_
+
+### Improved:
+
+- Code enhancements
 
 ### 7.5.1 - _June 15, 2020_
 
