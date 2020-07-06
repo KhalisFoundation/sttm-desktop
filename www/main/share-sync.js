@@ -1,6 +1,7 @@
 const request = require('request-promise');
 const { remote } = require('electron');
-const { store } = remote.require('./app');
+
+const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Noty = require('noty');
