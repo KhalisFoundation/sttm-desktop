@@ -10,7 +10,6 @@ let code = '...';
 let adminPin = '...';
 let adminPinVisible = true;
 let isConntected = false;
-let isRequestSent = false;
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -152,21 +151,20 @@ const setListeners = () => {
   }
 };
 
+const showSyncError = errorMessage => {
+  document.querySelector('.sync-code-label').innerText = errorMessage;
+  document.querySelector('.sync-code-num').innerText = '...';
+  document.querySelector('.admin-pin').innerText = `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ...`;
+  document.querySelector('#tool-sync-button').setAttribute('title', '...');
+};
+
 const remoteSyncInit = async () => {
   const $syncConent = document.querySelector('.sync-content-wrapper');
   $syncConent.classList.add('loading');
   const onlineVal = await isOnline();
-  if (isRequestSent) {
-    return;
-  }
   if (onlineVal) {
     const newCode = await tryConnection();
-    if (newCode) {
-      $syncConent.classList.remove('loading');
-    } else {
-      remoteSyncInit();
-    }
-    isRequestSent = true;
+    $syncConent.classList.remove('loading');
     if (newCode !== code) {
       document.body.classList.remove('controller-on');
     }
@@ -181,17 +179,12 @@ const remoteSyncInit = async () => {
         ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
         : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
+    } else {
+      showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
     }
-    isRequestSent = false;
   } else {
-    document.querySelector('.sync-code-label').innerText = i18n.t(
-      'TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR',
-    );
-    document.querySelector('.sync-code-num').innerText = '...';
-    document.querySelector('.admin-pin').innerText = `${i18n.t(
-      'TOOLBAR.SYNC_CONTROLLER.PIN',
-    )}: ...`;
-    document.querySelector('#tool-sync-button').setAttribute('title', '...');
+    $syncConent.classList.remove('loading');
+    showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
   }
   setListeners();
 };
