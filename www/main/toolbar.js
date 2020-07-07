@@ -2,6 +2,9 @@ const h = require('hyperscript');
 const { remote } = require('electron');
 const anvaad = require('anvaad-js');
 const isOnline = require('is-online');
+const Noty = require('noty');
+const qrCode = require('qrcode');
+
 const banidb = require('./banidb');
 const { tryConnection, onEnd } = require('./share-sync');
 
@@ -49,10 +52,38 @@ const toggleOverlayUI = (toolbarItem, show) => {
   });
 };
 
+const qrCodeGenerator = syncCode => {
+  const canvas = document.querySelector('canvas.qr-bani-ctrl');
+  qrCode.toCanvas(canvas, `https:/sttm.co/control/${syncCode}`, error => {
+    if (error) {
+      new Noty({
+        type: 'error',
+        text: `${i18n.t('TOOLBAR.QR_CODE.ERROR')} : ${error}`,
+        timeout: 5000,
+        modal: true,
+      }).show();
+    }
+  });
+};
+
 const setListeners = () => {
   if (window.socket !== undefined) {
+    const $shabad = document.getElementById('shabad');
     window.socket.on('data', data => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
+      const lineHeight = 35.6; // height of verse in shabad pane, unit: pixels
+
+      const loadVerse = (crossPlatformId, lineCount) => {
+        $shabad.parentElement.scrollTo(0, parseInt(lineCount - 1, 10) * lineHeight);
+        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
+        if (currentVerse) {
+          currentVerse.click();
+        } else {
+          store.set('GlobalState', {
+            currentVerseSelector: `[data-cp-id = "${crossPlatformId}"]`,
+          });
+        }
+      };
 
       /* We need gurmukhi here to add for history support.
       Will no longer be needed when we move to better state management */
@@ -69,21 +100,19 @@ const setListeners = () => {
         }
       };
 
-      const loadCeremony = (ceremonyId, crossPlatformId) => {
+      const loadCeremony = (ceremonyId, crossPlatformId, lineCount) => {
         const currentCeremonyID = global.core.search.getCurrentShabadId().id;
-        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
-        if (currentCeremonyID === ceremonyId && currentVerse) {
-          currentVerse.click();
+        if (currentCeremonyID === ceremonyId) {
+          loadVerse(crossPlatformId, lineCount);
         } else {
           global.core.search.loadCeremony(ceremonyId, null, false, crossPlatformId);
         }
       };
 
-      const loadBani = (BaniId, crossPlatformId) => {
+      const loadBani = (BaniId, crossPlatformId, lineCount) => {
         const currentBaniID = global.core.search.getCurrentShabadId().id;
-        const currentVerse = document.querySelector(`[data-cp-id = "${crossPlatformId}"]`);
-        if (currentBaniID === BaniId && currentVerse) {
-          currentVerse.click();
+        if (currentBaniID === BaniId) {
+          loadVerse(crossPlatformId, lineCount);
         } else {
           global.core.search.loadBani(BaniId, null, false, crossPlatformId);
         }
@@ -139,8 +168,8 @@ const setListeners = () => {
             isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
           );
         },
-        bani: payload => loadBani(payload.baniId, payload.verseId),
-        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId),
+        bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
       };
 
       // if its an event from web and not from desktop itself
@@ -179,6 +208,7 @@ const remoteSyncInit = async () => {
         ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
         : '...';
       document.querySelector('#tool-sync-button').setAttribute('title', code);
+      qrCodeGenerator(code);
     } else {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
     }
@@ -224,6 +254,9 @@ const syncToggle = async (forceConnect = false) => {
     onEnd(code);
     code = '...';
     adminPin = '...';
+    const canvas = document.querySelector('.qr-bani-ctrl');
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     document.querySelector('.sync-code-num').innerText = code;
     document.querySelector('.admin-pin').innerText = adminPinVisible
       ? `${i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: ${adminPin}`
@@ -329,6 +362,11 @@ const syncContent = h('div.sync-content-wrapper', [
         false,
       ),
     ]),
+  ]),
+  h('div.qr-container', [
+    h('div.qr-desc', i18n.t('TOOLBAR.QR_CODE.DESC')),
+    h('canvas.qr-bani-ctrl'),
+    h('div.qr-title', i18n.t('TOOLBAR.BANI_CONTROLLER')),
   ]),
 ]);
 

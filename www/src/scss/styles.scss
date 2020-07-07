@@ -492,6 +492,35 @@ a {
       }
     }
   }
+
+  .qr-container {
+    align-items: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 468px;
+    justify-content: center;
+    position: absolute;
+    right: -220px;
+    text-align: center;
+    width: 200px;
+
+    .qr-desc {
+      padding: 20px;
+    }
+
+    .qr-bani-ctrl {
+      background: #fff;
+      height: 148px;
+      width: 148px;
+    }
+
+    .qr-title {
+      font-size: 21px;
+      font-weight: bold;
+      padding: 20px;
+    }
+  }
 }
 
 .sync-dialogue-wrapper {

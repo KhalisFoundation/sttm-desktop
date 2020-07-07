@@ -327,6 +327,10 @@
         "1": "Allow the Sangat to visit ",
         "2": " to enter a code and view the Shabad being presented in real-time."
       }
+    },
+    "QR_CODE": {
+      "DESC": "Scan this code with your phone to quickly connect",
+      "ERROR": "There was an error generating QR Code"
     }
   }
 }
