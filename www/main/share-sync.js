@@ -13,6 +13,33 @@ function onConnect(namespaceString) {
   window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
 }
 
+async function getNewCode(host) {
+  let newCode = null;
+  try {
+    const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
+    const {
+      data: { namespaceString },
+    } = JSON.parse(result);
+
+    if (window.io !== undefined) {
+      window.namespaceString = namespaceString;
+      onConnect(namespaceString);
+    }
+
+    newCode = namespaceString;
+  } catch (error) {
+    analytics.trackEvent('sync', 'error', error);
+    new Noty({
+      type: 'error',
+      text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
+      timeout: 3000,
+      modal: true,
+    }).show();
+    newCode = null;
+  }
+  return newCode;
+}
+
 module.exports = {
   init() {
     // Inject socket.io script
@@ -22,43 +49,17 @@ module.exports = {
       document.body.appendChild(script);
     }
   },
+
   async tryConnection() {
     const host = store.get('userId');
     let syncCode = null;
-
-    const getNewCode = async () => {
-      let newCode = null;
-      try {
-        const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
-        const {
-          data: { namespaceString },
-        } = JSON.parse(result);
-
-        if (window.io !== undefined) {
-          window.namespaceString = namespaceString;
-          onConnect(namespaceString);
-        }
-
-        newCode = namespaceString;
-      } catch (error) {
-        analytics.trackEvent('sync', 'error', error);
-        new Noty({
-          type: 'error',
-          text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
-          timeout: 3000,
-          modal: true,
-        }).show();
-        newCode = null;
-      }
-      return newCode;
-    };
 
     // if a succesful code already exists, use that or else get new code
     try {
       await request(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
       syncCode = window.namespaceString;
     } catch (e) {
-      syncCode = getNewCode();
+      syncCode = getNewCode(host);
     }
 
     return syncCode;
