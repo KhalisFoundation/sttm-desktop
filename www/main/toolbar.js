@@ -344,7 +344,16 @@ const syncContent = h('div.sync-content-wrapper', [
       i18n.t('TOOLBAR.BANI_CONTROLLER'),
       h('span', [
         i18n.t('TOOLBAR.BANI_DESC.1'),
-        h('strong', 'sttm.co/control'),
+        h(
+          'strong',
+          h(
+            'a',
+            {
+              href: 'https:sttm.co/control',
+            },
+            'sttm.co/control',
+          ),
+        ),
         i18n.t('TOOLBAR.BANI_DESC.2'),
       ]),
       adminContent,
