@@ -1,13 +1,12 @@
 const request = require('request-promise');
 const { store } = require('electron').remote.require('./app');
+const { API_ENDPOINT: SYNC_API_URL } = require('./api-config');
 
-const SYNC_API_URL = 'https://api.sikhitothemax.org';
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 
 function onConnect(namespaceString) {
   window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
 }
-
 module.exports = {
   init() {
     // Inject socket.io script
