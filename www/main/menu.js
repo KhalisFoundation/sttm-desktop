@@ -23,7 +23,7 @@ const modal = new tingle.Modal({
   closeMethods: ['overlay', 'button', 'escape'],
 });
 
-const API_ENDPOINT = 'http://api.sikhitothemax.org'; // TODO: move this to config file
+const { API_ENDPOINT } = require('./api-config');
 
 const closeBtn = 'Close';
 modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {

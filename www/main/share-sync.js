@@ -5,8 +5,8 @@ const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Noty = require('noty');
+const { API_ENDPOINT: SYNC_API_URL } = require('./api-config');
 
-const SYNC_API_URL = 'https://api.sikhitothemax.org';
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 
 function onConnect(namespaceString) {
