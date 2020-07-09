@@ -316,7 +316,8 @@
       "2": " from a mobile device to search, navigate, and control the entire app."
     },
     "SYNC_CONTROLLER": {
-      "INTERNET_ERR": "Sorry! You seem to be offline. Sync only works when you are connected to the internet.",
+      "INTERNET_ERR": "Sorry, You seem to be offline. Sync only works when you are connected to the internet.",
+      "CODE_ERR": "Sorry, Failed to get a new code for you, please try again later.",
       "PIN": "Pin",
       "PRESENT_CODE": "Present Code to Sangat",
       "SANGAT_SYNC": "Sangat Sync",
@@ -326,6 +327,10 @@
         "1": "Allow the Sangat to visit ",
         "2": " to enter a code and view the Shabad being presented in real-time."
       }
+    },
+    "QR_CODE": {
+      "DESC": "Scan this code with your phone to quickly connect",
+      "ERROR": "There was an error generating QR Code"
     }
   }
 }
