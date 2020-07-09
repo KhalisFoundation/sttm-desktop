@@ -1,5 +1,10 @@
 const request = require('request-promise');
-const { store } = require('electron').remote.require('./app');
+const { remote } = require('electron');
+
+const { store, i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
+
+const Noty = require('noty');
 const { API_ENDPOINT: SYNC_API_URL } = require('./api-config');
 
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
@@ -7,6 +12,34 @@ const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 function onConnect(namespaceString) {
   window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
 }
+
+async function getNewCode(host) {
+  let newCode = null;
+  try {
+    const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
+    const {
+      data: { namespaceString },
+    } = JSON.parse(result);
+
+    if (window.io !== undefined) {
+      window.namespaceString = namespaceString;
+      onConnect(namespaceString);
+    }
+
+    newCode = namespaceString;
+  } catch (error) {
+    analytics.trackEvent('sync', 'error', error);
+    new Noty({
+      type: 'error',
+      text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
+      timeout: 3000,
+      modal: true,
+    }).show();
+    newCode = null;
+  }
+  return newCode;
+}
+
 module.exports = {
   init() {
     // Inject socket.io script
@@ -16,28 +49,20 @@ module.exports = {
       document.body.appendChild(script);
     }
   },
+
   async tryConnection() {
     const host = store.get('userId');
+    let syncCode = null;
 
-    if (window.namespaceString) {
-      return window.namespaceString;
-    }
+    // if a succesful code already exists, use that or else get new code
     try {
-      const result = await request(`${SYNC_API_URL}/sync/begin/${host}`);
-      const {
-        data: { namespaceString },
-      } = JSON.parse(result);
-
-      if (window.io !== undefined) {
-        window.namespaceString = namespaceString;
-        onConnect(namespaceString);
-      } else {
-        // TODO: Wait for io or something
-      }
-      return namespaceString;
+      await request(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
+      syncCode = window.namespaceString;
     } catch (e) {
-      return false;
+      syncCode = getNewCode(host);
     }
+
+    return syncCode;
   },
   addEvent(event, data) {
     if (window.socket) {
@@ -52,7 +77,7 @@ module.exports = {
   async onEnd(namespaceString) {
     await request(`${SYNC_API_URL}/sync/end/${namespaceString}`);
     window.socket.disconnect();
-    window.socket = undefined;
-    window.namespaceString = undefined;
+    window.socket = null;
+    window.namespaceString = null;
   },
 };
