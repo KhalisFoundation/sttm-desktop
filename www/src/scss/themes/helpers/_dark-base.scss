@@ -23,6 +23,7 @@
   }
 
   #toolbar,
+  #toolbar-nav,
   .bani-list,
   .ceremonies-list,
   .ceremony-pane,
@@ -98,7 +99,8 @@
     color: $text-base;
   }
 
-  #toolbar {
+  #toolbar,
+  #toolbar-nav {
     background: $bg-alt;
   }
 

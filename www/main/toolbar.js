@@ -569,9 +569,9 @@ module.exports = {
       toggleOverlayUI(currentToolbarItem, false);
     });
 
-    toolbarItems.forEach(toolbarItem => {
+    /*toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-    });
+    });*/
 
     document.querySelector('#tool-sync-button').appendChild(betaLabel);
 

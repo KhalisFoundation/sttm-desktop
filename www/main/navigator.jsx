@@ -1,10 +1,14 @@
+/* eslint-disable */
 import React from 'react';
+import Toolbar from './components/toolbar/toolbar';
+import Container from './components/Container';
 
 export const Navigator = () => {
   return (
-    <React.Fragment>
+    <Container>
+      <Toolbar />
       <div className="focus-overlay hidden overlay-ui common-overlay"></div>
-      <div id="toolbar">
+      {/*<div id="toolbar" style={{'display':'none'}}>
         <div className="bani-list hidden overlay-ui ui-sunder-gutka">
           <header className="navigator-header">
             <span data-key="SUNDAR_GUTKA"></span>
@@ -29,7 +33,7 @@ export const Navigator = () => {
             <div className="lock-screen-message" data-key="LOCKED_SCREEN"></div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div id="main-ui" className="base-ui">
         <div className="nav-page" id="search-page">
           <div className="navigator-header">
@@ -135,6 +139,6 @@ export const Navigator = () => {
         </div>
       </div>
       <section className="shortcut-tray base-ui"></section>
-    </React.Fragment>
+    </Container>
   );
 };

@@ -89,7 +89,8 @@ a {
   }
 }
 
-#toolbar {
+#toolbar,
+#toolbar-nav {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -542,7 +543,8 @@ a {
   padding: 10px;
 }
 
-.presenter-view #toolbar {
+.presenter-view #toolbar,
+.presenter-view #toolbar-nav {
   @extend .fullscreen-fixed;
 
   padding-top: $presenter-pane-gap;
@@ -637,7 +639,8 @@ body.show-overlay {
   &.minimized {
     height: 40px;
 
-    #toolbar {
+    #toolbar,
+    #toolbar-nav {
       display: none;
     }
   }
@@ -947,7 +950,8 @@ body.show-overlay {
   top: 30px;
 }
 
-.win32 #toolbar {
+.win32 #toolbar,
+#toolbar-nav {
   .bani-list {
     width: 470px;
   }
@@ -978,7 +982,8 @@ body.show-overlay {
     } */
   }
 
-  #toolbar {
+  #toolbar,
+  #toolbar-nav {
     padding-top: calc(#{$title-bar-offset} + 10px);
 
     .bani-list {
