@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.6 - _July 13, 2020_
+### 7.6 - _July 15, 2020_
 
 ### Improved:
 
