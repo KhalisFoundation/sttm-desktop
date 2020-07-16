@@ -565,13 +565,13 @@ const toolbarItemFactory = toolbarItem =>
 
 module.exports = {
   init() {
-    document.querySelector('.focus-overlay').addEventListener('click', () => {
+    /*document.querySelector('.focus-overlay').addEventListener('click', () => {
       toggleOverlayUI(currentToolbarItem, false);
     });
 
-    /*toolbarItems.forEach(toolbarItem => {
+    toolbarItems.forEach(toolbarItem => {
       $toolbar.appendChild(toolbarItemFactory(toolbarItem));
-    });*/
+    });
 
     document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
@@ -594,6 +594,6 @@ module.exports = {
     $baniList.querySelector('header').appendChild(translitSwitch);
     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
     $baniExtras.appendChild(baniGroupFactory('popular banis'));
-    $toolbar.appendChild(closeOverlayUI);
+    $toolbar.appendChild(closeOverlayUI);*/
   },
 };

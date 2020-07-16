@@ -136,20 +136,6 @@ a {
     width: 35px;
   }
 
-  .sync-button {
-    bottom: 10px;
-    cursor: pointer;
-    font-size: 48px;
-    height: 50px;
-    left: 10px;
-    position: fixed;
-    transition: 0.3s all ease;
-    width: 50px;
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-
   .close-overlay-ui {
     border: 2px solid white;
     border-radius: 50%;
@@ -386,6 +372,35 @@ a {
     background-repeat: no-repeat;
     background-size: auto 75%;
   }
+}
+
+.sync-dialogue-wrapper {
+  align-items: flex-end;
+  display: flex;
+  height: 100vh;
+  justify-content: flex-start;
+  left: 100px;
+  position: fixed;
+  top: 0;
+  width: calc(100% - 100px);
+
+  &.hidden {
+    display: none;
+  }
+
+  .sync-button {
+    bottom: 10px;
+    cursor: pointer;
+    font-size: 48px;
+    height: 50px;
+    left: 10px;
+    position: fixed;
+    transition: 0.3s all ease;
+    width: 50px;
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
 
   .sync-header {
     color: $white;
@@ -521,21 +536,6 @@ a {
       font-weight: bold;
       padding: 20px;
     }
-  }
-}
-
-.sync-dialogue-wrapper {
-  align-items: flex-end;
-  display: flex;
-  height: 100vh;
-  justify-content: flex-start;
-  left: 100px;
-  position: fixed;
-  top: 0;
-  width: calc(100% - 100px);
-
-  &.hidden {
-    display: none;
   }
 }
 

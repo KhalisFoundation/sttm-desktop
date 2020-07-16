@@ -1,12 +1,17 @@
 /* eslint-disable */
 import React from 'react';
+import { StoreProvider } from 'easy-peasy';
+
+import GlobalState from './components/state-mgmt/GlobalState';
+
 import Toolbar from './components/toolbar/toolbar';
-import Container from './components/Container';
+import SyncDialogue from './components/bani-controller/SyncDialogue';
 
 export const Navigator = () => {
   return (
-    <Container>
+    <StoreProvider store={GlobalState}>
       <Toolbar />
+      <SyncDialogue />
       <div className="focus-overlay hidden overlay-ui common-overlay"></div>
       {/*<div id="toolbar" style={{'display':'none'}}>
         <div className="bani-list hidden overlay-ui ui-sunder-gutka">
@@ -139,6 +144,6 @@ export const Navigator = () => {
         </div>
       </div>
       <section className="shortcut-tray base-ui"></section>
-    </Container>
+    </StoreProvider>
   );
 };

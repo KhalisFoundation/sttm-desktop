@@ -1,22 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import GlobalState from '../contexts/GlobalState';
+import { useStoreActions } from 'easy-peasy';
 
 function ToolbarItem(props) {
-  const [, setState] = useContext(GlobalState);
-
-  const setCurrentScreen = currentItem => {
-    setState(prevState => ({ ...prevState, currentOverlayScreen: currentItem }));
-  };
+  const { toggleOverlayScreen } = useStoreActions(actions => actions.toolbar);
 
   return (
     <div
       className="toolbar-item"
       id={`tool-${props.itemName}`}
-      onClick={() => setCurrentScreen(props.itemName)}
-    >
-      {console.log('here')}
-    </div>
+      onClick={() => toggleOverlayScreen(props.itemName)}
+    ></div>
   );
 }
 
