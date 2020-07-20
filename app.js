@@ -9,6 +9,7 @@ const op = require('openport');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
+const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
@@ -65,8 +66,9 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
-// Reset the global state
+// Reset the states
 store.set('GlobalState', null);
+store.set('userPrefs.app.zoomToken', '');
 
 let mainWindow;
 let viewerWindow = false;
@@ -99,6 +101,10 @@ const secondaryWindows = {
     obj: false,
     url: `file://${__dirname}/www/overlay.html`,
   },
+  zoomCCWindow: {
+    obj: false,
+    url: `file://${__dirname}/www/zoomCC.html`,
+  },
   shortcutLegend: {
     obj: false,
     url: `file://${__dirname}/www/legend.html`,
@@ -115,6 +121,7 @@ function openSecondaryWindow(windowName) {
     openWindow[0].show();
   } else {
     window.obj = new BrowserWindow({
+      minWidth: 800,
       width: 1366,
       height: 768,
       show: false,
@@ -132,6 +139,7 @@ function openSecondaryWindow(windowName) {
       if (window.focus) {
         window.focus();
       }
+      window.obj.webContents.openDevTools();
     });
     window.obj.loadURL(window.url);
 
@@ -334,7 +342,9 @@ function createBroadcastFiles(arg) {
   }
 }
 
-const showLine = (line, socket = io) => {
+let seq = Math.floor(Math.random() * 100);
+
+const showLine = async (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
@@ -345,6 +355,24 @@ const showLine = (line, socket = io) => {
   const payload = Object.assign(lineWithSettings, overlayPrefs);
   if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
+  }
+  const zoomToken = store.get('userPrefs.app.zoomToken');
+  const english =
+    store.get('userPrefs.slide-layout.fields.display-translation') &&
+    store.get('userPrefs.slide-layout.language-settings.translation-language');
+  if (zoomToken) {
+    try {
+      console.log(`Sending-${line.Line.Unicode}\n${english ? line.Line.English : ''}`);
+      await fetch(`${zoomToken}&seq=${seq}`, {
+        method: 'POST',
+        body: `${line.Line.Unicode}\t${english ? line.Line.English : ''}`,
+      });
+      seq += 1;
+    } catch (e) {
+      console.log(e);
+      // TODO: zoom recommends retrying 4XX responses.
+      log(e);
+    }
   }
 };
 

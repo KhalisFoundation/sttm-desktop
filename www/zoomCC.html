@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zoom closed captions</title>
+    <link rel="stylesheet" href="assets/css/bundle.css" />
+    <link rel="stylesheet" href="assets/css/vendor/font-awesome.min.css" />
+  </head>
+  <body>
+    <div id="zoomCCPage"></div>
+    <script>
+      const comp = require('./js/ZoomClosedCaptionPage.js');
+      const { render } = require('react-dom');
+      render(comp.Page(), document.getElementById('zoomCCPage'));
+    </script>
+  </body>
+</html>

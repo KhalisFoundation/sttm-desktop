@@ -118,6 +118,12 @@ const menuTemplate = [
         },
       },
       {
+        label: i18n.t('MENU.WINDOW.ZOOM_CC'),
+        click: () => {
+          main.openSecondaryWindow('zoomCCWindow');
+        },
+      },
+      {
         label: i18n.t('MENU.WINDOW.MINIMIZE'),
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize',
@@ -242,6 +248,12 @@ const winMenu = [
     label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
     click: () => {
       main.openSecondaryWindow('overlayWindow');
+    },
+  },
+  {
+    label: i18n.t('MENU.WINDOW.ZOOM_CC'),
+    click: () => {
+      main.openSecondaryWindow('zoomCCWindow');
     },
   },
 ];
@@ -552,6 +564,7 @@ module.exports = {
       Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
       Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
     };
+    Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
     return Line;
   },
 

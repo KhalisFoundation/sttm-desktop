@@ -33,7 +33,20 @@
     "PRESETS": "Presets",
     "SIZE": "Size",
     "TEXT": "Text",
-    "GREEN_SCREEN": "Green Screen"
+    "GREEN_SCREEN": "Green Screen",
+    "ZOOM_CLOSED_CAPTIONS_PAGE": {
+      "CONNECT_ZOOM_TITLE": "Connect to Zoom meeting",
+      "CONNECT_ZOOM_INPUT_HELPER": "Paste your Zoom meeting API token above",
+      "SAVE_BUTTON": "Save",
+      "CLEAR_BUTTON": "Clear",
+      "INSTRUCTIONS_HEADING": "To add Bani Overlay to your Zoom meeting, you need to enabled the closed captioning feature. Follow the steps below.",
+      "INSTRUCTIONS_1_1": "1) Visit ",
+      "INSTRUCTIONS_1_2": " and logging to your account.",
+      "INSTRUCTIONS_1_3": "You must be the host of the meeting for this to work.",
+      "INSTRUCTIONS_2": "2) Enabled the \"Closed Captioning\" feature. This is a free feature.",
+      "INSTRUCTIONS_3": "3) Start your Zoom meeting. You will now see an option for Closed Captions.",
+      "INSTRUCTIONS_4": "4) Copy your API token and paste it into the text box above."
+    }
   },
 
   "CHROMECAST": {
@@ -130,6 +143,7 @@
     },
     "WINDOW": {
       "BANI_OVERLAY": "Bani Overlay",
+      "ZOOM_CC": "Zoom Closed Captions",
       "CLOSE": "Close",
       "MINIMIZE": "Minimize",
       "SELF": "Window"
