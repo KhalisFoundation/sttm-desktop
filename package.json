@@ -164,7 +164,9 @@
       "icon": "assets/STTM.ico",
       "publisherName": [
         "KHALIS FOUNDATION (KHALIS, INC.)",
-        "KHALIS INC"
+        "KHALIS INC",
+        "USERTrust RSA Certification Authority",
+        "Sectigo RSA Code Signing CA"
       ],
       "target": [
         "nsis"
