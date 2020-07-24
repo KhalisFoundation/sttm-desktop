@@ -168,8 +168,7 @@
       ],
       "target": [
         "nsis"
-      ],
-      "rfc3161TimeStampServer": "http://timestamp.comodoca.com/rfc3161?td=sha256"
+      ]
     },
     "linux": {
       "target": "deb",
