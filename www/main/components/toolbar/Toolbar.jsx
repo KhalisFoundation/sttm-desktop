@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { ToolbarItem } from './ToolbarItem';
+import ToolbarItem from './ToolbarItem';
 
-export const Toolbar = () => {
+const Toolbar = () => {
   const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen'];
-  console.log('WHY NOT TOOLBAR..');
+
   return (
     <div id="toolbar-nav">
       {toolbarItems.map((itemName, index) => {
@@ -13,3 +13,5 @@ export const Toolbar = () => {
     </div>
   );
 };
+
+export default Toolbar;

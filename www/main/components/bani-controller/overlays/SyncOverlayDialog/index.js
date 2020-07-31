@@ -1,1 +1,1 @@
-export * from './SyncOverlayDialog';
+export { default } from './SyncOverlayDialog';

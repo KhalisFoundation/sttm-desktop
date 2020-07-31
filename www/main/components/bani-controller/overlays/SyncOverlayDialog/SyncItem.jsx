@@ -1,5 +1,6 @@
 import React from 'react';
-export const SyncItem = ({ title, description, control }) => {
+
+const SyncItem = ({ title, description, control }) => {
   return (
     <div className="sync-item">
       <div className="sync-item-left">
@@ -10,3 +11,5 @@ export const SyncItem = ({ title, description, control }) => {
     </div>
   );
 };
+
+export default SyncItem;

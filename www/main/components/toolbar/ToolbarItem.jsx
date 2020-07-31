@@ -4,7 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { DEFAULT_OVERLAY } from '../../constants';
 
-export const ToolbarItem = ({ itemName }) => {
+const ToolbarItem = ({ itemName }) => {
   const { overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const isSelectedOverlay = overlayScreen === itemName;
@@ -27,3 +27,5 @@ export const ToolbarItem = ({ itemName }) => {
 ToolbarItem.propTypes = {
   itemName: PropTypes.string.isRequired,
 };
+
+export default ToolbarItem;

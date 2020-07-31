@@ -1,7 +1,10 @@
 import React from 'react';
 import { remote } from 'electron';
+
 const { i18n } = remote.require('./app');
-export const getSyncItems = ({ code, adminPin, toggleAdminPin, toggleLockScreen }) => [
+const analytics = remote.getGlobal('analytics');
+
+const getSyncItems = ({ code, adminPin, toggleAdminPin, toggleLockScreen }) => [
   {
     title: i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
     description: (
@@ -53,3 +56,5 @@ export const getSyncItems = ({ code, adminPin, toggleAdminPin, toggleLockScreen 
     ),
   },
 ];
+
+export default getSyncItems;

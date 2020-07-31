@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { convertToHyphenCase } from '../../../../utils';
-export const ExtraBani = ({ title, banis = [] }) => {
+
+const ExtraBani = ({ title, banis = [] }) => {
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const groupHeaderClassName = `${hyphenedTitle}-heading`;
   const groupClassName = hyphenedTitle;
@@ -28,3 +29,5 @@ ExtraBani.propTypes = {
     name: PropTypes.string.isRequired,
   }),
 };
+
+export default ExtraBani;

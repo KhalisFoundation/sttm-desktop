@@ -14,9 +14,9 @@ $toolbar-width: 75px;
 }
 
 .sundar-gutka-dialog {
-  position: fixed;
   left: 100px;
   max-width: calc(100% - #{$toolbar-width});
+  position: fixed;
 }
 
 .preview {

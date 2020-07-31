@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Switch } from '../../../../sttm-ui';
-import { ExtraBani } from './ExtraBani';
-import { DialogWrapper } from '../DialogWrapper';
+import DialogWrapper from '../DialogWrapper';
+import ExtraBani from './ExtraBani';
+
 import { convertToHyphenCase } from '../../../../utils';
 
-export const SundarGutkaOverlayDialog = ({
+const SundarGutkaOverlayDialog = ({
   title = 'Sunder Gutka',
   isShowTranslitSwitch = false,
   banis = [{ name: 'Sundar Gutka' }],
@@ -49,3 +50,5 @@ SundarGutkaOverlayDialog.propTypes = {
   title: PropTypes.string,
   isShowTranslitSwitch: PropTypes.bool,
 };
+
+export default SundarGutkaOverlayDialog;

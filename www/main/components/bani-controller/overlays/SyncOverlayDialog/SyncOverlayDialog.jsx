@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { DialogWrapper } from '../DialogWrapper';
-import { SyncItem } from './SyncItem';
+import DialogWrapper from '../DialogWrapper';
+import SyncItem from './SyncItem';
 import { Switch } from '../../../../sttm-ui';
 
 import { getSyncItems, generateQrCode } from './utils';
-export const SyncOverlayDialog = ({
+
+const SyncOverlayDialog = ({
   onDialogClose,
   title = 'Mobile device sync',
   code = '123',
@@ -65,3 +66,5 @@ export const SyncOverlayDialog = ({
     </DialogWrapper>
   );
 };
+
+export default SyncOverlayDialog;

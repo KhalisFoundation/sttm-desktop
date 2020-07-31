@@ -2,15 +2,13 @@ import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { DEFAULT_OVERLAY } from '../../constants';
-
-import { Toolbar } from '../toolbar';
+import Toolbar from '../toolbar';
 import { SundarGutkaOverlayDialog, SyncOverlayDialog } from '../bani-controller/overlays';
 
-export const Dashboard = () => {
+const Dashboard = () => {
   const { overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const onDialogClose = () => {
-    console.log('onDialogClose hit...');
     setOverlayScreen(DEFAULT_OVERLAY);
   };
 
@@ -25,3 +23,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+export default Dashboard;

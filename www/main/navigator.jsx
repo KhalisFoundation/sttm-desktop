@@ -3,8 +3,7 @@ import React from 'react';
 import { StoreProvider } from 'easy-peasy';
 
 import GlobalState from './store/GlobalState';
-
-import { Dashboard } from './components/dashboard';
+import Dashboard from './components/dashboard';
 
 export const Navigator = () => {
   return (

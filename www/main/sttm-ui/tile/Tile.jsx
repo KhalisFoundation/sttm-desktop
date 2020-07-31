@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const Tile = ({ bgColor, bgImageUrl, title, margin }) => {
+const Tile = ({ bgColor, bgImageUrl, title, margin }) => {
   return (
     <div
       className="ui-tile"
@@ -22,3 +22,5 @@ Tile.propTypes = {
   margin: PropTypes.string,
   title: PropTypes.string,
 };
+
+export default Tile;

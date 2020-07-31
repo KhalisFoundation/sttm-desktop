@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-export const Switch = ({ title, onToggleSwitch }) => {
+
+const Switch = ({ title, onToggleSwitch }) => {
   const [isSwitched, toggleSwitchedState] = useState(false);
 
   return (
@@ -31,3 +32,5 @@ Switch.propTypes = {
   title: PropTypes.string,
   onToggleSwitch: PropTypes.func,
 };
+
+export default Switch;

@@ -1,6 +1,10 @@
 import Noty from 'noty';
 import qrCode from 'qrcode';
-export const generateQrCode = (canvas, syncCode = 'sample') => {
+import { remote } from 'electron';
+
+const { i18n } = remote.require('./app');
+
+const generateQrCode = (canvas, syncCode = 'sample') => {
   qrCode.toCanvas(canvas, `https:/sttm.co/control/${syncCode}`, error => {
     if (error) {
       new Noty({
@@ -12,3 +16,5 @@ export const generateQrCode = (canvas, syncCode = 'sample') => {
     }
   });
 };
+
+export default generateQrCode;

@@ -1,2 +1,2 @@
-export * from './switch';
-export * from './tile';
+export { default as Switch } from './switch';
+export { default as Tile } from './tile';
