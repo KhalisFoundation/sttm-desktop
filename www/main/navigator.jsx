@@ -2,17 +2,14 @@
 import React from 'react';
 import { StoreProvider } from 'easy-peasy';
 
-import GlobalState from './components/state-mgmt/GlobalState';
+import GlobalState from './store/GlobalState';
 
-import Toolbar from './components/toolbar/toolbar';
-import SyncDialogue from './components/bani-controller/SyncDialogue';
+import { Dashboard } from './components/dashboard';
 
 export const Navigator = () => {
   return (
     <StoreProvider store={GlobalState}>
-      <Toolbar />
-      <SyncDialogue />
-      <div className="focus-overlay hidden overlay-ui common-overlay"></div>
+      <Dashboard />
       {/*<div id="toolbar" style={{'display':'none'}}>
         <div className="bani-list hidden overlay-ui ui-sunder-gutka">
           <header className="navigator-header">

@@ -32,7 +32,7 @@ $tag-popular-color: #ce744e;
 }
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
-  'overlay', 'animations', 'noty';
+  'overlay', 'animations', 'noty', 'ui-library';
 
 a {
   cursor: pointer;
@@ -60,7 +60,7 @@ a {
   z-index: 1100;
 }
 
-.focus-overlay {
+.backdrop {
   @extend .fullscreen-fixed;
 
   background: rgba(0, 0, 0, 0.7);
@@ -374,7 +374,7 @@ a {
   }
 }
 
-.sync-dialogue-wrapper {
+.sync-dialog-wrapper {
   align-items: flex-end;
   display: flex;
   height: 100vh;
@@ -409,7 +409,7 @@ a {
     padding: 10px 0;
   }
 
-  .sync-dialogue {
+  .sync-dialog {
     margin-bottom: 20px;
     max-width: 600px;
   }
@@ -419,21 +419,13 @@ a {
     .sync-content {
       opacity: 1;
     }
-    .sttm-loader {
-      display: none;
-    }
+
     &.loading {
       align-items: center;
       display: flex;
       height: 468px;
       justify-content: center;
       width: 500px;
-      .sync-content {
-        display: none;
-      }
-      .sttm-loader {
-        display: block;
-      }
     }
   }
 
@@ -516,9 +508,10 @@ a {
     flex-direction: column;
     height: 468px;
     justify-content: center;
-    position: absolute;
-    right: -220px;
+    left: 600px;
+    position: fixed;
     text-align: center;
+    top: 200px;
     width: 200px;
 
     .qr-desc {
