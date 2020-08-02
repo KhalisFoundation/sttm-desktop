@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { getStylesBasedOnTheme } from './utils/get-styles-based-on-theme';
+import getStylesBasedOnTheme from './utils/get-styles-based-on-theme';
 
 const Tile = ({
   wrapperClassName = '',

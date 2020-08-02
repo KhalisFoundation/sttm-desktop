@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 import { Switch } from '../../../../../sttm-ui';
 import DialogWrapper from '../../DialogWrapper';
 import ExtraBani from './ExtraBani';
-
 import { convertToHyphenCase } from '../../../../../utils';
-import { useLoadBani } from '../hooks/use-load-bani';
+import useLoadBani from '../hooks/use-load-bani';
 
 const SundarGutkaOverlayDialog = ({ isShowTranslitSwitch = false, onDialogClose }) => {
   const title = 'Sundar Gutka';

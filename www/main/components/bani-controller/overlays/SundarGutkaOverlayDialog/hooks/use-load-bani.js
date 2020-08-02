@@ -3,7 +3,8 @@ import Noty from 'noty';
 
 import { loadBanis } from '../../../../../banidb';
 import cache from '../bani-cache';
-export const useLoadBani = () => {
+
+const useLoadBani = () => {
   const [isLoadingBani, setLoadingBani] = useState(false);
   const [baniData, setBaniData] = useState(cache.baniData);
 
@@ -15,7 +16,7 @@ export const useLoadBani = () => {
       (async () => {
         try {
           const rows = await loadBanis();
-          console.log(rows, 'rows..');
+          // console.log(rows, 'rows..');
           setBaniData(rows);
         } catch (error) {
           setLoadingBani(false);
@@ -37,3 +38,5 @@ export const useLoadBani = () => {
     baniData,
   };
 };
+
+export default useLoadBani;

@@ -1,13 +1,18 @@
 import themesArr from '../../../../configs/themes.json';
-console.log(typeof themesArr);
 
-const themesMap = themesArr.reduce((themesObj, theme) => (themesObj[theme.name] = theme), {});
+/* eslint-disable no-param-reassign */
+const themesMap = themesArr.reduce((themesObj, theme) => {
+  themesObj[theme.name] = { ...theme };
+  return themesObj;
+}, {});
 
 const getStylesBasedOnTheme = themeName => {
   const theme = themesMap[themeName];
-  return {
+  const tileStyles = {
     bgColor: theme['background-color'] || '',
     textColor: theme['gurbani-color'] || '',
     bgImageUrl: theme['background-image'] || '',
   };
+  return tileStyles;
 };
+export default getStylesBasedOnTheme;
