@@ -7,6 +7,7 @@ const themesMap = themesArr.reduce((themesObj, theme) => {
 }, {});
 
 const getStylesBasedOnTheme = themeName => {
+  // console.log(themesMap, 'themeMap')
   const theme = themesMap[themeName];
   const tileStyles = {
     bgColor: theme['background-color'] || '',

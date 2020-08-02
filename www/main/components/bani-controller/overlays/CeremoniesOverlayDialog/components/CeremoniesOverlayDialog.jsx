@@ -8,8 +8,8 @@ const CeremoniesOverlayDialog = ({ onDialogClose }) => {
     <DialogWrapper onDialogClose={onDialogClose}>
       <div className="ceremonies-dialog-wrapper">
         <div className="ceremonies-list ui-ceremonies">
-          <header className="navigator-header ceremonies-header"></header>
-          <CeremonyPane />
+          <header className="navigator-header ceremonies-header">ceremonies</header>
+          <CeremonyPane name="anandkaraj" paneId="anandkaraj" />
         </div>
       </div>
     </DialogWrapper>

@@ -65,6 +65,7 @@ a {
 
   background: rgba(0, 0, 0, 0.7);
   cursor: pointer;
+  position: fixed;
   z-index: 1200;
 
   &.hidden {
@@ -419,6 +420,8 @@ a {
 
   .sync-content-wrapper {
     border-radius: 5px;
+    position: relative;
+
     .sync-content {
       opacity: 1;
     }
@@ -511,10 +514,10 @@ a {
     flex-direction: column;
     height: 468px;
     justify-content: center;
-    left: 600px;
-    position: fixed;
+    position: absolute;
+    right: -200px;
     text-align: center;
-    top: 200px;
+    top: 0;
     width: 200px;
 
     .qr-desc {

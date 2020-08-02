@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Switch, Tile } from '../../../../../sttm-ui';
-import { themes } from '../../../../../../main/';
 
 const CeremonyPane = ({ name, paneId }) => {
   return (
@@ -19,29 +18,17 @@ const CeremonyPane = ({ name, paneId }) => {
 
           <div className="ceremony-pane-themes">
             <div className="ceremony-theme-header">{i18n.t('TOOLBAR.CHOOSE_THEME')}</div>
+            <Tile wrapperClassName="theme-instance" theme="LOW_LIGHT">
+              Light
+            </Tile>
 
-            {/*
-          <Tile
-            wrapperClassName="theme-instance"
-            theme="LOW_LIGHT"
-          >
-            Light
-          </Tile>
+            <Tile wrapperClassNames="theme-instance" theme="FLORAL">
+              Floral
+            </Tile>
 
-          <Tile
-            wrapperClassNames="theme-instance"
-            theme="FLORAL"
-          >
-            Floral
-          </Tile>
-
-          <Tile
-            wrapperClassName="theme-instance"
-            theme="FLORAL"
-          >
-            Floral
-          </Tile>
-            */}
+            <Tile wrapperClassName="theme-instance" theme="FLORAL">
+              Floral
+            </Tile>
           </div>
         </div>
       </div>

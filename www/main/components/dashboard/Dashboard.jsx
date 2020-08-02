@@ -3,7 +3,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import Toolbar from '../toolbar';
 import {
-  // CeremoniesOverlayDialog,
+  CeremoniesOverlayDialog,
   SundarGutkaOverlayDialog,
   SyncOverlayDialog,
 } from '../bani-controller/overlays';
@@ -27,7 +27,7 @@ const Dashboard = () => {
       <Toolbar />
       {isSundarGutkaOverlay && <SundarGutkaOverlayDialog onDialogClose={onDialogClose} />}
       {isSyncOverlay && <SyncOverlayDialog onDialogClose={onDialogClose} />}
-      {/* {isCeremoniesOverlay && <CeremoniesOverlayDialog onDialogClose={onDialogClose} />} */}
+      {isCeremoniesOverlay && <CeremoniesOverlayDialog onDialogClose={onDialogClose} />}
     </div>
   );
 };
