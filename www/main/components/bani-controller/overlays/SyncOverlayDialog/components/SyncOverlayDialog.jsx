@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { remote } from 'electron';
 
-import DialogWrapper from '../DialogWrapper';
+import DialogWrapper from '../../DialogWrapper';
 import SyncItem from './SyncItem';
-import { Switch } from '../../../../sttm-ui';
+import { Switch } from '../../../../../sttm-ui';
 
-import { getSyncItems, generateQrCode } from './utils';
+import { getSyncItems, generateQrCode } from '../utils';
+const { i18n } = remote.require('./app');
 
 const SyncOverlayDialog = ({
   onDialogClose,
@@ -48,7 +50,7 @@ const SyncOverlayDialog = ({
 
                   <div className="connection-switch-container">
                     <p>Disable all the remote connections to SikhiToTheMax</p>
-                    <Switch onToggleSwitch={setConnectionsDisabled} />
+                    <Switch controlId="" onToggleSwitch={setConnectionsDisabled} />
                   </div>
                 </>
               )}

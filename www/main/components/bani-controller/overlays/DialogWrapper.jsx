@@ -3,8 +3,8 @@ import React from 'react';
 const DialogWrapper = ({ onDialogClose, children }) => {
   return (
     <div className="backdrop">
-      <button style={{ width: 100, height: 100 }} className="dialog-close" onClick={onDialogClose}>
-        close
+      <button className="close-dialog" onClick={onDialogClose}>
+        <i className="fa fa-times" />
       </button>
       {children}
     </div>

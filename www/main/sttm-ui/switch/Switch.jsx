@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Switch = ({ title, onToggleSwitch }) => {
+const Switch = ({ title, controlId, wrapperClassName, onToggleSwitch }) => {
   const [isSwitched, toggleSwitchedState] = useState(false);
 
   return (
-    <div className="translit-switch">
+    <div className={wrapperClassName}>
       {title && <span>{title}</span>}
       <div className="switch">
         <input
-          id="sg-translit-toggle"
-          name="hg-trasnlit-toggle"
+          id={controlId}
           type="checkbox"
-          value="sg-translit"
           checked={isSwitched}
           onChange={() => {
             const newState = !isSwitched;
@@ -22,7 +20,7 @@ const Switch = ({ title, onToggleSwitch }) => {
             }
           }}
         />
-        <label htmlFor="sg-translit-toggle" />
+        <label htmlFor={controlId} />
       </div>
     </div>
   );
@@ -30,6 +28,8 @@ const Switch = ({ title, onToggleSwitch }) => {
 
 Switch.propTypes = {
   title: PropTypes.string,
+  controlId: PropTypes.string,
+  wrapperClassName: PropTypes.string,
   onToggleSwitch: PropTypes.func,
 };
 

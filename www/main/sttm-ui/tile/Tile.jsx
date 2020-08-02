@@ -1,17 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Tile = ({ bgColor, bgImageUrl, title, margin }) => {
+import { getStylesBasedOnTheme } from './utils/get-styles-based-on-theme';
+
+const Tile = ({
+  wrapperClassName = '',
+  contentClassName = '',
+  bgColor,
+  bgImageUrl,
+  content,
+  themeName,
+}) => {
+  const tileStyles = getStylesBasedOnTheme(themeName);
+
   return (
     <div
-      className="ui-tile"
+      className={`ui-tile ${wrapperClassName}`}
       style={{
-        margin,
-        backgroundColor: bgColor,
-        backgroundImage: `url(${bgImageUrl})`,
+        backgroundColor: bgColor || tileStyles.bgColor,
+        backgroundImage: `url(${bgImageUrl})` || tileStyles.bgImageUrl,
       }}
     >
-      {title}
+      <span className={contentClassName} style={{ color: tileStyles.textColor }}>
+        {children || content}
+      </span>
     </div>
   );
 };
@@ -19,8 +31,10 @@ const Tile = ({ bgColor, bgImageUrl, title, margin }) => {
 Tile.propTypes = {
   bgColor: PropTypes.string,
   bgImageUrl: PropTypes.string,
-  margin: PropTypes.string,
-  title: PropTypes.string,
+  contentClassName: PropTypes.string,
+  content: PropTypes.string,
+  wrapperClassName: PropTypes.string,
+  themeName: PropTypes.string,
 };
 
 export default Tile;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { convertToHyphenCase } from '../../../../utils';
+import { convertToHyphenCase } from '../../../../../utils';
 
 const ExtraBani = ({ title, banis = [] }) => {
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());

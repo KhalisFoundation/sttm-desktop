@@ -1,1 +1,1 @@
-export { default } from './SundarGutkaOverlayDialog';
+export { default } from './components/SundarGutkaOverlayDialog';

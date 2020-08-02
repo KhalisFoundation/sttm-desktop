@@ -1,1 +1,1 @@
-export { default } from './SyncOverlayDialog';
+export { default } from './components/SyncOverlayDialog';
