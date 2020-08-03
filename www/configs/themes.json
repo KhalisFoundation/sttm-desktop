@@ -119,16 +119,16 @@
     "key": "blue-darbar"
   },
   {
-    "name": "NIRBAN",
+    "name": "NIRBAAN",
     "background-color": "#05060b",
     "gurbani-color": "#ffebbe",
     "translation-color": "#c2af85",
     "transliteration-color": "#9cabff",
     "teeka-color": "#ff723b",
-    "background-image": "thumbnails/nirban.png",
-    "background-image-full": "nirban.png",
+    "background-image": "thumbnails/nirbaan.png",
+    "background-image-full": "nirbaan.png",
     "type": "BACKGROUND",
-    "key": "nirban"
+    "key": "nirbaan"
   },
   {
     "name": "HIGH_CONTRAST",

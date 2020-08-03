@@ -1,7 +1,7 @@
-$themeNirban: (
+$themeNirbaan: (
   type: 'dark',
   background-color: #07ccf3,
-  background-image: url('../../assets/img/custom_backgrounds/nirban.png'),
+  background-image: url('../../assets/img/custom_backgrounds/nirbaan.png'),
   gurbani: #ffebbe,
   translation: #c2af85,
   teeka: #9cabff,
@@ -10,6 +10,6 @@ $themeNirban: (
   yamki: #c2951a,
 );
 
-body.nirban {
-  @include generateTheme($themeNirban...);
+body.nirbaan {
+  @include generateTheme($themeNirbaan...);
 }
