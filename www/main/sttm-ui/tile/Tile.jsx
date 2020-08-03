@@ -8,10 +8,11 @@ const Tile = ({
   contentClassName = '',
   bgColor,
   bgImageUrl,
+  theme,
   content,
-  themeName,
+  children,
 }) => {
-  const tileStyles = getStylesBasedOnTheme(themeName);
+  const tileStyles = getStylesBasedOnTheme(theme);
 
   return (
     <div
@@ -34,7 +35,7 @@ Tile.propTypes = {
   contentClassName: PropTypes.string,
   content: PropTypes.string,
   wrapperClassName: PropTypes.string,
-  themeName: PropTypes.string,
+  theme: PropTypes.string,
 };
 
 export default Tile;

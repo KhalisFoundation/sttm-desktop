@@ -17,7 +17,7 @@ const CeremonyPane = ({ name, paneId }) => {
           />
 
           <div className="ceremony-pane-themes">
-            <div className="ceremony-theme-header">{i18n.t('TOOLBAR.CHOOSE_THEME')}</div>
+            <div className="ceremony-theme-header"> {i18n.t('TOOLBAR.CHOOSE_THEME')} </div>
             <Tile wrapperClassName="theme-instance" theme="LOW_LIGHT">
               Light
             </Tile>

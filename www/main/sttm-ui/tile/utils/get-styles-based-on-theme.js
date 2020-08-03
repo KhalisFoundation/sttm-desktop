@@ -7,12 +7,11 @@ const themesMap = themesArr.reduce((themesObj, theme) => {
 }, {});
 
 const getStylesBasedOnTheme = themeName => {
-  // console.log(themesMap, 'themeMap')
   const theme = themesMap[themeName];
   const tileStyles = {
-    bgColor: theme['background-color'] || '',
-    textColor: theme['gurbani-color'] || '',
-    bgImageUrl: theme['background-image'] || '',
+    bgColor: theme ? theme['background-color'] : '',
+    textColor: theme ? theme['gurbani-color'] : '',
+    bgImageUrl: theme ? theme['background-image'] : '',
   };
   return tileStyles;
 };

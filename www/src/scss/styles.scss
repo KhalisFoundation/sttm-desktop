@@ -90,15 +90,29 @@ a {
   }
 }
 
-.sundar-gutka-dialog,
-.ceremonies-dialog {
+.sundar-gutka-dialog-wrapper,
+.ceremonies-dialog-wrapper,
+.sync-dialog-wrapper {
+  align-items: flex-end;
+  display: flex;
+  height: 100vh;
+  justify-content: flex-start;
+  left: 100px;
+  position: fixed;
+  top: 0;
+  width: calc(100% - 100px);
+}
+
+.sundar-gutka-dialog-wrapper,
+.ceremonies-dialog-wrapper {
+  align-items: flex-start;
+  margin-top: 100px;
+
   .bani-list,
   .ceremonies-list {
-    bottom: 0;
     height: 300px;
+    margin-right: 20px;
     overflow: hidden;
-    position: fixed;
-    right: 0;
     width: 500px;
     word-wrap: break-word;
 
@@ -193,7 +207,6 @@ a {
     .ceremony-pane-options {
       align-items: center;
       display: flex;
-      flex-direction: column;
       font-size: 12px;
       justify-content: center;
       padding: 20px 10px;
@@ -221,9 +234,7 @@ a {
   }
 
   .bani-extras {
-    bottom: 325px;
-    position: fixed;
-    right: 250px;
+    margin-top: 20px;
     width: $bani-list-width;
 
     .bani-group {
@@ -379,15 +390,6 @@ a {
 }
 
 .sync-dialog-wrapper {
-  align-items: flex-end;
-  display: flex;
-  height: 100vh;
-  justify-content: flex-start;
-  left: 100px;
-  position: fixed;
-  top: 0;
-  width: calc(100% - 100px);
-
   &.hidden {
     display: none;
   }

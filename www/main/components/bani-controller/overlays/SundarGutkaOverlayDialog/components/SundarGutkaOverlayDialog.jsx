@@ -26,7 +26,7 @@ const SundarGutkaOverlayDialog = ({ isShowTranslitSwitch = false, onDialogClose 
 
   return (
     <DialogWrapper onDialogClose={onDialogClose}>
-      <div className="sundar-gutka-dialog">
+      <div className={`${hyphenedTitle}-dialog-wrapper`}>
         <div className={`bani-list overlay-ui ${overlayClassName}`}>
           {isLoadingBani ? (
             <div className="sttm-loader" />
