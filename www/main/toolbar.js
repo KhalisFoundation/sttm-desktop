@@ -131,6 +131,9 @@ const setListeners = () => {
             host: 'sttm-desktop',
             type: 'response-control',
             success: isPinCorrect,
+            settings: {
+              fontSizes: store.getUserPref('slide-layout.font-sizes'),
+            },
           });
 
           // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
