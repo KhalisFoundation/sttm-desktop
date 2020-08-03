@@ -173,6 +173,12 @@ const setListeners = () => {
         },
         bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
         ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
+        settings: payload => {
+          const { settings } = payload;
+          if (settings.action === 'changeFontSize') {
+            global.core.menu.settings.changeFontSize(settings.target, settings.value);
+          }
+        },
       };
 
       // if its an event from web and not from desktop itself
