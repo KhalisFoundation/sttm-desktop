@@ -1,0 +1,15 @@
+$themeNirbaan: (
+  type: 'dark',
+  background-color: #07ccf3,
+  background-image: url('../../assets/img/custom_backgrounds/nirbaan.png'),
+  gurbani: #ffebbe,
+  translation: #c2af85,
+  teeka: #9cabff,
+  transliteration: #ff723b,
+  visraam: #d20b0b,
+  yamki: #c2951a,
+);
+
+body.nirbaan {
+  @include generateTheme($themeNirbaan...);
+}
