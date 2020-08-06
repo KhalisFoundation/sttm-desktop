@@ -14,7 +14,6 @@ const os = require('os');
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
-const overlayPresets = require('./www/configs/overlay_presets.json');
 const Analytics = require('./analytics');
 
 // Are we packaging for a platform's app store?
@@ -654,7 +653,6 @@ module.exports = {
   autoUpdater,
   store,
   themes,
-  overlayPresets,
   appstore,
   i18n,
   isUnsupportedWindow,

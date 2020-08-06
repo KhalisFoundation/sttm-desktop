@@ -4,10 +4,13 @@ const ip = require('ip');
 const copy = require('copy-to-clipboard');
 // eslint-disable-next-line import/no-unresolved
 const { obs: defaultPrefs } = require('./configs/defaults.json');
+// eslint-disable-next-line import/no-unresolved
+const themeObjects = require('./configs/overlay_presets.json');
 
 const { ipcRenderer, remote } = electron;
 
-const { store, i18n, overlayPresets } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
+
 const analytics = remote.getGlobal('analytics');
 
 const { fonts, overlayVars } = store.get('obs').overlayPrefs;
@@ -493,8 +496,6 @@ document
   .classList.toggle('vertical-left', overlayVars.layout === 'vertical-left');
 
 const themeSelector = document.querySelector('.theme-selector');
-
-const themeObjects = overlayPresets;
 
 const updateColorInputs = () => {
   document.querySelector('input.toggle-gurbani-text').value = overlayVars.gurbaniTextColor;
