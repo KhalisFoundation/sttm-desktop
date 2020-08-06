@@ -537,6 +537,12 @@ const themeObjects = {
     textColor: '#ffba00',
     gurbaniTextColor: '#ffba00',
   },
+  nirbaan: {
+    label: 'NIRBAAN',
+    bgColor: '#002a52',
+    textColor: '#ff723b',
+    gurbaniTextColor: '#ffebbe',
+  },
   neverForget: {
     label: 'NEVER_FORGET',
     bgColor: '#000000',
