@@ -372,6 +372,13 @@ module.exports = {
     store.setUserPref(`slide-layout.font-sizes.${iconType}`, newSize);
     global.platform.updateSettings();
     analytics.trackEvent('settings', `${iconType}`, newSize);
+    window.socket.emit('data', {
+      host: 'sttm-desktop',
+      type: 'settings',
+      settings: {
+        fontSizes: store.getUserPref('slide-layout.font-sizes'),
+      },
+    });
   },
   showHide(e, type) {
     const catKey = 'slide-layout';
