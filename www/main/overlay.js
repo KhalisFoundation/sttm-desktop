@@ -7,7 +7,7 @@ const { obs: defaultPrefs } = require('./configs/defaults.json');
 
 const { ipcRenderer, remote } = electron;
 
-const { store, i18n } = remote.require('./app');
+const { store, i18n, overlayPresets } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const { fonts, overlayVars } = store.get('obs').overlayPrefs;
@@ -494,62 +494,7 @@ document
 
 const themeSelector = document.querySelector('.theme-selector');
 
-const themeObjects = {
-  aNewDay: {
-    label: 'A_NEW_DAY',
-    bgColor: '#97d6f7',
-    textColor: '#003a8c',
-    gurbaniTextColor: '#0e2654',
-  },
-  baagiBlue: {
-    label: 'BAAGI_BLUE',
-    bgColor: '#274f69',
-    textColor: '#ffffff',
-    gurbaniTextColor: '#ffffff',
-  },
-  khalsaRush: {
-    label: 'KHALSA_RUSH',
-    bgColor: '#ffa61a',
-    textColor: '#071f77',
-    gurbaniTextColor: '#071f77',
-  },
-  moodyBlue: {
-    label: 'MOODY_BLUE',
-    bgColor: '#2d73a7',
-    textColor: '#ffffff',
-    gurbaniTextColor: '#ffffff',
-  },
-  blackAndBlue: {
-    label: 'BLACK_&_BLUE',
-    bgColor: '#000000',
-    textColor: '#a3eafd',
-    gurbaniTextColor: '#ffffff',
-  },
-  floral: {
-    label: 'FLORAL',
-    bgColor: '#f5b7d1',
-    textColor: '#a3eafd',
-    gurbaniTextColor: '#ffffff',
-  },
-  khalsaGold: {
-    label: 'KHALSA_GOLD',
-    bgColor: '#58330a',
-    textColor: '#ffba00',
-    gurbaniTextColor: '#ffba00',
-  },
-  nirbaan: {
-    label: 'NIRBAAN',
-    bgColor: '#002a52',
-    textColor: '#ff723b',
-    gurbaniTextColor: '#ffebbe',
-  },
-  neverForget: {
-    label: 'NEVER_FORGET',
-    bgColor: '#000000',
-    textColor: '#ff0000',
-    gurbaniTextColor: '#ff0000',
-  },
-};
+const themeObjects = overlayPresets;
 
 const updateColorInputs = () => {
   document.querySelector('input.toggle-gurbani-text').value = overlayVars.gurbaniTextColor;
@@ -576,6 +521,10 @@ const themeSwatchFactory = themeOptions => {
         updateColorInputs();
 
         analytics.trackEvent('overlay', 'theme', overlayVars.theme);
+      },
+      style: {
+        color: themeOptions.gurbaniTextColor,
+        background: themeOptions.bgColor,
       },
     },
     h('span', i18n.t(`THEMES.${themeOptions.label}`)),

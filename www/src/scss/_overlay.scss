@@ -95,6 +95,7 @@
   right: 0;
   top: 0;
   width: 180px;
+  overflow-y: auto;
 }
 
 .overlay-theme-swatch {
@@ -130,73 +131,6 @@
   padding: 10px;
   text-align: center;
   text-transform: uppercase;
-}
-
-.bani-overlay-page,
-.theme-selector {
-  .never-forget {
-    background: #000;
-    color: #f00;
-  }
-
-  .khalsa-gold {
-    background: #58330a;
-    color: #ffba00;
-  }
-
-  .baagi-blue {
-    background: #274f69;
-    color: #fff;
-
-    .translit {
-      color: #a0d5fe;
-    }
-  }
-
-  .khalsa-rush {
-    background: #ffa61a;
-    color: #071f77;
-  }
-
-  .moody-blue {
-    background: #2d73a7;
-    color: #fff;
-  }
-
-  .a-new-day {
-    background: #97d6f7;
-    color: #0e2654;
-
-    .teeka,
-    .translation {
-      color: #003a8c;
-    }
-  }
-
-  .black-and-blue {
-    background: #000;
-    color: #fff;
-
-    .teeka,
-    .translation {
-      color: #a3eafd;
-    }
-  }
-
-  .floral {
-    background: #f5b7d1;
-    color: #460a1e;
-
-    .teeka,
-    .translation {
-      color: #821d3e;
-    }
-  }
-
-  .nirbaan {
-    background: #002a52;
-    color: #ffebbe;
-  }
 }
 
 input[type='color']::-webkit-color-swatch-wrapper {
