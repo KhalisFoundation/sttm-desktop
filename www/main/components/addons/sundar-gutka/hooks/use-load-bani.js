@@ -7,7 +7,7 @@ import cache from '../bani-cache';
 const useLoadBani = () => {
   const [isLoadingBanis, setLoadingBanis] = useState(false);
   const [banis, setBanis] = useState(cache.banis);
-  console.log(banis, ' in the load bani');
+
   useEffect(() => {
     setLoadingBanis(true);
 
@@ -20,11 +20,9 @@ const useLoadBani = () => {
 
           // resolving proxy
           const banisObject = Object.assign({}, rows);
-
-          // converting banisObject to an banis array
-          const banis = Object.keys(banisObject).map(baniPosition => banisObject[baniPosition]);
-          cache.banis = banis;
-          setBanis(banis);
+          const banisArr = Object.keys(banisObject).map(baniPosition => banisObject[baniPosition]);
+          cache.banis = banisArr;
+          setBanis(banisArr);
         } catch (error) {
           new Noty({
             type: 'error',
