@@ -21,9 +21,9 @@ const useLoadBani = () => {
           // resolving proxy
           const banisObject = Object.assign({}, rows);
 
+          // converting banisObject to an banis array
           const banis = Object.keys(banisObject).map(baniPosition => banisObject[baniPosition]);
           cache.banis = banis;
-          console.log(banis, '????????');
           setBanis(banis);
         } catch (error) {
           new Noty({
