@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Switch = ({ title, controlId, wrapperClassName, onToggleSwitch }) => {
+const Switch = ({ title, controlId, className, onToggle }) => {
   const [isSwitched, toggleSwitchedState] = useState(false);
 
   return (
-    <div className={wrapperClassName}>
+    <div className={className}>
       {title && <span>{title}</span>}
       <div className="switch">
         <input
@@ -15,8 +15,8 @@ const Switch = ({ title, controlId, wrapperClassName, onToggleSwitch }) => {
           onChange={() => {
             const newState = !isSwitched;
             toggleSwitchedState(newState);
-            if (onToggleSwitch) {
-              onToggleSwitch(newState);
+            if (onToggle) {
+              onToggle(newState);
             }
           }}
         />
@@ -29,8 +29,8 @@ const Switch = ({ title, controlId, wrapperClassName, onToggleSwitch }) => {
 Switch.propTypes = {
   title: PropTypes.string,
   controlId: PropTypes.string,
-  wrapperClassName: PropTypes.string,
-  onToggleSwitch: PropTypes.func,
+  className: PropTypes.string,
+  onToggle: PropTypes.func,
 };
 
 export default Switch;

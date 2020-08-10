@@ -1,41 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import getStylesBasedOnTheme from './utils/get-styles-based-on-theme';
+import { joinClasses } from '../../utils';
 
-const Tile = ({
-  wrapperClassName = '',
-  contentClassName = '',
-  bgColor,
-  bgImageUrl,
-  theme,
-  content,
-  children,
-}) => {
-  const tileStyles = getStylesBasedOnTheme(theme);
+const Tile = ({ children, className, theme = 'LIGHT', type }) => {
+  const tileClassname = joinClasses([
+    `${type}-tile`,
+    className ? className : null,
+    theme ? theme : null,
+  ]);
 
   return (
-    <div
-      className={`ui-tile ${wrapperClassName}`}
-      style={{
-        backgroundColor: bgColor || tileStyles.bgColor,
-        backgroundImage: `url(${bgImageUrl})` || tileStyles.bgImageUrl,
-      }}
-    >
-      <span className={contentClassName} style={{ color: tileStyles.textColor }}>
-        {children || content}
-      </span>
+    <div className={`ui-tile ${tileClassname}`}>
+      <span>{children || content}</span>
     </div>
   );
 };
 
 Tile.propTypes = {
-  bgColor: PropTypes.string,
-  bgImageUrl: PropTypes.string,
-  contentClassName: PropTypes.string,
   content: PropTypes.string,
-  wrapperClassName: PropTypes.string,
-  theme: PropTypes.string,
+  theme: PropTypes.string, //TODO: typing for the themes.
+  type: PropTypes.arrayOf(['extras']),
 };
 
 export default Tile;

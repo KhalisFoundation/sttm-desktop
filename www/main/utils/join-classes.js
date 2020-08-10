@@ -1,5 +1,5 @@
 // joining all the classes passed to an array.
-const joinClasses = ({ classNames }) => {
+const joinClasses = classNames => {
   return classNames.filter(cn => !!cn).join(' ');
 };
 
