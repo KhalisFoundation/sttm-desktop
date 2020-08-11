@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import anvaad from 'anvaad-js';
 
 import { Switch, Overlay } from '../../../../sttm-ui';
 import ExtraBani from './ExtraBani';
@@ -8,7 +9,7 @@ import { nitnemBaniIds, popularBaniIds } from '../../../../constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 
-const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose, extraBanis }) => {
+const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
 
@@ -34,8 +35,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose, extraBanis }
 
     return b;
   });
-  // const nitnemBanis = banis.filter(b => nitnemBaniIds.some(bId => bId === b.id));
-  // const popularBanis = banis.filter(b => popularBaniIds.some(bId => bId === b.id));
 
   return (
     <Overlay onScreenClose={onScreenClose}>
@@ -61,6 +60,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose, extraBanis }
                     <li key={b.name} className={blockListItemClassName}>
                       <span className={`tag tag-${b.baniTag}`} />
                       <span>{b.name}</span>
+                      <span className="translit-bani">{anvaad.translit(b.name)}</span>
                     </li>
                   ))}
                 </ul>
@@ -81,8 +81,8 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose, extraBanis }
 };
 
 SundarGutka.propTypes = {
-  onScreenClose: PropTypes.func,
   isShowTranslitSwitch: PropTypes.bool,
+  onScreenClose: PropTypes.func,
 };
 
 export default SundarGutka;

@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import Noty from 'noty';
 
-import { loadBanis } from '../../../../banidb';
-import cache from '../bani-cache';
+import { loadCeremonies } from '../../../../banidb';
+import cache from '../ceremonies-cache';
 
-const useLoadBani = () => {
-  const [isLoadingBanis, setLoadingBanis] = useState(false);
-  const [banis, setBanis] = useState(cache.banis);
+const useLoadCeremonies = () => {
+  const [isLoadingCeremonies, setLoadingCeremonies] = useState(false);
+  const [ceremonies, setCeremonies] = useState(cache.ceremonies);
 
   useEffect(() => {
-    const fetchBanisFromDb = async () => {
+    const fetchCeremoniesFromDb = async () => {
       try {
         // rows are proxy here
-        const rows = await loadBanis();
+        const rows = await loadCeremonies();
 
         // resolving proxy
         const banisObject = Object.assign({}, rows);
@@ -25,31 +25,31 @@ const useLoadBani = () => {
           };
         });
         cache.banis = banisArr;
-        setBanis(banisArr);
+        setCeremonies(banisArr);
       } catch (error) {
         new Noty({
           type: 'error',
-          text: `Was error loading bani : ${error}`,
+          text: `Was error loading ceremonies : ${error}`,
           timeout: 5000,
           modal: true,
         }).show();
       }
     };
 
-    // load sundar gutka bani if there is no banis in cache.
+    // load ceremonies if there is no ceremonies in cache.
     (async () => {
-      setLoadingBanis(true);
-      if (!banis.length) {
-        await fetchBanisFromDb();
+      setLoadingCeremonies(true);
+      if (!ceremonies.length) {
+        await fetchCeremoniesFromDb();
       }
-      setLoadingBanis(false);
+      setLoadingCeremonies(false);
     })();
   }, []);
 
   return {
-    isLoadingBanis,
-    banis,
+    isLoadingCeremonies,
+    ceremonies,
   };
 };
 
-export default useLoadBani;
+export default useLoadCeremonies;

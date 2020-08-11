@@ -2,9 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import CeremonyPane from './CeremonyPane';
+import useLoadCeremonies from '../hooks/use-load-ceremonies';
 import { Overlay } from '../../../../sttm-ui';
 
 const Ceremonies = ({ onScreenClose }) => {
+  const { isLoadingCeremonies, ceremonies } = useLoadCeremonies();
+  console.log(isLoadingCeremonies, ceremonies, '>>>>>>>>>>.');
   return (
     <Overlay onClose={onScreenClose}>
       <div className="ceremonies-wrapper">
