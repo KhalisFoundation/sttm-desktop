@@ -7,7 +7,7 @@ import { Overlay } from '../../../../sttm-ui';
 const Ceremonies = ({ onScreenClose }) => {
   return (
     <Overlay onClose={onScreenClose}>
-      <div className="ceremonies-dialog-wrapper">
+      <div className="ceremonies-wrapper">
         <div className="ceremonies-list ui-ceremonies">
           <header className="navigator-header ceremonies-header">ceremonies</header>
           <CeremonyPane name="anandkaraj" paneId="anandkaraj" />

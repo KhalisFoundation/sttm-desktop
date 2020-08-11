@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { Tile } from '../../../../sttm-ui';
 import { convertToHyphenCase } from '../../../../utils';
 
 const ExtraBani = ({ title, banis = [] }) => {
@@ -13,10 +14,10 @@ const ExtraBani = ({ title, banis = [] }) => {
     <div className="bani-group-container">
       <header className={`bani-group-heading ${groupHeaderClassName}`}>{title}</header>
       <div className={`bani-group ${groupClassName}`}>
-        {banis.map((b, idx) => (
-          <div key={idx} className={`extras-tile ${groupItemClassName}`}>
-            <div className="gurmukhi">{b.name}</div>
-          </div>
+        {banis.map(b => (
+          <Tile key={b.name} type="extras" className={groupItemClassName}>
+            {b.name}
+          </Tile>
         ))}
       </div>
     </div>

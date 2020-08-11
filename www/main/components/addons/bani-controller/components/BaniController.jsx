@@ -22,8 +22,8 @@ const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
 
   return (
     <Overlay onClose={onScreenClose}>
-      <div className="sync-dialog-wrapper overlay-ui ui-sync-button">
-        <div className="sync-dialog overlay-ui ui-sync-button">
+      <div className="sync-wrapper overlay-ui ui-sync-button">
+        <div className="sync overlay-ui ui-sync-button">
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">
             {title}
           </header>

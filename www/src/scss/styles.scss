@@ -90,9 +90,9 @@ a {
   }
 }
 
-.sundar-gutka-dialog-wrapper,
-.ceremonies-dialog-wrapper,
-.sync-dialog-wrapper {
+.sundar-gutka-wrapper,
+.ceremonies-wrapper,
+.sync-wrapper {
   align-items: flex-end;
   display: flex;
   height: 100vh;
@@ -103,8 +103,8 @@ a {
   width: calc(100% - 100px);
 }
 
-.sundar-gutka-dialog-wrapper,
-.ceremonies-dialog-wrapper {
+.sundar-gutka-wrapper,
+.ceremonies-wrapper {
   align-items: flex-start;
   margin-top: 100px;
 
@@ -253,7 +253,7 @@ a {
     .extras-tile {
       align-items: center;
       border-radius: 3px;
-      color: white;
+      color: $white;
       cursor: pointer;
       display: flex;
       height: 75px;
@@ -263,6 +263,11 @@ a {
       text-align: center;
       transition: 0.3s all ease;
       width: 125px;
+
+      & > span {
+        font-family: 'gurbaniakhar';
+        font-size: 1.1rem;
+      }
 
       &:hover {
         transform: scale(1.1);
@@ -297,7 +302,7 @@ a {
   }
 }
 
-.close-dialog {
+.close-screen {
   border: 2px solid white;
   border-radius: 50%;
   color: white;
@@ -389,7 +394,7 @@ a {
   }
 }
 
-.sync-dialog-wrapper {
+.sync-wrapper {
   &.hidden {
     display: none;
   }

@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { joinClasses } from '../../utils';
 
-const Tile = ({ children, className, theme = 'LIGHT', type }) => {
+const Tile = ({ children, className, theme = 'LIGHT', type = 'extras' }) => {
   const tileClassname = joinClasses([
     `${type}-tile`,
+    theme ? `${theme}-tile` : null,
     className ? className : null,
-    theme ? theme : null,
   ]);
 
   return (

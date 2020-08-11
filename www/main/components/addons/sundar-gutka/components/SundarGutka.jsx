@@ -4,30 +4,42 @@ import PropTypes from 'prop-types';
 import { Switch, Overlay } from '../../../../sttm-ui';
 import ExtraBani from './ExtraBani';
 import { convertToHyphenCase } from '../../../../utils';
+import { nitnemBaniIds, popularBaniIds } from '../../../../constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 
-const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
-  const title = 'Sundar Gutka';
-  // const banis = [{ name: 'Sundar Gutka' }];
-  const extraBanis = [
-    {
-      title: 'Nitnem Banis',
-      banis: [{ name: 'Nitnem Banis' }],
-    },
-  ];
-
+const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose, extraBanis }) => {
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
+
+  const nitnemBanis = [];
+  const popularBanis = [];
+  const title = 'Sundar Gutka';
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;
   const blockListItemClassName = `${hyphenedTitle}-bani`;
-  console.log(banis, 'bani data..');
+
+  const taggedBanis = banis.map(b => {
+    b.baniTag = '';
+
+    if (nitnemBaniIds.includes(b.id)) {
+      b.baniTag = 'nitnem';
+      nitnemBanis.push(b);
+    }
+    if (popularBaniIds.includes(b.id)) {
+      b.baniTag = 'popular';
+      popularBanis.push(b);
+    }
+
+    return b;
+  });
+  // const nitnemBanis = banis.filter(b => nitnemBaniIds.some(bId => bId === b.id));
+  // const popularBanis = banis.filter(b => popularBaniIds.some(bId => bId === b.id));
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className={`${hyphenedTitle}-dialog-wrapper`}>
+      <div className={`${hyphenedTitle}-wrapper`}>
         <div className={`bani-list overlay-ui ${overlayClassName}`}>
           {isLoadingBanis ? (
             <div className="sttm-loader" />
@@ -47,7 +59,8 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                 <ul id={blockListId} className="gurmukhi">
                   {banis.map(b => (
                     <li key={b.name} className={blockListItemClassName}>
-                      {b.name}
+                      <span className={`tag tag-${b.baniTag}`} />
+                      <span>{b.name}</span>
                     </li>
                   ))}
                 </ul>
@@ -58,7 +71,8 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
-            {extraBanis && extraBanis.map((extra, idx) => <ExtraBani key={idx} {...extra} />)}
+            {nitnemBanis && <ExtraBani title="Nitnem Banis" banis={nitnemBanis} />}
+            {popularBanis && <ExtraBani title="Popular Banis" banis={popularBanis} />}
           </div>
         )}
       </div>

@@ -10,7 +10,7 @@ const useLoadBani = () => {
 
   useEffect(() => {
     setLoadingBanis(true);
-
+    console.log(banis, 'IN THE LOAD BANI');
     // load sundar gutka bani if there is no banis in cache.
     if (!banis.length) {
       (async () => {
@@ -20,7 +20,14 @@ const useLoadBani = () => {
 
           // resolving proxy
           const banisObject = Object.assign({}, rows);
-          const banisArr = Object.keys(banisObject).map(baniPosition => banisObject[baniPosition]);
+          const banisArr = Object.keys(banisObject).map(baniPosition => {
+            const { ID, Gurmukhi, Token } = banisObject[baniPosition];
+            return {
+              id: ID,
+              name: Gurmukhi,
+              token: Token,
+            };
+          });
           cache.banis = banisArr;
           setBanis(banisArr);
         } catch (error) {
