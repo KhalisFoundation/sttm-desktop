@@ -6,6 +6,7 @@ import BaniControllerItem from './BaniControllerItem';
 import { Switch, Overlay } from '../../../../sttm-ui';
 
 import { getBaniControllerItems, generateQrCode } from '../utils';
+
 const { i18n } = remote.require('./app');
 
 const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
@@ -21,7 +22,7 @@ const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
   const baniControllerItems = getBaniControllerItems({ code, adminPin });
 
   return (
-    <Overlay onClose={onScreenClose}>
+    <Overlay onScreenClose={onScreenClose}>
       <div className="sync-wrapper overlay-ui ui-sync-button">
         <div className="sync overlay-ui ui-sync-button">
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">

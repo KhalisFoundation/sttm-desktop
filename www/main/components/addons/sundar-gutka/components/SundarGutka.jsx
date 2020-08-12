@@ -11,7 +11,7 @@ import useLoadBani from '../hooks/use-load-bani';
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const { isLoadingBanis, banis } = useLoadBani();
-  const [isTranslit, setTranslitState] = useState(false);
+  // const [isTranslit, setTranslitState] = useState(false);
 
   const nitnemBanis = [];
   const popularBanis = [];
@@ -20,7 +20,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;
   const blockListItemClassName = `${hyphenedTitle}-bani`;
-  console.log(banis, 'banis........');
   const taggedBanis = banis.map(b => {
     b.baniTag = '';
 
@@ -46,17 +45,17 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
             <>
               <header className="navigator-header">{title}</header>
 
-              {isShowTranslitSwitch && (
-                <Switch
-                  controlId="translit-switch"
-                  className="translit-switch"
-                  onToggle={setTranslitState}
-                />
-              )}
+              {/* {isShowTranslitSwitch && (
+                  <Switch
+                    controlId="translit-switch"
+                    className="translit-switch"
+                    onToggle={setTranslitState}
+                  />
+                )} */}
 
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">
-                  {banis.map(b => (
+                  {taggedBanis.map(b => (
                     <li key={b.name} className={blockListItemClassName}>
                       <span className={`tag tag-${b.baniTag}`} />
                       <span>{b.name}</span>
@@ -71,8 +70,12 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
-            {nitnemBanis && <ExtraBani title="Nitnem Banis" banis={nitnemBanis} />}
-            {popularBanis && <ExtraBani title="Popular Banis" banis={popularBanis} />}
+            {nitnemBanis && (
+              <ExtraBani onScreenClose={onScreenClose} title="Nitnem Banis" banis={nitnemBanis} />
+            )}
+            {popularBanis && (
+              <ExtraBani onScreenClose={onScreenClose} title="Popular Banis" banis={popularBanis} />
+            )}
           </div>
         )}
       </div>

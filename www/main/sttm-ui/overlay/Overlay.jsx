@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Overlay = ({ onClose, children }) => {
+const Overlay = ({ onScreenClose, children }) => {
   return (
     <div className="backdrop">
-      <button className="close-screen" onClick={onClose}>
+      <button className="close-screen" onClick={onScreenClose}>
         <i className="fa fa-times" />
       </button>
       {children}
@@ -13,7 +13,7 @@ const Overlay = ({ onClose, children }) => {
 };
 
 Overlay.propTypes = {
-  onClose: PropTypes.func,
+  onScreenClose: PropTypes.func,
 };
 
 export default Overlay;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { joinClasses } from '../../utils';
 
-const Tile = ({ children, className, theme = 'LIGHT', type = 'extras' }) => {
+const Tile = ({ children, className, theme = 'LIGHT', type = 'extras', onTileClick }) => {
   const tileClassname = joinClasses([
     `${type}-tile`,
     theme ? `${theme}-tile` : null,
@@ -11,16 +11,17 @@ const Tile = ({ children, className, theme = 'LIGHT', type = 'extras' }) => {
   ]);
 
   return (
-    <div className={`ui-tile ${tileClassname}`}>
+    <div role="button" onClick={onTileClick} className={`ui-tile ${tileClassname}`}>
       <span>{children || content}</span>
     </div>
   );
 };
 
 Tile.propTypes = {
+  onTileClick: PropTypes.func,
   content: PropTypes.string,
   theme: PropTypes.string, //TODO: typing for the themes.
-  type: PropTypes.arrayOf(['extras']),
+  type: PropTypes.oneOf(['extras']),
 };
 
 export default Tile;
