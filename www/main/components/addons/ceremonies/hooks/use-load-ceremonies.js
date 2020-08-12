@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Noty from 'noty';
 
 import { loadCeremonies } from '../../../../banidb';
+import convertDbProxyToArray from '../../utils/convert-db-proxy-to-array';
 import cache from '../ceremonies-cache';
 
 const useLoadCeremonies = () => {
@@ -10,22 +11,14 @@ const useLoadCeremonies = () => {
 
   useEffect(() => {
     const fetchCeremoniesFromDb = async () => {
-      try {
-        // rows are proxy here
-        const rows = await loadCeremonies();
+      setLoadingCeremonies(true);
 
+      try {
+        const dbProxyObj = await loadCeremonies();
         // resolving proxy
-        const banisObject = Object.assign({}, rows);
-        const banisArr = Object.keys(banisObject).map(baniPosition => {
-          const { ID, Gurmukhi, Token } = banisObject[baniPosition];
-          return {
-            id: ID,
-            name: Gurmukhi,
-            token: Token,
-          };
-        });
-        cache.banis = banisArr;
-        setCeremonies(banisArr);
+        const ceremoniesArr = convertDbProxyToArray(dbProxyObj);
+        cache.ceremonies = ceremoniesArr;
+        setCeremonies(ceremoniesArr);
       } catch (error) {
         new Noty({
           type: 'error',
@@ -33,17 +26,15 @@ const useLoadCeremonies = () => {
           timeout: 5000,
           modal: true,
         }).show();
+      } finally {
+        setLoadingCeremonies(false);
       }
     };
 
     // load ceremonies if there is no ceremonies in cache.
-    (async () => {
-      setLoadingCeremonies(true);
-      if (!ceremonies.length) {
-        await fetchCeremoniesFromDb();
-      }
-      setLoadingCeremonies(false);
-    })();
+    if (!ceremonies.length) {
+      fetchCeremoniesFromDb();
+    }
   }, []);
 
   return {

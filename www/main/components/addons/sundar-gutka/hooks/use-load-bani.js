@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Noty from 'noty';
 
 import { loadBanis } from '../../../../banidb';
+import convertDbProxyToArray from '../../utils/convert-db-proxy-to-array';
 import cache from '../bani-cache';
 
 const useLoadBani = () => {
@@ -10,20 +11,11 @@ const useLoadBani = () => {
 
   useEffect(() => {
     const fetchBanisFromDb = async () => {
+      setLoadingBanis(true);
       try {
-        // rows are proxy here
-        const rows = await loadBanis();
-
+        const dbProxyObj = await loadBanis();
         // resolving proxy
-        const banisObject = Object.assign({}, rows);
-        const banisArr = Object.keys(banisObject).map(baniPosition => {
-          const { ID, Gurmukhi, Token } = banisObject[baniPosition];
-          return {
-            id: ID,
-            name: Gurmukhi,
-            token: Token,
-          };
-        });
+        const banisArr = convertDbProxyToArray(dbProxyObj);
         cache.banis = banisArr;
         setBanis(banisArr);
       } catch (error) {
@@ -33,17 +25,15 @@ const useLoadBani = () => {
           timeout: 5000,
           modal: true,
         }).show();
+      } finally {
+        setLoadingBanis(false);
       }
     };
 
     // load sundar gutka bani if there is no banis in cache.
-    (async () => {
-      setLoadingBanis(true);
-      if (!banis.length) {
-        await fetchBanisFromDb();
-      }
-      setLoadingBanis(false);
-    })();
+    if (!banis.length) {
+      fetchBanisFromDb();
+    }
   }, []);
 
   return {

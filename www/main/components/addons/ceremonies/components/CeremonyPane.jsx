@@ -1,8 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { Switch, Tile } from '../../../../sttm-ui';
 
-const CeremonyPane = ({ name, paneId }) => {
+const CeremonyPane = ({ name, token }) => {
+  const paneId = token;
   return (
     <div className="ceremony-pane" id={paneId}>
       <header className="toolbar-nh navigator-header">
@@ -23,7 +25,7 @@ const CeremonyPane = ({ name, paneId }) => {
               Light
             </Tile>
 
-            <Tile classNames="theme-instance" theme="FLORAL">
+            <Tile className="theme-instance" theme="FLORAL">
               Floral
             </Tile>
 
@@ -35,6 +37,11 @@ const CeremonyPane = ({ name, paneId }) => {
       </div>
     </div>
   );
+};
+
+CeremonyPane.propTypes = {
+  name: PropTypes.string,
+  token: PropTypes.string,
 };
 
 export default CeremonyPane;

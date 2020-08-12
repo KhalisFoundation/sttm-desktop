@@ -20,7 +20,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;
   const blockListItemClassName = `${hyphenedTitle}-bani`;
-
+  console.log(banis, 'banis........');
   const taggedBanis = banis.map(b => {
     b.baniTag = '';
 
