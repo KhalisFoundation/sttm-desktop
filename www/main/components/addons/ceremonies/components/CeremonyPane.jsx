@@ -15,14 +15,14 @@ const CeremonyPane = props => {
   // TODO: handle changing theme.
   const loadCeremony = () => {
     analytics.trackEvent('ceremony', token);
-    loadCeremonyGlobal(id, token);
+    loadCeremonyGlobal(id);
     onScreenClose();
   };
 
   const toggleEnglishExplainations = isEnglishExplainations => {
     store.setUserPref(`gurbani.ceremonies.ceremony-${token}-english`, isEnglishExplainations);
     global.platform.updateSettings();
-    loadCeremonyGlobal(id, token);
+    loadCeremonyGlobal(id);
   };
 
   return (
