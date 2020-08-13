@@ -305,6 +305,15 @@ module.exports = {
 
   applySettings(prefs = false) {
     const newUserPrefs = prefs || store.getAllPrefs();
+    if (window.socket !== undefined) {
+      window.socket.emit('data', {
+        host: 'sttm-desktop',
+        type: 'settings',
+        settings: {
+          fontSizes: store.getUserPref('slide-layout.font-sizes'),
+        },
+      });
+    }
     Object.keys(settings).forEach(catKey => {
       const cat = settings[catKey];
       Object.keys(cat.settings).forEach(settingKey => {
