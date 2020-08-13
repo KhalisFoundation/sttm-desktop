@@ -45,13 +45,13 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
             <>
               <header className="navigator-header">{title}</header>
 
-              {/* {isShowTranslitSwitch && (
+              {/* isShowTranslitSwitch && (
                   <Switch
                     controlId="translit-switch"
                     className="translit-switch"
                     onToggle={setTranslitState}
                   />
-                )} */}
+                ) */}
 
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">

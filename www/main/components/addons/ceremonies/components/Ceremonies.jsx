@@ -8,7 +8,7 @@ import { visibleCeremoniesIds } from '../../../../constants';
 
 const Ceremonies = ({ onScreenClose }) => {
   const { isLoadingCeremonies, ceremonies } = useLoadCeremonies();
-  console.log(ceremonies, 'ceremonies');
+
   const visibleCeremonies =
     ceremonies.length > 0
       ? visibleCeremoniesIds.map(cId => {

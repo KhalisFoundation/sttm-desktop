@@ -47,7 +47,11 @@ const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
 
                   <div className="connection-switch-container">
                     <p>Disable all the remote connections to SikhiToTheMax</p>
-                    <Switch controlId="bani-controller" onToggle={setConnectionsDisabled} />
+                    <Switch
+                      controlId="bani-controller"
+                      onToggle={setConnectionsDisabled}
+                      defaultValue={isConnectionsDisabled}
+                    />
                   </div>
                 </>
               )}

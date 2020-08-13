@@ -21,15 +21,10 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
 
   return (
     <div className="bani-group-container">
-      <header
-        onClick={() => console.log('HEADER CLICKED')}
-        className={`bani-group-heading ${groupHeaderClassName}`}
-      >
-        {title}
-      </header>
+      <header className={`bani-group-heading ${groupHeaderClassName}`}>{title}</header>
       <div className={`bani-group ${groupClassName}`}>
         {banis.map(b => (
-          <Tile onTileClick={loadBani(b)} key={b.name} type="extras" className={groupItemClassName}>
+          <Tile onClick={loadBani(b)} key={b.name} type="extras" className={groupItemClassName}>
             {b.name}
           </Tile>
         ))}
