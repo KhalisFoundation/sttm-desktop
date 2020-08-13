@@ -1,11 +1,10 @@
-const request = require('request-promise');
-const { remote } = require('electron');
+import request from 'request-promise';
+import { remote } from 'electron';
+import Noty from 'noty';
+import { API_ENDPOINT as SYNC_API_URL } from '../../../../constants';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
-
-const Noty = require('noty');
-const { API_ENDPOINT: SYNC_API_URL } = require('./api-config');
 
 const SOCKET_SCRIPT_SOURCE = `${SYNC_API_URL}/socket.io/socket.io.js`;
 

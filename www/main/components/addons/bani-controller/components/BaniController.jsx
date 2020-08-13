@@ -1,23 +1,69 @@
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
+import isOnline from 'is-online';
 
 import BaniControllerItem from './BaniControllerItem';
 import { Switch, Overlay } from '../../../../sttm-ui';
 
 import { getBaniControllerItems, generateQrCode } from '../utils';
+import { tryConnection, onEnd } from '../utils/share-sync';
 
 const { i18n } = remote.require('./app');
 
-const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
+const BaniController = ({ onScreenClose }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
-  const [isFetchingData, setFetchingData] = useState(false);
+  const [codeLabel, setCodeLabel] = useState('');
+  const [isFetchingCode, setFetchingCode] = useState(false);
   const [isConnectionsDisabled, setConnectionsDisabled] = useState(false);
+  const { adminPin, code, isAdminPinVisible, isConnected } = useStoreState(
+    state => state.baniController,
+  );
+  const { setAdminPin, setCode, setAdminPinVisibility, setConnection } = useStoreActions(
+    actions => actions.baniController,
+  );
+
+  const showSyncError = errorMessage => {
+    setCodeLabel(errorMessage);
+    setCode('...');
+    setAdminPin('...');
+  };
 
   useEffect(() => {
-    generateQrCode(canvasRef.current, code);
-  }, [canvasRef, code]);
+    const remoteSyncInit = async () => {
+      setFetchingCode(true);
+
+      // 1. check onlineValue
+      const onlineValue = await isOnline();
+      if (onlineValue) {
+        const newCode = await tryConnection();
+
+        if (newCode) {
+          const newAdminPin =
+            adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
+
+          generateQrCode(canvasRef.current, newCode);
+          setAdminPin(newAdminPin);
+          setCode(newCode);
+        } else {
+          showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
+        }
+        // set the newCode as our global code
+      } else {
+        showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
+      }
+
+      setFetchingCode(false);
+    };
+
+    remoteSyncInit();
+  }, []);
+
+  // useEffect(() => {
+  //   generateQrCode(canvasRef.current, code);
+  // }, [canvasRef, code]);
 
   const baniControllerItems = getBaniControllerItems({ code, adminPin });
 
@@ -28,10 +74,10 @@ const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">
             {title}
           </header>
-          <div className={`sync-content-wrapper ${isFetchingData ? 'loading' : ''}`}>
+          <div className={`sync-content-wrapper ${isFetchingCode ? 'loading' : ''}`}>
             {/* Sync-container */}
             <div className="sync-content">
-              {isFetchingData ? (
+              {isFetchingCode ? (
                 <div className="sttm-loader" />
               ) : (
                 <>
@@ -39,7 +85,7 @@ const BaniController = ({ onScreenClose, code = 123, adminPin = 1234 }) => {
                     {i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')}
                   </div>
 
-                  <div className="sync-code-num"> ABC_DEF </div>
+                  <div className="sync-code-num"> {code} </div>
 
                   {baniControllerItems.map(item => (
                     <BaniControllerItem key={item.title} {...item} />

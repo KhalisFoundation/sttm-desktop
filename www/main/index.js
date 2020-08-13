@@ -2,7 +2,7 @@ const copy = require('./copy');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
-const shareSync = require('./share-sync');
+// const shareSync = require('./share-sync');
 const settings = require('.//settings');
 const shortcutTray = require('./shortcut_tray');
 const toolbar = require('./toolbar');
@@ -65,7 +65,7 @@ module.exports = {
   copy,
   menu,
   search,
-  shareSync,
+  // shareSync,
   platformMethod,
   toolbar,
   themeEditor,
