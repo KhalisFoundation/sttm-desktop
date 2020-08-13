@@ -11,7 +11,7 @@ import useLoadBani from '../hooks/use-load-bani';
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const { isLoadingBanis, banis } = useLoadBani();
-  // const [isTranslit, setTranslitState] = useState(false);
+  const [isTranslit, setTranslitState] = useState(false);
 
   const nitnemBanis = [];
   const popularBanis = [];
@@ -45,13 +45,14 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
             <>
               <header className="navigator-header">{title}</header>
 
-              {/* isShowTranslitSwitch && (
-                  <Switch
-                    controlId="translit-switch"
-                    className="translit-switch"
-                    onToggle={setTranslitState}
-                  />
-                ) */}
+              {isShowTranslitSwitch && (
+                <Switch
+                  controlId="translit-switch"
+                  className="translit-switch"
+                  onToggle={setTranslitState}
+                  defaultValue={isTranslit}
+                />
+              )}
 
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">

@@ -35,7 +35,8 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
 
 ExtraBani.propTypes = {
   title: PropTypes.string,
-  baanis: PropTypes.arrayOf({
+  onScreenClose: PropTypes.func,
+  banis: PropTypes.arrayOf({
     name: PropTypes.string.isRequired,
   }),
 };
