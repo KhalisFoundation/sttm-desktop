@@ -1,5 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200" viewBox="0 0 200 200">
-  <image id="Background" width="200" height="200" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAACFElEQVR4nO3TAQ3AMAzAsH78OfcEtiCwIUTKt7s7wNWRBd4MAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIPAyMz9T2QWMmCB7ogAAAABJRU5ErkJggg=="/>
-  <image id="Color_Fill_1" data-name="Color Fill 1" width="200" height="200" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAACGElEQVR4nO3TQRGAMBDAwANH/VYnfsEAjYJdCZnJtfbzDvDrlgXODALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSAQDALBIBAMAsEgEAwCwSBwMjMfYfEDjhOHbLIAAAAASUVORK5CYII="/>
-  <image id="suMdr_gutkw" data-name="suMdr gutkw" x="29" y="20" width="145" height="157" xlink:href="data:img/png;base64,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"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 83.532738 83.532738"
+   height="83.532738mm"
+   width="83.532738mm">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-102.43155,-60.00893)"
+     id="layer1">
+    <flowRoot
+       transform="scale(0.26458333)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="flowRoot898"
+       xml:space="preserve"><flowRegion
+         id="flowRegion900"><rect
+           y="433.34311"
+           x="393.9595"
+           height="80.559662"
+           width="89.398499"
+           id="rect902" /></flowRegion><flowPara
+         id="flowPara904" /></flowRoot>    <g
+       transform="matrix(3.1571429,0,0,3.1571429,-220.95949,-291.74001)"
+       id="g1317">
+      <g
+         data-name="Rectangle 1"
+         id="Rectangle_1"
+         transform="matrix(0.05535216,0,0,0.05535216,102.43155,111.41369)"
+         style="fill:#313a94;stroke:#707070;stroke-width:1">
+        <rect
+           id="rect882"
+           height="478"
+           width="478"
+           x="0"
+           y="0"
+           style="stroke:none" />
+        <rect
+           id="rect884"
+           height="477"
+           width="477"
+           y="0.5"
+           x="0.5"
+           style="fill:none" />
+      </g>
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot917"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         transform="scale(0.26458333)"><flowRegion
+           id="flowRegion919"><rect
+             id="rect921"
+             width="80.054588"
+             height="64.902298"
+             x="399.76788"
+             y="440.66672" /></flowRegion><flowPara
+           id="flowPara923"
+           style="fill:#ffffff"> ਸੁੰਦਰ ਗੁਟਕਾ ਸੁੰਦਰ ਗੁਟਕਾ</flowPara></flowRoot>      <flowRoot
+         xml:space="preserve"
+         id="flowRoot925"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none"
+         transform="matrix(0.26458333,0,0,0.26458333,43.63175,5.2785732)"><flowRegion
+           id="flowRegion927"
+           style="text-align:center;text-anchor:middle;fill:#ffffff"><rect
+             id="rect929"
+             width="99.895393"
+             height="99.895409"
+             x="222.23547"
+             y="401.14059"
+             style="text-align:center;text-anchor:middle;fill:#ffffff" /></flowRegion><flowPara
+           id="flowPara931"
+           style="font-size:32px;line-height:0;text-align:center;text-anchor:middle"> </flowPara><flowPara
+           id="flowPara933"
+           style="font-size:32px;line-height:0;text-align:center;text-anchor:middle" /></flowRoot>      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="106.55149"
+         y="122.94197"
+         id="text951"><tspan
+           id="tspan949"
+           x="106.55149"
+           y="122.94197"
+           style="font-size:9.87777805px;fill:#ffffff;stroke-width:0.26458332">ਸੁੰਦਰ</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="105.75772"
+         y="133.10951"
+         id="text955"><tspan
+           id="tspan953"
+           x="105.75772"
+           y="133.10951"
+           style="font-size:9.87777805px;fill:#ffffff;stroke-width:0.26458332">ਗੁਟਕਾ</tspan></text>
+    </g>
+  </g>
 </svg>
