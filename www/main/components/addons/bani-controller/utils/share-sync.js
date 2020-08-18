@@ -57,6 +57,7 @@ module.exports = {
     try {
       await request(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
       syncCode = window.namespaceString;
+      console.log(syncCode, 'SYNC CODE');
     } catch (e) {
       syncCode = getNewCode(host);
     }

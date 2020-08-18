@@ -38,8 +38,9 @@ const BaniController = ({ onScreenClose }) => {
       // 1. check onlineValue
       const onlineValue = await isOnline();
       if (onlineValue) {
+        console.log(onlineValue, '>>>>');
         const newCode = await tryConnection();
-
+        console.log(newCode, 'new code...');
         if (newCode) {
           const newAdminPin =
             adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
@@ -58,8 +59,10 @@ const BaniController = ({ onScreenClose }) => {
       setFetchingCode(false);
     };
 
-    remoteSyncInit();
-  }, []);
+    if (canvasRef.current) {
+      remoteSyncInit();
+    }
+  }, [canvasRef.current]);
 
   // useEffect(() => {
   //   generateQrCode(canvasRef.current, code);
