@@ -18,7 +18,7 @@ const BaniController = ({ onScreenClose }) => {
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isConnectionsDisabled, setConnectionsDisabled] = useState(false);
-  const { adminPin, code, isAdminPinVisible, isConnected } = useStoreState(
+  const { adminPin, code, isAdminPinVisible, isConnected, isListenersSet } = useStoreState(
     state => state.baniController,
   );
   const { setAdminPin, setCode, setAdminPinVisibility, setConnection } = useStoreActions(
@@ -38,9 +38,8 @@ const BaniController = ({ onScreenClose }) => {
       // 1. check onlineValue
       const onlineValue = await isOnline();
       if (onlineValue) {
-        console.log(onlineValue, '>>>>');
         const newCode = await tryConnection();
-        console.log(newCode, 'new code...');
+
         if (newCode) {
           const newAdminPin =
             adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
@@ -58,6 +57,8 @@ const BaniController = ({ onScreenClose }) => {
 
       setFetchingCode(false);
     };
+
+    setListeners();
 
     if (canvasRef.current) {
       remoteSyncInit();

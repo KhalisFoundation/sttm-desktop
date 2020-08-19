@@ -4,10 +4,17 @@ import { DEFAULT_OVERLAY } from '../constants';
 const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
+    isListeners: false,
     setOverlayScreen: action((state, payload) => {
       return {
         ...state,
         overlayScreen: payload,
+      };
+    }),
+    setListeners: action((state, listenersState) => {
+      return {
+        ...state,
+        isListeners: listenersState,
       };
     }),
   },
@@ -28,16 +35,16 @@ const GlobalState = createStore({
         code,
       };
     }),
-    setAdminPinVisible: action((state, adminPinVisibility) => {
+    setAdminPinVisible: action((state, adminPinVisibleState) => {
       return {
         ...state,
-        isAdminPinVisible: adminPinVisibility,
+        isAdminPinVisible: adminPinVisibleState,
       };
     }),
-    setConnection: action((state, connection) => {
+    setConnection: action((state, connectionState) => {
       return {
         ...state,
-        isConnected: connection,
+        isConnected: connectionState,
       };
     }),
   },
