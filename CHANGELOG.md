@@ -2,6 +2,8 @@
 
 ### 7.7 - August 25, 2020_
 
+![](./assets/img/help_images/desktop-nirbaan.jpg)
+
 ### Improved:
 
 - Added new Nirbaan theme
