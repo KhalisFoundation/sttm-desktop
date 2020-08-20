@@ -1,3 +1,4 @@
+import axios from 'axios';
 import request from 'request-promise';
 import { remote } from 'electron';
 import Noty from 'noty';
@@ -55,7 +56,7 @@ module.exports = {
 
     // if a succesful code already exists, use that or else get new code
     try {
-      await request(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
+      await axios.get(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
       syncCode = window.namespaceString;
     } catch (e) {
       syncCode = getNewCode(host);

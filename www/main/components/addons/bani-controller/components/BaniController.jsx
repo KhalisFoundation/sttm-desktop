@@ -18,12 +18,13 @@ const BaniController = ({ onScreenClose }) => {
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isConnectionsDisabled, setConnectionsDisabled] = useState(false);
-  const { adminPin, code, isAdminPinVisible, isConnected, isListenersSet } = useStoreState(
+  const { adminPin, code, isAdminPinVisible, isConnected } = useStoreState(
     state => state.baniController,
   );
   const { setAdminPin, setCode, setAdminPinVisibility, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
+  const { setListeners } = useStoreActions(actions => actions.app);
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -58,7 +59,7 @@ const BaniController = ({ onScreenClose }) => {
       setFetchingCode(false);
     };
 
-    setListeners();
+    setListeners(true);
 
     if (canvasRef.current) {
       remoteSyncInit();
