@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 83.532738 83.532738"
+   height="83.532738mm"
+   width="83.532738mm">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-102.43155,-60.00893)"
+     id="layer1">
+    <flowRoot
+       transform="scale(0.26458333)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="flowRoot898"
+       xml:space="preserve"><flowRegion
+         id="flowRegion900"><rect
+           y="433.34311"
+           x="393.9595"
+           height="80.559662"
+           width="89.398499"
+           id="rect902" /></flowRegion><flowPara
+         id="flowPara904" /></flowRoot>    <g
+       transform="matrix(3.1571429,0,0,3.1571429,-220.95949,-291.74001)"
+       id="g1317">
+      <g
+         data-name="Rectangle 1"
+         id="Rectangle_1"
+         transform="matrix(0.05535216,0,0,0.05535216,102.43155,111.41369)"
+         style="fill:#313a94;stroke:#707070;stroke-width:1">
+        <rect
+           id="rect882"
+           height="478"
+           width="478"
+           x="0"
+           y="0"
+           style="stroke:none" />
+        <rect
+           id="rect884"
+           height="477"
+           width="477"
+           y="0.5"
+           x="0.5"
+           style="fill:none" />
+      </g>
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot917"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         transform="scale(0.26458333)"><flowRegion
+           id="flowRegion919"><rect
+             id="rect921"
+             width="80.054588"
+             height="64.902298"
+             x="399.76788"
+             y="440.66672" /></flowRegion><flowPara
+           id="flowPara923"
+           style="fill:#ffffff"> ਸੁੰਦਰ ਗੁਟਕਾ ਸੁੰਦਰ ਗੁਟਕਾ</flowPara></flowRoot>      <flowRoot
+         xml:space="preserve"
+         id="flowRoot925"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none"
+         transform="matrix(0.26458333,0,0,0.26458333,43.63175,5.2785732)"><flowRegion
+           id="flowRegion927"
+           style="text-align:center;text-anchor:middle;fill:#ffffff"><rect
+             id="rect929"
+             width="99.895393"
+             height="99.895409"
+             x="222.23547"
+             y="401.14059"
+             style="text-align:center;text-anchor:middle;fill:#ffffff" /></flowRegion><flowPara
+           id="flowPara931"
+           style="font-size:32px;line-height:0;text-align:center;text-anchor:middle"> </flowPara><flowPara
+           id="flowPara933"
+           style="font-size:32px;line-height:0;text-align:center;text-anchor:middle" /></flowRoot>      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="106.55149"
+         y="122.94197"
+         id="text951"><tspan
+           id="tspan949"
+           x="106.55149"
+           y="122.94197"
+           style="font-size:9.87777805px;fill:#ffffff;stroke-width:0.26458332">ਸੁੰਦਰ</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="105.75772"
+         y="133.10951"
+         id="text955"><tspan
+           id="tspan953"
+           x="105.75772"
+           y="133.10951"
+           style="font-size:9.87777805px;fill:#ffffff;stroke-width:0.26458332">ਗੁਟਕਾ</tspan></text>
+    </g>
+  </g>
+</svg>
