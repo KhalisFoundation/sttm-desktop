@@ -8,7 +8,9 @@ import BaniControllerItem from './BaniControllerItem';
 import { Switch, Overlay } from '../../../../sttm-ui';
 
 import { getBaniControllerItems, generateQrCode } from '../utils';
-import { tryConnection, onEnd } from '../utils/share-sync';
+import { shareSync } from '../utils/share-sync';
+
+const { tryConnection } = shareSync;
 
 const { i18n } = remote.require('./app');
 

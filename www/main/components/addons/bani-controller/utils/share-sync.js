@@ -40,7 +40,7 @@ async function getNewCode(host) {
   return newCode;
 }
 
-module.exports = {
+const shareSync = {
   init() {
     // Inject socket.io script
     if (document.querySelector(`script[src="${SOCKET_SCRIPT_SOURCE}"]`) === null) {
@@ -81,3 +81,5 @@ module.exports = {
     window.namespaceString = null;
   },
 };
+
+export default shareSync;
