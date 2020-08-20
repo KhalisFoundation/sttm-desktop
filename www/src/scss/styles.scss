@@ -351,7 +351,7 @@ a {
   }
 
   #tool-sunder-gutka {
-    background-image: url('../../assets/img/icons/sunder_gutka.png');
+    background-image: url('../../assets/img/icons/sunder_gutka.svg');
   }
 
   #tool-lock-screen {
@@ -400,6 +400,7 @@ a {
 
   .sync-content-wrapper {
     border-radius: 5px;
+    position: relative;
     .sync-content {
       opacity: 1;
     }
@@ -503,6 +504,7 @@ a {
     position: absolute;
     right: -220px;
     text-align: center;
+    top: 0;
     width: 200px;
 
     .qr-desc {
