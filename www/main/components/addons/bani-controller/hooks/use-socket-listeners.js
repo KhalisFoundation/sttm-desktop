@@ -1,17 +1,16 @@
 import { remote } from 'electron';
 import { useEffect } from 'react';
+import { handleRequestControl, loadBani, loadCeremony, loadShabad } from '../utils';
 
 const { analytics } = remote.require('./app');
-
-const { handleRequestControl, loadBani, loadCeremony, loadShabad } = '../utils';
 
 const useSocketListeners = (isListeners, adminPin) => {
   useEffect(() => {
     if (isListeners) {
       if (window.socket !== undefined) {
         window.socket.on('data', data => {
-          console.log(data, 'DATA IN THE WINDOW. LISTENER');
           const isPinCorrect = parseInt(data.pin, 10) === adminPin;
+          console.log(data, 'DATA IN THE WINDOW. LISTENER');
 
           const listenerActions = {
             shabad: payload => {
@@ -33,7 +32,7 @@ const useSocketListeners = (isListeners, adminPin) => {
         });
       }
     }
-  }, [isListeners, adminPin]);
+  }, [isListeners]);
 };
 
 export default useSocketListeners;

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import isOnline from 'is-online';
 
+import useSocketListeners from '../hooks/use-socket-listeners';
 import BaniControllerItem from './BaniControllerItem';
 import { Switch, Overlay } from '../../../../sttm-ui';
 
@@ -19,6 +20,7 @@ const BaniController = ({ onScreenClose }) => {
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  const { isListeners } = useStoreState(state => state.app);
   const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
   const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
@@ -46,6 +48,7 @@ const BaniController = ({ onScreenClose }) => {
         setAdminPin(newAdminPin);
         setCode(newCode);
         setConnection(true);
+        setListeners(true);
       } else {
         showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
       }
@@ -68,17 +71,17 @@ const BaniController = ({ onScreenClose }) => {
       setAdminPin('...');
       // analytics.trackEvent('syncStopped', true);
     } else {
-      setConnection(true);
       await remoteSyncInit();
     }
   };
 
   useEffect(() => {
     if (canvasRef.current) {
-      setListeners(true);
       syncToggle(true);
     }
   }, [canvasRef.current]);
+
+  useSocketListeners(isListeners, adminPin);
 
   const baniControllerItems = getBaniControllerItems({
     code,
