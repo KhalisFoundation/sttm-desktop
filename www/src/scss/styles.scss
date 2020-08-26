@@ -614,14 +614,14 @@ body.show-overlay {
   }
 }
 
-.controller-on #shabad-page .controller-signal {
-  display: block;
-}
+// .controller-on #shabad-page .controller-signal {
+//   display: block;
+// }
 
 #shabad-page {
   .controller-signal {
     bottom: 10px;
-    display: none;
+    display: block;
     height: 20px;
     position: absolute;
     right: 10px;

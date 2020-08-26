@@ -7,10 +7,9 @@ import isOnline from 'is-online';
 import BaniControllerItem from './BaniControllerItem';
 import { Switch, Overlay } from '../../../../sttm-ui';
 
-import { getBaniControllerItems, generateQrCode } from '../utils';
-import { shareSync } from '../utils/share-sync';
+import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
 
-const { tryConnection } = shareSync;
+const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
 
@@ -19,7 +18,6 @@ const BaniController = ({ onScreenClose }) => {
   const canvasRef = useRef(null);
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
-  const [isConnectionsDisabled, setConnectionsDisabled] = useState(false);
   const { adminPin, code, isAdminPinVisible, isConnected } = useStoreState(
     state => state.baniController,
   );
@@ -34,43 +32,52 @@ const BaniController = ({ onScreenClose }) => {
     setAdminPin('...');
   };
 
-  useEffect(() => {
-    const remoteSyncInit = async () => {
-      setFetchingCode(true);
+  const remoteSyncInit = async () => {
+    setFetchingCode(true);
 
-      // 1. check onlineValue
-      const onlineValue = await isOnline();
-      if (onlineValue) {
-        const newCode = await tryConnection();
+    // 1. check onlineValue
+    const onlineValue = await isOnline();
+    if (onlineValue) {
+      const newCode = await tryConnection();
 
-        if (newCode) {
-          const newAdminPin =
-            adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
+      if (newCode) {
+        const newAdminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
 
-          generateQrCode(canvasRef.current, newCode);
-          setAdminPin(newAdminPin);
-          setCode(newCode);
-        } else {
-          showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
-        }
-        // set the newCode as our global code
+        generateQrCode(canvasRef.current, newCode);
+        setAdminPin(newAdminPin);
+        setCode(newCode);
+        setConnection(true);
       } else {
-        showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
+        showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
       }
+      // set the newCode as our global code
+    } else {
+      showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
+    }
 
-      setFetchingCode(false);
-    };
+    setFetchingCode(false);
+  };
 
-    setListeners(true);
+  const syncToggle = async (forceConnect = false) => {
+    if (isConnected && !forceConnect) {
+      setListeners(false);
+      setConnection(false);
+      onEnd(code);
+      setCode('...');
+      setAdminPin('...');
+      // analytics.trackEvent('syncStopped', true);
+    } else {
+      setConnection(true);
+      await remoteSyncInit();
+    }
+  };
 
+  useEffect(() => {
     if (canvasRef.current) {
-      remoteSyncInit();
+      setListeners(true);
+      syncToggle(true);
     }
   }, [canvasRef.current]);
-
-  // useEffect(() => {
-  //   generateQrCode(canvasRef.current, code);
-  // }, [canvasRef, code]);
 
   const baniControllerItems = getBaniControllerItems({ code, adminPin });
 
@@ -102,8 +109,12 @@ const BaniController = ({ onScreenClose }) => {
                     <p>Disable all the remote connections to SikhiToTheMax</p>
                     <Switch
                       controlId="bani-controller"
-                      onToggle={setConnectionsDisabled}
-                      defaultValue={isConnectionsDisabled}
+                      onToggle={() => {
+                        syncToggle();
+                        //           analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
+                        //         },
+                      }}
+                      defaultValue={!isConnected}
                     />
                   </div>
                 </>

@@ -35,7 +35,7 @@ const GlobalState = createStore({
         code,
       };
     }),
-    setAdminPinVisible: action((state, adminPinVisibleState) => {
+    setAdminPinVisiblility: action((state, adminPinVisibleState) => {
       return {
         ...state,
         isAdminPinVisible: adminPinVisibleState,

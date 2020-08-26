@@ -13,6 +13,7 @@ const Launchpad = () => {
   const { overlayScreen, isListeners } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const { adminPin } = useStoreState(state => state.baniController);
+
   useSocketListeners(isListeners, adminPin);
 
   const onScreenClose = React.useCallback(() => {

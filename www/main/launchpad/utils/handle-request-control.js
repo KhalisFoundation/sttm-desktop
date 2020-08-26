@@ -3,13 +3,12 @@ import { remote } from 'electron';
 const analytics = remote.getGlobal('analytics');
 
 const handleRequestControl = isPinCorrect => {
-  document.body.classList.toggle(`controller-on`, isPinCorrect);
+  console.log(isPinCorrect, 'IS PIN CORRECT');
   window.socket.emit('data', {
     host: 'sttm-desktop',
     type: 'response-control',
     success: isPinCorrect,
   });
-
   // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
   if (isPinCorrect) {
     const currentShabad = global.core.search.getCurrentShabadId();

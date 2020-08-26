@@ -1,6 +1,9 @@
 import React from 'react';
+import { useStoreState } from 'easy-peasy';
 
 const Navigator = () => {
+  const { isConnected } = useStoreState(state => state.baniController);
+
   return (
     <>
       <div id="main-ui" className="base-ui">
@@ -86,9 +89,11 @@ const Navigator = () => {
           <section className="block-list">
             <ul id="shabad" className="gurmukhi"></ul>
           </section>
-          <div className="controller-signal" title="Bani Controller currently in use">
-            <img alt="sync" src="assets/img/icons/sync.svg" />
-          </div>
+          {isConnected && (
+            <div className="controller-signal" title="Bani Controller currently in use">
+              <img alt="sync" src="assets/img/icons/sync.svg" />
+            </div>
+          )}
         </div>
         <div className="takeover-page" id="menu-page">
           <div className="navigator-header">
