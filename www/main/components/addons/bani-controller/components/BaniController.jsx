@@ -18,10 +18,9 @@ const BaniController = ({ onScreenClose }) => {
   const canvasRef = useRef(null);
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
-  const { adminPin, code, isAdminPinVisible, isConnected } = useStoreState(
-    state => state.baniController,
-  );
-  const { setAdminPin, setCode, setAdminPinVisibility, setConnection } = useStoreActions(
+  const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
+  const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
   const { setListeners } = useStoreActions(actions => actions.app);
@@ -60,6 +59,8 @@ const BaniController = ({ onScreenClose }) => {
 
   const syncToggle = async (forceConnect = false) => {
     if (isConnected && !forceConnect) {
+      // TODO: Needs to remove this DOM interaction
+      document.body.classList.remove('controller-on');
       setListeners(false);
       setConnection(false);
       onEnd(code);
@@ -79,7 +80,12 @@ const BaniController = ({ onScreenClose }) => {
     }
   }, [canvasRef.current]);
 
-  const baniControllerItems = getBaniControllerItems({ code, adminPin });
+  const baniControllerItems = getBaniControllerItems({
+    code,
+    adminPin,
+    isAdminPinVisible,
+    setAdminPinVisibility,
+  });
 
   return (
     <Overlay onScreenClose={onScreenClose}>

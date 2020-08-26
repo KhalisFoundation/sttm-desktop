@@ -491,8 +491,8 @@ a {
       display: flex;
       width: 100%;
 
-      .connection-switch {
-        padding: 5px 10px;
+      > p {
+        margin-right: 20px;
       }
     }
 
@@ -614,14 +614,14 @@ body.show-overlay {
   }
 }
 
-// .controller-on #shabad-page .controller-signal {
-//   display: block;
-// }
+.controller-on #shabad-page .controller-signal {
+  display: block;
+}
 
 #shabad-page {
   .controller-signal {
     bottom: 10px;
-    display: block;
+    display: none;
     height: 20px;
     position: absolute;
     right: 10px;

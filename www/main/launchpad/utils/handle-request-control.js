@@ -3,7 +3,7 @@ import { remote } from 'electron';
 const analytics = remote.getGlobal('analytics');
 
 const handleRequestControl = isPinCorrect => {
-  console.log(isPinCorrect, 'IS PIN CORRECT');
+  document.body.classList.toggle(`controller-on`, isPinCorrect);
   window.socket.emit('data', {
     host: 'sttm-desktop',
     type: 'response-control',

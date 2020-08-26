@@ -21,7 +21,7 @@ const GlobalState = createStore({
   baniController: {
     adminPin: '...',
     code: '...',
-    isAdminPinVisible: true,
+    // isAdminPinVisible: true,
     isConnected: false,
     setAdminPin: action((state, adminPin) => {
       return {
@@ -35,12 +35,12 @@ const GlobalState = createStore({
         code,
       };
     }),
-    setAdminPinVisiblility: action((state, adminPinVisibleState) => {
-      return {
-        ...state,
-        isAdminPinVisible: adminPinVisibleState,
-      };
-    }),
+    // setAdminPinVisiblility: action((state, adminPinVisibleState) => {
+    //   return {
+    //     ...state,
+    //     isAdminPinVisible: adminPinVisibleState,
+    //   };
+    // }),
     setConnection: action((state, connectionState) => {
       return {
         ...state,

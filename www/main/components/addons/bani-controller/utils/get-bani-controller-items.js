@@ -4,7 +4,13 @@ import { remote } from 'electron';
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const getBaniControllerItems = ({ code, adminPin, toggleAdminPin, toggleLockScreen }) => [
+const getBaniControllerItems = ({
+  code,
+  adminPin,
+  isAdminPinVisible,
+  setAdminPinVisibility,
+  toggleLockScreen,
+}) => [
   {
     title: i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
     description: (
@@ -43,10 +49,10 @@ const getBaniControllerItems = ({ code, adminPin, toggleAdminPin, toggleLockScre
       <div>
         <div className="large-text">
           <span className="admin-pin">
-            {i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: {adminPin}
+            {i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: {isAdminPinVisible ? adminPin : '...'}
           </span>
-          <span className="hide-btn" onClick={toggleAdminPin}>
-            <i className="fa fa-eye" />
+          <span className="hide-btn" onClick={() => setAdminPinVisibility(!isAdminPinVisible)}>
+            <i className={`fa ${isAdminPinVisible ? 'fa-eye' : 'fa-eye-slash'}`} />
           </span>
         </div>
         <button className="button lock-screen-btn" onClick={toggleLockScreen}>
