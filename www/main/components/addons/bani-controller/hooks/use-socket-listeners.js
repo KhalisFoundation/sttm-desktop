@@ -10,7 +10,6 @@ const useSocketListeners = (isListeners, adminPin) => {
       if (window.socket !== undefined) {
         window.socket.on('data', data => {
           const isPinCorrect = parseInt(data.pin, 10) === adminPin;
-          console.log(data, 'DATA IN THE WINDOW. LISTENER');
 
           const listenerActions = {
             shabad: payload => {

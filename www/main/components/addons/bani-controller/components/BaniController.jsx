@@ -46,13 +46,13 @@ const BaniController = ({ onScreenClose }) => {
 
         generateQrCode(canvasRef.current, newCode);
         setAdminPin(newAdminPin);
+        // set the newCode as our global code
         setCode(newCode);
         setConnection(true);
         setListeners(true);
       } else {
         showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
       }
-      // set the newCode as our global code
     } else {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
     }
