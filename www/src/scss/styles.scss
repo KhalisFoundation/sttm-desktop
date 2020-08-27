@@ -106,7 +106,6 @@ a {
 .sundar-gutka-wrapper,
 .ceremonies-wrapper {
   align-items: flex-start;
-  margin-top: 100px;
 
   .bani-list,
   .ceremonies-list {
@@ -116,7 +115,7 @@ a {
     width: 500px;
     word-wrap: break-word;
 
-    .sunder-gutka-bani {
+    .sundar-gutka-bani {
       cursor: pointer;
       padding: 0.3rem 1rem;
     }
@@ -286,6 +285,10 @@ a {
       display: none;
     }
   }
+}
+
+.ceremonies-wrapper {
+  margin-top: 50px;
 }
 
 .beta-label {
@@ -987,19 +990,18 @@ body.show-overlay {
       &:nth-child(1) { @include calculateTop(0,1,$keyboard-height); }
     } */
   }
+}
 
-  #toolbar,
-  #toolbar-nav {
-    padding-top: calc(#{$title-bar-offset} + 10px);
+.sundar-gutka-wrapper {
+  padding-top: calc(#{$title-bar-offset} + 10px);
 
-    .bani-list {
-      height: calc(100vh - calc(#{$presenter-pane-gap * 2} + #{$title-bar-offset}));
-      top: $presenter-pane-gap + $title-bar-offset;
-      width: $bani-list-width;
-    }
+  .bani-list {
+    height: calc(100vh - calc(#{$presenter-pane-gap * 2} + #{$title-bar-offset}));
+    top: $presenter-pane-gap + $title-bar-offset;
+    width: $bani-list-width;
+  }
 
-    .bani-extras {
-      top: $presenter-pane-gap + $title-bar-offset;
-    }
+  .bani-extras {
+    top: $presenter-pane-gap + $title-bar-offset;
   }
 }

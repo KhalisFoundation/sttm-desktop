@@ -9,7 +9,7 @@ const ToolbarItem = ({ itemName }) => {
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const isSelectedOverlay = overlayScreen === itemName;
   const isSyncOverlay = itemName === 'sync-button';
-  console.log(isSyncOverlay, ' IS OVERLAY', itemName);
+
   return (
     <div
       id={`tool-${itemName}`}
