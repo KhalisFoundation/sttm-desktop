@@ -323,6 +323,25 @@ const adminContent = h('div', [
   ),
 ]);
 
+const zoomContent = h('div.zoom-content-wrapper', [
+  h('div.zoom-content', [
+    h('div.zoom-code-label', 'Enter your API code'),
+    h('div.zoom-form', [
+      h('input.zoom-api-input', {
+        type: 'text',
+        placeholder: 'Copy from your zoom meeting',
+      }),
+      h('button.save-btn', ['Save'], {
+        onclick: event => {
+          const apiCode = document.querySelector('.zoom-api-input').value;
+          store.set('userPrefs.app.zoomToken', apiCode);
+        },
+      }),
+    ]),
+    h('button.instructions-btn', ['Instructions']),
+  ]),
+]);
+
 const syncContent = h('div.sync-content-wrapper', [
   h('div.sttm-loader'),
   h('div.sync-content', [
@@ -584,6 +603,7 @@ module.exports = {
 
     document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
+    document.querySelector('.zoom-dialogue').appendChild(zoomContent);
     document.querySelector('.sync-dialogue').appendChild(syncContent);
 
     const syncButton = document.querySelector('#tool-sync-button');

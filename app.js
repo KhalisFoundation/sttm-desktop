@@ -365,7 +365,7 @@ const showLine = async (line, socket = io) => {
       console.log(`Sending-${line.Line.Unicode}\n${english ? line.Line.English : ''}`);
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
-        body: `${line.Line.Unicode}\t${english ? line.Line.English : ''}`,
+        body: `${line.Line.Unicode}\n${english ? line.Line.English : ''}`,
       });
       seq += 1;
     } catch (e) {
