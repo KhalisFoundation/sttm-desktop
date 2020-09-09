@@ -325,20 +325,33 @@ const adminContent = h('div', [
 
 const zoomContent = h('div.zoom-content-wrapper', [
   h('div.zoom-content', [
-    h('div.zoom-code-label', 'Enter your API code'),
+    h('div.zoom-code-label', 'Enter your API code below:'),
     h('div.zoom-form', [
       h('input.zoom-api-input', {
         type: 'text',
-        placeholder: 'Copy from your zoom meeting',
       }),
-      h('button.save-btn', ['Save'], {
+      h('button.button.save-btn', ['Save'], {
         onclick: event => {
           const apiCode = document.querySelector('.zoom-api-input').value;
           store.set('userPrefs.app.zoomToken', apiCode);
         },
       }),
     ]),
-    h('button.instructions-btn', ['Instructions']),
+    h('button.instructions-btn', [
+      h('img.play-icon', {
+        src: 'assets/img/icons/play-button.svg',
+      }),
+      h('span', ['Instructions']),
+    ]),
+    h('div.quick-container', [
+      h('div.quick-title', ['Quick Guide']),
+      h('ol.quick-steps', [
+        h('li', ['Enable Closed Captioning on your Zoom account.']),
+        h('li', ['Start a Zoom meeting, click the Closed Captions button.']),
+        h('li', ['Copy the API token that is provided.']),
+        h('li', ['Paste and save the API token in SikhiToTheMax.']),
+      ]),
+    ]),
   ]),
 ]);
 

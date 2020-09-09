@@ -422,16 +422,72 @@ a {
     }
   }
 
-  .zoom-content {
-    padding: 18px;
+  .zoom-dialogue {
+    max-width: 500px;
+    width: 100%;
 
-    .zoom-code-label {
-      text-align: center;
+    .zoom-logo {
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: baseline;
     }
+  }
 
-    button {
-      padding: 12px;
-      background-color: #eee;
+  .zoom-content-wrapper {
+    border-radius: 5px;
+
+    .zoom-content {
+      padding: 18px;
+      position: relative;
+
+      .zoom-form {
+        padding: 12px;
+        text-align: center;
+
+        input {
+          width: 70%;
+        }
+      }
+
+      .zoom-code-label {
+        text-align: center;
+      }
+
+      button {
+        cursor: pointer;
+        vertical-align: top;
+
+        &.instructions-btn {
+          align-items: center;
+          background-color: #973737;
+          color: white;
+          display: flex;
+          margin: auto;
+          padding: 12px;
+
+          .play-icon {
+            margin-right: 10px;
+            width: 20px;
+          }
+        }
+      }
+
+      .quick-container {
+        height: inherit;
+        line-height: 1.2;
+        right: -300px;
+        text-align: left;
+        top: -30px;
+        width: 300px;
+
+        .quick-title {
+          padding: 5px;
+        }
+
+        li {
+          margin-bottom: 8px;
+        }
+      }
     }
   }
 
@@ -507,7 +563,8 @@ a {
     }
   }
 
-  .qr-container {
+  .qr-container,
+  .quick-container {
     align-items: center;
     color: white;
     display: flex;
@@ -530,7 +587,8 @@ a {
       width: 148px;
     }
 
-    .qr-title {
+    .qr-title,
+    .quick-title {
       font-size: 21px;
       font-weight: bold;
       padding: 20px;
@@ -543,7 +601,7 @@ a {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  justify-content: flex-start;
+  justify-content: flex-end;
   left: 100px;
   position: fixed;
   top: 0;
