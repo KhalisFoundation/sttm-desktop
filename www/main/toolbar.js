@@ -331,7 +331,7 @@ const zoomContent = h('div.zoom-content-wrapper', [
         type: 'text',
       }),
       h('button.button.save-btn', ['Save'], {
-        onclick: event => {
+        onclick: () => {
           const apiCode = document.querySelector('.zoom-api-input').value;
           store.set('userPrefs.app.zoomToken', apiCode);
         },

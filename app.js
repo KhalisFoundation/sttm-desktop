@@ -362,14 +362,14 @@ const showLine = async (line, socket = io) => {
     store.get('userPrefs.slide-layout.language-settings.translation-language');
   if (zoomToken) {
     try {
-      console.log(`Sending-${line.Line.Unicode}\n${english ? line.Line.English : ''}`);
+      // console.log(`Sending-${line.Line.Unicode}\n${english ? line.Line.English : ''}`);
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
         body: `${line.Line.Unicode}\n${english ? line.Line.English : ''}`,
       });
       seq += 1;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       // TODO: zoom recommends retrying 4XX responses.
       log(e);
     }
