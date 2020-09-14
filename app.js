@@ -99,10 +99,6 @@ const secondaryWindows = {
     obj: false,
     url: `file://${__dirname}/www/overlay.html`,
   },
-  zoomCCWindow: {
-    obj: false,
-    url: `file://${__dirname}/www/zoomCC.html`,
-  },
   shortcutLegend: {
     obj: false,
     url: `file://${__dirname}/www/legend.html`,
