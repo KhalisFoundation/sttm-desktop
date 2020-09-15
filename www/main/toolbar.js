@@ -336,7 +336,7 @@ const zoomContent = h('div.zoom-content-wrapper', [
       }),
       h('button.button.save-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.SAVE_BUTTON')], {
         onclick: () => {
-          //sets the zoom api token
+          // sets the zoom api token
           const apiCode = document.querySelector('.zoom-api-input').value;
           if (apiCode) {
             store.set('userPrefs.app.zoomToken', apiCode);
@@ -348,7 +348,7 @@ const zoomContent = h('div.zoom-content-wrapper', [
       }),
       h('button.button.clear-btn.hidden-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.CLEAR_BUTTON')], {
         onclick: () => {
-          //clears the zoom api token
+          // clears the zoom api token
           document.querySelector('.zoom-api-input').value = '';
           store.set('userPrefs.app.zoomToken', '');
           document.querySelector('.save-btn').classList.remove('hidden-btn');
