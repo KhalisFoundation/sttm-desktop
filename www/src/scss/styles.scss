@@ -447,6 +447,14 @@ a {
         input {
           width: 70%;
         }
+
+        .clear-btn {
+          background-color: #7a7a7a;
+        }
+
+        .hidden-btn {
+          display: none;
+        }
       }
 
       .zoom-code-label {
