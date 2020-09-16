@@ -66,8 +66,6 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
-store.set('userPrefs.app.zoomToken', '');
-
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
@@ -115,7 +113,6 @@ function openSecondaryWindow(windowName) {
     openWindow[0].show();
   } else {
     window.obj = new BrowserWindow({
-      minWidth: 800,
       width: 1366,
       height: 768,
       show: false,
@@ -133,7 +130,6 @@ function openSecondaryWindow(windowName) {
       if (window.focus) {
         window.focus();
       }
-      window.obj.webContents.openDevTools();
     });
     window.obj.loadURL(window.url);
 
@@ -356,14 +352,12 @@ const showLine = async (line, socket = io) => {
     store.get('userPrefs.slide-layout.language-settings.translation-language');
   if (zoomToken) {
     try {
-      // console.log(`Sending-${line.Line.Unicode}\n${english ? line.Line.English : ''}`);
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
         body: `${line.Line.Unicode}\n${english ? line.Line.English : ''}\n`,
       });
       seq += 1;
     } catch (e) {
-      // console.log(e);
       // TODO: zoom recommends retrying 4XX responses.
       log(e);
     }
@@ -445,6 +439,7 @@ app.on('ready', () => {
 
   // Reset the global state
   store.set('GlobalState', null);
+  store.set('userPrefs.app.zoomToken', '');
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {

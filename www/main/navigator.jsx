@@ -20,6 +20,7 @@ export const Navigator = () => {
 
         <div className="sync-dialogue-wrapper hidden overlay-ui ui-sync-button">
           <div className="zoom-dialogue hidden overlay-ui ui-sync-button">
+            <img class="zoom-logo" src="assets/img/icons/zoom.svg" />
             <header className="sync-header" data-key="ZOOM_HEADING"></header>
           </div>
 
