@@ -1,6 +1,6 @@
 ## New Updates
 
-### 7.7 - August 25, 2020_
+### 7.7 - _August 25, 2020_
 
 ![](./assets/img/help_images/desktop-nirbaan.jpg)
 

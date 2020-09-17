@@ -65,9 +65,6 @@ if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
 
-// Reset the global state
-store.set('GlobalState', null);
-
 let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
@@ -420,6 +417,9 @@ if (!singleInstanceLock) {
 app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
+
+  // Reset the global state
+  store.set('GlobalState', null);
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {
