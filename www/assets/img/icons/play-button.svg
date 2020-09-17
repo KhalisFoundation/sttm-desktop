@@ -1,9 +1,1 @@
-<?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 426.667 426.667" style="enable-background:new 0 0 426.667 426.667;" xml:space="preserve" width="512" height="512"><g><g>
-	<g>
-		<g>
-			<polygon points="170.667,309.333 298.667,213.333 170.667,117.333    " data-original="#000000" class="active-path" style="fill:#FFFFFF" data-old_color="#000000"/>
-			<path d="M213.333,0C95.467,0,0,95.467,0,213.333s95.467,213.333,213.333,213.333S426.667,331.2,426.667,213.333     S331.2,0,213.333,0z M213.333,384c-94.08,0-170.667-76.587-170.667-170.667S119.253,42.667,213.333,42.667     S384,119.253,384,213.333S307.413,384,213.333,384z" data-original="#000000" class="active-path" style="fill:#FFFFFF" data-old_color="#000000"/>
-		</g>
-	</g>
-</g></g> </svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="enable-background:new 0 0 426.667 426.667" id="Capa_1" width="512" height="512" x="0" y="0" version="1.1" viewBox="0 0 426.667 426.667" xml:space="preserve"><g><g><g><g><polygon points="170.667 309.333 298.667 213.333 170.667 117.333" class="active-path" data-old_color="#000000" data-original="#000000" style="fill:#fff"/><path d="M213.333,0C95.467,0,0,95.467,0,213.333s95.467,213.333,213.333,213.333S426.667,331.2,426.667,213.333 S331.2,0,213.333,0z M213.333,384c-94.08,0-170.667-76.587-170.667-170.667S119.253,42.667,213.333,42.667 S384,119.253,384,213.333S307.413,384,213.333,384z" class="active-path" data-old_color="#000000" data-original="#000000" style="fill:#fff"/></g></g></g></g></svg>
