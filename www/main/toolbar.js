@@ -323,6 +323,57 @@ const adminContent = h('div', [
   ),
 ]);
 
+const zoomContent = h('div.zoom-content-wrapper', [
+  h('div.zoom-content', [
+    h('div.zoom-code-label', i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INPUT_HELPER')),
+    h('div.zoom-form', [
+      h('input.zoom-api-input', {
+        type: 'text',
+        onchange: () => {
+          document.querySelector('.save-btn').classList.remove('hidden-btn');
+          document.querySelector('.clear-btn').classList.add('hidden-btn');
+        },
+      }),
+      h('button.button.save-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.SAVE_BUTTON')], {
+        onclick: () => {
+          // sets the zoom api token
+          const apiCode = document.querySelector('.zoom-api-input').value;
+          if (apiCode) {
+            store.set('userPrefs.app.zoomToken', apiCode);
+
+            document.querySelector('.save-btn').classList.add('hidden-btn');
+            document.querySelector('.clear-btn').classList.remove('hidden-btn');
+          }
+        },
+      }),
+      h('button.button.clear-btn.hidden-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.CLEAR_BUTTON')], {
+        onclick: () => {
+          // clears the zoom api token
+          document.querySelector('.zoom-api-input').value = '';
+          store.set('userPrefs.app.zoomToken', '');
+          document.querySelector('.save-btn').classList.remove('hidden-btn');
+          document.querySelector('.clear-btn').classList.add('hidden-btn');
+        },
+      }),
+    ]),
+    h('button.instructions-btn', [
+      h('img.play-icon', {
+        src: 'assets/img/icons/play-button.svg',
+      }),
+      h('span', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_BUTTON')]),
+    ]),
+    h('div.quick-container', [
+      h('div.quick-title', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_HEADING')]),
+      h('ol.quick-steps', [
+        h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.0')]),
+        h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.1')]),
+        h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.2')]),
+        h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.3')]),
+      ]),
+    ]),
+  ]),
+]);
+
 const syncContent = h('div.sync-content-wrapper', [
   h('div.sttm-loader'),
   h('div.sync-content', [
@@ -584,6 +635,7 @@ module.exports = {
 
     document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
+    document.querySelector('.zoom-dialogue').appendChild(zoomContent);
     document.querySelector('.sync-dialogue').appendChild(syncContent);
 
     const syncButton = document.querySelector('#tool-sync-button');

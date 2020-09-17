@@ -9,6 +9,7 @@ const op = require('openport');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
+const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
@@ -331,7 +332,9 @@ function createBroadcastFiles(arg) {
   }
 }
 
-const showLine = (line, socket = io) => {
+let seq = Math.floor(Math.random() * 100);
+
+const showLine = async (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
@@ -342,6 +345,22 @@ const showLine = (line, socket = io) => {
   const payload = Object.assign(lineWithSettings, overlayPrefs);
   if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
+  }
+  const zoomToken = store.get('userPrefs.app.zoomToken');
+  const english =
+    store.get('userPrefs.slide-layout.fields.display-translation') &&
+    store.get('userPrefs.slide-layout.language-settings.translation-language');
+  if (zoomToken) {
+    try {
+      await fetch(`${zoomToken}&seq=${seq}`, {
+        method: 'POST',
+        body: `${line.Line.Unicode}\n${english ? line.Line.English : ''}\n`,
+      });
+      seq += 1;
+    } catch (e) {
+      // TODO: zoom recommends retrying 4XX responses.
+      log(e);
+    }
   }
 };
 
@@ -420,6 +439,7 @@ app.on('ready', () => {
 
   // Reset the global state
   store.set('GlobalState', null);
+  store.set('userPrefs.app.zoomToken', '');
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {

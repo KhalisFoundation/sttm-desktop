@@ -1,6 +1,7 @@
 {
   "userPrefs": {
     "app": {
+      "zoomToken": "",
       "theme": "light-theme",
       "themebg": "",
       "overlay-cast": false,
