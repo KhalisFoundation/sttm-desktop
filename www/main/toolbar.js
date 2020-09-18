@@ -1,5 +1,5 @@
 const h = require('hyperscript');
-const { remote } = require('electron');
+const { remote, shell } = require('electron');
 const anvaad = require('anvaad-js');
 const isOnline = require('is-online');
 const Noty = require('noty');
@@ -356,12 +356,22 @@ const zoomContent = h('div.zoom-content-wrapper', [
         },
       }),
     ]),
-    h('button.instructions-btn', [
-      h('img.play-icon', {
-        src: 'assets/img/icons/play-button.svg',
-      }),
-      h('span', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_BUTTON')]),
-    ]),
+    h(
+      'button.instructions-btn',
+      [
+        h('img.play-icon', {
+          src: 'assets/img/icons/play-button.svg',
+        }),
+        h('span', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_BUTTON')]),
+      ],
+      {
+        onclick: () => {
+          shell.openExternal(
+            'https://support.khalisfoundation.org/en/support/solutions/articles/63000255302-how-to-use-zoom-overlay-with-sikhitothemax',
+          );
+        },
+      },
+    ),
     h('div.quick-container', [
       h('div.quick-title', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_HEADING')]),
       h('ol.quick-steps', [

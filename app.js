@@ -347,14 +347,11 @@ const showLine = async (line, socket = io) => {
     socket.emit('show-line', payload);
   }
   const zoomToken = store.get('userPrefs.app.zoomToken');
-  const english =
-    store.get('userPrefs.slide-layout.fields.display-translation') &&
-    store.get('userPrefs.slide-layout.language-settings.translation-language');
   if (zoomToken) {
     try {
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
-        body: `${line.Line.Unicode}\n${english ? line.Line.English : ''}\n`,
+        body: `${line.Line.Unicode}\n`,
       });
       seq += 1;
     } catch (e) {
