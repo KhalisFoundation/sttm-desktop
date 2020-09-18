@@ -7,22 +7,36 @@ import { getUserPreferenceForEnglishExp, loadCeremonyGlobal } from '../utils';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
+const { getTheme, getCurrentTheme, applyTheme } = require('../../../../theme_editor');
 
 const CeremonyPane = props => {
   const { token, name, id, onScreenClose } = props;
   const paneId = token;
 
-  // TODO: handle changing theme.
+  // TODO: handle changing theme
   const loadCeremony = () => {
     analytics.trackEvent('ceremony', token);
     loadCeremonyGlobal(id);
     onScreenClose();
   };
 
+  const onThemeClick = theme => {
+    loadCeremony();
+    applyTheme(theme);
+  };
+
   const toggleEnglishExplainations = isEnglishExplainations => {
     store.setUserPref(`gurbani.ceremonies.ceremony-${token}-english`, isEnglishExplainations);
     global.platform.updateSettings();
     loadCeremonyGlobal(id);
+  };
+
+  const themes = {
+    light: getTheme('light-theme'),
+    anandkaraj: getTheme('floral'),
+    anand: getTheme('a-new-day'),
+    akbhogrm: getTheme('khalsa-gold'),
+    current: getCurrentTheme(),
   };
 
   return (
@@ -43,15 +57,33 @@ const CeremonyPane = props => {
           <div className="ceremony-pane-themes">
             <div className="ceremony-theme-header"> {i18n.t('TOOLBAR.CHOOSE_THEME')} </div>
 
-            <Tile onClick={loadCeremony} className="theme-instance" theme="LOW_LIGHT">
+            <Tile
+              onClick={() => {
+                onThemeClick(themes.light);
+              }}
+              className="theme-instance"
+              theme={themes.light}
+            >
               LIGHT
             </Tile>
 
-            <Tile onClick={loadCeremony} className="theme-instance" theme="FLORAL">
-              FLORAL
+            <Tile
+              onClick={() => {
+                onThemeClick(themes[token]);
+              }}
+              className="theme-instance"
+              theme={themes[token]}
+            >
+              {themes[token].name.replace(/_/g, ' ')}
             </Tile>
 
-            <Tile onClick={loadCeremony} className="theme-instance" theme="FLORAL">
+            <Tile
+              onClick={() => {
+                onThemeClick(themes.current);
+              }}
+              className="theme-instance"
+              theme={themes.current}
+            >
               CURRENT THEME
             </Tile>
           </div>

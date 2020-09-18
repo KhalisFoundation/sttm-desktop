@@ -103,13 +103,17 @@ a {
   width: calc(100% - 100px);
 }
 
+.ceremonies-wrapper {
+  flex-direction: column;
+}
+
 .sundar-gutka-wrapper,
 .ceremonies-wrapper {
   align-items: flex-start;
 
   .bani-list,
   .ceremonies-list {
-    height: 300px;
+    height: 100vh;
     margin-right: 20px;
     overflow: hidden;
     width: 500px;
@@ -172,10 +176,6 @@ a {
 
     header {
       padding: 0.3rem 1rem;
-    }
-
-    .ceremonies-header {
-      font-weight: bold;
     }
 
     .ceremony-pane.active {
@@ -289,6 +289,19 @@ a {
 
 .ceremonies-wrapper {
   margin-top: 50px;
+  .ceremonies-header {
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.5;
+    text-transform: capitalize;
+  }
+
+  .ceremony-pane {
+    border-radius: 3px;
+    margin-bottom: 15px;
+  }
 }
 
 .beta-label {

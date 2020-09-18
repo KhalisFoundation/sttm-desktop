@@ -20,8 +20,8 @@ const Ceremonies = ({ onScreenClose }) => {
   return (
     <Overlay onScreenClose={onScreenClose}>
       <div className="ceremonies-wrapper">
+        <header className="ceremonies-header ">Ceremonies</header>
         <div className="ceremonies-list ui-ceremonies">
-          <header className="navigator-header ceremonies-header">ceremonies</header>
           {isLoadingCeremonies && <div className="sttm-loader" />}
           {!isLoadingCeremonies &&
             visibleCeremonies.map(c => (

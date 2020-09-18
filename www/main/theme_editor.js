@@ -114,34 +114,42 @@ const recentSwatchFactory = backgroundPath =>
     ),
   );
 
+const getThemeSwatchStyles = themeInstance => {
+  return {
+    'background-color': themeInstance['background-color'],
+    'background-image': themeInstance['background-image']
+      ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})`
+      : 'none',
+  };
+};
+
+const applyTheme = (themeInstance, isCustom) => {
+  try {
+    document.body.classList.remove(store.getUserPref('app.theme'));
+    store.setUserPref('app.theme', themeInstance.key);
+    if (!isCustom) {
+      store.setUserPref('app.themebg', {
+        type: 'default',
+        url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
+      });
+    }
+    document.body.classList.add(themeInstance.key);
+    global.core.platformMethod('updateSettings');
+    analytics.trackEvent('theme', themeInstance.key);
+    // eslint-disable-next-line no-use-before-define
+    updateCeremonyThemeTiles();
+  } catch (error) {
+    uploadErrorNotification(i18n.t('THEMES.PARSE_ERR', { error }), 5000);
+  }
+};
+
 const swatchFactory = (themeInstance, isCustom, forceLabel = null) =>
   h(
     'li.theme-instance',
     {
-      style: {
-        'background-color': themeInstance['background-color'],
-        'background-image': themeInstance['background-image']
-          ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})`
-          : 'none',
-      },
+      style: getThemeSwatchStyles(themeInstance),
       onclick: () => {
-        try {
-          document.body.classList.remove(store.getUserPref('app.theme'));
-          store.setUserPref('app.theme', themeInstance.key);
-          if (!isCustom) {
-            store.setUserPref('app.themebg', {
-              type: 'default',
-              url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
-            });
-          }
-          document.body.classList.add(themeInstance.key);
-          global.core.platformMethod('updateSettings');
-          analytics.trackEvent('theme', themeInstance.key);
-          // eslint-disable-next-line no-use-before-define
-          updateCeremonyThemeTiles();
-        } catch (error) {
-          uploadErrorNotification(i18n.t('THEMES.PARSE_ERR', { error }), 5000);
-        }
+        applyTheme(themeInstance, isCustom);
       },
     },
     h(
@@ -223,6 +231,9 @@ const updateCeremonyThemeTiles = () => {
   }
 };
 
+const getTheme = themeKey => themes.find(theme => theme.key === themeKey);
+const getCurrentTheme = () => getTheme(store.getUserPref('app.theme'));
+
 const imageInput = themesContainer =>
   h(
     'label.file-input-label',
@@ -275,6 +286,9 @@ const imageInput = themesContainer =>
 module.exports = {
   defaultTheme,
   updateCeremonyThemeTiles,
+  getCurrentTheme,
+  getTheme,
+  applyTheme,
   init() {
     const themeOptions = document.querySelector('#custom-theme-options');
 
