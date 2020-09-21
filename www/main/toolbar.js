@@ -1,5 +1,5 @@
 // const h = require('hyperscript');
-// const { remote } = require('electron');
+// const { remote, shell } = require('electron');
 // const anvaad = require('anvaad-js');
 // const isOnline = require('is-online');
 // const Noty = require('noty');
@@ -131,6 +131,9 @@
 //             host: 'sttm-desktop',
 //             type: 'response-control',
 //             success: isPinCorrect,
+//             settings: {
+//               fontSizes: store.getUserPref('slide-layout.font-sizes'),
+//             },
 //           });
 
 //           // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
@@ -170,6 +173,12 @@
 //         },
 //         bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
 //         ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
+//         settings: payload => {
+//           const { settings } = payload;
+//           if (settings.action === 'changeFontSize') {
+//             global.core.menu.settings.changeFontSize(settings.target, settings.value);
+//           }
+//         },
 //       };
 
 //       // if its an event from web and not from desktop itself
@@ -312,6 +321,67 @@
 //     },
 //     'Lock Screen',
 //   ),
+// ]);
+
+// const zoomContent = h('div.zoom-content-wrapper', [
+//   h('div.zoom-content', [
+//     h('div.zoom-code-label', i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INPUT_HELPER')),
+//     h('div.zoom-form', [
+//       h('input.zoom-api-input', {
+//         type: 'text',
+//         onchange: () => {
+//           document.querySelector('.save-btn').classList.remove('hidden-btn');
+//           document.querySelector('.clear-btn').classList.add('hidden-btn');
+//         },
+//       }),
+//       h('button.button.save-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.SAVE_BUTTON')], {
+//         onclick: () => {
+//           // sets the zoom api token
+//           const apiCode = document.querySelector('.zoom-api-input').value;
+//           if (apiCode) {
+//             store.set('userPrefs.app.zoomToken', apiCode);
+
+//             document.querySelector('.save-btn').classList.add('hidden-btn');
+//             document.querySelector('.clear-btn').classList.remove('hidden-btn');
+//           }
+//         },
+//       }),
+//       h('button.button.clear-btn.hidden-btn', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.CLEAR_BUTTON')], {
+//         onclick: () => {
+//           // clears the zoom api token
+//           document.querySelector('.zoom-api-input').value = '';
+//           store.set('userPrefs.app.zoomToken', '');
+//           document.querySelector('.save-btn').classList.remove('hidden-btn');
+//           document.querySelector('.clear-btn').classList.add('hidden-btn');
+//         },
+//       }),
+//     ]),
+//     h(
+//       'button.instructions-btn',
+//       [
+//         h('img.play-icon', {
+//           src: 'assets/img/icons/play-button.svg',
+//         }),
+//         h('span', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_BUTTON')]),
+//       ],
+//       {
+//         onclick: () => {
+//           shell.openExternal(
+//             'https://support.khalisfoundation.org/en/support/solutions/articles/63000255302-how-to-use-zoom-overlay-with-sikhitothemax',
+//           );
+//         },
+//       },
+//     ),
+//     h('div.quick-container', [
+//       h('div.quick-title', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS_HEADING')]),
+//       h('ol.quick-steps', [
+//         h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.0')]),
+//         h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.1')]),
+//         h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.2')]),
+//         h('li', [i18n.t('TOOLBAR.ZOOM_CC_OVERLAY.INSTRUCTIONS.3')]),
+//       ]),
+//     ]),
+//   ]),
 // ]);
 
 // const syncContent = h('div.sync-content-wrapper', [
@@ -565,7 +635,7 @@
 
 // module.exports = {
 //   init() {
-//     /*document.querySelector('.focus-overlay').addEventListener('click', () => {
+//     document.querySelector('.focus-overlay').addEventListener('click', () => {
 //       toggleOverlayUI(currentToolbarItem, false);
 //     });
 
@@ -575,6 +645,7 @@
 
 //     document.querySelector('#tool-sync-button').appendChild(betaLabel);
 
+//     document.querySelector('.zoom-dialogue').appendChild(zoomContent);
 //     document.querySelector('.sync-dialogue').appendChild(syncContent);
 
 //     const syncButton = document.querySelector('#tool-sync-button');
@@ -594,6 +665,6 @@
 //     $baniList.querySelector('header').appendChild(translitSwitch);
 //     $baniExtras.appendChild(baniGroupFactory('nitnem banis'));
 //     $baniExtras.appendChild(baniGroupFactory('popular banis'));
-//     $toolbar.appendChild(closeOverlayUI);*/
+//     $toolbar.appendChild(closeOverlayUI);
 //   },
 // };

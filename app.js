@@ -9,6 +9,7 @@ const op = require('openport');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
+const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
@@ -64,9 +65,6 @@ const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.t
 if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
-
-// Reset the global state
-store.set('GlobalState', null);
 
 let mainWindow;
 let viewerWindow = false;
@@ -334,7 +332,9 @@ function createBroadcastFiles(arg) {
   }
 }
 
-const showLine = (line, socket = io) => {
+let seq = Math.floor(Math.random() * 100);
+
+const showLine = async (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
@@ -345,6 +345,19 @@ const showLine = (line, socket = io) => {
   const payload = Object.assign(lineWithSettings, overlayPrefs);
   if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
+  }
+  const zoomToken = store.get('userPrefs.app.zoomToken');
+  if (zoomToken) {
+    try {
+      await fetch(`${zoomToken}&seq=${seq}`, {
+        method: 'POST',
+        body: `${line.Line.Unicode}\n`,
+      });
+      seq += 1;
+    } catch (e) {
+      // TODO: zoom recommends retrying 4XX responses.
+      log(e);
+    }
   }
 };
 
@@ -420,6 +433,10 @@ if (!singleInstanceLock) {
 app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
+
+  // Reset the global state
+  store.set('GlobalState', null);
+  store.set('userPrefs.app.zoomToken', '');
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {

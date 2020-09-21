@@ -8,7 +8,10 @@
   "plugins": ["prettier"],
   "rules": {
     "no-mixed-operators": "off",
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "import/prefer-default-export": "off",
+    "no-plusplus": "off",
+    "class-methods-use-this": "off"
   },
   "settings": {
     "import/core-modules": "electron",
