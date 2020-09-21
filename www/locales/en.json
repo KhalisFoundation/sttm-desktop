@@ -130,6 +130,7 @@
     },
     "WINDOW": {
       "BANI_OVERLAY": "Bani Overlay",
+      "ZOOM_CC": "Zoom Closed Captions",
       "CLOSE": "Close",
       "MINIMIZE": "Minimize",
       "SELF": "Window"
@@ -304,6 +305,7 @@
     "INSERT": "Insert",
     "LOCKED_SCREEN": "SikhiToTheMax is being controlled remotely.",
     "MOBILE_DEVICE_SYNC": "Mobile Device Sync",
+    "ZOOM_HEADING": "Overlay",
     "NITNEM_BANIS": "Nitnem Banis",
     "OTHERS": "Others",
     "POPULAR_BANIS": "Popular Banis",
@@ -332,6 +334,19 @@
     "QR_CODE": {
       "DESC": "Scan this code with your phone to quickly connect",
       "ERROR": "There was an error generating QR Code"
+    },
+    "ZOOM_CC_OVERLAY": {
+      "INPUT_HELPER": "Enter your API code below:",
+      "SAVE_BUTTON": "Save",
+      "CLEAR_BUTTON": "Clear",
+      "INSTRUCTIONS_BUTTON": "Instructions",
+      "INSTRUCTIONS_HEADING": "Quick Guide",
+      "INSTRUCTIONS": [
+        "Enable Closed Captioning on your Zoom account.",
+        "Start a Zoom meeting, click the Closed Captions button.",
+        "Copy the API token that is provided.",
+        "Paste and save the API token in SikhiToTheMax."
+      ]
     }
   }
 }
