@@ -36,6 +36,7 @@ Tile.propTypes = {
   className: PropTypes.string,
   content: PropTypes.string,
   theme: PropTypes.object,
+  children: PropTypes.object,
   type: PropTypes.oneOf(['extras']),
 };
 
