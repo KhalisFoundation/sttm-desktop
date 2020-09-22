@@ -11,6 +11,7 @@ import QrCode from './QrCode';
 
 import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
 import ConnectionSwitch from './ConnectionSwitch';
+import ZoomController from './ZoomController';
 
 const { tryConnection, onEnd } = shareSync;
 
@@ -20,7 +21,6 @@ const analytics = remote.getGlobal('analytics');
 const BaniController = ({ onScreenClose }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
-  const syncRef = useRef(null);
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
@@ -105,7 +105,8 @@ const BaniController = ({ onScreenClose }) => {
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className="sync-wrapper overlay-ui ui-sync-button" ref={syncRef}>
+      <div className="sync-wrapper overlay-ui ui-sync-button">
+        <ZoomController />
         <div className="sync overlay-ui ui-sync-button">
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">
             {title}

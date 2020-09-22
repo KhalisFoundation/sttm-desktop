@@ -103,8 +103,14 @@ a {
   width: calc(100% - 100px);
 }
 
-.ceremonies-wrapper {
+.ceremonies-wrapper,
+.sync-wrapper {
   flex-direction: column;
+}
+
+.sync-wrapper {
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
 .sundar-gutka-wrapper,
