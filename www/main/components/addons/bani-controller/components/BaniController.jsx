@@ -17,14 +17,19 @@ const { i18n } = remote.require('./app');
 const BaniController = ({ onScreenClose }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
+  // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  // Store State
   const { isListeners } = useStoreState(state => state.app);
   const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
   const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
+
+  const { overlayScreen } = useStoreState(state => state.app);
+  const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const { setListeners } = useStoreActions(actions => actions.app);
 
   const showSyncError = errorMessage => {
@@ -75,6 +80,13 @@ const BaniController = ({ onScreenClose }) => {
     }
   };
 
+  const toggleLockScreen = () => {
+    console.log('lock screen clicked');
+    if (overlayScreen !== 'lock-screen') {
+      setOverlayScreen('lock-screen');
+    }
+  };
+
   useEffect(() => {
     if (canvasRef.current) {
       syncToggle(true);
@@ -88,6 +100,7 @@ const BaniController = ({ onScreenClose }) => {
     adminPin,
     isAdminPinVisible,
     setAdminPinVisibility,
+    toggleLockScreen,
   });
 
   return (
