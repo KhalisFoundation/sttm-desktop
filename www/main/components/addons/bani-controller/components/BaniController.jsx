@@ -81,7 +81,6 @@ const BaniController = ({ onScreenClose }) => {
   };
 
   const toggleLockScreen = () => {
-    console.log('lock screen clicked');
     if (overlayScreen !== 'lock-screen') {
       setOverlayScreen('lock-screen');
     }
