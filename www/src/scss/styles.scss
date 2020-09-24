@@ -396,7 +396,7 @@ a {
 
   .sync-dialogue {
     margin-bottom: 20px;
-    max-width: 600px;
+    max-width: 500px;
   }
 
   .sync-content-wrapper {
@@ -615,6 +615,11 @@ a {
   position: fixed;
   top: 0;
   width: calc(100% - 100px);
+
+  .sync-dialogue-container {
+    overflow: auto;
+    width: 100%;
+  }
 
   &.hidden {
     display: none;
