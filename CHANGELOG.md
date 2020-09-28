@@ -1,6 +1,6 @@
 ## New Updates
 
-### 8.0 - _September 28, 2020_
+### 8.0.1 - _September 28, 2020_
 
 ![](./assets/img/help_images/desktop-nirbaan.jpg)
 
