@@ -351,7 +351,7 @@ a {
   }
 
   #tool-sunder-gutka {
-    background-image: url('../../assets/img/icons/sunder_gutka.png');
+    background-image: url('../../assets/img/icons/sundar_gutka.png');
   }
 
   #tool-lock-screen {
@@ -388,6 +388,7 @@ a {
 
   .sync-header {
     color: $white;
+    display: inline-block;
     font-size: 24px;
     font-weight: bold;
     padding: 10px 0;
@@ -395,7 +396,7 @@ a {
 
   .sync-dialogue {
     margin-bottom: 20px;
-    max-width: 600px;
+    max-width: 500px;
   }
 
   .sync-content-wrapper {
@@ -418,6 +419,83 @@ a {
       }
       .sttm-loader {
         display: block;
+      }
+    }
+  }
+
+  .zoom-dialogue {
+    max-width: 500px;
+    width: 100%;
+
+    .zoom-logo {
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: baseline;
+    }
+  }
+
+  .zoom-content-wrapper {
+    border-radius: 5px;
+
+    .zoom-content {
+      padding: 18px;
+      position: relative;
+
+      .zoom-form {
+        padding: 12px;
+        text-align: center;
+
+        input {
+          width: 70%;
+        }
+
+        .clear-btn {
+          background-color: #7a7a7a;
+        }
+
+        .hidden-btn {
+          display: none;
+        }
+      }
+
+      .zoom-code-label {
+        text-align: center;
+      }
+
+      button {
+        cursor: pointer;
+        vertical-align: top;
+
+        &.instructions-btn {
+          align-items: center;
+          background-color: #973737;
+          color: white;
+          display: flex;
+          margin: auto;
+          padding: 12px;
+
+          .play-icon {
+            margin-right: 10px;
+            width: 20px;
+          }
+        }
+      }
+
+      .quick-container {
+        height: inherit;
+        line-height: 1.2;
+        right: -300px;
+        text-align: left;
+        top: -30px;
+        width: 300px;
+
+        .quick-title {
+          padding: 5px;
+        }
+
+        li {
+          margin-bottom: 8px;
+        }
       }
     }
   }
@@ -494,7 +572,8 @@ a {
     }
   }
 
-  .qr-container {
+  .qr-container,
+  .quick-container {
     align-items: center;
     color: white;
     display: flex;
@@ -517,7 +596,8 @@ a {
       width: 148px;
     }
 
-    .qr-title {
+    .qr-title,
+    .quick-title {
       font-size: 21px;
       font-weight: bold;
       padding: 20px;
@@ -526,14 +606,20 @@ a {
 }
 
 .sync-dialogue-wrapper {
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
+  flex-direction: column;
   height: 100vh;
-  justify-content: flex-start;
+  justify-content: flex-end;
   left: 100px;
   position: fixed;
   top: 0;
   width: calc(100% - 100px);
+
+  .sync-dialogue-container {
+    overflow: auto;
+    width: 100%;
+  }
 
   &.hidden {
     display: none;

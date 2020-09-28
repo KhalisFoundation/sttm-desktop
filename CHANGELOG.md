@@ -1,17 +1,28 @@
 ## New Updates
 
-### 7.6 - _July 21, 2020_
+### 8.0 - _September 28, 2020_
+
+![](./assets/img/help_images/desktop-nirbaan.jpg)
 
 ### Improved:
 
-- Added QR code for Bani Controller
-- Added Sundar Gutka support for Bani Controller
+- Added Zoom Overlay feature
+- Added new Nirbaan theme
+- Added font size controls in Bani Controller
+- Updated Sundar Gutka icon
 
 </br>
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
+
+### 7.6 - _July 21, 2020_
+
+### Improved:
+
+- Added QR code for Bani Controller
+- Added Sundar Gutka support for Bani Controller
 
 ### 7.5.2 - _June 26, 2020_
 

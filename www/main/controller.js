@@ -552,6 +552,7 @@ module.exports = {
       Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
       Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
     };
+    Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
     return Line;
   },
 
