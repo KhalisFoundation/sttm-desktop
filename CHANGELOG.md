@@ -9,7 +9,6 @@
 - Added Zoom Overlay feature
 - Added new Nirbaan theme
 - Added font size controls in Bani Controller
-- Updated Sundar Gutka icon
 
 </br>
 
