@@ -1,6 +1,6 @@
 ## New Updates
 
-### 8.0.1 - _September 28, 2020_
+### 8.0 - _September 28, 2020_
 
 ![](./assets/img/help_images/desktop-nirbaan.jpg)
 
@@ -9,6 +9,7 @@
 - Added Zoom Overlay feature
 - Added new Nirbaan theme
 - Added font size controls in Bani Controller
+- Updated Sundar Gutka icon
 
 </br>
 
