@@ -578,9 +578,19 @@ module.exports = {
 
   sendText(text, isGurmukhi, isAnnouncement = false) {
     global.webview.send('show-empty-slide');
-    global.webview.send('show-text', { text, isGurmukhi, isAnnouncement });
+    global.webview.send('show-text', {
+      unicode: isGurmukhi ? anvaad.unicode(text) : '',
+      text,
+      isGurmukhi,
+      isAnnouncement,
+    });
     global.platform.ipc.send('show-empty-slide');
-    global.platform.ipc.send('show-text', { text, isGurmukhi, isAnnouncement });
+    global.platform.ipc.send('show-text', {
+      unicode: isGurmukhi ? anvaad.unicode(text) : '',
+      text,
+      isGurmukhi,
+      isAnnouncement,
+    });
   },
   sendScroll(pos) {
     global.platform.ipc.send('send-scroll', { pos });
