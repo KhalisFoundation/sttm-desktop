@@ -67,7 +67,7 @@ const qrCodeGenerator = syncCode => {
 };
 
 const setListeners = () => {
-  if (window.socket !== undefined) {
+  if (window.socket !== undefined && window.socket !== null) {
     const $shabad = document.getElementById('shabad');
     window.socket.on('data', data => {
       const isPinCorrect = parseInt(data.pin, 10) === adminPin;
