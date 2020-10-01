@@ -305,7 +305,7 @@ module.exports = {
 
   applySettings(prefs = false) {
     const newUserPrefs = prefs || store.getAllPrefs();
-    if (window.socket !== undefined) {
+    if (window.socket !== undefined && window.socket !== null) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
         type: 'settings',
