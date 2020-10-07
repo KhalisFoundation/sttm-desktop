@@ -34,8 +34,8 @@ const BaniController = ({ onScreenClose }) => {
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
-    setCode('...');
-    setAdminPin('...');
+    setCode(null);
+    setAdminPin(null);
   };
 
   const remoteSyncInit = async () => {
@@ -47,7 +47,7 @@ const BaniController = ({ onScreenClose }) => {
       const newCode = await tryConnection();
 
       if (newCode) {
-        const newAdminPin = adminPin === '...' ? Math.floor(1000 + Math.random() * 8999) : adminPin;
+        const newAdminPin = Math.floor(1000 + Math.random() * 8999);
 
         generateQrCode(canvasRef.current, newCode);
         setAdminPin(newAdminPin);
@@ -72,8 +72,8 @@ const BaniController = ({ onScreenClose }) => {
       setListeners(false);
       setConnection(false);
       onEnd(code);
-      setCode('...');
-      setAdminPin('...');
+      setCode(null);
+      setAdminPin(null);
       // analytics.trackEvent('syncStopped', true);
     } else {
       await remoteSyncInit();
@@ -117,10 +117,10 @@ const BaniController = ({ onScreenClose }) => {
               ) : (
                 <>
                   <div className="sync-code-label">
-                    {i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')}
+                    {codeLabel || i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')}
                   </div>
 
-                  <div className="sync-code-num"> {code} </div>
+                  <div className="sync-code-num"> {code || '...'} </div>
 
                   {baniControllerItems.map(item => (
                     <BaniControllerItem key={item.title} {...item} />
@@ -145,7 +145,7 @@ const BaniController = ({ onScreenClose }) => {
             {/* QR-container */}
             <div className="qr-container">
               <div className="qr-desc">{i18n.t('TOOLBAR.QR_CODE.DESC')}</div>
-              <canvas ref={canvasRef} className="qr-bani-ctr" />
+              {code && <canvas ref={canvasRef} className="qr-bani-ctr" />}
               <div className="qr-title">{i18n.t('TOOLBAR.BANI_CONTROLLER')}</div>
             </div>
           </div>

@@ -23,7 +23,7 @@ const getBaniControllerItems = ({
       <button
         className="button copy-code-btn"
         onClick={() => {
-          if (code !== '...') {
+          if (code) {
             const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
             global.controller.sendText(syncString);
             analytics.trackEvent('controller', 'codePresented', true);
@@ -49,7 +49,8 @@ const getBaniControllerItems = ({
       <div>
         <div className="large-text">
           <span className="admin-pin">
-            {i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}: {isAdminPinVisible ? adminPin : '...'}
+            {i18n.t('TOOLBAR.SYNC_CONTROLLER.PIN')}:
+            {isAdminPinVisible && adminPin ? adminPin : '...'}
           </span>
           <span className="hide-btn" onClick={() => setAdminPinVisibility(!isAdminPinVisible)}>
             <i className={`fa ${isAdminPinVisible ? 'fa-eye' : 'fa-eye-slash'}`} />
