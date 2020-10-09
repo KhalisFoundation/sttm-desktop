@@ -13,14 +13,17 @@ import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const BaniController = ({ onScreenClose }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
+  const syncRef = useRef(null);
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  const [theFirstRun, setTheFirstRun] = useState(true);
   // Store State
   const { isListeners } = useStoreState(state => state.app);
   const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
@@ -49,10 +52,11 @@ const BaniController = ({ onScreenClose }) => {
       if (newCode) {
         const newAdminPin = Math.floor(1000 + Math.random() * 8999);
 
-        generateQrCode(canvasRef.current, newCode);
-        setAdminPin(newAdminPin);
-        // set the newCode as our global code
         setCode(newCode);
+        setAdminPin(newAdminPin);
+
+        generateQrCode(canvasRef.current, newCode);
+
         setConnection(true);
         setListeners(true);
       } else {
@@ -74,7 +78,7 @@ const BaniController = ({ onScreenClose }) => {
       onEnd(code);
       setCode(null);
       setAdminPin(null);
-      // analytics.trackEvent('syncStopped', true);
+      analytics.trackEvent('syncStopped', true);
     } else {
       await remoteSyncInit();
     }
@@ -87,12 +91,13 @@ const BaniController = ({ onScreenClose }) => {
   };
 
   useEffect(() => {
-    if (canvasRef.current) {
+    if (theFirstRun) {
       syncToggle(true);
+      setTheFirstRun(false);
     }
-  }, [canvasRef.current]);
+  });
 
-  useSocketListeners(isListeners, adminPin);
+  useSocketListeners(isListeners, adminPin); //null
 
   const baniControllerItems = getBaniControllerItems({
     code,
@@ -104,7 +109,7 @@ const BaniController = ({ onScreenClose }) => {
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className="sync-wrapper overlay-ui ui-sync-button">
+      <div className="sync-wrapper overlay-ui ui-sync-button" ref={syncRef}>
         <div className="sync overlay-ui ui-sync-button">
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">
             {title}
@@ -132,8 +137,11 @@ const BaniController = ({ onScreenClose }) => {
                       controlId="bani-controller"
                       onToggle={() => {
                         syncToggle();
-                        //           analytics.trackEvent('controller', 'connection', isConntected ? 'Enabled' : 'Disabled');
-                        //         },
+                        analytics.trackEvent(
+                          'controller',
+                          'connection',
+                          isConnected ? 'Enabled' : 'Disabled',
+                        );
                       }}
                       defaultValue={!isConnected}
                     />
@@ -145,7 +153,7 @@ const BaniController = ({ onScreenClose }) => {
             {/* QR-container */}
             <div className="qr-container">
               <div className="qr-desc">{i18n.t('TOOLBAR.QR_CODE.DESC')}</div>
-              {code && <canvas ref={canvasRef} className="qr-bani-ctr" />}
+              <canvas ref={canvasRef} className="qr-bani-ctr" />
               <div className="qr-title">{i18n.t('TOOLBAR.BANI_CONTROLLER')}</div>
             </div>
           </div>
