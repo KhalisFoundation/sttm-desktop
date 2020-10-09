@@ -5,7 +5,6 @@ const themeEditor = require('./theme_editor');
 // const shareSync = require('./share-sync');
 const settings = require('.//settings');
 const shortcutTray = require('./shortcut_tray');
-const toolbar = require('./toolbar');
 const { applyShortcuts } = require('./keyboard-shortcuts/shortcuts');
 const { updateInsertedSlide } = require('./keyboard-shortcuts/shortcut-functions');
 
@@ -65,9 +64,7 @@ module.exports = {
   copy,
   menu,
   search,
-  // shareSync,
   platformMethod,
-  toolbar,
   themeEditor,
   updateInsertedSlide,
   shortcutTray,
