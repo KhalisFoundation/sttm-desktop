@@ -347,7 +347,7 @@ const showLine = async (line, socket = io) => {
     socket.emit('show-line', payload);
   }
   const zoomToken = store.get('userPrefs.app.zoomToken');
-  if (zoomToken) {
+  if (zoomToken && line.Line.Unicode) {
     try {
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
@@ -576,6 +576,7 @@ ipcMain.on('show-text', (event, arg) => {
     Line: {
       Gurmukhi: arg.isGurmukhi ? arg.text : '',
       English: !arg.isGurmukhi ? arg.text : '',
+      Unicode: arg.unicode,
       Punjabi: '',
       Transliteration: {
         devanagari: '',

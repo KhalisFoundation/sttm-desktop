@@ -1,6 +1,19 @@
 ## New Updates
 
-### 8.0 - _September 17, 2020_
+### 8.0.1 - _October 1, 2020_
+
+### Improved:
+
+- Fixed a bug where shortcut slides weren't appearing in Zoom Overlay
+- Fixed a bug with the settings that would sometimes cause the app to not work correctly
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
+### 8.0 - _September 28, 2020_
 
 ![](./assets/img/help_images/desktop-nirbaan.jpg)
 
@@ -10,12 +23,6 @@
 - Added new Nirbaan theme
 - Added font size controls in Bani Controller
 - Updated Sundar Gutka icon
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 7.6 - _July 21, 2020_
 
