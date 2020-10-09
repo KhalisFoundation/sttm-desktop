@@ -32,8 +32,7 @@ const BaniController = ({ onScreenClose }) => {
   );
 
   const { overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
-  const { setListeners } = useStoreActions(actions => actions.app);
+  const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -143,7 +142,7 @@ const BaniController = ({ onScreenClose }) => {
                           isConnected ? 'Enabled' : 'Disabled',
                         );
                       }}
-                      defaultValue={!isConnected}
+                      value={!isConnected}
                     />
                   </div>
                 </>

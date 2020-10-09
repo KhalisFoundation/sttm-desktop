@@ -50,7 +50,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                   controlId="translit-switch"
                   className="translit-switch"
                   onToggle={setTranslitState}
-                  defaultValue={isTranslit}
+                  value={isTranslit}
                 />
               )}
 

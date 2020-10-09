@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const Switch = ({ title, controlId, className, onToggle, defaultValue = false }) => {
-  const [isSwitched, toggleSwitchedState] = useState(defaultValue);
+const Switch = ({ title, controlId, className, onToggle, value = false }) => {
+  const [isSwitched, setSwitchedState] = useState(value);
+
+  useEffect(() => {
+    setSwitchedState(value);
+  }, [value]);
 
   return (
     <div className={className}>
@@ -14,7 +18,7 @@ const Switch = ({ title, controlId, className, onToggle, defaultValue = false })
           checked={isSwitched}
           onChange={() => {
             const newState = !isSwitched;
-            toggleSwitchedState(newState);
+            setSwitchedState(newState);
             if (onToggle) {
               onToggle(newState);
             }
@@ -30,7 +34,7 @@ Switch.propTypes = {
   title: PropTypes.string,
   controlId: PropTypes.string,
   className: PropTypes.string,
-  defaultValue: PropTypes.bool,
+  value: PropTypes.bool,
   onToggle: PropTypes.func,
 };
 

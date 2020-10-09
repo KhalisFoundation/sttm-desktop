@@ -48,7 +48,7 @@ const CeremonyPane = props => {
         <div className="ceremony-pane-options" id={`cpo-${paneId}`}>
           <Switch
             onToggle={toggleEnglishExplainations}
-            defaultValue={getUserPreferenceForEnglishExp(token)}
+            value={getUserPreferenceForEnglishExp(token)}
             title={i18n.t('TOOLBAR.ENG_EXPLANATIONS')}
             controlId={`${name}-english-exp-toggle`}
             className={`${name}-english-exp-switch`}
