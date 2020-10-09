@@ -6,9 +6,11 @@ import isOnline from 'is-online';
 
 import useSocketListeners from '../hooks/use-socket-listeners';
 import BaniControllerItem from './BaniControllerItem';
-import { Switch, Overlay } from '../../../../sttm-ui';
+import { Overlay } from '../../../../sttm-ui';
+import QrCode from './QrCode';
 
 import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
+import ConnectionSwitch from './ConnectionSwitch';
 
 const { tryConnection, onEnd } = shareSync;
 
@@ -25,14 +27,13 @@ const BaniController = ({ onScreenClose }) => {
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
   const [theFirstRun, setTheFirstRun] = useState(true);
   // Store State
-  const { isListeners } = useStoreState(state => state.app);
+  const { isListeners, overlayScreen } = useStoreState(state => state.app);
+  const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
+
   const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
   const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
-
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -114,7 +115,6 @@ const BaniController = ({ onScreenClose }) => {
             {title}
           </header>
           <div className={`sync-content-wrapper ${isFetchingCode ? 'loading' : ''}`}>
-            {/* Sync-container */}
             <div className="sync-content">
               {isFetchingCode ? (
                 <div className="sttm-loader" />
@@ -130,31 +130,12 @@ const BaniController = ({ onScreenClose }) => {
                     <BaniControllerItem key={item.title} {...item} />
                   ))}
 
-                  <div className="connection-switch-container">
-                    <p>Disable all the remote connections to SikhiToTheMax</p>
-                    <Switch
-                      controlId="bani-controller"
-                      onToggle={() => {
-                        syncToggle();
-                        analytics.trackEvent(
-                          'controller',
-                          'connection',
-                          isConnected ? 'Enabled' : 'Disabled',
-                        );
-                      }}
-                      value={!isConnected}
-                    />
-                  </div>
+                  <ConnectionSwitch isConnected={isConnected} syncToggle={syncToggle} />
                 </>
               )}
             </div>
 
-            {/* QR-container */}
-            <div className="qr-container">
-              <div className="qr-desc">{i18n.t('TOOLBAR.QR_CODE.DESC')}</div>
-              <canvas ref={canvasRef} className="qr-bani-ctr" />
-              <div className="qr-title">{i18n.t('TOOLBAR.BANI_CONTROLLER')}</div>
-            </div>
+            <QrCode canvasRef={canvasRef} />
           </div>
         </div>
       </div>
