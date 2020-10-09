@@ -20,14 +20,13 @@ const Tile = ({ children, className, theme = null, type = 'extras', onClick, con
   };
 
   return (
-    <div
-      role="button"
+    <button
       onClick={onClick}
       className={`ui-tile ${tileClassname}`}
       style={theme ? getThemeSwatchStyles(theme) : null}
     >
       <span>{children || content}</span>
-    </div>
+    </button>
   );
 };
 
