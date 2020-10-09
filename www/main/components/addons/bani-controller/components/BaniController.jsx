@@ -97,7 +97,7 @@ const BaniController = ({ onScreenClose }) => {
     }
   });
 
-  useSocketListeners(isListeners, adminPin); //null
+  useSocketListeners(isListeners, adminPin);
 
   const baniControllerItems = getBaniControllerItems({
     code,
