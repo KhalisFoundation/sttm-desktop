@@ -91,11 +91,8 @@ const BaniController = ({ onScreenClose }) => {
   };
 
   useEffect(() => {
-    if (theFirstRun) {
-      syncToggle(true);
-      setTheFirstRun(false);
-    }
-  });
+    syncToggle(true);
+  }, []);
 
   useSocketListeners(isListeners, adminPin);
 
