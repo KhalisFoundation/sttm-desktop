@@ -6,7 +6,7 @@ import Navigator from '../navigator';
 
 import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
 
-import { DEFAULT_OVERLAY } from '../constants';
+import { DEFAULT_OVERLAY } from '../common/constants';
 
 const Launchpad = () => {
   const { overlayScreen } = useStoreState(state => state.app);

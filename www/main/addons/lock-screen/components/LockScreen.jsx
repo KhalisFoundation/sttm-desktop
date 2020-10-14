@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 
-import { Overlay } from '../../../sttm-ui';
+import { Overlay } from '../../../common/sttm-ui';
 
 const { i18n } = remote.require('./app');
 

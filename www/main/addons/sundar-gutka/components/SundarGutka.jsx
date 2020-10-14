@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 
-import { Switch, Overlay } from '../../../sttm-ui';
+import { Switch, Overlay } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
-import { convertToHyphenCase } from '../../../utils';
-import { nitnemBaniIds, popularBaniIds } from '../../../constants';
+import { convertToHyphenCase } from '../../../common/utils';
+import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 

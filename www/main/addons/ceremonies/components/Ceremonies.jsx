@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import CeremonyPane from './CeremonyPane';
 import useLoadCeremonies from '../hooks/use-load-ceremonies';
-import { Overlay } from '../../../sttm-ui';
-import { visibleCeremoniesIds } from '../../../constants';
+import { Overlay } from '../../../common/sttm-ui';
+import { visibleCeremoniesIds } from '../../../common/constants';
 
 const Ceremonies = ({ onScreenClose }) => {
   const { isLoadingCeremonies, ceremonies } = useLoadCeremonies();

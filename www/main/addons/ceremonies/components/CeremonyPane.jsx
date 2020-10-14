@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 
-import { Switch, Tile } from '../../../sttm-ui';
+import { Switch, Tile } from '../../../common/sttm-ui';
 import { getUserPreferenceForEnglishExp, loadCeremonyGlobal } from '../utils';
 
 const { store, i18n } = remote.require('./app');

@@ -1,9 +1,9 @@
 import React from 'react';
 import { StoreProvider } from 'easy-peasy';
 
-import GlobalState from './store/GlobalState';
+import GlobalState from './common/store/GlobalState';
 import Launchpad from './launchpad';
-import { globalInit } from './constants';
+import { globalInit } from './common/constants';
 
 // Initialize globals
 globalInit.socket();
