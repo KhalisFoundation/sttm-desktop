@@ -25,7 +25,6 @@ const BaniController = ({ onScreenClose }) => {
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
-  const [theFirstRun, setTheFirstRun] = useState(true);
   // Store State
   const { isListeners, overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
