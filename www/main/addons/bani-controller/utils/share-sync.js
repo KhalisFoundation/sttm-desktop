@@ -3,7 +3,7 @@ import request from 'request-promise';
 import { remote } from 'electron';
 import Noty from 'noty';
 
-import { API_ENDPOINT as SYNC_API_URL } from '../../../constants';
+import { API_ENDPOINT as SYNC_API_URL } from '../../../common/constants';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');

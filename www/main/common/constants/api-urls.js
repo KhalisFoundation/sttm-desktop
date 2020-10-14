@@ -1,4 +1,4 @@
-import { version as appVersion } from '../../../package.json';
+import { version as appVersion } from '../../../../package.json';
 
 const useStageAPI = appVersion.includes('alpha') || process.env.NODE_ENV === 'development';
 export const API_ENDPOINT = useStageAPI

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { Tile } from '../../../sttm-ui';
-import { convertToHyphenCase } from '../../../utils';
+import { Tile } from '../../../common/sttm-ui';
+import { convertToHyphenCase } from '../../../common/utils';
 
 const analytics = remote.getGlobal('analytics');
 

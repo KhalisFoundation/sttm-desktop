@@ -6,7 +6,7 @@ import isOnline from 'is-online';
 
 import useSocketListeners from '../hooks/use-socket-listeners';
 import BaniControllerItem from './BaniControllerItem';
-import { Overlay } from '../../../sttm-ui';
+import { Overlay } from '../../../common/sttm-ui';
 import QrCode from './QrCode';
 
 import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
