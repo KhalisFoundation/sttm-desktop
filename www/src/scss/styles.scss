@@ -91,8 +91,7 @@ a {
 }
 
 .sundar-gutka-wrapper,
-.ceremonies-wrapper,
-.sync-wrapper {
+.ceremonies-wrapper {
   align-items: flex-end;
   display: flex;
   height: 100vh;
@@ -103,14 +102,19 @@ a {
   width: calc(100% - 100px);
 }
 
-.ceremonies-wrapper,
-.sync-wrapper {
+.ceremonies-wrapper {
   flex-direction: column;
 }
 
 .sync-wrapper {
-  align-items: flex-start;
-  justify-content: flex-end;
+  bottom: 0;
+  height: 100vh;
+  left: 100px;
+  max-height: 750px;
+  max-width: 850px;
+  overflow: auto;
+  position: fixed;
+  width: calc(100% - 100px);
 }
 
 .sundar-gutka-wrapper,
@@ -451,6 +455,7 @@ a {
   .sync-content-wrapper {
     border-radius: 5px;
     position: relative;
+    width: 500px;
 
     .sync-content {
       opacity: 1;
