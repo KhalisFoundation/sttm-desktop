@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 
-import { Switch, Overlay } from '../../../../sttm-ui';
+import { Switch, Overlay } from '../../../sttm-ui';
 import ExtraBani from './ExtraBani';
-import { convertToHyphenCase } from '../../../../utils';
-import { nitnemBaniIds, popularBaniIds } from '../../../../constants';
+import { convertToHyphenCase } from '../../../utils';
+import { nitnemBaniIds, popularBaniIds } from '../../../constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 
@@ -20,7 +20,8 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;
   const blockListItemClassName = `${hyphenedTitle}-bani`;
-  const taggedBanis = banis.map(b => {
+  const taggedBanis = banis.map(bani => {
+    const b = bani;
     b.baniTag = '';
 
     if (nitnemBaniIds.includes(b.id)) {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Noty from 'noty';
 
-import { loadBanis } from '../../../../banidb';
+import { loadBanis } from '../../../banidb';
 import convertDbProxyToArray from '../../utils/convert-db-proxy-to-array';
 import cache from '../bani-cache';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { Switch } from '../../../../sttm-ui';
+import { Switch } from '../../../sttm-ui';
 
 const analytics = remote.getGlobal('analytics');
 

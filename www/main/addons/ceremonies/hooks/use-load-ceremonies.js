@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Noty from 'noty';
 
-import { loadCeremonies } from '../../../../banidb';
+import { loadCeremonies } from '../../../banidb';
 import convertDbProxyToArray from '../../utils/convert-db-proxy-to-array';
 import cache from '../ceremonies-cache';
 

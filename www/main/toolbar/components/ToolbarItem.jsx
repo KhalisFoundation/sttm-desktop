@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-import { DEFAULT_OVERLAY } from '../../../constants';
+import { DEFAULT_OVERLAY } from '../../constants';
 
 const ToolbarItem = ({ itemName }) => {
   const { overlayScreen } = useStoreState(state => state.app);

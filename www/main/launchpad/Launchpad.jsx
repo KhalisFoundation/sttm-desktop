@@ -1,10 +1,10 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-import Toolbar from '../components/toolbar';
-import Navigator from '../components/navigator';
+import Toolbar from '../toolbar';
+import Navigator from '../navigator';
 
-import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../components/addons';
+import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
 
 import { DEFAULT_OVERLAY } from '../constants';
 

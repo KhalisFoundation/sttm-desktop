@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 
-import { Switch, Tile } from '../../../../sttm-ui';
+import { Switch, Tile } from '../../../sttm-ui';
 import { getUserPreferenceForEnglishExp, loadCeremonyGlobal } from '../utils';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
-const { getTheme, getCurrentTheme, applyTheme } = require('../../../../theme_editor');
+const { getTheme, getCurrentTheme, applyTheme } = require('../../../theme_editor');
 
 const CeremonyPane = props => {
   const { token, name, id, onScreenClose } = props;
