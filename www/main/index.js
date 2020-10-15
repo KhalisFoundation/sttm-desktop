@@ -2,14 +2,10 @@ const copy = require('./copy');
 const search = require('./search');
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
-// const shareSync = require('./share-sync');
 const settings = require('.//settings');
 const shortcutTray = require('./shortcut_tray');
 const { applyShortcuts } = require('./keyboard-shortcuts/shortcuts');
 const { updateInsertedSlide } = require('./keyboard-shortcuts/shortcut-functions');
-
-/* const Settings = require('../../js/settings');
-const settings = new Settings(platform.store); */
 
 // is the current slide of the shabad (= false) or an inserted slide (= true)
 function findLine(e) {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
+import { remote } from 'electron';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
@@ -9,13 +10,15 @@ import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 
+const { i18n } = remote.require('./app');
+
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
 
   const nitnemBanis = [];
   const popularBanis = [];
-  const title = 'Sundar Gutka';
+  const title = i18n.t('TOOLBAR.SUNDAR_GUTKA');
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;

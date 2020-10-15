@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { remote, shell } from 'electron';
 
+import { ZOOM_LINK } from '../../../common/constants';
+
 const { store, i18n } = remote.require('./app');
 
 const ZoomController = () => {
@@ -28,9 +30,7 @@ const ZoomController = () => {
   };
 
   const openBrowser = () => {
-    shell.openExternal(
-      'https://support.khalisfoundation.org/en/support/solutions/articles/63000255302-how-to-use-zoom-overlay-with-sikhitothemax',
-    );
+    shell.openExternal(ZOOM_LINK);
   };
 
   return (

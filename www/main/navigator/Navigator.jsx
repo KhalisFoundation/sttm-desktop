@@ -90,7 +90,7 @@ const Navigator = () => {
             <ul id="shabad" className="gurmukhi"></ul>
           </section>
           {isConnected && (
-            <div className="controller-signal" title="Bani Controller currently in use">
+            <div className="controller-signal" data-i18n="[title]IN_USE">
               <img alt="sync" src="assets/img/icons/sync.svg" />
             </div>
           )}
