@@ -319,6 +319,7 @@
       "2": " from a mobile device to search, navigate, and control the entire app."
     },
     "SYNC_CONTROLLER": {
+      "IN_USE": "Bani controller currently in use",
       "INTERNET_ERR": "Sorry, You seem to be offline. Sync only works when you are connected to the internet.",
       "CODE_ERR": "Sorry, Failed to get a new code for you, please try again later.",
       "PIN": "Pin",
