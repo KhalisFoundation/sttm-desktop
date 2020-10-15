@@ -4,6 +4,7 @@ const SEARCH_TYPES = {
   GURMUKHI_WORD: 2,
   ENGLISH_WORD: 3,
   ANG: 4,
+  MAIN_LETTERS: 6,
 };
 
 const GURMUKHI_SEARCH_TEXTS = {
