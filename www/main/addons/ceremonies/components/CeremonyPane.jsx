@@ -73,7 +73,7 @@ const CeremonyPane = props => {
             <Switch
               onToggle={toggleRm}
               value={getUserPreferenceFor('rm', token)}
-              title={i18n.t('Raagmala')}
+              title={i18n.t('TOOLBAR.RAAGMALA')}
               controlId={`${name}-rm-toggle`}
               className={`${name}-rm-switch`}
             />
