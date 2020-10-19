@@ -2,12 +2,12 @@ import { remote } from 'electron';
 
 const { store } = remote.require('./app');
 
-const getUserPreferenceForEnglishExp = token => {
-  const englishExpVal = store.getUserPref(`gurbani.ceremonies.ceremony-${token}-english`);
-  if (englishExpVal === undefined) {
+const getUserPreferenceFor = (prefFor, token) => {
+  const forVal = store.getUserPref(`gurbani.ceremonies.ceremony-${token}-${prefFor}`);
+  if (forVal === undefined) {
     return true;
   }
-  return englishExpVal;
+  return forVal;
 };
 
-export default getUserPreferenceForEnglishExp;
+export default getUserPreferenceFor;

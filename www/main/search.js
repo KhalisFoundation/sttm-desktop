@@ -828,6 +828,7 @@ module.exports = {
       const flatRows = [].concat(...rows);
       const nameOfCeremony = rowsDb[0].Ceremony.Gurmukhi;
       if (!historyReload) {
+        console.log(ceremonyID, nameOfCeremony);
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
       if (window.socket !== undefined && window.socket !== null) {

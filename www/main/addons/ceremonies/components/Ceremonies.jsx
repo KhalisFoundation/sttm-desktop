@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 import CeremonyPane from './CeremonyPane';
 import useLoadCeremonies from '../hooks/use-load-ceremonies';
 import { Overlay } from '../../../common/sttm-ui';
-import { visibleCeremoniesIds } from '../../../common/constants';
+import { ceremoniesFilter } from '../../../common/constants';
 
 const Ceremonies = ({ onScreenClose }) => {
   const { isLoadingCeremonies, ceremonies } = useLoadCeremonies();
 
   const visibleCeremonies =
     ceremonies.length > 0
-      ? visibleCeremoniesIds.map(cId => {
+      ? ceremoniesFilter.visible.map(cId => {
           const ceremony = ceremonies.find(c => c.id === cId);
           return ceremony;
         })
