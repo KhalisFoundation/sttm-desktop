@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 
 import { Switch, Tile } from '../../../common/sttm-ui';
-import { getUserPreferenceForEnglishExp, loadCeremonyGlobal } from '../utils';
+import { ceremoniesFilter } from '../../../common/constants';
+
+import { getUserPreferenceFor, loadCeremonyGlobal } from '../utils';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -12,11 +14,11 @@ const { getTheme, getCurrentTheme, applyTheme } = require('../../../theme_editor
 const CeremonyPane = props => {
   const { token, name, id, onScreenClose } = props;
   const paneId = token;
+  const [currentCeremony, setCurrentCeremony] = useState(id);
 
-  // TODO: handle changing theme
   const loadCeremony = () => {
     analytics.trackEvent('ceremony', token);
-    loadCeremonyGlobal(id);
+    loadCeremonyGlobal(currentCeremony);
     onScreenClose();
   };
 
@@ -25,10 +27,21 @@ const CeremonyPane = props => {
     applyTheme(theme);
   };
 
-  const toggleEnglishExplainations = isEnglishExplainations => {
-    store.setUserPref(`gurbani.ceremonies.ceremony-${token}-english`, isEnglishExplainations);
+  const toggleOptions = (toggleType, toggleVar) => {
+    store.setUserPref(`gurbani.ceremonies.ceremony-${token}-${toggleType}`, toggleVar);
     global.platform.updateSettings();
-    loadCeremonyGlobal(id);
+    const ceremonyToLoad = toggleType === 'rm' ? ceremoniesFilter.raagmalaMap[id] : id;
+    loadCeremonyGlobal(ceremonyToLoad);
+    // make sure when clicked on theme, the rm version is loaded
+    setCurrentCeremony(ceremonyToLoad);
+  };
+
+  const toggleEnglishExplainations = isEnglishExplainations => {
+    toggleOptions('english', isEnglishExplainations);
+  };
+
+  const toggleRm = isRm => {
+    toggleOptions('rm', isRm);
   };
 
   const themes = {
@@ -46,13 +59,25 @@ const CeremonyPane = props => {
       </header>
       <div className="ceremony-pane-content">
         <div className="ceremony-pane-options" id={`cpo-${paneId}`}>
-          <Switch
-            onToggle={toggleEnglishExplainations}
-            value={getUserPreferenceForEnglishExp(token)}
-            title={i18n.t('TOOLBAR.ENG_EXPLANATIONS')}
-            controlId={`${name}-english-exp-toggle`}
-            className={`${name}-english-exp-switch`}
-          />
+          {ceremoniesFilter.englishToggle.includes(id) && (
+            <Switch
+              onToggle={toggleEnglishExplainations}
+              value={getUserPreferenceFor('english', token)}
+              title={i18n.t('TOOLBAR.ENG_EXPLANATIONS')}
+              controlId={`${name}-english-exp-toggle`}
+              className={`${name}-english-exp-switch`}
+            />
+          )}
+
+          {ceremoniesFilter.raagmalaToggle.includes(id) && (
+            <Switch
+              onToggle={toggleRm}
+              value={getUserPreferenceFor('rm', token)}
+              title={i18n.t('Raagmala')}
+              controlId={`${name}-rm-toggle`}
+              className={`${name}-rm-switch`}
+            />
+          )}
 
           <div className="ceremony-pane-themes">
             <div className="ceremony-theme-header"> {i18n.t('TOOLBAR.CHOOSE_THEME')} </div>
