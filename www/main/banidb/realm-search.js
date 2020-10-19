@@ -131,6 +131,21 @@ const query = (searchQuery, searchType, searchSource) =>
         }
         condition = `${searchCol} = ${dbQuery} AND Source.SourceID = '${angSearchSourceId}'`;
         break;
+      case CONSTS.SEARCH_TYPES.MAIN_LETTERS:
+        searchCol = 'MainLetters';
+
+        saniQuery.split(' ').forEach((word, index) => {
+          condition +=
+            index === 0
+              ? `${searchCol} CONTAINS '${word}'`
+              : ` AND ${searchCol} CONTAINS '${word}'`;
+        });
+
+        if (searchSource !== 'all') {
+          condition += ` AND Source.SourceID = '${searchSource}'`;
+        }
+
+        break;
       default:
         break;
     }
