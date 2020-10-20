@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay } from '../../common/sttm-ui';
-import { SettingsItem } from '../';
+import { SettingsItem } from './SettingsItem';
 
 const settingsJson = require('../../../configs/settings.json');
 
