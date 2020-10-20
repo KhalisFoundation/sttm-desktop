@@ -5,6 +5,7 @@ import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 
 import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
+import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
 
@@ -20,6 +21,7 @@ const Launchpad = () => {
   const isBaniControllerOverlay = overlayScreen === 'sync-button';
   const isCeremoniesOverlay = overlayScreen === 'ceremonies';
   const isLockScreen = overlayScreen === 'lock-screen';
+  const isSettingsOverlay = overlayScreen === 'settings';
 
   return (
     <div className="launchpad">
@@ -28,6 +30,7 @@ const Launchpad = () => {
       {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}
       {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
       {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
+      {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
 
       <Navigator />
     </div>
