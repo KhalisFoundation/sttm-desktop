@@ -30,14 +30,15 @@ const CeremonyPane = props => {
   const toggleOptions = (toggleType, toggleVar) => {
     store.setUserPref(`gurbani.ceremonies.ceremony-${token}-${toggleType}`, toggleVar);
     global.platform.updateSettings();
-    const ceremonyToLoad = toggleType === 'rm' ? ceremoniesFilter.raagmalaMap[id] : id;
+    const ceremonyToLoad =
+      toggleType === 'rm' && !toggleVar ? ceremoniesFilter.raagmalaMap[id] : id;
     loadCeremonyGlobal(ceremonyToLoad);
-    // make sure when clicked on theme, the rm version is loaded
+    // make sure when clicked on theme, the correct version is loaded
     setCurrentCeremony(ceremonyToLoad);
   };
 
-  const toggleEnglishExplainations = isEnglishExplainations => {
-    toggleOptions('english', isEnglishExplainations);
+  const toggleEnglishExplanations = isEnglishExplanations => {
+    toggleOptions('english', isEnglishExplanations);
   };
 
   const toggleRm = isRm => {
@@ -61,7 +62,7 @@ const CeremonyPane = props => {
         <div className="ceremony-pane-options" id={`cpo-${paneId}`}>
           {ceremoniesFilter.englishToggle.includes(id) && (
             <Switch
-              onToggle={toggleEnglishExplainations}
+              onToggle={toggleEnglishExplanations}
               value={getUserPreferenceFor('english', token)}
               title={i18n.t('TOOLBAR.ENG_EXPLANATIONS')}
               controlId={`${name}-english-exp-toggle`}
