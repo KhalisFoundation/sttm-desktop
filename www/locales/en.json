@@ -188,12 +188,19 @@
     "TOOLBAR": "Toolbar",
     "VISHRAAM_OPTIONS": "Vishraam Options",
     "VISHRAAM_SOURCE": "Vishraam Source",
+    "SLIDE_OPTIONS": "Slide Options",
+    "BANI_AND_LANGUAGES": "Bani & Languages",
+    "DELAY": "Delay (Seconds)",
 
     "APP_LAYOUT": {
       "PRESENTER_VIEW": "Presenter View",
-      "SELF": "App Layout"
+      "SELF": "App Layout",
+      "QUICK_TOOLS": "Quick Tools",
+      "SHORTCUT_TRAY": "Shortcut Tray",
+      "LIVE_FEED": "Live Feed Text Files"
     },
     "AUTOPLAY_OPTIONS": {
+      "AUTO_PLAY": "Auto Play",
       "DELAY": "Delay (Seconds)",
       "SELF": "Autoplay Options"
     },
@@ -210,7 +217,6 @@
     },
     "DISPLAY_OPTIONS": {
       "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
-      "AUTO_PLAY": "Auto Play",
       "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
       "LARIVAAR": "Larivaar",
       "LARIVAAR_ASSIST": "Larivaar Assist",
@@ -219,7 +225,8 @@
       "LIVE_FEED": "Live Feed Text Files",
       "QUICK_TOOLS": "Quick Tools",
       "SELF": "Display Options",
-      "SHORTCUT_TRAY": "Shortcut Tray"
+      "SHORTCUT_TRAY": "Shortcut Tray",
+      "SHOW_VISHRAAMS": "Show Vishraams"
     },
     "FIELDS_TO_DISPLAY": {
       "NEXT_LINE": "Next Line",

@@ -1,3 +1,61 @@
+.settings-wrapper {
+  height: 100vh;
+  left: 100px;
+  margin-top: 24px;
+  overflow-y: scroll;
+  position: relative;
+  scroll-behavior: smooth;
+
+  .settings-nav {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    max-width: 500px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    span {
+      flex-grow: 1;
+      padding: 16px;
+      text-align: center;
+    }
+  }
+
+  .settings-container {
+    margin-bottom: 20px;
+    max-width: 500px;
+    padding: 12px;
+
+    .controls-container {
+      h4 {
+        color: #757575;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        padding-top: 0.75em;
+        text-transform: uppercase;
+        word-spacing: 0.2em;
+
+        &:empty {
+          display: none;
+        }
+      }
+
+      .control-item {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+
+        input [type='checkbox'] {
+          left: -9999px;
+          position: absolute;
+        }
+      }
+    }
+  }
+}
+
 #settings,
 #list-of-custom-slides {
   h2 {
@@ -17,7 +75,9 @@
     padding-top: 0.75em;
     word-spacing: 0.2em;
 
-    &:empty { display: none; }
+    &:empty {
+      display: none;
+    }
   }
 
   h2:first-child + section.block-list > header:first-child {
@@ -71,4 +131,3 @@
   font-weight: lighter;
   margin-left: 1.5rem;
 }
-

@@ -2,19 +2,39 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay } from '../../common/sttm-ui';
-import { SettingsItem } from './SettingsItem';
+import SettingsItem from './SettingsItem';
 
-const settingsJson = require('../../../configs/settings.json');
+const { remote } = require('electron');
+const { i18n } = remote.require('./app');
+
+const settingsJson = require('../../../configs/settingsv2.json');
 
 const Settings = ({ onScreenClose }) => {
-  const settingCategories = Object.keys(settingsJson);
-  const items = settingCategories.map((category, index) => {
-    return <SettingsItem key={'settings' + index} settingsObj={settingsJson[category]} />;
+  const settingItems = Object.keys(settingsJson);
+  let settingsNav = [];
+  let items = [];
+
+  settingItems.map((item, index) => {
+    const itemHeading = settingsJson[item]['title'];
+    settingsNav.push(
+      <span
+        key={'settings-item-heading-' + index}
+        onClick={() => {
+          document.getElementById(itemHeading).scrollIntoView();
+        }}
+      >
+        {i18n.t(`SETTINGS.${itemHeading}`)}
+      </span>,
+    );
+    items.push(<SettingsItem key={'settings-item-' + index} settingsObj={settingsJson[item]} />);
   });
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div id="settings-wrapper"> {items} </div>
+      <div className="settings-wrapper">
+        <div className="settings-nav">{settingsNav}</div>
+        {items}
+      </div>
     </Overlay>
   );
 };

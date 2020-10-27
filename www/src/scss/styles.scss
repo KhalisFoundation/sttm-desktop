@@ -392,9 +392,9 @@ a {
   }
 
   #tool-sync-button {
+    background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: auto 75%;
     bottom: 10px;
     position: fixed;
   }
@@ -408,7 +408,11 @@ a {
   }
 
   #tool-settings {
-    background-color: royalblue;
+    background-image: url('../../assets/img/icons/settings.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    bottom: 80px;
+    position: fixed;
   }
 }
 

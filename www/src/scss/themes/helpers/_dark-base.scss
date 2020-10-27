@@ -14,10 +14,6 @@
   $highlight-text: $transparent-blue;
   color: $text-base;
 
-  #tool-sync-button {
-    background-image: url('../../assets/img/icons/sync_button_white.svg');
-  }
-
   a {
     color: $white;
   }
@@ -27,7 +23,8 @@
   .bani-list,
   .ceremony-pane,
   .sync-content-wrapper,
-  .zoom-content-wrapper {
+  .zoom-content-wrapper,
+  .settings-container {
     background-color: $bg-alt;
     .sttm-loader {
       border-color: $bg-bright;
@@ -51,7 +48,8 @@
   }
 
   .navigator-header,
-  .more-tabs .nav-header-tab {
+  .more-tabs .nav-header-tab,
+  .settings-nav {
     background-color: $bg-main;
     color: $text-base;
   }
