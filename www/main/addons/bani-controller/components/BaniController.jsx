@@ -105,7 +105,7 @@ const BaniController = ({ onScreenClose }) => {
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className="sync-wrapper overlay-ui ui-sync-button">
+      <div className="addon-wrapper sync-wrapper overlay-ui ui-sync-button">
         <ZoomController />
         <div className="sync overlay-ui ui-sync-button">
           <header className="sync-header" data-key="MOBILE_DEVICE_SYNC">

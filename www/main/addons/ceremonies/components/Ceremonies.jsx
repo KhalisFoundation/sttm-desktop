@@ -19,7 +19,7 @@ const Ceremonies = ({ onScreenClose }) => {
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className="ceremonies-wrapper">
+      <div className="addon-wrapper ceremonies-wrapper">
         <header className="ceremonies-header ">Ceremonies</header>
         <div className="ceremonies-list ui-ceremonies">
           {isLoadingCeremonies && <div className="sttm-loader" />}
