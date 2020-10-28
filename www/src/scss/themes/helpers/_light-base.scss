@@ -86,6 +86,10 @@
     color: $base-text;
   }
 
+  .control-item:hover {
+    background-color: $statusbar-bg;
+  }
+
   .shortcut-tray {
     background: $alt-bg;
   }

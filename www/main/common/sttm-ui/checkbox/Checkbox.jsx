@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 const Checkbox = ({ id, name, value, label, handler }) => {
   return (
-    <>
+    <span className="custom-checkbox">
       <input id={id} name={name} type="checkbox" value={value} onChange={handler}></input>
-      <label for={id}>{label}</label>
-    </>
+      {label && <label htmlFor={id}>{label}</label>}
+    </span>
   );
 };
 

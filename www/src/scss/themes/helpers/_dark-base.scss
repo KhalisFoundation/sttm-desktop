@@ -54,6 +54,10 @@
     color: $text-base;
   }
 
+  .control-item:hover {
+    background-color: $bg-main;
+  }
+
   .announcement-text {
     border: 1px solid $white;
     color: $white;

@@ -2,6 +2,37 @@ $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
 
 /* Toggle vishraam settings and larivaar settings based on if vishraams/larivaar are visible */
+
+.settings-container {
+  .controls-container {
+    .control-item.vishraam-options,
+    .control-item.vishraam-source {
+      display: none;
+
+      .display-visraams & {
+        display: flex;
+      }
+    }
+
+    .control-item.larivaar-assist,
+    .control-item.assist-type {
+      display: none;
+
+      .larivaar & {
+        display: flex;
+      }
+    }
+
+    .control-item.autoplayTimer-range {
+      display: none;
+
+      .autoplay & {
+        display: flex;
+      }
+    }
+  }
+}
+
 #settings {
   .block-list {
     overflow-y: hidden;

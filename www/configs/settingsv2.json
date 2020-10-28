@@ -16,29 +16,28 @@
             "title": "BANI",
             "max": 20,
             "min": 1,
-            "step": 1,
-            "checkbox": true
+            "step": 1
           },
           "translation": {
             "title": "TRANSLATION",
             "max": 20,
             "min": 1,
             "step": 1,
-            "checkbox": true
+            "checkbox": "display-translation"
           },
           "teeka": {
             "title": "PUNJABI_TEEKA",
             "max": 20,
             "min": 1,
             "step": 1,
-            "checkbox": true
+            "checkbox": "display-teeka"
           },
           "transliteration": {
             "title": "TRANSLITERATION",
             "max": 20,
             "min": 1,
             "step": 1,
-            "checkbox": true
+            "checkbox": "display-transliteration"
           }
         }
       },
@@ -51,13 +50,32 @@
             "label": "AKHAND_PATH_VIEW",
             "subLabel": "CHROMECAST_UNAVAILABLE"
           },
+          "display-next-line": "NEXT_LINE",
           "left-align": "LEFT_ALIGN",
           "larivaar": "LARIVAAR",
           "larivaar-assist": {
             "label": "LARIVAAR_ASSIST",
             "subLabel": "LARIVAAR_ASSIST_MSG"
-          },
-          "SHOW_VISHRAAMS": "SHOW_VISHRAAMS"
+          }
+        }
+      },
+      "larivaar-settings": {
+        "type": "dropdown",
+        "options": {
+          "assist-type": {
+            "title": "ASSIST_TYPE",
+            "options": {
+              "single-color": "SINGLE_COLOR",
+              "multi-color": "MULTI_COLOR"
+            }
+          }
+        }
+      },
+      "vishraam-toggle": {
+        "title": "",
+        "type": "switch",
+        "options": {
+          "show-vishraams": "SHOW_VISHRAAMS"
         }
       },
       "vishraam-settings": {
@@ -77,18 +95,6 @@
               "sttm2": "STTM2",
               "igurbani": "I_GURBANI",
               "sttm": "STTM"
-            }
-          }
-        }
-      },
-      "larivaar-settings": {
-        "type": "dropdown",
-        "options": {
-          "assist-type": {
-            "title": "ASSIST_TYPE",
-            "options": {
-              "single-color": "SINGLE_COLOR",
-              "multi-color": "MULTI_COLOR"
             }
           }
         }

@@ -43,13 +43,46 @@
 
       .control-item {
         align-items: center;
+        border-radius: 4px;
         display: flex;
+        min-height: 40px;
         justify-content: space-between;
         margin: 4px 0;
+        padding: 6px;
+        transition: 0.2s background-color ease;
 
-        input [type='checkbox'] {
-          left: -9999px;
-          position: absolute;
+        .custom-checkbox {
+          input[type='checkbox'] {
+            left: -9999px;
+            position: absolute;
+
+            & + label {
+              align-items: center;
+              display: flex;
+              opacity: 0.6;
+
+              &::before {
+                background-image: url('../../assets/img/icons/invisible.svg');
+                background-position: center left;
+                background-repeat: no-repeat;
+                background-size: 80%;
+                border-radius: 50%;
+                content: '';
+                cursor: pointer;
+                display: inline-block;
+                height: 24px;
+                width: 24px;
+              }
+            }
+
+            &:checked + label {
+              opacity: 1;
+
+              &::before {
+                background-image: url('../../assets/img/icons/visibility.svg');
+              }
+            }
+          }
         }
       }
     }

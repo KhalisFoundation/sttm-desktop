@@ -5,9 +5,12 @@ import { Overlay } from '../../common/sttm-ui';
 import SettingsItem from './SettingsItem';
 
 const { remote } = require('electron');
-const { i18n } = remote.require('./app');
+const { i18n, store } = remote.require('./app');
 
 const settingsJson = require('../../../configs/settingsv2.json');
+
+const userPrefs = store.getAllPrefs();
+const defaultPrefs = store.getDefaults().userPrefs;
 
 const Settings = ({ onScreenClose }) => {
   const settingItems = Object.keys(settingsJson);
@@ -20,7 +23,7 @@ const Settings = ({ onScreenClose }) => {
       <span
         key={'settings-item-heading-' + index}
         onClick={() => {
-          document.getElementById(itemHeading).scrollIntoView();
+          document.getElementById(itemHeading).scrollIntoView({ block: 'center' });
         }}
       >
         {i18n.t(`SETTINGS.${itemHeading}`)}
