@@ -1,27 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { generateSwitchMarkup, generateDropdownMarkup, generateRangeMarkup } from '../utils';
+import { generateMarkup } from '../utils';
 
 const { remote } = require('electron');
 const { i18n } = remote.require('./app');
 
-const SettingsItem = ({ settingsObj }) => {
+const SettingsItem = ({ settingsObj, settingsKey }) => {
   const { title, settings } = settingsObj;
   const controls = Object.keys(settings);
 
   const controlItems = controls.map((control, index) => {
     const { options, title, type } = settings[control];
     const titleKey = title ? `SETTINGS.${title}.` : `SETTINGS.`;
-    let optionItems = [];
 
-    if (type === 'switch') {
-      optionItems = optionItems.concat(generateSwitchMarkup(options, titleKey));
-    } else if (type === 'dropdown') {
-      optionItems = optionItems.concat(generateDropdownMarkup(options, titleKey));
-    } else if (type === 'range') {
-      optionItems = optionItems.concat(generateRangeMarkup(options, titleKey));
-    }
+    const optionItems = generateMarkup(type, options, titleKey, settingsKey, control);
 
     return (
       <div key={`control-${index}`} className={`controls-container control-${type}`}>

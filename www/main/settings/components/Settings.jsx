@@ -5,12 +5,9 @@ import { Overlay } from '../../common/sttm-ui';
 import SettingsItem from './SettingsItem';
 
 const { remote } = require('electron');
-const { i18n, store } = remote.require('./app');
+const { i18n } = remote.require('./app');
 
 const settingsJson = require('../../../configs/settingsv2.json');
-
-const userPrefs = store.getAllPrefs();
-const defaultPrefs = store.getDefaults().userPrefs;
 
 const Settings = ({ onScreenClose }) => {
   const settingItems = Object.keys(settingsJson);
@@ -29,7 +26,13 @@ const Settings = ({ onScreenClose }) => {
         {i18n.t(`SETTINGS.${itemHeading}`)}
       </span>,
     );
-    items.push(<SettingsItem key={'settings-item-' + index} settingsObj={settingsJson[item]} />);
+    items.push(
+      <SettingsItem
+        key={'settings-item-' + index}
+        settingsObj={settingsJson[item]}
+        settingsKey={item}
+      />,
+    );
   });
 
   return (

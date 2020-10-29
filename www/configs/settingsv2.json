@@ -1,8 +1,8 @@
 {
-  "slide-options": {
+  "slide-layout": {
     "title": "SLIDE_OPTIONS",
     "settings": {
-      "annoucement-font-size": {
+      "font-sizes": {
         "title": "FONT_SIZES",
         "type": "range",
         "options": {
@@ -106,7 +106,7 @@
           "autoplay": "AUTO_PLAY"
         }
       },
-      "autoplay-settings": {
+      "autoplay-options": {
         "title": "",
         "type": "range",
         "options": {
@@ -120,7 +120,7 @@
       }
     }
   },
-  "bani": {
+  "toolbar": {
     "title": "BANI_AND_LANGUAGES",
     "settings": {
       "gurbani": {

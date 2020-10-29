@@ -34,6 +34,10 @@
       "vishraam": {
         "vishraam-options": "colored-words",
         "vishraam-source": "sttm"
+      },
+      "language-settings": {
+        "translation-language": "English",
+        "transliteration-language": "English"
       }
     },
     "slide-layout": {
@@ -68,6 +72,16 @@
         "left-align": false,
         "quick-tools": true,
         "shortcut-tray-on": true
+      },
+      "vishraam-toggle": {
+        "show-vishraams": false
+      },
+      "autoplay-toggle": {
+        "autoplay": false
+      },
+      "vishraam-settings": {
+        "vishraam-options": "colored-words",
+        "vishraam-source": "sttm"
       }
     }
   },
