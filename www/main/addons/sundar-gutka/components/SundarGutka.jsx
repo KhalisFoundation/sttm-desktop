@@ -9,6 +9,7 @@ import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
+import loadBani from '../utils/load-bani';
 
 const { i18n } = remote.require('./app');
 
@@ -41,7 +42,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className={`${hyphenedTitle}-wrapper`}>
+      <div className={`addon-wrapper ${hyphenedTitle}-wrapper`}>
         <div className={`bani-list overlay-ui ${overlayClassName}`}>
           {isLoadingBanis ? (
             <div className="sttm-loader" />
@@ -61,7 +62,11 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">
                   {taggedBanis.map(b => (
-                    <li key={b.name} className={blockListItemClassName}>
+                    <li
+                      key={b.name}
+                      className={blockListItemClassName}
+                      onClick={loadBani(b, onScreenClose)}
+                    >
                       <span className={`tag tag-${b.baniTag}`} />
                       <span>{b.name}</span>
                       <span className="translit-bani">{anvaad.translit(b.name)}</span>
