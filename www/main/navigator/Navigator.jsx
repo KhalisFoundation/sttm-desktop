@@ -1,42 +1,11 @@
 import React from 'react';
+import { useStoreState } from 'easy-peasy';
 
-export const Navigator = () => {
+const Navigator = () => {
+  const { isConnected } = useStoreState(state => state.baniController);
+
   return (
-    <React.Fragment>
-      <div className="focus-overlay hidden overlay-ui common-overlay"></div>
-      <div id="toolbar">
-        <div className="bani-list hidden overlay-ui ui-sunder-gutka">
-          <header className="navigator-header">
-            <span data-key="SUNDAR_GUTKA"></span>
-          </header>
-        </div>
-        <div className="bani-extras hidden overlay-ui ui-sunder-gutka"></div>
-
-        <div className="ceremonies-list hidden overlay-ui ui-ceremonies">
-          <header className="navigator-header ceremonies-header">
-            <span data-key="CEREMONIES"></span>
-          </header>
-        </div>
-
-        <div className="sync-dialogue-wrapper hidden overlay-ui ui-sync-button">
-          <div className="sync-dialogue-container">
-            <div className="zoom-dialogue hidden overlay-ui ui-sync-button">
-              <img class="zoom-logo" src="assets/img/icons/zoom.svg" />
-              <header className="sync-header" data-key="ZOOM_HEADING"></header>
-            </div>
-
-            <div className="sync-dialogue hidden overlay-ui ui-sync-button">
-              <header className="sync-header" data-key="MOBILE_DEVICE_SYNC"></header>
-            </div>
-          </div>
-        </div>
-
-        <div className="lock-screen hidden overlay-ui ui-lock-screen">
-          <div className="lock-screen-content">
-            <div className="lock-screen-message" data-key="LOCKED_SCREEN"></div>
-          </div>
-        </div>
-      </div>
+    <>
       <div id="main-ui" className="base-ui">
         <div className="nav-page" id="search-page">
           <div className="navigator-header">
@@ -120,9 +89,11 @@ export const Navigator = () => {
           <section className="block-list">
             <ul id="shabad" className="gurmukhi"></ul>
           </section>
-          <div className="controller-signal" title="Bani Controller currently in use">
-            <img alt="sync" src="assets/img/icons/sync.svg" />
-          </div>
+          {isConnected && (
+            <div className="controller-signal" title="Bani controller in use">
+              <img alt="sync" src="assets/img/icons/sync.svg" />
+            </div>
+          )}
         </div>
         <div className="takeover-page" id="menu-page">
           <div className="navigator-header">
@@ -142,6 +113,8 @@ export const Navigator = () => {
         </div>
       </div>
       <section className="shortcut-tray base-ui"></section>
-    </React.Fragment>
+    </>
   );
 };
+
+export default Navigator;

@@ -76,6 +76,10 @@ ul {
   transition: 0.5s height ease;
 }
 
+.launchpad {
+  height: 100%;
+}
+
 .minimized {
   #main-ui {
     height: calc(100%); //Full-height minus header, search, and footer

@@ -23,8 +23,8 @@
   }
 
   #toolbar,
+  #toolbar-nav,
   .bani-list,
-  .ceremonies-list,
   .ceremony-pane,
   .sync-content-wrapper,
   .zoom-content-wrapper {
@@ -99,7 +99,8 @@
     color: $text-base;
   }
 
-  #toolbar {
+  #toolbar,
+  #toolbar-nav {
     background: $bg-alt;
   }
 

@@ -1,3 +1,5 @@
+$toolbar-width: 75px;
+
 .canvas {
   align-items: center;
   display: flex;
@@ -5,6 +7,16 @@
   justify-content: center;
   margin-left: 120px;
   margin-right: 180px;
+}
+
+.backdrop {
+  z-index: 1200;
+}
+
+.sundar-gutka {
+  left: 100px;
+  max-width: calc(100% - #{$toolbar-width});
+  position: fixed;
 }
 
 .preview {

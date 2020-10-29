@@ -29,9 +29,9 @@ const buttons = `<div class="btn-group" id = "btn-group">
   <button class= "guru" id = "guru3">${i18n.t('INSERT.DHAN_GURU.AMARDAS_SAHIB_JI')}</button>
   <button class= "guru" id = "guru4">${i18n.t('INSERT.DHAN_GURU.RAMDAS_SAHIB_JI')}</button>
   <button class= "guru" id = "guru5">${i18n.t('INSERT.DHAN_GURU.ARJUN_DEV_JI')}</button>
-  <button class= "guru" id = "guru6">${i18n.t('INSERT.DHAN_GURU.HAR_GOBIND_SAHIB_JI')}</button>
-  <button class= "guru" id = "guru7">${i18n.t('INSERT.DHAN_GURU.HAR_RAI_SAHIB_JI')}</button>
-  <button class= "guru" id = "guru8">${i18n.t('INSERT.DHAN_GURU.HAR_KRISHAN_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru6">${i18n.t('INSERT.DHAN_GURU.HARGOBIND_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru7">${i18n.t('INSERT.DHAN_GURU.HARRAI_SAHIB_JI')}</button>
+  <button class= "guru" id = "guru8">${i18n.t('INSERT.DHAN_GURU.HARKRISHAN_SAHIB_JI')}</button>
   <button class= "guru" id = "guru9">${i18n.t('INSERT.DHAN_GURU.TEG_BAHADUR_SAHIB_JI')}</button>
   <button class= "guru" id = "guru10">${i18n.t('INSERT.DHAN_GURU.GOBIND_SINGH_SAHIB_JI')}</button>
   <button class= "guru" id = "guru11">${i18n.t('INSERT.DHAN_GURU.GRANTH_SAHIB_JI')}</button>

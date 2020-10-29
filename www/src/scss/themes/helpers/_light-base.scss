@@ -47,8 +47,8 @@
   }
 
   #toolbar,
+  #toolbar-nav,
   .bani-list,
-  .ceremonies-list,
   .ceremony-pane,
   .sync-content-wrapper,
   .zoom-content-wrapper {
@@ -122,7 +122,8 @@
     color: $base-text;
   }
 
-  #toolbar {
+  #toolbar,
+  #toolbar-nav {
     background-color: $nav-bg;
   }
 
