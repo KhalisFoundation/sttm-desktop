@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 
@@ -15,6 +15,13 @@ const CeremonyPane = props => {
   const { token, name, id, onScreenClose } = props;
   const paneId = token;
   const [currentCeremony, setCurrentCeremony] = useState(id);
+
+  useEffect(() => {
+    if (currentCeremony === 5 && !getUserPreferenceFor('rm', token)) {
+      const ceremonyToLoad = ceremoniesFilter.raagmalaMap[id];
+      setCurrentCeremony(ceremonyToLoad);
+    }
+  }, []);
 
   const loadCeremony = () => {
     analytics.trackEvent('ceremony', token);
@@ -69,7 +76,6 @@ const CeremonyPane = props => {
               className={`${name}-english-exp-switch`}
             />
           )}
-
           {ceremoniesFilter.raagmalaToggle.includes(id) && (
             <Switch
               onToggle={toggleRm}
