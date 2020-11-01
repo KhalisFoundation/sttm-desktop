@@ -73,7 +73,8 @@ let endChangelogOpenTimer;
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
-    url: `file://${__dirname}/www/changelog.html`,
+    name: 'changelog',
+    title: 'Changelog',
     onClose: () => {
       const count = store.get('changelog-seen-count');
       endChangelogOpenTimer = new Date().getTime();
@@ -91,7 +92,8 @@ const secondaryWindows = {
   },
   helpWindow: {
     obj: false,
-    url: `file://${__dirname}/www/help.html`,
+    name: 'help',
+    title: 'STTM Help',
   },
   overlayWindow: {
     obj: false,
@@ -99,7 +101,8 @@ const secondaryWindows = {
   },
   shortcutLegend: {
     obj: false,
-    url: `file://${__dirname}/www/legend.html`,
+    name: 'legend',
+    title: 'STTM Shortcut Legend',
   },
 };
 let manualUpdate = false;
@@ -107,9 +110,9 @@ const viewerWindowPos = {};
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
-  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
+  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getTitle() === window.title);
 
-  if (openWindow.length > 0) {
+  if (openWindow.length) {
     openWindow[0].show();
   } else {
     window.obj = new BrowserWindow({
@@ -131,7 +134,9 @@ function openSecondaryWindow(windowName) {
         window.focus();
       }
     });
-    window.obj.loadURL(window.url);
+    window.obj.loadURL(window.url || `file://${__dirname}/www/secondary_window.html}`);
+    window.obj.webContents.openDevTools();
+    window.obj.webContents.send('window-name', { title: window.title, name: window.name });
 
     window.obj.on('close', () => {
       window.obj = false;

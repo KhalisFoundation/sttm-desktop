@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="assets/css/bundle.css" />
+  </head>
+
+  <body class="noselect">
+    <div class="frame"></div>
+    <script>
+      import { Markdwown } from './js/addons/';
+      const { render } = require('react-dom');
+      const ipcRenderer = require('electron').ipcRenderer;
+
+      ipcRenderer.on('window-name', (_, { title }) => {
+        console.log(title);
+      });
+      render(Markdown(), document.getElementById('frame'));
+    </script>
+  </body>
+</html>
