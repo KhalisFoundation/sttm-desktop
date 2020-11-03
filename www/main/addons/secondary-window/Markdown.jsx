@@ -20,11 +20,11 @@ const readMarkdown = name => {
 function Markdown() {
   const [markdown, setMarkdown] = useState('# Loading...');
   useEffect(() => {
-    ipcRenderer.on('window-name', (_, { title, name, excludeFromMarkdown }) => {
+    ipcRenderer.on('window-name', (_, { title, name }) => {
       document.title = title;
       document.querySelector('.markdown-frame').classList.toggle(name);
 
-      if (!excludeFromMarkdown) setMarkdown(readMarkdown(name));
+      setMarkdown(readMarkdown(name));
     });
   }, []);
   return <ReactMarkdown allowDangerousHtml>{markdown}</ReactMarkdown>;

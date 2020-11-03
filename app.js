@@ -125,13 +125,14 @@ function openSecondaryWindow(windowName) {
       },
     });
     window.obj.loadURL(window.url || `file://${__dirname}/www/secondary_window.html`);
-    window.obj.webContents.on('did-finish-load', () => {
-      window.obj.webContents.send('window-name', {
-        title: window.title,
-        name: window.name,
-        excludeFromMarkdown: !!window.url,
+    if (!window.url) {
+      window.obj.webContents.on('did-finish-load', () => {
+        window.obj.webContents.send('window-name', {
+          title: window.title,
+          name: window.name,
+        });
       });
-    });
+    }
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();
