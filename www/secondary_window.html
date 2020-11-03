@@ -8,14 +8,10 @@
   <body class="noselect">
     <div class="frame"></div>
     <script>
-      import { Markdwown } from './js/addons/';
+      const { Markdown } = require('./js/addons');
       const { render } = require('react-dom');
-      const ipcRenderer = require('electron').ipcRenderer;
 
-      ipcRenderer.on('window-name', (_, { title }) => {
-        console.log(title);
-      });
-      render(Markdown(), document.getElementById('frame'));
+      render(Markdown(), document.querySelector('.frame'));
     </script>
   </body>
 </html>
