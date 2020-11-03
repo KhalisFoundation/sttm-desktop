@@ -125,7 +125,6 @@ function openSecondaryWindow(windowName) {
       },
     });
     window.obj.loadURL(window.url || `file://${__dirname}/www/secondary_window.html`);
-    window.obj.webContents.openDevTools();
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.webContents.send('window-name', {
         title: window.title,
