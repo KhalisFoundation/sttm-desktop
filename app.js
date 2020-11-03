@@ -97,6 +97,7 @@ const secondaryWindows = {
   },
   overlayWindow: {
     obj: false,
+    title: 'Bani Overlay',
     url: `file://${__dirname}/www/overlay.html`,
   },
   shortcutLegend: {
