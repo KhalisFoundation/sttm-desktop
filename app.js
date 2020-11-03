@@ -124,6 +124,15 @@ function openSecondaryWindow(windowName) {
         webviewTag: true,
       },
     });
+    window.obj.loadURL(window.url || `file://${__dirname}/www/secondary_window.html`);
+    window.obj.webContents.openDevTools();
+    window.obj.webContents.on('did-finish-load', () => {
+      window.obj.webContents.send('window-name', {
+        title: window.title,
+        name: window.name,
+        excludeFromMarkdown: !!window.url,
+      });
+    });
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();
@@ -133,11 +142,6 @@ function openSecondaryWindow(windowName) {
       if (window.focus) {
         window.focus();
       }
-    });
-    window.obj.loadURL(window.url || `file://${__dirname}/www/secondary_window.html`);
-    window.obj.webContents.openDevTools();
-    window.obj.webContents.on('did-finish-load', () => {
-      window.obj.webContents.send('window-name', { title: window.title, name: window.name });
     });
 
     window.obj.on('close', () => {

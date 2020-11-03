@@ -70,9 +70,10 @@
       <div id="navigator" class="noselect"></div>
     </div>
     <script>
+      const React = require('react');
       const app = require('./js/app.js').default;
       const { render } = require('react-dom');
-      render(app(), document.getElementById('navigator'));
+      render(React.createElement(app), document.getElementById('navigator'));
     </script>
     <script src="assets/js/vendor/mousetrap.min.js"></script>
     <script src="js/desktop_index.js"></script>

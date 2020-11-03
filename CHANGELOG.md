@@ -7,11 +7,7 @@
 - Added new ceremony for Akhand Paath Sahib Bhog
 - Bug fixes and code enhancements
 
-</br>
-
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 8.0.1 - _October 1, 2020_
 

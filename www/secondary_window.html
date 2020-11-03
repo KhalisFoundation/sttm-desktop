@@ -6,12 +6,13 @@
   </head>
 
   <body class="noselect">
-    <div class="frame"></div>
+    <div id="frame" class="markdown-frame"></div>
     <script>
+      const React = require('react');
       const { Markdown } = require('./js/addons');
-      const { render } = require('react-dom');
+      const ReactDOM = require('react-dom');
 
-      render(Markdown(), document.querySelector('.frame'));
+      ReactDOM.render(React.createElement(Markdown), document.querySelector('#frame'));
     </script>
   </body>
 </html>
