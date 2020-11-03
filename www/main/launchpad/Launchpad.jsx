@@ -3,6 +3,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
+import WorkspaceBar from '../workspace-bar';
 
 import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
 
@@ -22,15 +23,18 @@ const Launchpad = () => {
   const isLockScreen = overlayScreen === 'lock-screen';
 
   return (
-    <div className="launchpad">
-      <Toolbar />
-      {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
-      {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}
-      {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
-      {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
+    <>
+      <WorkspaceBar />
+      <div className="launchpad">
+        <Toolbar />
+        {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
+        {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}
+        {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
+        {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
 
-      <Navigator />
-    </div>
+        <Navigator />
+      </div>
+    </>
   );
 };
 

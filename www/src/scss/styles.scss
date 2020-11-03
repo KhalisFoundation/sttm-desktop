@@ -1,5 +1,6 @@
 $presenter-pane-gap: 25px;
-$title-bar-offset: 32px;
+$title-bar-offset: 10px;
+$ws-offset: 40px;
 $keyboard-height: 128px;
 $toolbar-offset: 75px;
 $toolbar-small-offset: 50px;
@@ -17,14 +18,25 @@ $tag-popular-color: #ce744e;
   }
 
   @if $is-windows == 0 {
-    top: calc(#{$screen-offset}% + #{($presenter-pane-gap * $pane-gap-ratio) + $keyboard-offset});
+    top: calc(
+      #{$screen-offset}% +
+        #{($presenter-pane-gap * $pane-gap-ratio) +
+        $keyboard-offset +
+        $ws-offset}
+    );
   } @else if $is-windows == 1 {
-    top: calc(#{$screen-offset}% + #{$presenter-pane-gap + $title-bar-offset + $keyboard-offset});
+    top: calc(
+      #{$screen-offset}% +
+        #{$presenter-pane-gap +
+        $title-bar-offset +
+        $keyboard-offset +
+        $ws-offset}
+    );
   }
 }
 
 @mixin calculateDimensions() {
-  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5));
+  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$ws-offset/2});
 
   $presenter-panes-container: calc(50% - #{$toolbar-width-offset});
 
@@ -32,7 +44,7 @@ $tag-popular-color: #ce744e;
 }
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
-  'overlay', 'animations', 'noty', 'ui-library';
+  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar';
 
 a {
   cursor: pointer;
@@ -790,7 +802,7 @@ body.show-overlay {
 
 .controller.scale-viewer.presenter-view {
   #navigator {
-    bottom: $presenter-pane-gap;
+    bottom: 5px;
     right: $presenter-pane-gap;
 
     @include calculateDimensions();
@@ -847,7 +859,7 @@ body.show-overlay {
     }
 
     &:nth-child(2) {
-      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$footerOffset});
+      height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$footerOffset + 20px});
       left: auto;
       right: $presenter-pane-gap;
 
@@ -894,7 +906,7 @@ body.show-overlay {
 }
 
 .controller.scale-viewer.presenter-view.shortcut-tray-on .nav-page:nth-child(2) {
-  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset});
+  height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset + 20px});
 }
 
 .scale-viewer {

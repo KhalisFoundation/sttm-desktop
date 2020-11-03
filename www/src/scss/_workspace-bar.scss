@@ -1,0 +1,28 @@
+.workspace-bar {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  font-size: 13px;
+  height: 30px;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+
+  div {
+    cursor: pointer;
+    min-width: 200px;
+    &.active .workspace-name {
+      border-bottom: 1px solid #f00;
+      font-weight: bold;
+    }
+  }
+}
+
+body.win32 {
+  .workspace-bar {
+    height: 50px;
+    padding-top: 25px;
+  }
+}

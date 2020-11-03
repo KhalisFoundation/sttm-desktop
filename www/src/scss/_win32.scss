@@ -1,3 +1,7 @@
+#titlebar {
+  display: none;
+}
+
 body.win32:not(.webview) {
   border: 1px solid #333;
 
@@ -5,6 +9,7 @@ body.win32:not(.webview) {
     -webkit-app-region: drag;
     background-color: #333;
     color: #fff;
+    display: block;
     font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
     height: 32px;
