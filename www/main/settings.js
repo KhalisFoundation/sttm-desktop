@@ -185,8 +185,6 @@ function createSettingsPage(userPrefs) {
         case 'range': {
           const rangeList = h('ul');
           Object.keys(setting.options).forEach(optionKey => {
-            console.log('settings key', catKey, settingKey, optionKey);
-            console.log(userPrefs[catKey][settingKey][optionKey]);
             const option = setting.options[optionKey];
             const optionId = `setting-${catKey}-${settingKey}-${optionKey}`;
             const switchListAttrs = {

@@ -6,12 +6,6 @@
         "title": "FONT_SIZES",
         "type": "range",
         "options": {
-          "announcements": {
-            "title": "ANNOUNCEMENTS",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
           "gurbani": {
             "title": "BANI",
             "max": 20,
@@ -38,6 +32,12 @@
             "min": 1,
             "step": 1,
             "checkbox": "display-transliteration"
+          },
+          "announcements": {
+            "title": "ANNOUNCEMENTS",
+            "max": 20,
+            "min": 1,
+            "step": 1
           }
         }
       },

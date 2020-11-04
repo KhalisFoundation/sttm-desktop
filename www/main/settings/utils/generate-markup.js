@@ -16,14 +16,21 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
     const dropdownOptions = options[name].options;
     const { max, min, step, checkbox } = options[name];
 
-    let savedValue;
+    let savedValue, checkBoxValue;
 
     try {
       savedValue = userPrefs[settingsKey][control][name];
+      if (checkbox) {
+        checkBoxValue = userPrefs[settingsKey]['fields'][checkbox];
+        console.log('checkbox for' + settingsKey + ' ' + checkBoxValue);
+      }
     } catch (e) {
       console.log('for default');
-      console.log(settingsKey, control, name);
+      console.log(settingsKey, control, name, checkbox);
       savedValue = defaultPrefs[settingsKey][control][name];
+      if (checkbox) {
+        checkBoxValue = defaultPrefs[settingsKey]['fields'][checkbox];
+      }
     }
 
     if (type == 'range') {
@@ -38,6 +45,7 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
               id={checkbox}
               name={checkbox}
               value={checkbox}
+              checked={checkBoxValue}
               label={i18n.t(`${titleKey}${controlname}`)}
               handler={() => {
                 console.log('clicked the checkbox');
@@ -46,7 +54,14 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
           ) : (
             <span>{i18n.t(`${titleKey}${controlname}`)}</span>
           )}
-          <input type="range" min={min} max={max} step={step} value={savedValue}></input>
+          <input
+            type="range"
+            data-value={savedValue}
+            min={min}
+            max={max}
+            step={step}
+            value={savedValue}
+          ></input>
         </div>
       );
     } else if (type === 'dropdown') {

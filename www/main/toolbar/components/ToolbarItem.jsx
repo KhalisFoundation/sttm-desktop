@@ -22,7 +22,7 @@ const ToolbarItem = ({ itemName }) => {
         setOverlayScreen(itemName);
       }}
     >
-      {isSyncOverlay && <div className="beta-label">BETA</div>}
+      {isSyncOverlay}
     </div>
   );
 };

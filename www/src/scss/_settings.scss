@@ -51,6 +51,12 @@
         padding: 6px;
         transition: 0.2s background-color ease;
 
+        input[type='range']::before {
+          content: attr(data-value);
+          display: inherit;
+          transform: translateX(-150%);
+        }
+
         .custom-checkbox {
           input[type='checkbox'] {
             left: -9999px;
