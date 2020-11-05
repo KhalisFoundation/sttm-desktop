@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { generateMarkup } from '../utils';
 
 const { remote } = require('electron');
+
 const { i18n } = remote.require('./app');
 
 const SettingsItem = ({ settingsObj, settingsKey }) => {
@@ -33,6 +34,7 @@ const SettingsItem = ({ settingsObj, settingsKey }) => {
 
 SettingsItem.propTypes = {
   settingsObj: PropTypes.object,
+  settingsKey: PropTypes.string,
 };
 
 export default SettingsItem;

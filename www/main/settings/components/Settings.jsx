@@ -5,20 +5,21 @@ import { Overlay } from '../../common/sttm-ui';
 import SettingsItem from './SettingsItem';
 
 const { remote } = require('electron');
+
 const { i18n } = remote.require('./app');
 
 const settingsJson = require('../../../configs/settingsv2.json');
 
 const Settings = ({ onScreenClose }) => {
   const settingItems = Object.keys(settingsJson);
-  let settingsNav = [];
-  let items = [];
+  const settingsNav = [];
+  const items = [];
 
-  settingItems.map((item, index) => {
-    const itemHeading = settingsJson[item]['title'];
+  settingItems.forEach((item, index) => {
+    const itemHeading = settingsJson[item].title;
     settingsNav.push(
       <span
-        key={'settings-item-heading-' + index}
+        key={`settings-item-heading-${index}`}
         onClick={() => {
           document.getElementById(itemHeading).scrollIntoView({ block: 'center' });
         }}
@@ -28,7 +29,7 @@ const Settings = ({ onScreenClose }) => {
     );
     items.push(
       <SettingsItem
-        key={'settings-item-' + index}
+        key={`settings-item-${index}`}
         settingsObj={settingsJson[item]}
         settingsKey={item}
       />,
