@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ipcRenderer } from 'electron';
+import marked from 'marked';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,7 +13,7 @@ const MarkdownFiles = {
 
 const readMarkdown = name => {
   try {
-    return fs.readFileSync(path.resolve(__dirname, MarkdownFiles[name]), 'utf8');
+    return marked(fs.readFileSync(path.resolve(__dirname, MarkdownFiles[name]), 'utf8'));
   } catch (e) {
     return '# Error';
   }
