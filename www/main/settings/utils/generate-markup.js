@@ -15,6 +15,7 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
     let controlname = options[name].title;
     const dropdownOptions = options[name].options;
     const { max, min, step, checkbox } = options[name];
+    let itemsMarkup;
 
     let savedValue;
     let checkBoxValue;
@@ -36,7 +37,7 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
 
     switch (type) {
       case 'range':
-        return (
+        itemsMarkup = (
           <div
             key={`control-item-range-${index}`}
             className={`control-item ${name}-range`}
@@ -66,8 +67,9 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
             ></input>
           </div>
         );
+        break;
       case 'dropdown':
-        return (
+        itemsMarkup = (
           <div
             key={`control-item-dropdown-${index}`}
             className={`control-item ${name}`}
@@ -88,9 +90,10 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
             </select>
           </div>
         );
+        break;
       case 'switch':
         controlname = typeof options[name] === 'object' ? options[name].label : options[name];
-        return (
+        itemsMarkup = (
           <Switch
             key={`control-item-switch-${index}`}
             title={i18n.t(`${titleKey}${controlname}`)}
@@ -102,7 +105,11 @@ const generateMarkup = (type, options, titleKey, settingsKey, control) => {
             }}
           />
         );
+        break;
+      default:
+        itemsMarkup = <p>No support yet</p>;
     }
+    return itemsMarkup;
   });
   return items;
 };
