@@ -1,117 +1,72 @@
 import React from 'react';
 
-import Checkbox from '../../common/sttm-ui/checkbox';
+// import Checkbox from '../../common/sttm-ui/checkbox';
 import Switch from '../../common/sttm-ui/switch';
 
 const { remote } = require('electron');
 
 const { store, i18n } = remote.require('./app');
 
-const userPrefs = store.getAllPrefs();
-const defaultPrefs = store.getDefaults().userPrefs;
+// const userPrefs = store.getAllPrefs();
+// const defaultPrefs = store.getDefaults().userPrefs;
 
-const generateMarkup = (type, options, titleKey, settingsKey, control) => {
-  const items = Object.keys(options).map((name, index) => {
-    let controlname = options[name].title;
-    const dropdownOptions = options[name].options;
-    const { max, min, step, checkbox } = options[name];
-    let itemsMarkup;
+const generateMarkup = (type, controlObj) => {
+  let itemsMarkup;
 
-    let savedValue;
-    let checkBoxValue;
+  const { title, initialValue } = controlObj;
 
-    try {
-      savedValue = userPrefs[settingsKey][control][name];
-      if (checkbox) {
-        checkBoxValue = userPrefs[settingsKey].fields[checkbox];
-        console.log('checkbox for', settingsKey, checkBoxValue);
-      }
-    } catch (e) {
-      console.log('for default');
-      console.log(settingsKey, control, name, checkbox);
-      savedValue = defaultPrefs[settingsKey][control][name];
-      if (checkbox) {
-        checkBoxValue = defaultPrefs[settingsKey].fields[checkbox];
-      }
-    }
-
-    switch (type) {
-      case 'range':
-        itemsMarkup = (
-          <div
-            key={`control-item-range-${index}`}
-            className={`control-item ${name}-range`}
-            id={`${name}-range-id`}
-          >
-            {checkbox ? (
-              <Checkbox
-                id={checkbox}
-                name={checkbox}
-                value={checkbox}
-                checked={checkBoxValue}
-                label={i18n.t(`${titleKey}${controlname}`)}
-                handler={() => {
-                  console.log('clicked the checkbox');
-                }}
-              />
-            ) : (
-              <span>{i18n.t(`${titleKey}${controlname}`)}</span>
-            )}
-            <input
-              type="range"
-              data-value={savedValue}
-              min={min}
-              max={max}
-              step={step}
-              value={savedValue}
-            ></input>
-          </div>
-        );
-        break;
-      case 'dropdown':
-        itemsMarkup = (
-          <div
-            key={`control-item-dropdown-${index}`}
-            className={`control-item ${name}`}
-            id={`${name}-switch`}
-          >
-            <span>{i18n.t(`${titleKey}${controlname}`)}</span>
-            <select
-              value={savedValue}
-              onChange={() => {
-                console.log('changed the dropdown');
-              }}
-            >
-              {Object.keys(dropdownOptions).map((op, opIndex) => (
-                <option key={`control-dropdown-options-${opIndex}`}>
-                  {i18n.t(`${titleKey}${dropdownOptions[op]}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-        );
-        break;
-      case 'switch':
-        controlname = typeof options[name] === 'object' ? options[name].label : options[name];
-        itemsMarkup = (
-          <Switch
-            key={`control-item-switch-${index}`}
-            title={i18n.t(`${titleKey}${controlname}`)}
-            controlId={`${name}-switch`}
-            className={`control-item ${name}`}
-            value={savedValue}
-            onToggle={() => {
-              console.log('switched the switch');
+  switch (type) {
+    case 'range':
+      itemsMarkup = (
+        <div
+          key={`control-item-range-${title}`}
+          className={`control-item ${title}-range`}
+          id={`${title}-range-id`}
+        >
+          <span>{title}</span>
+          <input type="range" data-value={initialValue} value={initialValue}></input>
+        </div>
+      );
+      break;
+    case 'dropdown':
+      itemsMarkup = (
+        <div
+          key={`control-item-dropdown-${title}`}
+          className={`control-item ${title}`}
+          id={`${title}-switch`}
+        >
+          <span>{title}</span>
+          <select
+            value={initialValue}
+            onChange={() => {
+              console.log('changed the dropdown');
             }}
-          />
-        );
-        break;
-      default:
-        itemsMarkup = <p>No support yet</p>;
-    }
-    return itemsMarkup;
-  });
-  return items;
+          >
+            {Object.keys(controlObj.options).map((op, opIndex) => (
+              <option key={`control-dropdown-options-${opIndex}`}>{controlObj.options[op]}</option>
+            ))}
+          </select>
+        </div>
+      );
+      break;
+    case 'switch':
+      itemsMarkup = (
+        <Switch
+          key={`control-item-switch-${title}`}
+          title={title}
+          controlId={`${title}-switch`}
+          className={`control-item ${title}`}
+          value={false}
+          onToggle={() => {
+            console.log('switched the switch');
+          }}
+        />
+      );
+      break;
+    default:
+      itemsMarkup = <p>No support yet</p>;
+  }
+  return itemsMarkup;
 };
 
 export default generateMarkup;

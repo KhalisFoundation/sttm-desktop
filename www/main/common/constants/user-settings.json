@@ -15,7 +15,6 @@
         "larivaar",
         "larivaar-assist",
         "larivaar-assist-type",
-        "vishraam",
         "display-vishraams",
         "vishraam-type",
         "vishraam-source"
@@ -27,12 +26,18 @@
       "max": 20,
       "min": 1,
       "step": 1,
-      "settings": ["gurbani", "translation", "transliteration", "teeka", "announcements"]
+      "settings": [
+        "gurbani-font-size",
+        "translation-font-size",
+        "transliteration-font-size",
+        "teeka-font-size",
+        "announcements-font-size"
+      ]
     },
     "visibility": {
       "title": "VISIBILITY",
       "type": "checkbox",
-      "settings": ["translation", "transliteration", "teeka"]
+      "settings": ["translation-visibility", "transliteration-visibility", "teeka-visibility"]
     },
     "autoplay-options": {
       "title": "AUTOPLAY_OPTIONS",
@@ -52,63 +57,63 @@
     "language": {
       "title": "LANGUAGE_SETTINGS",
       "type": "dropdown",
-      "settings": ["translation-language", "teeka-language"]
+      "settings": ["translation-language", "transliteration-language"]
     }
   },
   "settings": {
     "gurbani-font-size": {
       "title": "BANI",
-      "default": 9
+      "initialValue": 9
     },
     "translation-font-size": {
       "title": "TRANSLATION",
-      "default": 5
+      "initialValue": 5
     },
     "teeka-font-size": {
       "title": "TRANSLATION",
-      "default": 4
+      "initialValue": 4
     },
     "transliteration-font-size": {
       "title": "TRANSLITERATION",
-      "default": 4
+      "initialValue": 4
     },
     "announcements-font-size": {
       "title": "TRANSLITERATION",
-      "default": 7
+      "initialValue": 7
     },
     "translation-visibiliity": {
       "title": "TRANSLATION",
-      "default": true
+      "initialValue": true
     },
     "teeka-visibiliity": {
       "title": "TRANSLATION",
-      "default": true
+      "initialValue": true
     },
     "transliteration-visibiliity": {
       "title": "TRANSLITERATION",
-      "default": true
+      "initialValue": true
     },
     "akhandpatt": {
       "title": "AKHAND_PATH_VIEW",
       "notes": "CHROMECAST_UNAVAILABLE",
-      "default": false
+      "initialValue": false
     },
     "display-next-line": {
       "title": "NEXT_LINE",
-      "default": false
+      "initialValue": false
     },
     "left-align": {
       "title": "LEFT_ALIGN",
-      "default": false
+      "initialValue": false
     },
     "larivaar": {
       "title": "LARIVAAR",
-      "default": false
+      "initialValue": false
     },
     "larivaar-assist": {
       "title": "LARIVAAR_ASSIST",
       "notes": "LARIVAAR_ASSIST_MSG",
-      "default": false
+      "initialValue": false
     },
     "larivaar-assist-type": {
       "title": "ASSIST_TYPE",
@@ -117,16 +122,16 @@
         "single-color": "SINGLE_COLOR",
         "multi-color": "MULTI_COLOR"
       },
-      "default": "single-color"
+      "initialValue": "single-color"
     },
     "display-vishraams": {
       "title": "SHOW_VISHRAAMS",
-      "default": false
+      "initialValue": false
     },
     "vishraam-type": {
       "title": "VISHRAAM_OPTIONS",
       "type": "dropdown",
-      "default": "colored-words",
+      "initialValue": "colored-words",
       "options": {
         "colored-words": "COLORED_WORDS",
         "gradient-bg": "GRADIENT_BG"
@@ -139,11 +144,11 @@
         "igurbani": "I_GURBANI",
         "sttm": "STTM"
       },
-      "default": "sttm-2"
+      "initialValue": "sttm-2"
     },
     "autoplay-toggle": {
       "title": "AUTO_PLAY",
-      "default": false
+      "initialValue": false
     },
     "autoplay-delay": {
       "title": "DELAY",
@@ -151,7 +156,7 @@
       "max": 20,
       "min": 1,
       "step": 1,
-      "default": 10
+      "initialValue": 10
     },
     "bani-length": {
       "title": "BANI_LENGTH",
@@ -162,7 +167,7 @@
         "long": "LONG",
         "extralong": "EXTRA_LONG"
       },
-      "default": "short"
+      "initialValue": "short"
     },
     "mangal-position": {
       "title": "MANGAL_POSITION",
@@ -171,7 +176,7 @@
         "current": "CURRENT",
         "above": "ABOVE"
       },
-      "default": "current"
+      "initialValue": "current"
     },
     "translation-language": {
       "title": "TRANSLATION_LANGUAGE",
@@ -180,7 +185,7 @@
         "English": "ENGLISH",
         "Spanish": "SPANISH"
       },
-      "default": "English"
+      "initialValue": "English"
     },
     "transliteration-language": {
       "title": "TRANSLITERATION_LANGUAGE",
@@ -189,7 +194,7 @@
         "English": "ENGLISH",
         "Devanagri": "DEVANAGARI"
       },
-      "default": "English"
+      "initialValue": "English"
     }
   }
 }
