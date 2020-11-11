@@ -36,6 +36,11 @@
     "GREEN_SCREEN": "Green Screen"
   },
 
+  "WORKSPACES": {
+    "PRESENTER": "Presentation",
+    "SINGLE_DISPLAY": "Single Display"
+  },
+
   "CHROMECAST": {
     "CANCEL": "Cancel",
     "MSG_SENT": "Message sent: ",

@@ -59,6 +59,13 @@
     }
   }
 
+  .workspace-bar {
+    background-color: $dialog-bg;
+    div:hover {
+      background-color: $nav-bg;
+    }
+  }
+
   .viewer-controls {
     background-color: $nav-bg;
   }

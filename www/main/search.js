@@ -265,30 +265,6 @@ document.querySelectorAll('.nav-header-tab').forEach(element => {
     module.exports.activateNavLink(clickedTabId, true);
   });
 });
-
-const presenterSwitch = h('li', [
-  h('span', i18n.t('SETTINGS.APP_LAYOUT.PRESENTER_VIEW')),
-  h('div.switch', [
-    h('input#presenter-view-toggle', {
-      name: 'presenter-view-toggle',
-      type: 'checkbox',
-      checked: store.getUserPref('app.layout.presenter-view'),
-      onclick: () => {
-        store.setUserPref(
-          'app.layout.presenter-view',
-          !store.getUserPref('app.layout.presenter-view'),
-        );
-        global.platform.updateSettings();
-        global.controller['presenter-view']();
-      },
-      value: 'presenter-view',
-    }),
-    h('label', {
-      htmlFor: 'presenter-view-toggle',
-    }),
-  ]),
-]);
-
 const footerNav = h('ul.menu-bar', navPageLinks);
 
 const sources = {
@@ -341,8 +317,6 @@ module.exports = {
     document.querySelector('.shabad-next').appendChild(shabadNavFwd);
     document.querySelector('.shabad-prev').appendChild(shabadNavBack);
     document.querySelector('#footer .menu-group-left').appendChild(footerNav);
-    document.querySelector('.presenter-switch').appendChild(presenterSwitch);
-
     this.$navigator = document.getElementById('navigator');
     this.$searchPage = document.getElementById('search-page');
     this.$search = document.getElementById('search');
