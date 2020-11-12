@@ -744,7 +744,7 @@ module.exports = {
       id: parseInt(ShabadID, 10),
       type: 'shabad',
     };
-    if (window.socket !== undefined) {
+    if (window.socket !== undefined && window.socket !== null) {
       window.socket.emit('data', {
         type: 'shabad',
         host: 'sttm-desktop',
@@ -830,7 +830,7 @@ module.exports = {
       if (!historyReload) {
         this.addToHistory(ceremonyID, null, nameOfCeremony, 'ceremony');
       }
-      if (window.socket !== undefined) {
+      if (window.socket !== undefined && window.socket !== null) {
         window.socket.emit('data', {
           host: 'sttm-desktop',
           type: 'ceremony',
@@ -912,7 +912,7 @@ module.exports = {
           return row;
         });
 
-      if (window.socket !== undefined) {
+      if (window.socket !== undefined && window.socket !== null) {
         window.socket.emit('data', {
           host: 'sttm-desktop',
           type: 'bani',
@@ -1186,7 +1186,7 @@ module.exports = {
   },
 
   clickShabad(e, ShabadID, LineID, Line, rows, mode = 'click') {
-    if (window.socket !== undefined) {
+    if (window.socket !== undefined && window.socket !== null) {
       let sessionKeySplit;
       if (typeof Line.sessionKey === 'string') {
         sessionKeySplit = Line.sessionKey.split('-');

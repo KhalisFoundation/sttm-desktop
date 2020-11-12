@@ -76,9 +76,9 @@
       "ARJUN_DEV_JI": "Guru Arjun Dev Ji",
       "GOBIND_SINGH_SAHIB_JI": "Guru Gobind Singh Ji",
       "GRANTH_SAHIB_JI": "Guru Granth Sahib Ji",
-      "HAR_GOBIND_SAHIB_JI": "Guru Har Gobind Ji",
-      "HAR_KRISHAN_SAHIB_JI": "Guru Har Krishan Ji",
-      "HAR_RAI_SAHIB_JI": "Guru Har Rai Ji",
+      "HARGOBIND_SAHIB_JI": "Guru Hargobind Ji",
+      "HARKRISHAN_SAHIB_JI": "Guru Harkrishan Ji",
+      "HARRAI_SAHIB_JI": "Guru Harrai Ji",
       "NANAK_DEV_JI": "Guru Nanak Dev Ji",
       "RAMDAS_SAHIB_JI": "Guru Ramdas Ji",
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
@@ -159,6 +159,7 @@
     "FULL_WORDS": "Full Word(s)",
     "FULL_WORDS_ENGLISH": "Full Word(s) - English",
     "FULL_WORDS_GURMUKHI": "Full Word(s) - Gurmukhi",
+    "MAIN_LETTERS": "Main Letters - Gurmukhi",
     "SOURCES": {
       "ALL_SOURCES": "All Sources",
       "AMRIT_KEERTAN": "Amrit Keertan",
@@ -301,6 +302,7 @@
     "CURRENT_SHABAD": "Current Shabad",
     "DISABLE_CONNECTIONS_MSG": "Disable all the remote connections to {{appName}}",
     "ENG_EXPLANATIONS": "English Explanations",
+    "RAAGMALA": "Raagmala",
     "HISTORY": "History",
     "INSERT": "Insert",
     "LOCKED_SCREEN": "SikhiToTheMax is being controlled remotely.",
@@ -319,6 +321,7 @@
       "2": " from a mobile device to search, navigate, and control the entire app."
     },
     "SYNC_CONTROLLER": {
+      "IN_USE": "Bani controller currently in use",
       "INTERNET_ERR": "Sorry, You seem to be offline. Sync only works when you are connected to the internet.",
       "CODE_ERR": "Sorry, Failed to get a new code for you, please try again later.",
       "PIN": "Pin",

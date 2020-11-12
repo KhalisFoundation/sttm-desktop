@@ -14,6 +14,11 @@
     "class-methods-use-this": "off"
   },
   "settings": {
-    "import/core-modules": "electron"
+    "import/core-modules": "electron",
+    "import/resolver": {
+      "node": {
+        "extensions": [".js",".jsx"]
+      }
+    }
   }
 }
