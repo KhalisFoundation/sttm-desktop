@@ -8,7 +8,7 @@ const { remote } = require('electron');
 const { i18n } = remote.require('./app');
 
 const SettingsItem = ({ subcategories, settingsKey, settingsObj }) => {
-  let markup = [];
+  const markup = [];
   subcategories.forEach(subCategory => {
     const controls = subCategory.settings;
     const subcategoryTitle = subCategory.title;
@@ -40,6 +40,8 @@ const SettingsItem = ({ subcategories, settingsKey, settingsObj }) => {
       </div>,
     );
   });
+
+  return markup;
   // const { title, settings } = settingsObj;
   // const controls = Object.keys(settings);
 

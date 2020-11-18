@@ -1,5 +1,6 @@
 import { createStore, action } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../constants';
+import userSettingsState from './UserSettings';
 
 const GlobalState = createStore({
   app: {
@@ -41,6 +42,7 @@ const GlobalState = createStore({
       };
     }),
   },
+  userSettings: userSettingsState,
 });
 
 export default GlobalState;
