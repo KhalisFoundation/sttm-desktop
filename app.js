@@ -258,7 +258,7 @@ function createViewer(ipcData) {
       autoHideMenuBar: true,
       show: false,
       titleBarStyle: 'hidden',
-      frame: process.platform !== 'win32',
+      frame: false,
       backgroundColor: '#000000',
       webPreferences: {
         nodeIntegration: true,
