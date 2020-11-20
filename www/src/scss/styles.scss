@@ -790,6 +790,13 @@ body.show-overlay {
   }
 }
 
+.presenter-view #navigator.minimized {
+  #toolbar,
+  #toolbar-nav {
+    left: 0;
+  }
+}
+
 .darwin #navigator {
   width: 500px;
 }
