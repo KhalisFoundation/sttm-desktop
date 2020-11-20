@@ -360,7 +360,8 @@ h2 {
   }
 }
 
-.navigator-minimized {
+.navigator-minimized,
+.presenter-view {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     left: 0;

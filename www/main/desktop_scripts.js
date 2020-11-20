@@ -232,7 +232,6 @@ if ($minimize) {
       });
       document.getElementById('navigator').classList.toggle('minimized');
       if (global.webview) global.webview.send('navigator-toggled');
-      if (global.platform) global.platform.ipc.send('navigator-toggled');
     });
   });
 }
