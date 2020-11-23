@@ -25,6 +25,7 @@ const Setting = ({ settingObj, defaultType, stateVar, stateFunction }) => {
       settingDOM = (
         <input
           type="range"
+          data-value={userSettings[stateVar]}
           value={userSettings[stateVar]}
           min={settingObj.min}
           max={settingObj.max}
@@ -37,7 +38,9 @@ const Setting = ({ settingObj, defaultType, stateVar, stateFunction }) => {
       settingDOM = (
         <select value={userSettings[stateVar]} onChange={handleInputChange}>
           {Object.keys(settingObj.options).map((op, opIndex) => (
-            <option key={`control-dropdown-options-${opIndex}`}>{settingObj.options[op]}</option>
+            <option key={`control-dropdown-options-${opIndex}`}>
+              {i18n.t(`SETTINGS.${settingObj.options[op]}`)}
+            </option>
           ))}
         </select>
       );

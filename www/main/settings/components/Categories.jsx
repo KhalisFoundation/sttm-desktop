@@ -13,7 +13,7 @@ const SettingsFactory = ({ subCategory }) => {
   Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
     settingsDOM.push(
       <div className="control-item" id={settingKey} key={settingIndex}>
-        <span> {subCategory.settingObjs[settingKey].title}</span>
+        <span> {i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
         <Setting
           settingObj={subCategory.settingObjs[settingKey]}
           defaultType={subCategory.type}
@@ -31,7 +31,7 @@ const Categories = ({ category }) => {
   Object.keys(category.subCatObjs).forEach((subCat, scIndex) => {
     categoriesDOM.push(
       <div key={`control-${scIndex}`} className={`controls-container`} id={`settings-${subCat}`}>
-        <h4>{category.subCatObjs[subCat].title}</h4>
+        <h4>{i18n.t(`SETTINGS.${category.subCatObjs[subCat].title}`)}</h4>
         <SettingsFactory subCategory={category.subCatObjs[subCat]} />
       </div>,
     );

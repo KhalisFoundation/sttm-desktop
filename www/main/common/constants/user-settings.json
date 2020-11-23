@@ -58,6 +58,21 @@
       "title": "LANGUAGE_SETTINGS",
       "type": "dropdown",
       "settings": ["translation-language", "transliteration-language"]
+    },
+    "app-settings": {
+      "title": "APP_SETTINGS",
+      "type": "title",
+      "subcategories": ["app-layout", "other-options"]
+    },
+    "app-layout": {
+      "title": "APP_LAYOUT",
+      "type": "switch",
+      "settings": ["presenter-view", "quick-tools", "shortcut-tray", "live-feed"]
+    },
+    "other-options": {
+      "title": "OTHER_OPTIONS",
+      "type": "switch",
+      "settings": ["changelog", "statistics"]
     }
   },
   "settings": {
@@ -139,6 +154,7 @@
     },
     "vishraam-source": {
       "title": "VISHRAAM_SOURCE",
+      "type": "dropdown",
       "options": {
         "sttm2": "STTM2",
         "igurbani": "I_GURBANI",
@@ -162,10 +178,10 @@
       "title": "BANI_LENGTH",
       "type": "dropdown",
       "options": {
-        "short": "SHORT",
-        "medium": "MEDIUM",
-        "long": "LONG",
-        "extralong": "EXTRA_LONG"
+        "short": "SHORT_BANI_LENGTH",
+        "medium": "MEDIUM_BANI_LENGTH",
+        "long": "LONG_BANI_LENGTH",
+        "extralong": "EXTRA_LONG_BANI_LENGTH"
       },
       "initialValue": "short"
     },
@@ -173,8 +189,8 @@
       "title": "MANGAL_POSITION",
       "type": "dropdown",
       "options": {
-        "current": "CURRENT",
-        "above": "ABOVE"
+        "current": "CURRENT_MANGAL",
+        "above": "ABOVE_MANGAL"
       },
       "initialValue": "current"
     },
@@ -182,8 +198,8 @@
       "title": "TRANSLATION_LANGUAGE",
       "type": "dropdown",
       "options": {
-        "English": "ENGLISH",
-        "Spanish": "SPANISH"
+        "English": "ENGLISH_LANGUAGE",
+        "Spanish": "SPANISH_LANGUAGE"
       },
       "initialValue": "English"
     },
@@ -191,10 +207,35 @@
       "title": "TRANSLITERATION_LANGUAGE",
       "type": "dropdown",
       "options": {
-        "English": "ENGLISH",
-        "Devanagri": "DEVANAGARI"
+        "English": "ENGLISH_LANGUAGE",
+        "Devanagri": "DEVANAGARI_LANGUAGE"
       },
       "initialValue": "English"
+    },
+    "presenter-view": {
+      "title": "PRESENTER_VIEW",
+      "initialValue": false
+    },
+    "quick-tools": {
+      "title": "QUICK_TOOLS",
+      "initialValue": false
+    },
+    "shortcut-tray": {
+      "title": "SHORTCUT_TRAY",
+      "initialValue": false
+    },
+    "live-feed": {
+      "title": "LIVE_FEED",
+      "initialValue": false
+    },
+    "changelog": {
+      "title": "LIMIT_CHANGELOG",
+      "initialValue": false,
+      "notes": "LIMIT_CHANGELOG_MSG"
+    },
+    "statistics": {
+      "title": "COLLECT_STATISTICS",
+      "initialValue": false
     }
   }
 }

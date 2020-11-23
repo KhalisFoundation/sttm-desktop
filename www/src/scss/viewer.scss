@@ -5,8 +5,8 @@ $viewer-padding: 30px;
 
 .settings-container {
   .controls-container {
-    .control-item.vishraam-options,
-    .control-item.vishraam-source {
+    .control-item#vishraam-type,
+    .control-item#vishraam-source {
       display: none;
 
       .display-visraams & {
@@ -14,8 +14,8 @@ $viewer-padding: 30px;
       }
     }
 
-    .control-item.larivaar-assist,
-    .control-item.assist-type {
+    .control-item#larivaar-assist,
+    .control-item#larivaar-assist-type {
       display: none;
 
       .larivaar & {
@@ -23,7 +23,7 @@ $viewer-padding: 30px;
       }
     }
 
-    .control-item.autoplayTimer-range {
+    .control-item#autoplay-delay {
       display: none;
 
       .autoplay & {

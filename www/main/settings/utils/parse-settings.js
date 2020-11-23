@@ -25,6 +25,13 @@ const settingsObjGenerator = () => {
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
+          const subCat = settingsNewObj[category].subCatObjs[subCategory];
+          if (subCat.type === 'range') {
+            const { max, min, step } = subCat;
+            subCat.settingObjs[setting].max = max;
+            subCat.settingObjs[setting].min = min;
+            subCat.settingObjs[setting].step = step;
+          }
         });
       });
     }
