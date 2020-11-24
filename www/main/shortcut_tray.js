@@ -7,7 +7,7 @@ const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const shortcutTrayContainer = document.querySelector('.shortcut-tray');
-let isShortcutTrayOn = store.getUserPref('slide-layout.display-options.shortcut-tray-on');
+let isShortcutTrayOn = global.userSettings.shortcutTray;
 
 const trayItemFactory = (trayItemKey, trayItem) =>
   h(
@@ -40,8 +40,7 @@ const shortcutsToggle = h(
     onclick: () => {
       isShortcutTrayOn = !isShortcutTrayOn;
       analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
-      store.setUserPref('slide-layout.display-options.shortcut-tray-on', isShortcutTrayOn);
-      global.core.platformMethod('updateSettings');
+      global.applySettings.setShortcutTray(isShortcutTrayOn);
       document
         .querySelector('i.shortcut-toggle-icon')
         .classList.toggle('fa-caret-up', !isShortcutTrayOn);

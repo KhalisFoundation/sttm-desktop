@@ -31,8 +31,8 @@ class Analytics {
     const useragent = this.store.get('user-agent');
 
     if (process.env.NODE_ENV !== 'development') {
-      if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
-        isOnline().then((online) => {
+      if (global.userSettings.collectStatistics) {
+        isOnline().then(online => {
           // TODO: for offline users, come up with a way of storing and send when online.
           if (online && this.usr) {
             this.usr
@@ -49,10 +49,11 @@ class Analytics {
         });
       }
     } else {
-      console.log(`Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, ua: ${useragent}`);
+      console.log(
+        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, ua: ${useragent}`,
+      );
     }
   }
-
 
   /**
    *
@@ -62,8 +63,8 @@ class Analytics {
    */
   trackPageView(path, title, hostname = 'SikhiToTheMax Desktop') {
     if (process.env.NODE_ENV !== 'development') {
-      if (this.store.get('userPrefs.app.analytics.collect-statistics')) {
-        isOnline().then((online) => {
+      if (global.userSettings.collectStatistics) {
+        isOnline().then(online => {
           if (online && this.usr) {
             const useragent = this.store.get('user-agent');
 

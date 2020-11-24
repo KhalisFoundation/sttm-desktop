@@ -76,7 +76,7 @@
   .tray-item-label {
     color: $bg-main;
   }
-  &.shortcut-tray-on .shortcut-toggle {
+  &.shortcut-tray-true .shortcut-toggle {
     background: darken($bg-main, 10);
   }
 

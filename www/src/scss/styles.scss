@@ -901,7 +901,7 @@ body.show-overlay {
   }
 }
 
-.controller.scale-viewer.presenter-view.shortcut-tray-on .nav-page:nth-child(2) {
+.controller.scale-viewer.presenter-view.shortcut-tray-true .nav-page:nth-child(2) {
   height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset});
 }
 

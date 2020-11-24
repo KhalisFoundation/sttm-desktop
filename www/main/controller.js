@@ -611,15 +611,16 @@ module.exports = {
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
-  'gurbani-bani-length': function gurbaniBaniLength() {
+  'bani-length': function gurbaniBaniLength() {
     reloadBani();
   },
 
-  'gurbani-mangal-position': function gurbaniMangalPosition() {
+  'mangal-position': function gurbaniMangalPosition() {
     reloadBani(true);
   },
 
-  autoplay() {
+  'autoplay-toggle'() {
+    console.log('auto play works');
     global.core.search.checkAutoPlay();
   },
 

@@ -49,7 +49,7 @@ $viewer-padding: 30px;
   }
 }
 
-.display-visraams #settings {
+.display-visraams-true #settings {
   #setting-container-toolbar-vishraam-vishraam-options,
   #setting-container-toolbar-vishraam-vishraam-source {
     display: flex;
@@ -140,7 +140,7 @@ body {
   transform: rotate(270deg);
 }
 
-.left-align {
+.left-align-true {
   #viewer {
     text-align: left;
 
@@ -222,7 +222,7 @@ h2 {
   }
 }
 
-.larivaar {
+.larivaar-true {
   .gurbani {
     .padchhed {
       display: none;
@@ -303,11 +303,11 @@ h2 {
 
 /* ***** FONT SIZES ***** */
 @for $i from 1 through 20 {
-  .gurbani-#{$i} .gurbani,
-  .translation-#{$i} .translation,
-  .transliteration-#{$i} .transliteration,
-  .announcements-#{$i} .announcements,
-  .teeka-#{$i} .teeka {
+  .gurbani-font-size-#{$i} .gurbani,
+  .translation-font-size-#{$i} .translation,
+  .transliteration-font-size-#{$i} .transliteration,
+  .announcements-font-size-#{$i} .announcements,
+  .teeka-font-size-#{$i} .teeka {
     font-size: #{$i}vh;
   }
 }
@@ -376,7 +376,7 @@ h2 {
   }
 }
 
-.quick-tools {
+.quick-tools-true {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;

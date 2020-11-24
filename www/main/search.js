@@ -848,8 +848,8 @@ module.exports = {
 
   loadBani(BaniID, LineID = null, historyReload = false, crossPlatformID = null) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
-    const baniLength = store.get('userPrefs.toolbar.gurbani.bani-length');
-    const mangalPosition = store.get('userPrefs.toolbar.gurbani.mangal-position');
+    const baniLength = global.userSettings.baniLength;
+    const mangalPosition = global.userSettings.mangalPosition;
     let lineID = LineID;
     currentShabadState = {
       id: parseInt(BaniID, 10),
@@ -1170,12 +1170,9 @@ module.exports = {
     if (LineID === null && document.body.querySelector('#shabad li')) {
       document.body.querySelector('#shabad .panktee.current').click();
     }
-    const bodyClassList = document.body.classList;
-    const delay = [...bodyClassList]
-      .find(value => /^autoplayTimer-/.test(value))
-      .replace('autoplayTimer-', '');
+    const delay = global.userSettings.autoplayDelay;
     if (
-      bodyClassList.contains('autoplay') &&
+      global.userSettings.autoplayToggle &&
       LineID !== currentShabad[currentShabad.length - 1] &&
       LineID !== null
     ) {

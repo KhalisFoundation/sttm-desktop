@@ -1,4 +1,10 @@
 /* eslint import/no-unresolved: 0 */
+import GlobalState from './js/common/store/GlobalState';
+
+global.userSettings = GlobalState.getState().userSettings;
+global.applySettings = GlobalState.getActions().userSettings;
+
+console.log(global.applySettings);
 
 global.platform = require('./js/desktop_scripts');
 global.controller = require('./js/controller');

@@ -52,7 +52,7 @@ expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 
 const store = new Store({
-  configName: 'user-preferences',
+  configName: 'user-preferences-test',
   defaults: defaultPrefs,
 });
 
@@ -241,7 +241,7 @@ function checkForExternalDisplay() {
 function showChangelog() {
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
-  const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
+  const limitChangeLog = global.userSettings.limitChangeLog;
 
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }

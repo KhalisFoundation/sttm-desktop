@@ -199,6 +199,13 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
+global.platform.ipc.on('save-settings', (event, setting) => {
+  const { key, value, oldValue } = setting;
+  document.body.classList.remove(`${key}-${oldValue}`);
+  document.body.classList.add(`${key}-${value}`);
+  console.log(`${key}-${value}`);
+});
+
 const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);

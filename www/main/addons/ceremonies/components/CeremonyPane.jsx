@@ -13,7 +13,6 @@ const CeremonyPane = props => {
   const { token, name, id, onScreenClose } = props;
   const paneId = token;
 
-  // TODO: handle changing theme
   const loadCeremony = () => {
     analytics.trackEvent('ceremony', token);
     loadCeremonyGlobal(id);
