@@ -11,6 +11,8 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 
+const { savedSettings } = require('./www/js/common/store/SavedUserSettings');
+
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
 const defaultPrefs = require('./www/configs/defaults.json');
@@ -241,7 +243,7 @@ function checkForExternalDisplay() {
 function showChangelog() {
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
-  const limitChangeLog = global.userSettings.limitChangeLog;
+  const limitChangeLog = savedSettings.limitChangeLog;
 
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }

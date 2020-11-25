@@ -72,7 +72,7 @@
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["changelog", "statistics"]
+      "settings": ["limit-change-log", "statistics"]
     }
   },
   "settings": {
@@ -231,7 +231,7 @@
       "title": "LIVE_FEED",
       "initialValue": false
     },
-    "changelog": {
+    "limit-change-log": {
       "title": "LIMIT_CHANGELOG",
       "initialValue": false,
       "notes": "LIMIT_CHANGELOG_MSG"

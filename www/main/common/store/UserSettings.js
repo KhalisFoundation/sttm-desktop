@@ -1,5 +1,6 @@
 import { action } from 'easy-peasy';
 import { convertToCamelCase } from '../utils';
+import { savedSettings, userConfigPath } from './SavedUserSettings';
 
 // can we change them to import?
 const electron = require('electron');
@@ -7,29 +8,14 @@ const fs = require('fs');
 const path = require('path');
 const { settings } = require('../../../main/common/constants/user-settings.json');
 
-const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-const userConfigPath = path.join(userDataPath, 'user-data.json');
-const savedSettings = parseDataFile(userConfigPath) || {};
-
-function parseDataFile(filePath) {
-  // We'll try/catch it in case the file doesn't exist yet,
-  // which will be the case on the first application run.
-  // `fs.readFileSync` will return a JSON string which we then parse into a Javascript object
-  try {
-    return JSON.parse(fs.readFileSync(filePath));
-  } catch (error) {
-    // if there was some kind of error, return the passed in defaults instead.
-    return null;
-  }
-}
-
 if (typeof localStorage === 'object') {
   localStorage.setItem('prefs', JSON.stringify(savedSettings));
 }
-
-Object.keys(savedSettings).forEach(key => {
-  document.body.classList.add(`${key}-${savedSettings[key]}`);
-});
+if (document) {
+  Object.keys(savedSettings).forEach(key => {
+    document.body.classList.add(`${key}-${savedSettings[key]}`);
+  });
+}
 
 const userSettingsState = {};
 Object.keys(settings).forEach(settingKey => {
@@ -39,12 +25,10 @@ Object.keys(settings).forEach(settingKey => {
   userSettingsState[stateVarName] = savedSettings[settingKey] || settings[settingKey].initialValue;
 
   userSettingsState[stateFuncName] = action((state, payload) => {
-    // Update the DOM
     const oldValue = state[stateVarName];
-    document.body.classList.remove(`${settingKey}-${oldValue}`);
     // eslint-disable-next-line no-param-reassign
     state[stateVarName] = payload;
-    document.body.classList.add(`${settingKey}-${payload}`);
+    console.log(settingKey, payload, oldValue);
     global.webview.send('save-settings', { key: settingKey, payload, oldValue });
 
     // Save settings to file
@@ -54,6 +38,12 @@ Object.keys(settings).forEach(settingKey => {
     // Update localStorage for viewer
     if (typeof localStorage === 'object') {
       localStorage.setItem('prefs', JSON.stringify(savedSettings));
+    }
+
+    // Update DOM if ready
+    if (document) {
+      document.body.classList.remove(`${settingKey}-${oldValue}`);
+      document.body.classList.add(`${settingKey}-${payload}`);
     }
 
     // Run the sideeffects

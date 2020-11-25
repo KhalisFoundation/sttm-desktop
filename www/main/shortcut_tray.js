@@ -7,7 +7,6 @@ const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const shortcutTrayContainer = document.querySelector('.shortcut-tray');
-let isShortcutTrayOn = global.userSettings.shortcutTray;
 
 const trayItemFactory = (trayItemKey, trayItem) =>
   h(
@@ -34,23 +33,26 @@ const trayItemFactory = (trayItemKey, trayItem) =>
     ),
   );
 
-const shortcutsToggle = h(
-  'div.shortcut-toggle',
-  {
-    onclick: () => {
-      isShortcutTrayOn = !isShortcutTrayOn;
-      analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
-      global.applySettings.setShortcutTray(isShortcutTrayOn);
-      document
-        .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-caret-up', !isShortcutTrayOn);
-      document
-        .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-caret-down', isShortcutTrayOn);
+const shortcutsToggle = () => {
+  let isShortcutTrayOn = global.userSettings.shortcutTray;
+  return h(
+    'div.shortcut-toggle',
+    {
+      onclick: () => {
+        isShortcutTrayOn = !isShortcutTrayOn;
+        analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
+        global.applySettings.setShortcutTray(isShortcutTrayOn);
+        document
+          .querySelector('i.shortcut-toggle-icon')
+          .classList.toggle('fa-caret-up', !isShortcutTrayOn);
+        document
+          .querySelector('i.shortcut-toggle-icon')
+          .classList.toggle('fa-caret-down', isShortcutTrayOn);
+      },
     },
-  },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
-);
+    h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
+  );
+};
 
 module.exports = {
   init() {
@@ -58,6 +60,6 @@ module.exports = {
       shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
     });
 
-    document.querySelector('#footer').appendChild(shortcutsToggle);
+    document.querySelector('#footer').appendChild(shortcutsToggle());
   },
 };
