@@ -9,8 +9,8 @@
   @each $source in $visraam-sources {
     /* If its on larivaar assist do not show vishraams
     If larivaar is off, but larivaar assist is on, then do show vishraams */
-    &.larivaar-assist:not(.larivaar-true),
-    &:not(.larivaar-assist) {
+    &.larivaar-assist-true:not(.larivaar-true),
+    &:not(.larivaar-assist-true) {
       &.display-visraams-true.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
         .gurbani {
         .visraam-main.visraam-#{$source} {
@@ -51,13 +51,13 @@
       }
     }
 
-    &.larivaar.larivaar-assist.larivaar-settings-assist-type-single-color {
+    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-single-color {
       .gurbani .larivaar span:nth-of-type(even) {
         opacity: 0.75;
       }
     }
 
-    &.larivaar.larivaar-assist.larivaar-settings-assist-type-multi-color {
+    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-multi-color {
       .gurbani .larivaar span:nth-of-type(even) {
         color: $yamki;
       }
