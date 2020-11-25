@@ -9,7 +9,7 @@ $viewer-padding: 30px;
     .control-item#vishraam-source {
       display: none;
 
-      .display-visraams & {
+      .display-vishraams-true & {
         display: flex;
       }
     }
@@ -18,7 +18,7 @@ $viewer-padding: 30px;
     .control-item#larivaar-assist-type {
       display: none;
 
-      .larivaar & {
+      .larivaar-true & {
         display: flex;
       }
     }
@@ -26,7 +26,7 @@ $viewer-padding: 30px;
     .control-item#autoplay-delay {
       display: none;
 
-      .autoplay & {
+      .autoplay-toggle-true & {
         display: flex;
       }
     }
