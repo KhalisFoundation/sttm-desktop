@@ -25,12 +25,24 @@ const settingsObjGenerator = () => {
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
+          if (subCategory === 'font-sizes') {
+            let addon;
+            if (setting === 'translation-font-size') {
+              addon = settings['translation-visibility'];
+            } else if (setting === 'transliteration-font-size') {
+              addon = settings['transliteration-visibility'];
+            } else if (setting === 'teeka-font-size') {
+              addon = settings['teeka-visibility'];
+            }
+            settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addon = addon;
+          }
           const subCat = settingsNewObj[category].subCatObjs[subCategory];
           if (subCat.type === 'range') {
-            const { max, min, step } = subCat;
+            const { max, min, step, type } = subCat;
             subCat.settingObjs[setting].max = max;
             subCat.settingObjs[setting].min = min;
             subCat.settingObjs[setting].step = step;
+            subCat.settingObjs[setting].type = subCat.settingObjs[setting].type || type;
           }
         });
       });

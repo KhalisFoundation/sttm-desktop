@@ -57,6 +57,14 @@
           transform: translateX(-150%);
         }
 
+        .notes {
+          color: #999;
+          flex-grow: 1;
+          font-size: 0.8em;
+          font-style: italic;
+          margin-left: 3px;
+        }
+
         .custom-checkbox {
           input[type='checkbox'] {
             left: -9999px;

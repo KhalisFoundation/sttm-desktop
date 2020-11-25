@@ -85,7 +85,7 @@
       "initialValue": 5
     },
     "teeka-font-size": {
-      "title": "TRANSLATION",
+      "title": "PUNJABI_TEEKA",
       "initialValue": 4
     },
     "transliteration-font-size": {
@@ -93,19 +93,22 @@
       "initialValue": 4
     },
     "announcements-font-size": {
-      "title": "TRANSLITERATION",
+      "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
-    "translation-visibiliity": {
-      "title": "TRANSLATION",
+    "translation-visibility": {
+      "title": "TRANSLATION_VISIBILITY",
+      "type": "checkbox",
       "initialValue": true
     },
-    "teeka-visibiliity": {
-      "title": "TRANSLATION",
+    "teeka-visibility": {
+      "title": "TEEKA_VISIBILITY",
+      "type": "checkbox",
       "initialValue": true
     },
-    "transliteration-visibiliity": {
-      "title": "TRANSLITERATION",
+    "transliteration-visibility": {
+      "title": "TRANSLITERATION_VISIBILITY",
+      "type": "checkbox",
       "initialValue": true
     },
     "akhandpatt": {

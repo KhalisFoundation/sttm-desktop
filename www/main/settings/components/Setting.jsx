@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-import Switch from '../../common/sttm-ui/switch';
+import { Switch, Checkbox } from '../../common/sttm-ui';
 
 const { remote } = require('electron');
 
@@ -52,6 +52,16 @@ const Setting = ({ settingObj, defaultType, stateVar, stateFunction }) => {
           className={`control-item-switch-${title}`}
           value={userSettings[stateVar]}
           onToggle={handleInputChange}
+        />
+      );
+      break;
+    case 'checkbox':
+      settingDOM = (
+        <Checkbox
+          id={`${title}-checkbox`}
+          name={`control-item-checkbox-${title}`}
+          value={userSettings[stateVar]}
+          handler={handleInputChange}
         />
       );
       break;

@@ -3,9 +3,9 @@ import React from 'react';
 // import Checkbox from '../../common/sttm-ui/checkbox';
 import Switch from '../../common/sttm-ui/switch';
 
-const { remote } = require('electron');
+// const { remote } = require('electron');
 
-const { store, i18n } = remote.require('./app');
+// const { store, i18n } = remote.require('./app');
 
 // const userPrefs = store.getAllPrefs();
 // const defaultPrefs = store.getDefaults().userPrefs;
@@ -39,7 +39,7 @@ const generateMarkup = (type, controlObj) => {
           <select
             value={initialValue}
             onChange={() => {
-              console.log('changed the dropdown');
+              // console.log('changed the dropdown');
             }}
           >
             {Object.keys(controlObj.options).map((op, opIndex) => (
@@ -58,7 +58,7 @@ const generateMarkup = (type, controlObj) => {
           className={`control-item ${title}`}
           value={false}
           onToggle={() => {
-            console.log('switched the switch');
+            // console.log('switched the switch');
           }}
         />
       );

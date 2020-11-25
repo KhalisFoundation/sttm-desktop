@@ -11,9 +11,28 @@ const { i18n } = remote.require('./app');
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];
   Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
+    const { addon } = subCategory.settingObjs[settingKey];
     settingsDOM.push(
       <div className="control-item" id={settingKey} key={settingIndex}>
-        <span> {i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
+        {addon && (
+          <Setting
+            settingObj={addon}
+            defaultType={addon.type}
+            stateVar={convertToCamelCase(addon.title)}
+            stateFunction={`set${convertToCamelCase(addon.title, true)}`}
+          />
+        )}
+        <span>{i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
+        {subCategory.settingObjs[settingKey].notes && (
+          <span className="notes">
+            {i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].notes}`)}
+          </span>
+        )}
+        {subCategory.settingObjs[settingKey].type === 'range' && (
+          <span className="notes">
+            {`(Default: ${subCategory.settingObjs[settingKey].initialValue})`}
+          </span>
+        )}
         <Setting
           settingObj={subCategory.settingObjs[settingKey]}
           defaultType={subCategory.type}

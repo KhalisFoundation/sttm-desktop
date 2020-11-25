@@ -12,6 +12,5 @@ Object.keys(settings).forEach(settingKey => {
     return state;
   });
 });
-console.log(userSettingsState);
 
 export default userSettingsState;
