@@ -34,7 +34,7 @@ const trayItemFactory = (trayItemKey, trayItem) =>
   );
 
 const shortcutsToggle = () => {
-  let isShortcutTrayOn = global.userSettings.shortcutTray;
+  let isShortcutTrayOn = global.getUserSettings().shortcutTray;
   return h(
     'div.shortcut-toggle',
     {

@@ -620,7 +620,6 @@ module.exports = {
   },
 
   'autoplay-toggle'() {
-    console.log('auto play works');
     global.core.search.checkAutoPlay();
   },
 
