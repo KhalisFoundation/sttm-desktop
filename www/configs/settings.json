@@ -2,42 +2,6 @@
   "slide-layout": {
     "title": "SLIDE_LAYOUT",
     "settings": {
-      "font-sizes": {
-        "title": "FONT_SIZES",
-        "type": "range",
-        "options": {
-          "announcements": {
-            "title": "ANNOUNCEMENTS",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "gurbani": {
-            "title": "BANI",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "translation": {
-            "title": "TRANSLATION",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "teeka": {
-            "title": "PUNJABI_TEEKA",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          },
-          "transliteration": {
-            "title": "TRANSLITERATION",
-            "max": 20,
-            "min": 1,
-            "step": 1
-          }
-        }
-      },
       "language-settings": {
         "title": "LANGUAGE",
         "type": "dropdown",

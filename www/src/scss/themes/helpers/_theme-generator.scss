@@ -11,8 +11,7 @@
     If larivaar is off, but larivaar assist is on, then do show vishraams */
     &.larivaar-assist-true:not(.larivaar-true),
     &:not(.larivaar-assist-true) {
-      &.display-visraams-true.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
-        .gurbani {
+      &.display-vishraams-true.vishraam-type-colored-words.vishraam-source-#{$source} .gurbani {
         .visraam-main.visraam-#{$source} {
           color: $visraam-main;
         }
@@ -22,8 +21,7 @@
         }
       }
 
-      &.display-visraams-true.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
-        .gurbani {
+      &.display-vishraams-true.vishraam-type-gradient-bg.vishraam-source-#{$source} .gurbani {
         span {
           border-radius: 15px;
         }

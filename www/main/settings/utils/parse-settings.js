@@ -25,6 +25,7 @@ const settingsObjGenerator = () => {
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
+          // TODO: Add add-on as a property in settings object
           if (subCategory === 'font-sizes') {
             let addon;
             if (setting === 'translation-font-size') {

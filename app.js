@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
+const savedSettings = require('./www/js/common/store/user-settings/get-saved-user-settings');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -241,7 +242,7 @@ function checkForExternalDisplay() {
 function showChangelog() {
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
-  const limitChangeLog = true;
+  const limitChangeLog = savedSettings.limitChangeLog;
 
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }
@@ -338,8 +339,8 @@ const showLine = async (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
-    translation: store.getUserPref('slide-layout.language-settings.translation-language'),
-    transliteration: store.getUserPref('slide-layout.language-settings.transliteration-language'),
+    translation: savedSettings.translationLanguage,
+    transliteration: savedSettings.transliterationLanguage,
   };
 
   const payload = Object.assign(lineWithSettings, overlayPrefs);

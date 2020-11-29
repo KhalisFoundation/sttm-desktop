@@ -211,7 +211,7 @@
       "type": "dropdown",
       "options": {
         "English": "ENGLISH_LANGUAGE",
-        "Devanagri": "DEVANAGARI_LANGUAGE"
+        "Devanagari": "DEVANAGARI_LANGUAGE"
       },
       "initialValue": "English"
     },
