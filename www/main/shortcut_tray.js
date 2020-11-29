@@ -41,7 +41,7 @@ const shortcutsToggle = () => {
       onclick: () => {
         isShortcutTrayOn = !isShortcutTrayOn;
         analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
-        global.applySettings.setShortcutTray(isShortcutTrayOn);
+        global.setUserSettings.setShortcutTray(isShortcutTrayOn);
         document
           .querySelector('i.shortcut-toggle-icon')
           .classList.toggle('fa-caret-up', !isShortcutTrayOn);

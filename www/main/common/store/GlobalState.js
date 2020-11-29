@@ -1,6 +1,9 @@
 import { createStore, action } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../constants';
-import userSettingsState from './UserSettings';
+import createUserSettingsState from './user-settings/create-user-settings-state';
+import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
+
+const { settings } = require('../../../configs/user-settings.json');
 
 const GlobalState = createStore({
   app: {
@@ -42,7 +45,7 @@ const GlobalState = createStore({
       };
     }),
   },
-  userSettings: userSettingsState,
+  userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
 });
 
 export default GlobalState;

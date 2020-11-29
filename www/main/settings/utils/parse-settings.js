@@ -1,4 +1,4 @@
-const settingsJson = require('../../../main/common/constants/user-settings.json');
+const settingsJson = require('../../../configs/user-settings.json');
 
 const { categories, settings } = settingsJson;
 

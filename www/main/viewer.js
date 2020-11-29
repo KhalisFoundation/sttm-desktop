@@ -6,6 +6,9 @@
   no-undef: 0
 */
 
+import { savedSettings } from './js/common/store/user-settings/get-saved-user-settings';
+import { applyUserSettings } from './js/common/store/user-settings/apply-user-settings';
+
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -40,6 +43,7 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
+applyUserSettings(savedSettings);
 
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(

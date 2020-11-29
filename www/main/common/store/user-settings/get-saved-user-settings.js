@@ -1,7 +1,8 @@
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
-const { settings } = require('../../../main/common/constants/user-settings.json');
+const { settings } = require('../../../../configs/user-settings.json');
+const settings = {};
 
 const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 export const userConfigPath = path.join(userDataPath, 'user-data.json');

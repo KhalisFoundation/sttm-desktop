@@ -6,7 +6,7 @@ global.controller = require('./js/controller');
 global.core = require('./js/index');
 
 global.userSettings = GlobalState.getState().userSettings;
-global.applySettings = GlobalState.getActions().userSettings;
+global.setUserSettings = GlobalState.getActions().userSettings;
 
 // Pull in navigator from core
 global.core.search.init();
