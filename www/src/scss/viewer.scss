@@ -362,7 +362,7 @@ h2 {
   padding-top: 12px;
   position: absolute;
   text-align: center;
-  top: 0;
+  top: 20px;
   width: 28vh;
   z-index: 50;
 
@@ -374,6 +374,10 @@ h2 {
     font-size: 3vh;
     font-weight: bold;
   }
+}
+
+.presenter-view .vc-toggle-icon {
+  top: 0;
 }
 
 .quick-tools-true {

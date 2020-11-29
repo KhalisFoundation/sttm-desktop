@@ -233,4 +233,12 @@
     background-color: $scrollbar;
     border-radius: 6px;
   }
+
+  .workspace-bar {
+    background-color: $bg-main;
+    div:hover {
+      color: $text-base;
+      background-color: $bg-bright;
+    }
+  }
 }

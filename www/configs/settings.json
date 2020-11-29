@@ -140,13 +140,6 @@
         "type": "dynamic",
         "options": {}
       },
-      "layout": {
-        "title": "APP_LAYOUT",
-        "type": "switch",
-        "options": {
-          "presenter-view": "PRESENTER_VIEW"
-        }
-      },
       "analytics": {
         "title": "OTHER_OPTIONS",
         "type": "switch",

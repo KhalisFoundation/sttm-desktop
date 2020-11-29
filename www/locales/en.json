@@ -36,6 +36,11 @@
     "GREEN_SCREEN": "Green Screen"
   },
 
+  "WORKSPACES": {
+    "PRESENTER": "Presentation",
+    "SINGLE_DISPLAY": "Single Display"
+  },
+
   "CHROMECAST": {
     "CANCEL": "Cancel",
     "MSG_SENT": "Message sent: ",
@@ -298,6 +303,7 @@
     "CURRENT_SHABAD": "Current Shabad",
     "DISABLE_CONNECTIONS_MSG": "Disable all the remote connections to {{appName}}",
     "ENG_EXPLANATIONS": "English Explanations",
+    "RAAGMALA": "Raagmala",
     "HISTORY": "History",
     "INSERT": "Insert",
     "LOCKED_SCREEN": "SikhiToTheMax is being controlled remotely.",

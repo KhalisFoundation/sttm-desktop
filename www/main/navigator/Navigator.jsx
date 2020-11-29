@@ -109,7 +109,6 @@ const Navigator = () => {
       <div id="footer" className="base-ui">
         <div className="menu-group">
           <div className="menu-group-left"></div>
-          <div className="presenter-switch"></div>
         </div>
       </div>
       <section className="shortcut-tray base-ui"></section>
