@@ -2,26 +2,6 @@
   "slide-layout": {
     "title": "SLIDE_LAYOUT",
     "settings": {
-      "language-settings": {
-        "title": "LANGUAGE",
-        "type": "dropdown",
-        "options": {
-          "translation-language": {
-            "title": "TRANSLATION",
-            "options": {
-              "English": "ENGLISH",
-              "Spanish": "SPANISH"
-            }
-          },
-          "transliteration-language": {
-            "title": "TRANSLITERATION",
-            "options": {
-              "English": "ENGLISH",
-              "Devanagari": "DEVANAGARI"
-            }
-          }
-        }
-      },
       "fields": {
         "title": "FIELDS_TO_DISPLAY",
         "type": "checkbox",

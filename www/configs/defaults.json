@@ -34,10 +34,6 @@
       "vishraam": {
         "vishraam-options": "colored-words",
         "vishraam-source": "sttm"
-      },
-      "language-settings": {
-        "translation-language": "English",
-        "transliteration-language": "English"
       }
     },
     "slide-layout": {
