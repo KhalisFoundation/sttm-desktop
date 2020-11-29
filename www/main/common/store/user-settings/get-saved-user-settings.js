@@ -1,3 +1,5 @@
+import convertObjToCamelCase from '../../utils/convert-object-to-camel-case';
+
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
@@ -24,3 +26,7 @@ function parseDataFile(filePath) {
 }
 
 export const savedSettings = parseDataFile(userConfigPath);
+
+export const savedSettingsCamelCase = () => {
+  return convertObjToCamelCase(parseDataFile(userConfigPath));
+};

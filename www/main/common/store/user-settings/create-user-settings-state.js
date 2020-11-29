@@ -1,5 +1,6 @@
 import { action } from 'easy-peasy';
 import { convertToCamelCase } from '../../utils';
+import { savedSettingsCamelCase } from './get-saved-user-settings';
 
 // can we change them to import?
 const fs = require('fs');
@@ -21,13 +22,17 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       global.webview.send('save-settings', { key: settingKey, payload, oldValue });
 
       // Save settings to file
-      savedSettings[settingKey] = payload;
-      fs.writeFileSync(userConfigPath, JSON.stringify(savedSettings));
+      const updatedSettings = savedSettings;
+      updatedSettings[settingKey] = payload;
+      fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
       // Update localStorage for viewer
       if (typeof localStorage === 'object') {
-        localStorage.setItem('prefs', JSON.stringify(savedSettings));
+        localStorage.setItem('prefs', JSON.stringify(updatedSettings));
       }
+
+      // Update global object
+      global.getUserSettings[stateVarName] = payload;
 
       // Update DOM if ready
       if (document) {

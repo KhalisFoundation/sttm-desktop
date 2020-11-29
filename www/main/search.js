@@ -848,8 +848,8 @@ module.exports = {
 
   loadBani(BaniID, LineID = null, historyReload = false, crossPlatformID = null) {
     const $shabadList = this.$shabad || document.getElementById('shabad');
-    const baniLength = global.getUserSettings().baniLength;
-    const mangalPosition = global.getUserSettings().mangalPosition;
+    const baniLength = global.getUserSettings.baniLength;
+    const mangalPosition = global.getUserSettings.mangalPosition;
     let lineID = LineID;
     currentShabadState = {
       id: parseInt(BaniID, 10),
@@ -1170,8 +1170,8 @@ module.exports = {
     if (LineID === null && document.body.querySelector('#shabad li')) {
       document.body.querySelector('#shabad .panktee.current').click();
     }
-    const delay = global.getUserSettings().autoplayDelay;
-    const autoplayToggle = global.getUserSettings().autoplayToggle;
+    const delay = global.getUserSettings.autoplayDelay;
+    const autoplayToggle = global.getUserSettings.autoplayToggle;
     console.log(delay);
     if (autoplayToggle && LineID !== currentShabad[currentShabad.length - 1] && LineID !== null) {
       autoplaytimer = setTimeout(() => {

@@ -619,11 +619,11 @@ module.exports = {
     reloadBani(true);
   },
 
-  'autoplay-toggle'() {
+  'autoplay-toggle': function autoPlayToggle() {
     global.core.search.checkAutoPlay();
   },
 
-  livefeed(val) {
+  'live-feed': function livefeed(val) {
     if (val) {
       const path = dialog.showOpenDialogSync({
         defaultPath: remote.app.getPath('desktop'),

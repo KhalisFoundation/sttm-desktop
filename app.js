@@ -13,7 +13,9 @@ const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
-const savedSettings = require('./www/js/common/store/user-settings/get-saved-user-settings');
+const {
+  savedSettingsCamelCase,
+} = require('./www/js/common/store/user-settings/get-saved-user-settings');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -28,6 +30,8 @@ const httpBase = require('http').Server(expressApp);
 const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
+
+const savedSettings = savedSettingsCamelCase();
 
 const platform = os.platform();
 let isUnsupportedWindow = false;
@@ -242,7 +246,7 @@ function checkForExternalDisplay() {
 function showChangelog() {
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
-  const limitChangeLog = savedSettings.limitChangeLog;
+  const { limitChangeLog } = savedSettings;
 
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }
