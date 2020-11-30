@@ -15,10 +15,8 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
 
     userSettingsState[stateFuncName] = action((state, payload) => {
       const oldValue = state[stateVarName];
-      console.log('old value is', oldValue, 'new value is', payload);
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
-      console.log(settingKey, payload, oldValue);
       global.webview.send('save-settings', { key: settingKey, payload, oldValue });
 
       // Save settings to file

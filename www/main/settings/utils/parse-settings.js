@@ -32,7 +32,9 @@ const settingsObjGenerator = () => {
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
-          const addon = settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addon;
+          const { addon } = settingsNewObj[category].subCatObjs[subCategory].settingObjs[
+            setting
+          ].addon;
           if (addon) {
             settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addonObj =
               settings[addon];
@@ -50,7 +52,6 @@ const settingsObjGenerator = () => {
       });
     }
   });
-  console.log(settingsNewObj);
   return settingsNewObj;
 };
 

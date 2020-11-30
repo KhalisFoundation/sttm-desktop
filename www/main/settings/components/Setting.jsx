@@ -15,10 +15,8 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const userSettingsActions = useStoreActions(state => state.userSettings);
 
   const handleInputChange = event => {
-    console.log(userSettings[stateVar], 'is user settings state var', event.target, 'is event');
     const value = event.target ? event.target.value : event;
-    console.log(stateFunction, event.target.checked, 'set this to that');
-    //userSettingsActions[stateFunction](value);
+    userSettingsActions[stateFunction](value);
   };
 
   const handleCheckboxChange = event => {

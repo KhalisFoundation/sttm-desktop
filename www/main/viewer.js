@@ -204,11 +204,9 @@ global.platform.ipc.on('update-settings', () => {
 });
 
 global.platform.ipc.on('save-settings', (event, setting) => {
-  console.log(setting);
   const { key, payload, oldValue } = setting;
   document.body.classList.remove(`${key}-${oldValue}`);
   document.body.classList.add(`${key}-${payload}`);
-  console.log(`${key}-${payload}`);
 });
 
 const nextAng = () => {

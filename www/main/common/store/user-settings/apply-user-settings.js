@@ -5,7 +5,6 @@ export const applyUserSettings = savedSettings => {
   if (document) {
     Object.keys(savedSettings).forEach(key => {
       document.body.classList.add(`${key}-${savedSettings[key]}`);
-      console.log('adding class', `${key}-${savedSettings[key]}`);
     });
   }
 };

@@ -2,7 +2,7 @@ const h = require('hyperscript');
 const { remote } = require('electron');
 const shortcutItemsJSON = require('../configs/shortcut_tray.json');
 
-const { store, i18n } = remote.require('./app');
+const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 
