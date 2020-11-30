@@ -11,18 +11,21 @@ const { i18n } = remote.require('./app');
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];
   Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
-    const { addon } = subCategory.settingObjs[settingKey];
+    const { addonObj, addon } = subCategory.settingObjs[settingKey];
     settingsDOM.push(
+      /* 1. Push the Addon first */
       <div className="control-item" id={settingKey} key={settingIndex}>
         {addon && (
           <Setting
-            settingObj={addon}
-            defaultType={addon.type}
-            stateVar={convertToCamelCase(addon.title)}
-            stateFunction={`set${convertToCamelCase(addon.title, true)}`}
+            settingObj={addonObj}
+            stateVar={convertToCamelCase(addon)}
+            stateFunction={`set${convertToCamelCase(addon, true)}`}
           />
         )}
+        {/* 2. Then add title */}
         <span>{i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
+
+        {/* 3. Push notes and default value text */}
         {subCategory.settingObjs[settingKey].notes && (
           <span className="notes">
             {i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].notes}`)}
@@ -33,12 +36,12 @@ const SettingsFactory = ({ subCategory }) => {
             {`(Default: ${subCategory.settingObjs[settingKey].initialValue})`}
           </span>
         )}
+
+        {/* 4. Push the setting input */}
         <Setting
           settingObj={subCategory.settingObjs[settingKey]}
-          defaultType={subCategory.type}
           stateVar={convertToCamelCase(settingKey)}
           stateFunction={`set${convertToCamelCase(settingKey, true)}`}
-          settingKey={settingKey}
         />
       </div>,
     );

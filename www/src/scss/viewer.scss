@@ -271,9 +271,9 @@ h2 {
   opacity: 0;
 }
 
-.display-translation .translation,
-.display-transliteration .transliteration,
-.display-teeka .teeka {
+.translation-visibility-true .translation,
+.transliteration-visibility-true .transliteration,
+.teeka-visibility-true .teeka {
   display: block;
   height: auto;
   opacity: 1;
@@ -286,9 +286,9 @@ h2 {
   z-index: -1;
 }
 
-.display-translation .icons-translation,
-.display-transliteration .icons-transliteration,
-.display-teeka .icons-teeka {
+.translation-visibility-true .icons-translation,
+.transliteration-visibility-true .icons-transliteration,
+.teeka-visibility-true .icons-teeka {
   .size {
     opacity: 1;
     z-index: 20;

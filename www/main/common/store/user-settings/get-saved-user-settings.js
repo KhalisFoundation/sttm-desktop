@@ -7,6 +7,7 @@ const { settings } = require('../../../../configs/user-settings.json');
 
 const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 export const userConfigPath = path.join(userDataPath, 'user-data.json');
+console.log(userConfigPath);
 
 function parseDataFile(filePath) {
   // We'll try/catch it in case the file doesn't exist yet,

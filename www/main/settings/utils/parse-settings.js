@@ -16,6 +16,13 @@ const filterObject = (obj, filter, filterValue) =>
 
 const settingsObjGenerator = () => {
   const settingsNewObj = {};
+  /* Create a hierarchical structure that would map to the DOM
+     It would be like this
+     Category 
+      |___Subcategory
+              |___Setting
+                  |_____Addon
+  */
   Object.keys(categories).forEach(category => {
     if (categories[category].type === 'title') {
       settingsNewObj[category] = categories[category];
@@ -25,30 +32,25 @@ const settingsObjGenerator = () => {
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
-          // TODO: Add add-on as a property in settings object
-          if (subCategory === 'font-sizes') {
-            let addon;
-            if (setting === 'translation-font-size') {
-              addon = settings['translation-visibility'];
-            } else if (setting === 'transliteration-font-size') {
-              addon = settings['transliteration-visibility'];
-            } else if (setting === 'teeka-font-size') {
-              addon = settings['teeka-visibility'];
-            }
-            settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addon = addon;
+          const addon = settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addon;
+          if (addon) {
+            settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addonObj =
+              settings[addon];
           }
           const subCat = settingsNewObj[category].subCatObjs[subCategory];
-          if (subCat.type === 'range') {
-            const { max, min, step, type } = subCat;
+          const { type } = subCat;
+          if (type === 'range') {
+            const { max, min, step } = subCat;
             subCat.settingObjs[setting].max = max;
             subCat.settingObjs[setting].min = min;
             subCat.settingObjs[setting].step = step;
-            subCat.settingObjs[setting].type = subCat.settingObjs[setting].type || type;
           }
+          subCat.settingObjs[setting].type = subCat.settingObjs[setting].type || type;
         });
       });
     }
   });
+  console.log(settingsNewObj);
   return settingsNewObj;
 };
 

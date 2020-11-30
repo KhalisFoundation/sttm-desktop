@@ -48,6 +48,7 @@ const Launchpad = () => {
         {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}
         {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
+        {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
 
         <Navigator />
       </div>

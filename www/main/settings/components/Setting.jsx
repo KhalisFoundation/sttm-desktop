@@ -8,14 +8,21 @@ const { remote } = require('electron');
 
 const { i18n } = remote.require('./app');
 
-const Setting = ({ settingObj, defaultType, stateVar, stateFunction, settingKey }) => {
+const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title } = settingObj;
-  const type = settingObj.type || defaultType;
+  const type = settingObj.type;
   const userSettings = useStoreState(state => state.userSettings);
   const userSettingsActions = useStoreActions(state => state.userSettings);
 
   const handleInputChange = event => {
+    console.log(userSettings[stateVar], 'is user settings state var', event.target, 'is event');
     const value = event.target ? event.target.value : event;
+    console.log(stateFunction, event.target.checked, 'set this to that');
+    //userSettingsActions[stateFunction](value);
+  };
+
+  const handleCheckboxChange = event => {
+    const value = event.target.checked;
     userSettingsActions[stateFunction](value);
   };
 
@@ -61,8 +68,8 @@ const Setting = ({ settingObj, defaultType, stateVar, stateFunction, settingKey 
         <Checkbox
           id={`${title}-checkbox`}
           name={`control-item-checkbox-${title}`}
-          value={userSettings[stateVar]}
-          handler={handleInputChange}
+          handler={handleCheckboxChange}
+          checked={userSettings[stateVar]}
         />
       );
       break;
@@ -75,7 +82,8 @@ const Setting = ({ settingObj, defaultType, stateVar, stateFunction, settingKey 
 
 Setting.propTypes = {
   settingObj: PropTypes.object,
-  defaultType: PropTypes.string,
+  stateVar: PropTypes.string,
+  stateFunction: PropTypes.string,
 };
 
 export default Setting;

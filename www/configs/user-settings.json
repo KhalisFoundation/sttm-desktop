@@ -67,7 +67,7 @@
     "app-layout": {
       "title": "APP_LAYOUT",
       "type": "switch",
-      "settings": ["presenter-view", "quick-tools", "shortcut-tray", "live-feed"]
+      "settings": ["quick-tools", "shortcut-tray", "live-feed"]
     },
     "other-options": {
       "title": "OTHER_OPTIONS",
@@ -82,15 +82,18 @@
     },
     "translation-font-size": {
       "title": "TRANSLATION",
-      "initialValue": 5
+      "initialValue": 5,
+      "addon": "translation-visibility"
     },
     "teeka-font-size": {
       "title": "PUNJABI_TEEKA",
-      "initialValue": 4
+      "initialValue": 4,
+      "addon": "teeka-visibility"
     },
     "transliteration-font-size": {
       "title": "TRANSLITERATION",
-      "initialValue": 4
+      "initialValue": 4,
+      "addon": "transliteration-visibility"
     },
     "announcements-font-size": {
       "title": "ANNOUNCEMENTS",
@@ -214,10 +217,6 @@
         "Devanagari": "DEVANAGARI_LANGUAGE"
       },
       "initialValue": "English"
-    },
-    "presenter-view": {
-      "title": "PRESENTER_VIEW",
-      "initialValue": false
     },
     "quick-tools": {
       "title": "QUICK_TOOLS",
