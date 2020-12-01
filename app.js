@@ -669,6 +669,10 @@ ipcMain.on('update-settings', () => {
   mainWindow.webContents.send('sync-settings');
 });
 
+ipcMain.on('set-user-setting', (event, settingChanger) => {
+  mainWindow.webContents.send('set-user-setting', settingChanger);
+});
+
 module.exports = {
   openSecondaryWindow,
   appVersion,

@@ -247,21 +247,30 @@ const iconsetHtml = (classname, content) => {
       h(
         'span.visibility',
         {
-          onclick: e => core.menu.settings.showHide(e, iconType),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'visibility' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-eye-slash'),
       ),
       h(
         'span.minus.size',
         {
-          onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'size', operation: 'minus' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-minus-circle'),
       ),
       h(
         'span.plus.size',
         {
-          onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'size', operation: 'plus' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-plus-circle'),
       ),

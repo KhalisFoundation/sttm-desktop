@@ -8,6 +8,7 @@ const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
 const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
+const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
@@ -532,6 +533,14 @@ global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
+});
+
+global.platform.ipc.on('set-user-setting', (event, settingChanger) => {
+  if (settingChanger.func === 'size') {
+    changeFontSize(settingChanger.iconType, settingChanger.operation === 'plus');
+  } else if (settingChanger.func === 'visibility') {
+    changeVisibility(settingChanger.iconType);
+  }
 });
 
 module.exports = {
