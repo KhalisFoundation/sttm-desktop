@@ -368,11 +368,8 @@ a {
   display: flex;
   flex-direction: column;
   height: 100%;
-  left: -$toolbar-small-offset;
   padding-top: 10px;
-  position: absolute;
   top: 0;
-  width: $toolbar-small-offset;
   z-index: 1300;
 
   .toolbar-item {
@@ -689,8 +686,8 @@ a {
   padding: 10px;
 }
 
-.presenter-view #toolbar,
-.presenter-view #toolbar-nav {
+#toolbar,
+#toolbar-nav {
   @extend .fullscreen-fixed;
 
   padding-top: $presenter-pane-gap;
@@ -787,8 +784,16 @@ body.show-overlay {
 
     #toolbar,
     #toolbar-nav {
-      display: none;
+      left: -80px;
+      transition: left 1s ease;
     }
+  }
+}
+
+.presenter-view #navigator.minimized {
+  #toolbar,
+  #toolbar-nav {
+    left: 0;
   }
 }
 

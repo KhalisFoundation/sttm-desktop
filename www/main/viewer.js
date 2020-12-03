@@ -199,6 +199,14 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
+global.platform.ipc.on('navigator-toggled', () => {
+  document.body.classList.toggle('navigator-minimized');
+});
+
+global.platform.ipc.on('presenter-view', (event, inPresenterView) => {
+  document.body.classList.toggle('presenter-view', inPresenterView);
+});
+
 const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
@@ -373,7 +381,6 @@ const createCards = (rows, LineID) => {
 const createDeck = (cards, curSlide, shabad, ShabadID, mode) => {
   const $existingDeck = document.querySelector(`div#shabad${ShabadID}.deck.active`);
   if (mode === 'replace') {
-    document.querySelector('.vc-toggle-icon').style.left = '0';
     hideDecks();
     if (document.querySelector('.vc-open')) {
       $viewer.appendChild(h(`div#shabad${ShabadID}.deck.active.vc-open`, cards));

@@ -446,6 +446,7 @@ function checkPresenterView() {
   // hide header-tabs for non presenter view
   document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
   global.platform.ipc.send('presenter-view', inPresenterView);
+  global.webview.send('presenter-view', inPresenterView);
 }
 
 function reloadBani(resume = false) {
