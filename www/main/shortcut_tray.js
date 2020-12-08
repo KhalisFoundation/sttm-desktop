@@ -53,6 +53,17 @@ const shortcutsToggle = h(
   h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
 );
 
+const clearHistoryBtn = h(
+  'button.clear-history',
+  {
+    onclick: () => {
+      global.core.search.clearSession();
+    },
+  },
+  h(`i.clear-history-icon.fa.fa-history`),
+  'Clear History',
+);
+
 module.exports = {
   init() {
     Object.keys(shortcutItemsJSON).forEach(itemKey => {
@@ -60,5 +71,6 @@ module.exports = {
     });
 
     document.querySelector('#footer').appendChild(shortcutsToggle);
+    document.querySelector('#footer').appendChild(clearHistoryBtn);
   },
 };

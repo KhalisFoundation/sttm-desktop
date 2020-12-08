@@ -145,6 +145,22 @@ ul {
     display: block;
     width: 200px;
   }
+
+  &#session-page {
+    ul > li {
+      display: flex;
+      align-items: center;
+
+      a {
+        flex-grow: 1;
+      }
+
+      i {
+        cursor: pointer;
+        padding: 8px;
+      }
+    }
+  }
 }
 
 .nav-page {

@@ -140,6 +140,11 @@
     a.panktee.current {
       background-color: $current-focus !important;
       color: $base-text !important;
+
+      & + i {
+        background-color: $current-focus !important;
+        color: $base-text !important;
+      }
     }
   }
 
