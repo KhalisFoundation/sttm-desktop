@@ -384,8 +384,18 @@ h2 {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;
+    left: 75px;
     opacity: 0.9;
     position: fixed;
+    transition: left 1s ease;
+  }
+}
+
+.navigator-minimized,
+.presenter-view {
+  .viewer-controls,
+  &.webview .vc-toggle-icon {
+    left: 0;
   }
 }
 
