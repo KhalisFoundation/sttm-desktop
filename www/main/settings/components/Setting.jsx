@@ -72,7 +72,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       );
       break;
     default:
-      settingDOM = <p>No support yet</p>;
+      return null;
   }
 
   return settingDOM;

@@ -8,7 +8,6 @@ const ToolbarItem = ({ itemName }) => {
   const { overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const isSelectedOverlay = overlayScreen === itemName;
-  const isSyncOverlay = itemName === 'sync-button';
 
   return (
     <div
@@ -21,9 +20,7 @@ const ToolbarItem = ({ itemName }) => {
 
         setOverlayScreen(itemName);
       }}
-    >
-      {isSyncOverlay}
-    </div>
+    ></div>
   );
 };
 
