@@ -3,10 +3,6 @@ import PropTypes from 'prop-types';
 
 import Categories from './Categories';
 
-// const { remote } = require('electron');
-
-// const { i18n } = remote.require('./app');
-
 const SettingsContainer = ({ settingsObj }) => {
   const settingsList = [];
   Object.keys(settingsObj).forEach((cat, index) => {
