@@ -26,7 +26,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
 
       // Update localStorage for viewer
       if (typeof localStorage === 'object') {
-        localStorage.setItem('prefs', JSON.stringify(updatedSettings));
+        localStorage.setItem('userSettings', JSON.stringify(updatedSettings));
       }
 
       // Update global object
