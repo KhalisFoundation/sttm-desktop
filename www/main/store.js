@@ -1,5 +1,3 @@
-import { convertToLegancySettingsObj } from './common/utils/convert-to-legacy-settings-object';
-
 const electron = require('electron');
 const fs = require('fs');
 const ldDefaultsDeep = require('lodash.defaultsdeep');

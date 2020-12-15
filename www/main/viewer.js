@@ -23,7 +23,6 @@ const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
 const analytics = remote.getGlobal('analytics');
 let prefs = store.get('userPrefs');
-console.log(JSON.stringify(prefs));
 
 let isWebView = false;
 let apv = false;

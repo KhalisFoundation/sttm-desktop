@@ -31,7 +31,7 @@ const convertToLegacySettingsObj = newObject => {
         'assist-type': newObject['larivaar-assist-type'],
       },
       'display-options': {
-        larivaar: newObject['larivaar'],
+        larivaar: newObject.larivaar,
         'larivaar-assist': newObject['larivaar-assist'],
         'left-align': newObject['left-align'],
       },
