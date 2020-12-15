@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 
 // eslint-disable-next-line import/no-unresolved
 const Store = require('./www/js/store.js');
+// eslint-disable-next-line import/no-unresolved
 const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
@@ -57,7 +58,7 @@ expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 const { app, BrowserWindow, dialog, ipcMain } = electron;
 
 const store = new Store({
-  configName: 'user-preferences-test',
+  configName: 'user-preferences',
   defaults: defaultPrefs,
 });
 
