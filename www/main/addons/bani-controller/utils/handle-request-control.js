@@ -1,16 +1,15 @@
 import { remote } from 'electron';
 
-const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const handleRequestControl = isPinCorrect => {
+const handleRequestControl = (isPinCorrect, fontSizes) => {
   document.body.classList.toggle(`controller-on`, isPinCorrect);
   window.socket.emit('data', {
     host: 'sttm-desktop',
     type: 'response-control',
     success: isPinCorrect,
     settings: {
-      fontSizes: store.getUserPref('slide-layout.font-sizes'),
+      fontSizes,
     },
   });
   // if Pin is correct and there is a shabad already in desktop, emit that shabad details.

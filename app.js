@@ -11,12 +11,13 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 
-// eslint-disable import/no-unresolved
+/* eslint-disable import/no-unresolved */
 const Store = require('./www/js/store.js');
 const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
-// eslint-enable
+/* eslint-enable */
+
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');

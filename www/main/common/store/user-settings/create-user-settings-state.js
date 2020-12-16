@@ -24,7 +24,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       updatedSettings[settingKey] = payload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-      // Update localStorage for viewer
+      // Update localStorage
       if (typeof localStorage === 'object') {
         localStorage.setItem('userSettings', JSON.stringify(updatedSettings));
       }
@@ -41,6 +41,23 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       // Run the sideeffects
       if (typeof global.controller[settingKey] === 'function') {
         global.controller[settingKey](payload);
+      }
+
+      const fontSizes = {
+        gurbani: parseInt(savedSettings['gurbani-font-size'], 10),
+        translation: parseInt(savedSettings['translation-font-size'], 10),
+        teeka: parseInt(savedSettings['teeka-font-size'], 10),
+        transliteration: parseInt(savedSettings['transliteration-font-size'], 10),
+      };
+
+      if (window.socket !== undefined && window.socket !== null) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'settings',
+          settings: {
+            fontSizes,
+          },
+        });
       }
 
       return state;
