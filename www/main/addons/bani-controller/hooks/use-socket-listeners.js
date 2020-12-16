@@ -14,10 +14,10 @@ const useSocketListeners = (isListeners, adminPin) => {
   } = useStoreState(state => state.userSettings);
 
   const fontSizes = {
-    gurbani: parseInt(gurbaniFontSize),
-    translation: parseInt(translationFontSize),
-    teeka: parseInt(teekaFontSize),
-    transliteration: parseInt(transliterationFontSize),
+    gurbani: parseInt(gurbaniFontSize, 10),
+    translation: parseInt(translationFontSize, 10),
+    teeka: parseInt(teekaFontSize, 10),
+    transliteration: parseInt(transliterationFontSize, 10),
   };
 
   useEffect(() => {
