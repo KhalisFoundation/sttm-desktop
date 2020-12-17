@@ -642,7 +642,7 @@ module.exports = {
       });
       if (path) {
         store.set('userPrefs.app.live-feed-location', path[0]);
-        const locationLabel = document.getElementsByClassName('sub-label livefeed');
+        const locationLabel = document.querySelectorAll('.control-item#live-feed > .notes');
         for (let i = 0, len = locationLabel.length; i < len; i += 1) {
           locationLabel[i].innerText = path;
         }

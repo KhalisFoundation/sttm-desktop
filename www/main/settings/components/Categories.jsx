@@ -6,7 +6,7 @@ import { convertToCamelCase } from '../../common/utils';
 
 const { remote } = require('electron');
 
-const { i18n } = remote.require('./app');
+const { store, i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];
@@ -26,16 +26,14 @@ const SettingsFactory = ({ subCategory }) => {
         <span>{i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
 
         {/* 3. Push notes and default value text */}
-        {subCategory.settingObjs[settingKey].notes && (
-          <span className="notes">
-            {i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].notes}`)}
-          </span>
-        )}
-        {subCategory.settingObjs[settingKey].type === 'range' && (
-          <span className="notes">
-            {`(Default: ${subCategory.settingObjs[settingKey].initialValue})`}
-          </span>
-        )}
+        <span className="notes">
+          {subCategory.settingObjs[settingKey].notes &&
+            i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].notes}`)}
+          {subCategory.settingObjs[settingKey].type === 'range' &&
+            `(Default: ${subCategory.settingObjs[settingKey].initialValue})`}
+          {subCategory.settingObjs[settingKey].store &&
+            store.get(subCategory.settingObjs[settingKey].store)}
+        </span>
 
         {/* 4. Push the setting input */}
         <Setting

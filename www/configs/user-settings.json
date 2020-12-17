@@ -228,7 +228,8 @@
     },
     "live-feed": {
       "title": "LIVE_FEED",
-      "initialValue": false
+      "initialValue": false,
+      "store": "userPrefs.app.live-feed-location"
     },
     "limit-change-log": {
       "title": "LIMIT_CHANGELOG",
