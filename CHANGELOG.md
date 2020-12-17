@@ -1,6 +1,21 @@
 ## New Updates
 
-### 8.1.0 - _November #, 2020_
+### 8.2.0 - _December 17, 2020_
+
+### Improved:
+
+- Added workspaces toolbar to easily change between presentation and single-display modes
+- Added the ability to clear history
+- Fixed a bug tha was causing a border to appear on some projectors 
+- Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
+### 8.1.0 - _November 12, 2020_
 
 ### Improved:
 
