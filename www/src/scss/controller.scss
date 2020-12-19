@@ -151,7 +151,13 @@ ul {
       align-items: center;
       display: flex;
 
-      a {
+      .home &#setting-container-slide-layout-display-options-quick-tools {
+        display: none;
+      }
+
+      a,
+      label,
+      span {
         flex-grow: 1;
       }
 
