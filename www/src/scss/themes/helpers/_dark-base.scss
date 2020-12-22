@@ -22,6 +22,10 @@
     color: $white;
   }
 
+  #app-frame {
+    background-color: rgba($bg-main, 0.3);
+  }
+
   #toolbar,
   #toolbar-nav,
   .bani-list,
