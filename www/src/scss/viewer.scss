@@ -326,7 +326,7 @@ h2 {
   display: none;
   font-size: 5vh;
   justify-content: space-around;
-  left: -28vh;
+  left: -28vw;
   padding-bottom: 6px;
   padding-top: 12px;
   position: absolute;
@@ -353,7 +353,6 @@ h2 {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;
-    left: 75px;
     opacity: 0.9;
     position: fixed;
     transition: left 1s ease;
