@@ -152,6 +152,7 @@ const menuTemplate = [
 const devMenu = [];
 
 if (process.env.NODE_ENV === 'development') {
+  main.openSecondaryWindow('overlayWindow');
   devMenu.push({
     label: i18n.t('MENU.DEV.SELF'),
     submenu: [
