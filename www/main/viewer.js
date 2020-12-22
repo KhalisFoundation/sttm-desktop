@@ -325,6 +325,8 @@ const createCards = (rows, LineID) => {
     const esTranslation = h('div.spanish-translation.transtext');
     // If spanish translation is not available fall back to english
     esTranslation.innerHTML = row.Spanish || '';
+    const hiTranslation = h('div.hindi-translation.transtext');
+    hiTranslation.innerHTML = row.Hindi || '';
     /* Show English if spanish not available in ceremonies explanation slides
     so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
     let esText = row.Spanish;
@@ -336,6 +338,7 @@ const createCards = (rows, LineID) => {
     const translationsContainer = document.createElement('div');
     translationsContainer.appendChild(enTranslation);
     translationsContainer.appendChild(esTranslation);
+    translationsContainer.appendChild(hiTranslation);
 
     const shTransliteration = h(
       'div.shahmukhi-transliteration.translittext',
@@ -370,6 +373,7 @@ const createCards = (rows, LineID) => {
       translation: {
         Spanish: esText || '',
         English: row.English || '',
+        Hindi: row.Hindi || '',
       },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',

@@ -46,7 +46,8 @@
             "title": "TRANSLATION",
             "options": {
               "English": "ENGLISH",
-              "Spanish": "SPANISH"
+              "Spanish": "SPANISH",
+              "Hindi": "HINDI"
             }
           },
           "transliteration-language": {

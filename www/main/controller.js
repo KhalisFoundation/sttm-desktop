@@ -548,6 +548,7 @@ module.exports = {
       Line.English = lineTranslations.en.bdb;
       Line.Punjabi = lineTranslations.pu.bdb || lineTranslations.pu.ss;
       Line.Spanish = lineTranslations.es.sn;
+      Line.Hindi = lineTranslations.hi.ss || '';
     }
     Line.Transliteration = {
       English: anvaad.translit(Line.Gurmukhi || ''),
