@@ -258,7 +258,7 @@ function createViewer(ipcData) {
       autoHideMenuBar: true,
       show: false,
       titleBarStyle: 'hidden',
-      frame: process.platform !== 'win32',
+      frame: false,
       backgroundColor: '#000000',
       webPreferences: {
         nodeIntegration: true,
@@ -453,7 +453,7 @@ app.on('ready', () => {
     minHeight: 600,
     width,
     height,
-    frame: process.platform !== 'win32',
+    frame: false,
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',

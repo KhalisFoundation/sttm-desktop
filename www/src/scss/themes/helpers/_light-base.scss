@@ -59,6 +59,13 @@
     }
   }
 
+  .workspace-bar {
+    background-color: $dialog-bg;
+    div:hover {
+      background-color: $nav-bg;
+    }
+  }
+
   .viewer-controls {
     background-color: $nav-bg;
   }
@@ -133,6 +140,11 @@
     a.panktee.current {
       background-color: $current-focus !important;
       color: $base-text !important;
+
+      & + i {
+        background-color: $current-focus !important;
+        color: $base-text !important;
+      }
     }
   }
 

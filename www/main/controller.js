@@ -399,19 +399,21 @@ function updateViewerScale() {
 
   // Try scaling by width first
   const proposedHeight = fitInsideWidth / viewerRatio;
+  const workspaceHeight = '40px';
   if (fitInsideHeight > proposedHeight) {
     scale = fitInsideWidth / global.viewer.width;
     previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${fitInsidePadding} + ${(fitInsideHeight - proposedHeight) /
+    previewStyles += `top: calc(${workspaceHeight} + ${fitInsidePadding} + ${(fitInsideHeight -
+      proposedHeight) /
       2}px);`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + 25px + ${(fitInsideHeight -
+    previewWinStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} + 25px + ${(fitInsideHeight -
       proposedHeight) /
       2}px);`;
   } else {
     scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: ${fitInsidePadding};`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + 25px);`;
+    previewStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} );`;
+    previewWinStyles += `top: calc(${fitInsidePadding} + 35px);`;
     previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) /
       2}px);`;
   }
@@ -441,10 +443,10 @@ function checkPresenterView() {
   classList.toggle('home', !inPresenterView);
   classList.toggle('scale-viewer', inPresenterView);
 
-  document.querySelector('#presenter-view-toggle').checked = inPresenterView;
   // hide header-tabs for non presenter view
   document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
   global.platform.ipc.send('presenter-view', inPresenterView);
+  global.webview.send('presenter-view', inPresenterView);
 }
 
 function reloadBani(resume = false) {

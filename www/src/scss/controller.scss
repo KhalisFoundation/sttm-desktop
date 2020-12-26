@@ -93,6 +93,11 @@ ul {
   #language-selector {
     visibility: hidden;
   }
+
+  .workspace-bar {
+    height: 0;
+    overflow: hidden;
+  }
 }
 
 .nav-page,
@@ -139,6 +144,28 @@ ul {
     align-self: center;
     display: block;
     width: 200px;
+  }
+
+  &#session-page {
+    ul > li {
+      align-items: center;
+      display: flex;
+
+      .home &#setting-container-slide-layout-display-options-quick-tools {
+        display: none;
+      }
+
+      a,
+      label,
+      span {
+        flex-grow: 1;
+      }
+
+      i {
+        cursor: pointer;
+        padding: 8px;
+      }
+    }
   }
 }
 

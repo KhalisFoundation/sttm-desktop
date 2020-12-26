@@ -6,6 +6,7 @@ const loadBani = (bani, onScreenClose) => () => {
   analytics.trackEvent('sunderGutkaBanis', bani.token);
   global.core.search.loadBani(bani.id);
   global.core.copy.loadFromDB(bani.id, 'bani');
+  document.querySelector('#shabad-pageLink').click();
   onScreenClose();
 };
 

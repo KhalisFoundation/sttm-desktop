@@ -265,30 +265,6 @@ document.querySelectorAll('.nav-header-tab').forEach(element => {
     module.exports.activateNavLink(clickedTabId, true);
   });
 });
-
-const presenterSwitch = h('li', [
-  h('span', i18n.t('SETTINGS.APP_LAYOUT.PRESENTER_VIEW')),
-  h('div.switch', [
-    h('input#presenter-view-toggle', {
-      name: 'presenter-view-toggle',
-      type: 'checkbox',
-      checked: store.getUserPref('app.layout.presenter-view'),
-      onclick: () => {
-        store.setUserPref(
-          'app.layout.presenter-view',
-          !store.getUserPref('app.layout.presenter-view'),
-        );
-        global.platform.updateSettings();
-        global.controller['presenter-view']();
-      },
-      value: 'presenter-view',
-    }),
-    h('label', {
-      htmlFor: 'presenter-view-toggle',
-    }),
-  ]),
-]);
-
 const footerNav = h('ul.menu-bar', navPageLinks);
 
 const sources = {
@@ -341,8 +317,6 @@ module.exports = {
     document.querySelector('.shabad-next').appendChild(shabadNavFwd);
     document.querySelector('.shabad-prev').appendChild(shabadNavBack);
     document.querySelector('#footer .menu-group-left').appendChild(footerNav);
-    document.querySelector('.presenter-switch').appendChild(presenterSwitch);
-
     this.$navigator = document.getElementById('navigator');
     this.$searchPage = document.getElementById('search-page');
     this.$search = document.getElementById('search');
@@ -660,6 +634,15 @@ module.exports = {
     }
   },
 
+  deleteFromHistory(panktiId, type = 'shabad') {
+    document.getElementById(`session-${type}-${panktiId}`).remove();
+    const indexValue = sessionList.indexOf(`shabad-${panktiId}`);
+    if (indexValue > -1) {
+      sessionList.splice(indexValue, 1);
+    }
+    delete sessionStatesList[`shabad-${panktiId}`];
+  },
+
   addToHistory(SearchID, MainLineID, SearchTitle, type = 'shabad') {
     const sessionKey = `${type}-${SearchID}`;
     const sessionItem = h(
@@ -668,6 +651,8 @@ module.exports = {
       h(
         'a.panktee.current',
         {
+          'data-id': SearchID,
+          'data-type': type,
           onclick: ev => {
             const $panktee = ev.target;
             const { resumePanktee } = sessionStatesList[sessionKey];
@@ -693,6 +678,13 @@ module.exports = {
         },
         SearchTitle,
       ),
+      h('i.fa.fa-times', {
+        onclick: ev => {
+          const $button = ev.target;
+          const panktiData = $button.previousSibling.dataset;
+          this.deleteFromHistory(panktiData.id, panktiData.type);
+        },
+      }),
     );
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
