@@ -383,11 +383,18 @@ h2 {
 .quick-tools-true {
   .viewer-controls,
   &.webview .vc-toggle-icon {
-    display: flex;
+    display: none;
     left: 75px;
     opacity: 0.9;
     position: fixed;
     transition: left 1s ease;
+  }
+}
+
+.presenter-view {
+  .viewer-controls,
+  &.webview .vc-toggle-icon {
+    display: flex;
   }
 }
 

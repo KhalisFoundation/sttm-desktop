@@ -54,12 +54,24 @@ const shortcutsToggle = () => {
   );
 };
 
+const clearHistoryBtn = h(
+  'button.clear-history',
+  {
+    onclick: () => {
+      global.core.search.clearSession();
+    },
+  },
+  h(`i.clear-history-icon.fa.fa-history`),
+  'Clear History',
+);
+
 module.exports = {
   init() {
     Object.keys(shortcutItemsJSON).forEach(itemKey => {
       shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
     });
 
-    document.querySelector('#footer').appendChild(shortcutsToggle());
+    document.querySelector('#footer').appendChild(shortcutsToggle);
+    document.querySelector('#footer').appendChild(clearHistoryBtn);
   },
 };

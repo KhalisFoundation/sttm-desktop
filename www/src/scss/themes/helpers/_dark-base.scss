@@ -124,6 +124,11 @@
     a.panktee.current {
       background-color: $highlight-bg !important;
       color: $text-base !important;
+
+      & + i {
+        background-color: $highlight-bg !important;
+        color: $text-base !important;
+      }
     }
   }
 

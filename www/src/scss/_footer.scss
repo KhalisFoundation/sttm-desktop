@@ -30,4 +30,22 @@
       }
     }
   }
+
+  .clear-history {
+    align-self: center;
+    cursor: pointer;
+    display: none;
+    margin-left: auto;
+    margin-right: 20px;
+    padding: 10px;
+
+    .presenter-view & {
+      display: block;
+    }
+
+    i {
+      font-size: 14px;
+      padding: 4px;
+    }
+  }
 }

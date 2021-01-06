@@ -634,6 +634,15 @@ module.exports = {
     }
   },
 
+  deleteFromHistory(panktiId, type = 'shabad') {
+    document.getElementById(`session-${type}-${panktiId}`).remove();
+    const indexValue = sessionList.indexOf(`shabad-${panktiId}`);
+    if (indexValue > -1) {
+      sessionList.splice(indexValue, 1);
+    }
+    delete sessionStatesList[`shabad-${panktiId}`];
+  },
+
   addToHistory(SearchID, MainLineID, SearchTitle, type = 'shabad') {
     const sessionKey = `${type}-${SearchID}`;
     const sessionItem = h(
@@ -642,6 +651,8 @@ module.exports = {
       h(
         'a.panktee.current',
         {
+          'data-id': SearchID,
+          'data-type': type,
           onclick: ev => {
             const $panktee = ev.target;
             const { resumePanktee } = sessionStatesList[sessionKey];
@@ -667,6 +678,13 @@ module.exports = {
         },
         SearchTitle,
       ),
+      h('i.fa.fa-times', {
+        onclick: ev => {
+          const $button = ev.target;
+          const panktiData = $button.previousSibling.dataset;
+          this.deleteFromHistory(panktiData.id, panktiData.type);
+        },
+      }),
     );
     // get all the lines in the session block and remove the .current class from them
     const sessionLines = this.$session.querySelectorAll('a.panktee');
