@@ -71,7 +71,7 @@ module.exports = {
       shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
     });
 
-    document.querySelector('#footer').appendChild(shortcutsToggle);
+    document.querySelector('#footer').appendChild(shortcutsToggle());
     document.querySelector('#footer').appendChild(clearHistoryBtn);
   },
 };
