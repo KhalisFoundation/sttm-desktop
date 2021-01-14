@@ -6,7 +6,7 @@
 
 - Added workspaces toolbar to easily change between presentation and single-display modes
 - Added the ability to clear history
-- Fixed a bug tha was causing a border to appear on some projectors
+- Fixed a bug that was causing a border to appear on some projectors 
 - Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
 
 </br>
