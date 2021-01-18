@@ -101,6 +101,16 @@
       }
     }
   }
+
+  .settings-theme {
+    background: #fff;
+    bottom: 0;
+    height: calc(50% - calc(25px * 1.5) - 60px);
+    overflow: auto;
+    position: fixed;
+    right: 42px;
+    width: calc(calc(50% - 37.5px) - calc(25px * 1.5));
+  }
 }
 
 #settings,
@@ -171,6 +181,7 @@
       transform: translateX(-150%);
     }
   }
+
   #dhan-guru {
     margin-left: 12px;
   }

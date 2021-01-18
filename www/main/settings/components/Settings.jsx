@@ -5,7 +5,7 @@ import { Overlay } from '../../common/sttm-ui';
 
 import SettingsNav from './SettingsNav';
 import SettingsContainer from './SettingsContainer';
-
+import ThemeContainer from './ThemeContainer';
 import { settingsNavObj, settingsObj } from '../utils';
 
 const Settings = ({ onScreenClose }) => {
@@ -14,6 +14,7 @@ const Settings = ({ onScreenClose }) => {
       <div className="settings-wrapper">
         <SettingsNav settingsNavObj={settingsNavObj} />
         <SettingsContainer settingsObj={settingsObj} />
+        <ThemeContainer />
       </div>
     </Overlay>
   );

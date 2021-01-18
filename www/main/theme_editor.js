@@ -284,6 +284,7 @@ const imageInput = themesContainer =>
   );
 
 module.exports = {
+  themes,
   defaultTheme,
   updateCeremonyThemeTiles,
   getCurrentTheme,
