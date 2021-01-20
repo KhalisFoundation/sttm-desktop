@@ -1,5 +1,21 @@
 ## New Updates
 
+### 8.3.0 - _January 20, 2021_
+
+### Improved:
+
+- Moved the Settings menu to a new location and made it easier to use 
+- Updated icons for Settings and Bani Controller
+- Reduced the extra space at the bottom of presentaiton slides to prevent cut-offs
+- Updated the UI to have more contrast throughout the app
+- Updated the button for loading the daily Hukanbana to show if you are offline
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 8.2.0 - _January 20, 2021_
 
 ### Improved:
@@ -8,12 +24,6 @@
 - Added the ability to clear history
 - Fixed a bug that was causing a border to appear on some projectors 
 - Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 8.1.0 - _November 12, 2020_
 
