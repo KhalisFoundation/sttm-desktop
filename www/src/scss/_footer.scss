@@ -31,29 +31,21 @@
     }
   }
 
-  .presenter-switch {
-    @extend .menu-bar;
-    $switchHeight: 24px;
+  .clear-history {
+    align-self: center;
+    cursor: pointer;
+    display: none;
+    margin-left: auto;
+    margin-right: 20px;
+    padding: 10px;
 
-    bottom: 0;
-    position: absolute;
-    right: 0;
+    .presenter-view & {
+      display: block;
+    }
 
-    span {
+    i {
       font-size: 14px;
-      line-height: 0;
-    }
-
-    .switch {
-      height: $switchHeight;
-      margin: 8px;
-      vertical-align: middle;
-      width: 42px;
-    }
-
-    label::after {
-      height: $switchHeight;
-      width: $switchHeight;
+      padding: 4px;
     }
   }
 }

@@ -231,6 +231,7 @@ if ($minimize) {
         element.classList.toggle('disabled');
       });
       document.getElementById('navigator').classList.toggle('minimized');
+      if (global.webview) global.webview.send('navigator-toggled');
     });
   });
 }

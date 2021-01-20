@@ -331,7 +331,7 @@ h2 {
   padding-top: 12px;
   position: absolute;
   text-align: center;
-  top: 0;
+  top: 20px;
   width: 28vh;
   z-index: 50;
 
@@ -345,12 +345,33 @@ h2 {
   }
 }
 
+.presenter-view .vc-toggle-icon {
+  top: 0;
+}
+
 .quick-tools {
   .viewer-controls,
   &.webview .vc-toggle-icon {
-    display: flex;
+    display: none;
+    left: 75px;
     opacity: 0.9;
     position: fixed;
+    transition: left 1s ease;
+  }
+}
+
+.presenter-view {
+  .viewer-controls,
+  &.webview .vc-toggle-icon {
+    display: flex;
+  }
+}
+
+.navigator-minimized,
+.presenter-view {
+  .viewer-controls,
+  &.webview .vc-toggle-icon {
+    left: 0;
   }
 }
 
