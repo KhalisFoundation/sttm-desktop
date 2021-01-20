@@ -1,6 +1,6 @@
 ## New Updates
 
-### 8.2.0 - _December 17, 2020_
+### 8.2.0 - _January 20, 2021_
 
 ### Improved:
 
