@@ -1,3 +1,6 @@
+import { savedSettings } from './common/store/user-settings/get-saved-user-settings';
+import { applyUserSettings } from './common/store/user-settings/apply-user-settings';
+
 const h = require('hyperscript');
 const getJSON = require('get-json');
 const request = require('request');
@@ -333,6 +336,7 @@ module.exports = {
     // when the app is reloaded, enable the control for akhandpaatt
     store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
     settings.init();
+    applyUserSettings(savedSettings);
   },
 
   getNotifications,
