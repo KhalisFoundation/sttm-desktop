@@ -8,7 +8,7 @@
 - Updated icons for Settings and Bani Controller
 - Reduced the extra space at the bottom of presentaiton slides to prevent cut-offs
 - Updated the UI to have more contrast throughout the app
-- Updated the button for loading the daily Hukanbana to show if you are offline
+- Updated the button for loading the daily Hukamnama to show if you are offline
 
 </br>
 
