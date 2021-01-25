@@ -3,9 +3,12 @@ import React from 'react';
 import { remote } from 'electron';
 import { Tile } from '../../common/sttm-ui';
 
-import { themes, applyTheme } from '../../theme_editor';
+import { themes } from '../../theme_editor';
 
-const { i18n } = remote.require('./app');
+import { useStoreActions, useStoreState } from 'easy-peasy';
+
+const { i18n, store } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const themeTypes = [
   { type: 'COLOR', title: 'COLORS' },
@@ -14,7 +17,24 @@ const themeTypes = [
 ];
 
 const ThemeContainer = () => {
+  const { theme: currentTheme } = useStoreState(state => state.userSettings);
+  const { setTheme } = useStoreActions(state => state.userSettings);
+
+  const applyTheme = (themeInstance, isCustom) => {
+    setTheme(themeInstance.key);
+    if (!isCustom) {
+      /* TODO: move this to react state when porting viewer to react */
+      store.setUserPref('app.themebg', {
+        type: 'default',
+        url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
+      });
+    }
+    global.core.platformMethod('updateSettings');
+    analytics.trackEvent('theme', themeInstance.key);
+  };
+
   const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
+
   return (
     <div className="block-list settings-theme">
       <div id="custom-theme-options">
@@ -25,7 +45,9 @@ const ThemeContainer = () => {
               <Tile
                 key={theme.name}
                 onClick={() => {
-                  applyTheme(theme);
+                  if (currentTheme !== theme.key) {
+                    applyTheme(theme);
+                  }
                 }}
                 className="theme-instance"
                 theme={theme}

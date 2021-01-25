@@ -10,6 +10,6 @@ $themeLowLight: (
   yamki: #ffc500,
 );
 
-body.low-light {
+body.theme-low-light {
   @include generateTheme($themeLowLight...);
 }

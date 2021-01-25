@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const h = require('hyperscript');
 const Noty = require('noty');
 const fs = require('fs');
@@ -291,7 +292,7 @@ module.exports = {
   getTheme,
   applyTheme,
   init() {
-    const themeOptions = document.querySelector('#custom-theme-options');
+    /* const themeOptions = document.querySelector('#custom-theme-options');
 
     themeOptions.appendChild(swatchHeaderFactory(i18n.t('THEMES.COLORS')));
     swatchGroupFactory('COLOR', themeOptions);
@@ -310,6 +311,6 @@ module.exports = {
       swatchHeaderFactory(i18n.t('THEMES.RECENT_CUSTOM_BGS')),
     );
     recentBgHeader.classList.add('recentbg-header');
-    upsertCustomBackgrounds(themeOptions);
+    upsertCustomBackgrounds(themeOptions); */
   },
 };

@@ -10,6 +10,6 @@ $themeKhalsaRush: (
   yamki: #9a6914,
 );
 
-body.khalsa-rush {
+body.theme-khalsa-rush {
   @include generateTheme($themeKhalsaRush...);
 }

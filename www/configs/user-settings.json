@@ -239,6 +239,14 @@
     "statistics": {
       "title": "COLLECT_STATISTICS",
       "initialValue": false
+    },
+    "theme": {
+      "title": "THEME",
+      "initialValue": "light-theme"
+    },
+    "themeBg": {
+      "title": "THEME_BG",
+      "initialValue": " "
     }
   }
 }

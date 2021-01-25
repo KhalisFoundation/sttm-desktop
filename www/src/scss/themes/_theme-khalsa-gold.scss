@@ -10,7 +10,7 @@ $themeKhalsaGold: (
   yamki: #ffc500,
 );
 
-body.khalsa-gold {
+body.theme-khalsa-gold {
   @include generateTheme($themeKhalsaGold...);
 
   .deck .gurbani {

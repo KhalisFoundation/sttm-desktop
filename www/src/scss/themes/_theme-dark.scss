@@ -10,6 +10,6 @@ $themeDark: (
   yamki: #ffc500,
 );
 
-body.dark-theme {
+body.theme-dark-theme {
   @include generateTheme($themeDark...);
 }

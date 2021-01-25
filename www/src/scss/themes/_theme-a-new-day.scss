@@ -10,6 +10,6 @@ $themeNewDay: (
   yamki: #c2951a,
 );
 
-body.a-new-day {
+body.theme-a-new-day {
   @include generateTheme($themeNewDay...);
 }
