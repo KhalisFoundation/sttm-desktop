@@ -151,7 +151,7 @@ body {
 }
 
 .deck {
-  height: calc(100% - 100px);
+  height: calc(100% - 40px);
   opacity: 0;
   overflow: hidden;
   position: absolute;
@@ -391,7 +391,7 @@ h2 {
   }
 }
 
-.presenter-view {
+.presenter-view.quick-tools-true {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;
@@ -399,7 +399,7 @@ h2 {
 }
 
 .navigator-minimized,
-.presenter-view {
+.presenter-view.quick-tools-true {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     left: 0;
@@ -468,7 +468,7 @@ h2 {
   }
 }
 
-.presenter-view.webview {
+.presenter-view.webview.quick-tools-true {
   .viewer-controls {
     width: 30vh;
 

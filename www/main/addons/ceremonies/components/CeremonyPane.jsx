@@ -116,7 +116,7 @@ const CeremonyPane = props => {
               className="theme-instance"
               theme={themes.current}
             >
-              CURRENT THEME
+              <span class="current-cer-theme"> CURRENT THEME </span>
             </Tile>
           </div>
         </div>
