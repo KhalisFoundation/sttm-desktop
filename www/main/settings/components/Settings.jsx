@@ -11,7 +11,7 @@ import { settingsNavObj, settingsObj } from '../utils';
 const Settings = ({ onScreenClose }) => {
   return (
     <Overlay onScreenClose={onScreenClose}>
-      <div className="settings-wrapper">
+      <div className="addon-wrapper settings-wrapper">
         <SettingsNav settingsNavObj={settingsNavObj} />
         <SettingsContainer settingsObj={settingsObj} />
       </div>
