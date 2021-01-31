@@ -65,7 +65,7 @@
       "subcategories": ["app-layout", "other-options"]
     },
     "app-layout": {
-      "title": "APP_LAYOUT",
+      "title": "APP_SETTINGS",
       "type": "switch",
       "settings": ["quick-tools", "shortcut-tray", "live-feed"]
     },
