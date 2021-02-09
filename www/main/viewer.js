@@ -6,6 +6,10 @@
   no-undef: 0
 */
 
+import { savedSettings } from './js/common/store/user-settings/get-saved-user-settings';
+import { applyUserSettings } from './js/common/store/user-settings/apply-user-settings';
+import { convertToLegacySettingsObj } from './js/common/utils';
+
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -40,6 +44,7 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
+applyUserSettings(savedSettings);
 
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
@@ -81,7 +86,9 @@ const activateSlide = ($deck, LineID) => {
 };
 
 const castToReceiver = () => {
-  castCur.prefs = store.get('userPrefs');
+  const latestSettings = JSON.parse(localStorage.getItem('userSettings'));
+  castCur.prefs = convertToLegacySettingsObj(latestSettings);
+  castCur.prefs.app = { theme: store.get('userPrefs.app.theme') };
   sendMessage(JSON.stringify(castCur));
 };
 
@@ -201,6 +208,14 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
+global.platform.ipc.on('save-settings', (event, setting) => {
+  const { key, payload, oldValue } = setting;
+  document.body.classList.remove(`${key}-${oldValue}`);
+  document.body.classList.add(`${key}-${payload}`);
+  savedSettings[key] = payload;
+  localStorage.setItem('userSettings', JSON.stringify(savedSettings));
+});
+
 global.platform.ipc.on('navigator-toggled', () => {
   document.body.classList.toggle('navigator-minimized');
 });
@@ -247,21 +262,30 @@ const iconsetHtml = (classname, content) => {
       h(
         'span.visibility',
         {
-          onclick: e => core.menu.settings.showHide(e, iconType),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'visibility' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-eye-slash'),
       ),
       h(
         'span.minus.size',
         {
-          onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'size', operation: 'minus' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-minus-circle'),
       ),
       h(
         'span.plus.size',
         {
-          onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
+          onclick: () => {
+            const settingChanger = { iconType, func: 'size', operation: 'plus' };
+            global.platform.ipc.send('set-user-setting', settingChanger);
+          },
         },
         h('i.fa.fa-plus-circle'),
       ),
