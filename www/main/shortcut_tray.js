@@ -2,12 +2,11 @@ const h = require('hyperscript');
 const { remote } = require('electron');
 const shortcutItemsJSON = require('../configs/shortcut_tray.json');
 
-const { store, i18n } = remote.require('./app');
+const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 
 const shortcutTrayContainer = document.querySelector('.shortcut-tray');
-let isShortcutTrayOn = store.getUserPref('slide-layout.display-options.shortcut-tray-on');
 
 const trayItemFactory = (trayItemKey, trayItem) =>
   h(
@@ -34,24 +33,26 @@ const trayItemFactory = (trayItemKey, trayItem) =>
     ),
   );
 
-const shortcutsToggle = h(
-  'div.shortcut-toggle',
-  {
-    onclick: () => {
-      isShortcutTrayOn = !isShortcutTrayOn;
-      analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
-      store.setUserPref('slide-layout.display-options.shortcut-tray-on', isShortcutTrayOn);
-      global.core.platformMethod('updateSettings');
-      document
-        .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-caret-up', !isShortcutTrayOn);
-      document
-        .querySelector('i.shortcut-toggle-icon')
-        .classList.toggle('fa-caret-down', isShortcutTrayOn);
+const shortcutsToggle = () => {
+  let isShortcutTrayOn = global.getUserSettings.shortcutTray;
+  return h(
+    'div.shortcut-toggle',
+    {
+      onclick: () => {
+        isShortcutTrayOn = !isShortcutTrayOn;
+        analytics.trackEvent('shortcutTrayToggle', isShortcutTrayOn);
+        global.setUserSettings.setShortcutTray(isShortcutTrayOn);
+        document
+          .querySelector('i.shortcut-toggle-icon')
+          .classList.toggle('fa-caret-up', !isShortcutTrayOn);
+        document
+          .querySelector('i.shortcut-toggle-icon')
+          .classList.toggle('fa-caret-down', isShortcutTrayOn);
+      },
     },
-  },
-  h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
-);
+    h(`i.shortcut-toggle-icon.fa.${isShortcutTrayOn ? 'fa-caret-down' : 'fa-caret-up'}`),
+  );
+};
 
 const clearHistoryBtn = h(
   'button.clear-history',
@@ -70,7 +71,7 @@ module.exports = {
       shortcutTrayContainer.appendChild(trayItemFactory(itemKey, shortcutItemsJSON[itemKey]));
     });
 
-    document.querySelector('#footer').appendChild(shortcutsToggle);
+    document.querySelector('#footer').appendChild(shortcutsToggle());
     document.querySelector('#footer').appendChild(clearHistoryBtn);
   },
 };

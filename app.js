@@ -11,8 +11,13 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 
-// eslint-disable-next-line import/no-unresolved
+/* eslint-disable import/no-unresolved */
 const Store = require('./www/js/store.js');
+const {
+  savedSettingsCamelCase,
+} = require('./www/js/common/store/user-settings/get-saved-user-settings');
+/* eslint-enable */
+
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -27,6 +32,8 @@ const httpBase = require('http').Server(expressApp);
 const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
+
+const savedSettings = savedSettingsCamelCase();
 
 const platform = os.platform();
 let isUnsupportedWindow = false;
@@ -242,7 +249,7 @@ function checkForExternalDisplay() {
 function showChangelog() {
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
-  const limitChangeLog = store.get('userPrefs.app.analytics.limit-changelog');
+  const { limitChangeLog } = savedSettings;
 
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }
@@ -339,8 +346,8 @@ const showLine = async (line, socket = io) => {
   const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
-    translation: store.getUserPref('slide-layout.language-settings.translation-language'),
-    transliteration: store.getUserPref('slide-layout.language-settings.transliteration-language'),
+    translation: savedSettings.translationLanguage,
+    transliteration: savedSettings.transliterationLanguage,
   };
 
   const payload = Object.assign(lineWithSettings, overlayPrefs);
@@ -663,6 +670,10 @@ ipcMain.on('update-settings', () => {
     viewerWindow.webContents.send('update-settings');
   }
   mainWindow.webContents.send('sync-settings');
+});
+
+ipcMain.on('set-user-setting', (event, settingChanger) => {
+  mainWindow.webContents.send('set-user-setting', settingChanger);
 });
 
 module.exports = {

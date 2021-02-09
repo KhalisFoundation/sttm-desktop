@@ -9,10 +9,9 @@
   @each $source in $visraam-sources {
     /* If its on larivaar assist do not show vishraams
     If larivaar is off, but larivaar assist is on, then do show vishraams */
-    &.larivaar-assist:not(.larivaar),
-    &:not(.larivaar-assist) {
-      &.display-visraams.vishraam-vishraam-options-colored-words.vishraam-vishraam-source-#{$source}
-        .gurbani {
+    &.larivaar-assist-true:not(.larivaar-true),
+    &:not(.larivaar-assist-true) {
+      &.display-vishraams-true.vishraam-type-colored-words.vishraam-source-#{$source} .gurbani {
         .visraam-main.visraam-#{$source} {
           color: $visraam-main;
         }
@@ -22,8 +21,7 @@
         }
       }
 
-      &.display-visraams.vishraam-vishraam-options-gradient-bg.vishraam-vishraam-source-#{$source}
-        .gurbani {
+      &.display-vishraams-true.vishraam-type-gradient-bg.vishraam-source-#{$source} .gurbani {
         span {
           border-radius: 15px;
         }
@@ -51,13 +49,13 @@
       }
     }
 
-    &.larivaar.larivaar-assist.larivaar-settings-assist-type-single-color {
+    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-single-color {
       .gurbani .larivaar span:nth-of-type(even) {
         opacity: 0.75;
       }
     }
 
-    &.larivaar.larivaar-assist.larivaar-settings-assist-type-multi-color {
+    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-multi-color {
       .gurbani .larivaar span:nth-of-type(even) {
         color: $yamki;
       }
@@ -85,7 +83,8 @@
   background-color: $background-color;
   background-image: $background-image;
 
-  .gurbani {
+  .gurbani,
+  .current-cer-theme {
     color: $gurbani;
   }
 
