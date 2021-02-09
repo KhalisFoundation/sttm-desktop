@@ -129,7 +129,6 @@ function openSecondaryWindow(windowName) {
       },
     });
     window.obj.webContents.on('did-finish-load', () => {
-      window.obj.webContents.openDevTools();
       window.obj.show();
       window.obj.focus();
       if (window.show) {
