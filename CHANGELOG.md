@@ -1,14 +1,18 @@
 ## New Updates
 
-### 8.3.0 - _January 20, 2021_
+### 8.3.0 - _February 10, 2021_
 
 ### Improved:
 
 - Moved the Settings menu to a new location and made it easier to use
+- Added Hindi translations
 - Updated icons for Settings and Bani Controller
-- Reduced the extra space at the bottom of presentaiton slides to prevent cut-offs
+- Fixed some bugs with Bani Controller
+- Reduced the extra space at the bottom of presentation slides to prevent cut-offs
 - Updated the UI to have more contrast throughout the app
 - Updated the button for loading the daily Hukamnama to show if you are offline
+- Fixed a bug that was causing font options not to display properly in Bani Overlay
+- Fixed some bugs related to Quick Tools not appearing correctly
 
 </br>
 
