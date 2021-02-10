@@ -5,6 +5,16 @@
   overflow-y: scroll;
   position: relative;
   scroll-behavior: smooth;
+  display: flex;
+
+  .other-settings {
+    margin-left: 48px;
+  }
+
+  .settings-viewer {
+    width: 500px;
+    height: 300px;
+  }
 
   .settings-nav {
     align-items: center;
@@ -191,4 +201,122 @@
   font-size: smaller;
   font-weight: lighter;
   margin-left: 1.5rem;
+}
+
+.settings-viewer {
+  border: 1px solid red;
+}
+.gurbani {
+  font-weight: normal;
+  line-height: 1.5;
+
+  .padchhed {
+    span {
+      white-space: nowrap;
+
+      i {
+        font-size: 0;
+        margin-left: 1rem;
+      }
+    }
+  }
+
+  .larivaar {
+    display: none;
+
+    i {
+      display: none;
+      font-style: normal;
+    }
+  }
+}
+
+.larivaar-true {
+  .gurbani {
+    .padchhed {
+      display: none;
+    }
+
+    .larivaar {
+      display: inline;
+    }
+  }
+}
+
+.translation,
+.transliteration {
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.transtext,
+.translittext {
+  display: none;
+}
+
+.translation-language-English .english-translation,
+.translation-language-Spanish .spanish-translation,
+.transliteration-language-Shahmukhi .shahmukhi-transliteration,
+.transliteration-language-Devanagari .devanagari-transliteration,
+.transliteration-language-English .english-transliteration {
+  display: block;
+}
+
+.transliteration {
+  text-transform: lowercase;
+}
+
+.teeka {
+  font-family: 'gurbaniakhar';
+  line-height: 1.5;
+  margin-top: 0.25em;
+}
+
+.translation,
+.transliteration,
+.teeka {
+  display: none;
+  height: 0;
+  opacity: 0;
+}
+
+.translation-visibility-true .translation,
+.transliteration-visibility-true .transliteration,
+.teeka-visibility-true .teeka {
+  display: block;
+  height: auto;
+  opacity: 1;
+}
+
+.icons-translation .size,
+.icons-transliteration .size,
+.icons-teeka .size {
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.translation-visibility-true .icons-translation,
+.transliteration-visibility-true .icons-transliteration,
+.teeka-visibility-true .icons-teeka {
+  .size {
+    opacity: 1;
+    z-index: 20;
+  }
+
+  .visibility i {
+    &::before {
+      content: '\f06e';
+    }
+  }
+}
+
+/* ***** FONT SIZES ***** */
+@for $i from 1 through 20 {
+  .gurbani-font-size-#{$i} .gurbani,
+  .translation-font-size-#{$i} .translation,
+  .transliteration-font-size-#{$i} .transliteration,
+  .announcements-font-size-#{$i} .announcements,
+  .teeka-font-size-#{$i} .teeka {
+    font-size: #{$i}vh;
+  }
 }
