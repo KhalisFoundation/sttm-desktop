@@ -205,7 +205,8 @@
       "type": "dropdown",
       "options": {
         "English": "ENGLISH_LANGUAGE",
-        "Spanish": "SPANISH_LANGUAGE"
+        "Spanish": "SPANISH_LANGUAGE",
+        "Hindi": "HINDI_LANGUAGE"
       },
       "initialValue": "English"
     },
