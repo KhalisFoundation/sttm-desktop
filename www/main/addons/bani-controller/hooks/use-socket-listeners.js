@@ -2,6 +2,7 @@ import { remote } from 'electron';
 import { useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { handleRequestControl, loadBani, loadCeremony, loadShabad } from '../utils';
+import { changeFontSize } from '../../../quick-tools-utils';
 
 const analytics = remote.getGlobal('analytics');
 
@@ -37,6 +38,12 @@ const useSocketListeners = (isListeners, adminPin) => {
             ceremony: payload =>
               loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
             'request-control': () => handleRequestControl(adminPin, fontSizes),
+            settings: payload => {
+              const { settings } = payload;
+              if (settings.action === 'changeFontSize') {
+                changeFontSize(settings.target, settings.value === 'plus');
+              }
+            },
           };
 
           // if its an event from web and not from desktop itself
