@@ -110,7 +110,9 @@ const castShabadLine = lineID => {
     if (activeSlide) {
       Array.prototype.forEach.call(activeSlide.children, element => {
         const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-        if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+        if (icons) {
+          document.querySelector('.viewer-controls').appendChild(icons);
+        }
       });
     }
   }
@@ -458,6 +460,8 @@ const smoothScroll = (pos = 0) => {
 };
 
 const showLine = (ShabadID, LineID, rows, mode) => {
+  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
+  $vcToggleIcon.style.left = '0vw';
   const newShabadID = parseInt(ShabadID, 10) || ShabadID;
   if (apv && infiniteScroll) {
     createAPVContainer();
@@ -525,7 +529,7 @@ const showText = (text, isGurmukhi = false) => {
 
   /* If slide is not empty, show quick tools */
   const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
-  $vcToggleIcon.style.left = text ? '0vh' : '-28vh';
+  $vcToggleIcon.style.left = text ? '0vw' : '-28vw';
 
   $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
   castText(text, isGurmukhi);

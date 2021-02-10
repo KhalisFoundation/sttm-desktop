@@ -4,7 +4,7 @@
 
 ### Improved:
 
-- Moved the Settings menu to a new location and made it easier to use 
+- Moved the Settings menu to a new location and made it easier to use
 - Updated icons for Settings and Bani Controller
 - Reduced the extra space at the bottom of presentaiton slides to prevent cut-offs
 - Updated the UI to have more contrast throughout the app
@@ -22,7 +22,7 @@
 
 - Added workspaces toolbar to easily change between presentation and single-display modes
 - Added the ability to clear history
-- Fixed a bug that was causing a border to appear on some projectors 
+- Fixed a bug that was causing a border to appear on some projectors
 - Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
 
 ### 8.1.0 - _November 12, 2020_
