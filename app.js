@@ -592,6 +592,7 @@ ipcMain.on('show-text', (event, arg) => {
       Translation: {
         Spanish: '',
         English: '',
+        Hindi: '',
       },
     },
   };
@@ -608,6 +609,7 @@ ipcMain.on('show-text', (event, arg) => {
       Translation: {
         Spanish: '',
         English: '',
+        Hindi: '',
       },
     },
   };
