@@ -124,7 +124,7 @@
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
-    "copyright": "Copyright © 2020 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "copyright": "Copyright © 2021 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",
