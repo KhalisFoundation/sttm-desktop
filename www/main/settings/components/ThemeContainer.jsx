@@ -36,7 +36,7 @@ const ThemeContainer = () => {
   const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
 
   return (
-    <div className="settings-container">
+    <div className="settings-container themes-container">
       <div id="custom-theme-options">
         {themeTypes.map(({ type, title }) => (
           <React.Fragment key={type}>

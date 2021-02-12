@@ -2,8 +2,6 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
 const SettingViewer = () => {
-  const userSettings = useStoreState(state => state.userSettings);
-  console.log(userSettings, 'here goes');
   const {
     gurbaniFontSize,
     translationFontSize,
@@ -12,7 +10,7 @@ const SettingViewer = () => {
     displayNextLine,
     leftAlign,
     theme,
-  } = userSettings;
+  } = useStoreState(state => state.userSettings);
 
   const commonStyles = {
     textAlign: leftAlign ? 'left' : 'center',
