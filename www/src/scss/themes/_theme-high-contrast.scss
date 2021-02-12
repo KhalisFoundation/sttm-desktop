@@ -10,6 +10,6 @@ $themeHighContrast: (
   yamki: #ffc500,
 );
 
-body.high-contrast {
+.high-contrast {
   @include generateTheme($themeHighContrast...);
 }

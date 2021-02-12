@@ -14,6 +14,12 @@
   .settings-viewer {
     width: 500px;
     height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-size: cover;
   }
 
   .settings-nav {
@@ -203,20 +209,15 @@
   margin-left: 1.5rem;
 }
 
-.settings-viewer {
-  border: 1px solid red;
-}
 .gurbani {
   font-weight: normal;
   line-height: 1.5;
 
   .padchhed {
     span {
-      white-space: nowrap;
-
+      margin-right: 5px;
       i {
         font-size: 0;
-        margin-left: 1rem;
       }
     }
   }
@@ -307,16 +308,5 @@
     &::before {
       content: '\f06e';
     }
-  }
-}
-
-/* ***** FONT SIZES ***** */
-@for $i from 1 through 20 {
-  .gurbani-font-size-#{$i} .gurbani,
-  .translation-font-size-#{$i} .translation,
-  .transliteration-font-size-#{$i} .transliteration,
-  .announcements-font-size-#{$i} .announcements,
-  .teeka-font-size-#{$i} .teeka {
-    font-size: #{$i}vh;
   }
 }

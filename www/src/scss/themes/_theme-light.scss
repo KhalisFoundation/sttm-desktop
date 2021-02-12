@@ -10,6 +10,6 @@ $themeOptions: (
   yamki: #ffc500,
 );
 
-body.theme-light-theme {
+.theme-light-theme {
   @include generateTheme($themeOptions...);
 }

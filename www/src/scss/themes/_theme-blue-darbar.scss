@@ -10,6 +10,6 @@ $themeBlueDarbar: (
   yamki: #f6ff00,
 );
 
-body.theme-blue-darbar {
+.theme-blue-darbar {
   @include generateTheme($themeBlueDarbar...);
 }

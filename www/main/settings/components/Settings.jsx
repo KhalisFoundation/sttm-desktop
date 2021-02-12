@@ -18,10 +18,7 @@ const Settings = ({ onScreenClose }) => {
           <SettingsContainer settingsObj={settingsObj} />
         </div>
         <div className="other-settings">
-          <webview id="main-viewer" nodeintegration src="viewer.html" className="base-ui">
-            {' '}
-          </webview>
-          {/*<SettingViewer /> */}
+          <SettingViewer />
           <ThemeContainer />
         </div>
       </div>

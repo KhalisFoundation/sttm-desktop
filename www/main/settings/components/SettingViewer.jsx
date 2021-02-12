@@ -1,66 +1,157 @@
 import React from 'react';
+import { useStoreState } from 'easy-peasy';
 
 const SettingViewer = () => {
+  const userSettings = useStoreState(state => state.userSettings);
+  console.log(userSettings, 'here goes');
+  const {
+    gurbaniFontSize,
+    translationFontSize,
+    teekaFontSize,
+    transliterationFontSize,
+    displayNextLine,
+    leftAlign,
+    theme,
+  } = userSettings;
+
+  const commonStyles = {
+    textAlign: leftAlign ? 'left' : 'center',
+  };
+
+  const gurbaniStyles = {
+    fontSize: `${gurbaniFontSize * 3}px`,
+  };
+
+  const translationStyles = {
+    fontSize: `${translationFontSize * 3}px`,
+  };
+
+  const transliterationStyles = {
+    fontSize: `${transliterationFontSize * 3}px`,
+  };
+
+  const teekaStyles = {
+    fontSize: `${teekaFontSize * 3}px`,
+  };
+
+  const nextLineStyles = {
+    fontSize: `${gurbaniFontSize * 3}px`,
+    opacity: 0.5,
+    display: displayNextLine ? 'block' : 'none',
+  };
+
   return (
-    <div className="settings-container settings-viewer">
-      <h1 className="gurbani gurmukhi">
+    <div className={`settings-viewer theme-${theme}`} style={commonStyles}>
+      <h1 className="gurbani gurmukhi" style={gurbaniStyles}>
         <div>
           <span className="padchhed">
-            <span>hukim</span>
-            <span>rjweI</span>
-            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">clxw</span>
-            <span className="visraam-yamki visraam-sttm visraam-igurbani visraam-sttm2">nwnk</span>
-            <span>iliKAw</span>
-            <span>nwil</span>
-            <i> </i>
-            <span>]1]</span>
+            <span>ik®pw</span>
+            <span>kry</span>
+            <span>jy</span>
+            <span className="visraam-main visraam-sttm2">AwpxI</span>
+            <span>qw</span>
+            <span>hir</span>
+            <span>rKw</span>
+            <span>aur</span>
+            <span>
+              <span>Dwir</span>
+              <i> </i>
+              <span>]1]</span>
+            </span>
           </span>
           <span className="larivaar">
-            <span>hukim</span>
+            <span>ik®pw</span>
             <wbr />
-            <span>rjweI</span>
+            <span>kry</span>
             <wbr />
-            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">clxw</span>
+            <span>jy</span>
             <wbr />
-            <span className="visraam-yamki visraam-sttm visraam-igurbani visraam-sttm2">nwnk</span>
+            <span className="visraam-main visraam-sttm2">AwpxI</span>
             <wbr />
-            <span>iliKAw</span>
+            <span>qw</span>
             <wbr />
-            <span>nwil</span>
-            <i> </i>
-            <span>]1]</span>
+            <span>hir</span>
+            <wbr />
+            <span>rKw</span>
+            <wbr />
+            <span>aur</span>
+            <wbr />
+            <span>
+              <span>Dwir</span>
+              <i> </i>
+              <span>]1]</span>
+            </span>
           </span>
         </div>
       </h1>
-      <h2 className="translation">
+      <h2 className="translation" style={translationStyles}>
         <div>
           <div className="english-translation transtext">
-            O Nanak, it is written that you shall obey the Hukam of His Command, and walk in the Way
-            of His Will. ||1||
+            If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||
           </div>
           <div className="spanish-translation transtext">
-            Oh, dice Nanak, cuando por Su Gracia nuestro Destino es prefecto y vivimos en el Jukam
-            de Su Voluntad, el velo de la ilusión es levantado. (1)
+            Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)
           </div>
         </div>
       </h2>
-      <h2 className="teeka">
-        rzw dy mwlk Akwl purK dy hukm ivc qurnw-(iehI iek ivDI hY)[ hy nwnk ! (ieh ivDI) Dur qoN hI
-        jd qoN jgq bixAw hY, ilKI clI Aw rhI hY [1[
+      <h2 className="teeka" style={teekaStyles}>
+        jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[
       </h2>
-      <h2 className="transliteration">
+      <h2 className="transliteration" style={transliterationStyles}>
         <div>
           <div className="english-transliteration translittext">
-            hukam rajaiee chalanaa naanak likhiaa naal ||1||
+            kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||
           </div>
           <div className="shahmukhi-transliteration translittext">
-            هُکم رجاای چلݨا نانک لکھآ نال ۔۔۱۔۔
+            کِ®پا کرے جے آپݨیِ تا هر رکھا اُر دھار ۔۔۱۔۔
           </div>
           <div className="devanagari-transliteration translittext">
-            हुकमि रजाई चलणा नानक लिखिआ नालि ॥१॥
+            कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥
           </div>
         </div>
       </h2>
+      <h1 className="gurbani gurmukhi next-line" style={nextLineStyles}>
+        <div>
+          <span className="padchhed">
+            <span>ik®pw</span>
+            <span>kry</span>
+            <span>jy</span>
+            <span className="visraam-main visraam-sttm2">AwpxI</span>
+            <span>qw</span>
+            <span>hir</span>
+            <span>rKw</span>
+            <span>aur</span>
+            <span>
+              <span>Dwir</span>
+              <i> </i>
+              <span>]1]</span>
+            </span>
+          </span>
+          <span className="larivaar">
+            <span>ik®pw</span>
+            <wbr />
+            <span>kry</span>
+            <wbr />
+            <span>jy</span>
+            <wbr />
+            <span className="visraam-main visraam-sttm2">AwpxI</span>
+            <wbr />
+            <span>qw</span>
+            <wbr />
+            <span>hir</span>
+            <wbr />
+            <span>rKw</span>
+            <wbr />
+            <span>aur</span>
+            <wbr />
+            <span>
+              <span>Dwir</span>
+              <i> </i>
+              <span>]1]</span>
+            </span>
+          </span>
+        </div>
+      </h1>
     </div>
   );
 };

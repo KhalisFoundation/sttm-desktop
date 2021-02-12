@@ -10,6 +10,6 @@ $themeBlackBlue: (
   yamki: #fff600,
 );
 
-body.theme-black-blue {
+.theme-black-blue {
   @include generateTheme($themeBlackBlue...);
 }
