@@ -8,6 +8,7 @@ const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
 const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
+const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
@@ -535,6 +536,14 @@ global.platform.ipc.on('cast-session-stopped', () => {
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
 
+global.platform.ipc.on('set-user-setting', (event, settingChanger) => {
+  if (settingChanger.func === 'size') {
+    changeFontSize(settingChanger.iconType, settingChanger.operation === 'plus');
+  } else if (settingChanger.func === 'visibility') {
+    changeVisibility(settingChanger.iconType);
+  }
+});
+
 module.exports = {
   clearAPV() {
     global.webview.send('clear-apv');
@@ -548,6 +557,7 @@ module.exports = {
       Line.English = lineTranslations.en.bdb;
       Line.Punjabi = lineTranslations.pu.bdb || lineTranslations.pu.ss;
       Line.Spanish = lineTranslations.es.sn;
+      Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
     }
     Line.Transliteration = {
       English: anvaad.translit(Line.Gurmukhi || ''),
@@ -613,19 +623,19 @@ module.exports = {
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
-  'gurbani-bani-length': function gurbaniBaniLength() {
+  'bani-length': function gurbaniBaniLength() {
     reloadBani();
   },
 
-  'gurbani-mangal-position': function gurbaniMangalPosition() {
+  'mangal-position': function gurbaniMangalPosition() {
     reloadBani(true);
   },
 
-  autoplay() {
+  'autoplay-toggle': function autoPlayToggle() {
     global.core.search.checkAutoPlay();
   },
 
-  livefeed(val) {
+  'live-feed': function livefeed(val) {
     if (val) {
       const path = dialog.showOpenDialogSync({
         defaultPath: remote.app.getPath('desktop'),
@@ -633,7 +643,7 @@ module.exports = {
       });
       if (path) {
         store.set('userPrefs.app.live-feed-location', path[0]);
-        const locationLabel = document.getElementsByClassName('sub-label livefeed');
+        const locationLabel = document.querySelectorAll('.control-item#live-feed > .notes');
         for (let i = 0, len = locationLabel.length; i < len; i += 1) {
           locationLabel[i].innerText = path;
         }

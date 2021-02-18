@@ -193,67 +193,64 @@
     "TOOLBAR": "Toolbar",
     "VISHRAAM_OPTIONS": "Vishraam Options",
     "VISHRAAM_SOURCE": "Vishraam Source",
+    "SLIDE_OPTIONS": "Slide Options",
+    "BANI_AND_LANGUAGES": "Bani & Languages",
 
-    "APP_LAYOUT": {
-      "PRESENTER_VIEW": "Presenter View",
-      "SELF": "App Layout"
-    },
-    "AUTOPLAY_OPTIONS": {
-      "DELAY": "Delay (Seconds)",
-      "SELF": "Autoplay Options"
-    },
-    "BANI_SETTINGS": {
-      "ABOVE": "Above Raag Headings",
-      "CURRENT": "Current Saroops (default)",
-      "EXTRA_LONG": "Extra Long",
-      "LENGTH": "Bani Length",
-      "LONG": "Long",
-      "MANGAL_POSITION": "Mangal Position",
-      "MEDIUM": "Medium",
-      "SELF": "Bani Settings",
-      "SHORT": "Short"
-    },
-    "DISPLAY_OPTIONS": {
-      "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
-      "AUTO_PLAY": "Auto Play",
-      "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
-      "LARIVAAR": "Larivaar",
-      "LARIVAAR_ASSIST": "Larivaar Assist",
-      "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
-      "LEFT_ALIGN": "Left-Align",
-      "LIVE_FEED": "Live Feed Text Files",
-      "QUICK_TOOLS": "Quick Tools",
-      "SELF": "Display Options",
-      "SHORTCUT_TRAY": "Shortcut Tray"
-    },
+    "FONT_SIZES": "Font Sizes",
+    "ANNOUNCEMENTS": "Announcements",
+    "BANI": "Bani",
+    "PUNJABI_TEEKA": "Punjabi Teeka",
+    "TRANSLATION": "Translation",
+    "TRANSLITERATION": "Transliteration",
+
+    "DISPLAY_OPTIONS": "Display Options",
+    "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
+    "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
+    "LARIVAAR": "Larivaar",
+    "LARIVAAR_ASSIST": "Larivaar Assist",
+    "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
+    "LEFT_ALIGN": "Left-Align",
+    "NEXT_LINE": "Next Line",
+
+    "AUTOPLAY_OPTIONS": "Autoplay Options",
+    "AUTO_PLAY": "Auto Play",
+    "DELAY": "Delay (Seconds)",
+
+    "BANI_SETTINGS": "Bani Settings",
+    "MANGAL_POSITION": "Mangal Position",
+    "BANI_LENGTH": "Bani Length",
+    "ABOVE_MANGAL": "Above Raag Headings",
+    "CURRENT_MANGAL": "Current Saroops (default)",
+    "EXTRA_LONG_BANI_LENGTH": "Extra Long",
+    "LONG_BANI_LENGTH": "Long",
+    "MEDIUM_BANI_LENGTH": "Medium",
+    "SHORT_BANI_LENGTH": "Short",
+
+    "LANGUAGE_SETTINGS": "Language Settings",
+    "TRANSLATION_LANGUAGE": "Translation Language",
+    "TRANSLITERATION_LANGUAGE": "Transliteration Language",
+    "DEVANAGARI_LANGUAGE": "Devanagari",
+    "ENGLISH_LANGUAGE": "English",
+    "SPANISH_LANGUAGE": "Spanish",
+    "HINDI_LANGUAGE": "Hindi",
+
+    "APP_LAYOUT": "App Layout",
+    "PRESENTER_VIEW": "Presenter View",
+    "QUICK_TOOLS": "Quick Tools",
+    "SHORTCUT_TRAY": "Shortcut Tray",
+    "LIVE_FEED": "Live Feed Text Files",
+
+    "OTHER_OPTIONS": "Other Options",
+    "COLLECT_STATISTICS": "Collect Statistics",
+    "LIMIT_CHANGELOG": "Limit Changelog",
+    "LIMIT_CHANGELOG_MSG": "Only see changelog once per version",
+
     "FIELDS_TO_DISPLAY": {
       "NEXT_LINE": "Next Line",
       "PUNJABI_TEEKA": "Punjabi Teeka",
       "SELF": "Fields to Display",
       "TRANSLATION": "Translation",
       "TRANSLITERATION": "Transliteration"
-    },
-    "FONT_SIZES": {
-      "ANNOUNCEMENTS": "Announcements",
-      "BANI": "Bani",
-      "PUNJABI_TEEKA": "Punjabi Teeka",
-      "SELF": "Font Sizes",
-      "TRANSLATION": "Translation",
-      "TRANSLITERATION": "Transliteration"
-    },
-    "LANGUAGE": {
-      "DEVANAGARI": "Devanagari",
-      "ENGLISH": "English",
-      "SELF": "Language Settings",
-      "SPANISH": "Spanish",
-      "TRANSLATION": "Translation Language",
-      "TRANSLITERATION": "Transliteration Language"
-    },
-    "OTHER_OPTIONS": {
-      "COLLECT_STATISTICS": "Collect Statistics",
-      "LIMIT_CHANGELOG": "Limit Changelog",
-      "LIMIT_CHANGELOG_MSG": "Only see changelog once per version",
-      "SELF": "Other Options"
     }
   },
 

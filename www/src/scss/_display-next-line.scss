@@ -1,5 +1,5 @@
 @for $i from 1 through 12 {
-  .display-next-line.gurbani-#{$i} .deck {
+  .display-next-line-true.gurbani-font-size-#{$i} .deck {
     .slide.active {
       & + .slide .gurbani {
         font-size: calc(0.9 * #{$i}vh);
@@ -9,7 +9,7 @@
   }
 }
 
-.display-next-line:not(.akhandpaatt) {
+.display-next-line-true:not(.akhandpatt-true) {
   .deck {
     height: calc(100% - #{$viewer-padding} * 1);
   }
@@ -47,6 +47,6 @@
   }
 }
 
-body.display-next-line::-webkit-scrollbar {
+body.display-next-line-true::-webkit-scrollbar {
   display: none;
 }

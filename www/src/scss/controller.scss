@@ -9,7 +9,7 @@ $shortcutTrayHeight: 70px;
 $totalSessionOffset: $footerOffset + $shortcutTrayHeight;
 $sessionPageHeight: calc(100% - #{$totalSessionOffset});
 
-.presenter-view.shortcut-tray-on {
+.presenter-view.shortcut-tray-true {
   #main-ui,
   .nav-page:nth-child(2) {
     height: $sessionPageHeight;
@@ -125,6 +125,18 @@ ul {
   .announcement-box {
     display: flex;
     flex-direction: column;
+
+    li {
+      align-items: center;
+      display: flex;
+
+      .switch {
+        margin-left: 12px;
+        position: relative;
+        transform: unset;
+        transition: none;
+      }
+    }
   }
 
   .announcement-text {
@@ -132,6 +144,7 @@ ul {
     display: inline-block;
     margin: 0 20px 10px;
     min-height: 100px;
+    min-width: 300px;
     outline: none;
     padding: 10px;
   }
@@ -232,7 +245,7 @@ ul {
   display: block;
 }
 
-.presenter-view.shortcut-tray-on .shortcut-tray {
+.presenter-view.shortcut-tray-true .shortcut-tray {
   height: 70px;
   overflow-y: auto;
 }
