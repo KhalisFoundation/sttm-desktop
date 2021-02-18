@@ -20,7 +20,6 @@ function parseDataFile(filePath) {
     Object.keys(settings).forEach(key => {
       defaultSettings[key] = settings[key].initialValue;
     });
-    fs.writeFileSync(userConfigPath, JSON.stringify(defaultSettings));
     return defaultSettings;
   }
 }
