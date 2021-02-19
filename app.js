@@ -11,13 +11,6 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 
-/* eslint-disable import/no-unresolved */
-const Store = require('./www/js/store.js');
-const {
-  savedSettingsCamelCase,
-} = require('./www/js/common/store/user-settings/get-saved-user-settings');
-/* eslint-enable */
-
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -31,6 +24,13 @@ const expressApp = express();
 const httpBase = require('http').Server(expressApp);
 const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
+/* eslint-enable */
+
+/* eslint-disable import/no-unresolved */
+const Store = require('./www/js/store.js');
+const {
+  savedSettingsCamelCase,
+} = require('./www/js/common/store/user-settings/get-saved-user-settings');
 /* eslint-enable */
 
 const savedSettings = savedSettingsCamelCase();
