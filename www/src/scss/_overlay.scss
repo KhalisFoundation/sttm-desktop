@@ -1,7 +1,6 @@
 $toolbar-width: 75px;
 
 .canvas {
-  align-items: center;
   display: flex;
   height: 100vh;
   justify-content: center;
@@ -25,8 +24,8 @@ $toolbar-width: 75px;
   background-size: cover;
   border: 0;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
-  height: 450px;
-  margin: 0 auto;
+  height: 524px;
+  margin-left: auto;
   max-width: 800px;
   overflow: hidden;
   width: 100%;
@@ -46,10 +45,11 @@ $toolbar-width: 75px;
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 524px;
   justify-content: center;
   overflow: hidden;
   text-align: center;
+  width: 100%;
 }
 
 .separator-y {
