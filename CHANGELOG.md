@@ -1,19 +1,33 @@
 ## New Updates
 
-### 8.2.0 - _December 17, 2020_
+### 8.3.0 - _February 18, 2021_
 
 ### Improved:
 
-- Added workspaces toolbar to easily change between presentation and single-display modes
-- Added the ability to clear history
-- Fixed a bug that was causing a border to appear on some projectors 
-- Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
+- Moved the Settings menu to a new location and made it easier to use
+- Added Hindi translations
+- Updated icons for Settings and Bani Controller
+- Fixed some bugs with Bani Controller
+- Reduced the extra space at the bottom of presentation slides to prevent cut-offs
+- Updated the UI to have more contrast throughout the app
+- Updated the button for loading the daily Hukamnama to show if you are offline
+- Fixed a bug that was causing font options not to display properly in Bani Overlay
+- Fixed some bugs related to Quick Tools not appearing correctly
 
 </br>
 
 **Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 
 </br>
+
+### 8.2.0 - _January 20, 2021_
+
+### Improved:
+
+- Added workspaces toolbar to easily change between presentation and single-display modes
+- Added the ability to clear history
+- Fixed a bug that was causing a border to appear on some projectors
+- Fixed a bug that was displaying some of the "Dhan Guru" slides incorrectly
 
 ### 8.1.0 - _November 12, 2020_
 

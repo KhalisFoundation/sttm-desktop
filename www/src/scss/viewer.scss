@@ -151,7 +151,7 @@ body {
 }
 
 .deck {
-  height: calc(100% - 100px);
+  height: calc(100% - 40px);
   opacity: 0;
   overflow: hidden;
   position: absolute;
@@ -247,6 +247,7 @@ h2 {
 
 .translation-language-English .english-translation,
 .translation-language-Spanish .spanish-translation,
+.translation-language-Hindi .hindi-translation,
 .transliteration-language-Shahmukhi .shahmukhi-transliteration,
 .transliteration-language-Devanagari .devanagari-transliteration,
 .transliteration-language-English .english-transliteration {
@@ -357,7 +358,7 @@ h2 {
   display: none;
   font-size: 5vh;
   justify-content: space-around;
-  left: -28vh;
+  left: -28vw;
   padding-bottom: 6px;
   padding-top: 12px;
   position: absolute;

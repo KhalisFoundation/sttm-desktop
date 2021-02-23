@@ -110,7 +110,9 @@ const castShabadLine = lineID => {
     if (activeSlide) {
       Array.prototype.forEach.call(activeSlide.children, element => {
         const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-        if (icons) document.querySelector('.viewer-controls').appendChild(icons);
+        if (icons) {
+          document.querySelector('.viewer-controls').appendChild(icons);
+        }
       });
     }
   }
@@ -351,6 +353,8 @@ const createCards = (rows, LineID) => {
     esTranslation.innerHTML = row.Spanish || '';
     /* Show English if spanish not available in ceremonies explanation slides
     so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
+    const hiTranslation = h('div.hindi-translation.transtext');
+    hiTranslation.innerHTML = row.Hindi || '';
     let esText = row.Spanish;
     if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
       esText = row.Spanish || row.English;
@@ -360,6 +364,7 @@ const createCards = (rows, LineID) => {
     const translationsContainer = document.createElement('div');
     translationsContainer.appendChild(enTranslation);
     translationsContainer.appendChild(esTranslation);
+    translationsContainer.appendChild(hiTranslation);
 
     const shTransliteration = h(
       'div.shahmukhi-transliteration.translittext',
@@ -394,6 +399,7 @@ const createCards = (rows, LineID) => {
       translation: {
         Spanish: esText || '',
         English: row.English || '',
+        Hindi: row.Hindi || '',
       },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
@@ -458,6 +464,8 @@ const smoothScroll = (pos = 0) => {
 };
 
 const showLine = (ShabadID, LineID, rows, mode) => {
+  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
+  $vcToggleIcon.style.left = '0vw';
   const newShabadID = parseInt(ShabadID, 10) || ShabadID;
   if (apv && infiniteScroll) {
     createAPVContainer();
@@ -525,7 +533,7 @@ const showText = (text, isGurmukhi = false) => {
 
   /* If slide is not empty, show quick tools */
   const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
-  $vcToggleIcon.style.left = text ? '0vh' : '-28vh';
+  $vcToggleIcon.style.left = text ? '0vw' : '-28vw';
 
   $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
   castText(text, isGurmukhi);

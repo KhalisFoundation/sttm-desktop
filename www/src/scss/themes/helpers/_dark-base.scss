@@ -18,6 +18,10 @@
     color: $white;
   }
 
+  #app-frame {
+    background-color: rgba($bg-main, 0.3);
+  }
+
   #toolbar,
   #toolbar-nav,
   .bani-list,
@@ -49,7 +53,8 @@
 
   .navigator-header,
   .more-tabs .nav-header-tab,
-  .settings-nav {
+  .settings-nav,
+  .clear-history {
     background-color: $bg-main;
     color: $text-base;
   }

@@ -22,6 +22,11 @@
     width: 500px;
   }
 
+  .main-settings-wrapper,
+  .other-settings {
+    overflow-y: auto;
+  }
+
   .settings-nav {
     align-items: center;
     display: flex;
@@ -116,16 +121,6 @@
         }
       }
     }
-  }
-
-  .settings-theme {
-    background: #fff;
-    bottom: 0;
-    height: calc(50% - calc(25px * 1.5) - 60px);
-    overflow: auto;
-    position: fixed;
-    right: 42px;
-    width: calc(calc(50% - 37.5px) - calc(25px * 1.5));
   }
 }
 

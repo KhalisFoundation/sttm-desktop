@@ -65,7 +65,7 @@
       "subcategories": ["app-layout", "other-options"]
     },
     "app-layout": {
-      "title": "APP_LAYOUT",
+      "title": "APP_SETTINGS",
       "type": "switch",
       "settings": ["quick-tools", "shortcut-tray", "live-feed"]
     },
@@ -205,7 +205,8 @@
       "type": "dropdown",
       "options": {
         "English": "ENGLISH_LANGUAGE",
-        "Spanish": "SPANISH_LANGUAGE"
+        "Spanish": "SPANISH_LANGUAGE",
+        "Hindi": "HINDI_LANGUAGE"
       },
       "initialValue": "English"
     },
@@ -220,11 +221,11 @@
     },
     "quick-tools": {
       "title": "QUICK_TOOLS",
-      "initialValue": false
+      "initialValue": true
     },
     "shortcut-tray": {
       "title": "SHORTCUT_TRAY",
-      "initialValue": false
+      "initialValue": true
     },
     "live-feed": {
       "title": "LIVE_FEED",
@@ -246,7 +247,8 @@
     },
     "themeBg": {
       "title": "THEME_BG",
-      "initialValue": " "
+      "initialValue": false,
+      "store": "userPrefs.app.analytics.collectStatistics"
     }
   }
 }
