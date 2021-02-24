@@ -116,7 +116,6 @@
     "sanitize-html": "^1.20.0",
     "scroll": "^2.0.1",
     "socket.io": "^2.1.1",
-    "sqlite3": "^4.0.3",
     "tippy.js": "^2.5.2",
     "universal-analytics": "^0.4.20",
     "update": "^0.7.4",

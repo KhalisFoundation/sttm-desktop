@@ -6,7 +6,7 @@ const Navigator = () => {
 
   return (
     <>
-      <div id="main-ui" className="base-ui">
+      <div id="main-ui" className="base-ui" style={{ opacity: 0 }}>
         <div className="nav-page" id="search-page">
           <div className="navigator-header">
             <div className="preferences-open"></div>
