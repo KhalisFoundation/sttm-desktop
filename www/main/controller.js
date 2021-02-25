@@ -582,7 +582,7 @@ module.exports = {
       mode,
       fromScroll,
     };
-    if (document.body.classList.contains('livefeed')) {
+    if (document.body.classList.contains('live-feed-true')) {
       showLinePayload.live = true;
     }
     global.platform.ipc.send('show-line', showLinePayload);
