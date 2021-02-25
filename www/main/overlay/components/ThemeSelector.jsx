@@ -7,7 +7,7 @@ const themeObjects = require('../../../configs/overlay_presets.json');
 export const ThemeSelector = () => {
   return (
     <section className="theme-selector">
-      <p className="theme-selector-header">Themes</p>
+      <p className="overlay-window-text theme-selector-header">Themes</p>
       {getThemeMarkup(themeObjects)}
     </section>
   );

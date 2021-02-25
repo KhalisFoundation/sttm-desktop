@@ -33,7 +33,8 @@
     "PRESETS": "Presets",
     "SIZE": "Size",
     "TEXT": "Text",
-    "GREEN_SCREEN": "Green Screen"
+    "GREEN_SCREEN": "Green Screen",
+    "LIVE_URL": "Live URL"
   },
 
   "WORKSPACES": {

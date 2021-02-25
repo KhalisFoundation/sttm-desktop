@@ -4,7 +4,7 @@ $toolbar-width: 75px;
   display: flex;
   height: 100vh;
   justify-content: center;
-  margin-left: 120px;
+  // margin-left: 120px;
   margin-right: 180px;
 }
 
@@ -26,7 +26,6 @@ $toolbar-width: 75px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
   height: 524px;
   margin-left: auto;
-  max-width: 800px;
   overflow: hidden;
   width: 100%;
 }
@@ -34,11 +33,14 @@ $toolbar-width: 75px;
 .control-panel {
   background: #eee;
   height: 100vh;
-  left: 0;
-  padding: 10px;
-  position: fixed;
-  top: 0;
-  width: 120px;
+  // left: 0;
+  // padding: 10px;
+  // position: fixed;
+  // top: 0;
+
+  hr {
+    border-top: 2px solid blue;
+  }
 }
 
 .preview-container {
@@ -49,7 +51,7 @@ $toolbar-width: 75px;
   justify-content: center;
   overflow: hidden;
   text-align: center;
-  width: 100%;
+  flex-grow: 1;
 }
 
 .separator-y {
@@ -87,12 +89,12 @@ $toolbar-width: 75px;
   margin: 16px 8px;
 
   input[type='text'] {
-    background: #ebebeb;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 32px;
     color: #333;
     font-size: 12px;
-    margin: 0 10px;
+    margin: 0;
     padding: 10px;
     text-align: center;
     width: 300px;
@@ -142,13 +144,16 @@ $toolbar-width: 75px;
   }
 }
 
-.theme-selector-header {
-  font-size: 12px;
+.overlay-window-text {
+  font-size: 14px;
   font-weight: bold;
   letter-spacing: 2px;
   padding: 10px;
-  text-align: center;
   text-transform: uppercase;
+}
+
+.theme-selector-header {
+  text-align: center;
 }
 
 input[type='color']::-webkit-color-swatch-wrapper {
