@@ -45,6 +45,29 @@ const GlobalState = createStore({
       };
     }),
   },
+  navigator: {
+    defaultLanguage: 'gr',
+    searchOption: 'First Letter(Start)',
+    verseSelected: 'First verse',
+    setDefaultLanguage: action((state, language) => {
+      return {
+        ...state,
+        defaultLanguage: language,
+      };
+    }),
+    setSearchOption: action((state, newSearchOption) => {
+      return {
+        ...state,
+        searchOption: newSearchOption,
+      };
+    }),
+    setVerse: action((state, newVerse) => {
+      return {
+        ...state,
+        verseSelected: newVerse,
+      };
+    }),
+  },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
 });
 

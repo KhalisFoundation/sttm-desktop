@@ -2,65 +2,63 @@
   position: relative;
 }
 
-#search-container {
-  align-content: center;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-  display: flex;
-  height: 40px;
-  justify-content: space-between;
-  margin: 0;
-  width: 100%;
+// #search-container {
+//   align-content: center;
+//   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+//   display: flex;
+//   height: 40px;
+//   justify-content: space-between;
+//   margin: 0;
+//   width: 100%;
 
-  span {
-    align-self: center;
-  }
+//   span {
+//     align-self: center;
+//   }
 
-  input {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    display: inline-block;
-    flex-grow: 1;
-    float: left;
-    height: 40px;
-    margin: 0;
-    position: relative;
-    width: 100%;
+//   input {
+//     background: transparent;
+//     border: none;
+//     box-shadow: none;
+//     display: inline-block;
+//     flex-grow: 1;
+//     height: 40px;
+//     margin: 0;
+//     position: relative;
+//     width: 100%;
 
-    &::-webkit-input-placeholder {
-      font-family: $body-font-family;
-      font-size: 0.8em;
-    }
+//     &::-webkit-input-placeholder {
+//       font-family: $body-font-family;
+//       font-size: 0.8em;
+//     }
 
-    &[type='number'] {
-      margin-left: 12px;
-      max-width: 80px;
+//     &[type='number'] {
+//       margin-left: 12px;
+//       max-width: 80px;
 
-      &::-webkit-input-placeholder {
-        @extend .gurmukhi;
+//       &::-webkit-input-placeholder {
+//         @extend .gurmukhi;
 
-        opacity: 0.4;
-      }
-    }
-  }
+//         opacity: 0.4;
+//       }
+//     }
+//   }
 
-  > button {
-    background-color: #e1802f;
-    display: inline-block;
-    height: 40px;
-    padding: 0.5rem;
-    width: 40px;
-  }
-}
-
-#search-bg {
-  height: 55%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: -1;
-}
+//   > button {
+//     background-color: #e1802f;
+//     display: inline-block;
+//     height: 40px;
+//     padding: 0.5rem;
+//     width: 40px;
+//   }
+// }
+// #search-bg {
+//   height: 55%;
+//   left: 0;
+//   position: absolute;
+//   top: 0;
+//   width: 100%;
+//   z-index: -1;
+// }
 
 #db-download-progress {
   background-color: green;
@@ -221,7 +219,7 @@ button {
     span.highlight {
       display: inline;
       font-weight: bold;
-      text-shadow: .5px .5px rgba(0, 0, 0, 0.5);
+      text-shadow: 0.5px 0.5px rgba(0, 0, 0, 0.5);
     }
   }
 

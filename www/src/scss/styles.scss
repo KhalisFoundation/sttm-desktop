@@ -44,7 +44,8 @@ $tag-popular-color: #ce744e;
 }
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
-  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar';
+  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/pane',
+  'navigator/search/searchNew', 'navigator/gurbani/gurbani';
 
 a {
   cursor: pointer;

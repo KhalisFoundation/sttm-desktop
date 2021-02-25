@@ -1,0 +1,54 @@
+.pane {
+  position: relative;
+  overflow: hidden;
+  min-height: 470px;
+  min-width: 500px;
+  height: calc(100%-110px);
+  background-color: #3a3a3a;
+  transition: 0.5s height ease;
+  color: #fff;
+  i {
+    cursor: pointer;
+  }
+}
+.pane-header {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  margin: 0 10px;
+}
+.pane-content {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  flex-direction: column;
+}
+.pane-footer {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  top: auto;
+}
+.icon-button {
+  background-color: #e1802f;
+  display: inline-block;
+  height: 40px;
+  color: #fff;
+  padding: 0.5rem;
+  font-size: 25px;
+  width: 40px;
+}
+
+.input-box {
+  min-width: 480px;
+  align-content: center;
+}
