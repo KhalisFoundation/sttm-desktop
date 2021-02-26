@@ -180,7 +180,7 @@ const hukamnamaButton = h(
           if (online) {
             getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
               if (!error) {
-                const hukamShabadID = parseInt(response.shabadinfo.id, 10);
+                const hukamShabadID = parseInt(response.shabadIds[0], 10);
 
                 analytics.trackEvent('display', 'hukamnama', hukamShabadID);
                 goToShabadPage(hukamShabadID);
