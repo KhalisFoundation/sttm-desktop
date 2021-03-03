@@ -2,6 +2,8 @@
 
 ### 8.3.0 - _March 2, 2021_
 
+![](./assets/img/help_images/desktop-hindi-translation.jpg)
+
 ### Improved:
 
 - Moved the Settings menu to a new location and made it easier to use
