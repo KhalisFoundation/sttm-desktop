@@ -23,6 +23,10 @@
     }
   }
 
+  #app-frame {
+    background-color: rgba($snow-white, 0.3);
+  }
+
   .lock-screen-message {
     color: white;
   }
@@ -42,16 +46,13 @@
     }
   }
 
-  #tool-sync-button {
-    background-image: url('../../assets/img/icons/sync_button.svg');
-  }
-
   #toolbar,
   #toolbar-nav,
   .bani-list,
   .ceremony-pane,
   .sync-content-wrapper,
-  .zoom-content-wrapper {
+  .zoom-content-wrapper,
+  .settings-container {
     background-color: $nav-bg;
     .sttm-loader {
       border-color: $alt-bg;
@@ -90,9 +91,14 @@
   }
 
   .navigator-header,
-  .more-tabs .nav-header-tab {
+  .more-tabs .nav-header-tab,
+  .settings-nav {
     background-color: $statusbar-bg;
     color: $base-text;
+  }
+
+  .control-item:hover {
+    background-color: $statusbar-bg;
   }
 
   .shortcut-tray {
@@ -104,7 +110,7 @@
   .tray-item-label {
     color: $nav-bg;
   }
-  &.shortcut-tray-on .shortcut-toggle {
+  &.shortcut-tray-true .shortcut-toggle {
     background: $alt-bg;
   }
 

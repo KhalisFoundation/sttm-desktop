@@ -1,3 +1,108 @@
+.settings-wrapper {
+  height: 100vh;
+  left: 100px;
+  margin-top: 24px;
+  overflow-y: scroll;
+  position: relative;
+  scroll-behavior: smooth;
+
+  .settings-nav {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    max-width: 500px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    span {
+      flex-grow: 1;
+      padding: 16px;
+      text-align: center;
+    }
+  }
+
+  .settings-container {
+    margin-bottom: 20px;
+    max-width: 500px;
+    padding: 12px;
+
+    .controls-container {
+      h4 {
+        color: #757575;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        padding-top: 0.75em;
+        text-transform: uppercase;
+        word-spacing: 0.2em;
+
+        &:empty {
+          display: none;
+        }
+      }
+
+      .control-item {
+        align-items: center;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+        min-height: 40px;
+        padding: 6px;
+        transition: 0.2s background-color ease;
+
+        input[type='range']::before {
+          content: attr(data-value);
+          display: inherit;
+          transform: translateX(-150%);
+        }
+
+        .notes {
+          color: #999;
+          flex-grow: 1;
+          font-size: 0.8em;
+          font-style: italic;
+          margin-left: 3px;
+        }
+
+        .custom-checkbox {
+          input[type='checkbox'] {
+            left: -9999px;
+            position: absolute;
+
+            & + label {
+              align-items: center;
+              display: flex;
+              opacity: 0.6;
+
+              &::before {
+                background-image: url('../../assets/img/icons/invisible.svg');
+                background-position: center left;
+                background-repeat: no-repeat;
+                background-size: 80%;
+                border-radius: 50%;
+                content: '';
+                cursor: pointer;
+                display: inline-block;
+                height: 24px;
+                width: 24px;
+              }
+            }
+
+            &:checked + label {
+              opacity: 1;
+
+              &::before {
+                background-image: url('../../assets/img/icons/visibility.svg');
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 #settings,
 #list-of-custom-slides {
   h2 {
@@ -17,7 +122,9 @@
     padding-top: 0.75em;
     word-spacing: 0.2em;
 
-    &:empty { display: none; }
+    &:empty {
+      display: none;
+    }
   }
 
   h2:first-child + section.block-list > header:first-child {
@@ -64,6 +171,9 @@
       transform: translateX(-150%);
     }
   }
+  #dhan-guru {
+    margin-left: 12px;
+  }
 }
 
 .sub-label {
@@ -71,4 +181,3 @@
   font-weight: lighter;
   margin-left: 1.5rem;
 }
-
