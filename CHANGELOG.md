@@ -1,6 +1,6 @@
 ## New Updates
 
-### 8.3.0 - _March 2, 2021_
+### 8.3.0 - _March 4, 2021_
 
 ![](./assets/img/help_images/desktop-hindi-translation.jpg)
 
