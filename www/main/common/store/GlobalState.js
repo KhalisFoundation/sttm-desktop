@@ -48,7 +48,8 @@ const GlobalState = createStore({
   navigator: {
     defaultLanguage: 'gr',
     searchOption: 'First Letter(Start)',
-    verseSelected: 'First verse',
+    selectedBani: '',
+    verseSelected: ' soeI soeI sdw scu swihbu ',
     setDefaultLanguage: action((state, language) => {
       return {
         ...state,
@@ -59,6 +60,12 @@ const GlobalState = createStore({
       return {
         ...state,
         searchOption: newSearchOption,
+      };
+    }),
+    setSelectedBani: action((state, newSelectedBani) => {
+      return {
+        ...state,
+        selectedBani: newSelectedBani,
       };
     }),
     setVerse: action((state, newVerse) => {

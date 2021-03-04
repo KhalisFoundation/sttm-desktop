@@ -1,5 +1,5 @@
 import React from 'react';
-import Pane from '../../utils/Pane';
+import Pane from '../../../common/sttm-ui/pane/Pane';
 import SearchContent from './SearchContent';
 import SearchHeader from './SearchHeader';
 

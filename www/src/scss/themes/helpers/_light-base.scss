@@ -90,6 +90,7 @@
     }
   }
 
+  .pane-header,
   .navigator-header,
   .more-tabs .nav-header-tab,
   .settings-nav {
@@ -140,9 +141,9 @@
     background-color: $nav-bg;
   }
 
-  .nav-page {
+  .pane {
     background-color: $nav-bg;
-
+    color: $base-text !important;
     a.panktee.current {
       background-color: $current-focus !important;
       color: $base-text !important;
@@ -158,7 +159,11 @@
     background-color: $dialog-bg;
   }
 
-  #search-container {
+  .search-content {
+    color: $base-text;
+    .input-box {
+      color: $base-text;
+    }
     input {
       color: $base-text;
 
@@ -190,17 +195,14 @@
     }
   }
 
-  .block-list {
+  .search-pane .search-results .result-list ul {
     li {
-      > a,
-      > span,
-      > label {
-        color: $base-text;
+      width: 100%;
+      color: $base-text;
 
-        &:hover {
-          background-color: $nav-bg;
-          cursor: pointer;
-        }
+      &:hover {
+        background-color: $statusbar-bg;
+        cursor: pointer;
       }
     }
   }
@@ -220,18 +222,5 @@
         color: $active-focus;
       }
     }
-  }
-
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #bdbdbd;
-    border-radius: 6px;
   }
 }

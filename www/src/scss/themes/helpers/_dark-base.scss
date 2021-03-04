@@ -51,6 +51,7 @@
     }
   }
 
+  .pane-header,
   .navigator-header,
   .more-tabs .nav-header-tab,
   .settings-nav,
@@ -111,7 +112,7 @@
     background: $bg-alt;
   }
 
-  .nav-page,
+  .pane,
   .takeover-page {
     background: $bg-alt;
 
@@ -125,7 +126,7 @@
     }
   }
 
-  .nav-page {
+  .pane {
     a.panktee.current {
       background-color: $highlight-bg !important;
       color: $text-base !important;
@@ -155,12 +156,15 @@
     border-color: $accent;
   }
 
-  #search-container {
+  .search-content {
+    .input-box {
+      color: $text-bright;
+    }
     input {
       color: $text-bright;
 
       &[type='number'] {
-        background-color: $white;
+        background-color: white;
         color: $bg-main;
 
         &::-webkit-input-placeholder {
@@ -178,13 +182,12 @@
     }
   }
 
-  #search-container:focus {
+  .search-container:focus {
     background: white;
   }
-
-  #search-options select {
+  .search-type select {
     border: $bg-main;
-    color: $text-bright;
+    color: $bg-main;
 
     option {
       background-color: $bg-main;
@@ -199,17 +202,13 @@
     color: #fff;
   }
 
-  .block-list {
-    li {
-      > a,
-      > span,
-      > label {
-        color: $text-base;
+  .result-list ul li {
+    a {
+      color: $text-base;
 
-        &:hover {
-          background-color: $bg-bright;
-          cursor: pointer;
-        }
+      :hover {
+        background-color: $bg-bright;
+        cursor: pointer;
       }
     }
   }
@@ -230,25 +229,15 @@
       }
     }
   }
-
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: $scrollbar;
-    border-radius: 6px;
-  }
-
   .workspace-bar {
     background-color: $bg-main;
     div:hover {
       color: $text-base;
       background-color: $bg-bright;
     }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: $scrollbar;
   }
 }

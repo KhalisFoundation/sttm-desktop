@@ -1,18 +1,22 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
 import SearchPane from './search/components/SearchPane';
-import GurbaniPane from './gurbani/GurbaniPane';
-import NavigationPane from './navigation/NavigationPane';
+import Pane from '../common/sttm-ui/pane/Pane';
 
 const Navigator = () => {
   const { isConnected } = useStoreState(state => state.baniController);
 
   return (
     <>
-      <SearchPane />
-      <GurbaniPane />
-      <NavigationPane />
-      {/* <div className="navigator-wrapper" style={{ opacity: 0.3 }}>
+      <div className="navigator-row">
+        <SearchPane />
+        <Pane />
+      </div>
+      <div className="navigator-row">
+        <Pane />
+        <Pane />
+      </div>
+      <div className="navigator-wrapper" style={{ opacity: 0 }}>
         <div id="main-ui" className="base-ui">
           <div className="nav-page" id="search-page">
             <div className="navigator-header">
@@ -124,7 +128,7 @@ const Navigator = () => {
           </div>
         </div>
         <section className="shortcut-tray base-ui"></section>
-      </div> */}
+      </div>
     </>
   );
 };
