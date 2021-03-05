@@ -59,7 +59,7 @@ const ThemeContainer = () => {
         ))}
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
         <label className="file-input-label">
-          New Image
+          {i18n.t(`THEMES.NEW_IMAGE`)}
           <input className="file-input" id="themebg-upload" type="file" />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
