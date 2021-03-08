@@ -285,7 +285,6 @@ function createViewer(ipcData) {
         secondaryWindows.changelogWindow.obj.focus();
       }
       viewerWindow.setFullScreen(true);
-      viewerWindow.openDevTools();
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
