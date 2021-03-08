@@ -44,6 +44,13 @@ const Navigator = () => {
               <span className="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
                 <i className="fa fa-desktop"></i> <span data-key="INSERT"></span>
               </span>
+              <span
+                className="nav-header-tab nav-header-text"
+                id="settings-tab"
+                data-title="settings"
+              >
+                <i className="fa fa-cogs"></i> <span data-key="SETTINGS"></span>
+              </span>
               <span className="nav-header-tab nav-header-text" id="others-tab" data-title="others">
                 <i className="fa fa-ellipsis-h"></i> <span data-key="OTHERS"></span>
               </span>

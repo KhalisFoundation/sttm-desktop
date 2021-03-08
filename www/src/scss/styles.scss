@@ -401,10 +401,10 @@ a {
   }
 
   #tool-sync-button {
-    background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 80px;
+    background-size: auto 75%;
+    bottom: 10px;
     position: fixed;
   }
 
@@ -414,14 +414,6 @@ a {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 75%;
-  }
-
-  #tool-settings {
-    background-image: url('../../assets/img/icons/settings.png');
-    background-position: center center;
-    background-repeat: no-repeat;
-    bottom: 10px;
-    position: fixed;
   }
 }
 
@@ -918,7 +910,7 @@ body.show-overlay {
   }
 }
 
-.controller.scale-viewer.presenter-view.shortcut-tray-true .nav-page:nth-child(2) {
+.controller.scale-viewer.presenter-view.shortcut-tray-on .nav-page:nth-child(2) {
   height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset + 20px});
 }
 

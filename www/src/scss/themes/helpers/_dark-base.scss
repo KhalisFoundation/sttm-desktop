@@ -14,12 +14,12 @@
   $highlight-text: $transparent-blue;
   color: $text-base;
 
-  a {
-    color: $white;
+  #tool-sync-button {
+    background-image: url('../../assets/img/icons/sync_button_white.svg');
   }
 
-  #app-frame {
-    background-color: rgba($bg-main, 0.3);
+  a {
+    color: $white;
   }
 
   #toolbar,
@@ -27,8 +27,7 @@
   .bani-list,
   .ceremony-pane,
   .sync-content-wrapper,
-  .zoom-content-wrapper,
-  .settings-container {
+  .zoom-content-wrapper {
     background-color: $bg-alt;
     .sttm-loader {
       border-color: $bg-bright;
@@ -52,15 +51,9 @@
   }
 
   .navigator-header,
-  .more-tabs .nav-header-tab,
-  .settings-nav,
-  .clear-history {
+  .more-tabs .nav-header-tab {
     background-color: $bg-main;
     color: $text-base;
-  }
-
-  .control-item:hover {
-    background-color: $bg-main;
   }
 
   .announcement-text {
@@ -81,7 +74,7 @@
   .tray-item-label {
     color: $bg-main;
   }
-  &.shortcut-tray-true .shortcut-toggle {
+  &.shortcut-tray-on .shortcut-toggle {
     background: darken($bg-main, 10);
   }
 

@@ -3,7 +3,7 @@ import React from 'react';
 import ToolbarItem from './ToolbarItem';
 
 const Toolbar = () => {
-  const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen', 'settings'];
+  const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen'];
 
   return (
     <div id="toolbar-nav">

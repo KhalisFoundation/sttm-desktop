@@ -2,37 +2,6 @@ $viewer-gurmukhi-font-family: 'gurbaniakharthick';
 $viewer-padding: 30px;
 
 /* Toggle vishraam settings and larivaar settings based on if vishraams/larivaar are visible */
-
-.settings-container {
-  .controls-container {
-    .control-item#vishraam-type,
-    .control-item#vishraam-source {
-      display: none;
-
-      .display-vishraams-true & {
-        display: flex;
-      }
-    }
-
-    .control-item#larivaar-assist,
-    .control-item#larivaar-assist-type {
-      display: none;
-
-      .larivaar-true & {
-        display: flex;
-      }
-    }
-
-    .control-item#autoplay-delay {
-      display: none;
-
-      .autoplay-toggle-true & {
-        display: flex;
-      }
-    }
-  }
-}
-
 #settings {
   .block-list {
     overflow-y: hidden;
@@ -49,7 +18,7 @@ $viewer-padding: 30px;
   }
 }
 
-.display-visraams-true #settings {
+.display-visraams #settings {
   #setting-container-toolbar-vishraam-vishraam-options,
   #setting-container-toolbar-vishraam-vishraam-source {
     display: flex;
@@ -140,7 +109,7 @@ body {
   transform: rotate(270deg);
 }
 
-.left-align-true {
+.left-align {
   #viewer {
     text-align: left;
 
@@ -151,7 +120,7 @@ body {
 }
 
 .deck {
-  height: calc(100% - 40px);
+  height: calc(100% - 100px);
   opacity: 0;
   overflow: hidden;
   position: absolute;
@@ -222,7 +191,7 @@ h2 {
   }
 }
 
-.larivaar-true {
+.larivaar {
   .gurbani {
     .padchhed {
       display: none;
@@ -245,12 +214,11 @@ h2 {
   display: none;
 }
 
-.translation-language-English .english-translation,
-.translation-language-Spanish .spanish-translation,
-.translation-language-Hindi .hindi-translation,
-.transliteration-language-Shahmukhi .shahmukhi-transliteration,
-.transliteration-language-Devanagari .devanagari-transliteration,
-.transliteration-language-English .english-transliteration {
+.language-settings-translation-language-English .english-translation,
+.language-settings-translation-language-Spanish .spanish-translation,
+.language-settings-transliteration-language-Shahmukhi .shahmukhi-transliteration,
+.language-settings-transliteration-language-Devanagari .devanagari-transliteration,
+.language-settings-transliteration-language-English .english-transliteration {
   display: block;
 }
 
@@ -272,9 +240,9 @@ h2 {
   opacity: 0;
 }
 
-.translation-visibility-true .translation,
-.transliteration-visibility-true .transliteration,
-.teeka-visibility-true .teeka {
+.display-translation .translation,
+.display-transliteration .transliteration,
+.display-teeka .teeka {
   display: block;
   height: auto;
   opacity: 1;
@@ -287,9 +255,9 @@ h2 {
   z-index: -1;
 }
 
-.translation-visibility-true .icons-translation,
-.transliteration-visibility-true .icons-transliteration,
-.teeka-visibility-true .icons-teeka {
+.display-translation .icons-translation,
+.display-transliteration .icons-transliteration,
+.display-teeka .icons-teeka {
   .size {
     opacity: 1;
     z-index: 20;
@@ -304,11 +272,11 @@ h2 {
 
 /* ***** FONT SIZES ***** */
 @for $i from 1 through 20 {
-  .gurbani-font-size-#{$i} .gurbani,
-  .translation-font-size-#{$i} .translation,
-  .transliteration-font-size-#{$i} .transliteration,
-  .announcements-font-size-#{$i} .announcements,
-  .teeka-font-size-#{$i} .teeka {
+  .gurbani-#{$i} .gurbani,
+  .translation-#{$i} .translation,
+  .transliteration-#{$i} .transliteration,
+  .announcements-#{$i} .announcements,
+  .teeka-#{$i} .teeka {
     font-size: #{$i}vh;
   }
 }
@@ -358,7 +326,7 @@ h2 {
   display: none;
   font-size: 5vh;
   justify-content: space-around;
-  left: -28vw;
+  left: -28vh;
   padding-bottom: 6px;
   padding-top: 12px;
   position: absolute;
@@ -381,7 +349,7 @@ h2 {
   top: 0;
 }
 
-.quick-tools-true {
+.quick-tools {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: none;
@@ -392,7 +360,7 @@ h2 {
   }
 }
 
-.presenter-view.quick-tools-true {
+.presenter-view {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     display: flex;
@@ -400,7 +368,7 @@ h2 {
 }
 
 .navigator-minimized,
-.presenter-view.quick-tools-true {
+.presenter-view {
   .viewer-controls,
   &.webview .vc-toggle-icon {
     left: 0;
@@ -469,7 +437,7 @@ h2 {
   }
 }
 
-.presenter-view.webview.quick-tools-true {
+.presenter-view.webview {
   .viewer-controls {
     width: 30vh;
 

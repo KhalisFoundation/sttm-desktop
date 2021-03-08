@@ -8,7 +8,6 @@ const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
 const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
-const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
@@ -536,14 +535,6 @@ global.platform.ipc.on('cast-session-stopped', () => {
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
 });
 
-global.platform.ipc.on('set-user-setting', (event, settingChanger) => {
-  if (settingChanger.func === 'size') {
-    changeFontSize(settingChanger.iconType, settingChanger.operation === 'plus');
-  } else if (settingChanger.func === 'visibility') {
-    changeVisibility(settingChanger.iconType);
-  }
-});
-
 module.exports = {
   clearAPV() {
     global.webview.send('clear-apv');
@@ -557,7 +548,6 @@ module.exports = {
       Line.English = lineTranslations.en.bdb;
       Line.Punjabi = lineTranslations.pu.bdb || lineTranslations.pu.ss;
       Line.Spanish = lineTranslations.es.sn;
-      Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
     }
     Line.Transliteration = {
       English: anvaad.translit(Line.Gurmukhi || ''),
@@ -582,7 +572,7 @@ module.exports = {
       mode,
       fromScroll,
     };
-    if (store.getUserPref('app.live-feed-location')) {
+    if (document.body.classList.contains('livefeed')) {
       showLinePayload.live = true;
     }
     global.platform.ipc.send('show-line', showLinePayload);
@@ -623,19 +613,19 @@ module.exports = {
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
-  'bani-length': function gurbaniBaniLength() {
+  'gurbani-bani-length': function gurbaniBaniLength() {
     reloadBani();
   },
 
-  'mangal-position': function gurbaniMangalPosition() {
+  'gurbani-mangal-position': function gurbaniMangalPosition() {
     reloadBani(true);
   },
 
-  'autoplay-toggle': function autoPlayToggle() {
+  autoplay() {
     global.core.search.checkAutoPlay();
   },
 
-  'live-feed': function livefeed(val) {
+  livefeed(val) {
     if (val) {
       const path = dialog.showOpenDialogSync({
         defaultPath: remote.app.getPath('desktop'),
@@ -643,13 +633,11 @@ module.exports = {
       });
       if (path) {
         store.set('userPrefs.app.live-feed-location', path[0]);
-        const locationLabel = document.querySelectorAll('.control-item#live-feed > .notes');
+        const locationLabel = document.getElementsByClassName('sub-label livefeed');
         for (let i = 0, len = locationLabel.length; i < len; i += 1) {
           locationLabel[i].innerText = path;
         }
       }
-    } else {
-      store.set('userPrefs.app.live-feed-location', false);
     }
   },
 };

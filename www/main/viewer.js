@@ -6,10 +6,6 @@
   no-undef: 0
 */
 
-import { savedSettings } from './js/common/store/user-settings/get-saved-user-settings';
-import { applyUserSettings } from './js/common/store/user-settings/apply-user-settings';
-import { convertToLegacySettingsObj } from './js/common/utils';
-
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
@@ -44,7 +40,6 @@ const $scroll = window;
 $body.classList.add(process.platform);
 
 core.menu.settings.applySettings(prefs);
-applyUserSettings(savedSettings);
 
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
@@ -86,9 +81,7 @@ const activateSlide = ($deck, LineID) => {
 };
 
 const castToReceiver = () => {
-  const latestSettings = JSON.parse(localStorage.getItem('userSettings'));
-  castCur.prefs = convertToLegacySettingsObj(latestSettings);
-  castCur.prefs.app = { theme: store.get('userPrefs.app.theme') };
+  castCur.prefs = store.get('userPrefs');
   sendMessage(JSON.stringify(castCur));
 };
 
@@ -110,9 +103,7 @@ const castShabadLine = lineID => {
     if (activeSlide) {
       Array.prototype.forEach.call(activeSlide.children, element => {
         const icons = iconsetHtml(`icons-${element.classList[0]}`, element.innerHTML);
-        if (icons) {
-          document.querySelector('.viewer-controls').appendChild(icons);
-        }
+        if (icons) document.querySelector('.viewer-controls').appendChild(icons);
       });
     }
   }
@@ -208,14 +199,6 @@ global.platform.ipc.on('update-settings', () => {
   castToReceiver();
 });
 
-global.platform.ipc.on('save-settings', (event, setting) => {
-  const { key, payload, oldValue } = setting;
-  document.body.classList.remove(`${key}-${oldValue}`);
-  document.body.classList.add(`${key}-${payload}`);
-  savedSettings[key] = payload;
-  localStorage.setItem('userSettings', JSON.stringify(savedSettings));
-});
-
 global.platform.ipc.on('navigator-toggled', () => {
   document.body.classList.toggle('navigator-minimized');
 });
@@ -262,30 +245,21 @@ const iconsetHtml = (classname, content) => {
       h(
         'span.visibility',
         {
-          onclick: () => {
-            const settingChanger = { iconType, func: 'visibility' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
-          },
+          onclick: e => core.menu.settings.showHide(e, iconType),
         },
         h('i.fa.fa-eye-slash'),
       ),
       h(
         'span.minus.size',
         {
-          onclick: () => {
-            const settingChanger = { iconType, func: 'size', operation: 'minus' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
-          },
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'minus'),
         },
         h('i.fa.fa-minus-circle'),
       ),
       h(
         'span.plus.size',
         {
-          onclick: () => {
-            const settingChanger = { iconType, func: 'size', operation: 'plus' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
-          },
+          onclick: () => core.menu.settings.changeFontSize(iconType, 'plus'),
         },
         h('i.fa.fa-plus-circle'),
       ),
@@ -353,21 +327,15 @@ const createCards = (rows, LineID) => {
     esTranslation.innerHTML = row.Spanish || '';
     /* Show English if spanish not available in ceremonies explanation slides
     so if it's ceremony AND if it does not have a page no (aka it's not a verse) */
-    const hiTranslation = h('div.hindi-translation.transtext');
-    hiTranslation.innerHTML = row.Hindi || '';
     let esText = row.Spanish;
-    let hiText = row.Hindi;
     if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
       esText = row.Spanish || row.English;
-      hiText = row.Hindi || row.English;
       esTranslation.innerHTML = esText;
-      hiTranslation.innerHTML = hiText;
     }
 
     const translationsContainer = document.createElement('div');
     translationsContainer.appendChild(enTranslation);
     translationsContainer.appendChild(esTranslation);
-    translationsContainer.appendChild(hiTranslation);
 
     const shTransliteration = h(
       'div.shahmukhi-transliteration.translittext',
@@ -402,7 +370,6 @@ const createCards = (rows, LineID) => {
       translation: {
         Spanish: esText || '',
         English: row.English || '',
-        Hindi: row.Hindi || '',
       },
       teeka: row.Punjabi || '',
       transliteration: row.Transliteration || '',
@@ -467,8 +434,6 @@ const smoothScroll = (pos = 0) => {
 };
 
 const showLine = (ShabadID, LineID, rows, mode) => {
-  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
-  $vcToggleIcon.style.left = '0vw';
   const newShabadID = parseInt(ShabadID, 10) || ShabadID;
   if (apv && infiniteScroll) {
     createAPVContainer();
@@ -536,7 +501,7 @@ const showText = (text, isGurmukhi = false) => {
 
   /* If slide is not empty, show quick tools */
   const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
-  $vcToggleIcon.style.left = text ? '0vw' : '-28vw';
+  $vcToggleIcon.style.left = text ? '0vh' : '-28vh';
 
   $message.appendChild(h('div.slide.active#announcement-slide', $textIs));
   castText(text, isGurmukhi);

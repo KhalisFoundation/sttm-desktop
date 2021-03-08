@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "8.3.0",
+  "version": "8.2.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -74,7 +74,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
     "anvaad-js": "^1.4.3",
-    "axios": "^0.21.1",
+    "axios": "^0.19.2",
     "copy-to-clipboard": "^3.0.8",
     "easy-peasy": "^3.3.1",
     "electron-chromecast": "^1.1.0",
@@ -93,8 +93,6 @@
     "imagemin-pngquant": "^6.0.0",
     "ip": "^1.1.5",
     "is-online": "^7.0.0",
-    "lodash.camelcase": "^4.3.0",
-    "lodash.capitalize": "^4.2.1",
     "lodash.debounce": "^4.0.8",
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
@@ -124,7 +122,7 @@
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
-    "copyright": "Copyright © 2021 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "copyright": "Copyright © 2020 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",

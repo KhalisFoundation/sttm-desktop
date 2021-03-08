@@ -29,7 +29,6 @@ $toolbar-width: 75px;
   margin: 0 auto;
   max-width: 800px;
   overflow: hidden;
-  width: 100%;
 }
 
 .control-panel {
@@ -43,11 +42,6 @@ $toolbar-width: 75px;
 }
 
 .preview-container {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  justify-content: center;
   overflow: hidden;
   text-align: center;
 }

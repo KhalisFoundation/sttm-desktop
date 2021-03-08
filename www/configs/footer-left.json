@@ -24,6 +24,11 @@
     "icon": "desktop",
     "type": "tab-nav"
   },
+  "settings": {
+    "label": "Settings",
+    "icon": "cogs",
+    "type": "tab-nav"
+  },
   "others": {
     "label": "Others",
     "icon": "ellipsis-h",

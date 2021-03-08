@@ -1,4 +1,178 @@
 {
+  "slide-layout": {
+    "title": "SLIDE_LAYOUT",
+    "settings": {
+      "font-sizes": {
+        "title": "FONT_SIZES",
+        "type": "range",
+        "options": {
+          "announcements": {
+            "title": "ANNOUNCEMENTS",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "gurbani": {
+            "title": "BANI",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "translation": {
+            "title": "TRANSLATION",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "teeka": {
+            "title": "PUNJABI_TEEKA",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          },
+          "transliteration": {
+            "title": "TRANSLITERATION",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
+        }
+      },
+      "language-settings": {
+        "title": "LANGUAGE",
+        "type": "dropdown",
+        "options": {
+          "translation-language": {
+            "title": "TRANSLATION",
+            "options": {
+              "English": "ENGLISH",
+              "Spanish": "SPANISH"
+            }
+          },
+          "transliteration-language": {
+            "title": "TRANSLITERATION",
+            "options": {
+              "English": "ENGLISH",
+              "Devanagari": "DEVANAGARI"
+            }
+          }
+        }
+      },
+      "fields": {
+        "title": "FIELDS_TO_DISPLAY",
+        "type": "checkbox",
+        "options": {
+          "display-translation": "TRANSLATION",
+          "display-teeka": "PUNJABI_TEEKA",
+          "display-transliteration": "TRANSLITERATION",
+          "display-next-line": "NEXT_LINE"
+        }
+      },
+      "display-options": {
+        "title": "DISPLAY_OPTIONS",
+        "type": "switch",
+        "options": {
+          "akhandpaatt": {
+            "label": "AKHAND_PATH_VIEW",
+            "subLabel": "CHROMECAST_UNAVAILABLE"
+          },
+          "left-align": "LEFT_ALIGN",
+          "quick-tools": "QUICK_TOOLS",
+          "shortcut-tray-on": "SHORTCUT_TRAY",
+          "livefeed": {
+            "label": "LIVE_FEED",
+            "subLabel": {
+              "storepref": "userPrefs.app.live-feed-location"
+            }
+          },
+          "autoplay": "AUTO_PLAY",
+          "larivaar": "LARIVAAR",
+          "larivaar-assist": {
+            "label": "LARIVAAR_ASSIST",
+            "subLabel": "LARIVAAR_ASSIST_MSG"
+          }
+        }
+      },
+      "larivaar-settings": {
+        "type": "dropdown",
+        "options": {
+          "assist-type": {
+            "title": "ASSIST_TYPE",
+            "options": {
+              "single-color": "SINGLE_COLOR",
+              "multi-color": "MULTI_COLOR"
+            }
+          }
+        }
+      },
+      "autoplay-options": {
+        "title": "AUTOPLAY_OPTIONS",
+        "type": "range",
+        "options": {
+          "autoplayTimer": {
+            "title": "DELAY",
+            "max": 20,
+            "min": 1,
+            "step": 1
+          }
+        }
+      }
+    }
+  },
+  "toolbar": {
+    "title": "TOOLBAR",
+    "settings": {
+      "gurbani": {
+        "title": "BANI_SETTINGS",
+        "type": "dropdown",
+        "options": {
+          "bani-length": {
+            "title": "LENGTH",
+            "options": {
+              "short": "SHORT",
+              "medium": "MEDIUM",
+              "long": "LONG",
+              "extralong": "EXTRA_LONG"
+            }
+          },
+          "mangal-position": {
+            "title": "MANGAL_POSITION",
+            "options": {
+              "current": "CURRENT",
+              "above": "ABOVE"
+            }
+          }
+        }
+      },
+      "gurbani-options": {
+        "type": "switch",
+        "options": {
+          "display-visraams": "SHOW_VISHRAAMS"
+        }
+      },
+      "vishraam": {
+        "title": "",
+        "type": "dropdown",
+        "options": {
+          "vishraam-options": {
+            "title": "VISHRAAM_OPTIONS",
+            "options": {
+              "colored-words": "COLORED_WORDS",
+              "gradient-bg": "GRADIENT_BG"
+            }
+          },
+          "vishraam-source": {
+            "title": "VISHRAAM_SOURCE",
+            "options": {
+              "sttm2": "STTM2",
+              "igurbani": "I_GURBANI",
+              "sttm": "STTM"
+            }
+          }
+        }
+      }
+    }
+  },
   "app": {
     "title": "APP_SETTINGS",
     "settings": {
@@ -21,6 +195,17 @@
         "title": "",
         "type": "dynamic",
         "options": {}
+      },
+      "analytics": {
+        "title": "OTHER_OPTIONS",
+        "type": "switch",
+        "options": {
+          "limit-changelog": {
+            "label": "LIMIT_CHANGELOG",
+            "subLabel": "LIMIT_CHANGELOG_MSG"
+          },
+          "collect-statistics": "COLLECT_STATISTICS"
+        }
       }
     }
   }
