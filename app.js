@@ -285,6 +285,7 @@ function createViewer(ipcData) {
         secondaryWindows.changelogWindow.obj.focus();
       }
       viewerWindow.setFullScreen(true);
+      viewerWindow.openDevTools();
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -671,6 +672,12 @@ ipcMain.on('update-settings', () => {
     viewerWindow.webContents.send('update-settings');
   }
   mainWindow.webContents.send('sync-settings');
+});
+
+ipcMain.on('save-settings', (event, setting) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('save-settings', setting);
+  }
 });
 
 ipcMain.on('set-user-setting', (event, settingChanger) => {
