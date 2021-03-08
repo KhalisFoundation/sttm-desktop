@@ -9,6 +9,10 @@
       "layout": {
         "presenter-view": true
       },
+      "analytics": {
+        "collect-statistics": true,
+        "limit-changelog": false
+      },
       "custom-theme-options": {
         "show-theme-editor": true
       },
@@ -18,6 +22,53 @@
       "translationEnglish": "ssk",
       "transliteration": true,
       "meta": true
+    },
+    "toolbar": {
+      "gurbani-options": {
+        "display-visraams": false
+      },
+      "gurbani": {
+        "bani-length": "short",
+        "mangal-position": "current"
+      },
+      "vishraam": {
+        "vishraam-options": "colored-words",
+        "vishraam-source": "sttm"
+      }
+    },
+    "slide-layout": {
+      "fields": {
+        "display-translation": true,
+        "display-transliteration": true,
+        "display-teeka": true,
+        "display-next-line": false
+      },
+      "font-sizes": {
+        "announcements": 7,
+        "gurbani": 9,
+        "translation": 5,
+        "transliteration": 4,
+        "teeka": 4
+      },
+      "language-settings": {
+        "translation-language": "English",
+        "transliteration-language": "English"
+      },
+      "larivaar-settings": {
+        "assist-type": "single-color"
+      },
+      "autoplay-options": {
+        "autoplayTimer": 10
+      },
+      "display-options": {
+        "disable-akhandpaatt": false,
+        "akhandpaatt": false,
+        "larivaar": false,
+        "larivaar-assist": false,
+        "left-align": false,
+        "quick-tools": true,
+        "shortcut-tray-on": true
+      }
     }
   },
   "gurmukhiKB": false,

@@ -6,13 +6,7 @@ const { i18n } = remote.require('./app');
 
 const generateQrCode = (canvas, syncCode) => {
   if (syncCode && canvas) {
-    let url;
-    if (process.env.NODE_ENV === 'development') {
-      url = `http://dev.sikhitothemax.org/control/${syncCode}`;
-    } else {
-      url = `https://sttm.co/control/${syncCode}`;
-    }
-    qrCode.toCanvas(canvas, url, error => {
+    qrCode.toCanvas(canvas, `https:/sttm.co/control/${syncCode}`, error => {
       if (error) {
         new Noty({
           type: 'error',

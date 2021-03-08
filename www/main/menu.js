@@ -1,15 +1,11 @@
-import { savedSettings } from './common/store/user-settings/get-saved-user-settings';
-import { applyUserSettings } from './common/store/user-settings/apply-user-settings';
-
 const h = require('hyperscript');
 const getJSON = require('get-json');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 const sanitizeHtml = require('sanitize-html');
-const isOnline = require('is-online');
-
 const strings = require('./strings');
+
 const { randomShabad } = require('./banidb');
 const settings = require('./settings');
 const tingle = require('../assets/js/vendor/tingle');
@@ -176,16 +172,12 @@ const hukamnamaButton = h(
     'a.hukamnama-button',
     {
       onclick: () => {
-        isOnline().then(online => {
-          if (online) {
-            getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
-              if (!error) {
-                const hukamShabadID = parseInt(response.shabadIds[0], 10);
+        getJSON('https://api.banidb.com/hukamnama/today', (error, response) => {
+          if (!error) {
+            const hukamShabadID = parseInt(response.shabadinfo.id, 10);
 
-                analytics.trackEvent('display', 'hukamnama', hukamShabadID);
-                goToShabadPage(hukamShabadID);
-              }
-            });
+            analytics.trackEvent('display', 'hukamnama', hukamShabadID);
+            goToShabadPage(hukamShabadID);
           }
         });
       },
@@ -338,14 +330,9 @@ module.exports = {
     $listOfShabadOptions.appendChild(hukamnamaButton);
     $listOfShabadOptions.appendChild(notificationButton);
 
-    isOnline().then(online => {
-      document.querySelector('.hukamnama-button').classList.toggle('is-offline', !online);
-    });
-
     // when the app is reloaded, enable the control for akhandpaatt
     store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
     settings.init();
-    applyUserSettings(savedSettings);
   },
 
   getNotifications,

@@ -123,10 +123,6 @@
   background: #fff;
 }
 
-.nirbaan .tingle-modal-box {
-  background-color: #212121;
-}
-
 .tingle-modal-box__content {
   padding: 3rem 3rem;
 }
@@ -147,9 +143,6 @@
   background-color: #3a3a3a;
 }
 .moody-blue .tingle-modal-box__footer {
-  background-color: #3a3a3a;
-}
-.nirbaan .tingle-modal-box__footer {
   background-color: #3a3a3a;
 }
 .black-blue .tingle-modal-box__footer {
