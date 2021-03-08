@@ -114,6 +114,7 @@ const menuTemplate = [
     submenu: [
       {
         label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
+        accelerator: 'CmdOrCtrl+O',
         click: () => {
           main.openSecondaryWindow('overlayWindow');
         },
