@@ -1,5 +1,11 @@
 ## New Updates
 
+### 8.3.1 - _March 8, 2021_
+
+### Fixed:
+
+- Fixed a bug that was causing settings not to change correctly on external displays
+
 ### 8.3.0 - _March 4, 2021_
 
 ![](./assets/img/help_images/desktop-hindi-translation.jpg)
