@@ -673,6 +673,12 @@ ipcMain.on('update-settings', () => {
   mainWindow.webContents.send('sync-settings');
 });
 
+ipcMain.on('save-settings', (event, setting) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('save-settings', setting);
+  }
+});
+
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });
