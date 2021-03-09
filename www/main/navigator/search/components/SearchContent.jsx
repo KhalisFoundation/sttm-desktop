@@ -6,6 +6,7 @@ import SearchResults from './SearchResults';
 
 function SearchContent() {
   const [searchVariables, setSearchVariables] = useState(null);
+  const verse = useStoreState(state => state.navigator.verseSelected);
   const searchOption = useStoreState(state => state.navigator.searchOption);
   const baniSelected = useStoreState(state => state.navigator.selectedBani);
   const setBaniSelected = useStoreActions(state => state.navigator);
@@ -26,6 +27,9 @@ function SearchContent() {
     const value = event.target.value.split('-')[0];
     const label = event.target.value.split('-')[1];
     setBaniSelected.setSelectedBani(label);
+  };
+  const activeVerse = () => {
+    console.log('Search Pane clicked');
   };
   return (
     <>
@@ -56,7 +60,7 @@ function SearchContent() {
         </select>
         <label>{baniSelected}</label>
       </div>
-      <SearchResults />
+      <SearchResults onClick={activeVerse} verse={verse} />
     </>
   );
 }

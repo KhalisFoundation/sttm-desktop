@@ -2,6 +2,7 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 import SearchPane from './search/components/SearchPane';
 import Pane from '../common/sttm-ui/pane/Pane';
+import ShabadPane from './shabad/ShabadPane';
 
 const Navigator = () => {
   const { isConnected } = useStoreState(state => state.baniController);
@@ -10,7 +11,7 @@ const Navigator = () => {
     <>
       <div className="navigator-row">
         <SearchPane />
-        <Pane />
+        <ShabadPane />
       </div>
       <div className="navigator-row">
         <Pane />
