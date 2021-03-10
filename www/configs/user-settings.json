@@ -239,7 +239,8 @@
     },
     "statistics": {
       "title": "COLLECT_STATISTICS",
-      "initialValue": false
+      "initialValue": false,
+      "store": "userPrefs.app.analytics.collectStatistics"
     },
     "theme": {
       "title": "THEME",
@@ -247,8 +248,7 @@
     },
     "themeBg": {
       "title": "THEME_BG",
-      "initialValue": false,
-      "store": "userPrefs.app.analytics.collectStatistics"
+      "initialValue": false
     }
   }
 }
