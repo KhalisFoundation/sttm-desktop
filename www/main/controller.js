@@ -470,6 +470,7 @@ global.platform.ipc.on('external-display', (e, args) => {
     width: args.width,
     height: args.height,
   };
+  checkPresenterView();
   updateViewerScale();
 });
 global.platform.ipc.on('remove-external-display', () => {
