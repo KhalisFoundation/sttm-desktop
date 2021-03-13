@@ -3,12 +3,12 @@ import PaneContent from './PaneContent';
 import PaneFooter from './PaneFooter';
 import PaneHeader from './PaneHeader';
 
-function Pane({ Content, Header, Footer }) {
+function Pane({ content, header, footer }) {
   return (
     <div className="pane">
-      {Header ? <PaneHeader Header={Header} /> : ''}
-      {Content ? <PaneContent Content={Content} /> : ''}
-      {Footer ? <PaneFooter Footer={Footer} /> : ''}
+      {header ? <PaneHeader Header={header} /> : ''}
+      {content ? <PaneContent Content={content} /> : ''}
+      {footer ? <PaneFooter Footer={footer} /> : ''}
     </div>
   );
 }

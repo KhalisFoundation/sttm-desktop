@@ -59,7 +59,7 @@
   align-content: center;
 }
 
-.search-results {
+.verse-block {
   z-index: 5;
   margin: 0;
   width: 100%;
@@ -75,7 +75,6 @@
       line-height: 1;
       user-select: none;
       .shabadPane-list {
-        display: inline-block;
         padding: 10px;
         .shabadPane-controls {
           display: inline-flex;
@@ -99,6 +98,10 @@
           padding: 10px;
           font-size: 1rem;
         }
+      }
+      .historyPane-controls {
+        position: absolute;
+        right: 20px;
       }
     }
   }

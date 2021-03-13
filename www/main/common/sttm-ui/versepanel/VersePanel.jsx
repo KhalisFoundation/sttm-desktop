@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { func } from 'prop-types';
+import React, { useState } from 'react';
 
 function ShabadControls({ isHome, isRead }) {
   return (
@@ -20,13 +21,17 @@ function ShabadControls({ isHome, isRead }) {
     </>
   );
 }
-function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
+function HistoryControls() {
+  return <i className="fa fa-times" />;
+}
+
+function SearchResults({ onClick, ShabadPane, onMouseOver, verse, HistoryPane }) {
   const [isActive, setActive] = useState(true);
   const [isHome, setHome] = useState(true);
   const [isRead, setRead] = useState(true);
 
   return (
-    <div className="search-results">
+    <div className="verse-block">
       {verse ? (
         <div className="result-list">
           <ul className="gurmukhi">
@@ -39,7 +44,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -49,7 +55,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -59,7 +66,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -69,7 +77,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -79,7 +88,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -89,7 +99,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -99,7 +110,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -109,7 +121,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -119,7 +132,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -129,7 +143,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -139,7 +154,8 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
+            </li>{' '}
             <li
               className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
               onClick={onClick}
@@ -149,16 +165,7 @@ function SearchResults({ onClick, ShabadPane, onMouseOver, verse }) {
                 {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
               </span>
               <a className="panktee">{verse}</a>
-            </li>
-            <li
-              className={`gurmukhi  ${ShabadPane && 'shabadPane-list'}`}
-              onClick={onClick}
-              onMouseOver={onMouseOver}
-            >
-              <span className="shabadPane-controls">
-                {ShabadPane && <ShabadControls isHome={isHome} isRead={isRead} />}
-              </span>
-              <a className="panktee">{verse}</a>
+              <span className="historyPane-controls">{HistoryPane && <HistoryControls />}</span>
             </li>
           </ul>{' '}
         </div>

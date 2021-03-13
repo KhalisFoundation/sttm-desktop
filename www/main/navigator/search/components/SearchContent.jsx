@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import IconButton from '../../utils/IconButton';
-import InputBox from '../../utils/InputBox';
+import IconButton from '../../../common/sttm-ui/iconbutton/IconButton';
+import InputBox from '../../../common/sttm-ui/inputbox/InputBox';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import SearchResults from './SearchResults';
+import VersePanel from '../../../common/sttm-ui/versepanel/VersePanel';
+import { remote } from 'electron';
 
 function SearchContent() {
-  const [searchVariables, setSearchVariables] = useState(null);
+  const banidb = require('../../../common/constants/banidb');
+  const verseSourcesText = banidb.SOURCE_TEXTS;
+  const verseSourcesType = Object.keys(verseSourcesText);
   const verse = useStoreState(state => state.navigator.verseSelected);
   const searchOption = useStoreState(state => state.navigator.searchOption);
   const baniSelected = useStoreState(state => state.navigator.selectedBani);
   const setBaniSelected = useStoreActions(state => state.navigator);
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
+  const { i18n } = remote.require('./app');
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
     console.log(keyboardOpenStatus);
   };
-  useEffect(() => {
-    fetch('locales/en.json')
-      .then(res => res.json())
-      .then(data => {
-        setSearchVariables(data.SEARCH),
-          setBaniSelected.setSelectedBani(data.SEARCH.SOURCES.ALL_SOURCES);
-      });
-  }, []);
   const newSelection = event => {
-    const value = event.target.value.split('-')[0];
-    const label = event.target.value.split('-')[1];
-    setBaniSelected.setSelectedBani(label);
+    setBaniSelected.setSelectedBani(verseSourcesText[event.target.value]);
   };
   const activeVerse = () => {
     console.log('Search Pane clicked');
@@ -36,7 +30,7 @@ function SearchContent() {
       <div className="search-content">
         <InputBox placeholder={searchOption} className="gurmukhi mousetrap" />
         <div className="input-buttons">
-          <span>Ang</span>
+          <span>{i18n.t('SEARCH.ANG')}</span>
           <input
             type="number"
             className="gurmukhi"
@@ -51,16 +45,16 @@ function SearchContent() {
       {/* <GurbaniKeyboard /> */}
       <div className="bani-selection">
         <select className="select-bani" onClickCapture={event => newSelection(event)}>
-          {searchVariables &&
-            Object.keys(searchVariables.SOURCES).map(source => (
-              <option key={source} value={source + '-' + searchVariables.SOURCES[source]}>
-                {searchVariables.SOURCES[source]}
+          {verseSourcesType &&
+            verseSourcesType.map(value => (
+              <option key={value} value={value}>
+                {i18n.t(`SEARCH.SOURCES.${verseSourcesText[value]}`)}
               </option>
             ))}
         </select>
-        <label>{baniSelected}</label>
+        <label>{i18n.t(`SEARCH.SOURCES.${baniSelected}`)}</label>
       </div>
-      <SearchResults onClick={activeVerse} verse={verse} />
+      <VersePanel onClick={activeVerse} verse={verse} />
     </>
   );
 }

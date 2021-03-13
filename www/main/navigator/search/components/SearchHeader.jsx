@@ -1,20 +1,28 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { remote } from 'electron';
 
 function SearchHeader() {
+  const banidb = require('../../../common/constants/banidb');
+  const { i18n } = remote.require('./app');
+  const gurmukhiSearchText = banidb.GURMUKHI_SEARCH_TEXTS;
+  const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
+  const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
+  const englishSearchTypes = Object.keys(englishSearchText);
   const language = useStoreState(state => state.navigator);
   const setLanguage = useStoreActions(state => state.navigator);
-
   const handleLanguageChange = event => {
     if (event.target.value == 'en') {
-      setLanguage.setSearchOption('Full Words');
+      setLanguage.setSearchOption(englishSearchTypes[0]);
     } else {
-      setLanguage.setSearchOption('First Letter (Start)');
+      setLanguage.setSearchOption(gurmukhiSearchTypes[0]);
     }
     setLanguage.setDefaultLanguage(event.target.value);
   };
   const handleSearchType = event => {
-    setLanguage.setSearchOption(event.target.value);
+    if (language.defaultLanguage === 'gr')
+      setLanguage.setSearchOption(i18n.t(`SEARCH.${gurmukhiSearchText[event.target.value]}`));
+    else setLanguage.setSearchOption(i18n.t(`SEARCH.${englishSearchText[event.target.value]}`));
   };
 
   return (
@@ -44,13 +52,19 @@ function SearchHeader() {
       <div className="search-type">
         {language.defaultLanguage === 'gr' ? (
           <select onChangeCapture={handleSearchType}>
-            <option value="First Letter (Start)">First Letter (Start)</option>
-            <option value="First Letter (Anywhere)">First Letter (Anywhere)</option>
-            <option value="Full Word(s)">Full Word(s)</option>
+            {gurmukhiSearchTypes.map(value => (
+              <option key={value} value={value}>
+                {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
+              </option>
+            ))}
           </select>
         ) : (
           <select onChangeCapture={handleSearchType}>
-            <option value="Full Word(s)">Full Word(s)</option>
+            {englishSearchTypes.map(value => (
+              <option key={value} value={value}>
+                {i18n.t(`SEARCH.${englishSearchText[value]}`)}
+              </option>
+            ))}
           </select>
         )}
       </div>

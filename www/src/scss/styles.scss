@@ -45,7 +45,7 @@ $tag-popular-color: #ce744e;
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/pane',
-  'navigator/search/searchNew', 'navigator/shabad/shabad.scss';
+  'navigator/search/searchNew', 'navigator/shabad/shabad.scss', 'navigator/history/history.scss';
 
 a {
   cursor: pointer;

@@ -6,7 +6,7 @@ import ShabadHeader from './ShabadHeader';
 function ShabadPane() {
   return (
     <div className="shabad-pane">
-      <Pane Header={ShabadHeader} Content={ShabadContent} />
+      <Pane header={ShabadHeader} content={ShabadContent} />
     </div>
   );
 }

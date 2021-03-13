@@ -6,7 +6,7 @@ import SearchHeader from './SearchHeader';
 function SearchPane() {
   return (
     <div className="search-pane">
-      <Pane Header={SearchHeader} Content={SearchContent} />
+      <Pane header={SearchHeader} content={SearchContent} />
     </div>
   );
 }
