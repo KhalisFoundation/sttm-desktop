@@ -24,7 +24,7 @@
 }
 .pane-content {
   display: flex;
-  height: 400px;
+  max-height: 400px;
   transition: height 600ms cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 5;
   flex-wrap: nowrap;
@@ -36,9 +36,13 @@
 .pane-footer {
   display: flex;
   position: absolute;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 70px;
   width: 100%;
   bottom: 0;
   top: auto;
+  z-index: 10;
 }
 .icon-button {
   background-color: #e1802f;

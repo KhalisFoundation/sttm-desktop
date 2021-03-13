@@ -102,13 +102,13 @@
     background-color: $statusbar-bg;
   }
 
-  .shortcut-tray {
+  .pane-footer {
     background: $alt-bg;
   }
   .tray-item-icon {
     background: lighten($base-text, 30);
   }
-  .tray-item-label {
+  .tray-item-icon {
     color: $nav-bg;
   }
   &.shortcut-tray-true .shortcut-toggle {
