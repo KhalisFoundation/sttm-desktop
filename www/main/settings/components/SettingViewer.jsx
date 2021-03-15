@@ -90,6 +90,9 @@ const SettingViewer = () => {
           <div className="spanish-translation transtext">
             Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)
           </div>
+          <div className="hindi-translation transtext">
+            अगर परमात्मा अपनी मेहर करे।तो मैं भी उसका नाम हृदय में परो के रखूँ। 1।
+          </div>
         </div>
       </h2>
       <h2 className="teeka" style={teekaStyles}>
