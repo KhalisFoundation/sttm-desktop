@@ -1,0 +1,46 @@
+.verse-block {
+  z-index: 5;
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  .result-list {
+    transition: height 600ms cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: 0.5s height ease;
+    font-size: 1rem;
+    ul {
+      list-style-type: none;
+      line-height: 1;
+      user-select: none;
+      .shabadPane-list {
+        padding: 10px;
+        .shabadPane-controls {
+          display: inline-flex;
+          width: 8%;
+          justify-content: center;
+          align-items: center;
+          i {
+            font-size: 1rem;
+          }
+        }
+      }
+      .shabadPane-active {
+        background-color: aqua;
+      }
+      li {
+        position: relative;
+        cursor: pointer;
+        padding: 10px;
+        font-size: 1rem;
+        a {
+          padding: 10px;
+          font-size: 1rem;
+        }
+      }
+      .historyPane-controls {
+        position: absolute;
+        right: 20px;
+      }
+    }
+  }
+}

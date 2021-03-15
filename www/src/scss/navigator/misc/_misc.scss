@@ -1,3 +1,4 @@
+@import '../utils/variables';
 .misc-pane {
   height: 50%;
   padding: 10px;
@@ -39,9 +40,7 @@
       }
     }
     .announcement-box {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
+      @include flexbox($fd-value: column);
       header {
         border-top: 1px #757575 solid;
         color: #757575;
@@ -57,9 +56,8 @@
         text-transform: uppercase;
       }
       .announcement-switch {
-        align-items: center;
-        display: inline-flex;
-        justify-content: space-evenly;
+        @include flexbox($jc-value: space-evenly);
+        padding: 5px;
         width: initial;
         span {
           padding-right: 3px;
@@ -95,10 +93,9 @@
   }
   .tray-item-icon {
     cursor: pointer;
-    display: flex;
+    @include flexbox($jc-value: center);
     font-size: 16px;
     height: 50px;
-    justify-content: center;
     margin: 5px auto;
     min-width: 100px;
     padding: 10px;

@@ -50,14 +50,14 @@ const GlobalState = createStore({
     }),
   },
   navigator: {
-    defaultLanguage: 'gr',
+    selectedLanguage: 'gr',
     searchOption: i18n.t(`SEARCH.${GURMUKHI_SEARCH_TEXTS[0]}`),
     selectedBani: Object.keys(SOURCE_TYPES)[0],
     verseSelected: ' soeI soeI sdw scu swihbu ',
-    setDefaultLanguage: action((state, language) => {
+    setSelectedLanguage: action((state, language) => {
       return {
         ...state,
-        defaultLanguage: language,
+        selectedLanguage: language,
       };
     }),
     setSearchOption: action((state, newSearchOption) => {

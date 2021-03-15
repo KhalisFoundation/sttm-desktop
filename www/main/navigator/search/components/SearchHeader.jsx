@@ -9,22 +9,20 @@ function SearchHeader() {
   const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
-  const language = useStoreState(state => state.navigator);
-  const setLanguage = useStoreActions(state => state.navigator);
+  const navigator = useStoreState(state => state.navigator);
+  const setNavigator = useStoreActions(state => state.navigator);
   const handleLanguageChange = event => {
     if (event.target.value == 'en') {
-      setLanguage.setSearchOption(englishSearchTypes[0]);
+      setNavigator.setSearchOption(i18n.t(`SEARCH.${englishSearchText[3]}`));
     } else {
-      setLanguage.setSearchOption(gurmukhiSearchTypes[0]);
+      setNavigator.setSearchOption(i18n.t(`SEARCH.${gurmukhiSearchText[0]}`));
     }
-    setLanguage.setDefaultLanguage(event.target.value);
+    setNavigator.setSelectedLanguage(event.target.value);
   };
   const handleSearchType = event => {
-    if (language.defaultLanguage === 'gr')
-      setLanguage.setSearchOption(i18n.t(`SEARCH.${gurmukhiSearchText[event.target.value]}`));
-    else setLanguage.setSearchOption(i18n.t(`SEARCH.${englishSearchText[event.target.value]}`));
+    setNavigator.setSearchOption(event.target.value);
   };
-
+  console.log(navigator);
   return (
     <>
       <div className="language-selector">
@@ -33,7 +31,7 @@ function SearchHeader() {
             type="radio"
             value="gr"
             id="gurmukhi-language"
-            checked={language.defaultLanguage === 'gr'}
+            checked={navigator.selectedLanguage === 'gr'}
             onChange={handleLanguageChange}
           />
           aAe
@@ -44,13 +42,13 @@ function SearchHeader() {
             value="en"
             id="english-language"
             onChange={handleLanguageChange}
-            checked={language.defaultLanguage === 'en'}
+            checked={navigator.selectedLanguage === 'en'}
           />
           ABC
         </label>
       </div>
       <div className="search-type">
-        {language.defaultLanguage === 'gr' ? (
+        {navigator.selectedLanguage === 'gr' ? (
           <select onChangeCapture={handleSearchType}>
             {gurmukhiSearchTypes.map(value => (
               <option key={value} value={value}>

@@ -9,8 +9,7 @@ function SearchContent() {
   const banidb = require('../../../common/constants/banidb');
   const verseSourcesText = banidb.SOURCE_TEXTS;
   const verseSourcesType = Object.keys(verseSourcesText);
-  const verse = useStoreState(state => state.navigator.verseSelected);
-  const searchOption = useStoreState(state => state.navigator.searchOption);
+  const navigator = useStoreState(state => state.navigator);
   const baniSelected = useStoreState(state => state.navigator.selectedBani);
   const setBaniSelected = useStoreActions(state => state.navigator);
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
@@ -28,7 +27,10 @@ function SearchContent() {
   return (
     <>
       <div className="search-content">
-        <InputBox placeholder={searchOption} className="gurmukhi mousetrap" />
+        <InputBox
+          placeholder={navigator.searchOption}
+          className={`${navigator.selectedLanguage == 'gr' && 'gurmukhi'} mousetrap`}
+        />
         <div className="input-buttons">
           <span>{i18n.t('SEARCH.ANG')}</span>
           <input
@@ -54,7 +56,7 @@ function SearchContent() {
         </select>
         <label>{i18n.t(`SEARCH.SOURCES.${baniSelected}`)}</label>
       </div>
-      <VersePanel onClick={activeVerse} verse={verse} />
+      <VersePanel onClick={activeVerse} verse={navigator.verseSelected} />
     </>
   );
 }

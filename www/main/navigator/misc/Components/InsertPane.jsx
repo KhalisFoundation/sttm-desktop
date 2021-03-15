@@ -1,10 +1,14 @@
 import { remote } from 'electron';
-import React from 'react';
+import React, { useRef } from 'react';
 
 function InsertPane() {
   const { i18n } = remote.require('./app');
   const insert_slide = require('../../../common/constants/slidedb');
+  const inputRef = useRef(null);
   const gurus = insert_slide.dropdownStrings;
+  const addAnnouncement = () => {
+    console.log(inputRef.current.value);
+  };
   return (
     <ul className="list-of-items">
       <li>
@@ -53,8 +57,11 @@ function InsertPane() {
         <textarea
           className="announcement-text"
           placeholder={i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')}
+          ref={inputRef}
         />
-        <button className="announcement-slide-btn">{i18n.t('INSERT.ADD_ANNOUNCEMENT')}</button>
+        <button className="announcement-slide-btn" onClick={addAnnouncement}>
+          {i18n.t('INSERT.ADD_ANNOUNCEMENT')}
+        </button>
       </li>
     </ul>
   );

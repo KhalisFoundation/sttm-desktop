@@ -44,8 +44,9 @@ $tag-popular-color: #ce744e;
 }
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
-  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/pane',
-  'navigator/search/searchNew', 'navigator/shabad/shabad.scss', 'navigator/history/history.scss';
+  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
+  'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
+  'navigator/misc/misc';
 
 a {
   cursor: pointer;

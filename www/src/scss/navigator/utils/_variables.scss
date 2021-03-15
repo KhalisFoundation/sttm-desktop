@@ -1,0 +1,8 @@
+/* Display Flex   al=align-items jc=justify-content fd=flex-direction */
+@mixin flexbox($ai-value: center, $jc-value: space-between, $fd-value: row, $postion: relative) {
+  display: flex;
+  align-items: $ai-value;
+  justify-content: $jc-value;
+  flex-direction: $fd-value;
+  position: $postion;
+}

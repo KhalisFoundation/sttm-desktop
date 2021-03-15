@@ -1,3 +1,4 @@
+@import '../utils/variables';
 .search-pane {
   position: relative;
   width: 100%;
@@ -52,12 +53,8 @@
   }
 
   .search-content {
-    align-items: center;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-content: center;
+    @include flexbox;
     margin: 0;
     width: 100%;
     .input-buttons {
