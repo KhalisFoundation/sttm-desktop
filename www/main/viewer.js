@@ -356,9 +356,12 @@ const createCards = (rows, LineID) => {
     const hiTranslation = h('div.hindi-translation.transtext');
     hiTranslation.innerHTML = row.Hindi || '';
     let esText = row.Spanish;
+    let hiText = row.Hindi;
     if (row.sessionKey === 'ceremony-1' && !row.PageNo) {
       esText = row.Spanish || row.English;
+      hiText = row.Hindi || row.English;
       esTranslation.innerHTML = esText;
+      hiTranslation.innerHTML = hiText;
     }
 
     const translationsContainer = document.createElement('div');
