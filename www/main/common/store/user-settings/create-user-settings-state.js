@@ -17,7 +17,13 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       const oldValue = state[stateVarName];
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
-      global.webview.send('save-settings', { key: settingKey, payload, oldValue });
+      if (global.webview) {
+        global.webview.send('save-settings', { key: settingKey, payload, oldValue });
+      }
+
+      if (global.platform) {
+        global.platform.ipc.send('save-settings', { key: settingKey, payload, oldValue });
+      }
 
       // Save settings to file
       const updatedSettings = savedSettings;
