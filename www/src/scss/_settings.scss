@@ -1,11 +1,12 @@
 .settings-wrapper {
   display: flex;
-  height: 100vh;
+  height: 95vh;
   left: 100px;
   margin-top: 24px;
-  overflow-y: scroll;
+  overflow: scroll;
   position: relative;
   scroll-behavior: smooth;
+  width: 82vw;
 
   .other-settings {
     margin-left: 48px;
