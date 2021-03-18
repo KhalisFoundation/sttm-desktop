@@ -12,4 +12,6 @@ $themeNirbaan: (
 
 .theme-nirbaan {
   @include generateTheme($themeNirbaan...);
+
+  background-position: center center;
 }
