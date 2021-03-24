@@ -6,7 +6,6 @@ const { i18n } = remote.require('./app');
 
 function MiscFooter() {
   // For Global States
-  const navigator = useStoreState(state => state.navigator);
   const setGlobalStates = useStoreActions(state => state.navigator);
   // For shortcut tray
   const [shortcutOpen, setShortcutOpen] = useState(true);

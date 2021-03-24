@@ -64,9 +64,9 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
     setHome(index);
   };
   const activeVerse = verse => {
-    // setGlobalStates.setVerseSelected(verse);
-    setShabadId(verse.shabadId);
-    newHistory.push(verse);
+    setGlobalStates.setVerseSelected(verse.verseId);
+    setGlobalStates.setShabadSelected(verse.shabadId);
+    newHistory.push(verse.verseId);
     if (isRead.some(verseId => verseId == verse.verseId)) {
       console.log('exists');
     } else {

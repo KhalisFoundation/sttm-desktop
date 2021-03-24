@@ -21,9 +21,9 @@ function SearchHeader() {
   const setNavigator = useStoreActions(state => state.navigator);
   const handleLanguageChange = event => {
     if (event.target.value == 'en') {
-      setNavigator.setSearchOption(i18n.t(`SEARCH.${englishSearchText[3]}`));
+      setNavigator.setSearchOption('3');
     } else {
-      setNavigator.setSearchOption(i18n.t(`SEARCH.${gurmukhiSearchText[0]}`));
+      setNavigator.setSearchOption('0');
     }
     setNavigator.setSelectedLanguage(event.target.value);
   };
