@@ -1,30 +1,34 @@
 @import '../utils/variables';
+//Heights
+$misc-header: 40px;
+$misc-footer-inactive: 40px;
+$misc-footer-active: 70px;
 .misc-pane {
-  height: 50%;
-  padding: 10px;
-  position: relative;
-  width: 100%;
-  transition: 0.5s height ease;
+  @include pane-containers;
   .misc-header {
     display: inline-flex;
     width: 100%;
     a {
       padding: 0 10px;
       span {
-        padding: 0 3px;
-        letter-spacing: 1px;
+        padding: 0 5px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 16px;
       }
     }
   }
+  .history-results {
+    height: 320px;
+  }
   .list-of-items {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+    @include flex($fd-value: column, $jc-value: start);
     margin: 0;
     padding: 0;
+    height: 320px;
+    overflow: auto;
     li {
-      flex-grow: 1;
-      overflow: hidden;
+      overflow: visible;
       text-overflow: ellipsis;
       width: 100%;
       a {
@@ -40,7 +44,7 @@
       }
     }
     .announcement-box {
-      @include flexbox($fd-value: column);
+      @include flex($fd-value: column);
       header {
         border-top: 1px #757575 solid;
         color: #757575;
@@ -56,9 +60,8 @@
         text-transform: uppercase;
       }
       .announcement-switch {
-        @include flexbox($jc-value: space-evenly);
+        @include flex($jc-value: space-evenly, $width: initial);
         padding: 5px;
-        width: initial;
         span {
           padding-right: 3px;
         }
@@ -91,14 +94,56 @@
       }
     }
   }
-  .tray-item-icon {
-    cursor: pointer;
-    @include flexbox($jc-value: center);
-    font-size: 16px;
-    height: 50px;
-    margin: 5px auto;
-    min-width: 100px;
-    padding: 10px;
+  .misc-footer {
+    @include flex($fd-value: column);
+    height: fit-content;
     transition: 0.5s all ease;
+    .clear-pane {
+      @include flex($jc-value: space-between);
+      height: 40px;
+      transition: 0.5s all ease;
+      .footer-toggler {
+        padding: 12px;
+      }
+      .footer-toggler-inactive {
+        padding: 12px;
+      }
+      .clear-history {
+        cursor: pointer;
+        display: block;
+        padding: 10px;
+        span {
+          margin-left: 5px;
+        }
+      }
+    }
+    .shortcut-drawer-active {
+      transition: 0.5s all ease;
+      @include flex($jc-value: space-around);
+      height: 70px;
+      .tray-item-icon {
+        cursor: pointer;
+        @include flex($jc-value: center, $width: fit-content);
+        padding: 10px;
+        line-height: 30px;
+        transition: 0.5s all ease;
+        &:hover {
+          box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
+          transform: translateY(-4px);
+        }
+
+        &:active {
+          box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
+          transform: translateY(1px);
+        }
+      }
+    }
+    .shortcut-drawer {
+      height: 0;
+      transition: 0.5s all ease;
+      .tray-item-icon {
+        display: none;
+      }
+    }
   }
 }

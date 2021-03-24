@@ -1,7 +1,18 @@
+@import '../utils/variables';
 .shabad-pane {
-  position: relative;
-  display: flex;
+  @include flex($ai-value: start);
   width: 100%;
-  height: 50%;
   padding: 10px;
+  .fa-check {
+    font-size: 10px;
+  }
+  &:hover {
+    outline: 0;
+    .pane-header {
+      border-bottom: 1px solid #01579b;
+    }
+  }
+  .shabad-list {
+    height: 430px;
+  }
 }

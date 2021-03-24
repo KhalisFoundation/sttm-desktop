@@ -1,0 +1,10 @@
+.viewer-pane {
+  @include pane-containers;
+  .viewer-content {
+    height: 100%;
+    .base-ui {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

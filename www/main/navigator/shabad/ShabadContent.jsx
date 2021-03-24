@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import React from 'react';
+import { useStoreState } from 'easy-peasy';
 import VersePanel from '../../common/sttm-ui/versepanel/VersePanel';
 function ShabadContent() {
   const verse = useStoreState(state => state.navigator.verseSelected);
-  const [isHover, setHover] = useState(false);
-  const onClick = () => {
-    console.log('shabad clicked');
-  };
+  const shabad = useStoreState(state => state.navigator.shabadSelected);
 
-  const onMouseOver = () => {
-    setHover(true);
-    console.log(isHover);
-  };
   return (
-    <>
-      <VersePanel onClick={onClick} ShabadPane onMouseOver={onMouseOver} verse={verse} />
-    </>
+    <div className="shabad-list">
+      <VersePanel ShabadPane verses={shabad} activeVerse={verse} />
+    </div>
   );
 }
 

@@ -65,6 +65,7 @@
     "ADD_ANNOUNCEMENT": "Add Announcement",
     "ADD_ANNOUNCEMENT_SLIDE": "Add Announcement Slide",
     "ADD_ANNOUNCEMENT_TEXT": "Add announcement text here ...",
+    "ADD_ANNOUNCEMENT_TEXT_GURMUKHI": "GoSxw ie`Qy ilKo ...",
     "ADD_DHAN_GURU": "Add Dhan Guru",
     "ADD_EMPTY_SLIDE": "Add Empty Slide",
     "ADD_WAHEGURU_SLIDE": "Add Waheguru Slide",
@@ -174,6 +175,32 @@
       "GURU_GRANTH_SAHIB": "Guru Granth Sahib Ji",
       "NAND_LAL_VAARAN": "Bhai Nand Lal Ji Vaaran",
       "REHATNAMAS": "Rehatnamas & Panthic Sources"
+    },
+    "RAAGS": {
+      "ALL_RAAGS": "All Raags",
+      "ASA": "Asa",
+      "GUJARI": "Gujari",
+      "GAURI_DEEPAKI": "Gauri Deepaki",
+      "DHANASARI": "Dhanasri",
+      "GAURI_POORABI": "Gauri Poorabi",
+      "SRI": "Sri",
+      "MAJH": "Majh",
+      "GAURI_GAURAIREE": "Gauri Guarairee",
+      "GAURI": "Gauri",
+      "GAURI_DAKHANI": "Gauri Dakhani",
+      "OTHERS": "Others"
+    },
+    "WRITERS": {
+      "ALL_WRITERS": "All Writers",
+      "GURU_AMAR_DAS": "Guru Amar Das",
+      "GURU_ANGAD_DEV": "Guru Angad Dev",
+      "GURU_ARJAN_DEV": "Guru Arjan Dev",
+      "GURU_HAR_RAI": "Guru Har Rai",
+      "GURU_HARGOBIND": "Guru Hargobind",
+      "GURU_NANAK_DEV": "Guru Nanak Dev",
+      "GURU_RAM_DAS": "Guru Ram Das",
+      "GURU_TEGH_BAHADUR": "Guru Tegh Bahadur",
+      "OTHERS": "Others"
     }
   },
 

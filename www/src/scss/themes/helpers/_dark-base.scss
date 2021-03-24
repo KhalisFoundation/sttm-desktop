@@ -52,15 +52,27 @@
   }
 
   .pane-header,
-  .navigator-header,
+  .misc .navigator-header,
   .more-tabs .nav-header-tab,
   .settings-nav,
-  .clear-history,
-  .pane-content {
+  .clear-pane {
     background-color: $bg-main;
     color: $text-base;
   }
 
+  .misc-pane {
+    .misc-header {
+      a {
+        color: $grey;
+      }
+      .misc-active {
+        color: $white;
+      }
+    }
+  }
+  .pane-content {
+    background-color: $bg-alt;
+  }
   .control-item:hover {
     background-color: $bg-main;
   }
@@ -73,9 +85,30 @@
   .slide#announcement-slide .announcements {
     color: $white;
   }
+  .search-footer {
+    background: $bg-main;
+  }
+  .search-pane {
+    .pane {
+      .pane-footer {
+        background-color: $not-so-black;
+      }
+    }
+  }
 
   .pane-footer {
-    background: darken($bg-main, 10);
+    .clear-pane {
+      background-color: $bg-alt;
+      .footer-toggler-inactive {
+        background: darken($bg-main, 10);
+      }
+      .footer-toggler {
+        background-color: $bg-alt;
+      }
+    }
+    .shortcut-drawer-active {
+      background: darken($bg-main, 10);
+    }
   }
   .tray-item-icon {
     background: $text-bright;
@@ -186,12 +219,15 @@
   .search-container:focus {
     background: white;
   }
-  .search-type select {
-    border: $bg-main;
-    color: $bg-main;
+  .filters {
+    select {
+      border: $bg-main;
+      color: $bg-main;
 
-    option {
-      background-color: $bg-main;
+      option {
+        background-color: $bg-main;
+        color: $white;
+      }
     }
   }
 
@@ -206,11 +242,10 @@
   .result-list ul li {
     a {
       color: $text-base;
-
-      :hover {
-        background-color: $bg-bright;
-        cursor: pointer;
-      }
+    }
+    &:hover {
+      background-color: $bg-bright;
+      cursor: pointer;
     }
   }
 

@@ -2,6 +2,8 @@
   z-index: 5;
   margin: 0;
   width: 100%;
+  height: 100%;
+  max-height: inherit;
   overflow-x: hidden;
   overflow-y: scroll;
   .result-list {
@@ -14,6 +16,15 @@
       user-select: none;
       .shabadPane-list {
         padding: 10px;
+        .hoverIcon {
+          display: none;
+        }
+        &:hover {
+          .hoverIcon {
+            display: inline;
+            opacity: 0.5;
+          }
+        }
         .shabadPane-controls {
           display: inline-flex;
           width: 8%;
@@ -22,24 +33,48 @@
           i {
             font-size: 1rem;
           }
+          .fa-check {
+            font-size: 10px;
+          }
         }
       }
       .shabadPane-active {
         background-color: aqua;
       }
+      .search-list {
+        display: inline-flex;
+        border-left: 3px solid #e18030;
+        padding: 0 5px;
+        .span-color {
+          color: #e18030;
+        }
+      }
       li {
         position: relative;
         cursor: pointer;
-        padding: 10px;
+        padding: 5px 10px;
         font-size: 1rem;
-        a {
-          padding: 10px;
-          font-size: 1rem;
+        div {
+          display: inline-flex;
+          a {
+            padding: 5px;
+            font-size: 1rem;
+            &:hover {
+              background-color: transparent;
+            }
+          }
+        }
+        .search-list-footer {
+          display: flex;
+          color: #929292;
         }
       }
       .historyPane-controls {
         position: absolute;
         right: 20px;
+      }
+      i {
+        z-index: 100;
       }
     }
   }

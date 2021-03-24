@@ -3,6 +3,7 @@ import { useStoreState } from 'easy-peasy';
 import SearchPane from './search/components/SearchPane';
 import ShabadPane from './shabad/ShabadPane';
 import MiscPane from './misc/Components/MiscPane';
+import ViewerPane from './viewer/ViewerPane';
 
 const Navigator = () => {
   const { isConnected } = useStoreState(state => state.baniController);
@@ -14,7 +15,7 @@ const Navigator = () => {
         <ShabadPane />
       </div>
       <div className="navigator-row">
-        <ShabadPane />
+        <ViewerPane />
         <MiscPane />
       </div>
       <div className="navigator-wrapper" style={{ opacity: 0 }}>

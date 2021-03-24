@@ -46,7 +46,7 @@ $tag-popular-color: #ce744e;
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
-  'navigator/misc/misc';
+  'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer';
 
 a {
   cursor: pointer;
@@ -755,11 +755,11 @@ a {
   }
 }
 
-#main-viewer,
-#viewer {
-  height: 100%;
-  width: 100%;
-}
+// #main-viewer,
+// #viewer {
+//   height: 100%;
+//   width: 100%;
+// }
 
 .color-overlay {
   display: none;
@@ -936,14 +936,14 @@ body.show-overlay {
   height: calc(50% - calc(#{$presenter-pane-gap} * 1.5) - #{$totalSessionOffset + 20px});
 }
 
-.scale-viewer {
-  #main-viewer {
-    border-style: solid;
-    border-width: 1px;
-    position: fixed;
-    transform-origin: right top;
-  }
-}
+// .scale-viewer {
+//   #main-viewer {
+//     border-style: solid;
+//     border-width: 1px;
+//     position: fixed;
+//     transform-origin: right top;
+//   }
+// }
 
 .options-page {
   background: #f0f0f0;

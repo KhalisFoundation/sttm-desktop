@@ -525,7 +525,6 @@ module.exports = {
       this.$results.innerHTML = '';
     }
   },
-
   akhandPaatt,
 
   /* Taken from https://github.com/KhalisFoundation/sttm-web/blob/dev/src/js/util/index.js
@@ -623,6 +622,7 @@ module.exports = {
           ),
         );
         this.$results.appendChild(result);
+        console.log(item, resultNode);
       });
       document.getElementById('search-options').style.display = 'block';
     } else {

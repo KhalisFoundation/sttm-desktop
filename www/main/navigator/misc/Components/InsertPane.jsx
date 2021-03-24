@@ -1,13 +1,17 @@
 import { remote } from 'electron';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function InsertPane() {
   const { i18n } = remote.require('./app');
   const insert_slide = require('../../../common/constants/slidedb');
   const inputRef = useRef(null);
   const gurus = insert_slide.dropdownStrings;
+  const [isgurmukhi, setIsGurmukhi] = useState(false);
   const addAnnouncement = () => {
     console.log(inputRef.current.value);
+  };
+  const HandleChange = () => {
+    setIsGurmukhi(!isgurmukhi);
   };
   return (
     <ul className="list-of-items">
@@ -50,13 +54,18 @@ function InsertPane() {
               name="announcement-language"
               type="checkbox"
               value="gurmukhi"
+              onClick={HandleChange}
             />
             <label htmlFor="announcement-language" />
           </div>
         </div>
         <textarea
-          className="announcement-text"
-          placeholder={i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')}
+          className={`${isgurmukhi ? 'gurmukhi' : ''} announcement-text`}
+          placeholder={
+            !isgurmukhi
+              ? i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')
+              : i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI')
+          }
           ref={inputRef}
         />
         <button className="announcement-slide-btn" onClick={addAnnouncement}>

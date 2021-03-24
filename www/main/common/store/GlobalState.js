@@ -3,7 +3,7 @@ import { remote } from 'electron';
 import { DEFAULT_OVERLAY } from '../constants';
 import createUserSettingsState from './user-settings/create-user-settings-state';
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
-import { GURMUKHI_SEARCH_TEXTS, SOURCE_TYPES } from '../constants/banidb';
+import { GURMUKHI_SEARCH_TEXTS } from '../constants/banidb';
 
 const { settings } = require('../../../configs/user-settings.json');
 
@@ -52,8 +52,9 @@ const GlobalState = createStore({
   navigator: {
     selectedLanguage: 'gr',
     searchOption: i18n.t(`SEARCH.${GURMUKHI_SEARCH_TEXTS[0]}`),
-    selectedBani: Object.keys(SOURCE_TYPES)[0],
-    verseSelected: ' soeI soeI sdw scu swihbu ',
+    verseSelected: null,
+    shabadSelected: null,
+    versesHistory: [],
     setSelectedLanguage: action((state, language) => {
       return {
         ...state,
@@ -66,16 +67,22 @@ const GlobalState = createStore({
         searchOption: newSearchOption,
       };
     }),
-    setSelectedBani: action((state, newSelectedBani) => {
-      return {
-        ...state,
-        selectedBani: newSelectedBani,
-      };
-    }),
     setVerseSelected: action((state, newVerse) => {
       return {
         ...state,
         verseSelected: newVerse,
+      };
+    }),
+    setShabadSelected: action((state, newShabad) => {
+      return {
+        ...state,
+        shabadSelected: newShabad,
+      };
+    }),
+    setVersesHistory: action((state, newHistory) => {
+      return {
+        ...state,
+        versesHistory: newHistory,
       };
     }),
   },

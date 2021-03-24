@@ -101,9 +101,42 @@
   .control-item:hover {
     background-color: $statusbar-bg;
   }
+  .misc-pane {
+    .misc-header {
+      a {
+        color: $grey;
+      }
+      .misc-active {
+        color: $dark-grey;
+      }
+    }
+    .pane-footer {
+      background-color: $alt-bg;
+      .clear-pane {
+        background-color: $nav-bg;
+        .footer-toggler-inactive {
+          background-color: $alt-bg;
+        }
+        .footer-toggler {
+          background-color: $nav-bg;
+        }
+      }
+    }
+  }
+
+  .search-pane {
+    .pane {
+      .pane-footer {
+        background-color: transparent;
+      }
+      .search-footer {
+        background-color: $statusbar-bg;
+      }
+    }
+  }
 
   .pane-footer {
-    background: $alt-bg;
+    background: $statusbar-bg;
   }
   .tray-item-icon {
     background: lighten($base-text, 30);
@@ -160,9 +193,10 @@
   }
 
   .search-content {
+    background-color: $statusbar-bg;
     color: $base-text;
     .input-box {
-      color: $base-text;
+      color: $black;
     }
     input {
       color: $base-text;

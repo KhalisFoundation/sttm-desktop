@@ -9,9 +9,15 @@ function HistoryHeader() {
       misc_panel: event.target.textContent,
     });
   };
+  const isHistory = misc_panel === 'History';
+  const isInsert = misc_panel === 'Insert';
+  const isOther = misc_panel === 'Others';
   return (
     <div className="misc-header">
-      <a className="history-button" onClick={event => SetOpenTab(event)}>
+      <a
+        className={`misc-button ${isHistory && 'misc-active'}`}
+        onClick={event => SetOpenTab(event)}
+      >
         <i className="fa fa-clock-o">
           <span className="Icon-label" key={'History'}>
             History
@@ -19,14 +25,17 @@ function HistoryHeader() {
         </i>
       </a>
 
-      <a className="insert-button" onClick={event => SetOpenTab(event)}>
+      <a
+        className={`misc-button ${isInsert && 'misc-active'}`}
+        onClick={event => SetOpenTab(event)}
+      >
         <i className="fa fa-desktop">
           <span className="Icon-label" key={'Insert'}>
             Insert
           </span>
         </i>
       </a>
-      <a className="other-button" onClick={event => SetOpenTab(event)}>
+      <a className={`misc-button ${isOther && 'misc-active'}`} onClick={event => SetOpenTab(event)}>
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key={'Others'}>
             Others
