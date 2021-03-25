@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const sqlite3 = require('sqlite3').verbose();
 const electron = require('electron');
 const path = require('path');
