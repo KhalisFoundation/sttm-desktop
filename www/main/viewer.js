@@ -137,8 +137,10 @@ const castText = (text, isGurmukhi) => {
 
 const applyThemebg = () => {
   if (prefs.app.themebg.url) {
-    $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
-    $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+    if (prefs.app.themebg.url !== 'none') {
+      $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
+      $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+    }
   }
 };
 
@@ -210,10 +212,12 @@ global.platform.ipc.on('update-settings', () => {
 
 global.platform.ipc.on('save-settings', (event, setting) => {
   const { key, payload, oldValue } = setting;
-  document.body.classList.remove(`${key}-${oldValue}`);
-  document.body.classList.add(`${key}-${payload}`);
-  savedSettings[key] = payload;
-  localStorage.setItem('userSettings', JSON.stringify(savedSettings));
+  if (typeof savedSettings[key] !== 'object') {
+    document.body.classList.remove(`${key}-${oldValue}`);
+    document.body.classList.add(`${key}-${payload}`);
+    savedSettings[key] = payload;
+    localStorage.setItem('userSettings', JSON.stringify(savedSettings));
+  }
 });
 
 global.platform.ipc.on('navigator-toggled', () => {

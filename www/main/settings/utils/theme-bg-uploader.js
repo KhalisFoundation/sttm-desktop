@@ -2,6 +2,7 @@
 import { remote } from 'electron';
 
 import { themes } from '../../theme_editor';
+import GlobalState from '../../common/store/GlobalState';
 
 const fs = require('fs');
 const path = require('path');
@@ -105,6 +106,11 @@ export const uploadImage = async evt => {
       console.log(filePath);
       if (files) {
         store.setUserPref('app.themebg', {
+          type: 'custom',
+          url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
+        });
+
+        GlobalState.getActions().userSettings.setThemeBg({
           type: 'custom',
           url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
         });

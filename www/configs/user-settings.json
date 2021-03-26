@@ -248,7 +248,8 @@
     },
     "themeBg": {
       "title": "THEME_BG",
-      "initialValue": false
+      "initialValue": false,
+      "dontApplyClass": true
     }
   }
 }

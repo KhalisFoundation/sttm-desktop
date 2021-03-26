@@ -39,7 +39,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       global.getUserSettings[stateVarName] = payload;
 
       // Update DOM if ready
-      if (document) {
+      if (document && !settingsSchema[settingKey].dontApplyClass) {
         document.body.classList.remove(`${settingKey}-${oldValue}`);
         document.body.classList.add(`${settingKey}-${payload}`);
       }

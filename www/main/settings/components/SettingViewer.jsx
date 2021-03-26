@@ -1,7 +1,13 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
+// import { remote } from 'electron';
+
+// const { store } = remote.require('./app');
 
 const SettingViewer = () => {
+  const { themeBg } = useStoreState(state => state.userSettings);
+  // console.log(themeBg, 'check themebg');
+
   const {
     gurbaniFontSize,
     translationFontSize,
@@ -14,6 +20,7 @@ const SettingViewer = () => {
 
   const commonStyles = {
     textAlign: leftAlign ? 'left' : 'center',
+    backgroundImage: `${themeBg && themeBg.url ? `url(${themeBg.url})` : 'none'}`,
   };
 
   const gurbaniStyles = {

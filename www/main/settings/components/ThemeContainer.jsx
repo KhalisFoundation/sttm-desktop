@@ -7,6 +7,10 @@ import { Tile } from '../../common/sttm-ui';
 import { themes } from '../../theme_editor';
 import { uploadImage } from '../utils';
 
+// const path = require('path');
+
+// const userDataPath = remote.app.getPath('userData');
+// const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const { i18n, store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -18,16 +22,28 @@ const themeTypes = [
 
 const ThemeContainer = () => {
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
-  const { setTheme } = useStoreActions(state => state.userSettings);
+  const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
 
   const applyTheme = (themeInstance, isCustom) => {
+    // console.log("applying theme now");
     setTheme(themeInstance.key);
     if (!isCustom) {
-      /* TODO: move this to react state when porting viewer to react */
-      store.setUserPref('app.themebg', {
+      // console.log("theme is not custom");
+      const hasBackgroundImage = !!themeInstance['background-image'];
+      // console.log("does them have bg image?", hasBackgroundImage);
+      console.log(hasBackgroundImage);
+      const imageUrl = hasBackgroundImage
+        ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
+        : false;
+      // console.log("image url is", imageUrl);
+      const themeBgObj = {
         type: 'default',
-        url: `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`,
-      });
+        url: imageUrl,
+      };
+      setThemeBg(themeBgObj);
+      /* TODO: move this to react state when porting viewer to react */
+      store.setUserPref('app.themebg', themeBgObj);
+      // console.log("state object for themebg is", themeBgObj);
     }
     global.core.platformMethod('updateSettings');
     analytics.trackEvent('theme', themeInstance.key);
