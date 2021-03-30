@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { remote } from 'electron';
 
+// import { useStoreActions } from 'easy-peasy';
 import { themes } from '../../theme_editor';
 import GlobalState from '../../common/store/GlobalState';
 
@@ -40,6 +41,39 @@ const imageCheck = filePath => {
   }
 
   return false;
+};
+
+let allFiles = [];
+
+export const upsertCustomBackgrounds = () => {
+  try {
+    if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
+  } catch (error) {
+    console.error(error);
+  }
+  fs.readdir(userBackgroundsPath, async (error, files) => {
+    if (error) {
+      console.log(error);
+    } else {
+      allFiles = await files
+        .map(file => ({
+          name: file,
+          'background-image': `${userBackgroundsPath}/${file.replace(/(\s)/g, '\\ ')}`,
+          time: fs.statSync(path.resolve(userBackgroundsPath, file)).mtime.getTime(),
+        }))
+        .sort((a, b) => b.time - a.time);
+      setTimeout({}, 5000);
+    }
+  });
+  // console.log(allFiles);
+  return allFiles;
+};
+
+export const removeCustomBackgroundFile = imagePath => {
+  fs.unlink(imagePath, deleteError => {
+    if (deleteError) console.log(deleteError);
+  });
+  console.log(imagePath);
 };
 
 // export const upsertCustomBackgrounds = userBackgroundsPath => {
@@ -86,7 +120,6 @@ const imageCheck = filePath => {
 // };
 
 export const uploadImage = async evt => {
-  // store.setUserPref('app.theme', themesWithCustomBg[0]);
   console.log('uploadImage');
   try {
     if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
@@ -97,13 +130,11 @@ export const uploadImage = async evt => {
 
   try {
     const filePath = evt.target.files[0].path;
-    console.log(filePath);
     // eslint-disable-next-line no-param-reassign
     evt.target.value = '';
 
     if (imageCheck(filePath)) {
       const files = await imagemin([filePath], userBackgroundsPath);
-      console.log(filePath);
       if (files) {
         store.setUserPref('app.themebg', {
           type: 'custom',
@@ -115,11 +146,6 @@ export const uploadImage = async evt => {
           url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
         });
 
-        console.log(store.getUserPref('app.themebg'));
-
-        // upsertCustomBackgrounds(userBackground);
-        // console.log(files, userBackgroundsPath);
-        // analytics.trackEvent('theme', 'custom');
         global.core.platformMethod('updateSettings');
       }
     } else {

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { remote } from 'electron';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Tile } from '../../common/sttm-ui';
 
 import { themes } from '../../theme_editor';
-import { uploadImage } from '../utils';
+import { uploadImage, upsertCustomBackgrounds, removeCustomBackgroundFile } from '../utils';
 
 // const path = require('path');
 
@@ -20,22 +20,18 @@ const themeTypes = [
   { type: 'SPECIAL', title: 'SPECIAL_CONDITIONS' },
 ];
 
+let customThemes = [];
 const ThemeContainer = () => {
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
 
   const applyTheme = (themeInstance, isCustom) => {
-    // console.log("applying theme now");
-    setTheme(themeInstance.key);
     if (!isCustom) {
-      // console.log("theme is not custom");
+      setTheme(themeInstance.key);
       const hasBackgroundImage = !!themeInstance['background-image'];
-      // console.log("does them have bg image?", hasBackgroundImage);
-      console.log(hasBackgroundImage);
       const imageUrl = hasBackgroundImage
         ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
         : false;
-      // console.log("image url is", imageUrl);
       const themeBgObj = {
         type: 'default',
         url: imageUrl,
@@ -43,13 +39,31 @@ const ThemeContainer = () => {
       setThemeBg(themeBgObj);
       /* TODO: move this to react state when porting viewer to react */
       store.setUserPref('app.themebg', themeBgObj);
-      // console.log("state object for themebg is", themeBgObj);
+    } else {
+      const themeBgObj = {
+        type: 'custom',
+        url: themeInstance['background-image'],
+      };
+      setThemeBg(themeBgObj);
+      store.setUserPref('app.themebg', themeBgObj);
     }
     global.core.platformMethod('updateSettings');
     analytics.trackEvent('theme', themeInstance.key);
   };
 
   const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
+
+  const getCustomBgImageForTile = tile => {
+    return {
+      backgroundImage: `url(${tile['background-image']})`,
+    };
+  };
+
+  useEffect(() => {
+    // console.log(store.getUserPref('app.themebg'));
+    customThemes = upsertCustomBackgrounds();
+    // console.log(customThemes);
+  });
 
   return (
     <div className="settings-container themes-container">
@@ -79,6 +93,28 @@ const ThemeContainer = () => {
           <input className="file-input" onChange={uploadImage} id="themebg-upload" type="file" />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
+        {customThemes.map(tile => (
+          <React.Fragment key={tile.name}>
+            <button
+              key={tile.name}
+              onClick={() => {
+                applyTheme(tile, 'custom');
+                // removeCustomBackgroundFile(tile['background-image']);
+              }}
+              className={`theme-instance`}
+              style={getCustomBgImageForTile(tile)}
+            />
+            <button
+              key={tile.backgroundImage}
+              className="delete-button"
+              onClick={() => {
+                removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+              }}
+            >
+              <i className="fa fa-trash-o" />
+            </button>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

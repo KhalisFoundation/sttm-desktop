@@ -1,2 +1,6 @@
 export { settingsNavObj, settingsObj } from './parse-settings';
-export { uploadImage } from './theme-bg-uploader';
+export {
+  uploadImage,
+  upsertCustomBackgrounds,
+  removeCustomBackgroundFile,
+} from './theme-bg-uploader';
