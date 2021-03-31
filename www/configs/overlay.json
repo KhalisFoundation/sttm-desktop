@@ -1,0 +1,191 @@
+{
+  "sidebar": {
+    "categories": {
+      "subtitles": {
+        "title": "SUBTITLES",
+        "type": "title",
+        "subcategories": ["gurbani-options", "text-options"]
+      },
+      "gurbani-options": {
+        "title": "GURBANI",
+        "type": "dropdown",
+        "settings": ["gurbani-color", "gurbani-font", "gurbani-size"]
+      },
+      "text-options": {
+        "title": "TEXT",
+        "type": "dropdown",
+        "settings": ["text-color", "text-font", "text-size"]
+      },
+
+      "background": {
+        "title": "BACKGROUND",
+        "type": "title",
+        "subcategories": ["background-options"]
+      },
+      "background-options": {
+        "title": "",
+        "type": "size-icon",
+        "settings": [
+          "background-color",
+          "green-screen-toggle",
+          "background-height",
+          "background-opacity"
+        ]
+      },
+
+      "date-time": {
+        "title": "DATE_AND_TIME",
+        "type": "title",
+        "toggle": true,
+        "subcategories": ["date-time-options"]
+      },
+
+      "date-time-options": {
+        "title": "",
+        "type": "dropdown",
+        "settings": ["date-format", "time-format", "date-time-position"]
+      }
+    },
+    "settings": {
+      "gurbani-color": {
+        "type": "color-input",
+        "title": "",
+        "initialValue": "#ffffff"
+      },
+      "gurbani-font": {
+        "title": "",
+        "options": {
+          "font1": "ANMOL_LIPI",
+          "font2": "ANMOL_LIPI",
+          "font3": "ANMOL_LIPI"
+        },
+        "initialValue": "font1"
+      },
+      "gurbani-size": {
+        "title": "",
+        "type": "size-icon",
+        "initialValue": 12
+      },
+      "text-color": {
+        "type": "color-input",
+        "title": "",
+        "initialValue": "#ffffff"
+      },
+      "text-font": {
+        "title": "",
+        "options": {
+          "font1": "MULI",
+          "font2": "MULI",
+          "font3": "MULI"
+        },
+        "initialValue": "font1"
+      },
+      "text-size": {
+        "title": "",
+        "type": "size-icon",
+        "initialValue": 12
+      },
+      "background-color": {
+        "title": "",
+        "type": "color-input",
+        "initialValue": "#000000"
+      },
+      "green-screen-toggle": {
+        "type": "icon-toggle",
+        "icon": "rectangle.svg",
+        "initialValue": false
+      },
+      "background-height": {
+        "title": "HEIGHT",
+        "initialValue": 20
+      },
+      "background-opacity": {
+        "title": "OPACITY",
+        "initialValue": 1
+      },
+
+      "date-format": {
+        "title": "",
+        "options": {
+          "format1": "MM_DD_YYYY",
+          "format2": "MM_DD_YYYY",
+          "format3": "MM_DD_YYYY"
+        },
+        "initialValue": "format1"
+      },
+      "time-format": {
+        "title": "",
+        "options": {
+          "format1": "12HR",
+          "format2": "24HR"
+        },
+        "initialValue": "format1"
+      },
+      "date-time-position": {
+        "title": "POSITION",
+        "options": {
+          "position1": "TOP_LEFT",
+          "position2": "TOP_RIGHT",
+          "position3": "BOTTOM_RIGHT",
+          "position4": "BOTTOM_LEFT"
+        }
+      }
+    }
+  },
+  "bottomBar": {
+    "categories": {
+      "left-side-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["addons"]
+      },
+      "addons": {
+        "title": "",
+        "type": "icon-toggle",
+        "settings": ["toggle-logo", "toggle-annoucement", "toggle-link"]
+      },
+      "center-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["layouts"]
+      },
+      "layouts": {
+        "title": "",
+        "type": "custom",
+        "settings": ["layout-selector"]
+      },
+      "right-side-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["reset-options"]
+      },
+      "reset-options": {
+        "title": "",
+        "type": "icon-toggle",
+        "settings": ["reset"]
+      }
+    },
+
+    "settings": {
+      "reset": {
+        "icon": "reset.svg",
+        "initialValue": false
+      },
+      "layout-selector": {
+        "key": "LayoutSelector"
+      },
+      "toggle-logo": {
+        "icon": "sttm.png",
+        "initialValue": false
+      },
+      "toggle-annoucement": {
+        "icon": "rectangle.svg",
+        "initialValue": false
+      },
+      "toggle-link": {
+        "icon": "rectangle.svg",
+        "initialValue": false
+      }
+    }
+  }
+}

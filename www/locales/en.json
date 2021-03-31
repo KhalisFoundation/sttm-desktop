@@ -19,10 +19,14 @@
   "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
 
   "BANI_OVERLAY": {
+    "SUBTITLES": "Subtitles",
+    "GURBANI": "Gurbani",
+    "TEXT": "Text",
+    "BACKGROUND": "Background",
+    "DATE_AND_TIME": "Date & Time",
     "ANNOUNCEMENT": "Announcement",
     "BG": "BG",
     "COPY_URL": "Copy URL",
-    "GURBANI": "Gurbani",
     "LARIVAAR": "Larivaar",
     "LAYOUT": "Layout",
     "LOGO": "Logo",
@@ -32,9 +36,19 @@
     "PADCHED": "Padched",
     "PRESETS": "Presets",
     "SIZE": "Size",
-    "TEXT": "Text",
     "GREEN_SCREEN": "Green Screen",
-    "LIVE_URL": "Live URL"
+    "LIVE_URL": "Live URL",
+    "HEIGHT": "Height",
+    "POSITION": "Position",
+    "ANMOL_LIPI": "Anmol Lipi",
+    "MULI": "Muli",
+    "TOP_LEFT": "Top Left",
+    "TOP_RIGHT": "Top Right",
+    "BOTTOM_LEFT": "Bottom Left",
+    "BOTTOM_RIGHT": "Bottom Right",
+    "MM_DD_YYYY": "MM/DD/YYYY",
+    "12HR": "12Hr",
+    "24HR": "24Hr"
   },
 
   "WORKSPACES": {
