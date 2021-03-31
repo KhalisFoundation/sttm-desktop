@@ -159,7 +159,7 @@ $toolbar-width: 75px;
   font-weight: bold;
   letter-spacing: 2px;
   margin: 4px;
-  padding: 10px 0px;
+  padding: 10px 0;
   text-transform: uppercase;
 }
 
@@ -523,8 +523,8 @@ input[type='color'] {
     justify-content: space-between;
 
     .subcategory-title {
-      width: 100%;
       margin-bottom: 8px;
+      width: 100%;
     }
 
     .control-item {
@@ -532,7 +532,7 @@ input[type='color'] {
 
       &.control-dropdown {
         flex-grow: 1;
-        margin: 0px 10px;
+        margin: 0 10px;
 
         select {
           padding: 4px;
@@ -546,7 +546,7 @@ input[type='color'] {
 
       &:first-child(),
       &:last-child() {
-        margin: 0px;
+        margin: 0;
       }
 
       &#date-time-position {
@@ -557,7 +557,7 @@ input[type='color'] {
 
         select {
           flex-grow: 1;
-          margin: 0px 10px;
+          margin: 0 10px;
         }
       }
 
@@ -579,13 +579,12 @@ input[type='color'] {
           border-radius: 4px;
           border: 2px solid white;
           box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
-
           height: 30px;
           width: 30px;
 
           &.disabled {
-            opacity: 0.7;
             box-shadow: none;
+            opacity: 0.7;
           }
         }
       }
@@ -599,13 +598,13 @@ input[type='color'] {
           &::before {
             background-color: #222;
             border-radius: 50%;
+            box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
             color: #eee;
             display: inline-block;
             font-size: 12px;
             height: 20px;
             padding: 4px;
             text-align: center;
-            box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
             width: 20px;
           }
         }
