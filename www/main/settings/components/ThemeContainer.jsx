@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { remote } from 'electron';
 import { useStoreActions, useStoreState } from 'easy-peasy';
@@ -7,10 +7,6 @@ import { Tile } from '../../common/sttm-ui';
 import { themes } from '../../theme_editor';
 import { uploadImage, upsertCustomBackgrounds, removeCustomBackgroundFile } from '../utils';
 
-// const path = require('path');
-
-// const userDataPath = remote.app.getPath('userData');
-// const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const { i18n, store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -20,8 +16,8 @@ const themeTypes = [
   { type: 'SPECIAL', title: 'SPECIAL_CONDITIONS' },
 ];
 
-let customThemes = [];
 const ThemeContainer = () => {
+  const [customThemes, setCustomThemes] = useState([]);
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
 
@@ -60,10 +56,8 @@ const ThemeContainer = () => {
   };
 
   useEffect(() => {
-    // console.log(store.getUserPref('app.themebg'));
-    customThemes = upsertCustomBackgrounds();
-    // console.log(customThemes);
-  });
+    upsertCustomBackgrounds(setCustomThemes);
+  }, []);
 
   return (
     <div className="settings-container themes-container">
@@ -90,7 +84,15 @@ const ThemeContainer = () => {
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
         <label className="file-input-label">
           New Image
-          <input className="file-input" onChange={uploadImage} id="themebg-upload" type="file" />
+          <input
+            className="file-input"
+            onChange={e => {
+              uploadImage(e);
+              upsertCustomBackgrounds(setCustomThemes);
+            }}
+            id="themebg-upload"
+            type="file"
+          />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
         {customThemes.map(tile => (
@@ -99,7 +101,6 @@ const ThemeContainer = () => {
               key={tile.name}
               onClick={() => {
                 applyTheme(tile, 'custom');
-                // removeCustomBackgroundFile(tile['background-image']);
               }}
               className={`theme-instance`}
               style={getCustomBgImageForTile(tile)}
@@ -109,6 +110,7 @@ const ThemeContainer = () => {
               className="delete-button"
               onClick={() => {
                 removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+                upsertCustomBackgrounds(setCustomThemes);
               }}
             >
               <i className="fa fa-trash-o" />
