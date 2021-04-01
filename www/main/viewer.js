@@ -136,12 +136,12 @@ const castText = (text, isGurmukhi) => {
 };
 
 const applyThemebg = () => {
-  if (prefs.app.themebg.url) {
-    if (prefs.app.themebg.url !== 'none') {
-      $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
-      $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
-    }
+  if (prefs.app.themebg.url && prefs.app.themebg.url !== 'none') {
+    $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
+  } else {
+    $body.style.backgroundImage = 'none';
   }
+  $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
 };
 
 applyThemebg();
