@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { remote } from 'electron';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { Tile } from '../../common/sttm-ui';
-import CustomBgTile from './CustomBgTile';
+import { Tile, CustomBgTile } from '../../common/sttm-ui';
 
 import { themes } from '../../theme_editor';
 import { uploadImage, upsertCustomBackgrounds, removeCustomBackgroundFile } from '../utils';
