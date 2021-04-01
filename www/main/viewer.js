@@ -17,7 +17,6 @@ const { remote } = require('electron');
 const { store, i18n } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
-// const themes = require('./configs/themes.json');
 
 const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
@@ -202,9 +201,6 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 
 global.platform.ipc.on('update-settings', () => {
   prefs = store.get('userPrefs');
-  // const themeKeys = themes.map(item => item.key);
-  // $body.classList.remove(...themeKeys);
-  // $body.classList.add(prefs.app.theme);
   applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
@@ -212,6 +208,7 @@ global.platform.ipc.on('update-settings', () => {
 
 global.platform.ipc.on('save-settings', (event, setting) => {
   const { key, payload, oldValue } = setting;
+  // checking typeof savedSettings[key] so that classs should not apply while custom background
   if (typeof savedSettings[key] !== 'object') {
     document.body.classList.remove(`${key}-${oldValue}`);
     document.body.classList.add(`${key}-${payload}`);
