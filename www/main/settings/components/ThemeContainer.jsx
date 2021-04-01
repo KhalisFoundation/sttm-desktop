@@ -78,7 +78,7 @@ const ThemeContainer = () => {
         ))}
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
         <label className="file-input-label">
-          New Image
+          {i18n.t('THEMES.NEW_IMAGE')}
           <input
             className="file-input"
             onChange={async e => {
