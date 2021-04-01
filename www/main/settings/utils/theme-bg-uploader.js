@@ -14,6 +14,10 @@ const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
+const errorAlert = error => {
+  alert(error);
+};
+
 const imageCheck = filePath => {
   const acceptedExtensions = ['png', 'jpg'];
   const acceptedMimeTypes = ['image/png', 'image/jpeg'];
@@ -25,7 +29,7 @@ const imageCheck = filePath => {
       return acceptedExtensions.includes(fileMeta.ext) && acceptedMimeTypes.includes(fileMeta.mime);
     }
   } catch (error) {
-    console.error(error);
+    errorAlert(errorAlert);
   }
 
   return false;
@@ -35,12 +39,12 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
   try {
     if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
   } catch (error) {
-    console.error(error);
+    errorAlert('Unable to create File');
   }
 
   fs.readdir(userBackgroundsPath, (error, files) => {
     if (error) {
-      console.log(error);
+      errorAlert('Error fetching files');
     } else {
       responseCallback(
         files
@@ -57,7 +61,7 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
 
 export const removeCustomBackgroundFile = imagePath => {
   fs.unlink(imagePath, deleteError => {
-    if (deleteError) console.log(deleteError);
+    if (deleteError) errorAlert('Unable to delete file');
   });
 };
 
@@ -65,7 +69,7 @@ export const uploadImage = async evt => {
   try {
     if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
   } catch (error) {
-    console.error(error);
+    errorAlert('Unable to create folder');
   }
 
   try {
@@ -86,9 +90,9 @@ export const uploadImage = async evt => {
         global.core.platformMethod('updateSettings');
       }
     } else {
-      console.error('theme error filepath');
+      errorAlert('File must be in .png or .jpg format');
     }
   } catch (error) {
-    console.error(error);
+    errorAlert('Unknown error occured');
   }
 };
