@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { remote } from 'electron';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Tile } from '../../common/sttm-ui';
+import CustomBgTile from './CustomBgTile';
 
 import { themes } from '../../theme_editor';
 import { uploadImage, upsertCustomBackgrounds, removeCustomBackgroundFile } from '../utils';
@@ -49,12 +50,6 @@ const ThemeContainer = () => {
 
   const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
 
-  const getCustomBgImageForTile = tile => {
-    return {
-      backgroundImage: `url(${tile['background-image']})`,
-    };
-  };
-
   useEffect(() => {
     upsertCustomBackgrounds(setCustomThemes);
   }, []);
@@ -97,24 +92,16 @@ const ThemeContainer = () => {
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
         {customThemes.map(tile => (
           <React.Fragment key={tile.name}>
-            <button
-              key={tile.name}
-              onClick={() => {
+            <CustomBgTile
+              customBg={tile}
+              onApply={() => {
                 applyTheme(tile, 'custom');
               }}
-              className={`theme-instance`}
-              style={getCustomBgImageForTile(tile)}
-            />
-            <button
-              key={tile.backgroundImage}
-              className="delete-button"
-              onClick={() => {
+              onRemove={() => {
                 removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
                 upsertCustomBackgrounds(setCustomThemes);
               }}
-            >
-              <i className="fa fa-trash-o" />
-            </button>
+            />
           </React.Fragment>
         ))}
       </div>

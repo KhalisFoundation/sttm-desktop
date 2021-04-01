@@ -1,12 +1,8 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
-// import { remote } from 'electron';
-
-// const { store } = remote.require('./app');
 
 const SettingViewer = () => {
   const { themeBg } = useStoreState(state => state.userSettings);
-  // console.log(themeBg, 'check themebg');
 
   const {
     gurbaniFontSize,

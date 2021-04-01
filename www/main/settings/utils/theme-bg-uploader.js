@@ -76,16 +76,13 @@ export const uploadImage = async evt => {
     if (imageCheck(filePath)) {
       const files = await imagemin([filePath], userBackgroundsPath);
       if (files) {
-        store.setUserPref('app.themebg', {
+        const customThemeObj = {
           type: 'custom',
           url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
-        });
+        };
 
-        GlobalState.getActions().userSettings.setThemeBg({
-          type: 'custom',
-          url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
-        });
-
+        store.setUserPref('app.themebg', customThemeObj);
+        GlobalState.getActions().userSettings.setThemeBg(customThemeObj);
         global.core.platformMethod('updateSettings');
       }
     } else {
