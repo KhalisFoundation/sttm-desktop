@@ -86,8 +86,8 @@ const ThemeContainer = () => {
           New Image
           <input
             className="file-input"
-            onChange={e => {
-              uploadImage(e);
+            onChange={async e => {
+              await uploadImage(e);
               upsertCustomBackgrounds(setCustomThemes);
             }}
             id="themebg-upload"
