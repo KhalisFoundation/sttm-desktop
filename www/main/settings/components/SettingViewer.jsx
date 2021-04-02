@@ -46,113 +46,105 @@ const SettingViewer = () => {
       <h1 className="gurbani gurmukhi" style={gurbaniStyles}>
         <div>
           <span className="padchhed">
-            <span>ik®pw</span>
-            <span>kry</span>
-            <span>jy</span>
-            <span className="visraam-main visraam-sttm2">AwpxI</span>
-            <span>qw</span>
-            <span>hir</span>
-            <span>rKw</span>
-            <span>aur</span>
+            <span>jo</span>
+            <span>mwgih</span>
+            <span>Twkur</span>
+            <span>Apuny</span>
+            <wbr />
+            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
+            <wbr />
+            <span>soeI</span>
+            <span>soeI</span>
+            <wbr />
             <span>
-              <span>Dwir</span>
+              <span>dyvY</span>
               <i> </i>
-              <span>]1]</span>
+              <span>]</span>
             </span>
           </span>
           <span className="larivaar">
-            <span>ik®pw</span>
+            <span>jo</span>
             <wbr />
-            <span>kry</span>
+            <span>mwgih</span>
             <wbr />
-            <span>jy</span>
+            <span>Twkur</span>
             <wbr />
-            <span className="visraam-main visraam-sttm2">AwpxI</span>
+            <span>Apuny</span>
+            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
+            <span>soeI</span>
             <wbr />
-            <span>qw</span>
+            <span>soeI</span>
             <wbr />
-            <span>hir</span>
+            <span>dyvY</span>
             <wbr />
-            <span>rKw</span>
-            <wbr />
-            <span>aur</span>
-            <wbr />
-            <span>
-              <span>Dwir</span>
-              <i> </i>
-              <span>]1]</span>
-            </span>
+            <span>]</span>
           </span>
         </div>
       </h1>
       <h2 className="translation" style={translationStyles}>
         <div>
           <div className="english-translation transtext">
-            If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||
+            Whatever I ask for from my Lord and Master, he gives that to me.
           </div>
           <div className="spanish-translation transtext">
-            Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)
+            Lo que sea que el Esclavo del Señor, Nanak recita con sus labios,{' '}
           </div>
           <div className="hindi-translation transtext">
-            अगर परमात्मा अपनी मेहर करे।तो मैं भी उसका नाम हृदय में परो के रखूँ। 1।
+            हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
           </div>
         </div>
       </h2>
       <h2 className="teeka" style={teekaStyles}>
-        jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[
+        hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
       </h2>
       <h2 className="transliteration" style={transliterationStyles}>
         <div>
           <div className="english-transliteration translittext">
-            kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||
+            jo maageh Thaakur apune te soiee soiee dhevai ||
           </div>
           <div className="shahmukhi-transliteration translittext">
-            کِ®پا کرے جے آپݨیِ تا هر رکھا اُر دھار ۔۔۱۔۔
+            جو ماگه ٹھاکر اپنے تے سوای سوای دےوَے ۔۔
           </div>
           <div className="devanagari-transliteration translittext">
-            कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥
+            जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
           </div>
         </div>
       </h2>
       <h1 className="gurbani gurmukhi next-line" style={nextLineStyles}>
         <div>
           <span className="padchhed">
-            <span>ik®pw</span>
-            <span>kry</span>
-            <span>jy</span>
-            <span className="visraam-main visraam-sttm2">AwpxI</span>
-            <span>qw</span>
-            <span>hir</span>
-            <span>rKw</span>
-            <span>aur</span>
+            <span>jo</span>
+            <span>mwgih</span>
+            <span>Twkur</span>
+            <span>Apuny</span>
+            <wbr />
+            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
+            <wbr />
+            <span>soeI</span>
+            <span>soeI</span>
+            <wbr />
             <span>
-              <span>Dwir</span>
+              <span>dyvY</span>
               <i> </i>
-              <span>]1]</span>
+              <span>]</span>
             </span>
           </span>
           <span className="larivaar">
-            <span>ik®pw</span>
+            <span>jo</span>
             <wbr />
-            <span>kry</span>
+            <span>mwgih</span>
             <wbr />
-            <span>jy</span>
+            <span>Twkur</span>
             <wbr />
-            <span className="visraam-main visraam-sttm2">AwpxI</span>
+            <span>Apuny</span>
+            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
+            <span>soeI</span>
             <wbr />
-            <span>qw</span>
+            <span>soeI</span>
             <wbr />
-            <span>hir</span>
+            <span>dyvY</span>
             <wbr />
-            <span>rKw</span>
-            <wbr />
-            <span>aur</span>
-            <wbr />
-            <span>
-              <span>Dwir</span>
-              <i> </i>
-              <span>]1]</span>
-            </span>
+            <span>]</span>
           </span>
         </div>
       </h1>
