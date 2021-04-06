@@ -1,12 +1,9 @@
 import { remote } from 'electron';
-import { useStoreActions } from 'easy-peasy';
 
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
-
-export const applyTheme = (themeInstance, isCustom) => {
+export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg) => {
   if (!isCustom) {
     setTheme(themeInstance.key);
     const hasBackgroundImage = !!themeInstance['background-image'];

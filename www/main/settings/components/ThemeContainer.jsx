@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { remote } from 'electron';
-import { useStoreState, useStoreActions } from 'easy-peasy';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Tile, CustomBgTile } from '../../common/sttm-ui';
 
 import { themes } from '../../theme_editor';
