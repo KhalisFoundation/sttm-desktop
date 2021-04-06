@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
 import { remote } from 'electron';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import { Tile, CustomBgTile } from '../../common/sttm-ui';
 
 import { themes } from '../../theme_editor';
-import { uploadImage, upsertCustomBackgrounds, removeCustomBackgroundFile } from '../utils';
+import {
+  applyTheme,
+  uploadImage,
+  upsertCustomBackgrounds,
+  removeCustomBackgroundFile,
+} from '../utils';
 
-const { i18n, store } = remote.require('./app');
-const analytics = remote.getGlobal('analytics');
+const { i18n } = remote.require('./app');
 
 const themeTypes = [
   { type: 'COLOR', title: 'COLORS' },
@@ -18,35 +22,8 @@ const themeTypes = [
 
 const ThemeContainer = () => {
   const [customThemes, setCustomThemes] = useState([]);
-  const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
-
-  const applyTheme = (themeInstance, isCustom) => {
-    if (!isCustom) {
-      setTheme(themeInstance.key);
-      const hasBackgroundImage = !!themeInstance['background-image'];
-      const imageUrl = hasBackgroundImage
-        ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
-        : false;
-      const themeBgObj = {
-        type: 'default',
-        url: imageUrl,
-      };
-      setThemeBg(themeBgObj);
-      /* TODO: move this to react state when porting viewer to react */
-      store.setUserPref('app.themebg', themeBgObj);
-    } else {
-      const themeBgObj = {
-        type: 'custom',
-        url: themeInstance['background-image'],
-      };
-      setThemeBg(themeBgObj);
-      store.setUserPref('app.themebg', themeBgObj);
-    }
-    global.core.platformMethod('updateSettings');
-    analytics.trackEvent('theme', themeInstance.key);
-  };
-
+  const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
 
   useEffect(() => {
@@ -64,7 +41,7 @@ const ThemeContainer = () => {
                 key={theme.name}
                 onClick={() => {
                   if (currentTheme !== theme.key) {
-                    applyTheme(theme);
+                    applyTheme(theme, false, setTheme, setThemeBg);
                   }
                 }}
                 className="theme-instance"
@@ -94,7 +71,7 @@ const ThemeContainer = () => {
             <CustomBgTile
               customBg={tile}
               onApply={() => {
-                applyTheme(tile, 'custom');
+                applyTheme(tile, 'custom', setTheme, setThemeBg);
               }}
               onRemove={() => {
                 removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));

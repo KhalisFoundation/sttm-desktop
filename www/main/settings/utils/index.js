@@ -4,3 +4,4 @@ export {
   upsertCustomBackgrounds,
   removeCustomBackgroundFile,
 } from './theme-bg-uploader';
+export { applyTheme } from './apply-theme';
