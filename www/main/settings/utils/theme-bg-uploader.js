@@ -35,30 +35,6 @@ const imageCheck = filePath => {
   return false;
 };
 
-export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
-  try {
-    if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
-  } catch (error) {
-    errorAlert('Unable to create File');
-  }
-
-  fs.readdir(userBackgroundsPath, (error, files) => {
-    if (error) {
-      errorAlert('Error fetching files');
-    } else {
-      responseCallback(
-        files
-          .map(file => ({
-            name: file,
-            'background-image': `${userBackgroundsPath}/${file.replace(/(\s)/g, '\\ ')}`,
-            time: fs.statSync(path.resolve(userBackgroundsPath, file)).mtime.getTime(),
-          }))
-          .sort((a, b) => b.time - a.time),
-      );
-    }
-  });
-};
-
 export const removeCustomBackgroundFile = imagePath => {
   fs.unlink(imagePath, deleteError => {
     if (deleteError) errorAlert('Unable to delete file');
