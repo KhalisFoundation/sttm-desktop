@@ -135,11 +135,9 @@ const castText = (text, isGurmukhi) => {
 };
 
 const applyThemebg = () => {
-  $body.style.backgroundImage =
-    prefs.app.themebg.url && prefs.app.themebg.url !== 'none'
-      ? `url(${slash(prefs.app.themebg.url)})`
-      : 'none';
-  $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
+  const themeBgPrefs = prefs.app.themebg;
+  $body.style.backgroundImage = themeBgPrefs.url ? `url(${slash(themeBgPrefs.url)})` : 'none';
+  $body.classList.toggle('show-overlay', themeBgPrefs.type === 'custom');
 };
 
 applyThemebg();
