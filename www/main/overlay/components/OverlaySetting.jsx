@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-// import { useStoreState, useStoreActions } from 'easy-peasy';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
-const { remote } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 
 const { i18n } = remote.require('./app');
 
-const OverlaySetting = ({ settingObj }) => {
+const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
-  // const userSettings = useStoreState(state => state.userSettings);
-  // const userSettingsActions = useStoreActions(state => state.userSettings);
+  const baniOverlayState = useStoreState(state => state.baniOverlay);
+  const baniOverlayActions = useStoreActions(state => state.userSettings);
 
   const handleInputChange = event => {
     const value = event.target ? event.target.value : event;
     console.log(`value changed to ${value}`);
+    baniOverlayActions[stateFunction](value);
   };
+
+  useEffect(() => {
+    ipcRenderer.send('save-overlay-settings', baniOverlayState);
+  });
 
   const settingDOM = [];
 
@@ -40,6 +45,7 @@ const OverlaySetting = ({ settingObj }) => {
           type="color"
           className={`control-color-input-${title}`}
           onChange={handleInputChange}
+          value={baniOverlayState[stateVar]}
         />,
       );
       break;

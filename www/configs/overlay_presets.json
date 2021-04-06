@@ -23,7 +23,7 @@
     "textColor": "#ffffff",
     "gurbaniTextColor": "#ffffff"
   },
-  "blackAndBlue": {
+  "blackBlue": {
     "label": "BLACK_&_BLUE",
     "bgColor": "#000000",
     "textColor": "#a3eafd",

@@ -551,6 +551,19 @@ ipcMain.on('clear-apv', () => {
 let lastLine;
 
 ipcMain.on('update-overlay-vars', updateOverlayVars);
+ipcMain.on('save-overlay-settings', (event, overlayVars) => {
+  store.set('obs', {
+    overlayPrefs: {
+      overlayVars,
+    },
+  });
+  updateOverlayVars();
+});
+// ipcMain.on('update-overlay-vars', (event, arg) => {
+//   console.log('####### Updated bani overlay vars ##########');
+//   console.log(arg);
+//   io.emit('update-prefs', arg);
+// });
 
 io.on('connection', socket => {
   updateOverlayVars();

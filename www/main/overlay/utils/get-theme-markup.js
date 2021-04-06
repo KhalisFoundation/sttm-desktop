@@ -1,11 +1,12 @@
 import React from 'react';
+import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
 const electron = require('electron');
 
 const { remote } = electron;
 const { i18n } = remote.require('./app');
 
-const getThemeMarkup = themeObjects =>
+const getThemeMarkup = (themeObjects, handleThemeChange) =>
   Object.keys(themeObjects).map(theme => {
     const currentTheme = themeObjects[theme];
     const themeClass = i18n
@@ -18,10 +19,12 @@ const getThemeMarkup = themeObjects =>
       <div
         key={`theme-${theme}`}
         className={`overlay-theme-swatch ${themeClass}`}
+        data-theme-name={convertToCamelCase(themeClass)}
         style={{
           color: currentTheme.gurbaniTextColor,
           background: currentTheme.bgColor,
         }}
+        onClick={handleThemeChange}
       >
         <span>{i18n.t(`THEMES.${currentTheme.label}`)}</span>
       </div>

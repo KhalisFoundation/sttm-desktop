@@ -9,7 +9,7 @@
       "gurbani-options": {
         "title": "GURBANI",
         "type": "dropdown",
-        "settings": ["gurbani-color", "gurbani-font", "gurbani-size"]
+        "settings": ["gurbani-text-color", "gurbani-font", "gurbani-size"]
       },
       "text-options": {
         "title": "TEXT",
@@ -25,12 +25,7 @@
       "background-options": {
         "title": "",
         "type": "size-icon",
-        "settings": [
-          "background-color",
-          "green-screen-toggle",
-          "background-height",
-          "background-opacity"
-        ]
+        "settings": ["bg-color", "bg-height", "bg-opacity"]
       },
 
       "date-time": {
@@ -43,11 +38,11 @@
       "date-time-options": {
         "title": "",
         "type": "dropdown",
-        "settings": ["date-format", "time-format", "date-time-position"]
+        "settings": ["date-format", "time-format"]
       }
     },
     "settings": {
-      "gurbani-color": {
+      "gurbani-text-color": {
         "type": "color-input",
         "title": "",
         "initialValue": "#ffffff"
@@ -85,21 +80,16 @@
         "type": "size-icon",
         "initialValue": 12
       },
-      "background-color": {
+      "bg-color": {
         "title": "",
         "type": "color-input",
         "initialValue": "#000000"
       },
-      "green-screen-toggle": {
-        "type": "icon-toggle",
-        "icon": "rectangle.svg",
-        "initialValue": false
-      },
-      "background-height": {
+      "bg-height": {
         "title": "HEIGHT",
         "initialValue": 20
       },
-      "background-opacity": {
+      "bg-opacity": {
         "title": "OPACITY",
         "initialValue": 1
       },
@@ -120,15 +110,6 @@
           "format2": "24HR"
         },
         "initialValue": "format1"
-      },
-      "date-time-position": {
-        "title": "POSITION",
-        "options": {
-          "position1": "TOP_LEFT",
-          "position2": "TOP_RIGHT",
-          "position3": "BOTTOM_RIGHT",
-          "position4": "BOTTOM_LEFT"
-        }
       }
     }
   },
@@ -142,7 +123,7 @@
       "addons": {
         "title": "",
         "type": "icon-toggle",
-        "settings": ["toggle-logo", "toggle-annoucement", "toggle-link"]
+        "settings": ["toggle-logo", "toggle-annoucement", "toggle-link", "green-screen-toggle"]
       },
       "center-icons": {
         "title": "",
@@ -183,6 +164,11 @@
         "initialValue": false
       },
       "toggle-link": {
+        "icon": "rectangle.svg",
+        "initialValue": false
+      },
+      "green-screen-toggle": {
+        "type": "icon-toggle",
         "icon": "rectangle.svg",
         "initialValue": false
       }
