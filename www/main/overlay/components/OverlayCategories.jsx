@@ -14,7 +14,7 @@ const SettingsFactory = ({ subCategory }) => {
     settingsDOM.push(
       <div
         className={`control-item control-${subCategory.settingObjs[settingKey].type}`}
-        key={settingIndex}
+        key={`factory-${settingIndex}`}
         id={settingKey}
       >
         <OverlaySetting

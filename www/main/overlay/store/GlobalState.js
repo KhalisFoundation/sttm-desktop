@@ -1,48 +1,32 @@
 import { createStore, action } from 'easy-peasy';
 
-const GlobalState = createStore({
-  baniOverlay: {
-    theme: 'a-new-day',
-    textColor: '',
-    layout: 'split',
-    bgColor: '#274f69',
-    bgOpacity: 0.9,
-    padding: 0.5,
-    fontSize: 3,
-    gurbaniFontSize: 5,
-    gurbaniTextColor: '#ffffff',
-    overlayLogo: true,
-    overlayLarivaar: false,
-    translationFont: 'Muli',
-    gurbaniFont: 'Gurbani Akhar Thick',
-    larivaarAssist: false,
-    greenScreen: false,
+import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
-    setTheme: action((state, theme) => {
+const { sidebar, bottomBar } = require('../../../configs/overlay.json');
+
+const GlobalState = createStore({
+  baniOverlay: (() => {
+    const stateObj = {};
+    const settings = { ...sidebar.settings, ...bottomBar.settings };
+    Object.keys(settings).forEach(settingKey => {
+      const stateVarName = convertToCamelCase(settingKey);
+      const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
+      stateObj[stateVarName] = settings[settingKey].initialValue;
+      stateObj[stateFuncName] = action((state, payload) => {
+        const updatedState = { ...state };
+        updatedState[stateVarName] = payload;
+        return updatedState;
+      });
+    });
+    stateObj.theme = 'a-new-day';
+    stateObj.setTheme = action((state, theme) => {
       return {
         ...state,
         theme,
       };
-    }),
-    setTextColor: action((state, textColor) => {
-      return {
-        ...state,
-        textColor,
-      };
-    }),
-    setGurbaniTextColor: action((state, gurbaniTextColor) => {
-      return {
-        ...state,
-        gurbaniTextColor,
-      };
-    }),
-    setBgColor: action((state, bgColor) => {
-      return {
-        ...state,
-        bgColor,
-      };
-    }),
-  },
+    });
+    return stateObj;
+  })(),
 });
 
 export default GlobalState;

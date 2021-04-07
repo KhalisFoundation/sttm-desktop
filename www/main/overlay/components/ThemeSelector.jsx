@@ -22,7 +22,7 @@ export const ThemeSelector = () => {
   };
 
   useEffect(() => {
-    ipcRenderer.send('save-overlay-settings', baniOverlayState);
+    ipcRenderer.send('save-overlay-prefs', baniOverlayState);
   });
 
   return (

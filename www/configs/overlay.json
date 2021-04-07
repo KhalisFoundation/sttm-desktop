@@ -45,7 +45,7 @@
       "gurbani-text-color": {
         "type": "color-input",
         "title": "",
-        "initialValue": "#ffffff"
+        "initialValue": "#0e2654"
       },
       "gurbani-font": {
         "title": "",
@@ -64,7 +64,7 @@
       "text-color": {
         "type": "color-input",
         "title": "",
-        "initialValue": "#ffffff"
+        "initialValue": "#003a8c"
       },
       "text-font": {
         "title": "",
@@ -83,7 +83,7 @@
       "bg-color": {
         "title": "",
         "type": "color-input",
-        "initialValue": "#000000"
+        "initialValue": "#97d6f7"
       },
       "bg-height": {
         "title": "HEIGHT",

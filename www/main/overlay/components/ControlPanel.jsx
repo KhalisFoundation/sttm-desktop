@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 
 import { CopyToClipboard } from './CopyToClipboard';
 import OverlaySettings from './Options';
-import { settingsObjGenerator } from '../utils/parse-overlay-options';
-
-const { sidebar } = require('../../../configs/overlay.json');
+import { settingsObj } from '../utils/parse-overlay-options';
 
 export const ControlPanel = ({ url }) => {
-  const settingsObj = settingsObjGenerator(sidebar);
-
   return (
     <section className="control-panel">
       <OverlaySettings settingsObj={settingsObj} />

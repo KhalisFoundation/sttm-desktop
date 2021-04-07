@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 
 import OverlaySettings from './Options';
 
-import { settingsObjGenerator } from '../utils/parse-overlay-options';
-
-const { bottomBar } = require('../../../configs/overlay.json');
+import { bottomSettings } from '../utils/parse-overlay-options';
 
 export const PreviewContainer = ({ url }) => {
-  const bottomSettings = settingsObjGenerator(bottomBar);
-
   return (
     <section className="preview-container">
       <webview className="preview" src={url}></webview>
