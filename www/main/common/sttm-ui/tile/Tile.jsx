@@ -16,6 +16,7 @@ const Tile = ({ children, className, theme = null, type = 'extras', onClick, con
       backgroundImage: themeInstance['background-image']
         ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})`
         : 'none',
+      color: themeInstance['gurbani-color'],
     };
   };
 
