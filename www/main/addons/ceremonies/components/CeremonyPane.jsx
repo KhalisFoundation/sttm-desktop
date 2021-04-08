@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { Switch, Tile } from '../../../common/sttm-ui';
 import { ceremoniesFilter } from '../../../common/constants';
 
 import { getUserPreferenceFor, loadCeremonyGlobal } from '../utils';
+import { applyTheme } from '../../../settings/utils';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
-const { getTheme, getCurrentTheme, applyTheme } = require('../../../theme_editor');
+const { getTheme } = require('../../../theme_editor');
 
 const CeremonyPane = props => {
+  const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
+  const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const { token, name, id, onScreenClose } = props;
   const paneId = token;
   const [currentCeremony, setCurrentCeremony] = useState(id);
@@ -31,7 +35,9 @@ const CeremonyPane = props => {
 
   const onThemeClick = theme => {
     loadCeremony();
-    applyTheme(theme);
+    if (currentTheme !== theme.key) {
+      applyTheme(theme, null, setTheme, setThemeBg);
+    }
   };
 
   const toggleOptions = (toggleType, toggleVar) => {
@@ -57,7 +63,7 @@ const CeremonyPane = props => {
     anandkaraj: getTheme('floral'),
     anand: getTheme('a-new-day'),
     akbhogrm: getTheme('khalsa-gold'),
-    current: getCurrentTheme(),
+    current: getTheme(currentTheme),
   };
 
   return (
