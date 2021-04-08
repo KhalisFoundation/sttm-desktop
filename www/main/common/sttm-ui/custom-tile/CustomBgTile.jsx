@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const CustomBgTile = ({ customBg, onApply, onRemove }) => {
   const getCustomBgImageForTile = tile => {
     return {
-      backgroundImage: `url(${tile['background-image']})`,
+      backgroundImage: `url('${tile['background-image']}')`,
     };
   };
 
