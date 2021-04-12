@@ -4,7 +4,9 @@ export const applyUserSettings = savedSettings => {
   }
   if (document) {
     Object.keys(savedSettings).forEach(key => {
-      document.body.classList.add(`${key}-${savedSettings[key]}`);
+      if (typeof savedSettings[key] !== 'object') {
+        document.body.classList.add(`${key}-${savedSettings[key]}`);
+      }
     });
   }
 };

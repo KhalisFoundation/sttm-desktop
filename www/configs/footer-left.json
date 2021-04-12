@@ -14,11 +14,6 @@
     "icon": "dot-circle-o",
     "type": "pane-nav"
   },
-  "themes": {
-    "label": "Themes",
-    "icon": "paint-brush",
-    "type": "tab-nav"
-  },
   "insert": {
     "label": "Insert",
     "icon": "desktop",
