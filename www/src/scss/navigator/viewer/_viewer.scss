@@ -1,7 +1,11 @@
 .viewer-pane {
   @include pane-containers;
   .viewer-content {
-    height: 100%;
+    min-width: 500px;
+    position: relative;
+    overflow: hidden;
+    height: 470px;
+    width: 100%;
     .base-ui {
       width: 100%;
       height: 100%;

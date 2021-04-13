@@ -5,7 +5,7 @@ import ViewerContent from './ViewerContent';
 function ViewerPane() {
   return (
     <div className="viewer-pane">
-      <Pane />
+      <ViewerContent />
     </div>
   );
 }
