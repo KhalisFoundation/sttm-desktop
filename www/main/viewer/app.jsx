@@ -1,7 +1,8 @@
 import React from 'react';
+import ShabadDeck from './ShabadDeck/ShabadDeck';
 
 const App = () => {
-  return <p>text from viewer app after compilation</p>;
+  return <ShabadDeck />;
 };
 
 export default App;
