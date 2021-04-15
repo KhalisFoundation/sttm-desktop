@@ -1,7 +1,8 @@
 import React from 'react';
+import Slide from '../Slide/Slide';
 
 function ShabadDeck() {
-  return <h1> shabad deck it is</h1>;
+  return <Slide />;
 }
 
 export default ShabadDeck;
