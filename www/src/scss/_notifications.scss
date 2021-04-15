@@ -9,7 +9,6 @@
 }
 .notifications-modal {
   .tingle-modal-box__content {
-    color: #000;
     height: 400px;
     padding: 2rem 3rem;
 
@@ -45,7 +44,7 @@
   }
 }
 
-.dark-theme {
+.theme-dark-theme {
   .notifications-modal,
   .sync-code-modal {
     .tingle-modal-box__content {

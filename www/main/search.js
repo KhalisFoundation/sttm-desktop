@@ -1161,11 +1161,12 @@ module.exports = {
     if (LineID === null && document.body.querySelector('#shabad li')) {
       document.body.querySelector('#shabad .panktee.current').click();
     }
-    const { delay, autoplayToggle } = global.getUserSettings;
+    const { autoplayDelay, autoplayToggle } = global.getUserSettings;
+
     if (autoplayToggle && LineID !== currentShabad[currentShabad.length - 1] && LineID !== null) {
       autoplaytimer = setTimeout(() => {
         document.getElementById(`line${LineID + 1}`).click();
-      }, delay * 1000);
+      }, autoplayDelay * 1000);
     }
   },
 

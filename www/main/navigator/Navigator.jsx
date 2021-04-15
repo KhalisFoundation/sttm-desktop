@@ -18,7 +18,7 @@ const Navigator = () => {
         <ViewerPane />
         <MiscPane />
       </div>
-      <div className="navigator-wrapper" style={{ opacity: 0 }}>
+      <div className="navigator-wrapper" style={{ display: 'none' }}>
         <div id="main-ui" className="base-ui">
           <div className="nav-page" id="search-page">
             <div className="navigator-header">

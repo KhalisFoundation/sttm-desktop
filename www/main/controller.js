@@ -470,6 +470,7 @@ global.platform.ipc.on('external-display', (e, args) => {
     width: args.width,
     height: args.height,
   };
+  checkPresenterView();
   updateViewerScale();
 });
 global.platform.ipc.on('remove-external-display', () => {
@@ -582,7 +583,7 @@ module.exports = {
       mode,
       fromScroll,
     };
-    if (document.body.classList.contains('livefeed')) {
+    if (store.getUserPref('app.live-feed-location')) {
       showLinePayload.live = true;
     }
     global.platform.ipc.send('show-line', showLinePayload);
@@ -648,6 +649,8 @@ module.exports = {
           locationLabel[i].innerText = path;
         }
       }
+    } else {
+      store.set('userPrefs.app.live-feed-location', false);
     }
   },
 };

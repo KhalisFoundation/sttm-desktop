@@ -14,6 +14,7 @@ const ToolbarItem = ({ itemName }) => {
       id={`tool-${itemName}`}
       className="toolbar-item"
       onClick={() => {
+        document.body.classList.toggle(`overlay-${itemName}-active`, !isSelectedOverlay);
         if (isSelectedOverlay) {
           return setOverlayScreen(DEFAULT_OVERLAY);
         }

@@ -1062,28 +1062,23 @@ body.show-overlay {
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+}
 
-  .delete-btn {
-    background-color: #c0392b;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    display: none;
-    font-size: 14px;
-    height: 20px;
-    padding: 3px;
-    position: absolute;
-    right: 1px;
-    top: 1px;
-    width: 20px;
+.delete-button {
+  background-color: #c0392b;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  height: 20px;
+  padding: 3px;
+  position: relative;
+  right: 35px;
+  top: 15px;
+  width: 20px;
 
-    &:hover {
-      background-color: #e74c3c;
-    }
-  }
-
-  &:hover .delete-btn {
-    display: block;
+  &:hover {
+    background-color: #e74c3c;
   }
 }
 

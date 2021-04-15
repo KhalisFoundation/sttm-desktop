@@ -1,10 +1,33 @@
 .settings-wrapper {
-  height: 100vh;
+  display: flex;
+  height: 95vh;
   left: 100px;
   margin-top: 24px;
-  overflow-y: scroll;
+  overflow: scroll;
   position: relative;
   scroll-behavior: smooth;
+  width: 82vw;
+
+  .other-settings {
+    margin-left: 48px;
+  }
+
+  .settings-viewer {
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 12px;
+    width: 500px;
+  }
+
+  .main-settings-wrapper,
+  .other-settings {
+    min-width: 500px;
+    overflow-y: auto;
+  }
 
   .settings-nav {
     align-items: center;
@@ -171,6 +194,7 @@
       transform: translateX(-150%);
     }
   }
+
   #dhan-guru {
     margin-left: 12px;
   }
@@ -180,4 +204,106 @@
   font-size: smaller;
   font-weight: lighter;
   margin-left: 1.5rem;
+}
+
+.gurbani {
+  font-weight: normal;
+  line-height: 1.5;
+
+  .padchhed {
+    span {
+      margin-right: 5px;
+      i {
+        font-size: 0;
+      }
+    }
+  }
+
+  .larivaar {
+    display: none;
+
+    i {
+      display: none;
+      font-style: normal;
+    }
+  }
+}
+
+.larivaar-true {
+  .gurbani {
+    .padchhed {
+      display: none;
+    }
+
+    .larivaar {
+      display: inline;
+    }
+  }
+}
+
+.translation,
+.transliteration {
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.transtext,
+.translittext {
+  display: none;
+}
+
+.translation-language-English .english-translation,
+.translation-language-Spanish .spanish-translation,
+.transliteration-language-Shahmukhi .shahmukhi-transliteration,
+.transliteration-language-Devanagari .devanagari-transliteration,
+.transliteration-language-English .english-transliteration {
+  display: block;
+}
+
+.transliteration {
+  text-transform: lowercase;
+}
+
+.teeka {
+  font-family: 'gurbaniakhar';
+  line-height: 1.5;
+  margin-top: 0.25em;
+}
+
+.translation,
+.transliteration,
+.teeka {
+  display: none;
+  height: 0;
+  opacity: 0;
+}
+
+.translation-visibility-true .translation,
+.transliteration-visibility-true .transliteration,
+.teeka-visibility-true .teeka {
+  display: block;
+  height: auto;
+  opacity: 1;
+}
+
+.icons-translation .size,
+.icons-transliteration .size,
+.icons-teeka .size {
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.translation-visibility-true .icons-translation,
+.transliteration-visibility-true .icons-transliteration,
+.teeka-visibility-true .icons-teeka {
+  .size {
+    opacity: 1;
+    z-index: 20;
+  }
+
+  .visibility i {
+    &::before {
+      content: '\f06e';
+    }
+  }
 }
