@@ -1,3 +1,13 @@
+.verse-slide {
+  text-align: center;
+  padding: 20px 0;
+}
+
 .slide-gurbani {
   @extend .gurmukhi-vaak;
+  font-size: 45px;
+}
+
+.padchhed span {
+  margin: 0 5px;
 }

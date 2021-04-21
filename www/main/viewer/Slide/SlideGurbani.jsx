@@ -30,12 +30,10 @@ const SlideGurbani = ({ gurmukhiString, larivaar, vishraamPlacement, vishraamSou
   const bakePanktee = () => {
     // need to set <wbr /> according to larivaar on and off
     return breakIntoWords(gurmukhiString).map((word, i) => (
-      <>
-        <span key={i} className={word.vishraamType && `vishraam-${word.vishraamType}`}>
-          {word.text}
-        </span>
+      <React.Fragment key={i}>
+        <span className={word.vishraamType && `vishraam-${word.vishraamType}`}>{word.text}</span>
         <wbr />
-      </>
+      </React.Fragment>
     ));
   };
 
