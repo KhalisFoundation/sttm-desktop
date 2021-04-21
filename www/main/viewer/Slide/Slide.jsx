@@ -13,8 +13,8 @@ const Slide = ({ verseObj }) => {
     transliterationVisibility,
     teekaVisibility,
     larivaar,
+    vishraamSource,
   } = useStoreState(state => state.userSettings);
-  console.log('transliteration', verseObj);
 
   return (
     <div className="verse-slide">
@@ -22,7 +22,8 @@ const Slide = ({ verseObj }) => {
         <SlideGurbani
           gurmukhiString={verseObj.Gurmukhi}
           larivaar={larivaar}
-          vishraamPlacement={verseObj.Visraam}
+          vishraamPlacement={JSON.parse(verseObj.Visraam)}
+          vishraamSource={vishraamSource}
         />
       </div>
       {translationVisibility && <SlideTranslation />}
