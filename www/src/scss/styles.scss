@@ -48,6 +48,8 @@ $tag-popular-color: #ce744e;
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
   'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer';
 
+@import 'utils/utils', 'viewer/viewer';
+
 a {
   cursor: pointer;
 }

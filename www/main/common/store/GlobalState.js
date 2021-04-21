@@ -81,8 +81,8 @@ const GlobalState = createStore({
         versesHistory: newHistory,
       };
     }),
-    viewer: {},
   },
+  viewerSettings: {},
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
 });
 
