@@ -7,7 +7,7 @@ import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 
-const Slide = ({ verseObj }) => {
+const Slide = ({ verseObj, themeStyleObj }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -24,6 +24,7 @@ const Slide = ({ verseObj }) => {
           larivaar={larivaar}
           vishraamPlacement={JSON.parse(verseObj.Visraam)}
           vishraamSource={vishraamSource}
+          gurbaniColor={themeStyleObj['gurbani-color']}
         />
       </div>
       {translationVisibility && <SlideTranslation />}
@@ -35,6 +36,7 @@ const Slide = ({ verseObj }) => {
 
 Slide.propTypes = {
   verseObj: PropTypes.object,
+  themeStyleObj: PropTypes.object,
 };
 
 export default Slide;

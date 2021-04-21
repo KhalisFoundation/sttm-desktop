@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SlideGurbani = ({ gurmukhiString, larivaar, vishraamPlacement, vishraamSource }) => {
+const SlideGurbani = ({
+  gurmukhiString,
+  larivaar,
+  vishraamPlacement,
+  vishraamSource,
+  gurbaniColor,
+}) => {
   const filterAppliedVishraam = () => {
     const activeVishraams = {};
     Object.keys(vishraamPlacement).forEach(appliedVishraam => {
@@ -37,7 +43,11 @@ const SlideGurbani = ({ gurmukhiString, larivaar, vishraamPlacement, vishraamSou
     ));
   };
 
-  return <span className={larivaar ? 'larivaar' : 'padchhed'}>{bakePanktee()}</span>;
+  return (
+    <span className={larivaar ? 'larivaar' : 'padchhed'} style={{ color: gurbaniColor }}>
+      {bakePanktee()}
+    </span>
+  );
 };
 
 SlideGurbani.propTypes = {
@@ -45,6 +55,7 @@ SlideGurbani.propTypes = {
   larivaar: PropTypes.bool,
   vishraamPlacement: PropTypes.object,
   vishraamSource: PropTypes.string,
+  gurbaniColor: PropTypes.string,
 };
 
 export default SlideGurbani;

@@ -1,7 +1,33 @@
 import React from 'react';
+import { useStoreState } from 'easy-peasy';
 import Slide from '../Slide/Slide';
 
+const themes = require('../../../../www/configs/themes.json');
+
 function ShabadDeck() {
+  const { theme: currentTheme } = useStoreState(state => state.userSettings);
+
+  const getCurrentThemeInstance = () => {
+    return themes.find(theme => theme.key === currentTheme);
+  };
+
+  const bakeThemeStyles = themeInstance => {
+    return themeInstance['background-image-full']
+      ? {
+          backgroundImage: `url('assets/img/custom_backgrounds/${
+            themeInstance['background-image-full']
+          }')`,
+        }
+      : {
+          backgroundColor: themeInstance['background-color'],
+        };
+  };
+
+  const applyTheme = () => {
+    const themeInstance = getCurrentThemeInstance();
+    return bakeThemeStyles(themeInstance);
+  };
+
   const tempVerse = {
     ID: 11228,
     Gurmukhi: 'ddw dwqw eyku hY sB kau dyvnhwr ]',
@@ -57,8 +83,8 @@ function ShabadDeck() {
     Shabads: { '0': { ShabadID: 827 } },
   };
   return (
-    <div className="shabad-deck">
-      <Slide verseObj={tempVerse} />
+    <div className="shabad-deck" style={applyTheme()}>
+      <Slide verseObj={tempVerse} themeStyleObj={getCurrentThemeInstance()} />
     </div>
   );
 }
