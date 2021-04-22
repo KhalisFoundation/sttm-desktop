@@ -27,9 +27,9 @@ const Slide = ({ verseObj, themeStyleObj }) => {
           gurbaniColor={themeStyleObj['gurbani-color']}
         />
       </div>
-      {translationVisibility && <SlideTranslation />}
-      {transliterationVisibility && <SlideTransliteration />}
-      {teekaVisibility && <SlideTeeka />}
+      {translationVisibility && <SlideTranslation translationObj={verseObj.Translations} />}
+      {teekaVisibility && <SlideTeeka teekaObj={verseObj.Translations.pu} />}
+      {transliterationVisibility && <SlideTransliteration transliterationObj={verseObj.Gurmukhi} />}
     </div>
   );
 };
