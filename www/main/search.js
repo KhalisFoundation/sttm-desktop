@@ -622,7 +622,6 @@ module.exports = {
           ),
         );
         this.$results.appendChild(result);
-        console.log(item, resultNode);
       });
       document.getElementById('search-options').style.display = 'block';
     } else {

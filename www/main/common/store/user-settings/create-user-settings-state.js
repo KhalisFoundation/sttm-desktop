@@ -1,5 +1,4 @@
 import { action } from 'easy-peasy';
-import { ipcRenderer } from 'electron';
 import { convertToCamelCase } from '../../utils';
 
 // can we change them to import?
@@ -19,22 +18,20 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
       if (global.webview) {
-        //global.webview.send('save-settings', { key: settingKey, payload, oldValue });
         global.webview.send('setting-changed', {
-          state: stateVarName,
+          stateName: stateVarName,
           payload,
           oldValue,
-          action: stateFuncName,
+          actionName: stateFuncName,
         });
       }
 
       if (global.platform) {
-        //global.platform.ipc.send('save-settings', { key: settingKey, payload, oldValue });
         global.platform.ipc.send('setting-changed', {
-          state: stateVarName,
+          stateName: stateVarName,
           payload,
           oldValue,
-          action: stateFuncName,
+          actionName: stateFuncName,
         });
       }
 
