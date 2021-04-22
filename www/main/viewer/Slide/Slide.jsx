@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -15,6 +15,12 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     larivaar,
     vishraamSource,
   } = useStoreState(state => state.userSettings);
+  console.log('checking', translationVisibility);
+  console.log('checking larivaar', larivaar);
+
+  useEffect(() => {
+    console.log('larivaar checking', larivaar);
+  }, [larivaar]);
 
   return (
     <div className="verse-slide">

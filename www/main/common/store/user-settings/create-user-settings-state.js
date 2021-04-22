@@ -1,4 +1,5 @@
 import { action } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 import { convertToCamelCase } from '../../utils';
 
 // can we change them to import?
@@ -19,10 +20,28 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       state[stateVarName] = payload;
       if (global.webview) {
         global.webview.send('save-settings', { key: settingKey, payload, oldValue });
+        global.webview.send('new-setting-dispatch', {
+          state: stateVarName,
+          payload,
+          oldValue,
+          action: stateFuncName,
+        });
       }
+      ipcRenderer.send('new-setting-dispatch', {
+        state: stateVarName,
+        payload,
+        oldValue,
+        action: stateFuncName,
+      });
 
       if (global.platform) {
         global.platform.ipc.send('save-settings', { key: settingKey, payload, oldValue });
+        global.platform.ipc.send('new-setting-dispatch', {
+          state: stateVarName,
+          payload,
+          oldValue,
+          action: stateFuncName,
+        });
       }
 
       // Save settings to file
