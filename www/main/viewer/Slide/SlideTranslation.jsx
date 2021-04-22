@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 const SlideTranslation = ({ translationObj }) => {
-  const { translationLanguage } = useStoreState(state => state.userSettings);
+  const { translationLanguage, translationFontSize } = useStoreState(state => state.userSettings);
 
   const getTranslation = translations => {
     let translationLine;
@@ -25,9 +25,12 @@ const SlideTranslation = ({ translationObj }) => {
   };
 
   return (
-    <span className={`slide-translation language-${translationLanguage}`}>
+    <div
+      className={`slide-translation language-${translationLanguage}`}
+      style={{ fontSize: `${translationFontSize * 3}px` }}
+    >
       {getTranslation(translationObj)}
-    </span>
+    </div>
   );
 };
 

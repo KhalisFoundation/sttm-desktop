@@ -4,60 +4,53 @@
 @mixin vishraamStyles($visraam, $yamki) {
   $visraam-main: $visraam;
   $visraam-yamki: $yamki;
-  $visraam-sources: ('sttm', 'sttm2', 'igurbani');
 
-  @each $source in $visraam-sources {
-    /* If its on larivaar assist do not show vishraams
-    If larivaar is off, but larivaar assist is on, then do show vishraams */
-    &.larivaar-assist-true:not(.larivaar-true),
-    &:not(.larivaar-assist-true) {
-      &.display-vishraams-true.vishraam-type-colored-words.vishraam-source-#{$source} .gurbani {
-        .visraam-main.visraam-#{$source} {
-          color: $visraam-main;
-        }
-
-        .visraam-yamki.visraam-#{$source} {
-          color: $visraam-yamki;
-        }
+  .slide-gurbani.vishraam-gradient {
+    span {
+      span.vishraam-y {
+        border-radius: 15px;
+        background: linear-gradient(
+          to right,
+          rgba(229, 229, 229, 0) 20%,
+          rgba($visraam-main, 0.7) 100%
+        );
       }
 
-      &.display-vishraams-true.vishraam-type-gradient-bg.vishraam-source-#{$source} .gurbani {
-        span {
-          border-radius: 15px;
-        }
-
-        .padchhed .visraam-main.visraam-#{$source},
-        .padchhed .visraam-yamki.visraam-#{$source} {
-          padding-right: 5px;
-        }
-
-        .visraam-main.visraam-#{$source} {
-          background: linear-gradient(
-            to right,
-            rgba(229, 229, 229, 0) 20%,
-            rgba($visraam-main, 0.7) 100%
-          );
-        }
-
-        .visraam-yamki.visraam-#{$source} {
-          background: linear-gradient(
-            to right,
-            rgba(229, 229, 229, 0) 20%,
-            rgba($visraam-yamki, 0.7) 100%
-          );
-        }
+      span.vishraam-v {
+        border-radius: 15px;
+        background: linear-gradient(
+          to right,
+          rgba(229, 229, 229, 0) 20%,
+          rgba($visraam-yamki, 0.7) 100%
+        );
       }
     }
+  }
 
-    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-single-color {
-      .gurbani .larivaar span:nth-of-type(even) {
-        opacity: 0.75;
+  .slide-gurbani.vishraam-colored {
+    span {
+      span.vishraam-y {
+        color: $visraam-main;
+      }
+
+      span.vishraam-v {
+        color: $visraam-yamki;
       }
     }
+  }
 
-    &.larivaar-true.larivaar-assist-true.larivaar-assist-type-multi-color {
-      .gurbani .larivaar span:nth-of-type(even) {
-        color: $yamki;
+  .slide-gurbani.larivaar-assist-single-color {
+    .larivaar {
+      span:nth-of-type(even) {
+        opacity: 0.75 !important;
+      }
+    }
+  }
+
+  .slide-gurbani.larivaar-assist-multi-color {
+    .larivaar {
+      span:nth-of-type(even) {
+        color: $yamki !important;
       }
     }
   }
@@ -83,20 +76,19 @@
   background-color: $background-color;
   background-image: $background-image;
 
-  .gurbani,
-  .current-cer-theme {
+  .slide-gurbani {
     color: $gurbani;
   }
 
-  .translation {
+  .slide-translation {
     color: $translation;
   }
 
-  .teeka {
+  .slide-teeka {
     color: $teeka;
   }
 
-  .transliteration {
+  .slide-transliteration {
     color: $transliteration;
   }
 

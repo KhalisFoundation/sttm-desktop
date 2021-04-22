@@ -1,8 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useStoreState } from 'easy-peasy';
 
 const SlideTeeka = ({ teekaObj }) => {
-  return <span className="slide-teeka">{teekaObj.bdb || teekaObj.ss}</span>;
+  const { teekaFontSize } = useStoreState(state => state.userSettings);
+
+  return (
+    <div className="slide-teeka" style={{ fontSize: `${teekaFontSize * 3}px` }}>
+      {teekaObj.bdb || teekaObj.ss}
+    </div>
+  );
 };
 
 SlideTeeka.propTypes = {
