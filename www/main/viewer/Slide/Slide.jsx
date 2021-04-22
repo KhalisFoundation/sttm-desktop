@@ -15,15 +15,10 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     larivaar,
     vishraamSource,
   } = useStoreState(state => state.userSettings);
-  console.log('checking', translationVisibility);
-  console.log('checking larivaar', larivaar);
-
-  useEffect(() => {
-    console.log('larivaar checking', larivaar);
-  }, [larivaar]);
 
   return (
     <div className="verse-slide">
+      <div> {`larivaar${larivaar}`}</div>
       <div className="slide-gurbani">
         <SlideGurbani
           gurmukhiString={verseObj.Gurmukhi}

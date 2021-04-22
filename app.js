@@ -275,6 +275,7 @@ function createViewer(ipcData) {
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
+      viewerWindow.openDevTools();
       const [width, height] = viewerWindow.getSize();
       mainWindow.webContents.send('external-display', {
         width,
@@ -676,6 +677,12 @@ ipcMain.on('update-settings', () => {
 ipcMain.on('save-settings', (event, setting) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('save-settings', setting);
+  }
+});
+
+ipcMain.on('setting-changed', (event, setting) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.send('setting-changed', setting);
   }
 });
 
