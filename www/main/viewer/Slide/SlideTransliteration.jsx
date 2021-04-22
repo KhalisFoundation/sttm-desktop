@@ -4,7 +4,9 @@ import { useStoreState } from 'easy-peasy';
 import anvaad from 'anvaad-js';
 
 const SlideTransliteration = ({ transliterationObj }) => {
-  const { transliterationLanguage } = useStoreState(state => state.userSettings);
+  const { transliterationLanguage, transliterationFontSize } = useStoreState(
+    state => state.userSettings,
+  );
 
   const getTransliteration = () => {
     let transliteration;
@@ -26,9 +28,12 @@ const SlideTransliteration = ({ transliterationObj }) => {
   };
 
   return (
-    <span className={`slide-transliteration language-${transliterationLanguage}`}>
+    <div
+      className={`slide-transliteration language-${transliterationLanguage}`}
+      style={{ fontSize: `${transliterationFontSize * 3}px` }}
+    >
       {getTransliteration()}
-    </span>
+    </div>
   );
 };
 

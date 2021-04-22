@@ -13,7 +13,11 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     transliterationVisibility,
     teekaVisibility,
     larivaar,
+    larivaarAssist,
+    larivaarAssistType,
     vishraamSource,
+    vishraamType,
+    displayNextLine,
   } = useStoreState(state => state.userSettings);
   console.log('checking', translationVisibility);
   console.log('checking larivaar', larivaar);
@@ -22,20 +26,44 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     console.log('larivaar checking', larivaar);
   }, [larivaar]);
 
+  const getLarivaarAssistClass = () => {
+    return (
+      larivaarAssist &&
+      (larivaarAssistType === 'single-color'
+        ? 'larivaar-assist-single-color'
+        : 'larivaar-assist-multi-color')
+    );
+  };
+
+  const getVishraamType = () => {
+    return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
+  };
+
   return (
-    <div className="verse-slide">
-      <div className="slide-gurbani">
+    <div className={`verse-slide theme-${themeStyleObj.key}`}>
+      <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
         <SlideGurbani
           gurmukhiString={verseObj.Gurmukhi}
           larivaar={larivaar}
           vishraamPlacement={JSON.parse(verseObj.Visraam)}
           vishraamSource={vishraamSource}
-          gurbaniColor={themeStyleObj['gurbani-color']}
         />
       </div>
       {translationVisibility && <SlideTranslation translationObj={verseObj.Translations} />}
       {teekaVisibility && <SlideTeeka teekaObj={verseObj.Translations.pu} />}
       {transliterationVisibility && <SlideTransliteration transliterationObj={verseObj.Gurmukhi} />}
+      {displayNextLine && (
+        <div
+          className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+        >
+          <SlideGurbani
+            gurmukhiString={verseObj.Gurmukhi}
+            larivaar={larivaar}
+            vishraamPlacement={JSON.parse(verseObj.Visraam)}
+            vishraamSource={vishraamSource}
+          />
+        </div>
+      )}
     </div>
   );
 };
