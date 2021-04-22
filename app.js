@@ -553,9 +553,9 @@ ipcMain.on('clear-apv', () => {
 
 let lastLine;
 
-ipcMain.on('update-overlay-vars', updateOverlayVars);
-ipcMain.on('save-overlay-prefs', (event, overlayVars) => {
-  updateOverlayVars(overlayVars);
+// ipcMain.on('update-overlay-vars', updateOverlayVars);
+ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
+  io.emit('update-new-prefs', overlayPrefs);
 });
 
 io.on('connection', socket => {

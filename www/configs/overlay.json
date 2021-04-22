@@ -25,7 +25,7 @@
       "background-options": {
         "title": "",
         "type": "size-icon",
-        "settings": ["bg-color", "bg-height", "bg-opacity"]
+        "settings": ["bg-color", "bg-height", "bg-opacity", "overlay-theme"]
       },
 
       "date-time": {
@@ -50,16 +50,21 @@
       "gurbani-font": {
         "title": "",
         "options": {
-          "font1": "ANMOL_LIPI",
-          "font2": "ANMOL_LIPI",
-          "font3": "ANMOL_LIPI"
+          "Anmol Lipi": "Anmol Lipi",
+          "Anmol Lipi Bold": "Anmol Lipi Bold",
+          "Noto Sans": "Noto Sans",
+          "Noto Sans Bold": "Noto Sans Bold",
+          "Gurbani Akhar": "Gurbani Akhar",
+          "Gurbani Akhar Heavy": "Gurbani Akhar Heavy",
+          "Gurbani Akhar Thick": "Gurbani Akhar Thick",
+          "Prabhki": "Prabhki"
         },
-        "initialValue": "font1"
+        "initialValue": "Gurbani Akhar Thick"
       },
       "gurbani-size": {
         "title": "",
         "type": "size-icon",
-        "initialValue": 12
+        "initialValue": 5
       },
       "text-color": {
         "type": "color-input",
@@ -69,16 +74,16 @@
       "text-font": {
         "title": "",
         "options": {
-          "font1": "MULI",
-          "font2": "MULI",
-          "font3": "MULI"
+          "Muli": "Muli",
+          "Caveat": "Caveat",
+          "PT Serif": "PT Serif"
         },
-        "initialValue": "font1"
+        "initialValue": "Muli"
       },
       "text-size": {
         "title": "",
         "type": "size-icon",
-        "initialValue": 12
+        "initialValue": 3
       },
       "bg-color": {
         "title": "",
@@ -92,6 +97,11 @@
       "bg-opacity": {
         "title": "OPACITY",
         "initialValue": 1
+      },
+      "overlay-theme": {
+        "title": "",
+        "type": "hidden",
+        "initialValue": "a-new-day"
       },
 
       "date-format": {
@@ -133,17 +143,22 @@
       "layouts": {
         "title": "",
         "type": "custom",
-        "settings": ["layout-selector"]
+        "settings": ["layout"]
       },
       "right-side-icons": {
         "title": "",
         "type": "title",
-        "subcategories": ["reset-options"]
+        "subcategories": ["reset-options", "hidden-options"]
       },
       "reset-options": {
         "title": "",
         "type": "icon-toggle",
         "settings": ["reset"]
+      },
+      "hidden-options": {
+        "title": "",
+        "type": "hidden",
+        "settings": ["padding"]
       }
     },
 
@@ -152,8 +167,18 @@
         "icon": "reset.svg",
         "initialValue": false
       },
-      "layout-selector": {
-        "key": "LayoutSelector"
+      "padding": {
+        "initialValue": 0.5
+      },
+      "overlayLarivaar": {
+        "initialValue": false
+      },
+      "larivaarAssist": {
+        "initialValue": false
+      },
+      "layout": {
+        "key": "LayoutSelector",
+        "initialValue": "split"
       },
       "toggle-logo": {
         "icon": "sttm.png",

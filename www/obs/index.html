@@ -89,14 +89,13 @@
       };
 
       var applyOverlayPrefs = function() {
-        console.log('this works');
-        const overlayColor = overlayPrefs.overlayVars.greenScreen ? '#0f0' : 'transparent';
+        const overlayColor = overlayPrefs.overlayVars.greenScreenToggle ? '#0f0' : 'transparent';
         const bgOpacity =
-          Number(overlayPrefs.overlayVars.greenScreen) || overlayPrefs.overlayVars.bgOpacity;
+          Number(overlayPrefs.overlayVars.greenScreenToggle) || overlayPrefs.overlayVars.bgOpacity;
 
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           el.style.color = overlayPrefs.overlayVars.textColor;
-          el.style.fontSize = `${overlayPrefs.overlayVars.fontSize}vh`;
+          el.style.fontSize = `${overlayPrefs.overlayVars.textSize}vh`;
           el.style.padding = `${overlayPrefs.overlayVars.padding}vh`;
           el.style.backgroundColor = `rgba(${hexToRgb(
             overlayPrefs.overlayVars.bgColor,
@@ -106,7 +105,7 @@
         document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.overlayVars.bgOpacity;
         document.querySelector(
           '.o-gurbani',
-        ).style.fontSize = `${overlayPrefs.overlayVars.gurbaniFontSize}vh`;
+        ).style.fontSize = `${overlayPrefs.overlayVars.gurbaniSize}vh`;
         document.querySelector('.o-gurbani').style.color =
           overlayPrefs.overlayVars.gurbaniTextColor;
 
@@ -119,14 +118,14 @@
           'layout-vertical-left',
         );
 
-        const { gurbaniFont, translationFont } = overlayPrefs.overlayVars;
+        const { gurbaniFont, textFont } = overlayPrefs.overlayVars;
         document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
-        document.querySelector('.o-translation').style.fontFamily = translationFont;
-        document.querySelector('.o-transliteration').style.fontFamily = translationFont;
+        document.querySelector('.o-translation').style.fontFamily = textFont;
+        document.querySelector('.o-transliteration').style.fontFamily = textFont;
 
         document.body.classList.add('layout-' + overlayPrefs.overlayVars.layout);
 
-        document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.overlayLogo);
+        document.body.classList.toggle('logo-off', !overlayPrefs.overlayVars.toggleLogo);
 
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           // Clear styles added by other overrides
@@ -195,6 +194,13 @@
 
       socket.on('update-prefs', function(request) {
         overlayPrefs = request.overlayPrefs;
+        console.log(request);
+        console.log(overlayPrefs);
+        applyOverlayPrefs();
+      });
+
+      socket.on('update-new-prefs', function(settings) {
+        overlayPrefs.overlayVars = settings;
         applyOverlayPrefs();
       });
     </script>

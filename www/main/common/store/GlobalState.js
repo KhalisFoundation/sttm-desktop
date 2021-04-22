@@ -1,8 +1,12 @@
 import { createStore, action } from 'easy-peasy';
+
 import { DEFAULT_OVERLAY } from '../constants';
-import createUserSettingsState from './user-settings/create-user-settings-state';
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
 
+import createUserSettingsState from './user-settings/create-user-settings-state';
+import createOverlaySettingsState from './user-settings/create-overlay-settings-state';
+
+const { sidebar, bottomBar } = require('../../../configs/overlay.json');
 const { settings } = require('../../../configs/user-settings.json');
 
 const GlobalState = createStore({
@@ -46,6 +50,11 @@ const GlobalState = createStore({
     }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
+  baniOverlay: createOverlaySettingsState(
+    { ...sidebar.settings, ...bottomBar.settings },
+    savedSettings,
+    userConfigPath,
+  ),
 });
 
 export default GlobalState;

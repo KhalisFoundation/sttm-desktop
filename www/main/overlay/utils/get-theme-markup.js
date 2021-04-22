@@ -18,7 +18,7 @@ const getThemeMarkup = (themeObjects, handleThemeChange) =>
     return (
       <div
         key={`theme-${theme}`}
-        className={`overlay-theme-swatch ${themeClass}`}
+        className={`overlay-theme-swatch`}
         data-theme-name={convertToCamelCase(themeClass)}
         style={{
           color: currentTheme.gurbaniTextColor,
