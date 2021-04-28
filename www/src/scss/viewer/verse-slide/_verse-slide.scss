@@ -8,7 +8,7 @@
 }
 
 .slide-gurbani {
-  @extend .gurmukhi-vaak;
+  @extend .gurmukhi-vaak-thick;
   font-size: 45px;
 }
 
@@ -16,10 +16,66 @@
   margin: 0 5px;
 }
 
+.slide-translation {
+  font-weight: 600;
+}
+
 .slide-teeka {
   @extend .gurmukhi-vaak;
+  font-weight: 600;
+}
+
+.slide-transliteration {
+  font-weight: 600;
 }
 
 .slide-next-line {
   opacity: 0.5;
+}
+
+// Quick Tools Styles
+
+.slide-quicktools {
+  font-size: 12px;
+  font-weight: bold;
+  height: 100%;
+  position: absolute;
+  width: 18%;
+}
+
+.quicktool {
+  &-header {
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: space-around;
+    padding: 6px;
+  }
+
+  &-body {
+    background-color: rgba(246, 246, 246, 0.84);
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+    justify-content: space-between;
+    padding: 8px;
+  }
+
+  &-item {
+    text-align: center;
+  }
+
+  &-icons {
+    display: flex;
+    justify-content: space-around;
+    padding: 5px 0;
+
+    & i {
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 75px;
+      font-size: 16px;
+      padding: 2px;
+      height: 22px;
+      width: 22px;
+    }
+  }
 }

@@ -82,7 +82,9 @@ const GlobalState = createStore({
       };
     }),
   },
-  viewerSettings: {},
+  viewerSettings: {
+    quickTools: false,
+  },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
 });
 

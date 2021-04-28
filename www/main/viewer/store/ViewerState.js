@@ -3,9 +3,9 @@ import GlobalState from '../../common/store/GlobalState';
 
 global.platform = require('../../desktop_scripts');
 
-const createUserSettingsActions = () => {
+const createSettingsActions = settingsType => {
   const userSettingsActions = {};
-  Object.keys(GlobalState.getState().userSettings).forEach(stateVarName => {
+  Object.keys(GlobalState.getState()[settingsType]).forEach(stateVarName => {
     // convert state name ex- larivaar to action name ex- setLarivaar
     const stateActionName = `set${stateVarName.charAt(0).toUpperCase()}${stateVarName.slice(1)}`;
     userSettingsActions[stateActionName] = action((state, payload) => {
@@ -21,7 +21,11 @@ const ViewerState = createStore({
   // Create shadow object of user settings from Global State
   userSettings: {
     ...GlobalState.getState().userSettings,
-    ...createUserSettingsActions(),
+    ...createSettingsActions('userSettings'),
+  },
+  viewerSettings: {
+    ...GlobalState.getState().viewerSettings,
+    ...createSettingsActions('viewerSettings'),
   },
 });
 
@@ -29,6 +33,7 @@ const ViewerState = createStore({
 global.platform.ipc.on('setting-changed', (event, setting) => {
   const { actionName, payload } = setting;
   ViewerState.getActions().userSettings[actionName](payload);
+  ViewerState.getActions().viewerSettings[actionName](payload);
 });
 
 export default ViewerState;

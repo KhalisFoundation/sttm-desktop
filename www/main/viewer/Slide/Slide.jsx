@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -6,6 +6,7 @@ import SlideTeeka from './SlideTeeka';
 import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
+import QuickTools from './QuickTools';
 
 const Slide = ({ verseObj, themeStyleObj }) => {
   const {
@@ -34,22 +35,10 @@ const Slide = ({ verseObj, themeStyleObj }) => {
   };
 
   return (
-    <div className={`verse-slide theme-${themeStyleObj.key}`}>
-      <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
-        <SlideGurbani
-          gurmukhiString={verseObj.Gurmukhi}
-          larivaar={larivaar}
-          vishraamPlacement={JSON.parse(verseObj.Visraam)}
-          vishraamSource={vishraamSource}
-        />
-      </div>
-      {translationVisibility && <SlideTranslation translationObj={verseObj.Translations} />}
-      {teekaVisibility && <SlideTeeka teekaObj={verseObj.Translations.pu} />}
-      {transliterationVisibility && <SlideTransliteration transliterationObj={verseObj.Gurmukhi} />}
-      {displayNextLine && (
-        <div
-          className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-        >
+    <>
+      <QuickTools />
+      <div className={`verse-slide theme-${themeStyleObj.key}`}>
+        <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
           <SlideGurbani
             gurmukhiString={verseObj.Gurmukhi}
             larivaar={larivaar}
@@ -57,8 +46,25 @@ const Slide = ({ verseObj, themeStyleObj }) => {
             vishraamSource={vishraamSource}
           />
         </div>
-      )}
-    </div>
+        {translationVisibility && <SlideTranslation translationObj={verseObj.Translations} />}
+        {teekaVisibility && <SlideTeeka teekaObj={verseObj.Translations.pu} />}
+        {transliterationVisibility && (
+          <SlideTransliteration transliterationObj={verseObj.Gurmukhi} />
+        )}
+        {displayNextLine && (
+          <div
+            className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+          >
+            <SlideGurbani
+              gurmukhiString={verseObj.Gurmukhi}
+              larivaar={larivaar}
+              vishraamPlacement={JSON.parse(verseObj.Visraam)}
+              vishraamSource={vishraamSource}
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
