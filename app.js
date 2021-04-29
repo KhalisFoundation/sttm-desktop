@@ -686,6 +686,10 @@ ipcMain.on('setting-changed', (event, setting) => {
   }
 });
 
+ipcMain.on('recieve-setting', (event, setting) => {
+  mainWindow.webContents.send('recieve-setting', setting);
+});
+
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });

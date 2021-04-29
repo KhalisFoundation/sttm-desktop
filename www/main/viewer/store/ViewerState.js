@@ -3,6 +3,7 @@ import GlobalState from '../../common/store/GlobalState';
 
 global.platform = require('../../desktop_scripts');
 
+/* TODO: remove the settingsType argument */
 const createSettingsActions = settingsType => {
   const userSettingsActions = {};
   Object.keys(GlobalState.getState()[settingsType]).forEach(stateVarName => {
@@ -24,8 +25,13 @@ const ViewerState = createStore({
     ...createSettingsActions('userSettings'),
   },
   viewerSettings: {
-    ...GlobalState.getState().viewerSettings,
-    ...createSettingsActions('viewerSettings'),
+    quickToolsOpen: true,
+    setQuickToolsOpen: action((state, payload) => {
+      return {
+        ...state,
+        quickToolsOpen: payload,
+      };
+    }),
   },
 });
 
@@ -33,7 +39,6 @@ const ViewerState = createStore({
 global.platform.ipc.on('setting-changed', (event, setting) => {
   const { actionName, payload } = setting;
   ViewerState.getActions().userSettings[actionName](payload);
-  ViewerState.getActions().viewerSettings[actionName](payload);
 });
 
 export default ViewerState;

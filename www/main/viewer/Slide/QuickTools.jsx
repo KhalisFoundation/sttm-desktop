@@ -1,6 +1,8 @@
 import React from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+global.platform = require('../../desktop_scripts');
+
 const QuickTools = () => {
   const {
     setTranslationVisibility,
@@ -20,8 +22,18 @@ const QuickTools = () => {
     teekaFontSize,
     transliterationFontSize,
   } = useStoreState(state => state.userSettings);
-  const { quickTools } = useStoreState(state => state.viewerSettings);
-  const { setQuickTools } = useStoreActions(state => state.viewerSettings);
+  const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
+  const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
+
+  // quickToolsActions {
+  //   'subjects': ['Gurbani', 'translation', 'transliteration', 'teeka'],
+  //   'modifiers': 'plus', 'minus', 'visibility',
+  // };
+
+  // if (!'gurbani') {
+  //   visibilityClassName = true;
+  //   actionName = `set${name}FontSize`,
+  // };
 
   const quickToolsActions = [
     {
@@ -31,7 +43,14 @@ const QuickTools = () => {
         {
           name: 'minus',
           className: `fa fa-minus-circle`,
-          action: () => setGurbaniFontSize(gurbaniFontSize - 1),
+          action: () => {
+            setGurbaniFontSize(gurbaniFontSize - 1);
+            global.platform.ipc.send('recieve-setting', {
+              actionName: 'setGurbaniFontSize',
+              payload: gurbaniFontSize - 1,
+              settingType: 'userSettings',
+            });
+          },
         },
         {
           name: 'plus',
@@ -115,11 +134,11 @@ const QuickTools = () => {
 
   return (
     <div className="slide-quicktools">
-      <div className="quicktool-header" onClick={() => setQuickTools(!quickTools)}>
+      <div className="quicktool-header" onClick={() => setQuickToolsOpen(!quickToolsOpen)}>
         Quick Tools
-        <i className={`fa fa-caret-${quickTools ? 'up' : 'down'}`}></i>
+        <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>
       </div>
-      {quickTools && (
+      {quickToolsOpen && (
         <div className="quicktool-body">
           {quickToolsActions.map(quickTool => (
             <div key={quickTool.name} className="quicktool-item">

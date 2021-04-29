@@ -4,6 +4,7 @@ import createUserSettingsState from './user-settings/create-user-settings-state'
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
 
 const { settings } = require('../../../configs/user-settings.json');
+global.platform = require('../../desktop_scripts');
 
 const GlobalState = createStore({
   app: {
@@ -86,6 +87,11 @@ const GlobalState = createStore({
     quickTools: false,
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
+});
+
+global.platform.ipc.on('recieve-setting', (event, setting) => {
+  const { settingType, actionName, payload } = setting;
+  GlobalState.getActions()[settingType][actionName](payload);
 });
 
 export default GlobalState;
