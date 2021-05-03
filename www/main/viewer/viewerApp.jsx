@@ -6,7 +6,7 @@ import ShabadDeck from './ShabadDeck/ShabadDeck';
 
 import ViewerState from './store/ViewerState';
 
-const App = () => {
+const ViewerApp = () => {
   return (
     <StoreProvider store={ViewerState}>
       <ShabadDeck />
@@ -14,4 +14,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default ViewerApp;
