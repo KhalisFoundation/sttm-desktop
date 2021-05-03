@@ -16,6 +16,7 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     larivaar,
     larivaarAssist,
     larivaarAssistType,
+    leftAlign,
     vishraamSource,
     vishraamType,
     displayNextLine,
@@ -37,7 +38,9 @@ const Slide = ({ verseObj, themeStyleObj }) => {
   return (
     <>
       <QuickTools />
-      <div className={`verse-slide theme-${themeStyleObj.key}`}>
+      <div
+        className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
+      >
         <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
           <SlideGurbani
             gurmukhiString={verseObj.Gurmukhi}
