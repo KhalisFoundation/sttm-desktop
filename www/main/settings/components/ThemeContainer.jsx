@@ -36,20 +36,22 @@ const ThemeContainer = () => {
         {themeTypes.map(({ type, title }) => (
           <React.Fragment key={type}>
             <header className="options-header">{i18n.t(`THEMES.${title}`)}</header>
-            {groupThemes(type).map(theme => (
-              <Tile
-                key={theme.name}
-                onClick={() => {
-                  if (currentTheme !== theme.key) {
-                    applyTheme(theme, false, setTheme, setThemeBg);
-                  }
-                }}
-                className="theme-instance"
-                theme={theme}
-              >
-                {i18n.t(`THEMES.${theme.name}`)}
-              </Tile>
-            ))}
+            <span className="theme-tile-holder">
+              {groupThemes(type).map(theme => (
+                <Tile
+                  key={theme.name}
+                  onClick={() => {
+                    if (currentTheme !== theme.key) {
+                      applyTheme(theme, false, setTheme, setThemeBg);
+                    }
+                  }}
+                  className="theme-instance"
+                  theme={theme}
+                >
+                  {i18n.t(`THEMES.${theme.name}`)}
+                </Tile>
+              ))}
+            </span>
           </React.Fragment>
         ))}
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
