@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-eval */
 import React from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
@@ -27,6 +28,8 @@ const QuickTools = () => {
   const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
 
+  const quickToolsActions = ['Gurbani', 'Translation', 'Teeka', 'Transliteration'];
+
   const quickToolsModifiers = [
     {
       name: 'visibility',
@@ -39,21 +42,6 @@ const QuickTools = () => {
     {
       name: 'plus',
       actionName: 'FontSize',
-    },
-  ];
-
-  const quickToolsActions = [
-    {
-      name: 'Gurbani',
-    },
-    {
-      name: 'Translation',
-    },
-    {
-      name: 'Teeka',
-    },
-    {
-      name: 'Transliteration',
     },
   ];
 
@@ -75,12 +63,17 @@ const QuickTools = () => {
       return eval(convertToCamelCase(`${toolName}${action}`)) ? 'fa fa-eye' : 'fa fa-eye-slash';
     if (name === 'minus') return 'fa fa-minus-circle';
     if (name === 'plus') return 'fa fa-plus-circle';
-    return 'gbani';
+    return '';
+  };
+
+  const isGurbaniVisibiltyClass = (name, toolName) => {
+    if (name === 'visibility' && toolName === 'Gurbani') return 'quicktool-icons-hidden';
+    return '';
   };
 
   const bakeIcons = (toolName, icons) => {
     return icons.map(({ name, actionName }) => (
-      <div key={name} className="quicktool-icons">
+      <div key={name} className={`quicktool-icons ${isGurbaniVisibiltyClass(name, toolName)}`}>
         <i
           className={getIconClassName(name, toolName, actionName)}
           onClick={() => {
@@ -102,7 +95,7 @@ const QuickTools = () => {
       </div>
       {quickToolsOpen && (
         <div className="quicktool-body">
-          {quickToolsActions.map(({ name }) => (
+          {quickToolsActions.map(name => (
             <div key={name} className="quicktool-item">
               <div>{name}</div>
               <div className="quicktool-icons">{bakeIcons(name, quickToolsModifiers)}</div>
