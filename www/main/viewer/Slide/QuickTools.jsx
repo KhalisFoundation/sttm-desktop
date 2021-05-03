@@ -1,5 +1,7 @@
+/* eslint-disable no-eval */
 import React from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
+import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
 global.platform = require('../../desktop_scripts');
 
@@ -25,109 +27,69 @@ const QuickTools = () => {
   const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
 
-  // quickToolsActions {
-  //   'subjects': ['Gurbani', 'translation', 'transliteration', 'teeka'],
-  //   'modifiers': 'plus', 'minus', 'visibility',
-  // };
-
-  // if (!'gurbani') {
-  //   visibilityClassName = true;
-  //   actionName = `set${name}FontSize`,
-  // };
-
-  const quickToolsActions = [
+  const quickToolsModifiers = [
     {
-      name: 'Bani',
-      visibilty: null,
-      icons: [
-        {
-          name: 'minus',
-          className: `fa fa-minus-circle`,
-          action: () => {
-            setGurbaniFontSize(gurbaniFontSize - 1);
-            global.platform.ipc.send('recieve-setting', {
-              actionName: 'setGurbaniFontSize',
-              payload: gurbaniFontSize - 1,
-              settingType: 'userSettings',
-            });
-          },
-        },
-        {
-          name: 'plus',
-          className: `fa fa-plus-circle`,
-          action: () => setGurbaniFontSize(gurbaniFontSize + 1),
-        },
-      ],
+      name: 'visibility',
+      actionName: 'Visibility',
     },
     {
-      name: 'Translation',
-      visibilty: null,
-      icons: [
-        {
-          name: 'visibility',
-          className: `fa fa-eye${!translationVisibility ? '-slash' : ''}`,
-          action: () => setTranslationVisibility(!translationVisibility),
-        },
-        {
-          name: 'minus',
-          className: `fa fa-minus-circle`,
-          action: () => setTranslationFontSize(translationFontSize - 1),
-        },
-        {
-          name: 'plus',
-          className: `fa fa-plus-circle`,
-          action: () => setTranslationFontSize(translationFontSize + 1),
-        },
-      ],
+      name: 'minus',
+      actionName: 'FontSize',
     },
     {
-      name: 'Teeka',
-      visibilty: null,
-      icons: [
-        {
-          name: 'visibility',
-          className: `fa fa-eye${!teekaVisibility ? '-slash' : ''}`,
-          action: () => setTeekaVisibility(!teekaVisibility),
-        },
-        {
-          name: 'minus',
-          className: `fa fa-minus-circle`,
-          action: () => setTeekaFontSize(teekaFontSize - 1),
-        },
-        {
-          name: 'plus',
-          className: `fa fa-plus-circle`,
-          action: () => setTeekaFontSize(teekaFontSize + 1),
-        },
-      ],
-    },
-    {
-      name: 'Transliteration',
-      visibilty: null,
-      icons: [
-        {
-          name: 'visibility',
-          className: `fa fa-eye${!transliterationVisibility ? '-slash' : ''}`,
-          action: () => setTransliterationVisibility(!transliterationVisibility),
-        },
-        {
-          name: 'minus',
-          className: `fa fa-minus-circle`,
-          action: () => setTransliterationFontSize(transliterationFontSize - 1),
-        },
-        {
-          name: 'plus',
-          className: `fa fa-plus-circle`,
-          action: () => setTransliterationFontSize(transliterationFontSize + 1),
-        },
-      ],
+      name: 'plus',
+      actionName: 'FontSize',
     },
   ];
 
-  const bakeIcons = icons => {
-    return icons.map(icon => (
-      <div key={icon.name} className="quicktool-icons">
-        {<i className={icon.className} onClick={icon.action} />}
+  const quickToolsActions = [
+    {
+      name: 'Gurbani',
+    },
+    {
+      name: 'Translation',
+    },
+    {
+      name: 'Teeka',
+    },
+    {
+      name: 'Transliteration',
+    },
+  ];
+
+  const createGlobalPlatformObj = (name, toolName, action) => {
+    let payload = eval(convertToCamelCase(`${toolName}${action}`));
+    const actionName = `set${toolName}${action}`;
+    if (name === 'visibility') payload = eval(`${actionName}(${!payload})`);
+    if (name === 'minus') payload = eval(`${actionName}(${payload} - 1)`);
+    if (name === 'plus') payload = eval(`${actionName}(${payload} + 1)`);
+    return {
+      actionName,
+      payload: payload.payload,
+      settingType: 'userSettings',
+    };
+  };
+
+  const getIconClassName = (name, toolName, action) => {
+    if (name === 'visibility' && toolName !== 'Gurbani')
+      return eval(convertToCamelCase(`${toolName}${action}`)) ? 'fa fa-eye' : 'fa fa-eye-slash';
+    if (name === 'minus') return 'fa fa-minus-circle';
+    if (name === 'plus') return 'fa fa-plus-circle';
+    return 'gbani';
+  };
+
+  const bakeIcons = (toolName, icons) => {
+    return icons.map(({ name, actionName }) => (
+      <div key={name} className="quicktool-icons">
+        <i
+          className={getIconClassName(name, toolName, actionName)}
+          onClick={() => {
+            global.platform.ipc.send(
+              'recieve-setting',
+              createGlobalPlatformObj(name, toolName, actionName),
+            );
+          }}
+        />
       </div>
     ));
   };
@@ -140,10 +102,10 @@ const QuickTools = () => {
       </div>
       {quickToolsOpen && (
         <div className="quicktool-body">
-          {quickToolsActions.map(quickTool => (
-            <div key={quickTool.name} className="quicktool-item">
-              <div>{quickTool.name}</div>
-              <div className="quicktool-icons">{bakeIcons(quickTool.icons)}</div>
+          {quickToolsActions.map(({ name }) => (
+            <div key={name} className="quicktool-item">
+              <div>{name}</div>
+              <div className="quicktool-icons">{bakeIcons(name, quickToolsModifiers)}</div>
             </div>
           ))}
         </div>
