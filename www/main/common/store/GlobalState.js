@@ -60,8 +60,8 @@ const GlobalState = createStore({
 });
 
 global.platform.ipc.on('recieve-setting', (event, setting) => {
-  console.log('Event received in globalstate.js');
   const { settingType, actionName, payload } = setting;
+  console.log('Event received in globalstate.js', setting);
   GlobalState.getActions()[settingType][actionName](payload);
 });
 

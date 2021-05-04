@@ -1,8 +1,6 @@
 import { action } from 'easy-peasy';
 import { convertToCamelCase } from '../../utils';
 
-const { ipcRenderer } = require('electron');
-
 // can we change them to import?
 const fs = require('fs');
 
@@ -24,12 +22,7 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
       updatedSettings[`bani-overlay-${settingKey}`] = payload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-      // Update localStorage
-      if (typeof localStorage === 'object') {
-        localStorage.setItem('overlaySettings', JSON.stringify(updatedSettings));
-      }
-
-      global.getOverlaySettings[stateVarName] = payload;
+      // global.getOverlaySettings[stateVarName] = payload;
       // ipcRenderer.send('save-overlay-settings', global.getOverlaySettings);
       return state;
     });
