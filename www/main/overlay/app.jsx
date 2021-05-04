@@ -2,15 +2,16 @@ import React from 'react';
 
 import { StoreProvider } from 'easy-peasy';
 
-import GlobalState from '../common/store/GlobalState';
-
 import OverlayLayout from './components/OverlayLayout';
+import OverlayState from './store/OverlayState';
 
-global.getOverlaySettings = GlobalState.getState().baniOverlay;
+global.getOverlaySettings = OverlayState.getState().baniOverlay;
 
 const App = () => {
+  // ipcRenderer.emit('save-overlay-settings', global.getOverlaySettings);
+
   return (
-    <StoreProvider store={GlobalState}>
+    <StoreProvider store={OverlayState}>
       <OverlayLayout />
     </StoreProvider>
   );

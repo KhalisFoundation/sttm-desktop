@@ -4,7 +4,7 @@ export const applyUserSettings = savedSettings => {
   }
   if (document) {
     Object.keys(savedSettings).forEach(key => {
-      if (typeof savedSettings[key] !== 'object') {
+      if (typeof savedSettings[key] !== 'object' && !key.includes('bani-overlay-')) {
         document.body.classList.add(`${key}-${savedSettings[key]}`);
       }
     });

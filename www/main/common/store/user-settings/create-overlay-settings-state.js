@@ -5,7 +5,6 @@ const { ipcRenderer } = require('electron');
 
 // can we change them to import?
 const fs = require('fs');
-const themeObjects = require('../../../../configs/overlay_presets.json');
 
 const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
@@ -14,35 +13,24 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 
     userSettingsState[stateVarName] =
-      savedSettings[settingKey] || settingsSchema[settingKey].initialValue;
+      savedSettings[`bani-overlay-${settingKey}`] || settingsSchema[settingKey].initialValue;
 
     userSettingsState[stateFuncName] = action((state, payload) => {
-      const oldValue = state[stateVarName];
+      // eslint-disable-next-line no-param-reassign
+      state[stateVarName] = payload;
 
-      if (oldValue !== payload) {
-        /* eslint-disable no-param-reassign */
-        state[stateVarName] = payload;
-        if (stateFuncName === 'setOverlayTheme') {
-          const { gurbaniTextColor, textColor, bgColor } = themeObjects[payload];
-          state.gurbaniTextColor = gurbaniTextColor;
-          state.textColor = textColor;
-          state.bgColor = bgColor;
-        }
-        /* eslint-enable */
+      // Save settings to file
+      const updatedSettings = savedSettings;
+      updatedSettings[`bani-overlay-${settingKey}`] = payload;
+      fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-        // Save settings to file
-        const updatedSettings = savedSettings;
-        updatedSettings[settingKey] = payload;
-        fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
-
-        // Update localStorage
-        if (typeof localStorage === 'object') {
-          localStorage.setItem('overlaySettings', JSON.stringify(updatedSettings));
-        }
-
-        global.getOverlaySettings = state;
-        ipcRenderer.send('save-overlay-settings', global.getOverlaySettings);
+      // Update localStorage
+      if (typeof localStorage === 'object') {
+        localStorage.setItem('overlaySettings', JSON.stringify(updatedSettings));
       }
+
+      global.getOverlaySettings[stateVarName] = payload;
+      // ipcRenderer.send('save-overlay-settings', global.getOverlaySettings);
       return state;
     });
   });

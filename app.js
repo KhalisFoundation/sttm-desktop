@@ -686,6 +686,11 @@ ipcMain.on('save-settings', (event, setting) => {
   }
 });
 
+ipcMain.on('recieve-setting', (event, setting) => {
+  console.log('found the recieve setting in app.js');
+  mainWindow.webContents.send('recieve-setting', setting);
+});
+
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });

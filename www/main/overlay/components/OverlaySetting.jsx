@@ -10,10 +10,21 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
   const baniOverlayState = useStoreState(state => state.baniOverlay);
   const baniOverlayActions = useStoreActions(state => state.baniOverlay);
+  console.log(baniOverlayState);
 
   const handleInputChange = event => {
     const value = event.target ? event.target.value : event;
     baniOverlayActions[stateFunction](value);
+  };
+
+  const handleSizeIcon = event => {
+    const value = event.target ? event.target.value : event;
+    console.log(value);
+    // if (value === 'plus') {
+    //   console.log(stateFunction);
+    // } else if (value === 'minus') {
+    //   console.log(stateFunction);
+    // }
   };
 
   const settingDOM = [];
@@ -25,7 +36,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   switch (type) {
     case 'dropdown':
       settingDOM.push(
-        <select onChange={handleInputChange}>
+        <select onChange={handleInputChange} value={baniOverlayState[stateVar]}>
           {Object.keys(settingObj.options).map((op, opIndex) => (
             <option key={`control-dropdown-options-${opIndex}`} value={op}>
               {settingObj.options[op]}
@@ -47,10 +58,10 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     case 'size-icon':
       settingDOM.push(
         <span className={`size-icon-container`}>
-          <div className="size-icon icon-left">
+          <div className="size-icon icon-left" onClick={handleSizeIcon('plus')}>
             <i className="fa fa-plus"></i>
           </div>
-          <div className="size-icon icon-right">
+          <div className="size-icon icon-right" onClick={handleSizeIcon('minus')}>
             <i className="fa fa-minus"></i>
           </div>
         </span>,

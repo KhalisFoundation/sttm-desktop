@@ -201,6 +201,7 @@
 
       socket.on('update-new-prefs', function(settings) {
         overlayPrefs.overlayVars = settings;
+        console.log(settings);
         applyOverlayPrefs();
       });
     </script>
