@@ -113,7 +113,7 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
-    "sanitize-html": "^1.20.0",
+    "sanitize-html": "^2.3.2",
     "scroll": "^2.0.1",
     "socket.io": "^2.1.1",
     "sqlite3": "^4.0.3",
