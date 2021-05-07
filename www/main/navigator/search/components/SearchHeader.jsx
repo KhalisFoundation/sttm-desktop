@@ -17,18 +17,24 @@ function SearchHeader() {
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
   // For Global State
-  const navigator = useStoreState(state => state.navigator);
-  const setNavigator = useStoreActions(state => state.navigator);
+  const { selectedLanguage } = useStoreState(state => state.navigator);
+  const { setSearchOption, setSelectedLanguage } = useStoreActions(state => state.navigator);
+
   const handleLanguageChange = event => {
     if (event.target.value == 'en') {
-      setNavigator.setSearchOption('3');
+      setSearchOption(3);
     } else {
-      setNavigator.setSearchOption('0');
+      setSearchOption(0);
     }
-    setNavigator.setSelectedLanguage(event.target.value);
+    setSelectedLanguage(event.target.value);
   };
   const handleSearchType = event => {
-    setNavigator.setSearchOption(event.target.value);
+    setSearchOption(event.target.value);
+  };
+
+  const handleSearchOption = event => {
+    console.log(event.target.value);
+    setSearchOption(event.target.value);
   };
 
   return (
@@ -41,7 +47,7 @@ function SearchHeader() {
               type="radio"
               value="gr"
               id="gurmukhi-language"
-              checked={navigator.selectedLanguage === 'gr'}
+              checked={selectedLanguage === 'gr'}
               onChange={handleLanguageChange}
             />
             gurmuKI
@@ -52,14 +58,14 @@ function SearchHeader() {
               value="en"
               id="english-language"
               onChange={handleLanguageChange}
-              checked={navigator.selectedLanguage === 'en'}
+              checked={selectedLanguage === 'en'}
             />
             English
           </label>
         </div>
       </div>
       <>
-        {navigator.selectedLanguage === 'gr' ? (
+        {selectedLanguage === 'gr' ? (
           <>
             {width < breakpoint ? (
               <div className="search-select">
@@ -75,7 +81,7 @@ function SearchHeader() {
               <div className="search-type">
                 {gurmukhiSearchTypes.map(value => (
                   <label key={value}>
-                    <input type="checkbox" value={value} key={value} />
+                    <input type="checkbox" value={value} key={value} onClick={handleSearchOption} />
                     {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
                   </label>
                 ))}

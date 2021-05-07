@@ -1,21 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useStoreActions, useStoreState } from 'easy-peasy';
+import { searchShabads } from '../../../navigator/search/utils';
 
 function InputBox({ placeholder, className }) {
-  const [text, setText] = useState('');
+  const { searchOption, searchSource } = useStoreState(state => state.navigator);
+  const { setSearchedShabads } = useStoreActions(state => state.navigator);
+  const [searchQuery, setSearchQuery] = useState('');
   const handleChange = event => {
-    setText(event.target.value);
+    setSearchQuery(event.target.value);
   };
+
+  useEffect(() => {
+    searchShabads(searchQuery, searchOption, searchSource, setSearchedShabads);
+  }, [searchQuery, searchOption, searchSource]);
+
   return (
     <>
       <input
         className={`input-box ${className}`}
         type="search"
         placeholder={placeholder}
-        value={text}
+        value={searchQuery}
         onChange={handleChange}
       />
     </>
   );
 }
+
+InputBox.propTypes = {
+  placeholder: PropTypes.string,
+  className: PropTypes.string,
+};
 
 export default InputBox;
