@@ -3,6 +3,7 @@ import { convertToCamelCase } from '../../utils';
 
 // can we change them to import?
 const fs = require('fs');
+const { ipcRenderer } = require('electron');
 
 const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
@@ -11,7 +12,7 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 
     userSettingsState[stateVarName] =
-      savedSettings[`bani-overlay-${settingKey}`] || settingsSchema[settingKey].initialValue;
+      savedSettings.baniOverlay[settingKey] || settingsSchema[settingKey].initialValue;
 
     userSettingsState[stateFuncName] = action((state, payload) => {
       // eslint-disable-next-line no-param-reassign
@@ -19,11 +20,11 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
 
       // Save settings to file
       const updatedSettings = savedSettings;
-      updatedSettings[`bani-overlay-${settingKey}`] = payload;
+      updatedSettings.baniOverlay[settingKey] = payload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-      // global.getOverlaySettings[stateVarName] = payload;
-      // ipcRenderer.send('save-overlay-settings', global.getOverlaySettings);
+      ipcRenderer.send('save-overlay-settings', state);
+
       return state;
     });
   });

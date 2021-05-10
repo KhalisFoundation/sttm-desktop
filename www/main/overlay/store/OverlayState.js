@@ -11,7 +11,7 @@ const createOverlayActions = () => {
     overlayActions[stateActionName] = action((state, payload) => {
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
-      console.log('sent the recieve-setting');
+
       global.platform.ipc.send('recieve-setting', {
         actionName: stateActionName,
         payload,

@@ -10,7 +10,6 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
   const baniOverlayState = useStoreState(state => state.baniOverlay);
   const baniOverlayActions = useStoreActions(state => state.baniOverlay);
-  console.log(baniOverlayState);
 
   const handleInputChange = event => {
     const value = event.target ? event.target.value : event;

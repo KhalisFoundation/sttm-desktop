@@ -369,12 +369,12 @@ const showLine = async (line, socket = io) => {
   }
 };
 
-const updateOverlayVars = overlayVars => {
-  const overlayPrefs = store.get('obs');
-  if (overlayVars) {
-    overlayPrefs.overlayVars = { ...overlayVars };
+const updateOverlayVars = overlayPrefs => {
+  if (overlayPrefs) {
+    io.emit('update-prefs', overlayPrefs);
+  } else {
+    mainWindow.webContents.send('get-overlay-prefs');
   }
-  io.emit('update-prefs', overlayPrefs);
 };
 
 const emptyOverlay = () => {
@@ -553,9 +553,8 @@ ipcMain.on('clear-apv', () => {
 
 let lastLine;
 
-// ipcMain.on('update-overlay-vars', updateOverlayVars);
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
-  io.emit('update-new-prefs', overlayPrefs);
+  updateOverlayVars(overlayPrefs);
 });
 
 io.on('connection', socket => {
@@ -687,7 +686,6 @@ ipcMain.on('save-settings', (event, setting) => {
 });
 
 ipcMain.on('recieve-setting', (event, setting) => {
-  console.log('found the recieve setting in app.js');
   mainWindow.webContents.send('recieve-setting', setting);
 });
 

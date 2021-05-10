@@ -2,6 +2,7 @@ import { createStore, action } from 'easy-peasy';
 
 import { DEFAULT_OVERLAY } from '../constants';
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
+import { savedOverlaySettings } from './user-settings/get-saved-overlay-settings';
 
 import createUserSettingsState from './user-settings/create-user-settings-state';
 import createOverlaySettingsState from './user-settings/create-overlay-settings-state';
@@ -54,15 +55,19 @@ const GlobalState = createStore({
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
   baniOverlay: createOverlaySettingsState(
     { ...sidebar.settings, ...bottomBar.settings },
-    savedSettings,
+    savedOverlaySettings,
     userConfigPath,
   ),
 });
 
 global.platform.ipc.on('recieve-setting', (event, setting) => {
   const { settingType, actionName, payload } = setting;
-  console.log('Event received in globalstate.js', setting);
   GlobalState.getActions()[settingType][actionName](payload);
+});
+
+global.platform.ipc.on('get-overlay-prefs', () => {
+  const overlayState = GlobalState.getState().baniOverlay;
+  global.platform.ipc.send('save-overlay-settings', overlayState);
 });
 
 export default GlobalState;
