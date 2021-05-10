@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
   // Global States
-  const setGlobalStates = useStoreActions(state => state.navigator);
+  const { setVerseSelected, setShabadSelected } = useStoreActions(state => state.navigator);
 
   // States For Verses
   const [isActive, setActive] = useState(true);
@@ -63,9 +63,10 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
   const HandleHome = index => {
     setHome(index);
   };
-  const activeVerse = verse => {
-    setGlobalStates.setVerseSelected(verse.verseId);
-    setGlobalStates.setShabadSelected(verse.shabadId);
+  const changeActiveVerse = verse => {
+    console.log(verse, 'verse clicked from versepanel');
+    setVerseSelected(verse.verseId);
+    setShabadSelected(verse.shabadId);
     newHistory.push(verse.verseId);
     if (isRead.some(verseId => verseId == verse.verseId)) {
       console.log('exists');
@@ -77,6 +78,7 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
     setNewHistory(newHistory.filter(x => x.verseId != index));
     console.log('deleted item ', index);
   };
+
   return (
     <div className="verse-block">
       {verses ? (
@@ -87,7 +89,7 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
                 key={verse.verseId}
                 value={index}
                 className={`${ShabadPane && 'shabadPane-list'}`}
-                onClick={() => activeVerse(verse, index)}
+                onClick={() => changeActiveVerse(verse)}
               >
                 <span className="shabadPane-controls">
                   {ShabadPane && (
@@ -121,7 +123,7 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
                 <div className={`${SearchPane && 'search-list span-color'}`}>
                   <a className="panktee">
                     {SearchPane && <span className="span-color">Ang 683</span>}
-                    <span className="gurmukhi"> {JSON.stringify(verse.verse)}</span>
+                    <span className="gurmukhi">{verse.verse}</span>
                     {SearchPane && (
                       <div className={`${SearchPane && 'search-list-footer'}`}>
                         {i18n.t(`SEARCH.WRITERS.${verseWriterText[verse.writer]}`)},{' '}

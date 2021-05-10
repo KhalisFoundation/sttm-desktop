@@ -10,9 +10,7 @@ const { i18n } = remote.require('./app');
 
 function SearchContent() {
   // const banidb = require('../../../common/constants/banidb');
-  const { selectedLanguage, searchedShabads, searchSource } = useStoreState(
-    state => state.navigator,
-  );
+  const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
   const { setSearchSource } = useStoreActions(state => state.navigator);
   // For Constants
   const verseSourcesText = banidb.SOURCE_TEXTS;
@@ -68,10 +66,10 @@ function SearchContent() {
   // };
 
   const filterRequiredVerseItems = verses => {
-    return verses.map((verse, index) => {
+    return verses.map(verse => {
       return {
         verseId: verse.ID,
-        shabadId: index + 1,
+        shabadId: verse.Shabads[0].ShabadID,
         verse: verse.Gurmukhi,
         writer: verse.Writer ? verse.Writer.WriterEnglish : '',
         raag: verse.Raag ? verse.Raag.RaagEnglish : '',
