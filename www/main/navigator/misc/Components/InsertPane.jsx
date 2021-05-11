@@ -1,18 +1,21 @@
+import React, { useRef, useState } from 'react';
 import { remote } from 'electron';
-import React, { useEffect, useRef, useState } from 'react';
+import insertSlide from '../../../common/constants/slidedb';
 
 function InsertPane() {
   const { i18n } = remote.require('./app');
-  const insert_slide = require('../../../common/constants/slidedb');
-  const inputRef = useRef(null);
-  const gurus = insert_slide.dropdownStrings;
   const [isgurmukhi, setIsGurmukhi] = useState(false);
+  const inputRef = useRef(null);
+  const gurus = insertSlide.dropdownStrings;
+
   const addAnnouncement = () => {
     console.log(inputRef.current.value);
   };
+
   const HandleChange = () => {
     setIsGurmukhi(!isgurmukhi);
   };
+
   return (
     <ul className="list-of-items">
       <li>
@@ -34,7 +37,7 @@ function InsertPane() {
           <select>
             <option value=" ">{i18n.t('INSERT.SELECT')}</option>
             {gurus.gurus.map((value, index) => (
-              <option value={insert_slide.slideStrings.dhanguruStrings[index]} key={index}>
+              <option value={insertSlide.slideStrings.dhanguruStrings[index]} key={index}>
                 {i18n.t(`INSERT.DHAN_GURU.${value}`)}
               </option>
             ))}

@@ -1,4 +1,7 @@
 import React from 'react';
+import { remote } from 'electron';
+
+const { i18n } = remote.require('./app');
 
 function OtherPane() {
   return (

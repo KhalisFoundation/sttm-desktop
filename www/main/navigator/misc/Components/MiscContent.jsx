@@ -5,10 +5,10 @@ import InsertPane from './InsertPane';
 import OtherPane from './OtherPane';
 
 function MiscContent() {
-  const [{ misc_panel }, dispatch] = useDataLayerValue();
-  const isHistory = misc_panel === 'History';
-  const isInsert = misc_panel === 'Insert';
-  const isOther = misc_panel === 'Others';
+  const [{ miscPanel }] = useDataLayerValue();
+  const isHistory = miscPanel === 'History';
+  const isInsert = miscPanel === 'Insert';
+  const isOther = miscPanel === 'Others';
   return (
     <>
       {isHistory && <Historypane />}

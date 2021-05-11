@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function IconButton({ icon, onClick }) {
   return (
@@ -7,5 +8,10 @@ function IconButton({ icon, onClick }) {
     </button>
   );
 }
+
+IconButton.propTypes = {
+  icon: PropTypes.string,
+  onClick: PropTypes.func,
+};
 
 export default IconButton;

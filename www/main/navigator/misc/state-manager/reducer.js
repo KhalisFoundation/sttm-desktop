@@ -1,5 +1,5 @@
 export const initialState = {
-  misc_panel: 'History',
+  miscPanel: 'History',
 };
 export const actionTypes = {
   SET_PANEL: 'SET_PANEL',
@@ -9,7 +9,7 @@ const reducer = (state, action) => {
     case actionTypes.SET_PANEL:
       return {
         ...state,
-        misc_panel: action.misc_panel,
+        miscPanel: action.miscPanel,
       };
     default:
       return state;

@@ -1,4 +1,4 @@
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { useStoreActions } from 'easy-peasy';
 import { remote } from 'electron';
 import React, { useState } from 'react';
 

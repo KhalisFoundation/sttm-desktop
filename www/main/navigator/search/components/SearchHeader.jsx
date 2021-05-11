@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { remote } from 'electron';
+import banidb from '../../../common/constants/banidb';
 
 function SearchHeader() {
   // For responsiveness
@@ -10,7 +11,6 @@ function SearchHeader() {
     window.addEventListener('resize', () => setWidth(window.innerWidth));
   }, []);
   // For constants
-  const banidb = require('../../../common/constants/banidb');
   const { i18n } = remote.require('./app');
   const gurmukhiSearchText = banidb.GURMUKHI_SEARCH_TEXTS;
   const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
@@ -21,7 +21,7 @@ function SearchHeader() {
   const { setSearchOption, setSelectedLanguage } = useStoreActions(state => state.navigator);
 
   const handleLanguageChange = event => {
-    if (event.target.value == 'en') {
+    if (event.target.value === 'en') {
       setSearchOption(3);
     } else {
       setSearchOption(0);

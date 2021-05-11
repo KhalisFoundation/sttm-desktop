@@ -1,15 +1,20 @@
-import { useStoreActions } from 'easy-peasy';
-import { remote } from 'electron';
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { remote } from 'electron';
+import { useStoreState } from 'easy-peasy';
+import banidb from '../../constants/banidb';
+
+const { i18n } = remote.require('./app');
 
 function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
   // Global States
-  const { setVerseSelected, setShabadSelected } = useStoreActions(state => state.navigator);
+  // const { setVerseSelected, setShabadSelected } = useStoreActions(state => state.navigator);
+  const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
 
   // States For Verses
-  const [isActive, setActive] = useState(true);
+  // const [isActive, setActive] = useState(true);
   const [isHome, setHome] = useState([]);
-  const [isRead, setIsRead] = useState([]);
+  const [isRead] = useState([]);
   const [newHistory, setNewHistory] = useState([
     {
       verseId: '1',
@@ -52,10 +57,8 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
       source: 'verseSourcesType',
     },
   ]);
-  const [shabadId, setShabadId] = useState(null);
+  // const [shabadId, setShabadId] = useState(null);
   // Constants
-  const banidb = require('../../../common/constants/banidb');
-  const { i18n } = remote.require('./app');
   const verseSourcesText = banidb.SOURCE_TEXTS;
   const verseWriterText = banidb.WRITER_TEXTS;
   // Event Handlers
@@ -65,23 +68,28 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
   };
   const changeActiveVerse = verse => {
     console.log(verse, 'verse clicked from versepanel');
-    setVerseSelected(verse.verseId);
-    setShabadSelected(verse.shabadId);
-    newHistory.push(verse.verseId);
-    if (isRead.some(verseId => verseId == verse.verseId)) {
-      console.log('exists');
-    } else {
-      isRead.push(verse.verseId);
-    }
+    console.log(verseSelected, shabadSelected, 'verse and shabad from versepanel');
+    // if (verseSelected !== verse.verseId) {
+    //   setVerseSelected(verse.verseId);
+    // }
+    // if (shabadSelected !== verse.shabadId) {
+    //   setShabadSelected(verse.shabadId);
+    // }
+    // newHistory.push(verse.verseId);
+    // if (isRead.some(verseId => verseId == verse.verseId)) {
+    //   console.log('exists');
+    // } else {
+    //   isRead.push(verse.verseId);
+    // }
   };
   const DeleteItem = index => {
-    setNewHistory(newHistory.filter(x => x.verseId != index));
+    setNewHistory(newHistory.filter(x => x.verseId !== index));
     console.log('deleted item ', index);
   };
 
   return (
     <div className="verse-block">
-      {verses ? (
+      {verses && (
         <div className="result-list">
           <ul>
             {verses.map((verse, index) => (
@@ -94,38 +102,33 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
                 <span className="shabadPane-controls">
                   {ShabadPane && (
                     <>
-                      {isRead.map(isRead =>
-                        isRead == verse.verseId ? (
-                          <span key={isRead}>
-                            <i className="fa fa-fw fa-check" />
-                          </span>
-                        ) : (
-                          ''
-                        ),
+                      {isRead.map(
+                        isRead =>
+                          isRead === verse.verseId && (
+                            <span key={isRead}>
+                              <i className="fa fa-fw fa-check" />
+                            </span>
+                          ),
                       )}
-                      {isHome != index ? (
+                      {isHome !== index && (
                         <span onClick={() => HandleHome(index)}>
                           <i className="fa fa-home hoverIcon" />
                         </span>
-                      ) : (
-                        ''
                       )}
-                      {isHome == index ? (
+                      {isHome === index && (
                         <span>
                           <i className="fa fa-fw fa-home" onClick={HandleHome} />
                         </span>
-                      ) : (
-                        ''
                       )}
                     </>
                   )}
                 </span>
-                <div className={`${SearchPane && 'search-list span-color'}`}>
+                <div className={`${SearchPane ? 'search-list span-color' : ''}`}>
                   <a className="panktee">
                     {SearchPane && <span className="span-color">Ang 683</span>}
                     <span className="gurmukhi">{verse.verse}</span>
                     {SearchPane && (
-                      <div className={`${SearchPane && 'search-list-footer'}`}>
+                      <div className={`${SearchPane ? 'search-list-footer' : ''}`}>
                         {i18n.t(`SEARCH.WRITERS.${verseWriterText[verse.writer]}`)},{' '}
                         {i18n.t(`SEARCH.SOURCES.${verseSourcesText[verse.source]}`)}
                       </div>
@@ -141,11 +144,16 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
             ))}
           </ul>
         </div>
-      ) : (
-        ''
       )}
     </div>
   );
 }
+
+VersePanel.propTypes = {
+  ShabadPane: PropTypes.any,
+  verses: PropTypes.any,
+  HistoryPane: PropTypes.any,
+  SearchPane: PropTypes.any,
+};
 
 export default VersePanel;
