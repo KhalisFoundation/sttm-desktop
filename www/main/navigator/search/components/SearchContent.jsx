@@ -71,6 +71,7 @@ function SearchContent() {
         verseId: verse.ID,
         shabadId: verse.Shabads[0].ShabadID,
         verse: verse.Gurmukhi,
+        ang: verse.PageNo,
         writer: verse.Writer ? verse.Writer.WriterEnglish : '',
         raag: verse.Raag ? verse.Raag.RaagEnglish : '',
         source: verse.Source ? verse.Source.SourceEnglish : '',

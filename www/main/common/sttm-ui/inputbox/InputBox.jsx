@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { searchShabads } from '../../../navigator/search/utils';
+import { searchShabads } from '../../../navigator/utils';
 
 function InputBox({ placeholder, className }) {
   const { searchOption, searchSource } = useStoreState(state => state.navigator);

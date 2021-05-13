@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
 import VersePanel from '../../common/sttm-ui/versepanel/VersePanel';
-import { loadShabad } from './utils';
+import { loadShabad } from '../utils';
 
 function ShabadContent() {
   const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
@@ -15,6 +15,7 @@ function ShabadContent() {
             verseId: verse.ID,
             shabadId: verse.Shabads[0].ShabadID,
             verse: verse.Gurmukhi,
+            ang: verse.PageNo,
             writer: verse.Writer ? verse.Writer.WriterEnglish : '',
             raag: verse.Raag ? verse.Raag.RaagEnglish : '',
             source: verse.Source ? verse.Source.SourceEnglish : '',

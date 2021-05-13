@@ -1,4 +1,4 @@
-import banidb from '../../../banidb';
+import banidb from '../../banidb';
 
 export const searchShabads = (searchQuery, searchType, searchSource, setSearchedShabads) => {
   banidb

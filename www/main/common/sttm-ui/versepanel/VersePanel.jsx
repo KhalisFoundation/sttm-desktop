@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
+// import { remote } from 'electron';
 import { useStoreState } from 'easy-peasy';
 import banidb from '../../constants/banidb';
 
-const { i18n } = remote.require('./app');
+// const { i18n } = remote.require('./app');
 
 function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
   // Global States
@@ -125,12 +125,14 @@ function VersePanel({ ShabadPane, verses, HistoryPane, SearchPane }) {
                 </span>
                 <div className={`${SearchPane ? 'search-list span-color' : ''}`}>
                   <a className="panktee">
-                    {SearchPane && <span className="span-color">Ang 683</span>}
+                    {SearchPane && <span className="span-color">{`Ang ${verse.ang} `}</span>}
                     <span className="gurmukhi">{verse.verse}</span>
                     {SearchPane && (
                       <div className={`${SearchPane ? 'search-list-footer' : ''}`}>
-                        {i18n.t(`SEARCH.WRITERS.${verseWriterText[verse.writer]}`)},{' '}
-                        {i18n.t(`SEARCH.SOURCES.${verseSourcesText[verse.source]}`)}
+                        {/* {i18n.t(`SEARCH.WRITERS.${verseWriterText[verse.writer]}`)},{' '}
+                        {i18n.t(`SEARCH.SOURCES.${verseSourcesText[verse.source]}`)} */}
+                        {/* {Writer and source should come from i18n} */}
+                        {`Writer: ${verse.writer}, Source: ${verse.source}`}
                       </div>
                     )}
                   </a>
