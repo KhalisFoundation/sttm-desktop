@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import LayoutSelector from './LayoutSelector';
 
 const { remote } = require('electron');
 
@@ -17,13 +18,31 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleSizeIcon = event => {
-    const value = event.target ? event.target.value : event;
-    console.log(value);
-    // if (value === 'plus') {
-    //   console.log(stateFunction);
-    // } else if (value === 'minus') {
-    //   console.log(stateFunction);
-    // }
+    const { max, min, step } = settingObj;
+    const value = event.currentTarget ? event.currentTarget.dataset.value : event;
+    const currentValue = baniOverlayState[stateVar];
+    let updatedValue;
+
+    if (value === 'plus' && currentValue < max) {
+      updatedValue = currentValue + step;
+      baniOverlayActions[stateFunction](updatedValue);
+    } else if (value === 'minus' && currentValue > min) {
+      updatedValue = baniOverlayState[stateVar] - step;
+      baniOverlayActions[stateFunction](updatedValue);
+    }
+  };
+
+  const handleToggleChange = () => {
+    const existingValue = baniOverlayState[stateVar];
+    baniOverlayActions[stateFunction](!existingValue);
+  };
+
+  const handleLayoutChange = event => {
+    const currentLayout = baniOverlayState[stateVar];
+    const newLayout = event.currentTarget.dataset.layout;
+    if (newLayout !== currentLayout) {
+      baniOverlayActions[stateFunction](newLayout);
+    }
   };
 
   const settingDOM = [];
@@ -57,10 +76,10 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     case 'size-icon':
       settingDOM.push(
         <span className={`size-icon-container`}>
-          <div className="size-icon icon-left" onClick={handleSizeIcon('plus')}>
+          <div className="size-icon icon-left" data-value="plus" onClick={handleSizeIcon}>
             <i className="fa fa-plus"></i>
           </div>
-          <div className="size-icon icon-right" onClick={handleSizeIcon('minus')}>
+          <div className="size-icon icon-right" data-value="minus" onClick={handleSizeIcon}>
             <i className="fa fa-minus"></i>
           </div>
         </span>,
@@ -68,7 +87,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
       break;
     case 'icon-toggle':
       settingDOM.push(
-        <div className="size-icon-container">
+        <div className="size-icon-container" onClick={handleToggleChange}>
           <span
             className="icon-toggle"
             style={{
@@ -77,6 +96,9 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
           ></span>
         </div>,
       );
+      break;
+    case 'custom':
+      settingDOM.push(<LayoutSelector changeLayout={handleLayoutChange} />);
       break;
     default:
       return null;

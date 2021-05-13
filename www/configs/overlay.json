@@ -25,12 +25,11 @@
       "background-options": {
         "title": "",
         "type": "size-icon",
-        "settings": ["bg-color", "bg-height", "bg-opacity", "overlay-theme"]
+        "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
       },
 
       "date-time": {
         "title": "DATE_AND_TIME",
-        "type": "title",
         "toggle": true,
         "subcategories": ["date-time-options"]
       },
@@ -64,7 +63,10 @@
       "gurbani-size": {
         "title": "",
         "type": "size-icon",
-        "initialValue": 5
+        "initialValue": 5,
+        "max": 15,
+        "min": 1,
+        "step": 0.25
       },
       "text-color": {
         "type": "color-input",
@@ -83,20 +85,29 @@
       "text-size": {
         "title": "",
         "type": "size-icon",
-        "initialValue": 3
+        "initialValue": 3,
+        "max": 14,
+        "min": 1,
+        "step": 0.25
       },
       "bg-color": {
         "title": "",
         "type": "color-input",
         "initialValue": "#97d6f7"
       },
-      "bg-height": {
+      "padding": {
         "title": "HEIGHT",
-        "initialValue": 20
+        "initialValue": 0.5,
+        "max": 5,
+        "min": 0.5,
+        "step": 0.1
       },
       "bg-opacity": {
         "title": "OPACITY",
-        "initialValue": 1
+        "initialValue": 1,
+        "max": 1,
+        "min": 0.1,
+        "step": 0.1
       },
       "overlay-theme": {
         "title": "",
@@ -133,7 +144,7 @@
       "addons": {
         "title": "",
         "type": "icon-toggle",
-        "settings": ["toggle-logo", "toggle-annoucement", "toggle-link", "green-screen-toggle"]
+        "settings": ["toggle-logo", "toggle-annoucement", "overlayLarivaar", "green-screen-toggle"]
       },
       "center-icons": {
         "title": "",
@@ -148,17 +159,12 @@
       "right-side-icons": {
         "title": "",
         "type": "title",
-        "subcategories": ["reset-options", "hidden-options"]
+        "subcategories": ["reset-options"]
       },
       "reset-options": {
         "title": "",
         "type": "icon-toggle",
         "settings": ["reset"]
-      },
-      "hidden-options": {
-        "title": "",
-        "type": "hidden",
-        "settings": ["padding"]
       }
     },
 
@@ -167,10 +173,8 @@
         "icon": "reset.svg",
         "initialValue": false
       },
-      "padding": {
-        "initialValue": 0.5
-      },
       "overlayLarivaar": {
+        "icon": "link.png",
         "initialValue": false
       },
       "larivaarAssist": {
@@ -185,7 +189,7 @@
         "initialValue": false
       },
       "toggle-annoucement": {
-        "icon": "rectangle.svg",
+        "icon": "megaphone.png",
         "initialValue": false
       },
       "toggle-link": {

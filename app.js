@@ -343,14 +343,13 @@ function createBroadcastFiles(arg) {
 let seq = Math.floor(Math.random() * 100);
 
 const showLine = async (line, socket = io) => {
-  const overlayPrefs = store.get('obs');
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
     translation: savedSettings.translationLanguage,
     transliteration: savedSettings.transliterationLanguage,
   };
 
-  const payload = Object.assign(lineWithSettings, overlayPrefs);
+  const payload = lineWithSettings;
   if (!lineWithSettings.fromScroll) {
     socket.emit('show-line', payload);
   }
@@ -387,8 +386,7 @@ const emptyOverlay = () => {
     },
   };
   showLine(emptyLine);
-  const overlayPrefs = store.get('obs');
-  if (overlayPrefs.live) {
+  if (savedSettings.liveFeed) {
     createBroadcastFiles(emptyLine);
   }
 };
