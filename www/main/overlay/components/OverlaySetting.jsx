@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import LayoutSelector from './LayoutSelector';
+import { getDefaultSettings } from '../../common/store/user-settings/get-saved-overlay-settings';
+import { convertToCamelCase } from '../../common/utils';
 
 const { remote } = require('electron');
 
@@ -33,8 +35,17 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleToggleChange = () => {
-    const existingValue = baniOverlayState[stateVar];
-    baniOverlayActions[stateFunction](!existingValue);
+    if (stateVar === 'reset') {
+      const defaultSettings = getDefaultSettings();
+      Object.keys(baniOverlayState).forEach(state => {
+        if (baniOverlayState[state] !== defaultSettings[state]) {
+          baniOverlayActions[`set${convertToCamelCase(state, true)}`](defaultSettings[state]);
+        }
+      });
+    } else {
+      const existingValue = baniOverlayState[stateVar];
+      baniOverlayActions[stateFunction](!existingValue);
+    }
   };
 
   const handleLayoutChange = event => {
@@ -98,7 +109,9 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
       );
       break;
     case 'custom':
-      settingDOM.push(<LayoutSelector changeLayout={handleLayoutChange} />);
+      if (settingObj.key === 'LayoutSelector') {
+        settingDOM.push(<LayoutSelector changeLayout={handleLayoutChange} />);
+      }
       break;
     default:
       return null;
