@@ -103,7 +103,7 @@ const GlobalState = createStore({
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
 });
 
-global.platform.ipc.on('recieve-setting', (event, setting) => {
+global.platform.ipc.on('update-global-setting', (event, setting) => {
   const { settingType, actionName, payload } = setting;
   GlobalState.getActions()[settingType][actionName](payload);
 });

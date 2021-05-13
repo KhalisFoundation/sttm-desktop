@@ -78,7 +78,7 @@ const QuickTools = () => {
           className={getIconClassName(name, toolName, actionName)}
           onClick={() => {
             global.platform.ipc.send(
-              'recieve-setting',
+              'update-global-setting',
               createGlobalPlatformObj(name, toolName, actionName),
             );
           }}

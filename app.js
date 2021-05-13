@@ -680,14 +680,14 @@ ipcMain.on('save-settings', (event, setting) => {
   }
 });
 
-ipcMain.on('setting-changed', (event, setting) => {
+ipcMain.on('update-viewer-setting', (event, setting) => {
   if (viewerWindow) {
-    viewerWindow.webContents.send('setting-changed', setting);
+    viewerWindow.webContents.send('update-viewer-setting', setting);
   }
 });
 
-ipcMain.on('recieve-setting', (event, setting) => {
-  mainWindow.webContents.send('recieve-setting', setting);
+ipcMain.on('update-global-setting', (event, setting) => {
+  mainWindow.webContents.send('update-global-setting', setting);
 });
 
 ipcMain.on('set-user-setting', (event, settingChanger) => {

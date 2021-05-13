@@ -18,7 +18,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
       if (global.webview) {
-        global.webview.send('setting-changed', {
+        global.webview.send('update-viewer-setting', {
           stateName: stateVarName,
           payload,
           oldValue,
@@ -27,7 +27,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       }
 
       if (global.platform) {
-        global.platform.ipc.send('setting-changed', {
+        global.platform.ipc.send('update-viewer-setting', {
           stateName: stateVarName,
           payload,
           oldValue,
