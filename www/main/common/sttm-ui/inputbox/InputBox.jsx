@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads } from '../../../navigator/utils';
 
-function InputBox({ placeholder, className }) {
+const InputBox = ({ placeholder, className }) => {
   const { searchOption, searchSource } = useStoreState(state => state.navigator);
   const { setSearchedShabads } = useStoreActions(state => state.navigator);
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,9 +12,11 @@ function InputBox({ placeholder, className }) {
   };
 
   useEffect(() => {
-    searchShabads(searchQuery, searchOption, searchSource, setSearchedShabads);
-  }, [searchQuery, searchOption, searchSource]);
-
+    searchShabads(searchQuery, searchOption, searchSource).then(rows =>
+      searchQuery ? setSearchedShabads(rows) : setSearchedShabads([]),
+    );
+  }, [searchQuery]);
+  // rows ? setSearchedShabads(rows) : setSearchedShabads([])
   return (
     <>
       <input
@@ -26,7 +28,7 @@ function InputBox({ placeholder, className }) {
       />
     </>
   );
-}
+};
 
 InputBox.propTypes = {
   placeholder: PropTypes.string,

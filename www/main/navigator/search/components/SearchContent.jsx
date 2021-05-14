@@ -1,91 +1,71 @@
-import React, { useState } from 'react';
-import { remote } from 'electron';
+import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import IconButton from '../../../common/sttm-ui/iconbutton/IconButton';
-import InputBox from '../../../common/sttm-ui/inputbox/InputBox';
-import VersePanel from '../../../common/sttm-ui/versepanel/VersePanel';
 import banidb from '../../../common/constants/banidb';
-
-const { i18n } = remote.require('./app');
+import { searchShabads } from '../../utils';
+import { IconButton, InputBox, FilterDropdown, SearchResultVerse } from '../../../common/sttm-ui';
 
 function SearchContent() {
-  // const banidb = require('../../../common/constants/banidb');
-  const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
-  const { setSearchSource } = useStoreActions(state => state.navigator);
-  // For Constants
-  const verseSourcesText = banidb.SOURCE_TEXTS;
-  const verseSourcesType = Object.keys(verseSourcesText);
-  const verseWriterText = banidb.WRITER_TEXTS;
-  const verseWriterType = Object.keys(verseWriterText);
-  const verseRaagText = banidb.RAAG_TEXTS;
-  const verseRaagType = Object.keys(verseRaagText);
+  const {
+    selectedLanguage,
+    searchedShabads,
+    shabadSelected,
+    testingState,
+    searchQuery,
+  } = useStoreState(state => state.navigator);
+  const { setShabadSelected, setVerseSelected, setTestingState } = useStoreActions(
+    state => state.navigator,
+  );
+
+  const sourcesObj = banidb.SOURCE_TEXTS;
+  const writersObj = banidb.WRITER_TEXTS;
+  const raagsObj = banidb.RAAG_TEXTS;
+
   // Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
     console.log(keyboardOpenStatus);
   };
-  // For Filters
-  // const [filterBySource, setFilterBySource] = useState([]);
-  const [filterByRaag, setFilterByRaag] = useState([]);
-  const [filterByWriter, setFilterByWriter] = useState([]);
-  // const [verseArray, setVerseArray] = useState(searchedShabads);
-  // Event Handlers
-  const newWriterSelection = event => {
-    if (event.target.value !== 'ALL') {
-      setFilterByWriter([event.target.value]);
-    } else {
-      setFilterByWriter([]);
-    }
-  };
-  const newSourceSelection = event => {
-    setSearchSource(event.target.value);
-  };
-  const newRaagSelection = event => {
-    if (event.target.value !== 'ALL') {
-      setFilterByRaag([event.target.value]);
-    } else {
-      setFilterByRaag([]);
-    }
-  };
 
-  // const filters = (verseArrayTemp, index, array) => {
-  //   let Raag = true;
-  //   let Source = true;
-  //   let Writer = true;
-  //   if (filterByRaag.length != 0) {
-  //     Raag = filterByRaag.some(value => value == verseArrayTemp.raag);
-  //   }
-  //   if (filterBySource.length != 0) {
-  //     Source = filterBySource.some(value => value == verseArrayTemp.source);
-  //   }
-  //   if (filterByWriter.length != 0) {
-  //     Writer = filterByWriter.some(value => value == verseArrayTemp.writer);
-  //   }
-  //   return Writer && Raag && Source;
+  // const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
+  //   setTestingState('test');
+  //   console.log(newSelectedShabad, newSelectedVerse);
+  // if (shabadSelected !== newSelectedShabad) {
+  //   console.log('setShabadSelected(newSelectedShabad)', testingState);
+  // }
+  // setShabadSelected(newSelectedShabad);
+  // setVerseSelected(newSelectedVerse);
   // };
 
-  const filterRequiredVerseItems = verses => {
-    return verses.map(verse => {
-      return {
-        verseId: verse.ID,
-        shabadId: verse.Shabads[0].ShabadID,
-        verse: verse.Gurmukhi,
-        ang: verse.PageNo,
-        writer: verse.Writer ? verse.Writer.WriterEnglish : '',
-        raag: verse.Raag ? verse.Raag.RaagEnglish : '',
-        source: verse.Source ? verse.Source.SourceEnglish : '',
-      };
-    });
+  const filterRequiredVerseItems = searchedShabadsArray => {
+    // console.log('searchedShabadsArray', searchedShabadsArray);
+    return searchedShabadsArray
+      ? searchedShabadsArray.map(verse => {
+          return {
+            ang: verse.PageNo,
+            raag: verse.Raag ? verse.Raag.RaagEnglish : '',
+            shabadId: verse.Shabads[0].ShabadID,
+            source: verse.Source ? verse.Source.SourceEnglish : '',
+            verse: verse.Gurmukhi,
+            verseId: verse.ID,
+            writer: verse.Writer ? verse.Writer.WriterEnglish : '',
+          };
+        })
+      : [];
   };
 
-  // For verses
+  useEffect(() => {
+    console.log('from search content', searchQuery);
+  }, [searchQuery]);
 
-  //  list   -> hrik item te true false return krna
-  // raag -> abc ,source ->  bcd   > true , false
-  // true = raag(hp) -> [abc, xyz].some(x => x == comingItem.raag) ,
-  // false = source (>13000)->  [bcd,pqr ].some(x => comingItem.source)  > true , false
-  // return raag(true) && source(false) && color(red)
+  // console.log(
+  //   'searchContent',
+  //   selectedLanguage,
+  //   searchedShabads,
+  //   shabadSelected,
+  //   testingState,
+  //   typeof searchedShabads,
+  // );
 
   return (
     <div>
@@ -103,37 +83,28 @@ function SearchContent() {
         <span>{searchedShabads.length ? `${searchedShabads.length} Results` : ''}</span>
         <div className="filters">
           <span>Filter by </span>
-          <select className="select-bani" onChange={event => newWriterSelection(event)}>
-            {verseWriterType &&
-              verseWriterType.map(value => (
-                <option key={value} value={value}>
-                  {i18n.t(`SEARCH.WRITERS.${verseWriterText[value]}`)}
-                </option>
-              ))}{' '}
-          </select>
-          <label>Writer</label>{' '}
-          <select className="select-bani" onChange={event => newRaagSelection(event)}>
-            {verseRaagType &&
-              verseRaagType.map(value => (
-                <option key={value} value={value}>
-                  {i18n.t(`SEARCH.RAAGS.${verseRaagText[value]}`)}
-                </option>
-              ))}
-          </select>
-          <label>Raag</label>{' '}
-          <select className="select-bani" onChange={event => newSourceSelection(event)}>
-            {verseSourcesType &&
-              verseSourcesType.map(value => (
-                <option key={value} value={value}>
-                  {i18n.t(`SEARCH.SOURCES.${verseSourcesText[value]}`)}
-                </option>
-              ))}
-          </select>
-          <label>Source</label>
+          <FilterDropdown
+            title="Writer"
+            onChange={event => console.log(event)}
+            optionsObj={writersObj}
+          />
+          <FilterDropdown
+            title="Raag"
+            onChange={event => console.log(event)}
+            optionsObj={raagsObj}
+          />
+          <FilterDropdown
+            title="Source"
+            onChange={event => console.log(event)}
+            optionsObj={sourcesObj}
+          />
         </div>
       </div>
       <div className="search-results">
-        <VersePanel verses={filterRequiredVerseItems(searchedShabads)} SearchPane />
+        <SearchResultVerse
+          verses={filterRequiredVerseItems(searchedShabads)}
+          // onClick={changeActiveShabad} filterRequiredVerseItems(searchedShabads)
+        />
       </div>
     </div>
   );

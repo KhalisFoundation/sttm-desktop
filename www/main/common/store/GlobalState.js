@@ -49,11 +49,25 @@ const GlobalState = createStore({
   navigator: {
     selectedLanguage: 'gr',
     searchOption: 0,
+    searchQuery: '',
     verseSelected: null,
     shabadSelected: null,
     versesHistory: null,
+    testingState: '',
     searchedShabads: [],
     searchSource: 'all',
+    setSearchQuery: action((state, newSearchQuery) => {
+      return {
+        ...state,
+        searchQuery: newSearchQuery,
+      };
+    }),
+    setTestingState: action((state, language) => {
+      return {
+        ...state,
+        testingState: language,
+      };
+    }),
     setSelectedLanguage: action((state, language) => {
       return {
         ...state,

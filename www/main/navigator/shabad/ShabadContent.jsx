@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useStoreState } from 'easy-peasy';
-import VersePanel from '../../common/sttm-ui/versepanel/VersePanel';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import { loadShabad } from '../utils';
+import { ShabadVerse } from '../../common/sttm-ui';
 
 function ShabadContent() {
-  const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
-  const [activeShabad, setActiveShabad] = useState();
-  // console.log(verseSelected, shabadSelected);
+  const { verseSelected, shabadSelected, testingState } = useStoreState(state => state.navigator);
+  const { setTestingState } = useStoreActions(state => state.navigator);
+  const [activeShabad, setActiveShabad] = useState([]);
 
   const filterRequiredVerseItems = verses => {
     return verses
@@ -15,29 +15,26 @@ function ShabadContent() {
             verseId: verse.ID,
             shabadId: verse.Shabads[0].ShabadID,
             verse: verse.Gurmukhi,
-            ang: verse.PageNo,
-            writer: verse.Writer ? verse.Writer.WriterEnglish : '',
-            raag: verse.Raag ? verse.Raag.RaagEnglish : '',
-            source: verse.Source ? verse.Source.SourceEnglish : '',
           };
         })
       : [];
   };
 
-  useEffect(() => {
-    setActiveShabad(loadShabad(827, 11228, setActiveShabad));
+  const handleVerseClick = async (selectedVerseId, selectedShabadId) => {
+    await setTestingState(selectedVerseId.toString());
+    console.log(testingState);
+    await setTestingState(selectedShabadId.toString());
+    console.log(testingState);
+    console.log(selectedVerseId, selectedShabadId, testingState);
+  };
 
-    // uncomment the below line to get the results from state after resolving state updation issue in versepanel
-    // setActiveShabad(loadShabad(shabadSelected, verseSelected, setActiveShabad));
-  }, [shabadSelected, verseSelected]);
+  useEffect(() => {
+    loadShabad(827, 11228).then(verses => setActiveShabad(verses));
+  }, [testingState]);
 
   return (
     <div className="shabad-list">
-      <VersePanel
-        ShabadPane
-        verses={filterRequiredVerseItems(activeShabad)}
-        activeVerse={verseSelected}
-      />
+      <ShabadVerse verses={filterRequiredVerseItems(activeShabad)} onClick={handleVerseClick} />
     </div>
   );
 }
