@@ -1,32 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useStoreActions } from 'easy-peasy';
 
 const ShabadVerse = ({ verses, onClick }) => {
-  console.log(verses);
-  const { setTestingState } = useStoreActions(state => state.navigator);
+  const [traversedVerse, setTraversedVerse] = useState([]);
+
+  const updateTraversedVerse = newTraversedVerse => {
+    if (!traversedVerse.some(verseId => verseId === newTraversedVerse)) {
+      setTraversedVerse([...traversedVerse, newTraversedVerse]);
+    }
+  };
 
   return (
     <div className="verse-block">
       <div className="result-list">
         <ul>
-          {verses.map(({ verse, verseId, shabadId }, index) => (
+          {verses.map(({ verse, verseId }, index) => (
             <li
               key={verseId}
               value={index}
               className="shabadPane-list"
-              onClick={() => onClick(verseId, shabadId)}
+              onClick={() => {
+                onClick(verseId);
+                updateTraversedVerse(verseId);
+              }}
             >
               <span className="shabadPane-controls">
-                {/* {isRead.map(isRead =>
-                  isRead == verse.verseId ? ( */}
-                <span>
-                  <i className="fa fa-fw fa-check" />
-                </span>
-                {/* ) : (
-                    ''
-                  ),
-                )} */}
+                {traversedVerse.map(
+                  isRead =>
+                    isRead === verseId && (
+                      <span>
+                        <i className="fa fa-fw fa-check" />
+                      </span>
+                    ),
+                )}
                 {/* {isHome != index ? ( */}
                 <span onClick={() => console.log('home')}>
                   <i className="fa fa-home hoverIcon" />
@@ -57,6 +63,7 @@ const ShabadVerse = ({ verses, onClick }) => {
 
 ShabadVerse.propTypes = {
   verses: PropTypes.array,
+  onClick: PropTypes.func,
 };
 
 export default ShabadVerse;

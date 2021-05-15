@@ -1,16 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useStoreActions } from 'easy-peasy';
 
 const SearchResultVerse = ({ verses, onClick }) => {
-  const { setTestingState } = useStoreActions(state => state.navigator);
-
   return (
     <div className="verse-block">
       <div className="result-list">
         <ul>
           {verses.map(({ verseId, verse, ang, writer, source, shabadId }, index) => (
-            <li key={verseId} value={index} onClick={() => setTestingState('test')}>
+            <li key={verseId} value={index} onClick={() => onClick(shabadId, verseId)}>
               <div className="search-list span-color">
                 <a className="panktee">
                   <span className="span-color">{`Ang ${ang} `}</span>

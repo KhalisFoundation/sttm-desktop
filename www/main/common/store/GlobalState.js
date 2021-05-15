@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createStore, action } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../constants';
 import createUserSettingsState from './user-settings/create-user-settings-state';
@@ -49,66 +50,38 @@ const GlobalState = createStore({
   navigator: {
     selectedLanguage: 'gr',
     searchOption: 0,
-    searchQuery: '',
     verseSelected: null,
     shabadSelected: null,
     versesHistory: null,
-    testingState: '',
     searchedShabads: [],
     searchSource: 'all',
+    currentSelectedVerse: '',
     setSearchQuery: action((state, newSearchQuery) => {
-      return {
-        ...state,
-        searchQuery: newSearchQuery,
-      };
-    }),
-    setTestingState: action((state, language) => {
-      return {
-        ...state,
-        testingState: language,
-      };
+      state.searchQuery = newSearchQuery;
     }),
     setSelectedLanguage: action((state, language) => {
-      return {
-        ...state,
-        selectedLanguage: language,
-      };
+      state.selectedLanguage = language;
     }),
     setSearchOption: action((state, newSearchOption) => {
-      return {
-        ...state,
-        searchOption: newSearchOption,
-      };
+      state.searchOption = newSearchOption;
     }),
     setVerseSelected: action((state, newVerse) => {
-      return {
-        ...state,
-        verseSelected: newVerse,
-      };
+      state.verseSelected = newVerse;
     }),
     setShabadSelected: action((state, newShabad) => {
-      return {
-        ...state,
-        shabadSelected: newShabad,
-      };
+      state.shabadSelected = newShabad;
     }),
     setVersesHistory: action((state, newHistory) => {
-      return {
-        ...state,
-        versesHistory: newHistory,
-      };
+      state.versesHistory = newHistory;
     }),
     setSearchedShabads: action((state, searchResult) => {
-      return {
-        ...state,
-        searchedShabads: searchResult,
-      };
+      state.searchedShabads = searchResult;
     }),
     setSearchSource: action((state, newSource) => {
-      return {
-        ...state,
-        searchSource: newSource,
-      };
+      state.searchSource = newSource;
+    }),
+    setCurrentSelectedVerse: action((state, currentVerse) => {
+      state.currentSelectedVerse = currentVerse;
     }),
   },
   viewerSettings: {

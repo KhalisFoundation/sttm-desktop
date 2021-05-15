@@ -1,20 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
-import { searchShabads } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResultVerse } from '../../../common/sttm-ui';
 
 function SearchContent() {
-  const {
-    selectedLanguage,
-    searchedShabads,
-    shabadSelected,
-    testingState,
-    searchQuery,
-  } = useStoreState(state => state.navigator);
-  const { setShabadSelected, setVerseSelected, setTestingState } = useStoreActions(
-    state => state.navigator,
-  );
+  const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
+  const { setShabadSelected, setVerseSelected } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -27,15 +18,10 @@ function SearchContent() {
     console.log(keyboardOpenStatus);
   };
 
-  // const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
-  //   setTestingState('test');
-  //   console.log(newSelectedShabad, newSelectedVerse);
-  // if (shabadSelected !== newSelectedShabad) {
-  //   console.log('setShabadSelected(newSelectedShabad)', testingState);
-  // }
-  // setShabadSelected(newSelectedShabad);
-  // setVerseSelected(newSelectedVerse);
-  // };
+  const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
+    setShabadSelected(newSelectedShabad);
+    setVerseSelected(newSelectedVerse);
+  };
 
   const filterRequiredVerseItems = searchedShabadsArray => {
     // console.log('searchedShabadsArray', searchedShabadsArray);
@@ -53,19 +39,6 @@ function SearchContent() {
         })
       : [];
   };
-
-  useEffect(() => {
-    console.log('from search content', searchQuery);
-  }, [searchQuery]);
-
-  // console.log(
-  //   'searchContent',
-  //   selectedLanguage,
-  //   searchedShabads,
-  //   shabadSelected,
-  //   testingState,
-  //   typeof searchedShabads,
-  // );
 
   return (
     <div>
@@ -103,7 +76,7 @@ function SearchContent() {
       <div className="search-results">
         <SearchResultVerse
           verses={filterRequiredVerseItems(searchedShabads)}
-          // onClick={changeActiveShabad} filterRequiredVerseItems(searchedShabads)
+          onClick={changeActiveShabad}
         />
       </div>
     </div>

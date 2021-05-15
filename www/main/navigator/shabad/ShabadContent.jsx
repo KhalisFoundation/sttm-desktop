@@ -4,8 +4,8 @@ import { loadShabad } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
 function ShabadContent() {
-  const { verseSelected, shabadSelected, testingState } = useStoreState(state => state.navigator);
-  const { setTestingState } = useStoreActions(state => state.navigator);
+  const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
+  const { setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
 
   const filterRequiredVerseItems = verses => {
@@ -13,24 +13,21 @@ function ShabadContent() {
       ? verses.map(verse => {
           return {
             verseId: verse.ID,
-            shabadId: verse.Shabads[0].ShabadID,
             verse: verse.Gurmukhi,
           };
         })
       : [];
   };
 
-  const handleVerseClick = async (selectedVerseId, selectedShabadId) => {
-    await setTestingState(selectedVerseId.toString());
-    console.log(testingState);
-    await setTestingState(selectedShabadId.toString());
-    console.log(testingState);
-    console.log(selectedVerseId, selectedShabadId, testingState);
+  const handleVerseClick = currentVerse => {
+    setCurrentSelectedVerse(currentVerse);
   };
 
   useEffect(() => {
-    loadShabad(827, 11228).then(verses => setActiveShabad(verses));
-  }, [testingState]);
+    if (shabadSelected && verseSelected) {
+      loadShabad(shabadSelected, verseSelected).then(verses => setActiveShabad(verses));
+    }
+  }, [verseSelected, shabadSelected]);
 
   return (
     <div className="shabad-list">
