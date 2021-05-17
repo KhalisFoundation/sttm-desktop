@@ -30,7 +30,7 @@ const OverlaySettingsContainer = ({ settingsObj }) => {
                 className={`control-item-switch`}
                 value={false}
                 onToggle={() => {
-                  console.log('you flipped the flippty flip');
+                  // Add logic for switch toggle here
                 }}
               />
             )}

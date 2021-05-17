@@ -173,7 +173,6 @@
       };
 
       socket.on('show-line', function(request) {
-        console.log('show-line', request);
         if (!preview) {
           const { overlayLarivaar, larivaarAssist } = overlayPrefs;
           writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
@@ -182,8 +181,6 @@
 
       socket.on('update-prefs', function(data) {
         overlayPrefs = data;
-        console.log('data', data);
-        console.log('overlayPrefs', overlayPrefs);
         applyOverlayPrefs();
       });
     </script>

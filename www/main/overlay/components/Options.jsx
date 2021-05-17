@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// import { settingsObj } from '../utils/parse-overlay-options';
 import OverlaySettingsContainer from './OverlaySettingsContainer';
 
 const OverlaySettings = ({ settingsObj }) => {
