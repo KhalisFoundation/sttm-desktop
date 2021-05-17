@@ -48,7 +48,8 @@
     "BOTTOM_RIGHT": "Bottom Right",
     "MM_DD_YYYY": "MM/DD/YYYY",
     "12HR": "12Hr",
-    "24HR": "24Hr"
+    "24HR": "24Hr",
+    "THEME_HEADING": "Themes"
   },
 
   "WORKSPACES": {

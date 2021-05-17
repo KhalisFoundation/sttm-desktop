@@ -3,6 +3,9 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import getThemeMarkup from '../utils/get-theme-markup';
 
+const { remote } = require('electron');
+
+const { i18n } = remote.require('./app');
 const themeObjects = require('../../../configs/overlay_presets.json');
 
 export const ThemeSelector = () => {
@@ -31,7 +34,9 @@ export const ThemeSelector = () => {
 
   return (
     <section className="theme-selector">
-      <p className="overlay-window-text theme-selector-header">Themes</p>
+      <p className="overlay-window-text theme-selector-header">
+        {i18n.t(`BANI_OVERLAY.THEME_HEADING`)}
+      </p>
       {getThemeMarkup(themeObjects, handleThemeChange)}
     </section>
   );
