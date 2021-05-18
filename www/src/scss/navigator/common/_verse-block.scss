@@ -43,11 +43,31 @@
       }
       .search-list {
         display: inline-flex;
-        border-left: 3px solid #e18030;
         padding: 0 5px;
-        .span-color {
+        .sggs-color {
           color: #e18030;
         }
+        .sdg-color {
+          color: #348ce7;
+        }
+        .ak-color {
+          color: #65a757;
+        }
+        .other-color {
+          color: #717171;
+        }
+      }
+      .sggs-border {
+        border-left: 3px solid #e18030;
+      }
+      .sdg-border {
+        border-left: 3px solid #348ce7;
+      }
+      .ak-border {
+        border-left: 3px solid #65a757;
+      }
+      .other-border {
+        border-left: 3px solid #717171;
       }
       li {
         position: relative;

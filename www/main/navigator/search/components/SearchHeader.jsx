@@ -10,13 +10,13 @@ function SearchHeader() {
   useEffect(() => {
     window.addEventListener('resize', () => setWidth(window.innerWidth));
   }, []);
-  // For constants
+
   const { i18n } = remote.require('./app');
   const gurmukhiSearchText = banidb.GURMUKHI_SEARCH_TEXTS;
   const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
-  // For Global State
+
   const { selectedLanguage } = useStoreState(state => state.navigator);
   const { setSearchOption, setSelectedLanguage } = useStoreActions(state => state.navigator);
 

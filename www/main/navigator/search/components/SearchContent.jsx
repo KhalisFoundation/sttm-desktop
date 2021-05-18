@@ -37,6 +37,7 @@ function SearchContent() {
             raag: verse.Raag ? verse.Raag.RaagEnglish : '',
             shabadId: verse.Shabads[0].ShabadID,
             source: verse.Source ? verse.Source.SourceEnglish : '',
+            sourceId: verse.Source ? verse.Source.SourceID : '',
             verse: verse.Gurmukhi,
             verseId: verse.ID,
             writer: verse.Writer ? verse.Writer.WriterEnglish : '',
@@ -83,13 +84,14 @@ function SearchContent() {
           <div className="result-list">
             <ul>
               {mapVerseItems(searchedShabads).map(
-                ({ ang, shabadId, source, verse, verseId, writer }) => (
+                ({ ang, shabadId, source, sourceId, verse, verseId, writer }) => (
                   <SearchResults
                     key={verseId}
                     ang={ang}
                     onClick={changeActiveShabad}
                     shabadId={shabadId}
                     source={source}
+                    sourceId={sourceId}
                     verse={verse}
                     verseId={verseId}
                     writer={writer}
