@@ -7,6 +7,9 @@ function ShabadContent() {
   const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
   const { setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
+  const [isHomeVerse, setIsHomeVerse] = useState();
+  const [activeVerse, setActiveVerse] = useState({});
+  const [traversedVerses, setTraversedVerses] = useState([]);
 
   const filterRequiredVerseItems = verses => {
     return verses
@@ -23,6 +26,17 @@ function ShabadContent() {
     setCurrentSelectedVerse(currentVerse);
   };
 
+  const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
+    if (!traversedVerses.some(traversedVerse => traversedVerse === newTraversedVerse)) {
+      setTraversedVerses([...traversedVerses, newTraversedVerse]);
+    }
+    setActiveVerse({ [verseIndex]: newTraversedVerse });
+  };
+
+  const changeHomeVerse = verseIndex => {
+    setIsHomeVerse(verseIndex);
+  };
+
   useEffect(() => {
     if (shabadSelected && verseSelected) {
       loadShabad(shabadSelected, verseSelected).then(verses => setActiveShabad(verses));
@@ -31,7 +45,26 @@ function ShabadContent() {
 
   return (
     <div className="shabad-list">
-      <ShabadVerse verses={filterRequiredVerseItems(activeShabad)} onClick={handleVerseClick} />
+      <div className="verse-block">
+        <div className="result-list">
+          <ul>
+            {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
+              <ShabadVerse
+                key={verseId}
+                activeVerse={activeVerse}
+                isHomeVerse={isHomeVerse}
+                lineNumber={index}
+                onClick={handleVerseClick}
+                traversedVerses={traversedVerses}
+                verse={verse}
+                verseId={verseId}
+                changeHomeVerse={changeHomeVerse}
+                updateTraversedVerse={updateTraversedVerse}
+              />
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

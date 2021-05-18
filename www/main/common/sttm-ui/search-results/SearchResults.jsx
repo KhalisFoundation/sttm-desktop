@@ -1,31 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SearchResults = ({ verses, onClick }) => {
+const SearchResults = ({ ang, onClick, shabadId, source, verse, verseId, writer }) => {
   return (
-    <div className="verse-block">
-      <div className="result-list">
-        <ul>
-          {verses.map(({ verseId, verse, ang, writer, source, shabadId }, index) => (
-            <li key={verseId} value={index} onClick={() => onClick(shabadId, verseId)}>
-              <div className="search-list span-color">
-                <a className="panktee">
-                  <span className="span-color">{`Ang ${ang} `}</span>
-                  <span className="gurmukhi">{verse}</span>
-                  <div className="search-list-footer">{`${writer}, ${source}`}</div>
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
+    <li onClick={() => onClick(shabadId, verseId)}>
+      <div className="search-list span-color">
+        <a className="panktee">
+          <span className="span-color">{`Ang ${ang} `}</span>
+          <span className="gurmukhi">{verse}</span>
+          <div className="search-list-footer">{`${writer}, ${source}`}</div>
+        </a>
       </div>
-    </div>
+    </li>
   );
 };
 
 SearchResults.propTypes = {
-  verses: PropTypes.any,
+  ang: PropTypes.number,
   onClick: PropTypes.func,
+  shabadId: PropTypes.number,
+  source: PropTypes.string,
+  verse: PropTypes.string,
+  verseId: PropTypes.number,
+  writer: PropTypes.string,
 };
 
 export default SearchResults;

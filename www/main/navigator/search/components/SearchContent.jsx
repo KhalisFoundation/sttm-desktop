@@ -21,7 +21,7 @@ function SearchContent() {
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
-    console.log(keyboardOpenStatus);
+    // console.log(keyboardOpenStatus);
   };
 
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
@@ -30,7 +30,6 @@ function SearchContent() {
   };
 
   const mapVerseItems = searchedShabadsArray => {
-    // console.log('searchedShabadsArray', searchedShabadsArray);
     return searchedShabadsArray
       ? searchedShabadsArray.map(verse => {
           return {
@@ -80,7 +79,26 @@ function SearchContent() {
         </div>
       </div>
       <div className="search-results">
-        <SearchResults verses={mapVerseItems(searchedShabads)} onClick={changeActiveShabad} />
+        <div className="verse-block">
+          <div className="result-list">
+            <ul>
+              {mapVerseItems(searchedShabads).map(
+                ({ ang, shabadId, source, verse, verseId, writer }) => (
+                  <SearchResults
+                    key={verseId}
+                    ang={ang}
+                    onClick={changeActiveShabad}
+                    shabadId={shabadId}
+                    source={source}
+                    verse={verse}
+                    verseId={verseId}
+                    writer={writer}
+                  />
+                ),
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
