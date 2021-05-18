@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
-import { IconButton, InputBox, FilterDropdown, SearchResultVerse } from '../../../common/sttm-ui';
+import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 
 function SearchContent() {
   const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
-  const { setShabadSelected, setVerseSelected } = useStoreActions(state => state.navigator);
+  const {
+    setShabadSelected,
+    setVerseSelected,
+    setSearchWriter,
+    setSearchRaag,
+    setSearchSource,
+  } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -23,7 +29,7 @@ function SearchContent() {
     setVerseSelected(newSelectedVerse);
   };
 
-  const filterRequiredVerseItems = searchedShabadsArray => {
+  const mapVerseItems = searchedShabadsArray => {
     // console.log('searchedShabadsArray', searchedShabadsArray);
     return searchedShabadsArray
       ? searchedShabadsArray.map(verse => {
@@ -58,26 +64,23 @@ function SearchContent() {
           <span>Filter by </span>
           <FilterDropdown
             title="Writer"
-            onChange={event => console.log(event)}
+            onChange={event => setSearchWriter(event.target.value)}
             optionsObj={writersObj}
           />
           <FilterDropdown
             title="Raag"
-            onChange={event => console.log(event)}
+            onChange={event => setSearchRaag(event.target.value)}
             optionsObj={raagsObj}
           />
           <FilterDropdown
             title="Source"
-            onChange={event => console.log(event)}
+            onChange={event => setSearchSource(event.target.value)}
             optionsObj={sourcesObj}
           />
         </div>
       </div>
       <div className="search-results">
-        <SearchResultVerse
-          verses={filterRequiredVerseItems(searchedShabads)}
-          onClick={changeActiveShabad}
-        />
+        <SearchResults verses={mapVerseItems(searchedShabads)} onClick={changeActiveShabad} />
       </div>
     </div>
   );

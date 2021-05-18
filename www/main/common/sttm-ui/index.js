@@ -5,6 +5,6 @@ export { default as Checkbox } from './checkbox';
 export { default as CustomBgTile } from './custom-tile';
 export { default as InputBox } from './inputbox';
 export { default as IconButton } from './iconbutton';
-export { default as SearchResultVerse } from './search-result-verse';
+export { default as SearchResults } from './search-results';
 export { default as ShabadVerse } from './shabad-verse';
 export { default as FilterDropdown } from './filter-dropdown';

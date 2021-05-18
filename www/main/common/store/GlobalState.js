@@ -55,6 +55,8 @@ const GlobalState = createStore({
     versesHistory: null,
     searchedShabads: [],
     searchSource: 'all',
+    searchRaag: 'ALL',
+    searchWriter: 'ALL',
     currentSelectedVerse: '',
     setSearchQuery: action((state, newSearchQuery) => {
       state.searchQuery = newSearchQuery;
@@ -79,6 +81,12 @@ const GlobalState = createStore({
     }),
     setSearchSource: action((state, newSource) => {
       state.searchSource = newSource;
+    }),
+    setSearchRaag: action((state, newRaag) => {
+      state.searchRaag = newRaag;
+    }),
+    setSearchWriter: action((state, newWriter) => {
+      state.searchWriter = newWriter;
     }),
     setCurrentSelectedVerse: action((state, currentVerse) => {
       state.currentSelectedVerse = currentVerse;

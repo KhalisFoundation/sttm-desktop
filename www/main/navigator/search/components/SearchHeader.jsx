@@ -29,12 +29,11 @@ function SearchHeader() {
     setSelectedLanguage(event.target.value);
   };
   const handleSearchType = event => {
-    setSearchOption(event.target.value);
+    setSearchOption(parseInt(event.target.value, 10));
   };
 
   const handleSearchOption = event => {
-    console.log(event.target.value);
-    setSearchOption(event.target.value);
+    setSearchOption(parseInt(event.target.value, 10));
   };
 
   return (

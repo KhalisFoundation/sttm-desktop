@@ -28,7 +28,7 @@ const ShabadVerse = ({ verses, onClick }) => {
                 {traversedVerse.map(
                   isRead =>
                     isRead === verseId && (
-                      <span>
+                      <span key={verseId}>
                         <i className="fa fa-fw fa-check" />
                       </span>
                     ),

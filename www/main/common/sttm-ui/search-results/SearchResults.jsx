@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SearchResultVerse = ({ verses, onClick }) => {
+const SearchResults = ({ verses, onClick }) => {
   return (
     <div className="verse-block">
       <div className="result-list">
@@ -23,9 +23,9 @@ const SearchResultVerse = ({ verses, onClick }) => {
   );
 };
 
-SearchResultVerse.propTypes = {
+SearchResults.propTypes = {
   verses: PropTypes.any,
   onClick: PropTypes.func,
 };
 
-export default SearchResultVerse;
+export default SearchResults;
