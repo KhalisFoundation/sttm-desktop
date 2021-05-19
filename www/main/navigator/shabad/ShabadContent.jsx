@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useStoreState, useStoreActions } from 'easy-peasy';
+import { useStoreState } from 'easy-peasy';
 import { loadShabad } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
 function ShabadContent() {
   const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
-  const { setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
@@ -13,17 +12,14 @@ function ShabadContent() {
 
   const filterRequiredVerseItems = verses => {
     return verses
-      ? verses.map(verse => {
+      ? verses.map((verse, index) => {
           return {
+            ID: index,
             verseId: verse.ID,
             verse: verse.Gurmukhi,
           };
         })
       : [];
-  };
-
-  const handleVerseClick = currentVerse => {
-    setCurrentSelectedVerse(currentVerse);
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
@@ -41,7 +37,18 @@ function ShabadContent() {
     if (shabadSelected && verseSelected) {
       loadShabad(shabadSelected, verseSelected).then(verses => setActiveShabad(verses));
     }
+    setIsHomeVerse(0);
   }, [verseSelected, shabadSelected]);
+
+  useEffect(() => {
+    filterRequiredVerseItems(activeShabad).forEach(verses => {
+      if (verseSelected === verses.verseId) {
+        setTraversedVerses([verses.verseId]);
+        setActiveVerse({ [verses.ID]: verses.verseId });
+        setIsHomeVerse(verses.ID);
+      }
+    });
+  }, [activeShabad]);
 
   return (
     <div className="shabad-list">
@@ -54,7 +61,6 @@ function ShabadContent() {
                 activeVerse={activeVerse}
                 isHomeVerse={isHomeVerse}
                 lineNumber={index}
-                onClick={handleVerseClick}
                 traversedVerses={traversedVerses}
                 verse={verse}
                 verseId={verseId}
