@@ -6,7 +6,6 @@ const ShabadVerse = ({
   changeHomeVerse,
   isHomeVerse,
   lineNumber,
-  onClick,
   traversedVerses,
   updateTraversedVerse,
   verse,
@@ -49,7 +48,6 @@ const ShabadVerse = ({
       <div
         className="span-color"
         onClick={() => {
-          onClick(verseId);
           updateTraversedVerse(verseId, lineNumber);
         }}
       >
@@ -66,7 +64,6 @@ ShabadVerse.propTypes = {
   changeHomeVerse: PropTypes.func,
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
-  onClick: PropTypes.func,
   traversedVerses: PropTypes.array,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
