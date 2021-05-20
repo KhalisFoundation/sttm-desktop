@@ -52,7 +52,8 @@ const GlobalState = createStore({
     searchOption: 0,
     verseSelected: null,
     shabadSelected: null,
-    versesHistory: null,
+    versesHistory: [],
+    traversedVerses: [],
     searchedShabads: [],
     searchSource: 'all',
     searchRaag: 'ALL',
@@ -75,6 +76,9 @@ const GlobalState = createStore({
     }),
     setVersesHistory: action((state, newHistory) => {
       state.versesHistory = newHistory;
+    }),
+    setTraversedVerses: action((state, newVerses) => {
+      state.traversedVerses = newVerses;
     }),
     setSearchedShabads: action((state, searchResult) => {
       state.searchedShabads = searchResult;

@@ -2,7 +2,7 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 import SearchPane from './search/components/SearchPane';
 import ShabadPane from './shabad/ShabadPane';
-import MiscPane from './misc/Components/MiscPane';
+import MiscPane from './misc/components/MiscPane';
 import ViewerPane from './viewer/ViewerPane';
 
 const Navigator = () => {

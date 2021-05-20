@@ -4,13 +4,16 @@ import banidb from '../../../common/constants/banidb';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 
 function SearchContent() {
-  const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
+  const { selectedLanguage, searchedShabads, versesHistory } = useStoreState(
+    state => state.navigator,
+  );
   const {
     setShabadSelected,
     setVerseSelected,
     setSearchWriter,
     setSearchRaag,
     setSearchSource,
+    setVersesHistory,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -24,7 +27,23 @@ function SearchContent() {
     // console.log(keyboardOpenStatus);
   };
 
-  const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
+  const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
+    const check = versesHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
+    if (check.length === 0) {
+      const updatedHistory = versesHistory;
+      updatedHistory.push({
+        shabadId: newSelectedShabad,
+        verseId: newSelectedVerse,
+        label: newVerse,
+        type: 'shabad',
+        meta: {
+          baniLength: '',
+        },
+        versesRead: [newSelectedVerse],
+        continueFrom: newSelectedVerse,
+      });
+      setVersesHistory(updatedHistory);
+    }
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
   };
