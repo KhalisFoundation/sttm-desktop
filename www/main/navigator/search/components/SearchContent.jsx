@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 
 function SearchContent() {
-  const { selectedLanguage, searchedShabads } = useStoreState(state => state.navigator);
+  const {
+    selectedLanguage,
+    searchedShabads,
+    searchWriter,
+    searchRaag,
+    searchSource,
+  } = useStoreState(state => state.navigator);
   const {
     setShabadSelected,
     setVerseSelected,
@@ -21,12 +27,34 @@ function SearchContent() {
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
-    // console.log(keyboardOpenStatus);
   };
 
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
+  };
+
+  const filters = allSearchedVerses => {
+    let filteredResult = allSearchedVerses;
+    if (searchWriter !== 'ALL') {
+      filteredResult = allSearchedVerses.filter(verse => verse.writer.includes(searchWriter));
+    }
+    //  else if (searchWriter === 'ALL') {
+    //   filteredResult = allSearchedVerses;
+    // }
+    if (searchRaag !== 'ALL') {
+      filteredResult = filteredResult.filter(verse => verse.raag.includes(searchRaag));
+    }
+    //  else if (searchRaag === 'ALL') {
+    //   filteredResult = allSearchedVerses;
+    // }
+    if (searchSource !== 'all') {
+      filteredResult = filteredResult.filter(verse => verse.source.includes(searchSource));
+    }
+    //  else if (searchSource === 'all') {
+    //   filteredResult = allSearchedVerses;
+    // }
+    return filteredResult;
   };
 
   const mapVerseItems = searchedShabadsArray => {
@@ -46,6 +74,12 @@ function SearchContent() {
       : [];
   };
 
+  const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchedShabads))]);
+
+  useEffect(() => {
+    setFilteredShabads(filters(mapVerseItems(searchedShabads)));
+  }, [searchedShabads, searchWriter, searchRaag, searchSource]);
+
   return (
     <div>
       <div className="search-content">
@@ -59,7 +93,7 @@ function SearchContent() {
       </div>
       {/* <GurbaniKeyboard /> */}
       <div className="search-result-controls">
-        <span>{searchedShabads.length ? `${searchedShabads.length} Results` : ''}</span>
+        <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
         <div className="filters">
           <span>Filter by </span>
           <FilterDropdown
@@ -83,7 +117,7 @@ function SearchContent() {
         <div className="verse-block">
           <div className="result-list">
             <ul>
-              {mapVerseItems(searchedShabads).map(
+              {filteredShabads.map(
                 ({ ang, shabadId, source, sourceId, verse, verseId, writer }) => (
                   <SearchResults
                     key={verseId}
