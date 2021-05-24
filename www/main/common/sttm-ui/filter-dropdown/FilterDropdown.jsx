@@ -9,8 +9,11 @@ const FilterDropdown = ({ title, onChange, optionsObj }) => {
     <>
       <select className="select-bani" onChange={onChange}>
         {Object.keys(optionsObj).map(keyName => (
-          <option key={keyName} value={keyName}>
-            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}`)}
+          <option
+            key={keyName}
+            value={i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
+          >
+            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)}
           </option>
         ))}
       </select>

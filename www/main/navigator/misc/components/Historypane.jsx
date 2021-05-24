@@ -14,7 +14,7 @@ function Historypane() {
   versesHistory.forEach(element => {
     versesMarkup.push(
       <p
-        className="gurmukhi"
+        className="history-item gurmukhi"
         key={`history-${element.shabadId}`}
         onClick={() => {
           setShabadSelected(element.shabadId);
