@@ -2,9 +2,12 @@
 import { createStore, action } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../constants';
 import createUserSettingsState from './user-settings/create-user-settings-state';
+import createNavigatorSettingsState from './navigator-settings/create-navigator-settings';
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
 
 const { settings } = require('../../../configs/user-settings.json');
+const navigatorSettings = require('../../../configs/navigator-settings.json');
+
 global.platform = require('../../desktop_scripts');
 
 const GlobalState = createStore({
@@ -47,51 +50,7 @@ const GlobalState = createStore({
       };
     }),
   },
-  navigator: {
-    selectedLanguage: 'gr',
-    searchOption: 0,
-    verseSelected: null,
-    shabadSelected: null,
-    versesHistory: null,
-    searchedShabads: [],
-    searchSource: 'all',
-    searchRaag: 'ALL',
-    searchWriter: 'ALL',
-    currentSelectedVerse: '',
-    setSearchQuery: action((state, newSearchQuery) => {
-      state.searchQuery = newSearchQuery;
-    }),
-    setSelectedLanguage: action((state, language) => {
-      state.selectedLanguage = language;
-    }),
-    setSearchOption: action((state, newSearchOption) => {
-      state.searchOption = newSearchOption;
-    }),
-    setVerseSelected: action((state, newVerse) => {
-      state.verseSelected = newVerse;
-    }),
-    setShabadSelected: action((state, newShabad) => {
-      state.shabadSelected = newShabad;
-    }),
-    setVersesHistory: action((state, newHistory) => {
-      state.versesHistory = newHistory;
-    }),
-    setSearchedShabads: action((state, searchResult) => {
-      state.searchedShabads = searchResult;
-    }),
-    setSearchSource: action((state, newSource) => {
-      state.searchSource = newSource;
-    }),
-    setSearchRaag: action((state, newRaag) => {
-      state.searchRaag = newRaag;
-    }),
-    setSearchWriter: action((state, newWriter) => {
-      state.searchWriter = newWriter;
-    }),
-    setCurrentSelectedVerse: action((state, currentVerse) => {
-      state.currentSelectedVerse = currentVerse;
-    }),
-  },
+  navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
     quickTools: false,
   },

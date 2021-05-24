@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useStoreState } from 'easy-peasy';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import { loadShabad } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
 function ShabadContent() {
   const { verseSelected, shabadSelected } = useStoreState(state => state.navigator);
+  const { setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
@@ -27,6 +28,7 @@ function ShabadContent() {
       setTraversedVerses([...traversedVerses, newTraversedVerse]);
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
+    setCurrentSelectedVerse(newTraversedVerse);
   };
 
   const changeHomeVerse = verseIndex => {

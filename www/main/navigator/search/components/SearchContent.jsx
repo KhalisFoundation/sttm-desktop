@@ -17,6 +17,7 @@ function SearchContent() {
     setSearchWriter,
     setSearchRaag,
     setSearchSource,
+    setCurrentSelectedVerse,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -32,6 +33,7 @@ function SearchContent() {
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
+    setCurrentSelectedVerse(newSelectedVerse);
   };
 
   const filters = allSearchedVerses => {

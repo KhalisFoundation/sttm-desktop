@@ -41,30 +41,36 @@ const Slide = ({ verseObj, themeStyleObj }) => {
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >
-        <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
-          <SlideGurbani
-            gurmukhiString={verseObj.Gurmukhi}
-            larivaar={larivaar}
-            vishraamPlacement={JSON.parse(verseObj.Visraam)}
-            vishraamSource={vishraamSource}
-          />
-        </div>
-        {translationVisibility && <SlideTranslation translationObj={verseObj.Translations} />}
-        {teekaVisibility && <SlideTeeka teekaObj={verseObj.Translations.pu} />}
-        {transliterationVisibility && (
-          <SlideTransliteration transliterationObj={verseObj.Gurmukhi} />
-        )}
-        {displayNextLine && (
-          <div
-            className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-          >
-            <SlideGurbani
-              gurmukhiString={verseObj.Gurmukhi}
-              larivaar={larivaar}
-              vishraamPlacement={JSON.parse(verseObj.Visraam)}
-              vishraamSource={vishraamSource}
-            />
-          </div>
+        {verseObj && (
+          <>
+            <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+              <SlideGurbani
+                gurmukhiString={verseObj.Gurmukhi}
+                larivaar={larivaar}
+                vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                vishraamSource={vishraamSource}
+              />
+            </div>
+            {translationVisibility && (
+              <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
+            )}
+            {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
+            {transliterationVisibility && (
+              <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
+            )}
+            {displayNextLine && (
+              <div
+                className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+              >
+                <SlideGurbani
+                  gurmukhiString={verseObj.Gurmukhi}
+                  larivaar={larivaar}
+                  vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                  vishraamSource={vishraamSource}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </>

@@ -24,6 +24,10 @@ const ViewerState = createStore({
     ...GlobalState.getState().userSettings,
     ...createSettingsActions('userSettings'),
   },
+  navigator: {
+    ...GlobalState.getState().navigator,
+    ...createSettingsActions('navigator'),
+  },
   viewerSettings: {
     quickToolsOpen: true,
     setQuickToolsOpen: action((state, payload) => {
@@ -37,8 +41,8 @@ const ViewerState = createStore({
 
 // Whenever a setting is chagned in GlobalState, call the respective action here as well.
 global.platform.ipc.on('update-viewer-setting', (event, setting) => {
-  const { actionName, payload } = setting;
-  ViewerState.getActions().userSettings[actionName](payload);
+  const { actionName, payload, settingType } = setting;
+  ViewerState.getActions()[settingType][actionName](payload);
 });
 
 export default ViewerState;
