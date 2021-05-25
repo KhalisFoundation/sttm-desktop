@@ -19,6 +19,7 @@ function SearchContent() {
     setSearchRaag,
     setSearchSource,
     setVersesHistory,
+    setCurrentSelectedVerse,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -34,22 +35,25 @@ function SearchContent() {
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
     const check = versesHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
     if (check.length === 0) {
-      const updatedHistory = versesHistory;
-      updatedHistory.push({
-        shabadId: newSelectedShabad,
-        verseId: newSelectedVerse,
-        label: newVerse,
-        type: 'shabad',
-        meta: {
-          baniLength: '',
+      const updatedHistory = [
+        ...versesHistory,
+        {
+          shabadId: newSelectedShabad,
+          verseId: newSelectedVerse,
+          label: newVerse,
+          type: 'shabad',
+          meta: {
+            baniLength: '',
+          },
+          versesRead: [newSelectedVerse],
+          continueFrom: newSelectedVerse,
         },
-        versesRead: [newSelectedVerse],
-        continueFrom: newSelectedVerse,
-      });
+      ];
       setVersesHistory(updatedHistory);
     }
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
+    setCurrentSelectedVerse(newSelectedVerse);
   };
 
   const filters = allSearchedVerses => {

@@ -14,7 +14,7 @@ function MiscFooter() {
   };
   // Event Handlers
   const ClearHistory = () => {
-    setGlobalStates.setVersesHistory(null);
+    // setGlobalStates.setVersesHistory([]);
   };
   return (
     <div className="misc-footer">

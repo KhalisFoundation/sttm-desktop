@@ -7,12 +7,12 @@ function ShabadContent() {
   const { verseSelected, shabadSelected, versesHistory, traversedVerses } = useStoreState(
     state => state.navigator,
   );
-  const { setVersesHistory, setTraversedVerses } = useStoreActions(state => state.navigator);
+  const { setVersesHistory, setTraversedVerses, setCurrentSelectedVerse } = useStoreActions(
+    state => state.navigator,
+  );
   const [activeShabad, setActiveShabad] = useState([]);
   const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
-  // const [traversedVerses, setTraversedVerses] = useState([]);
-  console.log(traversedVerses);
 
   const filterRequiredVerseItems = verses => {
     return verses
@@ -31,12 +31,13 @@ function ShabadContent() {
       const currentIndex = versesHistory.findIndex(
         historyObj => historyObj.shabadId === shabadSelected,
       );
+
       versesHistory[currentIndex].continueFrom = newTraversedVerse;
       versesHistory[currentIndex].versesRead = traversedVerses;
-      setVersesHistory(versesHistory);
       setTraversedVerses([...traversedVerses, newTraversedVerse]);
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
+    setCurrentSelectedVerse(newTraversedVerse);
   };
 
   const changeHomeVerse = verseIndex => {

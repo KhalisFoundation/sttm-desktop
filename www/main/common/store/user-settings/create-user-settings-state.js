@@ -23,6 +23,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           payload,
           oldValue,
           actionName: stateFuncName,
+          settingType: 'userSettings',
         });
       }
 
@@ -32,6 +33,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           payload,
           oldValue,
           actionName: stateFuncName,
+          settingType: 'userSettings',
         });
       }
 
