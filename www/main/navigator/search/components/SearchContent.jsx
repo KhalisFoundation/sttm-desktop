@@ -10,6 +10,7 @@ function SearchContent() {
     searchWriter,
     searchRaag,
     searchSource,
+    versesHistory,
   } = useStoreState(state => state.navigator);
   const {
     setShabadSelected,
@@ -17,6 +18,7 @@ function SearchContent() {
     setSearchWriter,
     setSearchRaag,
     setSearchSource,
+    setVersesHistory,
     setCurrentSelectedVerse,
   } = useStoreActions(state => state.navigator);
 
@@ -30,7 +32,25 @@ function SearchContent() {
     setKeyboardOpenStatus(!keyboardOpenStatus);
   };
 
-  const changeActiveShabad = (newSelectedShabad, newSelectedVerse) => {
+  const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
+    const check = versesHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
+    if (check.length === 0) {
+      const updatedHistory = [
+        ...versesHistory,
+        {
+          shabadId: newSelectedShabad,
+          verseId: newSelectedVerse,
+          label: newVerse,
+          type: 'shabad',
+          meta: {
+            baniLength: '',
+          },
+          versesRead: [newSelectedVerse],
+          continueFrom: newSelectedVerse,
+        },
+      ];
+      setVersesHistory(updatedHistory);
+    }
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
     setCurrentSelectedVerse(newSelectedVerse);

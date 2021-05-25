@@ -1,4 +1,3 @@
-import { useStoreActions } from 'easy-peasy';
 import { remote } from 'electron';
 import React, { useState } from 'react';
 
@@ -6,7 +5,7 @@ const { i18n } = remote.require('./app');
 
 function MiscFooter() {
   // For Global States
-  const setGlobalStates = useStoreActions(state => state.navigator);
+  // const setGlobalStates = useStoreActions(state => state.navigator);
   // For shortcut tray
   const [shortcutOpen, setShortcutOpen] = useState(true);
   const HandleChange = () => {
@@ -14,7 +13,7 @@ function MiscFooter() {
   };
   // Event Handlers
   const ClearHistory = () => {
-    setGlobalStates.setVersesHistory(null);
+    // setGlobalStates.setVersesHistory([]);
   };
   return (
     <div className="misc-footer">

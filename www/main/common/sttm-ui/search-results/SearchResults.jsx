@@ -32,7 +32,7 @@ const SearchResults = ({ ang, onClick, shabadId, source, sourceId, verse, verseI
   };
 
   return (
-    <li onClick={() => onClick(shabadId, verseId)}>
+    <li onClick={() => onClick(shabadId, verseId, verse)}>
       <div className={`search-list ${getBorderColorClass(sourceId)}`}>
         <a className="panktee">
           {ang !== null && (
