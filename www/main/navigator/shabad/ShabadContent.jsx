@@ -7,9 +7,7 @@ function ShabadContent() {
   const { verseSelected, shabadSelected, versesHistory, traversedVerses } = useStoreState(
     state => state.navigator,
   );
-  const { setVersesHistory, setTraversedVerses, setCurrentSelectedVerse } = useStoreActions(
-    state => state.navigator,
-  );
+  const { setTraversedVerses, setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
