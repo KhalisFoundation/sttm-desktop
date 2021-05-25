@@ -4,10 +4,16 @@ import { loadShabad } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
 function ShabadContent() {
-  const { verseSelected, shabadSelected, versesHistory, traversedVerses } = useStoreState(
+  const {
+    verseSelected,
+    shabadSelected,
+    versesHistory,
+    traversedVerses,
+    isEmptySlide,
+  } = useStoreState(state => state.navigator);
+  const { setTraversedVerses, setCurrentSelectedVerse, setIsEmptySlide } = useStoreActions(
     state => state.navigator,
   );
-  const { setTraversedVerses, setCurrentSelectedVerse } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
@@ -36,6 +42,9 @@ function ShabadContent() {
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     setCurrentSelectedVerse(newTraversedVerse);
+    if (isEmptySlide === true) {
+      setIsEmptySlide(false);
+    }
   };
 
   const changeHomeVerse = verseIndex => {

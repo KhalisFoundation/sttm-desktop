@@ -29,7 +29,7 @@ const ViewerState = createStore({
     ...createSettingsActions('navigator'),
   },
   viewerSettings: {
-    quickToolsOpen: true,
+    quickToolsOpen: false,
     setQuickToolsOpen: action((state, payload) => {
       return {
         ...state,

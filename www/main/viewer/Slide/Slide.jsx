@@ -8,7 +8,7 @@ import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import QuickTools from './QuickTools';
 
-const Slide = ({ verseObj, themeStyleObj }) => {
+const Slide = ({ verseObj, isWaheguruSlide, themeStyleObj }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -35,6 +35,8 @@ const Slide = ({ verseObj, themeStyleObj }) => {
     return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
   };
 
+  console.log(verseObj, isWaheguruSlide);
+
   return (
     <>
       <QuickTools />
@@ -43,32 +45,46 @@ const Slide = ({ verseObj, themeStyleObj }) => {
       >
         {verseObj && (
           <>
-            <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
-              <SlideGurbani
-                gurmukhiString={verseObj.Gurmukhi}
-                larivaar={larivaar}
-                vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                vishraamSource={vishraamSource}
-              />
-            </div>
-            {translationVisibility && (
-              <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
-            )}
-            {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
-            {transliterationVisibility && (
-              <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
-            )}
-            {displayNextLine && (
-              <div
-                className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-              >
+            {isWaheguruSlide ? (
+              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
                 <SlideGurbani
                   gurmukhiString={verseObj.Gurmukhi}
-                  larivaar={larivaar}
-                  vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                  vishraamSource={vishraamSource}
+                  isWaheguruSlide={isWaheguruSlide}
+                  larivaar={null}
+                  vishraamPlacement={null}
+                  vishraamSource={null}
                 />
               </div>
+            ) : (
+              <>
+                <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+                  <SlideGurbani
+                    gurmukhiString={verseObj.Gurmukhi}
+                    larivaar={larivaar}
+                    vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                    vishraamSource={vishraamSource}
+                  />
+                </div>
+                {translationVisibility && (
+                  <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
+                )}
+                {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
+                {transliterationVisibility && (
+                  <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
+                )}
+                {displayNextLine && (
+                  <div
+                    className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+                  >
+                    <SlideGurbani
+                      gurmukhiString={verseObj.Gurmukhi}
+                      larivaar={larivaar}
+                      vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                      vishraamSource={vishraamSource}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
@@ -79,6 +95,7 @@ const Slide = ({ verseObj, themeStyleObj }) => {
 
 Slide.propTypes = {
   verseObj: PropTypes.object,
+  isWaheguruSlide: PropTypes.bool,
   themeStyleObj: PropTypes.object,
 };
 

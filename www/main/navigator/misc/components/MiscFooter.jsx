@@ -1,9 +1,12 @@
 import { remote } from 'electron';
 import React, { useState } from 'react';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const { i18n } = remote.require('./app');
 
 function MiscFooter() {
+  const { isEmptySlide, isWaheguruSlide } = useStoreState(state => state.navigator);
+  const { setIsEmptySlide, setIsWaheguruSlide } = useStoreActions(state => state.navigator);
   // For Global States
   // const setGlobalStates = useStoreActions(state => state.navigator);
   // For shortcut tray
@@ -11,10 +14,24 @@ function MiscFooter() {
   const HandleChange = () => {
     setShortcutOpen(!shortcutOpen);
   };
+
   // Event Handlers
   const ClearHistory = () => {
     // setGlobalStates.setVersesHistory([]);
   };
+
+  const openWaheguruSlide = () => {
+    if (isWaheguruSlide === false) {
+      setIsWaheguruSlide(true);
+    }
+  };
+
+  const openBlankViewer = () => {
+    if (isEmptySlide === false) {
+      setIsEmptySlide(true);
+    }
+  };
+
   return (
     <div className="misc-footer">
       <div className="clear-pane">
@@ -32,8 +49,12 @@ function MiscFooter() {
       <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
         <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}</button>
         <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}</button>
-        <button className="gurmukhi tray-item-icon">vwihgurU</button>
-        <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.BLANK`)}</button>
+        <button className="gurmukhi tray-item-icon" onClick={() => openWaheguruSlide()}>
+          vwihgurU
+        </button>
+        <button className="tray-item-icon" onClick={() => openBlankViewer()}>
+          {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+        </button>
       </div>
     </div>
   );

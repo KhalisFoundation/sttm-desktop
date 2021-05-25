@@ -11,6 +11,7 @@ function SearchContent() {
     searchRaag,
     searchSource,
     versesHistory,
+    isEmptySlide,
   } = useStoreState(state => state.navigator);
   const {
     setShabadSelected,
@@ -20,6 +21,7 @@ function SearchContent() {
     setSearchSource,
     setVersesHistory,
     setCurrentSelectedVerse,
+    setIsEmptySlide,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -54,6 +56,9 @@ function SearchContent() {
     setShabadSelected(newSelectedShabad);
     setVerseSelected(newSelectedVerse);
     setCurrentSelectedVerse(newSelectedVerse);
+    if (isEmptySlide === true) {
+      setIsEmptySlide(false);
+    }
   };
 
   const filters = allSearchedVerses => {

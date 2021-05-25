@@ -6,7 +6,9 @@ import { loadVerse } from '../../navigator/utils';
 const themes = require('../../../../www/configs/themes.json');
 
 function ShabadDeck() {
-  const { shabadSelected, currentSelectedVerse } = useStoreState(state => state.navigator);
+  const { shabadSelected, currentSelectedVerse, isEmptySlide, isWaheguruSlide } = useStoreState(
+    state => state.navigator,
+  );
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState(null);
 
@@ -32,16 +34,30 @@ function ShabadDeck() {
   };
 
   useEffect(() => {
-    if (currentSelectedVerse) {
+    if (currentSelectedVerse && !isEmptySlide) {
       loadVerse(shabadSelected, currentSelectedVerse).then(result =>
         result.map(activeRes => setActiveVerse(activeRes)),
       );
+    } else {
+      setActiveVerse(null);
     }
-  }, [currentSelectedVerse]);
+  }, [currentSelectedVerse, isEmptySlide]);
+
+  useEffect(() => {
+    if (isWaheguruSlide === true) {
+      setActiveVerse({
+        Gurmukhi: 'vwihgurU',
+      });
+    }
+  }, [isWaheguruSlide]);
 
   return (
     <div className="shabad-deck" style={applyTheme()}>
-      <Slide verseObj={activeVerse} themeStyleObj={getCurrentThemeInstance()} />
+      <Slide
+        verseObj={activeVerse}
+        isWaheguruSlide={isWaheguruSlide}
+        themeStyleObj={getCurrentThemeInstance()}
+      />
     </div>
   );
 }
