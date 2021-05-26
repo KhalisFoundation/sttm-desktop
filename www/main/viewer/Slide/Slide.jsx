@@ -8,7 +8,7 @@ import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import QuickTools from './QuickTools';
 
-const Slide = ({ verseObj, isWaheguruSlide, themeStyleObj }) => {
+const Slide = ({ verseObj, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -35,15 +35,13 @@ const Slide = ({ verseObj, isWaheguruSlide, themeStyleObj }) => {
     return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
   };
 
-  console.log(verseObj, isWaheguruSlide);
-
   return (
     <>
       <QuickTools />
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >
-        {verseObj && (
+        {verseObj && !isEmptySlide && (
           <>
             {isWaheguruSlide ? (
               <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
@@ -96,6 +94,7 @@ const Slide = ({ verseObj, isWaheguruSlide, themeStyleObj }) => {
 Slide.propTypes = {
   verseObj: PropTypes.object,
   isWaheguruSlide: PropTypes.bool,
+  isEmptySlide: PropTypes.bool,
   themeStyleObj: PropTypes.object,
 };
 

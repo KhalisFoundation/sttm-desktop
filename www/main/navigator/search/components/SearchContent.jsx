@@ -12,6 +12,10 @@ function SearchContent() {
     searchSource,
     versesHistory,
     isEmptySlide,
+    isWaheguruSlide,
+    shabadSelected,
+    verseSelected,
+    currentSelectedVerse,
   } = useStoreState(state => state.navigator);
   const {
     setShabadSelected,
@@ -22,6 +26,7 @@ function SearchContent() {
     setVersesHistory,
     setCurrentSelectedVerse,
     setIsEmptySlide,
+    setIsWaheguruSlide,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -53,10 +58,19 @@ function SearchContent() {
       ];
       setVersesHistory(updatedHistory);
     }
-    setShabadSelected(newSelectedShabad);
-    setVerseSelected(newSelectedVerse);
-    setCurrentSelectedVerse(newSelectedVerse);
-    if (isEmptySlide === true) {
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (shabadSelected !== newSelectedShabad) {
+      setShabadSelected(newSelectedShabad);
+    }
+    if (verseSelected !== newSelectedVerse) {
+      setVerseSelected(newSelectedVerse);
+    }
+    if (currentSelectedVerse !== newSelectedVerse) {
+      setCurrentSelectedVerse(newSelectedVerse);
+    }
+    if (isEmptySlide) {
       setIsEmptySlide(false);
     }
   };

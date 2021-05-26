@@ -21,13 +21,13 @@ function MiscFooter() {
   };
 
   const openWaheguruSlide = () => {
-    if (isWaheguruSlide === false) {
+    if (!isWaheguruSlide) {
       setIsWaheguruSlide(true);
     }
   };
 
   const openBlankViewer = () => {
-    if (isEmptySlide === false) {
+    if (!isEmptySlide) {
       setIsEmptySlide(true);
     }
   };

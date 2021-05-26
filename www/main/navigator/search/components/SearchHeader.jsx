@@ -26,7 +26,9 @@ function SearchHeader() {
     } else {
       setSearchOption(0);
     }
-    setSelectedLanguage(event.target.value);
+    if (selectedLanguage !== event.target.value) {
+      setSelectedLanguage(event.target.value);
+    }
   };
   const handleSearchType = event => {
     setSearchOption(parseInt(event.target.value, 10));

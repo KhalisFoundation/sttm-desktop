@@ -34,28 +34,27 @@ function ShabadDeck() {
   };
 
   useEffect(() => {
-    if (currentSelectedVerse && !isEmptySlide) {
+    if (currentSelectedVerse && !isEmptySlide && !isWaheguruSlide) {
       loadVerse(shabadSelected, currentSelectedVerse).then(result =>
         result.map(activeRes => setActiveVerse(activeRes)),
       );
-    } else {
+    }
+    if (isEmptySlide && !isWaheguruSlide) {
       setActiveVerse(null);
     }
-  }, [currentSelectedVerse, isEmptySlide]);
-
-  useEffect(() => {
-    if (isWaheguruSlide === true) {
+    if (isWaheguruSlide) {
       setActiveVerse({
         Gurmukhi: 'vwihgurU',
       });
     }
-  }, [isWaheguruSlide]);
+  }, [isWaheguruSlide, currentSelectedVerse, isEmptySlide]);
 
   return (
     <div className="shabad-deck" style={applyTheme()}>
       <Slide
         verseObj={activeVerse}
         isWaheguruSlide={isWaheguruSlide}
+        isEmptySlide={isEmptySlide}
         themeStyleObj={getCurrentThemeInstance()}
       />
     </div>
