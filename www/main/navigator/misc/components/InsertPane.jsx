@@ -1,19 +1,45 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { remote } from 'electron';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
 function InsertPane() {
+  const {
+    announcementString,
+    isAnnouncementSlide,
+    announcementGurmukhi,
+    isEmptySlide,
+    isWaheguruSlide,
+  } = useStoreState(state => state.navigator);
+  const {
+    setAnnouncementString,
+    setIsAnnouncementSlide,
+    setAnnouncementGurmukhi,
+    setIsEmptySlide,
+    setIsWaheguruSlide,
+  } = useStoreActions(state => state.navigator);
+
   const { i18n } = remote.require('./app');
-  const [isgurmukhi, setIsGurmukhi] = useState(false);
   const inputRef = useRef(null);
   const gurus = insertSlide.dropdownStrings;
 
   const addAnnouncement = () => {
-    console.log(inputRef.current.value);
+    if (isEmptySlide) {
+      setIsEmptySlide(false);
+    }
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (!isAnnouncementSlide) {
+      setIsAnnouncementSlide(true);
+    }
+    if (announcementString !== inputRef.current.value) {
+      setAnnouncementString(inputRef.current.value);
+    }
   };
 
-  const HandleChange = () => {
-    setIsGurmukhi(!isgurmukhi);
+  const HandleChange = event => {
+    setAnnouncementGurmukhi(event.target.checked);
   };
 
   return (
@@ -56,16 +82,15 @@ function InsertPane() {
               id="announcement-language"
               name="announcement-language"
               type="checkbox"
-              value="gurmukhi"
-              onClick={HandleChange}
+              onChange={HandleChange}
             />
             <label htmlFor="announcement-language" />
           </div>
         </div>
         <textarea
-          className={`${isgurmukhi ? 'gurmukhi' : ''} announcement-text`}
+          className={`${announcementGurmukhi ? 'gurmukhi' : ''} announcement-text`}
           placeholder={
-            !isgurmukhi
+            !announcementGurmukhi
               ? i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')
               : i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI')
           }

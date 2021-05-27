@@ -241,6 +241,12 @@
     }
   }
 
+  .history-results {
+    .history-item:hover {
+      background-color: $statusbar-bg;
+    }
+  }
+
   #footer {
     background-color: $statusbar-bg;
 

@@ -12,5 +12,8 @@
   "activeShabadId": null,
   "activeVerseId": "",
   "isEmptySlide": true,
-  "isWaheguruSlide": false
+  "isWaheguruSlide": false,
+  "isAnnouncementSlide": false,
+  "announcementGurmukhi": false,
+  "announcementString": ""
 }

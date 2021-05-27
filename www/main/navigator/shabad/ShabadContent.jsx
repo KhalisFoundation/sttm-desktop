@@ -12,6 +12,7 @@ function ShabadContent() {
     homeVerse,
     isEmptySlide,
     isWaheguruSlide,
+    isAnnouncementSlide,
     activeVerseId,
   } = useStoreState(state => state.navigator);
 
@@ -21,8 +22,8 @@ function ShabadContent() {
     setIsEmptySlide,
     setIsWaheguruSlide,
     setHomeVerse,
+    setIsAnnouncementSlide,
   } = useStoreActions(state => state.navigator);
-
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
 
@@ -41,6 +42,9 @@ function ShabadContent() {
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
+    }
+    if (isAnnouncementSlide) {
+      setIsAnnouncementSlide(false);
     }
     if (isEmptySlide) {
       setIsEmptySlide(false);
