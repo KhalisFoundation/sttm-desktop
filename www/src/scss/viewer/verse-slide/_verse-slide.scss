@@ -17,6 +17,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .gurmukhi-announcement-slide {
+    @extend .gurmukhi-vaak-thick;
+    line-height: 1.15em;
+  }
 }
 
 .padchhed span {

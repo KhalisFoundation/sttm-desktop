@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 import anvaad from 'anvaad-js';
@@ -7,33 +7,38 @@ const SlideTransliteration = ({ gurmukhiString }) => {
   const { transliterationLanguage, transliterationFontSize } = useStoreState(
     state => state.userSettings,
   );
+  const [transliterationString, setTransliterationString] = useState(null);
 
-  const getTransliteration = () => {
-    let transliteration;
+  const getTransliteration = gurmukhi => {
     switch (transliterationLanguage) {
       case 'English':
-        transliteration = anvaad.translit(gurmukhiString);
+        setTransliterationString(anvaad.translit(gurmukhi));
         break;
       case 'Shahmukhi':
-        transliteration = anvaad.translit(gurmukhiString || '', 'shahmukhi');
+        setTransliterationString(anvaad.translit(gurmukhi || '', 'shahmukhi'));
         break;
       case 'Devanagari':
-        transliteration = anvaad.translit(gurmukhiString || '', 'devnagri');
+        setTransliterationString(anvaad.translit(gurmukhi || '', 'devnagri'));
         break;
       default:
-        transliteration = '';
+        setTransliterationString(null);
         break;
     }
-    return transliteration;
   };
 
+  useEffect(() => {
+    getTransliteration(gurmukhiString);
+  }, [gurmukhiString]);
+
   return (
-    <div
-      className={`slide-transliteration language-${transliterationLanguage}`}
-      style={{ fontSize: `${transliterationFontSize * 3}px` }}
-    >
-      {getTransliteration()}
-    </div>
+    transliterationString && (
+      <div
+        className={`slide-transliteration language-${transliterationLanguage}`}
+        style={{ fontSize: `${transliterationFontSize * 3}px` }}
+      >
+        {transliterationString}
+      </div>
+    )
   );
 };
 

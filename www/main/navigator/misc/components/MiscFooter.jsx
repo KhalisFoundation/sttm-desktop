@@ -5,10 +5,16 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 const { i18n } = remote.require('./app');
 
 function MiscFooter() {
-  const { isEmptySlide, isWaheguruSlide } = useStoreState(state => state.navigator);
-  const { setIsEmptySlide, setIsWaheguruSlide, setVerseHistory } = useStoreActions(
+  const { isEmptySlide, isWaheguruSlide, isMoolMantraSlide, isAnnouncementSlide } = useStoreState(
     state => state.navigator,
   );
+  const {
+    setIsEmptySlide,
+    setIsWaheguruSlide,
+    setVerseHistory,
+    setIsMoolMantraSlide,
+    setIsAnnouncementSlide,
+  } = useStoreActions(state => state.navigator);
   // For Global States
   // const navigatorState = useStoreActions(state => state.navigator);
   // For shortcut tray
@@ -26,12 +32,42 @@ function MiscFooter() {
     if (isEmptySlide) {
       setIsEmptySlide(false);
     }
+    if (isAnnouncementSlide) {
+      setIsAnnouncementSlide(false);
+    }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
     if (!isWaheguruSlide) {
       setIsWaheguruSlide(true);
     }
   };
 
+  const openMoolMantraSlide = () => {
+    if (isEmptySlide) {
+      setIsEmptySlide(false);
+    }
+    if (isAnnouncementSlide) {
+      setIsAnnouncementSlide(false);
+    }
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (!isMoolMantraSlide) {
+      setIsMoolMantraSlide(true);
+    }
+  };
+
   const openBlankViewer = () => {
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (isAnnouncementSlide) {
+      setIsAnnouncementSlide(false);
+    }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
     if (!isEmptySlide) {
       setIsEmptySlide(true);
     }
@@ -53,11 +89,13 @@ function MiscFooter() {
       </div>
       <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
         <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}</button>
-        <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}</button>
-        <button className="gurmukhi tray-item-icon" onClick={() => openWaheguruSlide()}>
+        <button className="tray-item-icon" onClick={openMoolMantraSlide}>
+          {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
+        </button>
+        <button className="gurmukhi tray-item-icon" onClick={openWaheguruSlide}>
           vwihgurU
         </button>
-        <button className="tray-item-icon" onClick={() => openBlankViewer()}>
+        <button className="tray-item-icon" onClick={openBlankViewer}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
       </div>

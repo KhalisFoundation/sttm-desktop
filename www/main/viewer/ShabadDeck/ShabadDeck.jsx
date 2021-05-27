@@ -11,6 +11,7 @@ function ShabadDeck() {
     activeVerseId,
     isEmptySlide,
     isWaheguruSlide,
+    isMoolMantraSlide,
     isAnnouncementSlide,
   } = useStoreState(state => state.navigator);
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
@@ -50,6 +51,7 @@ function ShabadDeck() {
       <Slide
         verseObj={activeVerse}
         isWaheguruSlide={isWaheguruSlide}
+        isMoolMantraSlide={isMoolMantraSlide}
         isEmptySlide={isEmptySlide}
         isAnnouncementSlide={isAnnouncementSlide}
         themeStyleObj={getCurrentThemeInstance()}

@@ -9,7 +9,14 @@ import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
 import QuickTools from './QuickTools';
 
-const Slide = ({ verseObj, isAnnouncementSlide, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
+const Slide = ({
+  verseObj,
+  isAnnouncementSlide,
+  isMoolMantraSlide,
+  isWaheguruSlide,
+  isEmptySlide,
+  themeStyleObj,
+}) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -38,20 +45,46 @@ const Slide = ({ verseObj, isAnnouncementSlide, isWaheguruSlide, isEmptySlide, t
 
   return (
     <>
-      <QuickTools isAnnouncementSlide={isAnnouncementSlide} isWaheguruSlide={isWaheguruSlide} />
+      <QuickTools
+        isAnnouncementSlide={isAnnouncementSlide}
+        isWaheguruSlide={isWaheguruSlide}
+        isMoolMantraSlide={isMoolMantraSlide}
+      />
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >
-        {verseObj && !isEmptySlide && (
-          <>
-            {isWaheguruSlide || isAnnouncementSlide ? (
-              <SlideAnnouncement
-                isWaheguruSlide={isWaheguruSlide}
-                isAnnouncementSlide={isAnnouncementSlide}
-              />
-            ) : (
-              <>
-                <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+        {(isWaheguruSlide || isAnnouncementSlide || isEmptySlide || isMoolMantraSlide) && (
+          <SlideAnnouncement
+            isWaheguruSlide={isWaheguruSlide}
+            isMoolMantraSlide={isMoolMantraSlide}
+            isEmptySlide={isEmptySlide}
+          />
+        )}
+        {verseObj &&
+          !isEmptySlide &&
+          !isWaheguruSlide &&
+          !isMoolMantraSlide &&
+          !isAnnouncementSlide && (
+            <>
+              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+                <SlideGurbani
+                  gurmukhiString={verseObj.Gurmukhi}
+                  larivaar={larivaar}
+                  vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                  vishraamSource={vishraamSource}
+                />
+              </div>
+              {translationVisibility && (
+                <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
+              )}
+              {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
+              {transliterationVisibility && (
+                <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
+              )}
+              {displayNextLine && (
+                <div
+                  className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+                >
                   <SlideGurbani
                     gurmukhiString={verseObj.Gurmukhi}
                     larivaar={larivaar}
@@ -59,29 +92,9 @@ const Slide = ({ verseObj, isAnnouncementSlide, isWaheguruSlide, isEmptySlide, t
                     vishraamSource={vishraamSource}
                   />
                 </div>
-                {translationVisibility && (
-                  <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
-                )}
-                {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
-                {transliterationVisibility && (
-                  <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
-                )}
-                {displayNextLine && (
-                  <div
-                    className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-                  >
-                    <SlideGurbani
-                      gurmukhiString={verseObj.Gurmukhi}
-                      larivaar={larivaar}
-                      vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                      vishraamSource={vishraamSource}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
       </div>
     </>
   );
@@ -90,6 +103,7 @@ const Slide = ({ verseObj, isAnnouncementSlide, isWaheguruSlide, isEmptySlide, t
 Slide.propTypes = {
   verseObj: PropTypes.object,
   isAnnouncementSlide: PropTypes.bool,
+  isMoolMantraSlide: PropTypes.bool,
   isWaheguruSlide: PropTypes.bool,
   isEmptySlide: PropTypes.bool,
   themeStyleObj: PropTypes.object,

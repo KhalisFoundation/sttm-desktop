@@ -10,6 +10,7 @@ function InsertPane() {
     announcementGurmukhi,
     isEmptySlide,
     isWaheguruSlide,
+    isMoolMantraSlide,
   } = useStoreState(state => state.navigator);
   const {
     setAnnouncementString,
@@ -17,6 +18,7 @@ function InsertPane() {
     setAnnouncementGurmukhi,
     setIsEmptySlide,
     setIsWaheguruSlide,
+    setIsMoolMantraSlide,
   } = useStoreActions(state => state.navigator);
 
   const { i18n } = remote.require('./app');
@@ -30,6 +32,9 @@ function InsertPane() {
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
     }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
     if (!isAnnouncementSlide) {
       setIsAnnouncementSlide(true);
     }
@@ -38,20 +43,44 @@ function InsertPane() {
     }
   };
 
-  const HandleChange = event => {
+  const openWaheguruSlide = () => {
+    if (isEmptySlide) {
+      setIsEmptySlide(false);
+    }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
+    if (!isWaheguruSlide) {
+      setIsWaheguruSlide(true);
+    }
+  };
+
+  const openBlankViewer = () => {
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
+    if (!isEmptySlide) {
+      setIsEmptySlide(true);
+    }
+  };
+
+  const toggleAnnouncementLanguage = event => {
     setAnnouncementGurmukhi(event.target.checked);
   };
 
   return (
     <ul className="list-of-items">
       <li>
-        <a>
+        <a onClick={() => openBlankViewer()}>
           <i className="fa fa-eye-slash list-icon" />
           {i18n.t('INSERT.ADD_EMPTY_SLIDE')}
         </a>
       </li>
       <li>
-        <a>
+        <a onClick={() => openWaheguruSlide()}>
           <i className="fa fa-circle list-icon" />
           {i18n.t('INSERT.ADD_WAHEGURU_SLIDE')}
         </a>
@@ -82,7 +111,7 @@ function InsertPane() {
               id="announcement-language"
               name="announcement-language"
               type="checkbox"
-              onChange={HandleChange}
+              onChange={toggleAnnouncementLanguage}
             />
             <label htmlFor="announcement-language" />
           </div>

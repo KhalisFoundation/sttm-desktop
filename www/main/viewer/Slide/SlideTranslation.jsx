@@ -1,36 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 const SlideTranslation = ({ translationObj }) => {
   const { translationLanguage, translationFontSize } = useStoreState(state => state.userSettings);
+  const [translationString, setTranslationString] = useState(null);
 
   const getTranslation = translations => {
-    let translationLine;
     switch (translationLanguage) {
       case 'English':
-        translationLine = translations.en.bdb;
+        setTranslationString(translations.en.bdb);
         break;
       case 'Spanish':
-        translationLine = translations.es.sn;
+        setTranslationString(translations.es.sn);
         break;
       case 'Hindi':
-        translationLine = (translations.hi && translations.hi.ss) || '';
+        setTranslationString((translations.hi && translations.hi.ss) || null);
         break;
       default:
-        translationLine = '';
+        setTranslationString(null);
         break;
     }
-    return translationLine;
   };
 
+  useEffect(() => {
+    getTranslation(translationObj);
+  }, [translationObj]);
+
   return (
-    <div
-      className={`slide-translation language-${translationLanguage}`}
-      style={{ fontSize: `${translationFontSize * 3}px` }}
-    >
-      {getTranslation(translationObj)}
-    </div>
+    translationString && (
+      <div
+        className={`slide-translation language-${translationLanguage}`}
+        style={{ fontSize: `${translationFontSize * 3}px` }}
+      >
+        {translationString}
+      </div>
+    )
   );
 };
 

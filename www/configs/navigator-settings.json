@@ -11,9 +11,10 @@
   "currentWriter": "ALL",
   "activeShabadId": null,
   "activeVerseId": "",
-  "isEmptySlide": true,
+  "isEmptySlide": false,
   "isWaheguruSlide": false,
   "isAnnouncementSlide": false,
   "announcementGurmukhi": false,
-  "announcementString": ""
+  "announcementString": "",
+  "isMoolMantraSlide": false
 }
