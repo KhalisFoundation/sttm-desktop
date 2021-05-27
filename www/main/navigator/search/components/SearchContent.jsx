@@ -5,26 +5,26 @@ import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../co
 
 function SearchContent() {
   const {
-    selectedLanguage,
-    searchedShabads,
-    searchWriter,
-    searchRaag,
-    searchSource,
-    versesHistory,
+    currentLanguage,
+    searchData,
+    currentWriter,
+    currentRaag,
+    currentSource,
+    verseHistory,
     isEmptySlide,
     isWaheguruSlide,
     shabadSelected,
-    verseSelected,
-    currentSelectedVerse,
+    initialVerseId,
+    activeVerseId,
   } = useStoreState(state => state.navigator);
   const {
     setShabadSelected,
-    setVerseSelected,
-    setSearchWriter,
-    setSearchRaag,
-    setSearchSource,
-    setVersesHistory,
-    setCurrentSelectedVerse,
+    setInitialVerseId,
+    setCurrentWriter,
+    setCurrentRaag,
+    setCurrentSource,
+    setVerseHistory,
+    setActiveVerseId,
     setIsEmptySlide,
     setIsWaheguruSlide,
   } = useStoreActions(state => state.navigator);
@@ -40,10 +40,10 @@ function SearchContent() {
   };
 
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
-    const check = versesHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
+    const check = verseHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
     if (check.length === 0) {
       const updatedHistory = [
-        ...versesHistory,
+        ...verseHistory,
         {
           shabadId: newSelectedShabad,
           verseId: newSelectedVerse,
@@ -56,7 +56,7 @@ function SearchContent() {
           continueFrom: newSelectedVerse,
         },
       ];
-      setVersesHistory(updatedHistory);
+      setVerseHistory(updatedHistory);
     }
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
@@ -64,11 +64,11 @@ function SearchContent() {
     if (shabadSelected !== newSelectedShabad) {
       setShabadSelected(newSelectedShabad);
     }
-    if (verseSelected !== newSelectedVerse) {
-      setVerseSelected(newSelectedVerse);
+    if (initialVerseId !== newSelectedVerse) {
+      setInitialVerseId(newSelectedVerse);
     }
-    if (currentSelectedVerse !== newSelectedVerse) {
-      setCurrentSelectedVerse(newSelectedVerse);
+    if (activeVerseId !== newSelectedVerse) {
+      setActiveVerseId(newSelectedVerse);
     }
     if (isEmptySlide) {
       setIsEmptySlide(false);
@@ -77,22 +77,22 @@ function SearchContent() {
 
   const filters = allSearchedVerses => {
     let filteredResult = allSearchedVerses;
-    if (searchWriter !== 'ALL') {
-      filteredResult = allSearchedVerses.filter(verse => verse.writer.includes(searchWriter));
+    if (currentWriter !== 'ALL') {
+      filteredResult = allSearchedVerses.filter(verse => verse.writer.includes(currentWriter));
     }
-    //  else if (searchWriter === 'ALL') {
+    //  else if (currentWriter === 'ALL') {
     //   filteredResult = allSearchedVerses;
     // }
-    if (searchRaag !== 'ALL') {
-      filteredResult = filteredResult.filter(verse => verse.raag.includes(searchRaag));
+    if (currentRaag !== 'ALL') {
+      filteredResult = filteredResult.filter(verse => verse.raag.includes(currentRaag));
     }
-    //  else if (searchRaag === 'ALL') {
+    //  else if (currentRaag === 'ALL') {
     //   filteredResult = allSearchedVerses;
     // }
-    if (searchSource !== 'all') {
-      filteredResult = filteredResult.filter(verse => verse.source.includes(searchSource));
+    if (currentSource !== 'all') {
+      filteredResult = filteredResult.filter(verse => verse.source.includes(currentSource));
     }
-    //  else if (searchSource === 'all') {
+    //  else if (currentSource === 'all') {
     //   filteredResult = allSearchedVerses;
     // }
     return filteredResult;
@@ -115,18 +115,18 @@ function SearchContent() {
       : [];
   };
 
-  const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchedShabads))]);
+  const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchData))]);
 
   useEffect(() => {
-    setFilteredShabads(filters(mapVerseItems(searchedShabads)));
-  }, [searchedShabads, searchWriter, searchRaag, searchSource]);
+    setFilteredShabads(filters(mapVerseItems(searchData)));
+  }, [searchData, currentWriter, currentRaag, currentSource]);
 
   return (
     <div>
       <div className="search-content">
         <InputBox
           placeholder={'Enter Search term here or ang number'}
-          className={`${selectedLanguage === 'gr' && 'gurmukhi'} mousetrap`}
+          className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
         />
         <div className="input-buttons">
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
@@ -139,17 +139,17 @@ function SearchContent() {
           <span>Filter by </span>
           <FilterDropdown
             title="Writer"
-            onChange={event => setSearchWriter(event.target.value)}
+            onChange={event => setCurrentWriter(event.target.value)}
             optionsObj={writersObj}
           />
           <FilterDropdown
             title="Raag"
-            onChange={event => setSearchRaag(event.target.value)}
+            onChange={event => setCurrentRaag(event.target.value)}
             optionsObj={raagsObj}
           />
           <FilterDropdown
             title="Source"
-            onChange={event => setSearchSource(event.target.value)}
+            onChange={event => setCurrentSource(event.target.value)}
             optionsObj={sourcesObj}
           />
         </div>

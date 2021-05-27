@@ -17,25 +17,25 @@ function SearchHeader() {
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
 
-  const { selectedLanguage } = useStoreState(state => state.navigator);
-  const { setSearchOption, setSelectedLanguage } = useStoreActions(state => state.navigator);
+  const { currentLanguage } = useStoreState(state => state.navigator);
+  const { setCurrentSearchType, setCurrentLanguage } = useStoreActions(state => state.navigator);
 
   const handleLanguageChange = event => {
     if (event.target.value === 'en') {
-      setSearchOption(3);
+      setCurrentSearchType(3);
     } else {
-      setSearchOption(0);
+      setCurrentSearchType(0);
     }
-    if (selectedLanguage !== event.target.value) {
-      setSelectedLanguage(event.target.value);
+    if (currentLanguage !== event.target.value) {
+      setCurrentLanguage(event.target.value);
     }
   };
   const handleSearchType = event => {
-    setSearchOption(parseInt(event.target.value, 10));
+    setCurrentSearchType(parseInt(event.target.value, 10));
   };
 
   const handleSearchOption = event => {
-    setSearchOption(parseInt(event.target.value, 10));
+    setCurrentSearchType(parseInt(event.target.value, 10));
   };
 
   return (
@@ -48,7 +48,7 @@ function SearchHeader() {
               type="radio"
               value="gr"
               id="gurmukhi-language"
-              checked={selectedLanguage === 'gr'}
+              checked={currentLanguage === 'gr'}
               onChange={handleLanguageChange}
             />
             gurmuKI
@@ -59,14 +59,14 @@ function SearchHeader() {
               value="en"
               id="english-language"
               onChange={handleLanguageChange}
-              checked={selectedLanguage === 'en'}
+              checked={currentLanguage === 'en'}
             />
             English
           </label>
         </div>
       </div>
       <>
-        {selectedLanguage === 'gr' ? (
+        {currentLanguage === 'gr' ? (
           <>
             {width < breakpoint ? (
               <div className="search-select">

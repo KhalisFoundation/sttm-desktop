@@ -4,18 +4,18 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads } from '../../../navigator/utils';
 
 const InputBox = ({ placeholder, className }) => {
-  const { searchOption, searchSource } = useStoreState(state => state.navigator);
-  const { setSearchedShabads } = useStoreActions(state => state.navigator);
+  const { currentSearchType, currentSource } = useStoreState(state => state.navigator);
+  const { setSearchData } = useStoreActions(state => state.navigator);
   const [searchQuery, setSearchQuery] = useState('');
   const handleChange = event => {
     setSearchQuery(event.target.value);
   };
 
   useEffect(() => {
-    searchShabads(searchQuery, searchOption, searchSource).then(rows =>
-      searchQuery ? setSearchedShabads(rows) : setSearchedShabads([]),
+    searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
+      searchQuery ? setSearchData(rows) : setSearchData([]),
     );
-  }, [searchQuery, searchOption, searchSource]);
+  }, [searchQuery, currentSearchType, currentSource]);
 
   return (
     <>

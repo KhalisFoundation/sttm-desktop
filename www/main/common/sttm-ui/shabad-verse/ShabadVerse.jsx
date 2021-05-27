@@ -6,7 +6,7 @@ const ShabadVerse = ({
   changeHomeVerse,
   isHomeVerse,
   lineNumber,
-  traversedVerses,
+  versesRead,
   updateTraversedVerse,
   verse,
   verseId,
@@ -31,7 +31,7 @@ const ShabadVerse = ({
       className={`shabadPane-list ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
       <span className="shabadPane-controls">
-        {traversedVerses.map(
+        {versesRead.map(
           isRead =>
             isRead === verseId && (
               <span key={verseId}>
@@ -64,7 +64,7 @@ ShabadVerse.propTypes = {
   changeHomeVerse: PropTypes.func,
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
-  traversedVerses: PropTypes.array,
+  versesRead: PropTypes.array,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
   verseId: PropTypes.number,

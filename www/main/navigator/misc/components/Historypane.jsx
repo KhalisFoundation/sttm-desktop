@@ -2,24 +2,22 @@ import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 function Historypane() {
-  const navigatorState = useStoreState(state => state.navigator);
-  const { setShabadSelected, setVerseSelected, setTraversedVerses } = useStoreActions(
+  const { verseHistory } = useStoreState(state => state.navigator);
+  const { setShabadSelected, setInitialVerseId, setVersesRead } = useStoreActions(
     state => state.navigator,
   );
 
-  const { versesHistory } = navigatorState;
-
   const versesMarkup = [];
 
-  versesHistory.forEach(element => {
+  verseHistory.forEach(element => {
     versesMarkup.push(
       <p
         className="history-item gurmukhi"
         key={`history-${element.shabadId}`}
         onClick={() => {
           setShabadSelected(element.shabadId);
-          setVerseSelected(element.continueFrom);
-          setTraversedVerses(element.versesRead);
+          setInitialVerseId(element.continueFrom);
+          setVersesRead(element.versesRead);
         }}
       >
         {element.label}
