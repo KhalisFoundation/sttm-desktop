@@ -3,7 +3,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 function Historypane() {
   const { verseHistory } = useStoreState(state => state.navigator);
-  const { setShabadSelected, setInitialVerseId, setVersesRead } = useStoreActions(
+  const { setActiveShabadId, setInitialVerseId, setVersesRead } = useStoreActions(
     state => state.navigator,
   );
 
@@ -15,7 +15,7 @@ function Historypane() {
         className="history-item gurmukhi"
         key={`history-${element.shabadId}`}
         onClick={() => {
-          setShabadSelected(element.shabadId);
+          setActiveShabadId(element.shabadId);
           setInitialVerseId(element.continueFrom);
           setVersesRead(element.versesRead);
         }}

@@ -6,7 +6,7 @@ import { ShabadVerse } from '../../common/sttm-ui';
 function ShabadContent() {
   const {
     initialVerseId,
-    shabadSelected,
+    activeShabadId,
     verseHistory,
     versesRead,
     isEmptySlide,
@@ -41,7 +41,7 @@ function ShabadContent() {
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
-        historyObj => historyObj.shabadId === shabadSelected,
+        historyObj => historyObj.shabadId === activeShabadId,
       );
 
       verseHistory[currentIndex].continueFrom = newTraversedVerse;
@@ -59,11 +59,11 @@ function ShabadContent() {
   };
 
   useEffect(() => {
-    if (shabadSelected && initialVerseId) {
-      loadShabad(shabadSelected, initialVerseId).then(verses => setActiveShabad(verses));
+    if (activeShabadId && initialVerseId) {
+      loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
     }
     setIsHomeVerse(0);
-  }, [initialVerseId, shabadSelected]);
+  }, [initialVerseId, activeShabadId]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {

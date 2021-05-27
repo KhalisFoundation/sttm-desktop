@@ -13,12 +13,12 @@ function SearchContent() {
     verseHistory,
     isEmptySlide,
     isWaheguruSlide,
-    shabadSelected,
+    activeShabadId,
     initialVerseId,
     activeVerseId,
   } = useStoreState(state => state.navigator);
   const {
-    setShabadSelected,
+    setActiveShabadId,
     setInitialVerseId,
     setCurrentWriter,
     setCurrentRaag,
@@ -61,8 +61,8 @@ function SearchContent() {
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
     }
-    if (shabadSelected !== newSelectedShabad) {
-      setShabadSelected(newSelectedShabad);
+    if (activeShabadId !== newSelectedShabad) {
+      setActiveShabadId(newSelectedShabad);
     }
     if (initialVerseId !== newSelectedVerse) {
       setInitialVerseId(newSelectedVerse);

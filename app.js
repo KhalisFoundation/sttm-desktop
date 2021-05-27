@@ -470,6 +470,7 @@ app.on('ready', () => {
       webviewTag: true,
     },
   });
+  mainWindow.openDevTools();
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send('external-display', {

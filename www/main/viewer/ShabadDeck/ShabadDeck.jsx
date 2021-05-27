@@ -6,7 +6,7 @@ import { loadVerse } from '../../navigator/utils';
 const themes = require('../../../../www/configs/themes.json');
 
 function ShabadDeck() {
-  const { shabadSelected, activeVerseId, isEmptySlide, isWaheguruSlide } = useStoreState(
+  const { setActiveShabadId, activeVerseId, isEmptySlide, isWaheguruSlide } = useStoreState(
     state => state.navigator,
   );
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
@@ -35,7 +35,7 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId && !isEmptySlide && !isWaheguruSlide) {
-      loadVerse(shabadSelected, activeVerseId).then(result =>
+      loadVerse(setActiveShabadId, activeVerseId).then(result =>
         result.map(activeRes => setActiveVerse(activeRes)),
       );
     }

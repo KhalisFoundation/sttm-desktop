@@ -1,7 +1,6 @@
 {
   "currentSearchType": 0,
   "initialVerseId": null,
-  "shabadSelected": null,
   "verseHistory": [],
   "versesRead": [],
   "searchData": [],
@@ -9,6 +8,7 @@
   "currentSource": "all",
   "currentRaag": "ALL",
   "currentWriter": "ALL",
+  "activeShabadId": null,
   "activeVerseId": "",
   "isEmptySlide": true,
   "isWaheguruSlide": false
