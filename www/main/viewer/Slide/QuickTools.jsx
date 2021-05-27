@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-eval */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
 global.platform = require('../../desktop_scripts');
 
-const QuickTools = () => {
+const QuickTools = ({ isAnnouncementSlide, isWaheguruSlide }) => {
   const {
     setTranslationVisibility,
     setTeekaVisibility,
@@ -15,6 +16,7 @@ const QuickTools = () => {
     setTranslationFontSize,
     setTeekaFontSize,
     setTransliterationFontSize,
+    setAnnouncementsFontSize,
   } = useStoreActions(state => state.userSettings);
   const {
     translationVisibility,
@@ -24,11 +26,16 @@ const QuickTools = () => {
     translationFontSize,
     teekaFontSize,
     transliterationFontSize,
+    announcementsFontSize,
   } = useStoreState(state => state.userSettings);
   const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
-
-  const quickToolsActions = ['Gurbani', 'Translation', 'Teeka', 'Transliteration'];
+  const [quickToolsActions, setQuickToolsActions] = useState([
+    'Gurbani',
+    'Translation',
+    'Teeka',
+    'Transliteration',
+  ]);
 
   const quickToolsModifiers = [
     {
@@ -59,21 +66,22 @@ const QuickTools = () => {
   };
 
   const getIconClassName = (name, toolName, action) => {
-    if (name === 'visibility' && toolName !== 'Gurbani')
+    if (name === 'visibility' && ['Translation', 'Teeka', 'Transliteration'].includes(toolName))
       return eval(convertToCamelCase(`${toolName}${action}`)) ? 'fa fa-eye' : 'fa fa-eye-slash';
     if (name === 'minus') return 'fa fa-minus-circle';
     if (name === 'plus') return 'fa fa-plus-circle';
     return '';
   };
 
-  const isGurbaniVisibiltyClass = (name, toolName) => {
-    if (name === 'visibility' && toolName === 'Gurbani') return 'quicktool-icons-hidden';
-    return '';
+  const hide = (name, toolName) => {
+    return name === 'visibility' && ['Gurbani', 'Announcements'].includes(toolName)
+      ? 'quicktool-icons-hidden'
+      : '';
   };
 
   const bakeIcons = (toolName, icons) => {
     return icons.map(({ name, actionName }) => (
-      <div key={name} className={`quicktool-icons ${isGurbaniVisibiltyClass(name, toolName)}`}>
+      <div key={name} className={`quicktool-icons ${hide(name, toolName)}`}>
         <i
           className={getIconClassName(name, toolName, actionName)}
           onClick={() => {
@@ -87,6 +95,14 @@ const QuickTools = () => {
     ));
   };
 
+  useEffect(() => {
+    if (isAnnouncementSlide || isWaheguruSlide) {
+      setQuickToolsActions(['Announcements']);
+    } else {
+      setQuickToolsActions(['Gurbani', 'Translation', 'Teeka', 'Transliteration']);
+    }
+  }, [isAnnouncementSlide, isWaheguruSlide]);
+
   return (
     <div className="slide-quicktools">
       <div className="quicktool-header" onClick={() => setQuickToolsOpen(!quickToolsOpen)}>
@@ -94,7 +110,11 @@ const QuickTools = () => {
         <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>
       </div>
       {quickToolsOpen && (
-        <div className="quicktool-body">
+        <div
+          className={`quicktool-body quicktool-${
+            isAnnouncementSlide || isWaheguruSlide ? 'announcement' : 'gurbani'
+          }`}
+        >
           {quickToolsActions.map(name => (
             <div key={name} className="quicktool-item">
               <div>{name}</div>
@@ -105,6 +125,11 @@ const QuickTools = () => {
       )}
     </div>
   );
+};
+
+QuickTools.propTypes = {
+  isAnnouncementSlide: PropTypes.bool,
+  isWaheguruSlide: PropTypes.bool,
 };
 
 export default QuickTools;

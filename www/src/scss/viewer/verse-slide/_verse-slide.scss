@@ -12,6 +12,13 @@
   font-size: 45px;
 }
 
+.slide-announcement {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .padchhed span {
   margin: 0 5px;
 }
@@ -60,8 +67,15 @@
     display: flex;
     flex-direction: column;
     height: 95%;
-    justify-content: space-between;
     padding: 8px;
+  }
+
+  &-gurbani {
+    justify-content: space-between;
+  }
+
+  &-announcement {
+    justify-content: center;
   }
 
   &-item {

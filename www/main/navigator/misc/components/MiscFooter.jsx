@@ -21,6 +21,9 @@ function MiscFooter() {
   };
 
   const openWaheguruSlide = () => {
+    if (isEmptySlide) {
+      setIsEmptySlide(false);
+    }
     if (!isWaheguruSlide) {
       setIsWaheguruSlide(true);
     }

@@ -6,9 +6,10 @@ import SlideTeeka from './SlideTeeka';
 import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
+import SlideAnnouncement from './SlideAnnouncement';
 import QuickTools from './QuickTools';
 
-const Slide = ({ verseObj, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
+const Slide = ({ verseObj, isAnnouncementSlide, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -37,22 +38,17 @@ const Slide = ({ verseObj, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
 
   return (
     <>
-      <QuickTools />
+      <QuickTools isAnnouncementSlide={isAnnouncementSlide} isWaheguruSlide={isWaheguruSlide} />
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >
         {verseObj && !isEmptySlide && (
           <>
-            {isWaheguruSlide ? (
-              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
-                <SlideGurbani
-                  gurmukhiString={verseObj.Gurmukhi}
-                  isWaheguruSlide={isWaheguruSlide}
-                  larivaar={null}
-                  vishraamPlacement={null}
-                  vishraamSource={null}
-                />
-              </div>
+            {isWaheguruSlide || isAnnouncementSlide ? (
+              <SlideAnnouncement
+                isWaheguruSlide={isWaheguruSlide}
+                isAnnouncementSlide={isAnnouncementSlide}
+              />
             ) : (
               <>
                 <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
@@ -93,6 +89,7 @@ const Slide = ({ verseObj, isWaheguruSlide, isEmptySlide, themeStyleObj }) => {
 
 Slide.propTypes = {
   verseObj: PropTypes.object,
+  isAnnouncementSlide: PropTypes.bool,
   isWaheguruSlide: PropTypes.bool,
   isEmptySlide: PropTypes.bool,
   themeStyleObj: PropTypes.object,
