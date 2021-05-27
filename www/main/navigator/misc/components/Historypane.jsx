@@ -1,11 +1,25 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-function Historypane() {
-  const { verseHistory } = useStoreState(state => state.navigator);
-  const { setShabadSelected, setInitialVerseId, setVersesRead } = useStoreActions(
+const Historypane = () => {
+  const { verseHistory, activeShabadId, initialVerseId, versesRead } = useStoreState(
     state => state.navigator,
   );
+  const { setActiveShabadId, setInitialVerseId, setVersesRead } = useStoreActions(
+    state => state.navigator,
+  );
+
+  const openShabadFromHistory = element => {
+    if (element.shabadId !== activeShabadId) {
+      setActiveShabadId(element.shabadId);
+    }
+    if (element.continueFrom !== initialVerseId) {
+      setInitialVerseId(element.continueFrom);
+    }
+    if (element.versesRead !== versesRead) {
+      setVersesRead(element.versesRead);
+    }
+  };
 
   const versesMarkup = [];
 
@@ -15,9 +29,7 @@ function Historypane() {
         className="history-item gurmukhi"
         key={`history-${element.shabadId}`}
         onClick={() => {
-          setShabadSelected(element.shabadId);
-          setInitialVerseId(element.continueFrom);
-          setVersesRead(element.versesRead);
+          openShabadFromHistory(element);
         }}
       >
         {element.label}
@@ -26,6 +38,6 @@ function Historypane() {
   });
 
   return <div className="history-results">{versesMarkup}</div>;
-}
+};
 
 export default Historypane;

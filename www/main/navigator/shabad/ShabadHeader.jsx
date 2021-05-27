@@ -2,14 +2,14 @@ import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 function ShabadHeader() {
-  const { shabadSelected } = useStoreState(state => state.navigator);
-  const { setShabadSelected } = useStoreActions(state => state.navigator);
+  const { activeShabadId } = useStoreState(state => state.navigator);
+  const { setActiveShabadId } = useStoreActions(state => state.navigator);
 
   const navigateVerseLeft = () => {
-    setShabadSelected(shabadSelected - 1);
+    setActiveShabadId(activeShabadId - 1);
   };
   const navigateVerseRight = () => {
-    setShabadSelected(shabadSelected + 1);
+    setActiveShabadId(activeShabadId + 1);
   };
 
   return (

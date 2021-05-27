@@ -6,23 +6,25 @@ import { ShabadVerse } from '../../common/sttm-ui';
 function ShabadContent() {
   const {
     initialVerseId,
-    shabadSelected,
+    activeShabadId,
     verseHistory,
     versesRead,
+    homeVerse,
     isEmptySlide,
     isWaheguruSlide,
     isAnnouncementSlide,
     activeVerseId,
   } = useStoreState(state => state.navigator);
+
   const {
     setVersesRead,
     setActiveVerseId,
     setIsEmptySlide,
     setIsWaheguruSlide,
+    setHomeVerse,
     setIsAnnouncementSlide,
   } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
-  const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
 
   const filterRequiredVerseItems = verses => {
@@ -49,7 +51,7 @@ function ShabadContent() {
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
-        historyObj => historyObj.shabadId === shabadSelected,
+        historyObj => historyObj.shabadId === activeShabadId,
       );
 
       verseHistory[currentIndex].continueFrom = newTraversedVerse;
@@ -63,23 +65,28 @@ function ShabadContent() {
   };
 
   const changeHomeVerse = verseIndex => {
-    setIsHomeVerse(verseIndex);
+    if (homeVerse !== verseIndex) {
+      const currentIndex = verseHistory.findIndex(
+        historyObj => historyObj.shabadId === activeShabadId,
+      );
+      verseHistory[currentIndex].homeVerse = verseIndex;
+      setHomeVerse(verseIndex);
+    }
   };
 
   useEffect(() => {
-    if (shabadSelected && initialVerseId) {
-      loadShabad(shabadSelected, initialVerseId).then(verses => setActiveShabad(verses));
+    if (activeShabadId && initialVerseId) {
+      loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
     }
-    setIsHomeVerse(0);
-  }, [initialVerseId, shabadSelected]);
+  }, [initialVerseId, activeShabadId]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
-        // setVersesRead([verses.verseId]);
+        setVersesRead([...versesRead, verses.verseId]);
         setActiveVerse({ [verses.ID]: verses.verseId });
-        if (isHomeVerse !== verses.ID) {
-          setIsHomeVerse(verses.ID);
+        if (homeVerse !== verses.ID) {
+          setHomeVerse(verses.ID);
         }
       }
     });
@@ -94,7 +101,7 @@ function ShabadContent() {
               <ShabadVerse
                 key={verseId}
                 activeVerse={activeVerse}
-                isHomeVerse={isHomeVerse}
+                isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={versesRead}
                 verse={verse}

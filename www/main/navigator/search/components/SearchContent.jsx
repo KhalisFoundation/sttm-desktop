@@ -13,13 +13,13 @@ function SearchContent() {
     verseHistory,
     isEmptySlide,
     isWaheguruSlide,
-    shabadSelected,
+    activeShabadId,
     initialVerseId,
     activeVerseId,
     isAnnouncementSlide,
   } = useStoreState(state => state.navigator);
   const {
-    setShabadSelected,
+    setActiveShabadId,
     setInitialVerseId,
     setCurrentWriter,
     setCurrentRaag,
@@ -56,6 +56,7 @@ function SearchContent() {
           },
           versesRead: [newSelectedVerse],
           continueFrom: newSelectedVerse,
+          homeVerse: 0,
         },
       ];
       setVerseHistory(updatedHistory);
@@ -66,8 +67,8 @@ function SearchContent() {
     if (isAnnouncementSlide) {
       setIsAnnouncementSlide(false);
     }
-    if (shabadSelected !== newSelectedShabad) {
-      setShabadSelected(newSelectedShabad);
+    if (activeShabadId !== newSelectedShabad) {
+      setActiveShabadId(newSelectedShabad);
     }
     if (initialVerseId !== newSelectedVerse) {
       setInitialVerseId(newSelectedVerse);

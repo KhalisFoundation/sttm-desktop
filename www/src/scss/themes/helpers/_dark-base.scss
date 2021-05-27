@@ -249,6 +249,12 @@
     }
   }
 
+  .history-results {
+    .history-item:hover {
+      background-color: $bg-bright;
+    }
+  }
+
   #footer {
     background-color: $bg-main;
 

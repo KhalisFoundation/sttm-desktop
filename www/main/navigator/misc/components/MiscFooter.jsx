@@ -6,9 +6,11 @@ const { i18n } = remote.require('./app');
 
 function MiscFooter() {
   const { isEmptySlide, isWaheguruSlide } = useStoreState(state => state.navigator);
-  const { setIsEmptySlide, setIsWaheguruSlide } = useStoreActions(state => state.navigator);
+  const { setIsEmptySlide, setIsWaheguruSlide, setVerseHistory } = useStoreActions(
+    state => state.navigator,
+  );
   // For Global States
-  // const setGlobalStates = useStoreActions(state => state.navigator);
+  // const navigatorState = useStoreActions(state => state.navigator);
   // For shortcut tray
   const [shortcutOpen, setShortcutOpen] = useState(true);
   const HandleChange = () => {
@@ -16,8 +18,8 @@ function MiscFooter() {
   };
 
   // Event Handlers
-  const ClearHistory = () => {
-    // setGlobalStates.setVersesHistory([]);
+  const clearHistory = () => {
+    setVerseHistory([]);
   };
 
   const openWaheguruSlide = () => {
@@ -44,7 +46,7 @@ function MiscFooter() {
         >
           <i className={`${shortcutOpen ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
         </div>
-        <a className="clear-history" onClick={ClearHistory}>
+        <a className="clear-history" onClick={clearHistory}>
           <i className="fa fa-history" />
           <span>Clear History</span>
         </a>

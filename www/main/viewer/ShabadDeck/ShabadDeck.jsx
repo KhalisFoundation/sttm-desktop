@@ -7,7 +7,7 @@ const themes = require('../../../../www/configs/themes.json');
 
 function ShabadDeck() {
   const {
-    shabadSelected,
+    activeShabadId,
     activeVerseId,
     isEmptySlide,
     isWaheguruSlide,
@@ -39,7 +39,7 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId) {
-      loadVerse(shabadSelected, activeVerseId).then(result =>
+      loadVerse(activeShabadId, activeVerseId).then(result =>
         result.map(activeRes => setActiveVerse(activeRes)),
       );
     }

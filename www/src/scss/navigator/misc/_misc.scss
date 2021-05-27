@@ -20,6 +20,12 @@ $misc-footer-active: 70px;
   }
   .history-results {
     height: 320px;
+    overflow-y: auto;
+    .history-item {
+      cursor: pointer;
+      margin: 8px 0;
+      padding: 10px;
+    }
   }
   .list-of-items {
     @include flex($fd-value: column, $jc-value: start);
