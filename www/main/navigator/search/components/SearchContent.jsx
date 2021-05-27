@@ -54,6 +54,7 @@ function SearchContent() {
           },
           versesRead: [newSelectedVerse],
           continueFrom: newSelectedVerse,
+          homeVerse: 0,
         },
       ];
       setVerseHistory(updatedHistory);

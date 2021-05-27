@@ -9,15 +9,21 @@ function ShabadContent() {
     activeShabadId,
     verseHistory,
     versesRead,
+    homeVerse,
     isEmptySlide,
     isWaheguruSlide,
     activeVerseId,
   } = useStoreState(state => state.navigator);
-  const { setVersesRead, setActiveVerseId, setIsEmptySlide, setIsWaheguruSlide } = useStoreActions(
-    state => state.navigator,
-  );
+
+  const {
+    setVersesRead,
+    setActiveVerseId,
+    setIsEmptySlide,
+    setIsWaheguruSlide,
+    setHomeVerse,
+  } = useStoreActions(state => state.navigator);
+
   const [activeShabad, setActiveShabad] = useState([]);
-  const [isHomeVerse, setIsHomeVerse] = useState();
   const [activeVerse, setActiveVerse] = useState({});
 
   const filterRequiredVerseItems = verses => {
@@ -55,23 +61,28 @@ function ShabadContent() {
   };
 
   const changeHomeVerse = verseIndex => {
-    setIsHomeVerse(verseIndex);
+    if (homeVerse !== verseIndex) {
+      const currentIndex = verseHistory.findIndex(
+        historyObj => historyObj.shabadId === activeShabadId,
+      );
+      verseHistory[currentIndex].homeVerse = verseIndex;
+      setHomeVerse(verseIndex);
+    }
   };
 
   useEffect(() => {
     if (activeShabadId && initialVerseId) {
       loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
     }
-    setIsHomeVerse(0);
   }, [initialVerseId, activeShabadId]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
-        // setVersesRead([verses.verseId]);
+        setVersesRead([...versesRead, verses.verseId]);
         setActiveVerse({ [verses.ID]: verses.verseId });
-        if (isHomeVerse !== verses.ID) {
-          setIsHomeVerse(verses.ID);
+        if (homeVerse !== verses.ID) {
+          setHomeVerse(verses.ID);
         }
       }
     });
@@ -86,7 +97,7 @@ function ShabadContent() {
               <ShabadVerse
                 key={verseId}
                 activeVerse={activeVerse}
-                isHomeVerse={isHomeVerse}
+                isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={versesRead}
                 verse={verse}
