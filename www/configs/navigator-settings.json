@@ -16,5 +16,7 @@
   "isAnnouncementSlide": false,
   "announcementGurmukhi": false,
   "announcementString": "",
-  "isMoolMantraSlide": false
+  "isMoolMantraSlide": false,
+  "isDhanGuruSlide": false,
+  "dhanGuruString": ""
 }

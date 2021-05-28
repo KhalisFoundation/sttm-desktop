@@ -15,6 +15,7 @@ const Slide = ({
   isMoolMantraSlide,
   isWaheguruSlide,
   isEmptySlide,
+  isDhanGuruSlide,
   themeStyleObj,
 }) => {
   const {
@@ -53,17 +54,23 @@ const Slide = ({
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >
-        {(isWaheguruSlide || isAnnouncementSlide || isEmptySlide || isMoolMantraSlide) && (
+        {(isWaheguruSlide ||
+          isAnnouncementSlide ||
+          isEmptySlide ||
+          isMoolMantraSlide ||
+          isDhanGuruSlide) && (
           <SlideAnnouncement
             isWaheguruSlide={isWaheguruSlide}
             isMoolMantraSlide={isMoolMantraSlide}
             isEmptySlide={isEmptySlide}
+            isDhanGuruSlide={isDhanGuruSlide}
           />
         )}
         {verseObj &&
           !isEmptySlide &&
           !isWaheguruSlide &&
           !isMoolMantraSlide &&
+          !isDhanGuruSlide &&
           !isAnnouncementSlide && (
             <>
               <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
@@ -106,6 +113,7 @@ Slide.propTypes = {
   isMoolMantraSlide: PropTypes.bool,
   isWaheguruSlide: PropTypes.bool,
   isEmptySlide: PropTypes.bool,
+  isDhanGuruSlide: PropTypes.bool,
   themeStyleObj: PropTypes.object,
 };
 

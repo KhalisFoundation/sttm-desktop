@@ -11,6 +11,8 @@ function InsertPane() {
     isEmptySlide,
     isWaheguruSlide,
     isMoolMantraSlide,
+    isDhanGuruSlide,
+    dhanGuruString,
   } = useStoreState(state => state.navigator);
   const {
     setAnnouncementString,
@@ -19,6 +21,8 @@ function InsertPane() {
     setIsEmptySlide,
     setIsWaheguruSlide,
     setIsMoolMantraSlide,
+    setIsDhanGuruSlide,
+    setDhanGuruString,
   } = useStoreActions(state => state.navigator);
 
   const { i18n } = remote.require('./app');
@@ -35,6 +39,9 @@ function InsertPane() {
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
     }
+    if (isDhanGuruSlide) {
+      setIsDhanGuruSlide(false);
+    }
     if (!isAnnouncementSlide) {
       setIsAnnouncementSlide(true);
     }
@@ -50,6 +57,9 @@ function InsertPane() {
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
     }
+    if (isDhanGuruSlide) {
+      setIsDhanGuruSlide(false);
+    }
     if (!isWaheguruSlide) {
       setIsWaheguruSlide(true);
     }
@@ -62,6 +72,9 @@ function InsertPane() {
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
     }
+    if (isDhanGuruSlide) {
+      setIsDhanGuruSlide(false);
+    }
     if (!isEmptySlide) {
       setIsEmptySlide(true);
     }
@@ -69,6 +82,24 @@ function InsertPane() {
 
   const toggleAnnouncementLanguage = event => {
     setAnnouncementGurmukhi(event.target.checked);
+  };
+
+  const addDhanGuruSlide = e => {
+    if (isWaheguruSlide) {
+      setIsWaheguruSlide(false);
+    }
+    if (isMoolMantraSlide) {
+      setIsMoolMantraSlide(false);
+    }
+    if (isEmptySlide) {
+      setIsEmptySlide(false);
+    }
+    if (!isDhanGuruSlide) {
+      setIsDhanGuruSlide(true);
+    }
+    if (dhanGuruString !== e.target.value) {
+      setDhanGuruString(e.target.value);
+    }
   };
 
   return (
@@ -89,8 +120,10 @@ function InsertPane() {
         <a>
           <i className="fa fa-circle-o list-icon" />
           <label>{i18n.t('INSERT.ADD_DHAN_GURU')} </label>
-          <select>
-            <option value=" ">{i18n.t('INSERT.SELECT')}</option>
+          <select onClick={addDhanGuruSlide}>
+            <option value="" disabled>
+              {i18n.t('INSERT.SELECT')}
+            </option>
             {gurus.gurus.map((value, index) => (
               <option value={insertSlide.slideStrings.dhanguruStrings[index]} key={index}>
                 {i18n.t(`INSERT.DHAN_GURU.${value}`)}

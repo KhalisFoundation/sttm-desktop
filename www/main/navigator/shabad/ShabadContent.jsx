@@ -14,6 +14,7 @@ function ShabadContent() {
     isWaheguruSlide,
     isAnnouncementSlide,
     isMoolMantraSlide,
+    isDhanGuruSlide,
     activeVerseId,
   } = useStoreState(state => state.navigator);
 
@@ -25,6 +26,7 @@ function ShabadContent() {
     setHomeVerse,
     setIsAnnouncementSlide,
     setIsMoolMantraSlide,
+    setIsDhanGuruSlide,
   } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -53,6 +55,9 @@ function ShabadContent() {
     }
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
+    }
+    if (isDhanGuruSlide) {
+      setIsDhanGuruSlide(false);
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
