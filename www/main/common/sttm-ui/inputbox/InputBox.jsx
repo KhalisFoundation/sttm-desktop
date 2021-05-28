@@ -15,7 +15,7 @@ const InputBox = ({ placeholder, className }) => {
     searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
       searchQuery ? setSearchData(rows) : setSearchData([]),
     );
-  }, [searchQuery, currentSearchType, currentSource]);
+  }, [searchQuery, currentSearchType]);
 
   return (
     <>

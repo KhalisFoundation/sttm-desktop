@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
+import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 
 function SearchContent() {
@@ -86,29 +87,6 @@ function SearchContent() {
     }
   };
 
-  const filters = allSearchedVerses => {
-    let filteredResult = allSearchedVerses;
-    if (currentWriter !== 'ALL') {
-      filteredResult = allSearchedVerses.filter(verse => verse.writer.includes(currentWriter));
-    }
-    //  else if (currentWriter === 'ALL') {
-    //   filteredResult = allSearchedVerses;
-    // }
-    if (currentRaag !== 'ALL') {
-      filteredResult = filteredResult.filter(verse => verse.raag.includes(currentRaag));
-    }
-    //  else if (currentRaag === 'ALL') {
-    //   filteredResult = allSearchedVerses;
-    // }
-    if (currentSource !== 'all') {
-      filteredResult = filteredResult.filter(verse => verse.source.includes(currentSource));
-    }
-    //  else if (currentSource === 'all') {
-    //   filteredResult = allSearchedVerses;
-    // }
-    return filteredResult;
-  };
-
   const mapVerseItems = searchedShabadsArray => {
     return searchedShabadsArray
       ? searchedShabadsArray.map(verse => {
@@ -129,7 +107,9 @@ function SearchContent() {
   const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchData))]);
 
   useEffect(() => {
-    setFilteredShabads(filters(mapVerseItems(searchData)));
+    setFilteredShabads(
+      filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
+    );
   }, [searchData, currentWriter, currentRaag, currentSource]);
 
   return (
