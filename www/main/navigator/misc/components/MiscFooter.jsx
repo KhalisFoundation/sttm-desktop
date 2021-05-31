@@ -5,15 +5,20 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 const { i18n } = remote.require('./app');
 
 function MiscFooter() {
-  const { isEmptySlide, isWaheguruSlide, isMoolMantraSlide, isAnnouncementSlide } = useStoreState(
-    state => state.navigator,
-  );
+  const {
+    isEmptySlide,
+    isWaheguruSlide,
+    isMoolMantraSlide,
+    isAnnouncementSlide,
+    activeShabadId,
+  } = useStoreState(state => state.navigator);
   const {
     setIsEmptySlide,
     setIsWaheguruSlide,
     setVerseHistory,
     setIsMoolMantraSlide,
     setIsAnnouncementSlide,
+    setActiveShabadId,
   } = useStoreActions(state => state.navigator);
   // For Global States
   // const navigatorState = useStoreActions(state => state.navigator);
@@ -26,6 +31,12 @@ function MiscFooter() {
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
+  };
+
+  const openAnandSahibBhog = () => {
+    if (activeShabadId !== 333375) {
+      setActiveShabadId(333375);
+    }
   };
 
   const openWaheguruSlide = () => {
@@ -88,7 +99,9 @@ function MiscFooter() {
         </a>
       </div>
       <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
-        <button className="tray-item-icon">{i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}</button>
+        <button className="tray-item-icon" onClick={openAnandSahibBhog}>
+          {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
+        </button>
         <button className="tray-item-icon" onClick={openMoolMantraSlide}>
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
