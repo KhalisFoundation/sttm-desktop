@@ -6,9 +6,11 @@ const SlideTeeka = ({ teekaObj }) => {
   const { teekaFontSize } = useStoreState(state => state.userSettings);
 
   return (
-    <div className="slide-teeka" style={{ fontSize: `${teekaFontSize * 3}px` }}>
-      {teekaObj.bdb || teekaObj.ss}
-    </div>
+    (teekaObj.bdb || teekaObj.ss) && (
+      <div className="slide-teeka" style={{ fontSize: `${teekaFontSize * 3}px` }}>
+        {teekaObj.bdb || teekaObj.ss}
+      </div>
+    )
   );
 };
 

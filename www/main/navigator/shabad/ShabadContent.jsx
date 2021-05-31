@@ -63,9 +63,10 @@ function ShabadContent() {
       const currentIndex = verseHistory.findIndex(
         historyObj => historyObj.shabadId === activeShabadId,
       );
-
-      verseHistory[currentIndex].continueFrom = newTraversedVerse;
-      verseHistory[currentIndex].versesRead = versesRead;
+      if (verseHistory[currentIndex]) {
+        verseHistory[currentIndex].continueFrom = newTraversedVerse;
+        verseHistory[currentIndex].versesRead = versesRead;
+      }
       setVersesRead([...versesRead, newTraversedVerse]);
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
@@ -85,9 +86,7 @@ function ShabadContent() {
   };
 
   useEffect(() => {
-    if (activeShabadId && initialVerseId) {
-      loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
-    }
+    loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
   }, [initialVerseId, activeShabadId]);
 
   useEffect(() => {

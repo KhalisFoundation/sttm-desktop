@@ -32,9 +32,9 @@ const ShabadVerse = ({
     >
       <span className="shabadPane-controls">
         {versesRead.map(
-          isRead =>
+          (isRead, index) =>
             isRead === verseId && (
-              <span key={verseId}>
+              <span key={verseId + index}>
                 <i className="fa fa-fw fa-check" />
               </span>
             ),
