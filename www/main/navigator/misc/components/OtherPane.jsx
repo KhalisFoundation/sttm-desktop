@@ -2,6 +2,7 @@ import React from 'react';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
+import { dailyHukamnama } from '../../utils';
 
 const { i18n } = remote.require('./app');
 
@@ -13,6 +14,10 @@ function OtherPane() {
     randomShabad().then(randomId => activeShabadId !== randomId && setActiveShabadId(randomId));
   };
 
+  const openDailyHukamnana = () => {
+    dailyHukamnama(activeShabadId, setActiveShabadId);
+  };
+
   return (
     <ul className="list-of-items">
       <li>
@@ -22,7 +27,7 @@ function OtherPane() {
         </a>
       </li>
       <li>
-        <a>
+        <a onClick={openDailyHukamnana}>
           <i className="fa fa-gavel list-icon" />
           {i18n.t('OTHERS.DAILY_HUKAMNAMA')}
         </a>
