@@ -2,9 +2,12 @@ import React from 'react';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
-import { dailyHukamnama } from '../../utils';
+import { dailyHukamnama, getNotifications, showNotificationsModal } from '../../utils';
+
+const electron = require('electron');
 
 const { i18n } = remote.require('./app');
+const analytics = electron.remote.getGlobal('analytics');
 
 function OtherPane() {
   const { activeShabadId, noActiveVerse } = useStoreState(state => state.navigator);
@@ -19,6 +22,11 @@ function OtherPane() {
     if (!noActiveVerse) {
       setNoActiveVerse(true);
     }
+  };
+
+  const openWhatsNew = () => {
+    analytics.trackEvent('display', 'notifications');
+    getNotifications(null, showNotificationsModal);
   };
 
   return (
@@ -36,7 +44,7 @@ function OtherPane() {
         </a>
       </li>
       <li>
-        <a>
+        <a onClick={openWhatsNew}>
           <i className="fa fa-bell list-icon" />
           {i18n.t('OTHERS.WHATS_NEW')}
         </a>
