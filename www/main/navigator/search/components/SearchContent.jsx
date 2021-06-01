@@ -20,6 +20,7 @@ function SearchContent() {
     isAnnouncementSlide,
     isMoolMantraSlide,
     isDhanGuruSlide,
+    noActiveVerse,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -34,6 +35,7 @@ function SearchContent() {
     setIsMoolMantraSlide,
     setIsAnnouncementSlide,
     setIsDhanGuruSlide,
+    setNoActiveVerse,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -89,6 +91,9 @@ function SearchContent() {
     }
     if (activeVerseId !== newSelectedVerse) {
       setActiveVerseId(newSelectedVerse);
+    }
+    if (noActiveVerse) {
+      setNoActiveVerse(false);
     }
   };
 

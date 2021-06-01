@@ -16,6 +16,7 @@ function ShabadContent() {
     isMoolMantraSlide,
     isDhanGuruSlide,
     activeVerseId,
+    noActiveVerse,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -27,6 +28,7 @@ function ShabadContent() {
     setIsAnnouncementSlide,
     setIsMoolMantraSlide,
     setIsDhanGuruSlide,
+    setNoActiveVerse,
   } = useStoreActions(state => state.navigator);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -59,6 +61,9 @@ function ShabadContent() {
     if (isDhanGuruSlide) {
       setIsDhanGuruSlide(false);
     }
+    if (noActiveVerse) {
+      setNoActiveVerse(false);
+    }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
         historyObj => historyObj.shabadId === activeShabadId,
@@ -80,13 +85,21 @@ function ShabadContent() {
       const currentIndex = verseHistory.findIndex(
         historyObj => historyObj.shabadId === activeShabadId,
       );
-      verseHistory[currentIndex].homeVerse = verseIndex;
+      if (verseHistory[currentIndex]) {
+        verseHistory[currentIndex].homeVerse = verseIndex;
+      }
       setHomeVerse(verseIndex);
     }
   };
 
   useEffect(() => {
-    loadShabad(activeShabadId, initialVerseId).then(verses => setActiveShabad(verses));
+    loadShabad(activeShabadId, initialVerseId).then(verses => {
+      setActiveShabad(verses);
+      if (noActiveVerse) {
+        updateTraversedVerse(verses[0].ID, 0);
+        changeHomeVerse(0);
+      }
+    });
   }, [initialVerseId, activeShabadId]);
 
   useEffect(() => {

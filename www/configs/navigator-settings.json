@@ -18,5 +18,6 @@
   "announcementString": "",
   "isMoolMantraSlide": false,
   "isDhanGuruSlide": false,
-  "dhanGuruString": ""
+  "dhanGuruString": "",
+  "noActiveVerse": true
 }
