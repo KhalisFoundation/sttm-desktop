@@ -3,6 +3,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
+import GurbaniKeyboard from './GurbaniKeyboard';
 
 function SearchContent() {
   const {
@@ -133,7 +134,7 @@ function SearchContent() {
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
         </div>
       </div>
-      {/* <GurbaniKeyboard /> */}
+      {keyboardOpenStatus && <GurbaniKeyboard />}
       <div className="search-result-controls">
         <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
         <div className="filters">

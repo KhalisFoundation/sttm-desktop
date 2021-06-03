@@ -46,7 +46,8 @@ $tag-popular-color: #ce744e;
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
-  'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer';
+  'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
+  'navigator/search/gurmukhi-keyboard';
 
 @import 'utils/utils', 'viewer/viewer';
 
