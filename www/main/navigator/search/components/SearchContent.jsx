@@ -3,9 +3,9 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
-import GurbaniKeyboard from './GurbaniKeyboard';
+import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 
-function SearchContent() {
+const SearchContent = () => {
   const {
     currentLanguage,
     searchData,
@@ -22,6 +22,7 @@ function SearchContent() {
     isMoolMantraSlide,
     isDhanGuruSlide,
     noActiveVerse,
+    searchQuery,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -134,7 +135,9 @@ function SearchContent() {
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
         </div>
       </div>
-      {keyboardOpenStatus && <GurbaniKeyboard />}
+      {keyboardOpenStatus && (
+        <GurmukhiKeyboard value={searchQuery} onKeyClick={() => console.log('abc')} />
+      )}
       <div className="search-result-controls">
         <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
         <div className="filters">
@@ -181,6 +184,6 @@ function SearchContent() {
       </div>
     </div>
   );
-}
+};
 
 export default SearchContent;

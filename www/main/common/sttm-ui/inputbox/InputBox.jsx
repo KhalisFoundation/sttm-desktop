@@ -4,9 +4,9 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads } from '../../../navigator/utils';
 
 const InputBox = ({ placeholder, className }) => {
-  const { currentSearchType, currentSource } = useStoreState(state => state.navigator);
-  const { setSearchData } = useStoreActions(state => state.navigator);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { currentSearchType, currentSource, searchQuery } = useStoreState(state => state.navigator);
+  const { setSearchData, setSearchQuery } = useStoreActions(state => state.navigator);
+
   const handleChange = event => {
     setSearchQuery(event.target.value);
   };
