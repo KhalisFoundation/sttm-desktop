@@ -27,34 +27,28 @@ const ShabadVerse = ({
 
   return (
     <li
+      id={`line-${lineNumber}`}
       value={lineNumber}
       className={`shabadPane-list ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
       <span className="shabadPane-controls">
         {versesRead.map(
           (isRead, index) =>
-            isRead === verseId && (
-              <span key={verseId + index}>
-                <i className="fa fa-fw fa-check" />
-              </span>
-            ),
+            isRead === verseId && <i key={verseId + index} className="fa fa-fw fa-check" />,
         )}
-        <span onClick={() => changeHomeVerse(lineNumber)}>
-          <i
-            className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
-          />
-        </span>
+        <i
+          onClick={() => changeHomeVerse(lineNumber)}
+          className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
+        />
       </span>
-      <div
-        className="span-color"
+      <span
+        className="gurmukhi verse-content"
         onClick={() => {
           updateTraversedVerse(verseId, lineNumber);
         }}
       >
-        <a className="panktee">
-          <span className="gurmukhi">{verse}</span>
-        </a>
-      </div>
+        {verse}
+      </span>
     </li>
   );
 };

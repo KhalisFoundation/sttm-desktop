@@ -358,6 +358,7 @@ a {
 }
 
 .close-screen {
+  background-color: transparent;
   border: 2px solid white;
   border-radius: 50%;
   color: white;
@@ -1033,9 +1034,8 @@ body.show-overlay {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-bottom-width: 0;
+  border: none;
   border-radius: 5px;
-  border-top-width: 0;
   cursor: pointer;
   display: flex;
   height: 75px;
