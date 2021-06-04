@@ -17,13 +17,14 @@ function SearchHeader() {
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
 
-  const { currentLanguage } = useStoreState(state => state.navigator);
+  const { currentLanguage, currentSearchType } = useStoreState(state => state.navigator);
   const { setCurrentSearchType, setCurrentLanguage } = useStoreActions(state => state.navigator);
 
   const handleLanguageChange = event => {
-    if (event.target.value === 'en') {
+    if (event.target.value === 'en' && currentSearchType !== 3) {
       setCurrentSearchType(3);
-    } else {
+    }
+    if (event.target.value !== 'en' && currentSearchType !== 0) {
       setCurrentSearchType(0);
     }
     if (currentLanguage !== event.target.value) {
@@ -31,11 +32,15 @@ function SearchHeader() {
     }
   };
   const handleSearchType = event => {
-    setCurrentSearchType(parseInt(event.target.value, 10));
+    if (currentSearchType !== parseInt(event.target.value, 10)) {
+      setCurrentSearchType(parseInt(event.target.value, 10));
+    }
   };
 
   const handleSearchOption = event => {
-    setCurrentSearchType(parseInt(event.target.value, 10));
+    if (event.target.checked && currentSearchType !== parseInt(event.target.value, 10)) {
+      setCurrentSearchType(parseInt(event.target.value, 10));
+    }
   };
 
   return (
@@ -82,7 +87,12 @@ function SearchHeader() {
               <div className="search-type">
                 {gurmukhiSearchTypes.map(value => (
                   <label key={value}>
-                    <input type="checkbox" value={value} key={value} onClick={handleSearchOption} />
+                    <input
+                      type="checkbox"
+                      value={value}
+                      key={value}
+                      onChangeCapture={handleSearchOption}
+                    />
                     {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
                   </label>
                 ))}
