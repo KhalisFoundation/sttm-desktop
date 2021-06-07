@@ -1,20 +1,14 @@
 .gurmukhi-keyboard {
+  border: 1px solid $disabled-light;
+  border-top: none;
   border-radius: 2px;
   box-shadow: 0 2px 2px 0 $transparent-black, 0 0 0 1px $transparent-light-black;
   overflow: hidden;
-  pointer-events: none;
   position: relative;
   top: 0;
   transition: all 0.25s;
   width: 100%;
   z-index: 2;
-
-  // &.active {
-  //   height: initial;
-  //   opacity: 1;
-  //   pointer-events: auto;
-  //   transform: rotateX(0deg);
-  // }
 
   .keyboard-row-set {
     display: inline-block;
@@ -30,6 +24,7 @@
     border: 1px solid $transparent-black;
     border-radius: 5px;
     color: $black;
+    cursor: pointer;
     font-size: 1rem;
     line-height: 2;
     margin: 2px;
@@ -39,40 +34,12 @@
     transition: 0.3s border-color ease;
     width: calc(10% - 4px);
 
-    // &:hover {
-    //   border-color: $sttm-darker-grey;
-    // }
+    &:hover {
+      border-color: $darker-grey;
+    }
 
-    // &.active {
-    //   color: $sttm-orange;
-    // }
-
-    // &[data-action='page-1'] {
-    //   padding-right: 5px;
-    //   text-align: right;
-
-    //   &::after {
-    //     color: $sttm-pure-black;
-    //     content: '|';
-    //     font-family: Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
-    //     font-size: 0.8rem;
-    //     position: absolute;
-    //     right: -1px;
-    //     top: 2px;
-    //   }
-    // }
-
-    // &[data-action='page-2'] {
-    //   padding-left: 4px;
-    //   text-align: left;
-    // }
-
-    // &.matra-button {
-    //   background-color: $sttm-light-blue-30;
-
-    //   .dark-mode {
-    //     background-color: $sttm-dark-blue;
-    //   }
-    // }
+    &.matra-button {
+      background-color: $light-blue-30;
+    }
   }
 }

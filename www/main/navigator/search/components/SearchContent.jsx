@@ -23,6 +23,7 @@ const SearchContent = () => {
     isDhanGuruSlide,
     noActiveVerse,
     searchQuery,
+    currentSearchType,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -38,6 +39,7 @@ const SearchContent = () => {
     setIsAnnouncementSlide,
     setIsDhanGuruSlide,
     setNoActiveVerse,
+    setSearchQuery,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -125,7 +127,7 @@ const SearchContent = () => {
   }, [searchData, currentWriter, currentRaag, currentSource]);
 
   return (
-    <div>
+    <div className="search-content-container">
       <div className="search-content">
         <InputBox
           placeholder={'Enter Search term here or ang number'}
@@ -136,7 +138,11 @@ const SearchContent = () => {
         </div>
       </div>
       {keyboardOpenStatus && (
-        <GurmukhiKeyboard value={searchQuery} onKeyClick={() => console.log('abc')} />
+        <GurmukhiKeyboard
+          value={searchQuery}
+          setValue={setSearchQuery}
+          searchType={currentSearchType}
+        />
       )}
       <div className="search-result-controls">
         <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
