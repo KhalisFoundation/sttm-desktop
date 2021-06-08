@@ -14,14 +14,16 @@ const SlideGurbani = ({
   );
   const filterAppliedVishraam = () => {
     const activeVishraams = {};
-    Object.keys(vishraamPlacement).forEach(appliedVishraam => {
-      if (vishraamSource === appliedVishraam) {
-        const rawActiveVishraams = vishraamPlacement[appliedVishraam];
-        rawActiveVishraams.forEach(rav => {
-          activeVishraams[rav.p] = rav.t;
-        });
-      }
-    });
+    if (vishraamPlacement) {
+      Object.keys(vishraamPlacement).forEach(appliedVishraam => {
+        if (vishraamSource === appliedVishraam) {
+          const rawActiveVishraams = vishraamPlacement[appliedVishraam];
+          rawActiveVishraams.forEach(rav => {
+            activeVishraams[rav.p] = rav.t;
+          });
+        }
+      });
+    }
     return activeVishraams;
   };
 
