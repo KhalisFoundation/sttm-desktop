@@ -383,48 +383,27 @@ function updateViewerScale() {
     };
   }
   const $fitInsideWindow = document.body.classList.contains('presenter-view')
-    ? document.getElementById('navigator')
+    ? document.querySelector('.viewer-content')
     : document.body;
-  let scale = 1;
+
   let previewStyles = '';
-  let previewWinStyles = '';
-  previewStyles += `width: ${global.viewer.width}px;`;
-  previewStyles += `height: ${global.viewer.height}px;`;
   previewStyles += `font-size: ${global.viewer.height / 100}px;`;
 
   const fitInsideWidth = $fitInsideWindow.offsetWidth;
   const fitInsideHeight = $fitInsideWindow.offsetHeight;
-  const fitInsideStyle = window.getComputedStyle($fitInsideWindow);
-  const fitInsidePadding = fitInsideStyle.getPropertyValue('right');
   const viewerRatio = global.viewer.width / global.viewer.height;
 
   // Try scaling by width first
   const proposedHeight = fitInsideWidth / viewerRatio;
-  const workspaceHeight = '40px';
   if (fitInsideHeight > proposedHeight) {
-    scale = fitInsideWidth / global.viewer.width;
-    previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${workspaceHeight} + ${fitInsidePadding} + ${(fitInsideHeight -
-      proposedHeight) /
-      2}px);`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} + 25px + ${(fitInsideHeight -
-      proposedHeight) /
-      2}px);`;
+    previewStyles += `height: ${proposedHeight}px;`;
   } else {
-    scale = fitInsideHeight / global.viewer.height;
     const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} );`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + 35px);`;
-    previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) /
-      2}px);`;
+    previewStyles += `width: ${proposedWidth}px;`;
   }
-  previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(
-    `.scale-viewer #main-viewer { ${previewStyles} }
-    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`,
-  );
-  const $previewStyles = document.getElementById('preview-styles');
+  previewStyles = document.createTextNode(`.scale-viewer #webview-viewer { ${previewStyles} }`);
 
+  const $previewStyles = document.getElementById('preview-styles');
   if ($previewStyles) {
     $previewStyles.innerHTML = '';
     $previewStyles.appendChild(previewStyles);
