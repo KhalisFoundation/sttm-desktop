@@ -1,6 +1,8 @@
 .viewer-pane {
   @include pane-containers;
   .viewer-content {
+    align-items: center;
+    display: flex;
     min-width: 500px;
     position: relative;
     overflow: hidden;
@@ -10,5 +12,9 @@
       width: 100%;
       height: 100%;
     }
+  }
+
+  > div {
+    background: none !important;
   }
 }
