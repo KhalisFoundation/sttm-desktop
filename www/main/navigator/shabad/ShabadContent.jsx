@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { loadShabad } from '../utils';
+
+import { loadShabad, loadBani } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
-function ShabadContent() {
+const ShabadContent = () => {
   const {
     initialVerseId,
     activeShabadId,
@@ -17,6 +18,7 @@ function ShabadContent() {
     isDhanGuruSlide,
     activeVerseId,
     noActiveVerse,
+    sundarGutkaBaniId,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -36,11 +38,14 @@ function ShabadContent() {
   const filterRequiredVerseItems = verses => {
     return verses
       ? verses.map((verse, index) => {
-          return {
-            ID: index,
-            verseId: verse.ID,
-            verse: verse.Gurmukhi,
-          };
+          if (verse) {
+            return {
+              ID: index,
+              verseId: verse.ID,
+              verse: verse.Gurmukhi,
+            };
+          }
+          return {};
         })
       : [];
   };
@@ -94,10 +99,12 @@ function ShabadContent() {
 
   useEffect(() => {
     loadShabad(activeShabadId, initialVerseId).then(verses => {
-      setActiveShabad(verses);
-      if (noActiveVerse) {
-        updateTraversedVerse(verses[0].ID, 0);
-        changeHomeVerse(0);
+      if (verses) {
+        setActiveShabad(verses);
+        if (noActiveVerse) {
+          updateTraversedVerse(verses[0].ID, 0);
+          changeHomeVerse(0);
+        }
       }
     });
   }, [initialVerseId, activeShabadId]);
@@ -113,6 +120,18 @@ function ShabadContent() {
       }
     });
   }, [activeShabad]);
+
+  useEffect(() => {
+    const activeBani = [];
+    loadBani(sundarGutkaBaniId).then(singleVerse => {
+      activeBani.push(singleVerse);
+      setActiveShabad(...activeBani);
+      if (noActiveVerse) {
+        updateTraversedVerse(activeBani[0][0].ID, 0);
+        changeHomeVerse(0);
+      }
+    });
+  }, [sundarGutkaBaniId]);
 
   return (
     <div className="shabad-list">
@@ -137,6 +156,6 @@ function ShabadContent() {
       </div>
     </div>
   );
-}
+};
 
 export default ShabadContent;

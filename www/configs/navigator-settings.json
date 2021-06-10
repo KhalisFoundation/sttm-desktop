@@ -20,5 +20,7 @@
   "isMoolMantraSlide": false,
   "isDhanGuruSlide": false,
   "dhanGuruString": "",
-  "noActiveVerse": true
+  "noActiveVerse": true,
+  "isSundarGutkaBani": false,
+  "sundarGutkaBaniId": null
 }

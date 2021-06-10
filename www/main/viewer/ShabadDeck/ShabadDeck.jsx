@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
 import Slide from '../Slide/Slide';
-import { loadVerse } from '../../navigator/utils';
+import { loadShabadVerse, loadBaniVerse } from '../../navigator/utils';
 
 const themes = require('../../../../www/configs/themes.json');
 
@@ -14,6 +14,8 @@ function ShabadDeck() {
     isMoolMantraSlide,
     isAnnouncementSlide,
     isDhanGuruSlide,
+    sundarGutkaBaniId,
+    isSundarGutkaBani,
   } = useStoreState(state => state.navigator);
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState(null);
@@ -41,11 +43,20 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId) {
-      loadVerse(activeShabadId, activeVerseId).then(result =>
+      loadShabadVerse(activeShabadId, activeVerseId).then(result =>
         result.map(activeRes => setActiveVerse(activeRes)),
       );
     }
-  }, [activeVerseId]);
+    if (sundarGutkaBaniId && isSundarGutkaBani) {
+      loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
+        if (rows.length > 1) {
+          setActiveVerse(...rows[0]);
+        } else if (rows.length === 1) {
+          setActiveVerse(...rows);
+        }
+      });
+    }
+  }, [activeVerseId, sundarGutkaBaniId]);
 
   return (
     <div className="shabad-deck" style={applyTheme()}>
