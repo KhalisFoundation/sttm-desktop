@@ -25,6 +25,7 @@ const SearchContent = () => {
     searchQuery,
     currentSearchType,
     isSundarGutkaBani,
+    isCeremonyBani,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -42,6 +43,7 @@ const SearchContent = () => {
     setNoActiveVerse,
     setSearchQuery,
     setIsSundarGutkaBani,
+    setIsCeremonyBani,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
@@ -91,6 +93,9 @@ const SearchContent = () => {
     }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
+    }
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
     }
     if (activeShabadId !== newSelectedShabad) {
       setActiveShabadId(newSelectedShabad);

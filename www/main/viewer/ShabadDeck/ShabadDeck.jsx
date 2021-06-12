@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
 import Slide from '../Slide/Slide';
-import { loadShabadVerse, loadBaniVerse } from '../../navigator/utils';
+import { loadShabadVerse, loadBaniVerse, loadCeremony } from '../../navigator/utils';
 
 const themes = require('../../../../www/configs/themes.json');
 
@@ -16,6 +16,8 @@ function ShabadDeck() {
     isDhanGuruSlide,
     sundarGutkaBaniId,
     isSundarGutkaBani,
+    ceremonyId,
+    isCeremonyBani,
   } = useStoreState(state => state.navigator);
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState(null);
@@ -56,7 +58,18 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId]);
+    if (ceremonyId && isCeremonyBani) {
+      loadCeremony(ceremonyId).then(ceremonyVerses => {
+        const activeCeremonyVerse = ceremonyVerses.filter(ceremonyVerse => {
+          if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
+            return true;
+          }
+          return false;
+        });
+        setActiveVerse(...activeCeremonyVerse);
+      });
+    }
+  }, [activeVerseId, sundarGutkaBaniId, ceremonyId]);
 
   return (
     <div className="shabad-deck" style={applyTheme()}>

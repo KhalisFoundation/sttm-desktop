@@ -22,5 +22,7 @@
   "dhanGuruString": "",
   "noActiveVerse": true,
   "isSundarGutkaBani": false,
-  "sundarGutkaBaniId": null
+  "sundarGutkaBaniId": null,
+  "ceremonyId": null,
+  "isCeremonyBani": false
 }

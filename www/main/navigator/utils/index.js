@@ -6,3 +6,4 @@ export { dailyHukamnama } from './daily-hukamnama';
 export { getNotifications, showNotificationsModal } from './whats-new';
 export { loadBani } from './load-bani';
 export { loadBaniVerse } from './load-bani-verse';
+export { loadCeremony } from './load-ceremony';

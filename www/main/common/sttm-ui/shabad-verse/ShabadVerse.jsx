@@ -34,7 +34,8 @@ const ShabadVerse = ({
       <span className="shabadPane-controls">
         {versesRead.map(
           (isRead, index) =>
-            isRead === verseId && <i key={verseId + index} className="fa fa-fw fa-check" />,
+            isRead === verseId &&
+            lineNumber === verseId && <i key={index} className="fa fa-fw fa-check" />,
         )}
         <i
           onClick={() => changeHomeVerse(lineNumber)}

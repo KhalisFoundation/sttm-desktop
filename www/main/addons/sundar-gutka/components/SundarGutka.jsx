@@ -14,10 +14,15 @@ import useLoadBani from '../hooks/use-load-bani';
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
+  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
+    state => state.navigator,
+  );
+  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
+    state => state.navigator,
+  );
+
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
-  const { isSundarGutkaBani, sundarGutkaBaniId } = useStoreState(state => state.navigator);
-  const { setIsSundarGutkaBani, setSundarGutkaBaniId } = useStoreActions(state => state.navigator);
 
   const nitnemBanis = [];
   const popularBanis = [];
@@ -43,6 +48,10 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   });
 
   const loadBani = baniId => {
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+
     if (!isSundarGutkaBani) {
       setIsSundarGutkaBani(true);
     }
