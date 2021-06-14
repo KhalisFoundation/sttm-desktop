@@ -180,9 +180,9 @@ const SearchContent = () => {
           <div className="result-list">
             <ul>
               {filteredShabads.map(
-                ({ ang, shabadId, source, sourceId, verse, verseId, writer }) => (
+                ({ ang, shabadId, source, sourceId, verse, verseId, writer }, index) => (
                   <SearchResults
-                    key={verseId}
+                    key={index}
                     ang={ang}
                     onClick={changeActiveShabad}
                     shabadId={shabadId}

@@ -35,7 +35,7 @@ const ShabadVerse = ({
         {versesRead.map(
           (isRead, index) =>
             isRead === verseId &&
-            lineNumber === verseId && <i key={index} className="fa fa-fw fa-check" />,
+            lineNumber === index && <i key={index} className="fa fa-fw fa-check" />,
         )}
         <i
           onClick={() => changeHomeVerse(lineNumber)}

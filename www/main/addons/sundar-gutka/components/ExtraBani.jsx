@@ -1,15 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 import { Tile } from '../../../common/sttm-ui';
 import { convertToHyphenCase } from '../../../common/utils';
 
-import loadBani from '../utils/load-bani';
-
 const ExtraBani = ({ title, banis = [], onScreenClose }) => {
+  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
+    state => state.navigator,
+  );
+  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
+    state => state.navigator,
+  );
+
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const groupHeaderClassName = `${hyphenedTitle}-heading`;
   const groupClassName = hyphenedTitle;
   const groupItemClassName = hyphenedTitle.slice(0, -1); // removes last character from string.
+
+  const loadBani = baniId => {
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+
+    if (!isSundarGutkaBani) {
+      setIsSundarGutkaBani(true);
+    }
+
+    if (sundarGutkaBaniId !== baniId) {
+      setSundarGutkaBaniId(baniId);
+    }
+    onScreenClose();
+  };
 
   return (
     <div className="bani-group-container">
@@ -17,7 +38,7 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
       <div className={`bani-group ${groupClassName}`}>
         {banis.map(b => (
           <Tile
-            onClick={loadBani(b, onScreenClose)}
+            onClick={() => loadBani(b.id)}
             key={b.name}
             type="extras"
             className={groupItemClassName}
@@ -33,9 +54,7 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
 ExtraBani.propTypes = {
   title: PropTypes.string,
   onScreenClose: PropTypes.func,
-  banis: PropTypes.arrayOf({
-    name: PropTypes.string.isRequired,
-  }),
+  banis: PropTypes.array,
 };
 
 export default ExtraBani;

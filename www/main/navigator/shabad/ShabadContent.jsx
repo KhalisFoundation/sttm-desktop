@@ -111,7 +111,6 @@ const ShabadContent = () => {
       });
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
-        console.log(ceremonyVerses);
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
           if (noActiveVerse) {
@@ -132,32 +131,6 @@ const ShabadContent = () => {
       });
     }
   }, [initialVerseId, activeShabadId, sundarGutkaBaniId, ceremonyId]);
-
-  // useEffect(() => {
-  //   if (isSundarGutkaBani && sundarGutkaBaniId) {
-  //     loadBani(sundarGutkaBaniId).then(sundarGutkaVerses => {
-  //       setActiveShabad(sundarGutkaVerses);
-  //       if (noActiveVerse) {
-  //         updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
-  //         changeHomeVerse(0);
-  //       }
-  //     });
-  //   }
-  // }, [sundarGutkaBaniId]);
-
-  // useEffect(() => {
-  //   if (isCeremonyBani && ceremonyId) {
-  //     loadCeremony(ceremonyId).then(ceremonyVerses => {
-  //       if (ceremonyVerses) {
-  //         setActiveShabad(ceremonyVerses);
-  //         if (noActiveVerse) {
-  //           updateTraversedVerse(ceremonyVerses[0].ID, 0);
-  //           changeHomeVerse(0);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [ceremonyId]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {

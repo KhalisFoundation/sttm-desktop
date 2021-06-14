@@ -59,6 +59,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     if (sundarGutkaBaniId !== baniId) {
       setSundarGutkaBaniId(baniId);
     }
+    onScreenClose();
   };
 
   return (
