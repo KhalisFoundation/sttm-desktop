@@ -13,6 +13,7 @@ import { DEFAULT_OVERLAY } from '../common/constants';
 const Launchpad = () => {
   const { overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
+  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
 
   const onScreenClose = React.useCallback(
     evt => {
@@ -43,7 +44,7 @@ const Launchpad = () => {
   return (
     <>
       <WorkspaceBar />
-      <div className="launchpad">
+      <div className={`launchpad${isSingleDisplayMode ? ' single-display misc-pane' : ''}`}>
         <Toolbar />
         {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
         {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}

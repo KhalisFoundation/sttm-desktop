@@ -24,5 +24,6 @@
   "isSundarGutkaBani": false,
   "sundarGutkaBaniId": null,
   "ceremonyId": null,
-  "isCeremonyBani": false
+  "isCeremonyBani": false,
+  "singleDisplayActiveTab": "search"
 }

@@ -17,5 +17,3 @@ export const MiscContent = () => {
     </>
   );
 };
-
-export default MiscContent;

@@ -4,20 +4,40 @@ import SearchPane from './search/components/SearchPane';
 import ShabadPane from './shabad/ShabadPane';
 import { MiscPane } from './misc/components';
 import ViewerPane from './viewer/ViewerPane';
+import { Pane } from '../common/sttm-ui/pane';
+import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
 
 const Navigator = () => {
   const { isConnected } = useStoreState(state => state.baniController);
+  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
 
   return (
     <>
-      <div className="navigator-row">
-        <SearchPane />
-        <ShabadPane />
-      </div>
-      <div className="navigator-row">
-        <ViewerPane />
-        <MiscPane />
-      </div>
+      {isSingleDisplayMode ? (
+        <>
+          <div className="single-display-controller">
+            <Pane
+              header={singleDisplayHeader}
+              content={singleDisplayContent}
+              footer={singleDisplayFooter}
+            />
+          </div>
+          <div className="single-display-viewer">
+            <ViewerPane />
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={`navigator-row ${isSingleDisplayMode ? 'single-display' : ''}`}>
+            <SearchPane />
+            <ShabadPane />
+          </div>
+          <div className={`navigator-row ${isSingleDisplayMode ? 'single-display' : ''}`}>
+            <ViewerPane />
+            <MiscPane />
+          </div>
+        </>
+      )}
       <div className="navigator-wrapper" style={{ display: 'none' }}>
         <div id="main-ui" className="base-ui">
           <div className="nav-page" id="search-page">
