@@ -21,7 +21,6 @@ const database = {
 };
 
 const dbPlatform = 'realm';
-
 const dbSchemaPath = schemaPath =>
   !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
 
@@ -112,6 +111,7 @@ module.exports = {
       // $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
+      const $search = document.querySelector('.search-content > .input-box');
       if (online) {
         request(
           `https://banidb.com/databases/${database[dbPlatform].md5}`,
