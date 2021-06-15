@@ -4,7 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const { i18n } = remote.require('./app');
 
-function MiscFooter() {
+export const MiscFooter = () => {
   const {
     isEmptySlide,
     isWaheguruSlide,
@@ -114,6 +114,4 @@ function MiscFooter() {
       </div>
     </div>
   );
-}
-
-export default MiscFooter;
+};

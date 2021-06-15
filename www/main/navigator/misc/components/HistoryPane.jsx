@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-const Historypane = () => {
+export const HistoryPane = () => {
   const { verseHistory, activeShabadId, initialVerseId, versesRead } = useStoreState(
     state => state.navigator,
   );
@@ -39,5 +39,3 @@ const Historypane = () => {
 
   return <div className="history-results">{versesMarkup}</div>;
 };
-
-export default Historypane;

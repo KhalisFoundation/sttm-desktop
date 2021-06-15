@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDataLayerValue } from '../state-manager/DataLayer';
 
-function HistoryHeader() {
+export const MiscHeader = () => {
   const [{ miscPanel }, dispatch] = useDataLayerValue();
   const SetOpenTab = event => {
     dispatch({
@@ -47,6 +47,4 @@ function HistoryHeader() {
       </a>
     </div>
   );
-}
-
-export default HistoryHeader;
+};

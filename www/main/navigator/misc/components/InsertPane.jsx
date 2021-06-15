@@ -3,7 +3,7 @@ import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
-function InsertPane() {
+export const InsertPane = () => {
   const {
     announcementString,
     isAnnouncementSlide,
@@ -164,6 +164,4 @@ function InsertPane() {
       </li>
     </ul>
   );
-}
-
-export default InsertPane;
+};

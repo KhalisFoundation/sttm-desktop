@@ -9,7 +9,7 @@ const electron = require('electron');
 const { i18n } = remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
-function OtherPane() {
+export const OtherPane = () => {
   const { activeShabadId, noActiveVerse } = useStoreState(state => state.navigator);
   const { setActiveShabadId, setNoActiveVerse } = useStoreActions(state => state.navigator);
 
@@ -51,6 +51,4 @@ function OtherPane() {
       </li>
     </ul>
   );
-}
-
-export default OtherPane;
+};
