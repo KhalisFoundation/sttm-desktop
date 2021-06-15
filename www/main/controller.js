@@ -7,7 +7,6 @@ const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
-const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
 const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
@@ -114,6 +113,7 @@ const menuTemplate = [
     submenu: [
       {
         label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
+        accelerator: 'CmdOrCtrl+Alt+O',
         click: () => {
           main.openSecondaryWindow('overlayWindow');
         },
@@ -423,8 +423,6 @@ function checkPresenterView() {
   classList.toggle('home', !inPresenterView);
   classList.toggle('scale-viewer', inPresenterView);
 
-  // hide header-tabs for non presenter view
-  document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
   global.platform.ipc.send('presenter-view', inPresenterView);
   global.webview.send('presenter-view', inPresenterView);
 }
@@ -487,10 +485,6 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
 });
 global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(arg.PageNo, arg.SourceID);
-});
-
-global.platform.ipc.on('shortcuts', (event, arg) => {
-  shortcutFunctions[arg.actionName](arg.event);
 });
 
 global.platform.ipc.on('cast-session-active', () => {

@@ -9,10 +9,7 @@ global.getUserSettings = GlobalState.getState().userSettings;
 global.setUserSettings = GlobalState.getActions().userSettings;
 
 // Pull in navigator from core
-global.core.search.init();
 global.core.menu.init();
-global.core.shortcutTray.init();
-global.core.themeEditor.init();
 global.platform.init();
 
 document.body.classList.add(process.platform);

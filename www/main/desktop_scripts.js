@@ -107,11 +107,9 @@ module.exports = {
   },
 
   downloadLatestDB(force = false) {
-    const { $search } = global.core.search;
-
     if (force) {
-      $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-      $search.dataset.databaseState = 'loading';
+      // $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
+      // $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
       if (online) {
@@ -187,7 +185,7 @@ module.exports = {
 
   initDB() {
     if (global.core) {
-      global.core.search.initSearch();
+      // global.core.search.initSearch();
     }
   },
 
