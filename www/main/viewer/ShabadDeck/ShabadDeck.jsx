@@ -27,15 +27,15 @@ function ShabadDeck() {
   };
 
   const bakeThemeStyles = themeInstance => {
-    return themeInstance['background-image-full']
-      ? {
-          backgroundImage: `url('assets/img/custom_backgrounds/${
-            themeInstance['background-image-full']
-          }')`,
-        }
-      : {
-          backgroundColor: themeInstance['background-color'],
-        };
+    const backgroundImageObj = {
+      backgroundImage: `url('assets/img/custom_backgrounds/${
+        themeInstance['background-image-full']
+      }')`,
+    };
+    const backgroundColorObj = {
+      backgroundColor: themeInstance['background-color'],
+    };
+    return themeInstance['background-image-full'] ? backgroundImageObj : backgroundColorObj;
   };
 
   const applyTheme = () => {
@@ -52,7 +52,7 @@ function ShabadDeck() {
     if (sundarGutkaBaniId && isSundarGutkaBani) {
       loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
         if (rows.length > 1) {
-          setActiveVerse(...rows[0]);
+          setActiveVerse(rows[0]);
         } else if (rows.length === 1) {
           setActiveVerse(...rows);
         }
