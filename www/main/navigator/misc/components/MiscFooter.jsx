@@ -10,7 +10,9 @@ export const MiscFooter = () => {
     isWaheguruSlide,
     isMoolMantraSlide,
     isAnnouncementSlide,
-    activeShabadId,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    ceremonyId,
   } = useStoreState(state => state.navigator);
   const {
     setIsEmptySlide,
@@ -18,7 +20,9 @@ export const MiscFooter = () => {
     setVerseHistory,
     setIsMoolMantraSlide,
     setIsAnnouncementSlide,
-    setActiveShabadId,
+    setIsSundarGutkaBani,
+    setIsCeremonyBani,
+    setCeremonyId,
   } = useStoreActions(state => state.navigator);
   // For Global States
   // const navigatorState = useStoreActions(state => state.navigator);
@@ -34,8 +38,14 @@ export const MiscFooter = () => {
   };
 
   const openAnandSahibBhog = () => {
-    if (activeShabadId !== 333375) {
-      setActiveShabadId(333375);
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    if (ceremonyId !== 6) {
+      setCeremonyId(6);
+    }
+    if (!isCeremonyBani) {
+      setIsCeremonyBani(true);
     }
   };
 

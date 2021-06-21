@@ -140,7 +140,16 @@ const ShabadContent = () => {
         }
       });
     }
-  }, [initialVerseId, activeShabadId, sundarGutkaBaniId, ceremonyId, baniLength, mangalPosition]);
+  }, [
+    initialVerseId,
+    activeShabadId,
+    sundarGutkaBaniId,
+    ceremonyId,
+    baniLength,
+    mangalPosition,
+    isCeremonyBani,
+    isSundarGutkaBani,
+  ]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
