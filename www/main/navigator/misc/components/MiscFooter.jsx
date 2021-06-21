@@ -24,6 +24,8 @@ export const MiscFooter = () => {
     setIsCeremonyBani,
     setCeremonyId,
   } = useStoreActions(state => state.navigator);
+  const { akhandpatt } = useStoreState(state => state.userSettings);
+  const { setAkhandpatt } = useStoreActions(state => state.userSettings);
   // For Global States
   // const navigatorState = useStoreActions(state => state.navigator);
   // For shortcut tray
@@ -59,6 +61,9 @@ export const MiscFooter = () => {
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
     }
+    if (akhandpatt) {
+      setAkhandpatt(false);
+    }
     if (!isWaheguruSlide) {
       setIsWaheguruSlide(true);
     }
@@ -74,6 +79,9 @@ export const MiscFooter = () => {
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
     }
+    if (akhandpatt) {
+      setAkhandpatt(false);
+    }
     if (!isMoolMantraSlide) {
       setIsMoolMantraSlide(true);
     }
@@ -88,6 +96,9 @@ export const MiscFooter = () => {
     }
     if (isMoolMantraSlide) {
       setIsMoolMantraSlide(false);
+    }
+    if (akhandpatt) {
+      setAkhandpatt(false);
     }
     if (!isEmptySlide) {
       setIsEmptySlide(true);

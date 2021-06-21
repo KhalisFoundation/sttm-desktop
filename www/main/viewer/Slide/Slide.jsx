@@ -15,7 +15,6 @@ const Slide = ({
   isWaheguruSlide,
   isEmptySlide,
   isDhanGuruSlide,
-  themeStyleObj,
 }) => {
   const {
     translationVisibility,
@@ -45,9 +44,7 @@ const Slide = ({
 
   return (
     <>
-      <div
-        className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
-      >
+      <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
         {(isWaheguruSlide ||
           isAnnouncementSlide ||
           isEmptySlide ||
@@ -108,7 +105,6 @@ Slide.propTypes = {
   isWaheguruSlide: PropTypes.bool,
   isEmptySlide: PropTypes.bool,
   isDhanGuruSlide: PropTypes.bool,
-  themeStyleObj: PropTypes.object,
 };
 
 export default Slide;

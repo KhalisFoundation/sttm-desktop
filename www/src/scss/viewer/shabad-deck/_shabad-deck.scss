@@ -1,3 +1,16 @@
+.akhandpatt-view {
+  &.shabad-deck {
+    background-attachment: fixed;
+    background-size: cover;
+    height: unset;
+    padding-bottom: 10px;
+  }
+}
+
 .shabad-deck {
   height: 100%;
+}
+
+.empty-slide {
+  height: 100% !important;
 }

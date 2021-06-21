@@ -102,7 +102,12 @@ function ShabadDeck() {
   }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt]);
 
   return (
-    <div className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''}`} style={applyTheme()}>
+    <div
+      className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
+        isEmptySlide ? 'empty-slide' : ''
+      } theme-${getCurrentThemeInstance().key}`}
+      style={applyTheme()}
+    >
       <QuickTools
         isAnnouncementSlide={isAnnouncementSlide}
         isWaheguruSlide={isWaheguruSlide}
@@ -117,7 +122,6 @@ function ShabadDeck() {
           isEmptySlide={isEmptySlide}
           isAnnouncementSlide={isAnnouncementSlide}
           isDhanGuruSlide={isDhanGuruSlide}
-          themeStyleObj={getCurrentThemeInstance()}
         />
       ))}
     </div>
