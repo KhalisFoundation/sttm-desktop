@@ -35,8 +35,16 @@ const ShabadContent = () => {
     setIsDhanGuruSlide,
     setNoActiveVerse,
   } = useStoreActions(state => state.navigator);
+
+  const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+  const baniLengthCols = {
+    short: 'existsSGPC',
+    medium: 'existsMedium',
+    long: 'existsTaksal',
+    extralong: 'existsBuddhaDal',
+  };
 
   const filterRequiredVerseItems = verses => {
     return verses
@@ -102,7 +110,7 @@ const ShabadContent = () => {
 
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
-      loadBani(sundarGutkaBaniId).then(sundarGutkaVerses => {
+      loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
         setActiveShabad(sundarGutkaVerses);
         if (noActiveVerse) {
           updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
@@ -130,7 +138,7 @@ const ShabadContent = () => {
         }
       });
     }
-  }, [initialVerseId, activeShabadId, sundarGutkaBaniId, ceremonyId]);
+  }, [initialVerseId, activeShabadId, sundarGutkaBaniId, ceremonyId, baniLength]);
 
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {

@@ -1,7 +1,7 @@
 import banidb from '../../banidb';
 
-export const loadBani = baniId => {
+export const loadBani = (baniId, baniLength) => {
   return banidb
-    .loadBani(baniId, 'existsMedium')
+    .loadBani(baniId, baniLength)
     .then(rows => rows.map(row => row.Verse).filter(row => row));
 };
