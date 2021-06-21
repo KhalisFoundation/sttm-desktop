@@ -7,7 +7,6 @@ import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
-import QuickTools from './QuickTools';
 
 const Slide = ({
   verseObj,
@@ -46,11 +45,6 @@ const Slide = ({
 
   return (
     <>
-      <QuickTools
-        isAnnouncementSlide={isAnnouncementSlide}
-        isWaheguruSlide={isWaheguruSlide}
-        isMoolMantraSlide={isMoolMantraSlide}
-      />
       <div
         className={`verse-slide theme-${themeStyleObj.key}${leftAlign ? ' slide-left-align' : ''}`}
       >

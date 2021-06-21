@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
 import Slide from '../Slide/Slide';
-import { loadShabadVerse, loadBaniVerse, loadCeremony } from '../../navigator/utils';
+import QuickTools from '../Slide/QuickTools';
+import {
+  loadShabadVerse,
+  loadBaniVerse,
+  loadBani,
+  loadCeremony,
+  loadShabad,
+} from '../../navigator/utils';
 
 const themes = require('../../../../www/configs/themes.json');
 
@@ -19,8 +26,17 @@ function ShabadDeck() {
     ceremonyId,
     isCeremonyBani,
   } = useStoreState(state => state.navigator);
-  const { theme: currentTheme } = useStoreState(state => state.userSettings);
-  const [activeVerse, setActiveVerse] = useState(null);
+  const { theme: currentTheme, akhandpatt, baniLength, mangalPosition } = useStoreState(
+    state => state.userSettings,
+  );
+  const [activeVerse, setActiveVerse] = useState([]);
+
+  const baniLengthCols = {
+    short: 'existsSGPC',
+    medium: 'existsMedium',
+    long: 'existsTaksal',
+    extralong: 'existsBuddhaDal',
+  };
 
   const getCurrentThemeInstance = () => {
     return themes.find(theme => theme.key === currentTheme);
@@ -45,18 +61,28 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId) {
-      loadShabadVerse(activeShabadId, activeVerseId).then(result =>
-        result.map(activeRes => setActiveVerse(activeRes)),
-      );
+      if (akhandpatt) {
+        loadShabad(activeShabadId, activeVerseId).then(verses => setActiveVerse(verses));
+      } else {
+        loadShabadVerse(activeShabadId, activeVerseId).then(result =>
+          result.map(activeRes => setActiveVerse([activeRes])),
+        );
+      }
     }
     if (sundarGutkaBaniId && isSundarGutkaBani) {
-      loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
-        if (rows.length > 1) {
-          setActiveVerse(rows[0]);
-        } else if (rows.length === 1) {
-          setActiveVerse(...rows);
-        }
-      });
+      if (akhandpatt) {
+        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(baniRows => {
+          setActiveVerse([...baniRows]);
+        });
+      } else {
+        loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
+          if (rows.length > 1) {
+            setActiveVerse([rows[0]]);
+          } else if (rows.length === 1) {
+            setActiveVerse([...rows]);
+          }
+        });
+      }
     }
     if (ceremonyId && isCeremonyBani) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
@@ -66,22 +92,34 @@ function ShabadDeck() {
           }
           return false;
         });
-        setActiveVerse(...activeCeremonyVerse);
+        if (akhandpatt) {
+          setActiveVerse([...ceremonyVerses]);
+        } else {
+          setActiveVerse([...activeCeremonyVerse]);
+        }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId, ceremonyId]);
+  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt]);
 
   return (
-    <div className="shabad-deck" style={applyTheme()}>
-      <Slide
-        verseObj={activeVerse}
+    <div className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''}`} style={applyTheme()}>
+      <QuickTools
+        isAnnouncementSlide={isAnnouncementSlide}
         isWaheguruSlide={isWaheguruSlide}
         isMoolMantraSlide={isMoolMantraSlide}
-        isEmptySlide={isEmptySlide}
-        isAnnouncementSlide={isAnnouncementSlide}
-        isDhanGuruSlide={isDhanGuruSlide}
-        themeStyleObj={getCurrentThemeInstance()}
       />
+      {activeVerse.map((activeVerseObj, index) => (
+        <Slide
+          key={index}
+          verseObj={activeVerseObj}
+          isWaheguruSlide={isWaheguruSlide}
+          isMoolMantraSlide={isMoolMantraSlide}
+          isEmptySlide={isEmptySlide}
+          isAnnouncementSlide={isAnnouncementSlide}
+          isDhanGuruSlide={isDhanGuruSlide}
+          themeStyleObj={getCurrentThemeInstance()}
+        />
+      ))}
     </div>
   );
 }
