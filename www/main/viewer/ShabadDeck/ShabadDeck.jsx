@@ -26,10 +26,15 @@ function ShabadDeck() {
     ceremonyId,
     isCeremonyBani,
   } = useStoreState(state => state.navigator);
-  const { theme: currentTheme, akhandpatt, baniLength, mangalPosition } = useStoreState(
-    state => state.userSettings,
-  );
+  const {
+    theme: currentTheme,
+    akhandpatt,
+    baniLength,
+    mangalPosition,
+    displayNextLine,
+  } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState([]);
+  const [nextVerse, setNextVerse] = useState({});
 
   const baniLengthCols = {
     short: 'existsSGPC',
@@ -67,6 +72,12 @@ function ShabadDeck() {
         loadShabadVerse(activeShabadId, activeVerseId).then(result =>
           result.map(activeRes => setActiveVerse([activeRes])),
         );
+        // load next line of searched shabad verse from db
+        if (displayNextLine) {
+          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result =>
+            result.map(activeRes => setNextVerse(activeRes)),
+          );
+        }
       }
     }
     if (sundarGutkaBaniId && isSundarGutkaBani) {
@@ -75,6 +86,7 @@ function ShabadDeck() {
           setActiveVerse([...baniRows]);
         });
       } else {
+        // load current bani verse from db and set in the state
         loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
           if (rows.length > 1) {
             setActiveVerse([rows[0]]);
@@ -82,6 +94,16 @@ function ShabadDeck() {
             setActiveVerse([...rows]);
           }
         });
+        // load next line of bani
+        if (displayNextLine) {
+          loadBaniVerse(sundarGutkaBaniId, activeVerseId, displayNextLine).then(rows => {
+            if (rows.length > 1) {
+              setNextVerse(rows[0]);
+            } else if (rows.length === 1) {
+              setNextVerse(...rows);
+            }
+          });
+        }
       }
     }
     if (ceremonyId && isCeremonyBani) {
@@ -92,6 +114,11 @@ function ShabadDeck() {
           }
           return false;
         });
+        // filters next line of ceremony verse
+        const nextCeremonyVerse = ceremonyVerses.filter(ceremonyVerse => {
+          return ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1;
+        });
+        setNextVerse(...nextCeremonyVerse);
         if (akhandpatt) {
           setActiveVerse([...ceremonyVerses]);
         } else {
@@ -99,7 +126,7 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt]);
+  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   return (
     <div
@@ -117,6 +144,7 @@ function ShabadDeck() {
         <Slide
           key={index}
           verseObj={activeVerseObj}
+          nextLineObj={nextVerse}
           isWaheguruSlide={isWaheguruSlide}
           isMoolMantraSlide={isMoolMantraSlide}
           isEmptySlide={isEmptySlide}

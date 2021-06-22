@@ -10,6 +10,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 const Slide = ({
   verseObj,
+  nextLineObj,
   isAnnouncementSlide,
   isMoolMantraSlide,
   isWaheguruSlide,
@@ -79,12 +80,12 @@ const Slide = ({
               {transliterationVisibility && (
                 <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
               )}
-              {displayNextLine && (
+              {displayNextLine && nextLineObj.Gurmukhi && nextLineObj.Visraam && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
                 >
                   <SlideGurbani
-                    gurmukhiString={verseObj.Gurmukhi}
+                    gurmukhiString={nextLineObj.Gurmukhi}
                     larivaar={larivaar}
                     vishraamPlacement={JSON.parse(verseObj.Visraam)}
                     vishraamSource={vishraamSource}
@@ -100,6 +101,7 @@ const Slide = ({
 
 Slide.propTypes = {
   verseObj: PropTypes.object,
+  nextLineObj: PropTypes.object,
   isAnnouncementSlide: PropTypes.bool,
   isMoolMantraSlide: PropTypes.bool,
   isWaheguruSlide: PropTypes.bool,
