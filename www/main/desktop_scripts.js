@@ -21,7 +21,6 @@ const database = {
 };
 
 const dbPlatform = 'realm';
-
 const dbSchemaPath = schemaPath =>
   !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
 
@@ -107,13 +106,12 @@ module.exports = {
   },
 
   downloadLatestDB(force = false) {
-    const { $search } = global.core.search;
-
     if (force) {
-      $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-      $search.dataset.databaseState = 'loading';
+      // $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
+      // $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
+      const $search = document.querySelector('.search-content > .input-box');
       if (online) {
         request(
           `https://banidb.com/databases/${database[dbPlatform].md5}`,
@@ -187,7 +185,7 @@ module.exports = {
 
   initDB() {
     if (global.core) {
-      global.core.search.initSearch();
+      // global.core.search.initSearch();
     }
   },
 
