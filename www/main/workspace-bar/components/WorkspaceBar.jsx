@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { updateViewerScale } from '../../viewer/utils';
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -29,6 +30,9 @@ const WorkspaceBar = () => {
     global.controller['presenter-view']();
     setWorkspace(workspace);
     analytics.trackEvent('changed workspace', workspace);
+    setTimeout(() => {
+      updateViewerScale();
+    }, 2500);
   };
 
   return (

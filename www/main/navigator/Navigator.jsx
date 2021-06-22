@@ -27,11 +27,11 @@ const Navigator = () => {
         </>
       ) : (
         <>
-          <div className={`navigator-row ${isSingleDisplayMode ? 'single-display' : ''}`}>
+          <div className="navigator-row">
             <SearchPane />
             <ShabadPane />
           </div>
-          <div className={`navigator-row ${isSingleDisplayMode ? 'single-display' : ''}`}>
+          <div className="navigator-row">
             <ViewerPane />
             <MiscPane />
           </div>
