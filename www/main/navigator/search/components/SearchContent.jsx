@@ -13,6 +13,7 @@ const SearchContent = () => {
     currentRaag,
     currentSource,
     verseHistory,
+    versesRead,
     isEmptySlide,
     isWaheguruSlide,
     activeShabadId,
@@ -34,6 +35,7 @@ const SearchContent = () => {
     setCurrentRaag,
     setCurrentSource,
     setVerseHistory,
+    setVersesRead,
     setActiveVerseId,
     setIsEmptySlide,
     setIsWaheguruSlide,
@@ -75,6 +77,10 @@ const SearchContent = () => {
         },
       ];
       setVerseHistory(updatedHistory);
+    }
+    // Push verseId of active Verse to versesRead Array when shabad is changed
+    if (versesRead.some(traversedVerse => traversedVerse !== newSelectedVerse)) {
+      setVersesRead([...versesRead, newSelectedVerse]);
     }
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);

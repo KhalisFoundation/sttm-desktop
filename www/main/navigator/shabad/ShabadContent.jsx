@@ -113,17 +113,17 @@ const ShabadContent = () => {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
-            updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
-            changeHomeVerse(0);
+          updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
+          changeHomeVerse(0);
         },
       );
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-            updateTraversedVerse(ceremonyVerses[0].ID, 0);
-            changeHomeVerse(0);
-          }
+          updateTraversedVerse(ceremonyVerses[0].ID, 0);
+          changeHomeVerse(0);
+        }
       });
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
@@ -150,7 +150,6 @@ const ShabadContent = () => {
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
-        setVersesRead([...versesRead, verses.verseId]);
         setActiveVerse({ [verses.ID]: verses.verseId });
         if (homeVerse !== verses.ID) {
           setHomeVerse(verses.ID);
