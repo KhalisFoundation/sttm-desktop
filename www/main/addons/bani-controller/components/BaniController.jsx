@@ -142,8 +142,6 @@ const BaniController = ({ onScreenClose }) => {
 
 BaniController.propTypes = {
   onScreenClose: PropTypes.func,
-  code: PropTypes.number,
-  adminPin: PropTypes.number,
 };
 
 export default BaniController;

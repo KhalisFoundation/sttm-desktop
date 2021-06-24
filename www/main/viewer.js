@@ -179,10 +179,10 @@ global.platform.ipc.on('show-line', (event, data) => {
   showLine(data.shabadID, data.lineID, data.rows, data.mode);
 });
 
-global.platform.ipc.on('show-ang', (event, data) => {
-  apv = document.body.classList.contains('akhandpaatt');
-  showAng(data.PageNo, data.SourceID);
-});
+// global.platform.ipc.on('show-ang', (event, data) => {
+//   apv = document.body.classList.contains('akhandpaatt');
+//   showAng(data.PageNo, data.SourceID);
+// });
 
 global.platform.ipc.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
@@ -225,7 +225,7 @@ global.platform.ipc.on('presenter-view', (event, inPresenterView) => {
 const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
-  showAng(next, apvCur.SourceID);
+  // showAng(next, apvCur.SourceID);
   global.platform.ipc.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
 };
 
@@ -431,22 +431,22 @@ const createDeck = (cards, curSlide, shabad, ShabadID, mode) => {
   }
 };
 
-const showAng = (PageNo, SourceID, LineID, rows) => {
-  const { cards, lines } = createCards(rows, LineID);
-  apvCur.PageNo = PageNo;
-  apvCur.SourceID = SourceID;
-  apvPages[PageNo] = lines;
-  cards.forEach(card => $apv.appendChild(card));
-  hideDecks();
-  $apv.classList.add('active');
-  if (isWebView && infiniteScroll) {
-    $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
-    $apvObserver.observe($apvObserving);
-  }
-  if (LineID) {
-    setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
-  }
-};
+// const showAng = (PageNo, SourceID, LineID, rows) => {
+//   const { cards, lines } = createCards(rows, LineID);
+//   apvCur.PageNo = PageNo;
+//   apvCur.SourceID = SourceID;
+//   apvPages[PageNo] = lines;
+//   cards.forEach(card => $apv.appendChild(card));
+//   hideDecks();
+//   $apv.classList.add('active');
+//   if (isWebView && infiniteScroll) {
+//     $apvObserving = document.querySelector(`#apv #slide${lines[lines.length - 3]}`);
+//     $apvObserver.observe($apvObserving);
+//   }
+//   if (LineID) {
+//     setTimeout(() => smoothScroll(`#apv #slide${LineID}`), 100);
+//   }
+// };
 
 const smoothScroll = (pos = 0) => {
   let newScrollPos;
@@ -471,8 +471,8 @@ const showLine = (ShabadID, LineID, rows, mode) => {
   if (apv && infiniteScroll) {
     createAPVContainer();
     if (!apvCur.ShabadID || apvCur.ShabadID !== ShabadID) {
-      const info = rows[0];
-      showAng(info.PageNo, info.Source.SourceID, LineID, rows);
+      // const info = rows[0];
+      // showAng(info.PageNo, info.Source.SourceID, LineID, rows);
       apvCur.ShabadID = ShabadID;
     } else {
       smoothScroll(`#apv #slide${LineID}`);

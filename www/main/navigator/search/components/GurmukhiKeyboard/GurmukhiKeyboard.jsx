@@ -91,6 +91,4 @@ GurmukhiKeyboard.propTypes = {
   value: PropTypes.string,
   setValue: PropTypes.func,
   searchType: PropTypes.number,
-  active: PropTypes.bool,
-  onKeyClick: PropTypes.func,
 };

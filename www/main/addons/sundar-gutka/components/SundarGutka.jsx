@@ -102,10 +102,10 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
-            {nitnemBanis && (
+            {nitnemBanis.length > 0 && (
               <ExtraBani onScreenClose={onScreenClose} title="Nitnem Banis" banis={nitnemBanis} />
             )}
-            {popularBanis && (
+            {popularBanis.length > 0 && (
               <ExtraBani onScreenClose={onScreenClose} title="Popular Banis" banis={popularBanis} />
             )}
           </div>
