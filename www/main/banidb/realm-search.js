@@ -120,7 +120,8 @@ const query = (searchQuery, searchType, searchSource) =>
         searchCol = 'PageNo';
         howManyRows = 1000;
         dbQuery = parseInt(saniQuery, 10);
-        condition = `${searchCol} = ${dbQuery}`;
+        // condition = `${searchCol} = ${dbQuery}`;
+        // The above line is commented because to check if we can resolve mentioned deep scan issue (Value assigned to variable 'condition' at this point is not used before it is overwritten)
 
         switch (global.core.search.currentMeta.source) {
           case null:

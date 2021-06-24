@@ -7,8 +7,15 @@ function SearchHeader() {
   // For responsiveness
   const [width, setWidth] = useState(window.innerWidth);
   const breakpoint = 1308;
+  const resizeFn = () => {
+    setWidth(window.innerWidth);
+  };
+
   useEffect(() => {
-    window.addEventListener('resize', () => setWidth(window.innerWidth));
+    window.addEventListener('resize', resizeFn);
+    return () => {
+      window.removeEventListener('resize', resizeFn);
+    };
   }, []);
 
   const { i18n } = remote.require('./app');
