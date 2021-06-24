@@ -113,21 +113,17 @@ const ShabadContent = () => {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
-          if (noActiveVerse) {
             updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
             changeHomeVerse(0);
-          }
         },
       );
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          if (noActiveVerse) {
             updateTraversedVerse(ceremonyVerses[0].ID, 0);
             changeHomeVerse(0);
           }
-        }
       });
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
