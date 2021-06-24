@@ -3,9 +3,7 @@
   @include flex($ai-value: start);
   width: 100%;
   padding: 10px;
-  .fa-check {
-    font-size: 10px;
-  }
+
   &:hover {
     outline: 0;
     .pane-header {
@@ -14,5 +12,9 @@
   }
   .shabad-list {
     height: 430px;
+  }
+
+  .fa-check {
+    color: $grey;
   }
 }
