@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 const { i18n } = remote.require('./app');
 
-const SearchResults = ({ ang, onClick, shabadId, source, sourceId, verse, verseId, writer }) => {
+const SearchResults = ({ ang, onClick, raag, shabadId, sourceId, verse, verseId, writer }) => {
   const getClassForAng = baniSource => {
     if (baniSource === 'G') {
       return 'sggs-color';
@@ -42,9 +42,7 @@ const SearchResults = ({ ang, onClick, shabadId, source, sourceId, verse, verseI
           )}
           <span className="gurmukhi">{verse}</span>
           <div className="search-list-footer">
-            {`${writer} 
-            ${writer && source && ','}
-            ${source}`}
+            {`${writer}${writer && raag ? ', ' : ' '}${raag !== null ? raag : ''}`}
           </div>
         </a>
       </div>
@@ -56,7 +54,7 @@ SearchResults.propTypes = {
   ang: PropTypes.number,
   onClick: PropTypes.func,
   shabadId: PropTypes.number,
-  source: PropTypes.string,
+  raag: PropTypes.string,
   sourceId: PropTypes.string,
   verse: PropTypes.string,
   verseId: PropTypes.number,

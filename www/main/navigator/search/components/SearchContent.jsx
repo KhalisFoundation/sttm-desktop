@@ -186,13 +186,13 @@ const SearchContent = () => {
           <div className="result-list">
             <ul>
               {filteredShabads.map(
-                ({ ang, shabadId, source, sourceId, verse, verseId, writer }, index) => (
+                ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
                   <SearchResults
                     key={index}
                     ang={ang}
                     onClick={changeActiveShabad}
                     shabadId={shabadId}
-                    source={source}
+                    raag={raag}
                     sourceId={sourceId}
                     verse={verse}
                     verseId={verseId}
