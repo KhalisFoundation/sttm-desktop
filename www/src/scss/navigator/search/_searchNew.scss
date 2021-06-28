@@ -4,7 +4,8 @@
   .left-pane {
     @include inline-flex($jc-value: initial, $width: fit-content);
     i {
-      font-size: 16px;
+      font-size: 22px;
+      color: $mild-dark;
     }
     .language-selector {
       justify-content: space-between;
@@ -28,8 +29,15 @@
     @include flex;
     padding: 0 0 0 10px;
     font-style: italic;
+
+    & span {
+      color: $mild-dark;
+    }
+
     .filters {
       padding-right: 12px;
+      color: $mild-dark;
+
       .select-bani {
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -109,6 +117,7 @@
       &::-webkit-input-placeholder {
         font-family: $body-font-family;
         font-size: 0.8em;
+        color: $black;
       }
     }
   }
@@ -124,7 +133,6 @@
       @include inline-flex($width: initial);
       padding: 5px;
       height: 20px;
-      margin-bottom: 5px;
       border-left: 3px solid;
     }
     .search-footer-span1 {

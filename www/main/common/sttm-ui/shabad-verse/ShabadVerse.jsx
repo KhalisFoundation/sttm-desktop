@@ -29,7 +29,7 @@ const ShabadVerse = ({
     <li
       id={`line-${lineNumber}`}
       value={lineNumber}
-      className={`shabadPane-list ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
+      className={`shabadPane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
       <span className="shabadPane-controls">
         {versesRead.map(

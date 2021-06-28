@@ -87,8 +87,16 @@
       li {
         position: relative;
         cursor: pointer;
-        padding: 5px 10px;
         font-size: 1rem;
+
+        &.search-li {
+          padding: 2px 10px;
+        }
+
+        &.shabad-li {
+          padding: 5px 10px;
+        }
+
         div {
           display: inline-flex;
           a {

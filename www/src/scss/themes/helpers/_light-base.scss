@@ -206,7 +206,7 @@
         color: $dialog-bg;
 
         &::-webkit-input-placeholder {
-          color: $dialog-bg;
+          color: $black;
 
           @extend .gurmukhi;
         }
