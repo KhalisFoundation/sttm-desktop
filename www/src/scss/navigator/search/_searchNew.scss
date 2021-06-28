@@ -149,3 +149,10 @@
     }
   }
 }
+
+.bani-words {
+  margin: 0 2px !important;
+  &.highlight {
+    font-weight: bold;
+  }
+}

@@ -4,7 +4,17 @@ import PropTypes from 'prop-types';
 
 const { i18n } = remote.require('./app');
 
-const SearchResults = ({ ang, onClick, raag, shabadId, sourceId, verse, verseId, writer }) => {
+const SearchResults = ({
+  ang,
+  onClick,
+  raag,
+  shabadId,
+  sourceId,
+  searchQuery,
+  verse,
+  verseId,
+  writer,
+}) => {
   const getClassForAng = baniSource => {
     if (baniSource === 'G') {
       return 'sggs-color';
@@ -31,6 +41,19 @@ const SearchResults = ({ ang, onClick, raag, shabadId, sourceId, verse, verseId,
     return 'other-border';
   };
 
+  const highlightKeywords = (gurbaniVerse, searchCharacters) => {
+    const wordsToHightlight = searchCharacters.length;
+    if (gurbaniVerse) {
+      const brokenWords = gurbaniVerse.split(' ');
+      return brokenWords.map((word, index) => (
+        <span key={index} className={`bani-words ${wordsToHightlight > index ? 'highlight' : ''}`}>
+          {word}
+        </span>
+      ));
+    }
+    return gurbaniVerse;
+  };
+
   return (
     <li onClick={() => onClick(shabadId, verseId, verse)} className="search-li">
       <div className={`search-list ${getBorderColorClass(sourceId)}`}>
@@ -40,7 +63,7 @@ const SearchResults = ({ ang, onClick, raag, shabadId, sourceId, verse, verseId,
               `SEARCH.ANG`,
             )} ${ang} `}</span>
           )}
-          <span className="gurmukhi">{verse}</span>
+          <span className="gurmukhi">{highlightKeywords(verse, searchQuery)}</span>
           <div className="search-list-footer">
             {`${writer}${writer && raag ? ', ' : ' '}${raag !== null ? raag : ''}`}
           </div>
@@ -53,8 +76,9 @@ const SearchResults = ({ ang, onClick, raag, shabadId, sourceId, verse, verseId,
 SearchResults.propTypes = {
   ang: PropTypes.number,
   onClick: PropTypes.func,
-  shabadId: PropTypes.number,
   raag: PropTypes.string,
+  searchQuery: PropTypes.string,
+  shabadId: PropTypes.number,
   sourceId: PropTypes.string,
   verse: PropTypes.string,
   verseId: PropTypes.number,

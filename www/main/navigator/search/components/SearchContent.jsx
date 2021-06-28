@@ -194,6 +194,7 @@ const SearchContent = () => {
                     shabadId={shabadId}
                     raag={raag}
                     sourceId={sourceId}
+                    searchQuery={searchQuery}
                     verse={verse}
                     verseId={verseId}
                     writer={writer}
