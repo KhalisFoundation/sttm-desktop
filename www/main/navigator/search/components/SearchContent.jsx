@@ -190,6 +190,7 @@ const SearchContent = () => {
                   <SearchResults
                     key={index}
                     ang={ang}
+                    searchType={currentSearchType}
                     onClick={changeActiveShabad}
                     shabadId={shabadId}
                     raag={raag}

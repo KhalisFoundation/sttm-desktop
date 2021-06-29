@@ -7,6 +7,7 @@ const { i18n } = remote.require('./app');
 const SearchResults = ({
   ang,
   onClick,
+  searchType,
   raag,
   shabadId,
   sourceId,
@@ -41,12 +42,39 @@ const SearchResults = ({
     return 'other-border';
   };
 
-  const highlightKeywords = (gurbaniVerse, searchCharacters) => {
+  const isHighlightRequired = (word, wordIndex, searchCharacters) => {
     const wordsToHightlight = searchCharacters.length;
+    switch (searchType) {
+      // searchType value 0 represents First letter (start) option
+      case 0:
+        if (wordsToHightlight > wordIndex) {
+          return true;
+        }
+        break;
+
+      // searchType value 2 represents Full Word(s) option
+      case 2:
+        if (word.includes(searchCharacters)) {
+          return true;
+        }
+        break;
+
+      default:
+        return false;
+    }
+    return false;
+  };
+
+  const highlightKeywords = (gurbaniVerse, searchCharacters) => {
     if (gurbaniVerse) {
       const brokenWords = gurbaniVerse.split(' ');
       return brokenWords.map((word, index) => (
-        <span key={index} className={`bani-words ${wordsToHightlight > index ? 'highlight' : ''}`}>
+        <span
+          key={index}
+          className={`bani-words ${
+            isHighlightRequired(word, index, searchCharacters) ? 'highlight' : ''
+          }`}
+        >
           {word}
         </span>
       ));
@@ -78,6 +106,7 @@ SearchResults.propTypes = {
   onClick: PropTypes.func,
   raag: PropTypes.string,
   searchQuery: PropTypes.string,
+  searchType: PropTypes.number,
   shabadId: PropTypes.number,
   sourceId: PropTypes.string,
   verse: PropTypes.string,
