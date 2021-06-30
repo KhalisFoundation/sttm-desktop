@@ -79,8 +79,8 @@ const SearchContent = () => {
       setVerseHistory(updatedHistory);
     }
     // Push verseId of active Verse to versesRead Array when shabad is changed
-    if (versesRead.some(traversedVerse => traversedVerse !== newSelectedVerse)) {
-      setVersesRead([...versesRead, newSelectedVerse]);
+    if (!versesRead.includes(newSelectedVerse)) {
+      setVersesRead([newSelectedVerse]);
     }
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
