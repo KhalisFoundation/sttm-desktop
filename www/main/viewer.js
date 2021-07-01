@@ -136,7 +136,7 @@ const castText = (text, isGurmukhi) => {
 
 const applyThemebg = () => {
   const themeBgPrefs = prefs.app.themebg;
-  $body.style.backgroundImage = themeBgPrefs.url ? `url(${slash(themeBgPrefs.url)})` : 'none';
+  $body.style.backgroundImage = themeBgPrefs.url ? `url('${slash(themeBgPrefs.url)}')` : 'none';
   $body.classList.toggle('show-overlay', themeBgPrefs.type === 'custom');
 };
 

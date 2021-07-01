@@ -11,6 +11,40 @@
 }
 
 body.win32:not(.webview) {
+  div#toolbar-nav {
+    padding-top: 50px;
+  }
+
+  .workspace-bar {
+    top: 15px;
+  }
+
+  #search-page {
+    top: 80px;
+  }
+
+  #main-viewer {
+    top: 80px;
+  }
+
+  .settings-wrapper {
+    height: 93vh;
+    margin-top: 40px;
+  }
+
+  .sync-wrapper {
+    bottom: 10px;
+    height: 94vh;
+  }
+
+  .close-screen {
+    top: 35px;
+  }
+
+  .sundar-gutka-wrapper {
+    margin-top: 25px;
+  }
+
   #titlebar {
     background-color: #333;
     color: #fff;

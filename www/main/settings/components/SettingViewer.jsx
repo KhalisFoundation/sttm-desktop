@@ -43,7 +43,7 @@ const SettingViewer = () => {
 
   return (
     <div className={`settings-viewer theme-${theme}`} style={commonStyles}>
-      <h1 className="gurbani gurmukhi" style={gurbaniStyles}>
+      <h1 className="gurbani gurmukhi-thick" style={gurbaniStyles}>
         <div>
           <span className="padchhed">
             <span>jo</span>
