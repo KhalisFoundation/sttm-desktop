@@ -27,6 +27,7 @@ const SearchContent = () => {
     currentSearchType,
     isSundarGutkaBani,
     isCeremonyBani,
+    shortcuts,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -46,13 +47,14 @@ const SearchContent = () => {
     setSearchQuery,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
+    setShortcuts,
   } = useStoreActions(state => state.navigator);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
 
-  // Keyboard
+  // Gurmukhi Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
@@ -136,11 +138,30 @@ const SearchContent = () => {
 
   const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchData))]);
 
+  const openFirstResult = () => {
+    if (searchQuery.length > 0 && filteredShabads.length > 0) {
+      // Takes { shabadId, verseId, verse } from the first shabad in search result
+      const { shabadId, verseId, verse } = filteredShabads[0];
+      changeActiveShabad(shabadId, verseId, verse);
+    }
+  };
+
   useEffect(() => {
     setFilteredShabads(
       filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
     );
   }, [searchData, currentWriter, currentRaag, currentSource]);
+
+  // checks if keyboard shortcut is fired then it invokes the function
+  useEffect(() => {
+    if (shortcuts.openFirstResult) {
+      openFirstResult();
+      setShortcuts({
+        ...shortcuts,
+        openFirstResult: false,
+      });
+    }
+  }, [shortcuts]);
 
   return (
     <div className="search-content-container">

@@ -34,6 +34,7 @@
     "focusInput": false,
     "nextVerse": false,
     "prevVerse": false,
-    "homeVerse": false
+    "homeVerse": false,
+    "openFirstResult": false
   }
 }
