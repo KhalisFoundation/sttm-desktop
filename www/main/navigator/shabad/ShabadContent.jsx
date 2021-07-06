@@ -124,6 +124,15 @@ const ShabadContent = () => {
     }
   };
 
+  const openHomeVerse = () => {
+    if (homeVerse) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      const newVerseIndex = homeVerse;
+      const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+      updateTraversedVerse(newVerseId, newVerseIndex);
+    }
+  };
+
   const changeHomeVerse = verseIndex => {
     if (homeVerse !== verseIndex) {
       const currentIndex = verseHistory.findIndex(
@@ -186,6 +195,7 @@ const ShabadContent = () => {
     });
   }, [activeShabad]);
 
+  // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
     if (shortcuts.nextVerse) {
       openNextVerse();
@@ -199,6 +209,13 @@ const ShabadContent = () => {
       setShortcuts({
         ...shortcuts,
         prevVerse: false,
+      });
+    }
+    if (shortcuts.homeVerse) {
+      openHomeVerse();
+      setShortcuts({
+        ...shortcuts,
+        homeVerse: false,
       });
     }
   }, [shortcuts]);

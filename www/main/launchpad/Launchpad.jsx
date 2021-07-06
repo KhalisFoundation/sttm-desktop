@@ -112,6 +112,16 @@ const Launchpad = () => {
     }
   };
 
+  // handle down and right arrow key
+  const handleSpacebar = () => {
+    if (!shortcuts.homeVerse) {
+      setShortcuts({
+        ...shortcuts,
+        homeVerse: true,
+      });
+    }
+  };
+
   useKeys('Digit1', 'combination', handleCtrlPlus1);
   useKeys('Digit2', 'combination', handleCtrlPlus2);
   useKeys('Digit3', 'combination', handleCtrlPlus3);
@@ -121,6 +131,7 @@ const Launchpad = () => {
   useKeys('ArrowRight', 'single', handleDownAndRight);
   useKeys('ArrowUp', 'single', handleUpAndLeft);
   useKeys('ArrowLeft', 'single', handleUpAndLeft);
+  useKeys('Space', 'single', handleSpacebar);
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';
   const isBaniControllerOverlay = overlayScreen === 'sync-button';

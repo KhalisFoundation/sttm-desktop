@@ -33,6 +33,7 @@
     "openAnandSahibBhog": false,
     "focusInput": false,
     "nextVerse": false,
-    "prevVerse": false
+    "prevVerse": false,
+    "homeVerse": false
   }
 }
