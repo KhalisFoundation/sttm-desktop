@@ -12,12 +12,9 @@ import { Settings } from '../settings/';
 import { DEFAULT_OVERLAY } from '../common/constants';
 
 const Launchpad = () => {
-  const handleCtrlAnd1 = () => {
-    console.log('Enter key is pressed');
-  };
-  useKeys('Digit1', 'combination', handleCtrlAnd1);
-
   const { overlayScreen } = useStoreState(state => state.app);
+  const { shortcuts } = useStoreState(state => state.navigator);
+  const { setShortcuts } = useStoreActions(state => state.navigator);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
 
@@ -40,6 +37,55 @@ const Launchpad = () => {
     },
     [overlayScreen, setOverlayScreen, DEFAULT_OVERLAY],
   );
+
+  /** ******************************* */
+  /** *******Keyboard Shortcuts****** */
+  /** ******************************* */
+  // "waheguru": ["mod+1"],
+  // "moolMantra": ["mod+2"],
+  // "empty": ["mod+3"],
+  // "anandSahibBhog": ["mod+4"],
+
+  const handleCtrlPlus1 = () => {
+    if (!shortcuts.openWaheguruSlide) {
+      setShortcuts({
+        ...shortcuts,
+        openWaheguruSlide: true,
+      });
+    }
+  };
+
+  const handleCtrlPlus2 = () => {
+    if (!shortcuts.openMoolMantraSlide) {
+      setShortcuts({
+        ...shortcuts,
+        openMoolMantraSlide: true,
+      });
+    }
+  };
+
+  const handleCtrlPlus3 = () => {
+    if (!shortcuts.openBlankViewer) {
+      setShortcuts({
+        ...shortcuts,
+        openBlankViewer: true,
+      });
+    }
+  };
+
+  const handleCtrlPlus4 = () => {
+    if (!shortcuts.openAnandSahibBhog) {
+      setShortcuts({
+        ...shortcuts,
+        openAnandSahibBhog: true,
+      });
+    }
+  };
+
+  useKeys('Digit1', 'combination', handleCtrlPlus1);
+  useKeys('Digit2', 'combination', handleCtrlPlus2);
+  useKeys('Digit3', 'combination', handleCtrlPlus3);
+  useKeys('Digit4', 'combination', handleCtrlPlus4);
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';
   const isBaniControllerOverlay = overlayScreen === 'sync-button';

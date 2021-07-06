@@ -1,5 +1,5 @@
 import { remote } from 'electron';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const { i18n } = remote.require('./app');
@@ -13,6 +13,7 @@ export const MiscFooter = () => {
     isSundarGutkaBani,
     isCeremonyBani,
     ceremonyId,
+    shortcuts,
   } = useStoreState(state => state.navigator);
   const {
     setIsEmptySlide,
@@ -23,6 +24,7 @@ export const MiscFooter = () => {
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setCeremonyId,
+    setShortcuts,
   } = useStoreActions(state => state.navigator);
   const { akhandpatt } = useStoreState(state => state.userSettings);
   const { setAkhandpatt } = useStoreActions(state => state.userSettings);
@@ -104,6 +106,37 @@ export const MiscFooter = () => {
       setIsEmptySlide(true);
     }
   };
+
+  useEffect(() => {
+    if (shortcuts.openWaheguruSlide === true) {
+      openWaheguruSlide();
+      setShortcuts({
+        ...shortcuts,
+        openWaheguruSlide: false,
+      });
+    }
+    if (shortcuts.openMoolMantraSlide === true) {
+      openMoolMantraSlide();
+      setShortcuts({
+        ...shortcuts,
+        openMoolMantraSlide: false,
+      });
+    }
+    if (shortcuts.openBlankViewer === true) {
+      openBlankViewer();
+      setShortcuts({
+        ...shortcuts,
+        openBlankViewer: false,
+      });
+    }
+    if (shortcuts.openAnandSahibBhog === true) {
+      setShortcuts({
+        ...shortcuts,
+        openAnandSahibBhog: false,
+      });
+      openAnandSahibBhog();
+    }
+  }, [shortcuts]);
 
   return (
     <div className="misc-footer">

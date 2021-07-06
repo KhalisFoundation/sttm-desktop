@@ -25,5 +25,11 @@
   "sundarGutkaBaniId": null,
   "ceremonyId": null,
   "isCeremonyBani": false,
-  "singleDisplayActiveTab": "search"
+  "singleDisplayActiveTab": "search",
+  "shortcuts": {
+    "openWaheguruSlide": false,
+    "openMoolMantraSlide": false,
+    "openBlankViewer": false,
+    "openAnandSahibBhog": false
+  }
 }
