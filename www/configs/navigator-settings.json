@@ -31,6 +31,7 @@
     "openMoolMantraSlide": false,
     "openBlankViewer": false,
     "openAnandSahibBhog": false,
-    "focusInput": false
+    "focusInput": false,
+    "nextVerse": false
   }
 }

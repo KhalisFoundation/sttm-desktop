@@ -22,6 +22,7 @@ const ShabadContent = () => {
     ceremonyId,
     isCeremonyBani,
     isSundarGutkaBani,
+    shortcuts,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -34,6 +35,7 @@ const ShabadContent = () => {
     setIsMoolMantraSlide,
     setIsDhanGuruSlide,
     setNoActiveVerse,
+    setShortcuts,
   } = useStoreActions(state => state.navigator);
 
   const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
@@ -93,6 +95,19 @@ const ShabadContent = () => {
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
+    }
+  };
+
+  const openNextVerse = () => {
+    if (Object.entries(activeVerse).length !== 0) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      Object.keys(activeVerse).forEach(activeVerseIndex => {
+        if (mappedShabadArray.length - 1 > parseInt(activeVerseIndex, 10)) {
+          const newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
+          const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          updateTraversedVerse(newVerseId, newVerseIndex);
+        }
+      });
     }
   };
 
@@ -157,6 +172,16 @@ const ShabadContent = () => {
       }
     });
   }, [activeShabad]);
+
+  useEffect(() => {
+    if (shortcuts.nextVerse) {
+      openNextVerse();
+      setShortcuts({
+        ...shortcuts,
+        nextVerse: false,
+      });
+    }
+  }, [shortcuts]);
 
   return (
     <div className="shabad-list">
