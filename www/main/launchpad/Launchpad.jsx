@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
+import { useKeys } from '../common/hooks';
 
 import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
 import { Settings } from '../settings/';
@@ -11,6 +12,11 @@ import { Settings } from '../settings/';
 import { DEFAULT_OVERLAY } from '../common/constants';
 
 const Launchpad = () => {
+  const handleCtrlAnd1 = () => {
+    console.log('Enter key is pressed');
+  };
+  useKeys('Digit1', 'combination', handleCtrlAnd1);
+
   const { overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen } = useStoreActions(actions => actions.app);
   const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
