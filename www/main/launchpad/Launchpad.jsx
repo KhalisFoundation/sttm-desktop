@@ -41,11 +41,8 @@ const Launchpad = () => {
   /** ******************************* */
   /** *******Keyboard Shortcuts****** */
   /** ******************************* */
-  // "waheguru": ["mod+1"],
-  // "moolMantra": ["mod+2"],
-  // "empty": ["mod+3"],
-  // "anandSahibBhog": ["mod+4"],
 
+  // open waheguru slide shortcut
   const handleCtrlPlus1 = () => {
     if (!shortcuts.openWaheguruSlide) {
       setShortcuts({
@@ -55,6 +52,7 @@ const Launchpad = () => {
     }
   };
 
+  // open mool mantra slide shortcut
   const handleCtrlPlus2 = () => {
     if (!shortcuts.openMoolMantraSlide) {
       setShortcuts({
@@ -64,6 +62,7 @@ const Launchpad = () => {
     }
   };
 
+  // open blank slide shortcut
   const handleCtrlPlus3 = () => {
     if (!shortcuts.openBlankViewer) {
       setShortcuts({
@@ -73,6 +72,7 @@ const Launchpad = () => {
     }
   };
 
+  // open anand sahib bhog slide shortcut
   const handleCtrlPlus4 = () => {
     if (!shortcuts.openAnandSahibBhog) {
       setShortcuts({
@@ -82,10 +82,21 @@ const Launchpad = () => {
     }
   };
 
+  // focus on search shabad input shortcut
+  const handleCtrlPlusSlash = () => {
+    if (!shortcuts.focusInput) {
+      setShortcuts({
+        ...shortcuts,
+        focusInput: true,
+      });
+    }
+  };
+
   useKeys('Digit1', 'combination', handleCtrlPlus1);
   useKeys('Digit2', 'combination', handleCtrlPlus2);
   useKeys('Digit3', 'combination', handleCtrlPlus3);
   useKeys('Digit4', 'combination', handleCtrlPlus4);
+  useKeys('Slash', 'combination', handleCtrlPlusSlash);
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';
   const isBaniControllerOverlay = overlayScreen === 'sync-button';

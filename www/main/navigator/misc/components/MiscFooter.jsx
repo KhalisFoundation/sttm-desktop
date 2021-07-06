@@ -108,28 +108,28 @@ export const MiscFooter = () => {
   };
 
   useEffect(() => {
-    if (shortcuts.openWaheguruSlide === true) {
+    if (shortcuts.openWaheguruSlide) {
       openWaheguruSlide();
       setShortcuts({
         ...shortcuts,
         openWaheguruSlide: false,
       });
     }
-    if (shortcuts.openMoolMantraSlide === true) {
+    if (shortcuts.openMoolMantraSlide) {
       openMoolMantraSlide();
       setShortcuts({
         ...shortcuts,
         openMoolMantraSlide: false,
       });
     }
-    if (shortcuts.openBlankViewer === true) {
+    if (shortcuts.openBlankViewer) {
       openBlankViewer();
       setShortcuts({
         ...shortcuts,
         openBlankViewer: false,
       });
     }
-    if (shortcuts.openAnandSahibBhog === true) {
+    if (shortcuts.openAnandSahibBhog) {
       setShortcuts({
         ...shortcuts,
         openAnandSahibBhog: false,

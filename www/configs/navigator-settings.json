@@ -30,6 +30,7 @@
     "openWaheguruSlide": false,
     "openMoolMantraSlide": false,
     "openBlankViewer": false,
-    "openAnandSahibBhog": false
+    "openAnandSahibBhog": false,
+    "focusInput": false
   }
 }
