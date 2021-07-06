@@ -111,6 +111,19 @@ const ShabadContent = () => {
     }
   };
 
+  const openPrevVerse = () => {
+    if (Object.entries(activeVerse).length !== 0) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      Object.keys(activeVerse).forEach(activeVerseIndex => {
+        if (parseInt(activeVerseIndex, 10) > 0) {
+          const newVerseIndex = parseInt(activeVerseIndex, 10) - 1;
+          const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          updateTraversedVerse(newVerseId, newVerseIndex);
+        }
+      });
+    }
+  };
+
   const changeHomeVerse = verseIndex => {
     if (homeVerse !== verseIndex) {
       const currentIndex = verseHistory.findIndex(
@@ -179,6 +192,13 @@ const ShabadContent = () => {
       setShortcuts({
         ...shortcuts,
         nextVerse: false,
+      });
+    }
+    if (shortcuts.prevVerse) {
+      openPrevVerse();
+      setShortcuts({
+        ...shortcuts,
+        prevVerse: false,
       });
     }
   }, [shortcuts]);
