@@ -63,6 +63,7 @@ const ThemeContainer = () => {
             }}
             id="themebg-upload"
             type="file"
+            accept="image/png, image/jpeg"
           />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
