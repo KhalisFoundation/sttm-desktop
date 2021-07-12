@@ -55,25 +55,29 @@ function SearchHeader() {
       <div className="left-pane">
         <i className="fa fa-search" />
         <div className="language-selector">
-          <label className="gurmukhi">
+          <label className="gurmukhi language-btn-label">
+            <span className="label-text">gurmuKI</span>
             <input
               type="radio"
+              className="language-radio-btn"
               value="gr"
               id="gurmukhi-language"
               checked={currentLanguage === 'gr'}
               onChange={handleLanguageChange}
             />
-            gurmuKI
+            <span className="checkmark"></span>
           </label>
-          <label className="english">
+          <label className="english language-btn-label">
+            <span className="label-text">English</span>
             <input
               type="radio"
+              className="language-radio-btn"
               value="en"
               id="english-language"
               onChange={handleLanguageChange}
               checked={currentLanguage === 'en'}
             />
-            English
+            <span className="checkmark"></span>
           </label>
         </div>
       </div>

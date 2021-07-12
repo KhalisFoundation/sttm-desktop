@@ -1,4 +1,5 @@
 @import '../utils/variables';
+
 .search-pane {
   @include pane-containers;
   .left-pane {
@@ -11,10 +12,52 @@
       justify-content: space-between;
       display: inline-flex;
       align-items: center;
-      label {
-        display: inline-flex;
+
+      .language-btn-label {
+        $size: 14px;
         align-items: center;
-        padding: 0 2px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        height: $size;
+        justify-content: center;
+        margin-left: 10px;
+        min-width: $size;
+        padding-left: $size;
+        position: relative;
+
+        input {
+          display: none;
+        }
+
+        .label-text {
+          margin-left: 5px;
+        }
+
+        &[aria-label]::after {
+          display: inline-block;
+          margin-left: 5px;
+        }
+
+        .checkmark {
+          border: 2px solid $light-green;
+          border-radius: 50%;
+          display: inline-block;
+          height: $size;
+          left: 0;
+          padding: 3px;
+          position: absolute;
+          top: 0;
+          transition: opacity 0.3s ease;
+          width: $size;
+        }
+
+        input:checked ~ .checkmark {
+          background-image: url('../../../assets/img/icons/check-circle.svg');
+          background-origin: border-box;
+          background-repeat: no-repeat;
+          background-size: $size;
+        }
       }
     }
   }
