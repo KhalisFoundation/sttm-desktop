@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 import anvaad from 'anvaad-js';
 
-const SlideTransliteration = ({ gurmukhiString }) => {
+const SlideTransliteration = ({ getFontSize, gurmukhiString }) => {
   const { transliterationLanguage, transliterationFontSize } = useStoreState(
     state => state.userSettings,
   );
@@ -34,7 +34,7 @@ const SlideTransliteration = ({ gurmukhiString }) => {
     transliterationString && (
       <div
         className={`slide-transliteration language-${transliterationLanguage}`}
-        style={{ fontSize: `${transliterationFontSize * 3}px` }}
+        style={getFontSize(transliterationFontSize)}
       >
         {transliterationString}
       </div>
@@ -43,6 +43,7 @@ const SlideTransliteration = ({ gurmukhiString }) => {
 };
 
 SlideTransliteration.propTypes = {
+  getFontSize: PropTypes.func,
   gurmukhiString: PropTypes.string,
 };
 

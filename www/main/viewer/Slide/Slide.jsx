@@ -28,6 +28,7 @@ const Slide = ({
     vishraamSource,
     vishraamType,
     displayNextLine,
+    isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
 
   const getLarivaarAssistClass = () => {
@@ -43,6 +44,13 @@ const Slide = ({
     return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
   };
 
+  const getFontSize = verseType => {
+    if (isSingleDisplayMode) {
+      return { fontSize: `${verseType}vh` };
+    }
+    return { fontSize: `${verseType * 3}px` };
+  };
+
   return (
     <>
       <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
@@ -52,6 +60,7 @@ const Slide = ({
           isMoolMantraSlide ||
           isDhanGuruSlide) && (
           <SlideAnnouncement
+            getFontSize={getFontSize}
             isWaheguruSlide={isWaheguruSlide}
             isMoolMantraSlide={isMoolMantraSlide}
             isEmptySlide={isEmptySlide}
@@ -67,6 +76,7 @@ const Slide = ({
             <>
               <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
                 <SlideGurbani
+                  getFontSize={getFontSize}
                   gurmukhiString={verseObj.Gurmukhi}
                   larivaar={larivaar}
                   vishraamPlacement={JSON.parse(verseObj.Visraam)}
@@ -74,17 +84,29 @@ const Slide = ({
                 />
               </div>
               {translationVisibility && (
-                <SlideTranslation translationObj={JSON.parse(verseObj.Translations)} />
+                <SlideTranslation
+                  getFontSize={getFontSize}
+                  translationObj={JSON.parse(verseObj.Translations)}
+                />
               )}
-              {teekaVisibility && <SlideTeeka teekaObj={JSON.parse(verseObj.Translations).pu} />}
+              {teekaVisibility && (
+                <SlideTeeka
+                  getFontSize={getFontSize}
+                  teekaObj={JSON.parse(verseObj.Translations).pu}
+                />
+              )}
               {transliterationVisibility && (
-                <SlideTransliteration gurmukhiString={verseObj.Gurmukhi} />
+                <SlideTransliteration
+                  getFontSize={getFontSize}
+                  gurmukhiString={verseObj.Gurmukhi}
+                />
               )}
               {displayNextLine && nextLineObj.Gurmukhi && nextLineObj.Visraam && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
                 >
                   <SlideGurbani
+                    getFontSize={getFontSize}
                     gurmukhiString={nextLineObj.Gurmukhi}
                     larivaar={larivaar}
                     vishraamPlacement={JSON.parse(verseObj.Visraam)}

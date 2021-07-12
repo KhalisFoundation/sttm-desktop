@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 const SlideAnnouncement = ({
+  getFontSize,
   isWaheguruSlide,
   isMoolMantraSlide,
   isEmptySlide,
@@ -32,7 +33,7 @@ const SlideAnnouncement = ({
   return (
     <div className="slide-announcement">
       <span
-        style={{ fontSize: `${announcementsFontSize * 3}px` }}
+        style={getFontSize(announcementsFontSize)}
         className={
           isWaheguruSlide || announcementGurmukhi || isMoolMantraSlide || isDhanGuruSlide
             ? 'gurmukhi-announcement-slide'
@@ -46,6 +47,7 @@ const SlideAnnouncement = ({
 };
 
 SlideAnnouncement.propTypes = {
+  getFontSize: PropTypes.func,
   isWaheguruSlide: PropTypes.bool,
   isMoolMantraSlide: PropTypes.bool,
   isEmptySlide: PropTypes.bool,

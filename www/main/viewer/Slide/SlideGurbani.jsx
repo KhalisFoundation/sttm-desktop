@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 const SlideGurbani = ({
+  getFontSize,
   gurmukhiString,
   isWaheguruSlide,
   larivaar,
@@ -54,14 +55,14 @@ const SlideGurbani = ({
     return !isWaheguruSlide ? (
       breakIntoWords(gurmukhiString).map((word, i) => (
         <React.Fragment key={i}>
-          <span className={getVishraamStyle(word)} style={{ fontSize: `${gurbaniFontSize * 3}px` }}>
+          <span className={getVishraamStyle(word)} style={getFontSize(gurbaniFontSize)}>
             {word.text}
           </span>
           <wbr />
         </React.Fragment>
       ))
     ) : (
-      <span style={{ fontSize: `${gurbaniFontSize * 3}px` }}>{gurmukhiString}</span>
+      <span style={getFontSize(gurbaniFontSize)}>{gurmukhiString}</span>
     );
   };
 
@@ -69,6 +70,7 @@ const SlideGurbani = ({
 };
 
 SlideGurbani.propTypes = {
+  getFontSize: PropTypes.func,
   gurmukhiString: PropTypes.string,
   isWaheguruSlide: PropTypes.bool,
   larivaar: PropTypes.bool,
