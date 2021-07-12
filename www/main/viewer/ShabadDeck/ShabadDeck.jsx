@@ -32,6 +32,7 @@ function ShabadDeck() {
     baniLength,
     mangalPosition,
     displayNextLine,
+    isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
@@ -135,11 +136,14 @@ function ShabadDeck() {
       } theme-${getCurrentThemeInstance().key}`}
       style={applyTheme()}
     >
-      <QuickTools
-        isAnnouncementSlide={isAnnouncementSlide}
-        isWaheguruSlide={isWaheguruSlide}
-        isMoolMantraSlide={isMoolMantraSlide}
-      />
+      {/* show quicktools only on presentation mode */}
+      {!isSingleDisplayMode && (
+        <QuickTools
+          isAnnouncementSlide={isAnnouncementSlide}
+          isWaheguruSlide={isWaheguruSlide}
+          isMoolMantraSlide={isMoolMantraSlide}
+        />
+      )}
       {activeVerse.map((activeVerseObj, index) => (
         <Slide
           key={index}
