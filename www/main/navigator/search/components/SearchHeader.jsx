@@ -97,15 +97,19 @@ function SearchHeader() {
             ) : (
               <div className="search-type">
                 {gurmukhiSearchTypes.map(value => (
-                  <label key={value}>
+                  <React.Fragment key={value}>
                     <input
+                      className="search-type-checkbox"
+                      id={value}
                       type="checkbox"
                       value={value}
-                      key={value}
                       onChangeCapture={handleSearchOption}
                     />
-                    {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
-                  </label>
+                    <span className="search-type-checkmark"></span>
+                    <label htmlFor={value} className="search-type-label">
+                      {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
+                    </label>
+                  </React.Fragment>
                 ))}
               </div>
             )}{' '}
@@ -125,10 +129,18 @@ function SearchHeader() {
             ) : (
               <div className="search-type">
                 {englishSearchTypes.map(value => (
-                  <label key={value}>
-                    <input type="checkbox" value={value} key={value} />
-                    {i18n.t(`SEARCH.${englishSearchText[value]}`)}
-                  </label>
+                  <React.Fragment key={value}>
+                    <input
+                      className="search-type-checkbox"
+                      id={value}
+                      type="checkbox"
+                      value={value}
+                    />
+                    <span className="search-type-checkmark"></span>
+                    <label htmlFor={value} className="search-type-label">
+                      {i18n.t(`SEARCH.${englishSearchText[value]}`)}
+                    </label>
+                  </React.Fragment>
                 ))}
               </div>
             )}
