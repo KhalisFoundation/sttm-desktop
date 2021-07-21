@@ -131,11 +131,6 @@ const getNotifications = (timeStamp, callback) => {
   );
 };
 
-const notificationsBellClickHandler = () => {
-  analytics.trackEvent('display', 'notifications');
-  getNotifications(null, showNotificationsModal);
-};
-
 /* Generate Toggle Buttons */
 const menuButton = h('a.menu-button.navigator-button.active', h('i.fa.fa-bars'));
 const closeButton = buttonFactory({
@@ -159,17 +154,6 @@ const randomShabadButton = h(
   ),
 );
 
-const notificationButton = h(
-  'li',
-  h(
-    'a.notification-button',
-    {
-      onclick: notificationsBellClickHandler,
-    },
-    h('i.fa.fa-bell.list-icon'),
-    i18n.t('OTHERS.WHATS_NEW'),
-  ),
-);
 const hukamnamaButton = h(
   'li',
   h(
@@ -336,7 +320,6 @@ module.exports = {
     const $listOfShabadOptions = document.querySelector('#list-of-shabad-options');
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
-    $listOfShabadOptions.appendChild(notificationButton);
 
     isOnline().then(online => {
       document.querySelector('.hukamnama-button').classList.toggle('is-offline', !online);
