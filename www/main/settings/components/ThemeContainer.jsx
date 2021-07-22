@@ -68,20 +68,22 @@ const ThemeContainer = () => {
           />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
-        {customThemes.map(tile => (
-          <React.Fragment key={tile.name}>
-            <CustomBgTile
-              customBg={tile}
-              onApply={() => {
-                applyTheme(tile, 'custom', setTheme, setThemeBg);
-              }}
-              onRemove={() => {
-                removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
-                upsertCustomBackgrounds(setCustomThemes);
-              }}
-            />
-          </React.Fragment>
-        ))}
+        <span className="theme-tile-holder">
+          {customThemes.map(tile => (
+            <React.Fragment key={tile.name}>
+              <CustomBgTile
+                customBg={tile}
+                onApply={() => {
+                  applyTheme(tile, 'custom', setTheme, setThemeBg);
+                }}
+                onRemove={() => {
+                  removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+                  upsertCustomBackgrounds(setCustomThemes);
+                }}
+              />
+            </React.Fragment>
+          ))}
+        </span>
       </div>
     </div>
   );
