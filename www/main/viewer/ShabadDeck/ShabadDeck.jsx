@@ -9,6 +9,7 @@ import {
   loadCeremony,
   loadShabad,
 } from '../../navigator/utils';
+import ViewerIcon from '../icons/ViewerIcon';
 
 const themes = require('../../../../www/configs/themes.json');
 
@@ -130,33 +131,36 @@ function ShabadDeck() {
   }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   return (
-    <div
-      className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
-        isEmptySlide ? 'empty-slide' : ''
-      } theme-${getCurrentThemeInstance().key}`}
-      style={applyTheme()}
-    >
-      {/* show quicktools only on presentation mode */}
-      {!isSingleDisplayMode && (
-        <QuickTools
-          isAnnouncementSlide={isAnnouncementSlide}
-          isWaheguruSlide={isWaheguruSlide}
-          isMoolMantraSlide={isMoolMantraSlide}
-        />
-      )}
-      {activeVerse.map((activeVerseObj, index) => (
-        <Slide
-          key={index}
-          verseObj={activeVerseObj}
-          nextLineObj={nextVerse}
-          isWaheguruSlide={isWaheguruSlide}
-          isMoolMantraSlide={isMoolMantraSlide}
-          isEmptySlide={isEmptySlide}
-          isAnnouncementSlide={isAnnouncementSlide}
-          isDhanGuruSlide={isDhanGuruSlide}
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
+          isEmptySlide ? 'empty-slide' : ''
+        } theme-${getCurrentThemeInstance().key}`}
+        style={applyTheme()}
+      >
+        {/* show quicktools only on presentation mode */}
+        {!isSingleDisplayMode && (
+          <QuickTools
+            isAnnouncementSlide={isAnnouncementSlide}
+            isWaheguruSlide={isWaheguruSlide}
+            isMoolMantraSlide={isMoolMantraSlide}
+          />
+        )}
+        {activeVerse.map((activeVerseObj, index) => (
+          <Slide
+            key={index}
+            verseObj={activeVerseObj}
+            nextLineObj={nextVerse}
+            isWaheguruSlide={isWaheguruSlide}
+            isMoolMantraSlide={isMoolMantraSlide}
+            isEmptySlide={isEmptySlide}
+            isAnnouncementSlide={isAnnouncementSlide}
+            isDhanGuruSlide={isDhanGuruSlide}
+          />
+        ))}
+      </div>
+      <ViewerIcon className="viewer-logo" />
+    </>
   );
 }
 
