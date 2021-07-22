@@ -55,8 +55,8 @@ export const uploadImage = async evt => {
 
     if (imageCheck(filePath)) {
       const files = await imagemin([filePath], userBackgroundsPath);
-      const fileUrl = new URL(`file:///${files[0].path}`).href;
       if (files) {
+        const fileUrl = new URL(`file:///${files[0].path}`).href;
         const customThemeObj = {
           type: 'custom',
           url: `${fileUrl}`.replace(/(%20)/g, '\\ '),
