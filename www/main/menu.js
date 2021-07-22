@@ -34,28 +34,28 @@ modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--defa
   modal.close();
 });
 
-const buttonFactory = ({
-  buttonId = '',
-  buttonIcon = 'fa-times',
-  buttonType = 'open',
-  pageToToggle,
-}) => {
-  let classList;
-  if (buttonType === 'open') {
-    classList = `#${buttonId}.active`;
-  } else {
-    classList = '.close-button';
-  }
-  return h(
-    `a${classList}.navigator-button`,
-    {
-      onclick: () => {
-        module.exports.toggleMenu(pageToToggle);
-      },
-    },
-    h(`i.fa.${buttonIcon}`),
-  );
-};
+// const buttonFactory = ({
+//   buttonId = '',
+//   buttonIcon = 'fa-times',
+//   buttonType = 'open',
+//   pageToToggle,
+// }) => {
+//   let classList;
+//   if (buttonType === 'open') {
+//     classList = `#${buttonId}.active`;
+//   } else {
+//     classList = '.close-button';
+//   }
+//   return h(
+//     `a${classList}.navigator-button`,
+//     {
+//       onclick: () => {
+//         module.exports.toggleMenu(pageToToggle);
+//       },
+//     },
+//     h(`i.fa.${buttonIcon}`),
+//   );
+// };
 
 const goToShabadPage = shabadId => {
   global.core.search.loadShabad(shabadId);
@@ -130,13 +130,6 @@ const getNotifications = (timeStamp, callback) => {
     },
   );
 };
-
-/* Generate Toggle Buttons */
-const menuButton = h('a.menu-button.navigator-button.active', h('i.fa.fa-bars'));
-const closeButton = buttonFactory({
-  buttonType: 'close',
-  pageToToggle: '#menu-page',
-});
 
 /* load Shabad buttons */
 const randomShabadButton = h(
@@ -306,10 +299,8 @@ module.exports = {
   init() {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach($menuToggle => {
-      $menuToggle.appendChild(menuButton.cloneNode(true));
       $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
-    document.querySelector('.preferences-close').appendChild(closeButton);
 
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
     $listOfCustomSlides.appendChild(emptySlideButton);
