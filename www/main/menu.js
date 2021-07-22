@@ -34,29 +34,6 @@ modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--defa
   modal.close();
 });
 
-// const buttonFactory = ({
-//   buttonId = '',
-//   buttonIcon = 'fa-times',
-//   buttonType = 'open',
-//   pageToToggle,
-// }) => {
-//   let classList;
-//   if (buttonType === 'open') {
-//     classList = `#${buttonId}.active`;
-//   } else {
-//     classList = '.close-button';
-//   }
-//   return h(
-//     `a${classList}.navigator-button`,
-//     {
-//       onclick: () => {
-//         module.exports.toggleMenu(pageToToggle);
-//       },
-//     },
-//     h(`i.fa.${buttonIcon}`),
-//   );
-// };
-
 const goToShabadPage = shabadId => {
   global.core.search.loadShabad(shabadId);
   document.querySelector('#shabad-pageLink').click();
