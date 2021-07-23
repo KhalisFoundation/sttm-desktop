@@ -63,6 +63,7 @@ const ThemeContainer = () => {
             }}
             id="themebg-upload"
             type="file"
+            accept="image/png, image/jpeg"
           />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
@@ -74,7 +75,7 @@ const ThemeContainer = () => {
                 applyTheme(tile, 'custom', setTheme, setThemeBg);
               }}
               onRemove={() => {
-                removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+                removeCustomBackgroundFile(tile.path);
                 upsertCustomBackgrounds(setCustomThemes);
               }}
             />

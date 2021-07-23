@@ -66,6 +66,14 @@ shortcuts.applyShortcuts('viewer');
   document.body.title = viewerTitle;
   document.querySelector('span.title').innerHTML = viewerTitle;
   document.querySelector('.vc-label').innerHTML = i18n.t('QUICK_TOOLS.SELF');
+
+  if (store.getUserPref('app.layout.presenter-view')) {
+    document.querySelector('body').classList.add('presenter-view');
+  }
+
+  /* Hide quick tools when app is loaded */
+  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
+  $vcToggleIcon.style.left = '-28vw';
 })();
 
 const hideDecks = () => {
