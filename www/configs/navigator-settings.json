@@ -36,5 +36,6 @@
     "prevVerse": false,
     "homeVerse": false,
     "openFirstResult": false
-  }
+  },
+  "minimizedBySingleDisplay": false
 }

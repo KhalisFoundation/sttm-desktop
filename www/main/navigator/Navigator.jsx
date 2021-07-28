@@ -9,16 +9,21 @@ import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from '
 
 const Navigator = () => {
   const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
+  const { minimizedBySingleDisplay } = useStoreState(state => state.navigator);
 
   return (
     <>
       {isSingleDisplayMode ? (
         <>
-          <div className="single-display-controller">
+          <div
+            className={`single-display-controller ${
+              minimizedBySingleDisplay ? 'single-display-minimize' : ''
+            }`}
+          >
             <Pane
               header={singleDisplayHeader}
-              content={singleDisplayContent}
-              footer={singleDisplayFooter}
+              content={!minimizedBySingleDisplay && singleDisplayContent}
+              footer={!minimizedBySingleDisplay && singleDisplayFooter}
             />
           </div>
           <div className="single-display-viewer">

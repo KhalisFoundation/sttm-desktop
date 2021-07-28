@@ -1,8 +1,12 @@
 import React from 'react';
-import { useStoreState } from 'easy-peasy';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
 export const singleDisplayHeader = () => {
-  const { singleDisplayActiveTab } = useStoreState(state => state.navigator);
+  const { singleDisplayActiveTab, minimizedBySingleDisplay } = useStoreState(
+    state => state.navigator,
+  );
+  const { setMinimizedBySingleDisplay } = useStoreActions(state => state.navigator);
+
   const getActiveTab = tabName => {
     let component;
     switch (tabName) {
@@ -34,5 +38,18 @@ export const singleDisplayHeader = () => {
     return component;
   };
 
-  return <div>{getActiveTab(singleDisplayActiveTab)}</div>;
+  const toggleDisplayUI = () => {
+    if (minimizedBySingleDisplay) {
+      setMinimizedBySingleDisplay(false);
+    } else {
+      setMinimizedBySingleDisplay(true);
+    }
+  };
+
+  return (
+    <div className="header-controller">
+      <span>{getActiveTab(singleDisplayActiveTab)}</span>
+      <span onClick={toggleDisplayUI}>{getActiveTab(singleDisplayActiveTab)}</span>
+    </div>
+  );
 };

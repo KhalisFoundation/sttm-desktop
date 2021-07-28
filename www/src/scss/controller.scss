@@ -101,11 +101,25 @@ ul {
       z-index: 2;
 
       .pane {
+        .pane-header {
+          .header-controller {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+          }
+        }
+
         .pane-content {
           > div {
             padding: 0;
           }
         }
+      }
+    }
+
+    &-minimize {
+      .pane {
+        height: auto !important;
       }
     }
 
