@@ -11,6 +11,8 @@ const { store } = remote.require('./app');
 const WorkspaceBar = () => {
   const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
   const { setIsSingleDisplayMode } = useStoreActions(state => state.userSettings);
+  const { minimizedBySingleDisplay } = useStoreState(state => state.navigator);
+
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
   const workspaces = [presenterIdentifier, i18n.t('WORKSPACES.SINGLE_DISPLAY')];
   const defaultWsState = store.getUserPref('app.layout.presenter-view')
@@ -36,21 +38,23 @@ const WorkspaceBar = () => {
   };
 
   return (
-    <div className="workspace-bar">
-      {workspaces.map((workspace, index) => {
-        return (
-          <div
-            key={index}
-            className={currentWorkspace === workspace ? 'active' : 'inactive'}
-            onClick={() => {
-              handleWorkspaceChange(workspace);
-            }}
-          >
-            <span className="workspace-name"> {workspace} </span>
-          </div>
-        );
-      })}
-    </div>
+    !minimizedBySingleDisplay && (
+      <div className="workspace-bar">
+        {workspaces.map((workspace, index) => {
+          return (
+            <div
+              key={index}
+              className={currentWorkspace === workspace ? 'active' : 'inactive'}
+              onClick={() => {
+                handleWorkspaceChange(workspace);
+              }}
+            >
+              <span className="workspace-name"> {workspace} </span>
+            </div>
+          );
+        })}
+      </div>
+    )
   );
 };
 
