@@ -124,6 +124,8 @@ function openSecondaryWindow(windowName) {
       height: 768,
       show: false,
       webPreferences: {
+        contextIsolation: false,
+        enableRemoteModule: true,
         nodeIntegration: true,
         webviewTag: true,
       },
@@ -268,6 +270,8 @@ function createViewer(ipcData) {
       frame: false,
       backgroundColor: '#000000',
       webPreferences: {
+        contextIsolation: false,
+        enableRemoteModule: true,
         nodeIntegration: true,
         webviewTag: true,
       },
@@ -466,6 +470,8 @@ app.on('ready', () => {
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
     webPreferences: {
+      contextIsolation: false,
+      enableRemoteModule: true,
       nodeIntegration: true,
       webviewTag: true,
     },

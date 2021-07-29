@@ -14,7 +14,7 @@ global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
 // const { remote } = require('electron');
-const { store, i18n } = require('electron').remote.require('./app');
+const { store, i18n } = require('electron/remote');
 const slash = require('./js/slash');
 const core = require('./js/index');
 
