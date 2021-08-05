@@ -1,12 +1,16 @@
 import convertObjToCamelCase from '../../utils/convert-object-to-camel-case';
 
-const { app } = require('electron');
+const { remote } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { settings } = require('../../../../configs/user-settings.json');
 
-console.log(app.getPath('userData'));
-const userDataPath = app.getPath('userData');
+let userDataPath = '';
+
+if (remote) {
+  userDataPath = remote.app.getPath('userData');
+}
+
 export const userConfigPath = path.join(userDataPath, 'user-data.json');
 
 function parseDataFile(filePath) {
