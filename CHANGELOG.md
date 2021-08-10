@@ -1,6 +1,6 @@
 ## New Updates
 
-### 8.4.0 - _April 22, 2021_
+### 8.4.0 - _August 9, 2021_
 
 ### Improved:
 
