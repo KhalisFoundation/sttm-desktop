@@ -5,7 +5,18 @@ import { remote } from 'electron';
 const { i18n } = remote.require('./app');
 
 const FilterDropdown = ({ title, onChange, optionsObj }) => {
-  return (
+  return title === 'Source' ? (
+    <>
+      <select className="select-bani" onChange={onChange}>
+        {Object.keys(optionsObj).map(keyName => (
+          <option key={keyName} value={keyName}>
+            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)}
+          </option>
+        ))}
+      </select>
+      <span>{title}</span>
+    </>
+  ) : (
     <>
       <select className="select-bani" onChange={onChange}>
         {Object.keys(optionsObj).map(keyName => (

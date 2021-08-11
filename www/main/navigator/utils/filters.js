@@ -53,9 +53,46 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, currentSo
 
   // filters searchData from selected currentSource
   if (currentSource !== 'all') {
-    filteredResult = filteredResult.filter(verse => {
-      return verse.source === currentSource;
-    });
+    // TODO: refactor the switch state and compare the source from en.json
+    switch (currentSource) {
+      case 'G':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Sri Guru Granth Sahib Ji';
+        });
+        break;
+      case 'D':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Dasam Bani';
+        });
+        break;
+      case 'B':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Bhai Gurdas Ji Vaaran';
+        });
+        break;
+      case 'N':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Bhai Nand Lal Ji Vaaran';
+        });
+        break;
+      case 'A':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Amrit Keertan';
+        });
+        break;
+      case 'S':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Bhai Gurdas Singh Ji Vaaran';
+        });
+        break;
+      case 'R':
+        filteredResult = filteredResult.filter(verse => {
+          return verse.source === 'Codes of Conduct and Other Panthic Sources';
+        });
+        break;
+      default:
+        break;
+    }
   }
   return filteredResult;
 };
