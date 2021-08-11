@@ -34,29 +34,6 @@ modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--defa
   modal.close();
 });
 
-const buttonFactory = ({
-  buttonId = '',
-  buttonIcon = 'fa-times',
-  buttonType = 'open',
-  pageToToggle,
-}) => {
-  let classList;
-  if (buttonType === 'open') {
-    classList = `#${buttonId}.active`;
-  } else {
-    classList = '.close-button';
-  }
-  return h(
-    `a${classList}.navigator-button`,
-    {
-      onclick: () => {
-        module.exports.toggleMenu(pageToToggle);
-      },
-    },
-    h(`i.fa.${buttonIcon}`),
-  );
-};
-
 const goToShabadPage = shabadId => {
   global.core.search.loadShabad(shabadId);
   document.querySelector('#shabad-pageLink').click();
@@ -131,18 +108,6 @@ const getNotifications = (timeStamp, callback) => {
   );
 };
 
-const notificationsBellClickHandler = () => {
-  analytics.trackEvent('display', 'notifications');
-  getNotifications(null, showNotificationsModal);
-};
-
-/* Generate Toggle Buttons */
-const menuButton = h('a.menu-button.navigator-button.active', h('i.fa.fa-bars'));
-const closeButton = buttonFactory({
-  buttonType: 'close',
-  pageToToggle: '#menu-page',
-});
-
 /* load Shabad buttons */
 const randomShabadButton = h(
   'li',
@@ -159,17 +124,6 @@ const randomShabadButton = h(
   ),
 );
 
-const notificationButton = h(
-  'li',
-  h(
-    'a.notification-button',
-    {
-      onclick: notificationsBellClickHandler,
-    },
-    h('i.fa.fa-bell.list-icon'),
-    i18n.t('OTHERS.WHATS_NEW'),
-  ),
-);
 const hukamnamaButton = h(
   'li',
   h(
@@ -322,10 +276,8 @@ module.exports = {
   init() {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach($menuToggle => {
-      $menuToggle.appendChild(menuButton.cloneNode(true));
       $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
-    document.querySelector('.preferences-close').appendChild(closeButton);
 
     const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
     $listOfCustomSlides.appendChild(emptySlideButton);
@@ -336,7 +288,6 @@ module.exports = {
     const $listOfShabadOptions = document.querySelector('#list-of-shabad-options');
     $listOfShabadOptions.appendChild(randomShabadButton);
     $listOfShabadOptions.appendChild(hukamnamaButton);
-    $listOfShabadOptions.appendChild(notificationButton);
 
     isOnline().then(online => {
       document.querySelector('.hukamnama-button').classList.toggle('is-offline', !online);

@@ -56,9 +56,10 @@ export const uploadImage = async evt => {
     if (imageCheck(filePath)) {
       const files = await imagemin([filePath], userBackgroundsPath);
       if (files) {
+        const fileUrl = new URL(`file:///${files[0].path}`).href;
         const customThemeObj = {
           type: 'custom',
-          url: `${files[0].path}`.replace(/(\s)/g, '\\ '),
+          url: `${fileUrl}`.replace(/(%20)/g, '\\ '),
         };
 
         store.setUserPref('app.themebg', customThemeObj);
