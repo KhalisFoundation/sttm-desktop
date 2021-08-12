@@ -23,6 +23,7 @@ const ShabadContent = () => {
     isCeremonyBani,
     isSundarGutkaBani,
     shortcuts,
+    isRandomShabad,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -36,6 +37,7 @@ const ShabadContent = () => {
     setIsDhanGuruSlide,
     setNoActiveVerse,
     setShortcuts,
+    setIsRandomShabad,
   } = useStoreActions(state => state.navigator);
 
   const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
@@ -145,30 +147,35 @@ const ShabadContent = () => {
     }
   };
 
+  const openFirstVerse = firstVerse => {
+    updateTraversedVerse(firstVerse, 0);
+    changeHomeVerse(0);
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
-          updateTraversedVerse(sundarGutkaVerses[0].ID, 0);
-          changeHomeVerse(0);
+          openFirstVerse(sundarGutkaVerses[0].ID);
         },
       );
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          updateTraversedVerse(ceremonyVerses[0].ID, 0);
-          changeHomeVerse(0);
+          openFirstVerse(ceremonyVerses[0].ID);
         }
       });
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
           setActiveShabad(verses);
-          if (noActiveVerse) {
-            updateTraversedVerse(verses[0].ID, 0);
-            changeHomeVerse(0);
+          if (noActiveVerse || isRandomShabad) {
+            openFirstVerse(verses[0].ID);
+            if (isRandomShabad) {
+              setIsRandomShabad(false);
+            }
           }
         }
       });

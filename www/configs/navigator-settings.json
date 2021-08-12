@@ -21,6 +21,7 @@
   "isDhanGuruSlide": false,
   "dhanGuruString": "",
   "noActiveVerse": true,
+  "isRandomShabad": false,
   "isSundarGutkaBani": false,
   "sundarGutkaBaniId": null,
   "ceremonyId": null,

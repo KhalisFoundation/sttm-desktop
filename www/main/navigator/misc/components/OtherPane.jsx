@@ -10,10 +10,15 @@ const { i18n } = remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
 
 export const OtherPane = () => {
-  const { activeShabadId, noActiveVerse } = useStoreState(state => state.navigator);
-  const { setActiveShabadId, setNoActiveVerse } = useStoreActions(state => state.navigator);
+  const { activeShabadId, noActiveVerse, isRandomShabad } = useStoreState(state => state.navigator);
+  const { setActiveShabadId, setNoActiveVerse, setIsRandomShabad } = useStoreActions(
+    state => state.navigator,
+  );
 
   const openRandomShabad = () => {
+    if (!isRandomShabad) {
+      setIsRandomShabad(true);
+    }
     randomShabad().then(randomId => activeShabadId !== randomId && setActiveShabadId(randomId));
   };
 
