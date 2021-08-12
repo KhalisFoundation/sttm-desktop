@@ -45,8 +45,8 @@ export const MiscFooter = () => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
-    if (ceremonyId !== 6) {
-      setCeremonyId(6);
+    if (ceremonyId !== 3) {
+      setCeremonyId(3);
     }
     if (!isCeremonyBani) {
       setIsCeremonyBani(true);
