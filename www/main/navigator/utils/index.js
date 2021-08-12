@@ -7,3 +7,4 @@ export { getNotifications, showNotificationsModal } from './whats-new';
 export { loadBani } from './load-bani';
 export { loadBaniVerse } from './load-bani-verse';
 export { loadCeremony } from './load-ceremony';
+export { loadAng } from './load-ang';

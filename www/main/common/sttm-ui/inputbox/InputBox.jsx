@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { searchShabads } from '../../../navigator/utils';
+import { searchShabads, loadAng } from '../../../navigator/utils';
 
 const InputBox = ({ placeholder, className }) => {
   const { currentSearchType, currentSource, searchQuery, shortcuts } = useStoreState(
@@ -30,9 +30,15 @@ const InputBox = ({ placeholder, className }) => {
   }, [shortcuts]);
 
   useEffect(() => {
-    searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
-      searchQuery ? setSearchData(rows) : setSearchData([]),
-    );
+    const searchTypeInt = parseInt(searchQuery, 10);
+    const isAng = !!searchTypeInt;
+    if (isAng) {
+      loadAng(searchTypeInt).then(rows => setSearchData(rows));
+    } else {
+      searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
+        searchQuery ? setSearchData(rows) : setSearchData([]),
+      );
+    }
   }, [searchQuery, currentSearchType, currentSource]);
 
   return (
