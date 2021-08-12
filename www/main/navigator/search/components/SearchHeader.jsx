@@ -6,7 +6,7 @@ import banidb from '../../../common/constants/banidb';
 function SearchHeader() {
   // For responsiveness
   const [width, setWidth] = useState(window.innerWidth);
-  const breakpoint = 1308;
+  const breakpoint = 1440;
   const resizeFn = () => {
     setWidth(window.innerWidth);
   };
