@@ -38,9 +38,6 @@ const Navigator = () => {
               >
                 <i className="fa fa-clock-o"></i> <span data-key="HISTORY"></span>
               </span>
-              <span className="nav-header-tab nav-header-text" id="themes-tab" data-title="themes">
-                <i className="fa fa-paint-brush"></i> <span data-key="THEMES"></span>
-              </span>
               <span className="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
                 <i className="fa fa-desktop"></i> <span data-key="INSERT"></span>
               </span>

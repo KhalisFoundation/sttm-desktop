@@ -17,7 +17,6 @@ const { remote } = require('electron');
 const { store, i18n } = require('electron').remote.require('./app');
 const slash = require('./js/slash');
 const core = require('./js/index');
-const themes = require('./configs/themes.json');
 
 const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
 
@@ -67,6 +66,14 @@ shortcuts.applyShortcuts('viewer');
   document.body.title = viewerTitle;
   document.querySelector('span.title').innerHTML = viewerTitle;
   document.querySelector('.vc-label').innerHTML = i18n.t('QUICK_TOOLS.SELF');
+
+  if (store.getUserPref('app.layout.presenter-view')) {
+    document.querySelector('body').classList.add('presenter-view');
+  }
+
+  /* Hide quick tools when app is loaded */
+  const $vcToggleIcon = document.querySelector('.vc-toggle-icon');
+  $vcToggleIcon.style.left = '-28vw';
 })();
 
 const hideDecks = () => {
@@ -136,10 +143,9 @@ const castText = (text, isGurmukhi) => {
 };
 
 const applyThemebg = () => {
-  if (prefs.app.themebg.url) {
-    $body.style.backgroundImage = `url(${slash(prefs.app.themebg.url)})`;
-    $body.classList.toggle('show-overlay', prefs.app.themebg.type === 'custom');
-  }
+  const themeBgPrefs = prefs.app.themebg;
+  $body.style.backgroundImage = themeBgPrefs.url ? `url('${slash(themeBgPrefs.url)}')` : 'none';
+  $body.classList.toggle('show-overlay', themeBgPrefs.type === 'custom');
 };
 
 applyThemebg();
@@ -200,9 +206,6 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 
 global.platform.ipc.on('update-settings', () => {
   prefs = store.get('userPrefs');
-  const themeKeys = themes.map(item => item.key);
-  $body.classList.remove(...themeKeys);
-  $body.classList.add(prefs.app.theme);
   applyThemebg();
   core.menu.settings.applySettings(prefs);
   castToReceiver();
@@ -210,10 +213,13 @@ global.platform.ipc.on('update-settings', () => {
 
 global.platform.ipc.on('save-settings', (event, setting) => {
   const { key, payload, oldValue } = setting;
-  document.body.classList.remove(`${key}-${oldValue}`);
-  document.body.classList.add(`${key}-${payload}`);
-  savedSettings[key] = payload;
-  localStorage.setItem('userSettings', JSON.stringify(savedSettings));
+  // checking typeof savedSettings[key] so that classs should not apply while custom background
+  if (typeof savedSettings[key] !== 'object') {
+    document.body.classList.remove(`${key}-${oldValue}`);
+    document.body.classList.add(`${key}-${payload}`);
+    savedSettings[key] = payload;
+    localStorage.setItem('userSettings', JSON.stringify(savedSettings));
+  }
 });
 
 global.platform.ipc.on('navigator-toggled', () => {

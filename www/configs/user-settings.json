@@ -166,7 +166,7 @@
         "igurbani": "I_GURBANI",
         "sttm": "STTM"
       },
-      "initialValue": "sttm"
+      "initialValue": "sttm2"
     },
     "autoplay-toggle": {
       "title": "AUTO_PLAY",
@@ -241,6 +241,15 @@
       "title": "COLLECT_STATISTICS",
       "initialValue": true,
       "store": "userPrefs.app.analytics.collectStatistics"
+    },
+    "theme": {
+      "title": "THEME",
+      "initialValue": "light-theme"
+    },
+    "themeBg": {
+      "title": "THEME_BG",
+      "initialValue": false,
+      "dontApplyClass": true
     }
   }
 }

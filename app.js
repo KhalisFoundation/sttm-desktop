@@ -115,7 +115,6 @@ const viewerWindowPos = {};
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
   const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
-
   if (openWindow.length > 0) {
     openWindow[0].show();
   } else {
@@ -128,6 +127,7 @@ function openSecondaryWindow(windowName) {
         webviewTag: true,
       },
     });
+    window.obj.setMenu(null);
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
       window.obj.focus();

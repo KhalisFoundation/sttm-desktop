@@ -27,10 +27,11 @@ const Launchpad = () => {
         }
       }
       if (!isFromBackdrop) {
+        document.body.classList.toggle(`overlay-${overlayScreen}-active`, false);
         setOverlayScreen(DEFAULT_OVERLAY);
       }
     },
-    [setOverlayScreen, DEFAULT_OVERLAY],
+    [overlayScreen, setOverlayScreen, DEFAULT_OVERLAY],
   );
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';

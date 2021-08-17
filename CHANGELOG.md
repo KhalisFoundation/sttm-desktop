@@ -1,5 +1,17 @@
 ## New Updates
 
+### 8.4.0 - _August 9, 2021_
+
+### Improved:
+
+- Themes have been relocated to the settings menu
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 8.3.1 - _March 8, 2021_
 
 ### Fixed:
@@ -21,12 +33,6 @@
 - Updated the button for loading the daily Hukamnama to show if you are offline
 - Fixed a bug that was causing font options not to display properly in Bani Overlay
 - Fixed some bugs related to Quick Tools not appearing correctly
-
-</br>
-
-**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
-
-</br>
 
 ### 8.2.0 - _January 20, 2021_
 

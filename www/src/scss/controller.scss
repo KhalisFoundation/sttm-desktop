@@ -22,6 +22,7 @@ $sessionPageHeight: calc(100% - #{$totalSessionOffset});
 $body-font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
   'Helvetica Neue', Arial, sans-serif !default;
 $gurmukhi-font-family: 'gurbaniakhar';
+$gurmukhi-font-family-thick: 'gurbaniakharthick';
 
 @font-face {
   font-family: $gurmukhi-font-family;
@@ -40,6 +41,11 @@ $gurmukhi-font-family: 'gurbaniakhar';
 #navigator {
   .gurmukhi {
     font-family: $gurmukhi-font-family;
+    font-size: 1.1em;
+  }
+
+  .gurmukhi-thick {
+    font-family: $gurmukhi-font-family-thick;
     font-size: 1.1em;
   }
 }
