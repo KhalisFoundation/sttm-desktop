@@ -565,10 +565,6 @@ module.exports = {
     reloadBani(true);
   },
 
-  'autoplay-toggle': function autoPlayToggle() {
-    global.core.search.checkAutoPlay();
-  },
-
   'live-feed': function livefeed(val) {
     if (val) {
       const path = dialog.showOpenDialogSync({

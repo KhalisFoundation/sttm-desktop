@@ -40,6 +40,8 @@ const ShabadContent = () => {
     setIsRandomShabad,
   } = useStoreActions(state => state.navigator);
 
+  const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
+
   const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -226,6 +228,21 @@ const ShabadContent = () => {
       });
     }
   }, [shortcuts]);
+
+  useEffect(() => {
+    const milisecondsDelay = parseInt(autoplayDelay, 10) * 1000;
+    const interval = setInterval(() => {
+      if (autoplayToggle) {
+        setShortcuts({
+          ...shortcuts,
+          nextVerse: true,
+        });
+      }
+    }, milisecondsDelay);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [autoplayToggle, autoplayDelay]);
 
   return (
     <div className="shabad-list">
