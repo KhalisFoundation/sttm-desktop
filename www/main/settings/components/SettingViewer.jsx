@@ -12,6 +12,11 @@ const SettingViewer = () => {
     displayNextLine,
     leftAlign,
     theme,
+    larivaar,
+    larivaarAssist,
+    larivaarAssistType,
+    vishraamType,
+    displayVishraams,
   } = useStoreState(state => state.userSettings);
 
   const commonStyles = {
@@ -41,44 +46,65 @@ const SettingViewer = () => {
     display: displayNextLine ? 'block' : 'none',
   };
 
+  const getLarivaarAssistClass = () => {
+    if (larivaarAssist) {
+      return larivaarAssistType === 'single-color'
+        ? 'larivaar-assist-single-color'
+        : 'larivaar-assist-multi-color';
+    }
+    return '';
+  };
+
+  const getVishraamType = () => {
+    if (displayVishraams && !larivaarAssist) {
+      return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
+    }
+    return '';
+  };
+
   return (
     <div className={`settings-viewer theme-${theme}`} style={commonStyles}>
       <h1 className="gurbani gurmukhi" style={gurbaniStyles}>
-        <div>
-          <span className="padchhed">
-            <span>jo</span>
-            <span>mwgih</span>
-            <span>Twkur</span>
-            <span>Apuny</span>
-            <wbr />
-            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
-            <wbr />
-            <span>soeI</span>
-            <span>soeI</span>
-            <wbr />
-            <span>
+        <div className={`settings-verse ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+          {!larivaar ? (
+            <span className="padchhed">
+              <span>jo</span>
+              <span>mwgih</span>
+              <span>Twkur</span>
+              <span>Apuny</span>
+              <wbr />
+              <span className="vishraam vishraam-v">qy</span>
+              <wbr />
+              <span>soeI</span>
+              <span>soeI</span>
+              <wbr />
+              <span>
+                <span>dyvY</span>
+                <i> </i>
+                <span>]</span>
+              </span>
+            </span>
+          ) : (
+            <span className="larivaar">
+              <span>jo</span>
+              <wbr />
+              <span>mwgih</span>
+              <wbr />
+              <span>Twkur</span>
+              <wbr />
+              <span>Apuny</span>
+              <wbr />
+              <span className="vishraam vishraam-v">qy</span>
+              <wbr />
+              <span>soeI</span>
+              <wbr />
+              <span>soeI</span>
+              <wbr />
               <span>dyvY</span>
-              <i> </i>
+              <wbr />
               <span>]</span>
             </span>
-          </span>
-          <span className="larivaar">
-            <span>jo</span>
-            <wbr />
-            <span>mwgih</span>
-            <wbr />
-            <span>Twkur</span>
-            <wbr />
-            <span>Apuny</span>
-            <span className="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">qy</span>
-            <span>soeI</span>
-            <wbr />
-            <span>soeI</span>
-            <wbr />
-            <span>dyvY</span>
-            <wbr />
-            <span>]</span>
-          </span>
+          )}
         </div>
       </h1>
       <h2 className="translation" style={translationStyles}>

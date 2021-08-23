@@ -5,7 +5,7 @@
   $visraam-main: $visraam;
   $visraam-yamki: $yamki;
 
-  .slide-gurbani.vishraam-gradient {
+  .vishraam-gradient {
     span {
       span.vishraam-y {
         border-radius: 15px;
@@ -27,7 +27,7 @@
     }
   }
 
-  .slide-gurbani.vishraam-colored {
+  .vishraam-colored {
     span {
       span.vishraam-y {
         color: $visraam-main;
@@ -39,7 +39,7 @@
     }
   }
 
-  .slide-gurbani.larivaar-assist-single-color {
+  .larivaar-assist-single-color {
     .larivaar {
       span:nth-of-type(even) {
         opacity: 0.75 !important;
@@ -47,7 +47,7 @@
     }
   }
 
-  .slide-gurbani.larivaar-assist-multi-color {
+  .larivaar-assist-multi-color {
     .larivaar {
       span:nth-of-type(even) {
         color: $yamki !important;

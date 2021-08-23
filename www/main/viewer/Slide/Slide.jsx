@@ -32,12 +32,12 @@ const Slide = ({
   } = useStoreState(state => state.userSettings);
 
   const getLarivaarAssistClass = () => {
-    return (
-      larivaarAssist &&
-      (larivaarAssistType === 'single-color'
+    if (larivaarAssist) {
+      return larivaarAssistType === 'single-color'
         ? 'larivaar-assist-single-color'
-        : 'larivaar-assist-multi-color')
-    );
+        : 'larivaar-assist-multi-color';
+    }
+    return '';
   };
 
   const getVishraamType = () => {
