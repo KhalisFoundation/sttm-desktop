@@ -387,16 +387,6 @@ function checkPresenterView() {
   global.webview.send('presenter-view', inPresenterView);
 }
 
-function reloadBani(resume = false) {
-  const $shabad = document.getElementById('shabad');
-  const currentBani = $shabad.dataset.bani;
-  const $currentLine = $shabad.querySelector('.current');
-  const lineID = resume && $currentLine ? $currentLine.dataset.lineId : null;
-  if (currentBani) {
-    global.core.search.loadBani(currentBani, lineID);
-  }
-}
-
 global.platform.ipc.on('presenter-view', () => {
   checkPresenterView();
   updateViewerScale();
@@ -555,14 +545,6 @@ module.exports = {
   'gradient-bg': function gradientBg() {
     const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
-  },
-
-  'bani-length': function gurbaniBaniLength() {
-    reloadBani();
-  },
-
-  'mangal-position': function gurbaniMangalPosition() {
-    reloadBani(true);
   },
 
   'live-feed': function livefeed(val) {
