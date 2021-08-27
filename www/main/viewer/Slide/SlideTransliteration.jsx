@@ -28,7 +28,7 @@ const SlideTransliteration = ({ getFontSize, gurmukhiString }) => {
 
   useEffect(() => {
     getTransliteration(gurmukhiString);
-  }, [gurmukhiString]);
+  }, [gurmukhiString, transliterationLanguage]);
 
   return (
     transliterationString && (
