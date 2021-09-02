@@ -181,14 +181,6 @@ const winMenu = [
     label: i18n.t('MENU.FILE'),
     submenu: [
       {
-        label: i18n.t('MENU.APP.PREFERENCES'),
-        accelerator: 'Ctrl+,',
-        click: () => {
-          analytics.trackEvent('menu', 'preferences');
-          global.core.menu.showSettingsTab(true);
-        },
-      },
-      {
         type: 'separator',
       },
       {
@@ -260,13 +252,6 @@ const macMenu = [
       ...updateMenu,
       {
         type: 'separator',
-      },
-      {
-        label: i18n.t('MENU.APP.PREFERENCES'),
-        accelerator: 'Cmd+,',
-        click: () => {
-          global.core.menu.showSettingsTab(true);
-        },
       },
       {
         type: 'separator',
