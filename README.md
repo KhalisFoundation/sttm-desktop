@@ -24,6 +24,7 @@ Powered by [<img height="30" src="http://www.banidb.com/wp-content/uploads/2018/
 
 - Clone repository
 - Run `npm install` in the repository root
+- Create `.env` and add the variable `GOOGLE_ANALYTICS_ID=<ID>`
 
 ## Running
 

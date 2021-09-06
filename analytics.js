@@ -1,10 +1,11 @@
 const ua = require('universal-analytics'); // https://www.npmjs.com/package/universal-analytics
 const isOnline = require('is-online');
+require('dotenv').config();
 
 const pjson = require('./package.json');
 
 const appVersion = pjson.version;
-const trackingId = 'UA-45513519-12';
+const trackingId = process.env.GOOGLE_ANALYTICS_ID;
 
 class Analytics {
   constructor(userId, store) {
