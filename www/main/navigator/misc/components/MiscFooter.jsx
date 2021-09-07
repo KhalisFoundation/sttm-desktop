@@ -2,6 +2,7 @@ import { remote } from 'electron';
 import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 export const MiscFooter = () => {
@@ -34,6 +35,7 @@ export const MiscFooter = () => {
   const [shortcutOpen, setShortcutOpen] = useState(true);
   const HandleChange = () => {
     setShortcutOpen(!shortcutOpen);
+    analytics.trackEvent('shortcutTrayToggle', shortcutOpen);
   };
 
   // Event Handlers

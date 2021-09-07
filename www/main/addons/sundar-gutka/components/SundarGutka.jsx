@@ -11,6 +11,7 @@ import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
@@ -59,6 +60,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     if (sundarGutkaBaniId !== baniId) {
       setSundarGutkaBaniId(baniId);
     }
+    analytics.trackEvent('sunderGutkaBanis', baniId);
     onScreenClose();
   };
 
