@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads, loadAng } from '../../../navigator/utils';
 
-const InputBox = ({ placeholder, className }) => {
+const InputBox = ({ placeholder, disabled, className }) => {
   const { currentSearchType, currentSource, searchQuery, shortcuts } = useStoreState(
     state => state.navigator,
   );
@@ -50,6 +50,7 @@ const InputBox = ({ placeholder, className }) => {
         placeholder={placeholder}
         value={searchQuery}
         onChange={handleChange}
+        disabled={disabled}
       />
     </>
   );
@@ -57,6 +58,7 @@ const InputBox = ({ placeholder, className }) => {
 
 InputBox.propTypes = {
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
   className: PropTypes.string,
 };
 
