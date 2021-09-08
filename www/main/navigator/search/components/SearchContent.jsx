@@ -7,6 +7,7 @@ import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../co
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 
 const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {
   const {
@@ -64,6 +65,7 @@ const SearchContent = () => {
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
+    analytics.trackEvent('search', 'gurmukhi-keyboard-open', keyboardOpenStatus);
   };
 
   const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
@@ -123,6 +125,8 @@ const SearchContent = () => {
     if (noActiveVerse) {
       setNoActiveVerse(false);
     }
+    analytics.trackEvent('search', currentSearchType, searchQuery);
+    analytics.trackEvent('shabad', newSelectedShabad, newSelectedVerse);
   };
 
   const mapVerseItems = searchedShabadsArray => {
@@ -211,17 +215,26 @@ const SearchContent = () => {
           <span>Filter by </span>
           <FilterDropdown
             title="Writer"
-            onChange={event => setCurrentWriter(event.target.value)}
+            onChange={event => {
+              setCurrentWriter(event.target.value);
+              analytics.trackEvent('search', 'searchWriter', event.target.value);
+            }}
             optionsObj={writersObj}
           />
           <FilterDropdown
             title="Raag"
-            onChange={event => setCurrentRaag(event.target.value)}
+            onChange={event => {
+              setCurrentRaag(event.target.value);
+              analytics.trackEvent('search', 'searchRaag', event.target.value);
+            }}
             optionsObj={raagsObj}
           />
           <FilterDropdown
             title="Source"
-            onChange={event => setCurrentSource(event.target.value)}
+            onChange={event => {
+              setCurrentSource(event.target.value);
+              analytics.trackEvent('search', 'searchSource', event.target.value);
+            }}
             optionsObj={sourcesObj}
           />
         </div>

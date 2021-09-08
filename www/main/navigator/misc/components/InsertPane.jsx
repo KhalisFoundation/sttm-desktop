@@ -28,6 +28,7 @@ export const InsertPane = () => {
   const { i18n } = remote.require('./app');
   const inputRef = useRef(null);
   const gurus = insertSlide.dropdownStrings;
+  const analytics = remote.getGlobal('analytics');
 
   const addAnnouncement = () => {
     if (isEmptySlide) {
@@ -48,6 +49,7 @@ export const InsertPane = () => {
     if (announcementString !== inputRef.current.value) {
       setAnnouncementString(inputRef.current.value);
     }
+    analytics.trackEvent('display', 'announcement-slide');
   };
 
   const openWaheguruSlide = () => {

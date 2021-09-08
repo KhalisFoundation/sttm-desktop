@@ -1,7 +1,6 @@
 import { savedSettings } from './common/store/user-settings/get-saved-user-settings';
 import { applyUserSettings } from './common/store/user-settings/apply-user-settings';
 
-const h = require('hyperscript');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
@@ -98,9 +97,6 @@ const getNotifications = (timeStamp, callback) => {
   );
 };
 
-/* Generate Toggle Buttons */
-const menuButton = h('a.menu-button.navigator-button.active', h('i.fa.fa-bars'));
-
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -117,13 +113,8 @@ module.exports = {
   init() {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
     $preferencesOpen.forEach($menuToggle => {
-      $menuToggle.appendChild(menuButton.cloneNode(true));
       $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
-
-    // isOnline().then(online => {
-    //   document.querySelector('.hukamnama-button').classList.toggle('is-offline', !online);
-    // });
 
     applyUserSettings(savedSettings);
   },

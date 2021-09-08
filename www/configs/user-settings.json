@@ -166,7 +166,7 @@
         "igurbani": "I_GURBANI",
         "sttm": "STTM"
       },
-      "initialValue": "sttm"
+      "initialValue": "sttm2"
     },
     "autoplay-toggle": {
       "title": "AUTO_PLAY",

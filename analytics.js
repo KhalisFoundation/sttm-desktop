@@ -1,10 +1,11 @@
 const ua = require('universal-analytics'); // https://www.npmjs.com/package/universal-analytics
 const isOnline = require('is-online');
+require('dotenv').config();
 
 const pjson = require('./package.json');
 
 const appVersion = pjson.version;
-const trackingId = 'UA-45513519-12';
+const trackingId = process.env.GOOGLE_ANALYTICS_ID;
 
 class Analytics {
   constructor(userId, store) {
@@ -31,19 +32,25 @@ class Analytics {
     const useragent = this.store.get('user-agent');
 
     if (process.env.NODE_ENV !== 'development') {
-      if (this.store.get('userPrefs.app.analytics.collectStatistics')) {
+      // TODO: need to add variable that stops statistics collection
+      if (true) {
         isOnline().then(online => {
           // TODO: for offline users, come up with a way of storing and send when online.
           if (online && this.usr) {
             this.usr
-              .event({
-                ec: category,
-                ea: action,
-                el: label,
-                ev: value,
-                ua: useragent,
-                cd1: appVersion,
-              })
+              .event(
+                {
+                  ec: category,
+                  ea: action,
+                  el: label,
+                  ev: value,
+                  ua: useragent,
+                  cd1: appVersion,
+                },
+                err => {
+                  console.log(err);
+                },
+              )
               .send();
           }
         });

@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { remote } from 'electron';
 import { Tile } from '../../../common/sttm-ui';
 import { convertToHyphenCase } from '../../../common/utils';
+
+const analytics = remote.getGlobal('analytics');
 
 const ExtraBani = ({ title, banis = [], onScreenClose }) => {
   const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
@@ -29,6 +32,7 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
     if (sundarGutkaBaniId !== baniId) {
       setSundarGutkaBaniId(baniId);
     }
+    analytics.trackEvent('sunderGutkaBanis', baniId);
     onScreenClose();
   };
 
