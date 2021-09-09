@@ -1,3 +1,4 @@
+const { ipcRenderer } = require('electron');
 const electron = require('electron');
 const extract = require('extract-zip');
 const fs = require('fs');
@@ -111,7 +112,6 @@ module.exports = {
       // $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
-      const $search = document.querySelector('.search-content > .input-box');
       if (online) {
         request(
           `https://banidb.com/databases/${database[dbPlatform].md5}`,
@@ -123,17 +123,16 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
-                $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-                $search.dataset.databaseState = 'loading';
                 progress(
                   request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),
                 )
                   .on('progress', state => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
-                    global.core.search.updateDLProgress(state);
+                    ipcRenderer.emit('database-progress', state);
                   })
                   .on('end', () => {
+                    ipcRenderer.emit('database-progress', { percent: 1 });
                     extract(dbCompressed, { dir: newDBFolder }, err0 => {
                       if (err0) {
                         // ToDo: Log errors
@@ -184,9 +183,8 @@ module.exports = {
   },
 
   initDB() {
-    if (global.core) {
-      // global.core.search.initSearch();
-    }
+    // dbSchema = dbSchemaPath(userDataPath);
+    // newDBSchema = dbSchemaPath(newDBFolder);
   },
 
   updateSettings() {

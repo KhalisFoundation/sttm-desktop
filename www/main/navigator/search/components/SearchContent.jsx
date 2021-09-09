@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 
+const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {
@@ -52,6 +53,9 @@ const SearchContent = () => {
     setIsCeremonyBani,
     setShortcuts,
   } = useStoreActions(state => state.navigator);
+
+  // Local State
+  const [databaseProgress, setDatabaseProgress] = useState(1);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -169,16 +173,34 @@ const SearchContent = () => {
     }
   }, [shortcuts]);
 
+  ipcRenderer.on('database-progress', data => {
+    setDatabaseProgress(data.percent);
+  });
+
   return (
     <div className="search-content-container">
       <div className="search-content">
         <InputBox
-          placeholder={'Enter Search term here or ang number'}
+          placeholder={
+            databaseProgress < 1
+              ? i18n.t('DATABASE.DOWNLOADING')
+              : 'Enter Search term here or ang number'
+          }
+          disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
         />
         <div className="input-buttons">
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
         </div>
+      </div>
+      <div id="search-bg">
+        <div
+          id="db-download-progress"
+          style={{
+            width: `${databaseProgress * 100}%`,
+            height: databaseProgress < 1 ? '2px' : '0px',
+          }}
+        ></div>
       </div>
       {keyboardOpenStatus && (
         <GurmukhiKeyboard
