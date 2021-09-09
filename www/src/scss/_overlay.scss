@@ -1,11 +1,10 @@
 $toolbar-width: 75px;
 
 .canvas {
-  align-items: center;
   display: flex;
   height: 100vh;
   justify-content: center;
-  margin-left: 120px;
+  // margin-left: 120px;
   margin-right: 180px;
 }
 
@@ -25,9 +24,9 @@ $toolbar-width: 75px;
   background-size: cover;
   border: 0;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
-  height: 450px;
-  margin: 0 auto;
-  max-width: 800px;
+  flex-grow: 1;
+  height: 524px;
+  margin-left: auto;
   overflow: hidden;
   width: 100%;
 }
@@ -35,21 +34,36 @@ $toolbar-width: 75px;
 .control-panel {
   background: #eee;
   height: 100vh;
-  left: 0;
-  padding: 10px;
-  position: fixed;
-  top: 0;
-  width: 120px;
+  max-width: 320px;
+
+  hr {
+    border-top: 2px solid blue;
+  }
 }
 
 .preview-container {
   align-items: center;
+  align-self: flex-start;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  flex-grow: 1;
+  height: 100%;
   justify-content: center;
   overflow: hidden;
   text-align: center;
+
+  .bottom-settings {
+    width: 100%;
+
+    .overlay-settings-wrapper {
+      display: flex;
+      justify-content: space-between;
+
+      .overlay-settings-container {
+        border-bottom: 0;
+      }
+    }
+  }
 }
 
 .separator-y {
@@ -84,18 +98,15 @@ $toolbar-width: 75px;
 }
 
 .url-container {
-  margin: 16px 8px;
-
   input[type='text'] {
-    background: #ebebeb;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 32px;
     color: #333;
     font-size: 12px;
-    margin: 0 10px;
+    margin: 0;
     padding: 10px;
     text-align: center;
-    width: 300px;
   }
 }
 
@@ -142,13 +153,18 @@ $toolbar-width: 75px;
   }
 }
 
-.theme-selector-header {
-  font-size: 12px;
+.overlay-window-text {
+  color: #3d566a;
+  font-size: 16px;
   font-weight: bold;
   letter-spacing: 2px;
-  padding: 10px;
-  text-align: center;
+  margin: 4px;
+  padding: 10px 0;
   text-transform: uppercase;
+}
+
+.theme-selector-header {
+  text-align: center;
 }
 
 input[type='color']::-webkit-color-swatch-wrapper {
@@ -277,8 +293,7 @@ input[type='color'] {
 
   background: #ddd;
   border-radius: 25%;
-  display: flex;
-  flex-direction: column;
+  display: inline-block;
   margin: auto;
   overflow: hidden;
 
@@ -480,6 +495,118 @@ input[type='color'] {
 
       &:hover {
         background: #e9e9e9;
+      }
+    }
+  }
+}
+
+.overlay-url {
+  padding: 8px;
+}
+
+.overlay-settings-container {
+  border-bottom: 1px solid #3d566a;
+  padding: 8px;
+  padding-bottom: 20px;
+
+  .category-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .controls-container {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .subcategory-title {
+      margin-bottom: 8px;
+      width: 100%;
+    }
+
+    .control-item {
+      cursor: pointer;
+
+      &.control-dropdown {
+        flex-grow: 1;
+        margin: 0 10px;
+
+        select {
+          padding: 4px;
+          width: 100%;
+        }
+      }
+
+      &.control-size-icon {
+        text-align: center;
+      }
+
+      &:first-child(),
+      &:last-child() {
+        margin: 0;
+      }
+
+      &#date-time-position {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+
+        select {
+          flex-grow: 1;
+          margin: 0 10px;
+        }
+      }
+
+      input[type='color'] {
+        background: transparent;
+        border: 2px solid white;
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+      }
+
+      .size-icon-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+
+        .icon-toggle {
+          background-size: cover;
+          border: 2px solid white;
+          border-radius: 4px;
+          box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+          height: 30px;
+          width: 30px;
+
+          &.disabled {
+            box-shadow: none;
+            opacity: 0.7;
+          }
+        }
+      }
+
+      .size-icon {
+        i {
+          border: 2px solid white;
+          border-radius: 50%;
+          padding: 4px;
+
+          &::before {
+            background-color: #222;
+            border-radius: 50%;
+            box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+            color: #eee;
+            display: inline-block;
+            font-size: 12px;
+            height: 20px;
+            padding: 4px;
+            text-align: center;
+            width: 20px;
+          }
+        }
       }
     }
   }
