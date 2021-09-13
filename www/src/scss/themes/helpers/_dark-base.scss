@@ -73,6 +73,12 @@
   .pane-content {
     background-color: $bg-alt;
   }
+
+  .viewer-pane {
+    .pane-content {
+      background: none !important;
+    }
+  }
   .control-item:hover {
     background-color: $bg-main;
   }
@@ -191,19 +197,16 @@
   }
 
   .search-content {
-    .input-box {
+    input.input-box {
       color: $text-bright;
-    }
-    input {
-      color: $text-bright;
+
+      &::placeholder {
+        color: $darker-grey;
+      }
 
       &[type='number'] {
         background-color: white;
         color: $bg-main;
-
-        &::-webkit-input-placeholder {
-          color: $bg-main;
-        }
       }
     }
 
