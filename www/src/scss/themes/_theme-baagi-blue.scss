@@ -12,4 +12,12 @@ $themeBaagiBlue: (
 
 .theme-baagi-blue {
   @include generateTheme($themeBaagiBlue...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $light-blue-30;
+
+    &:hover {
+      background: $light-blue-30;
+    }
+  }
 }

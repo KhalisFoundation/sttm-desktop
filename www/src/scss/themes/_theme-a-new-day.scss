@@ -12,4 +12,12 @@ $themeNewDay: (
 
 .theme-a-new-day {
   @include generateTheme($themeNewDay...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+
+    &:hover {
+      background: $transparent-blue;
+    }
+  }
 }
