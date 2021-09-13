@@ -17,7 +17,7 @@
       line-height: 1;
       user-select: none;
 
-      .shabadPane-list {
+      .shabad-pane-list {
         display: flex;
 
         .hoverIcon {
@@ -35,7 +35,7 @@
             opacity: 0.5;
           }
         }
-        .shabadPane-controls {
+        .shabad-pane-controls {
           display: inline-flex;
           width: 8%;
           justify-content: center;
@@ -48,7 +48,7 @@
           }
         }
       }
-      .shabadPane-active {
+      .shabad-pane-active {
         .theme-light-theme & {
           background-color: $transparent-blue;
         }
@@ -112,7 +112,7 @@
           color: #929292;
         }
       }
-      .historyPane-controls {
+      .history-pane-controls {
         position: absolute;
         right: 20px;
       }

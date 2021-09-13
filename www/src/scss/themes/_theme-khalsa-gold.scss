@@ -13,7 +13,11 @@ $themeKhalsaGold: (
 .theme-khalsa-gold {
   @include generateTheme($themeKhalsaGold...);
 
-  .deck .gurbani {
-    -webkit-filter: drop-shadow(0 0 4px rgba(140, 81, 5, 1));
+  .slide-gurbani {
+    filter: drop-shadow(0 0 4px rgba(140, 81, 5, 1));
+  }
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
   }
 }
