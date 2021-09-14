@@ -2,12 +2,9 @@ import React from 'react';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
-import { dailyHukamnama, getNotifications, showNotificationsModal } from '../../utils';
-
-const electron = require('electron');
+import { dailyHukamnama } from '../../utils';
 
 const { i18n } = remote.require('./app');
-const analytics = electron.remote.getGlobal('analytics');
 
 export const OtherPane = () => {
   const { activeShabadId, noActiveVerse, isRandomShabad } = useStoreState(state => state.navigator);
@@ -29,11 +26,6 @@ export const OtherPane = () => {
     }
   };
 
-  const openWhatsNew = () => {
-    analytics.trackEvent('display', 'notifications');
-    getNotifications(null, showNotificationsModal);
-  };
-
   return (
     <ul className="list-of-items">
       <li>
@@ -46,12 +38,6 @@ export const OtherPane = () => {
         <a onClick={openDailyHukamnana}>
           <i className="fa fa-gavel list-icon" />
           {i18n.t('OTHERS.DAILY_HUKAMNAMA')}
-        </a>
-      </li>
-      <li>
-        <a onClick={openWhatsNew}>
-          <i className="fa fa-bell list-icon" />
-          {i18n.t('OTHERS.WHATS_NEW')}
         </a>
       </li>
     </ul>
