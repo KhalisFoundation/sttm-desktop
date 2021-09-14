@@ -1,5 +1,6 @@
 $sttm-orange: #f39c1d;
 $sttm-blue: #29679b;
+$transparent-black: rgba(0, 0, 0, 0.16);
 
 $transition-time: 600ms;
 $transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -103,6 +104,7 @@ ul {
   .single-display {
     &-controller {
       bottom: 0;
+      box-shadow: 0 10px 20px $transparent-black;
       position: fixed;
       right: 0;
       z-index: 2;

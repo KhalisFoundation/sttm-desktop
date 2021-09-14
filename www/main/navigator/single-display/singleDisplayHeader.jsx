@@ -49,7 +49,9 @@ export const singleDisplayHeader = () => {
   return (
     <div className="header-controller">
       <span>{getActiveTab(singleDisplayActiveTab)}</span>
-      <span onClick={toggleDisplayUI}>{getActiveTab(singleDisplayActiveTab)}</span>
+      <span onClick={toggleDisplayUI}>
+        <i className={`fa fa-window-${minimizedBySingleDisplay ? 'maximize' : 'minimize'}`}></i>
+      </span>
     </div>
   );
 };
