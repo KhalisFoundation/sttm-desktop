@@ -14,10 +14,21 @@ $themeBlackBlue: (
   @include generateTheme($themeBlackBlue...);
 
   .shabad-pane .shabad-pane-active {
-    background: $light-blue-30;
+    background: $dull-blue;
 
     &:hover {
-      background: $light-blue-30;
+      background: $dull-blue;
+    }
+  }
+
+  .launchpad .single-display-switches {
+    .tab-switch,
+    & {
+      background: $darker-grey;
+    }
+    .tab-switch.active {
+      background: $black !important;
+      color: $light-grey !important;
     }
   }
 }

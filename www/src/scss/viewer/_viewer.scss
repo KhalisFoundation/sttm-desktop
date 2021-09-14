@@ -2,6 +2,7 @@
 
 #viewer-container {
   height: 100%;
+  border: 1px solid $alt-grey;
 
   * {
     transition: 0.2s all ease-in;

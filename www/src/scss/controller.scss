@@ -144,11 +144,11 @@ ul {
       width: 100%;
 
       & > .viewer-pane {
+        padding: 0;
+
         & .pane {
-          height: 98vh;
-          margin-left: 65px;
-          margin-top: 20px;
-          width: 90%;
+          height: 100vh;
+          width: 100%;
         }
       }
     }
