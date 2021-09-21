@@ -15,7 +15,6 @@ const h = require('hyperscript');
 const scroll = require('scroll');
 // const { remote } = require('electron');
 const { store, i18n } = require('electron').remote.require('./app');
-const slash = require('./js/slash');
 const core = require('./js/index');
 
 const shortcuts = require('./js/keyboard-shortcuts/shortcuts');
@@ -141,14 +140,6 @@ const castText = (text, isGurmukhi) => {
     });
   }
 };
-
-const applyThemebg = () => {
-  const themeBgPrefs = prefs.app.themebg;
-  $body.style.backgroundImage = themeBgPrefs.url ? `url('${slash(themeBgPrefs.url)}')` : 'none';
-  $body.classList.toggle('show-overlay', themeBgPrefs.type === 'custom');
-};
-
-applyThemebg();
 
 // IPC
 global.platform.ipc.on('search-cast', (event, pos) => {
