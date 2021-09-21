@@ -65,7 +65,7 @@
     "semver": "^5.6.0",
     "simple-git": "^1.107.0",
     "spectron": "^3.6.1",
-    "ssh2": "^0.5.4",
+    "ssh2": "^1.4.0",
     "stylelint": "^7.9.0",
     "stylelint-config-prettier": "^5.0.0",
     "stylelint-config-standard": "^16.0.0",
