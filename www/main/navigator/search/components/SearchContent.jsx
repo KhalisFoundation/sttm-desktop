@@ -11,6 +11,8 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {
+  const useShabadUpdate = changeActiveShabad();
+
   const {
     currentLanguage,
     searchData,
@@ -163,9 +165,7 @@ const SearchContent = () => {
                     key={index}
                     ang={ang}
                     searchType={currentSearchType}
-                    onClick={() => {
-                      changeActiveShabad(shabadId, verseId);
-                    }}
+                    onClick={useShabadUpdate}
                     shabadId={shabadId}
                     raag={raag}
                     sourceId={sourceId}

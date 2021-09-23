@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
-
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
+const changeActiveShabad = () => {
   const {
     verseHistory,
     versesRead,
@@ -35,7 +33,7 @@ const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') 
     setIsCeremonyBani,
   } = useStoreActions(state => state.navigator);
 
-  useEffect(() => {
+  return (newSelectedShabad, newSelectedVerse, newVerse = '') => {
     const check = verseHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
     if (check.length === 0) {
       const updatedHistory = [
@@ -103,7 +101,7 @@ const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') 
         verseChange: false,
       });
     }
-  }, []);
+  };
 };
 
 export default changeActiveShabad;
