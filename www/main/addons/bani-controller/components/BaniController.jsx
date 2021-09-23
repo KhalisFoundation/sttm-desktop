@@ -16,7 +16,7 @@ import ZoomController from './ZoomController';
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
-const analytics = remote.getGlobal('analytics');
+// const analytics = remote.getGlobal('analytics');
 
 const BaniController = ({ onScreenClose }) => {
   const title = 'Mobile device sync';
@@ -77,7 +77,7 @@ const BaniController = ({ onScreenClose }) => {
       onEnd(code);
       setCode(null);
       setAdminPin(null);
-      analytics.trackEvent('syncStopped', true);
+      // analytics.trackEvent('syncStopped', true);
     } else {
       await remoteSyncInit();
     }

@@ -26,7 +26,7 @@ const getBaniControllerItems = ({
           if (code) {
             const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
             global.controller.sendText(syncString);
-            analytics.trackEvent('controller', 'codePresented', true);
+            // analytics.trackEvent('controller', 'codePresented', true);
           }
         }}
       >

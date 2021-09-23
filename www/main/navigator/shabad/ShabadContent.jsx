@@ -100,6 +100,17 @@ const ShabadContent = () => {
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
     }
+    if (window.socket !== undefined && window.socket !== null) {
+      window.socket.emit('data', {
+        type: 'shabad',
+        host: 'sttm-desktop',
+        id: activeShabadId,
+        shabadid: activeShabadId, // @deprecated
+        highlight: newTraversedVerse,
+        homeId: activeShabad[homeVerse].ID,
+        verseChange: false,
+      });
+    }
   };
 
   const openNextVerse = () => {

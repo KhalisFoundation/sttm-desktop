@@ -13,11 +13,11 @@ const ConnectionSwitch = props => {
         controlId="bani-controller"
         onToggle={() => {
           props.syncToggle();
-          analytics.trackEvent(
-            'controller',
-            'connection',
-            props.isConnected ? 'Enabled' : 'Disabled',
-          );
+          // analytics.trackEvent(
+          //   'controller',
+          //   'connection',
+          //   props.isConnected ? 'Enabled' : 'Disabled',
+          // );
         }}
         value={!props.isConnected}
       />
