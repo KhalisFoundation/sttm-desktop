@@ -87,10 +87,8 @@ export const useNewShabad = () => {
       }
     }
 
-    if (activeVerseId !== newSelectedVerse) {
-      if (newSelectedVerse) {
-        setActiveVerseId(newSelectedVerse);
-      }
+    if (newSelectedVerse && activeVerseId !== newSelectedVerse) {
+      setActiveVerseId(newSelectedVerse);
     }
     if (window.socket !== undefined && window.socket !== null) {
       window.socket.emit('data', {

@@ -36,8 +36,9 @@ const useSocketListeners = (isListeners, adminPin) => {
   };
 
   useEffect(() => {
+    console.log('is listening the listeners', isListeners);
     if (isListeners && adminPin) {
-      if (window.socket !== undefined) {
+      if (isListeners && window.socket !== undefined) {
         window.socket.on('data', data => {
           const isPinCorrect = parseInt(data.pin, 10) === adminPin;
           console.log(data);

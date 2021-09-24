@@ -66,6 +66,7 @@ const ShabadContent = () => {
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
+    console.log('update traversed verse runs');
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
     }
@@ -179,7 +180,7 @@ const ShabadContent = () => {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
           setActiveShabad(verses);
-          if (!activeVerseId || isRandomShabad) {
+          if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
             if (isRandomShabad) {
               setIsRandomShabad(false);
@@ -203,9 +204,10 @@ const ShabadContent = () => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
         setActiveVerse({ [verses.ID]: verses.verseId });
-        if (homeVerse !== verses.ID) {
-          setHomeVerse(verses.ID);
-        }
+        changeHomeVerse(initialVerseId);
+        // if (homeVerse !== verses.ID) {
+        //   setHomeVerse(verses.ID);
+        // }
       }
     });
   }, [activeShabad]);
