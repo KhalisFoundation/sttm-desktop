@@ -7,10 +7,8 @@ import { dailyHukamnama } from '../../utils';
 const { i18n } = remote.require('./app');
 
 export const OtherPane = () => {
-  const { activeShabadId, noActiveVerse, isRandomShabad } = useStoreState(state => state.navigator);
-  const { setActiveShabadId, setNoActiveVerse, setIsRandomShabad } = useStoreActions(
-    state => state.navigator,
-  );
+  const { activeShabadId, isRandomShabad } = useStoreState(state => state.navigator);
+  const { setActiveShabadId, setIsRandomShabad } = useStoreActions(state => state.navigator);
 
   const openRandomShabad = () => {
     if (!isRandomShabad) {
@@ -21,9 +19,6 @@ export const OtherPane = () => {
 
   const openDailyHukamnana = () => {
     dailyHukamnama(activeShabadId, setActiveShabadId);
-    if (!noActiveVerse) {
-      setNoActiveVerse(true);
-    }
   };
 
   return (

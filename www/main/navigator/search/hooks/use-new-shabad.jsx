@@ -1,6 +1,6 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-const changeActiveShabad = () => {
+export const useNewShabad = () => {
   const {
     verseHistory,
     versesRead,
@@ -12,7 +12,6 @@ const changeActiveShabad = () => {
     isAnnouncementSlide,
     isMoolMantraSlide,
     isDhanGuruSlide,
-    noActiveVerse,
     isSundarGutkaBani,
     isCeremonyBani,
   } = useStoreState(state => state.navigator);
@@ -28,7 +27,6 @@ const changeActiveShabad = () => {
     setIsMoolMantraSlide,
     setIsAnnouncementSlide,
     setIsDhanGuruSlide,
-    setNoActiveVerse,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
   } = useStoreActions(state => state.navigator);
@@ -78,17 +76,21 @@ const changeActiveShabad = () => {
     if (isCeremonyBani) {
       setIsCeremonyBani(false);
     }
+
     if (activeShabadId !== newSelectedShabad) {
       setActiveShabadId(newSelectedShabad);
+
+      // initialVerseId is the verse which is stored in history
+      // It is the verse we searched for.
+      if (initialVerseId !== newSelectedVerse) {
+        setInitialVerseId(newSelectedVerse);
+      }
     }
-    if (initialVerseId !== newSelectedVerse) {
-      setInitialVerseId(newSelectedVerse);
-    }
+
     if (activeVerseId !== newSelectedVerse) {
-      setActiveVerseId(newSelectedVerse);
-    }
-    if (noActiveVerse) {
-      setNoActiveVerse(false);
+      if (newSelectedVerse) {
+        setActiveVerseId(newSelectedVerse);
+      }
     }
     if (window.socket !== undefined && window.socket !== null) {
       window.socket.emit('data', {
@@ -103,5 +105,3 @@ const changeActiveShabad = () => {
     }
   };
 };
-
-export default changeActiveShabad;

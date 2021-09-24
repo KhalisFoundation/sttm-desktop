@@ -5,13 +5,13 @@ import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
-import changeActiveShabad from '../hooks/change-active-shabad';
+import { useNewShabad } from '../hooks/use-new-shabad';
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {
-  const useShabadUpdate = changeActiveShabad();
+  const changeActiveShabad = useNewShabad();
 
   const {
     currentLanguage,
@@ -165,7 +165,7 @@ const SearchContent = () => {
                     key={index}
                     ang={ang}
                     searchType={currentSearchType}
-                    onClick={useShabadUpdate}
+                    onClick={changeActiveShabad}
                     shabadId={shabadId}
                     raag={raag}
                     sourceId={sourceId}

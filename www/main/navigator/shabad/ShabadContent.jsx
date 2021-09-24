@@ -17,7 +17,6 @@ const ShabadContent = () => {
     isMoolMantraSlide,
     isDhanGuruSlide,
     activeVerseId,
-    noActiveVerse,
     sundarGutkaBaniId,
     ceremonyId,
     isCeremonyBani,
@@ -35,7 +34,6 @@ const ShabadContent = () => {
     setIsAnnouncementSlide,
     setIsMoolMantraSlide,
     setIsDhanGuruSlide,
-    setNoActiveVerse,
     setShortcuts,
     setIsRandomShabad,
   } = useStoreActions(state => state.navigator);
@@ -82,9 +80,6 @@ const ShabadContent = () => {
     }
     if (isDhanGuruSlide) {
       setIsDhanGuruSlide(false);
-    }
-    if (noActiveVerse) {
-      setNoActiveVerse(false);
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
@@ -184,7 +179,7 @@ const ShabadContent = () => {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
           setActiveShabad(verses);
-          if (noActiveVerse || isRandomShabad) {
+          if (!activeVerseId || isRandomShabad) {
             openFirstVerse(verses[0].ID);
             if (isRandomShabad) {
               setIsRandomShabad(false);
