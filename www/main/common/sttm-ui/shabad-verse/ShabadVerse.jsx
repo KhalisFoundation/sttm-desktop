@@ -21,7 +21,7 @@ const ShabadVerse = ({
       }
       return 0;
     })[0]
-      ? 'shabadPane-active'
+      ? 'shabad-pane-active'
       : '';
   };
 
@@ -29,9 +29,9 @@ const ShabadVerse = ({
     <li
       id={`line-${lineNumber}`}
       value={lineNumber}
-      className={`shabadPane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
+      className={`shabad-pane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
-      <span className="shabadPane-controls">
+      <span className="shabad-pane-controls">
         {versesRead.map(
           (isRead, index) => isRead === verseId && <i key={index} className="fa fa-fw fa-check" />,
         )}

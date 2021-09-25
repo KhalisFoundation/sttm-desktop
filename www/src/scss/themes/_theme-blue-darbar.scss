@@ -12,4 +12,23 @@ $themeBlueDarbar: (
 
 .theme-blue-darbar {
   @include generateTheme($themeBlueDarbar...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $dull-blue;
+
+    &:hover {
+      background: $dull-blue;
+    }
+  }
+
+  .launchpad .single-display-switches {
+    .tab-switch,
+    & {
+      background: $darker-grey;
+    }
+    .tab-switch.active {
+      background: $black !important;
+      color: $light-grey !important;
+    }
+  }
 }

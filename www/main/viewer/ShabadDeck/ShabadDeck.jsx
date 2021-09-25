@@ -34,6 +34,7 @@ function ShabadDeck() {
     mangalPosition,
     displayNextLine,
     isSingleDisplayMode,
+    themeBg,
   } = useStoreState(state => state.userSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
@@ -49,21 +50,28 @@ function ShabadDeck() {
     return themes.find(theme => theme.key === currentTheme);
   };
 
-  const bakeThemeStyles = themeInstance => {
-    const backgroundImageObj = {
-      backgroundImage: `url('assets/img/custom_backgrounds/${
-        themeInstance['background-image-full']
-      }')`,
-    };
+  const bakeThemeStyles = (themeInstance, themeObj) => {
+    const backgroundImageObj =
+      themeObj.type === 'default'
+        ? {
+            backgroundImage: `url('assets/img/custom_backgrounds/${
+              themeInstance['background-image-full']
+            }')`,
+          }
+        : {
+            backgroundImage: `url('${themeObj.url}')`,
+          };
     const backgroundColorObj = {
       backgroundColor: themeInstance['background-color'],
     };
-    return themeInstance['background-image-full'] ? backgroundImageObj : backgroundColorObj;
+    return themeInstance['background-image-full'] || themeObj.type === 'custom'
+      ? backgroundImageObj
+      : backgroundColorObj;
   };
 
   const applyTheme = () => {
     const themeInstance = getCurrentThemeInstance();
-    return bakeThemeStyles(themeInstance);
+    return bakeThemeStyles(themeInstance, themeBg);
   };
 
   useEffect(() => {

@@ -232,3 +232,15 @@
     font-weight: bold;
   }
 }
+
+#search-bg {
+  width: 100%;
+  z-index: -1;
+}
+
+#db-download-progress {
+  background-color: green;
+  height: 2px;
+  transition: all $transition-time $transition-easing;
+  width: 10px;
+}

@@ -9,6 +9,7 @@
 
 .shabad-deck {
   height: 100%;
+  background-size: cover;
 }
 
 .empty-slide {
@@ -16,6 +17,7 @@
 }
 
 .viewer-logo {
+  fill: $grey;
   bottom: 12px;
   position: absolute;
   left: 12px;
