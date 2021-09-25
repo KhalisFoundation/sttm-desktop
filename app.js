@@ -275,7 +275,6 @@ function createViewer(ipcData) {
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.show();
-      viewerWindow.openDevTools();
       const [width, height] = viewerWindow.getSize();
       mainWindow.webContents.send('external-display', {
         width,
@@ -350,7 +349,7 @@ const showLine = async (line, socket = io) => {
   };
 
   const payload = lineWithSettings;
-  if (!lineWithSettings.fromScroll) {
+  if (Object.keys(line).length) {
     socket.emit('show-line', payload);
   }
   const zoomToken = store.get('userPrefs.app.zoomToken');
@@ -370,7 +369,6 @@ const showLine = async (line, socket = io) => {
 
 const updateOverlayVars = overlayPrefs => {
   if (overlayPrefs) {
-    console.log(overlayPrefs);
     io.emit('update-prefs', overlayPrefs);
   } else {
     mainWindow.webContents.send('get-overlay-prefs');
@@ -472,7 +470,6 @@ app.on('ready', () => {
       webviewTag: true,
     },
   });
-  mainWindow.openDevTools();
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send('external-display', {

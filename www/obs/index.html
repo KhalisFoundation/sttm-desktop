@@ -173,10 +173,11 @@
       };
 
       socket.on('show-line', function(request) {
-        console.log(request);
         if (!preview) {
-          const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          if (overlayPrefs) {
+            const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+            writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          }
         }
       });
 
