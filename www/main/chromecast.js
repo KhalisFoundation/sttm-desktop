@@ -9,8 +9,14 @@
   no-undef: 0,
   prefer-template: 0
 */
+
+import chromecast from 'electron-chromecast';
+import { CHROMECAST } from './locales/en.json';
+
+const tingle = require('./assets/js/vendor/tingle.js');
+
 let trigID = 0;
-const receiverFn = receivers =>
+const receiverFn = async receivers =>
   new Promise(resolve => {
     trigID += 1;
     // instantiate new modal
@@ -45,13 +51,10 @@ const receiverFn = receivers =>
     });
 
     // set content
-    const message =
-      numReceivers === 0
-        ? i18n.t('CHROMECAST.NO_DEVICES_FOUND')
-        : i18n.t('CHROMECAST.SELECT_DEVICE');
+    const message = numReceivers === 0 ? CHROMECAST.NO_DEVICES_FOUND : CHROMECAST.SELECT_DEVICE;
     modal.setContent('<h2>' + message + '</h2>');
     // add cancel button
-    const cancelTitle = numReceivers === 0 ? i18n.t('OK') : i18n.t('CHROMECAST.CANCEL');
+    const cancelTitle = numReceivers === 0 ? 'OK' : CHROMECAST.CANCEL;
     modal.addFooterBtn(cancelTitle, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
       modal.close();
     });
@@ -60,7 +63,7 @@ const receiverFn = receivers =>
     modal.open();
   });
 
-require('electron-chromecast')(receiverFn);
+chromecast(receiverFn);
 
 const applicationID = '3F64A19C';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
@@ -108,9 +111,7 @@ function requestSession() {
  * listener for session updates
  */
 function sessionUpdateListener(isAlive) {
-  let message = isAlive
-    ? i18n.t('CHROMECAST.SESSION_UPDATED')
-    : i18n.t('CHROMECAST.SESSION_REMOVED');
+  let message = isAlive ? CHROMECAST.SESSION_UPDATED : CHROMECAST.SESSION_REMOVED;
   message += ': ' + session.sessionId;
   appendMessage(message);
   if (!isAlive) {
@@ -157,10 +158,10 @@ function onError(message) {
 
   switch (message.code) {
     case 'RECEIVER_UNAVAILABLE':
-      displayError(i18n.t('CHROMECAST.NO_DEVICES_DETECTED'));
+      displayError(CHROMECAST.NO_DEVICES_DETECTED);
       break;
     default:
-      displayError(i18n.t('CHROMECAST.TRY_AGAIN'));
+      displayError(CHROMECAST.TRY_AGAIN);
       break;
   }
 }
@@ -174,7 +175,7 @@ function displayError(errorMessage) {
 
   modal.setContent('<h2>' + errorMessage + '</h2>');
   // add ok button
-  modal.addFooterBtn(i18n.t('OK'), 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+  modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
     modal.close();
   });
 
@@ -217,10 +218,17 @@ function sendMessage(message) {
     session.sendMessage(
       namespace,
       message,
-      onSuccess.bind(this, i18n.t('CHROMECAST.MSG_SENT') + message),
+      onSuccess.bind(this, CHROMECAST.MSG_SENT + message),
       onError,
     );
   } else {
     appendMessage('Cannot send because session is null');
   }
 }
+
+// IPC
+global.platform.ipc.on('search-cast', (event, pos) => {
+  requestSession();
+  appendMessage(event);
+  appendMessage(pos);
+});
