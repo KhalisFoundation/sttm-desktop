@@ -6,7 +6,7 @@ const bakePanktee = () => {
     state => state.userSettings,
   );
 
-  return (getFontSize, gurmukhiString, isWaheguruSlide, vishraamPlacement, vishraamSource) => {
+  return (getFontSize, gurmukhiString = '', isWaheguruSlide, vishraamPlacement, vishraamSource) => {
     const filterAppliedVishraam = () => {
       const activeVishraams = {};
       if (vishraamPlacement) {

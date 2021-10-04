@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
+import anvaad from 'anvaad-js';
 import SlideTeeka from './SlideTeeka';
 import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
+import bakePanktee from '../hooks/bakePanktee';
 
 const Slide = ({
   verseObj,
@@ -30,6 +32,7 @@ const Slide = ({
     displayNextLine,
     isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
+  const usebakePanktee = bakePanktee();
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -50,6 +53,45 @@ const Slide = ({
     }
     return { fontSize: `${verseType * 3}px` };
   };
+
+  useEffect(() => {
+    const obj = {};
+    const translations = JSON.parse(verseObj.Translations);
+    const teeka = JSON.parse(verseObj.Translations).pu;
+
+    obj.gurmukhi = usebakePanktee(
+      getFontSize,
+      verseObj.Gurmukhi,
+      isWaheguruSlide,
+      JSON.parse(verseObj.Visraam),
+      vishraamSource,
+    );
+    obj.larivaar = usebakePanktee(
+      getFontSize,
+      verseObj.Gurmukhi,
+      isWaheguruSlide,
+      JSON.parse(verseObj.Visraam),
+      vishraamSource,
+    );
+    obj.nextLineObj = usebakePanktee(
+      getFontSize,
+      nextLineObj.Gurmukhi,
+      isWaheguruSlide,
+      JSON.parse(verseObj.Visraam),
+      vishraamSource,
+    );
+    obj.translation = {
+      English: translations.en.bdb,
+      Spanish: translations.es.sn,
+      Hindi: translations.hi && translations.hi.ss,
+    };
+    obj.transliteration = {
+      Devanagari: anvaad.translit(verseObj.Gurmukhi || '', 'devnagri'),
+      English: anvaad.translit(verseObj.Gurmukhi),
+      Shahmukhi: anvaad.translit(verseObj.Gurmukhi || '', 'shahmukhi'),
+    };
+    obj.teeka = teeka.bdb || teeka.ss;
+  }, []);
 
   return (
     <>
