@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+
+const anvaad = require('anvaad-js');
 
 const ShabadContent = () => {
   const {
@@ -63,6 +66,36 @@ const ShabadContent = () => {
           return {};
         })
       : [];
+  };
+
+  const filterOverlayVerseItems = (verses, verseId = activeVerseId) => {
+    if (verses) {
+      const currentIndex = verses.findIndex(obj => obj.ID === verseId);
+      const currentVerse = verses[currentIndex];
+      if (currentVerse) {
+        const Line = { ...currentVerse.toJSON() };
+        if (Line.Translations) {
+          const lineTranslations = JSON.parse(Line.Translations);
+          Line.English =
+            lineTranslations.en.bdb || lineTranslations.en.ms || lineTranslations.en.ssk;
+          Line.Punjabi =
+            lineTranslations.pu.bdb ||
+            lineTranslations.pu.ss ||
+            lineTranslations.pu.ft ||
+            lineTranslations.pu.ms;
+          Line.Spanish = lineTranslations.es.sn;
+          Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
+        }
+        Line.Transliteration = {
+          English: anvaad.translit(Line.Gurmukhi || ''),
+          Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
+          Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
+        };
+        Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
+        return Line;
+      }
+    }
+    return {};
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
@@ -211,6 +244,13 @@ const ShabadContent = () => {
       }
     });
   }, [activeShabad]);
+
+  useEffect(() => {
+    const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
+    ipcRenderer.send('show-line', {
+      Line: overlayVerse,
+    });
+  }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
