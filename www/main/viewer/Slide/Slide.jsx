@@ -48,16 +48,15 @@ const Slide = ({
   };
 
   const getFontSize = verseType => {
-    // if (isSingleDisplayMode) {
-    // }
-    // return { fontSize: `${verseType * 3}px` };
-    return { fontSize: `${verseType}vh` };
+    if (isSingleDisplayMode) {
+      return { fontSize: `${verseType}vh` };
+    }
+    return { fontSize: `${verseType * 3}px` };
   };
 
   useEffect(() => {
-    // console.log('slide rerendered', global.platform);
     global.platform.ipc.send('cast-to-receiver');
-  }, [verseObj]);
+  }, [verseObj, isWaheguruSlide, isMoolMantraSlide, isDhanGuruSlide]);
 
   return (
     <>
