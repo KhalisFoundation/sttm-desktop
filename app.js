@@ -540,6 +540,10 @@ ipcMain.on('cast-session-stopped', () => {
   mainWindow.webContents.send('cast-session-stopped');
 });
 
+ipcMain.on('cast-to-receiver', event => {
+  event.reply('cast-verse', 'update verse');
+});
+
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 

@@ -17,6 +17,7 @@ import { convertToLegacySettingsObj } from './js/common/utils';
 const { store } = require('electron').remote.require('./app');
 const { ipcRenderer } = require('electron');
 const tingle = require('./assets/js/vendor/tingle.js');
+global.platform = require('./main/desktop_scripts');
 
 // Find receiver and show to viewer
 let trigID = 0;
@@ -69,7 +70,7 @@ const receiverFn = async receivers =>
 
 chromecast(receiverFn);
 
-const applicationID = '3F64A19C';
+const applicationID = 'ECF05819';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
 let isCastInitialized = false;
@@ -114,12 +115,23 @@ const castCur = {
     app: { theme: 'light-theme' },
   },
 };
+const h1 = `<h1 style="color: white;">Testing</h1>`;
+
+// Removes quicktools and svg from clonedNode of viewer
+const getSanitizedViewer = () => {
+  const viewerHtml = document.querySelector('#viewer-container')
+    ? document.querySelector('#viewer-container').cloneNode(true)
+    : '';
+  viewerHtml.children[1].remove();
+  viewerHtml.children[0].children[0].remove();
+  console.log('viewerHtml', viewerHtml.innerHTML);
+  return viewerHtml.innerHTML;
+};
 
 const castToReceiver = () => {
-  sendMessage(JSON.stringify(castCur));
-  setTimeout(() => {
-    sendMessage(JSON.stringify(castCur));
-  }, 4000);
+  // const testString =
+  //   '<div class="shabad-deck   theme-light-theme" style="background-color: rgb(255, 255, 255);"><div class="verse-slide "><div class="slide-gurbani  vishraam-colored"><span class="padchhed"><span style="font-size: 11vh;">ddw</span><wbr><span style="font-size: 11vh;">dwqw</span><wbr><span style="font-size: 11vh;">eyku</span><wbr><span style="font-size: 11vh;">hY</span><wbr><span style="font-size: 11vh;">sB</span><wbr><span style="font-size: 11vh;">kau</span><wbr><span style="font-size: 11vh;">dyvnhwr</span><wbr><span style="font-size: 11vh;">]</span><wbr></span></div><div class="slide-translation language-English" style="font-size: 6vh;">DADDA: The One Lord is the Great Giver; He is the Giver to all.</div><div class="slide-teeka" style="font-size: 5vh;">iek pRBU hI (AYsw) dwqw hY jo sB jIvW ƒ irzk ApVwx dy smrQ hY</div><div class="slide-transliteration language-English" style="font-size: 11vh;">dhadhaa dhaataa ek hai sabh kau dhevanahaar ||</div></div></div>';
+  sendMessage(JSON.stringify(getSanitizedViewer()));
 };
 
 /**
@@ -289,10 +301,7 @@ global.platform.ipc.on('stop-cast', (event, pos) => {
   stopApp();
 });
 
-global.platform.ipc.on('cast-to-receiver2', (event, pos) => {
-  console.log('event, pos', event, pos);
-});
-
-ipcRenderer.on('cast-to-receiver2', (event, pos) => {
-  console.log('from ipc renderer', event, pos);
+ipcRenderer.on('cast-verse', event => {
+  console.log('cats verse invoked from ipc renderer in chromecast file');
+  castToReceiver();
 });

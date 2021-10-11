@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -137,6 +138,11 @@ function ShabadDeck() {
       });
     }
   }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+
+  useEffect(() => {
+    console.log(ipcRenderer);
+    ipcRenderer.send('cast-to-receiver');
+  }, [activeVerseId]);
 
   return (
     <>
