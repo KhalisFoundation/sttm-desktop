@@ -9,8 +9,19 @@
   no-undef: 0,
   prefer-template: 0
 */
+
+import chromecast from 'electron-chromecast';
+import { CHROMECAST } from './locales/en.json';
+import { convertToLegacySettingsObj } from './js/common/utils';
+
+const { store } = require('electron').remote.require('./app');
+const { ipcRenderer } = require('electron');
+const tingle = require('./assets/js/vendor/tingle.js');
+global.platform = require('./main/desktop_scripts');
+
+// Find receiver and show to viewer
 let trigID = 0;
-const receiverFn = receivers =>
+const receiverFn = async receivers =>
   new Promise(resolve => {
     trigID += 1;
     // instantiate new modal
@@ -45,13 +56,10 @@ const receiverFn = receivers =>
     });
 
     // set content
-    const message =
-      numReceivers === 0
-        ? i18n.t('CHROMECAST.NO_DEVICES_FOUND')
-        : i18n.t('CHROMECAST.SELECT_DEVICE');
+    const message = numReceivers === 0 ? CHROMECAST.NO_DEVICES_FOUND : CHROMECAST.SELECT_DEVICE;
     modal.setContent('<h2>' + message + '</h2>');
     // add cancel button
-    const cancelTitle = numReceivers === 0 ? i18n.t('OK') : i18n.t('CHROMECAST.CANCEL');
+    const cancelTitle = numReceivers === 0 ? 'OK' : CHROMECAST.CANCEL;
     modal.addFooterBtn(cancelTitle, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
       modal.close();
     });
@@ -60,12 +68,71 @@ const receiverFn = receivers =>
     modal.open();
   });
 
-require('electron-chromecast')(receiverFn);
+chromecast(receiverFn);
 
-const applicationID = '3F64A19C';
+const applicationID = 'ECF05819';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
 let isCastInitialized = false;
+const castCur = {
+  gurmukhi:
+    '<span class="visraam-yamki visraam-sttm visraam-igurbani">ddw</span> <span>dwqw</span> <span>eyku</span> <span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">hY</span> <span>sB</span> <span>kau</span> <span><span>dyvnhwr</span><i> </i><span>]</span></span>',
+  larivaar:
+    '<span class="visraam-yamki visraam-sttm visraam-igurbani">ddw</span><wbr><span>dwqw</span><wbr><span>eyku</span><wbr><span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">hY</span><wbr><span>sB</span><wbr><span>kau</span><wbr><span><span>dyvnhwr</span><i> </i><span>]</span></span>',
+  translation: {
+    Spanish: 'DADDA: Él, el Señor es el Único Dador, Él es quien da a todos, y sin ningún límite, ',
+    English: 'DADDA: The One Lord is the Great Giver; He is the Giver to all.',
+    Hindi: 'एक प्रभू ही (ऐसा) दाता है जो सब जीवों को रिजक पहुँचाने के स्मर्थ है।',
+  },
+  teeka: 'iek pRBU hI (AYsw) dwqw hY jo sB jIvW ƒ irzk ApVwx dy smrQ hY',
+  transliteration: {
+    Devanagari: 'ददा दाता एकु है सभ कउ देवनहार ॥',
+    English: 'dhadhaa dhaataa ek hai sabh kau dhevanahaar ||',
+    Shahmukhi: 'ددا داتا اےک هَے سبھ کا دےونهار ۔۔',
+  },
+  nextLine:
+    '<span>dyNdy</span> <span>qoit</span> <span>n</span> <span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">AwveI</span> <span>Agnq</span> <span>Bry</span> <span><span>BMfwr</span><i> </i><span>]</span></span>',
+  prefs: {
+    toolbar: {
+      'gurbani-options': { 'display-visraams': false },
+      vishraam: { 'vishraam-options': 'colored-words', 'vishraam-source': 'sttm2' },
+    },
+    'slide-layout': {
+      fields: {
+        'display-translation': true,
+        'display-transliteration': true,
+        'display-teeka': true,
+        'display-next-line': false,
+      },
+      'font-sizes': { announcements: 7, gurbani: 11, translation: 6, transliteration: 6, teeka: 5 },
+      'language-settings': {
+        'translation-language': 'English',
+        'transliteration-language': 'English',
+      },
+      'larivaar-settings': { 'assist-type': 'single-color' },
+      'display-options': { larivaar: false, 'larivaar-assist': false, 'left-align': false },
+    },
+    app: { theme: 'light-theme' },
+  },
+};
+const h1 = `<h1 style="color: white;">Testing</h1>`;
+
+// Removes quicktools and svg from clonedNode of viewer
+const getSanitizedViewer = () => {
+  const viewerHtml = document.querySelector('#viewer-container')
+    ? document.querySelector('#viewer-container').cloneNode(true)
+    : '';
+  viewerHtml.children[1].remove();
+  viewerHtml.children[0].children[0].remove();
+  console.log('viewerHtml', viewerHtml.innerHTML);
+  return viewerHtml.innerHTML;
+};
+
+const castToReceiver = () => {
+  // const testString =
+  //   '<div class="shabad-deck   theme-light-theme" style="background-color: rgb(255, 255, 255);"><div class="verse-slide "><div class="slide-gurbani  vishraam-colored"><span class="padchhed"><span style="font-size: 11vh;">ddw</span><wbr><span style="font-size: 11vh;">dwqw</span><wbr><span style="font-size: 11vh;">eyku</span><wbr><span style="font-size: 11vh;">hY</span><wbr><span style="font-size: 11vh;">sB</span><wbr><span style="font-size: 11vh;">kau</span><wbr><span style="font-size: 11vh;">dyvnhwr</span><wbr><span style="font-size: 11vh;">]</span><wbr></span></div><div class="slide-translation language-English" style="font-size: 6vh;">DADDA: The One Lord is the Great Giver; He is the Giver to all.</div><div class="slide-teeka" style="font-size: 5vh;">iek pRBU hI (AYsw) dwqw hY jo sB jIvW ƒ irzk ApVwx dy smrQ hY</div><div class="slide-transliteration language-English" style="font-size: 11vh;">dhadhaa dhaataa ek hai sabh kau dhevanahaar ||</div></div></div>';
+  sendMessage(JSON.stringify(getSanitizedViewer()));
+};
 
 /**
  * append message to debug message window
@@ -108,9 +175,7 @@ function requestSession() {
  * listener for session updates
  */
 function sessionUpdateListener(isAlive) {
-  let message = isAlive
-    ? i18n.t('CHROMECAST.SESSION_UPDATED')
-    : i18n.t('CHROMECAST.SESSION_REMOVED');
+  let message = isAlive ? CHROMECAST.SESSION_UPDATED : CHROMECAST.SESSION_REMOVED;
   message += ': ' + session.sessionId;
   appendMessage(message);
   if (!isAlive) {
@@ -157,10 +222,10 @@ function onError(message) {
 
   switch (message.code) {
     case 'RECEIVER_UNAVAILABLE':
-      displayError(i18n.t('CHROMECAST.NO_DEVICES_DETECTED'));
+      displayError(CHROMECAST.NO_DEVICES_DETECTED);
       break;
     default:
-      displayError(i18n.t('CHROMECAST.TRY_AGAIN'));
+      displayError(CHROMECAST.TRY_AGAIN);
       break;
   }
 }
@@ -174,7 +239,7 @@ function displayError(errorMessage) {
 
   modal.setContent('<h2>' + errorMessage + '</h2>');
   // add ok button
-  modal.addFooterBtn(i18n.t('OK'), 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
+  modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
     modal.close();
   });
 
@@ -217,10 +282,26 @@ function sendMessage(message) {
     session.sendMessage(
       namespace,
       message,
-      onSuccess.bind(this, i18n.t('CHROMECAST.MSG_SENT') + message),
+      onSuccess.bind(this, CHROMECAST.MSG_SENT + message),
       onError,
     );
   } else {
     appendMessage('Cannot send because session is null');
   }
 }
+
+// IPC
+global.platform.ipc.on('search-cast', (event, pos) => {
+  requestSession();
+  appendMessage(event);
+  appendMessage(pos);
+});
+
+global.platform.ipc.on('stop-cast', (event, pos) => {
+  stopApp();
+});
+
+ipcRenderer.on('cast-verse', event => {
+  console.log('cats verse invoked from ipc renderer in chromecast file');
+  castToReceiver();
+});
