@@ -74,48 +74,6 @@ const applicationID = 'ECF05819';
 const namespace = 'urn:x-cast:com.khalis.cast.sttm.gurbani';
 let session = null;
 let isCastInitialized = false;
-const castCur = {
-  gurmukhi:
-    '<span class="visraam-yamki visraam-sttm visraam-igurbani">ddw</span> <span>dwqw</span> <span>eyku</span> <span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">hY</span> <span>sB</span> <span>kau</span> <span><span>dyvnhwr</span><i> </i><span>]</span></span>',
-  larivaar:
-    '<span class="visraam-yamki visraam-sttm visraam-igurbani">ddw</span><wbr><span>dwqw</span><wbr><span>eyku</span><wbr><span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">hY</span><wbr><span>sB</span><wbr><span>kau</span><wbr><span><span>dyvnhwr</span><i> </i><span>]</span></span>',
-  translation: {
-    Spanish: 'DADDA: Él, el Señor es el Único Dador, Él es quien da a todos, y sin ningún límite, ',
-    English: 'DADDA: The One Lord is the Great Giver; He is the Giver to all.',
-    Hindi: 'एक प्रभू ही (ऐसा) दाता है जो सब जीवों को रिजक पहुँचाने के स्मर्थ है।',
-  },
-  teeka: 'iek pRBU hI (AYsw) dwqw hY jo sB jIvW ƒ irzk ApVwx dy smrQ hY',
-  transliteration: {
-    Devanagari: 'ददा दाता एकु है सभ कउ देवनहार ॥',
-    English: 'dhadhaa dhaataa ek hai sabh kau dhevanahaar ||',
-    Shahmukhi: 'ددا داتا اےک هَے سبھ کا دےونهار ۔۔',
-  },
-  nextLine:
-    '<span>dyNdy</span> <span>qoit</span> <span>n</span> <span class="visraam-main visraam-sttm visraam-igurbani visraam-sttm2">AwveI</span> <span>Agnq</span> <span>Bry</span> <span><span>BMfwr</span><i> </i><span>]</span></span>',
-  prefs: {
-    toolbar: {
-      'gurbani-options': { 'display-visraams': false },
-      vishraam: { 'vishraam-options': 'colored-words', 'vishraam-source': 'sttm2' },
-    },
-    'slide-layout': {
-      fields: {
-        'display-translation': true,
-        'display-transliteration': true,
-        'display-teeka': true,
-        'display-next-line': false,
-      },
-      'font-sizes': { announcements: 7, gurbani: 11, translation: 6, transliteration: 6, teeka: 5 },
-      'language-settings': {
-        'translation-language': 'English',
-        'transliteration-language': 'English',
-      },
-      'larivaar-settings': { 'assist-type': 'single-color' },
-      'display-options': { larivaar: false, 'larivaar-assist': false, 'left-align': false },
-    },
-    app: { theme: 'light-theme' },
-  },
-};
-const h1 = `<h1 style="color: white;">Testing</h1>`;
 
 // Removes quicktools and svg from clonedNode of viewer
 const getSanitizedViewer = () => {
@@ -124,13 +82,11 @@ const getSanitizedViewer = () => {
     : '';
   viewerHtml.children[1].remove();
   viewerHtml.children[0].children[0].remove();
-  console.log('viewerHtml', viewerHtml.innerHTML);
+  viewerHtml.children[0].removeAttribute('style');
   return viewerHtml.innerHTML;
 };
 
 const castToReceiver = () => {
-  // const testString =
-  //   '<div class="shabad-deck   theme-light-theme" style="background-color: rgb(255, 255, 255);"><div class="verse-slide "><div class="slide-gurbani  vishraam-colored"><span class="padchhed"><span style="font-size: 11vh;">ddw</span><wbr><span style="font-size: 11vh;">dwqw</span><wbr><span style="font-size: 11vh;">eyku</span><wbr><span style="font-size: 11vh;">hY</span><wbr><span style="font-size: 11vh;">sB</span><wbr><span style="font-size: 11vh;">kau</span><wbr><span style="font-size: 11vh;">dyvnhwr</span><wbr><span style="font-size: 11vh;">]</span><wbr></span></div><div class="slide-translation language-English" style="font-size: 6vh;">DADDA: The One Lord is the Great Giver; He is the Giver to all.</div><div class="slide-teeka" style="font-size: 5vh;">iek pRBU hI (AYsw) dwqw hY jo sB jIvW ƒ irzk ApVwx dy smrQ hY</div><div class="slide-transliteration language-English" style="font-size: 11vh;">dhadhaa dhaataa ek hai sabh kau dhevanahaar ||</div></div></div>';
   sendMessage(JSON.stringify(getSanitizedViewer()));
 };
 
