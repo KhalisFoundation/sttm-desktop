@@ -10,6 +10,10 @@
 .shabad-deck {
   height: 100%;
   background-size: cover;
+
+  &.single-display-mode {
+    padding: 24px 72px;
+  }
 }
 
 .empty-slide {

@@ -143,7 +143,9 @@ function ShabadDeck() {
       <div
         className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
           isEmptySlide ? 'empty-slide' : ''
-        } theme-${getCurrentThemeInstance().key}`}
+        } ${isSingleDisplayMode ? 'single-display-mode' : ''} theme-${
+          getCurrentThemeInstance().key
+        }`}
         style={applyTheme()}
       >
         {/* show quicktools only on presentation mode */}
