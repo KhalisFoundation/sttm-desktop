@@ -287,23 +287,19 @@ const ShabadContent = () => {
   return (
     <div className="shabad-list">
       <div className="verse-block">
-        <div className="result-list">
-          <ul>
-            {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
-              <ShabadVerse
-                key={index}
-                activeVerse={activeVerse}
-                isHomeVerse={homeVerse}
-                lineNumber={index}
-                versesRead={versesRead}
-                verse={verse}
-                verseId={verseId}
-                changeHomeVerse={changeHomeVerse}
-                updateTraversedVerse={updateTraversedVerse}
-              />
-            ))}
-          </ul>
-        </div>
+        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
+          <ShabadVerse
+            key={index}
+            activeVerse={activeVerse}
+            isHomeVerse={homeVerse}
+            lineNumber={index}
+            versesRead={versesRead}
+            verse={verse}
+            verseId={verseId}
+            changeHomeVerse={changeHomeVerse}
+            updateTraversedVerse={updateTraversedVerse}
+          />
+        ))}
       </div>
     </div>
   );

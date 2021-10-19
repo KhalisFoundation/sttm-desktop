@@ -11,7 +11,11 @@
     }
   }
   .shabad-list {
-    height: 430px;
+    height: 345px;
+
+    @include breakpoint(xxlarge) {
+      height: 430px;
+    }
   }
 
   .fa-check {

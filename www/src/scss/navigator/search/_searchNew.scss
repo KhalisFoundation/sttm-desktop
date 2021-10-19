@@ -198,7 +198,11 @@
     }
   }
   .search-results {
-    height: 300px;
+    height: 225px;
+
+    @include breakpoint(xxlarge) {
+      height: 300px;
+    }
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);
