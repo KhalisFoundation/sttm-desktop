@@ -41,6 +41,7 @@ const ShabadContent = () => {
     setNoActiveVerse,
     setShortcuts,
     setIsRandomShabad,
+    setVerseHistory,
   } = useStoreActions(state => state.navigator);
 
   const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
@@ -187,11 +188,38 @@ const ShabadContent = () => {
     changeHomeVerse(0);
   };
 
+  const saveToHistory = (verses, verseType) => {
+    const firstVerse = verses[0];
+    const shabadId = firstVerse.Shabads[0].ShabadID;
+    const verseId = firstVerse.ID;
+    const verse = firstVerse.Gurmukhi;
+    const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
+    if (check.length === 0) {
+      const updatedHistory = [
+        ...verseHistory,
+        {
+          shabadId,
+          verseId,
+          label: verse,
+          type: verseType,
+          meta: {
+            baniLength: '',
+          },
+          versesRead: [verseId],
+          continueFrom: verseId,
+          homeVerse: 0,
+        },
+      ];
+      setVerseHistory(updatedHistory);
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
+          saveToHistory(sundarGutkaVerses, 'bani');
           openFirstVerse(sundarGutkaVerses[0].ID);
         },
       );
@@ -199,6 +227,7 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
+          saveToHistory(ceremonyVerses, 'ceremony');
           openFirstVerse(ceremonyVerses[0].ID);
         }
       });
