@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 const ShabadVerse = ({
   activeVerse,
   changeHomeVerse,
+  forwardedRef,
   isHomeVerse,
   lineNumber,
   versesRead,
@@ -29,6 +30,7 @@ const ShabadVerse = ({
     <li
       id={`line-${lineNumber}`}
       value={lineNumber}
+      ref={loadActiveClass(activeVerse, verseId, lineNumber) ? forwardedRef : null}
       className={`shabad-pane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
       <span className="shabad-pane-controls">
@@ -55,6 +57,7 @@ const ShabadVerse = ({
 ShabadVerse.propTypes = {
   activeVerse: PropTypes.object,
   changeHomeVerse: PropTypes.func,
+  forwardedRef: PropTypes.any,
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
   versesRead: PropTypes.array,

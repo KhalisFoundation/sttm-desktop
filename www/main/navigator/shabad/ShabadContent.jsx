@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
@@ -49,6 +49,7 @@ const ShabadContent = () => {
   const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+  const activeVerseRef = useRef(null);
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
@@ -264,6 +265,13 @@ const ShabadContent = () => {
         }
       }
     });
+
+    setTimeout(() => {
+      if (activeVerseRef) {
+        activeVerseRef.current.parentNode.scrollTop =
+          activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
+      }
+    }, 100);
   }, [activeShabad]);
 
   useEffect(() => {
@@ -325,6 +333,7 @@ const ShabadContent = () => {
             versesRead={versesRead}
             verse={verse}
             verseId={verseId}
+            forwardedRef={activeVerseRef}
             changeHomeVerse={changeHomeVerse}
             updateTraversedVerse={updateTraversedVerse}
           />
