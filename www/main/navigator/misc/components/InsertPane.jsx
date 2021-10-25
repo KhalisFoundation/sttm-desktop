@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
-export const InsertPane = () => {
+export const InsertPane = ({ className }) => {
   const {
     announcementString,
     isAnnouncementSlide,
@@ -105,7 +106,7 @@ export const InsertPane = () => {
   };
 
   return (
-    <ul className="list-of-items">
+    <ul className={`list-of-items ${className}`}>
       <li>
         <a onClick={() => openBlankViewer()}>
           <i className="fa fa-eye-slash list-icon" />
@@ -166,4 +167,8 @@ export const InsertPane = () => {
       </li>
     </ul>
   );
+};
+
+InsertPane.propTypes = {
+  className: PropTypes.string,
 };

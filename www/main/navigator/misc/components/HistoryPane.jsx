@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-export const HistoryPane = () => {
+export const HistoryPane = ({ className }) => {
   const {
     verseHistory,
     activeShabadId,
@@ -64,5 +65,9 @@ export const HistoryPane = () => {
     );
   });
 
-  return <div className="history-results">{versesMarkup}</div>;
+  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
+};
+
+HistoryPane.propTypes = {
+  className: PropTypes.string,
 };
