@@ -4,27 +4,38 @@ import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import isOnline from 'is-online';
 
-import useSocketListeners from '../hooks/use-socket-listeners';
 import BaniControllerItem from './BaniControllerItem';
 import { Overlay } from '../../../common/sttm-ui';
+import {
+  handleRequestControl,
+  loadBani,
+  loadCeremony,
+  loadShabad,
+  getBaniControllerItems,
+  generateQrCode,
+  shareSync,
+} from '../utils';
+import { changeFontSize } from '../../../quick-tools-utils';
+
 import QrCode from './QrCode';
 
-import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
-// const analytics = remote.getGlobal('analytics');
+const analytics = remote.getGlobal('analytics');
 
-const BaniController = ({ onScreenClose }) => {
+const BaniController = ({ onScreenClose, className }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  const [socketData, setSocketData] = useState(null);
+
   // Store State
   const { isListeners, overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
@@ -89,11 +100,61 @@ const BaniController = ({ onScreenClose }) => {
     }
   };
 
+  const {
+    gurbaniFontSize,
+    translationFontSize,
+    transliterationFontSize,
+    teekaFontSize,
+  } = useStoreState(state => state.userSettings);
+
+  const fontSizes = {
+    gurbani: parseInt(gurbaniFontSize, 10),
+    translation: parseInt(translationFontSize, 10),
+    teeka: parseInt(teekaFontSize, 10),
+    transliteration: parseInt(transliterationFontSize, 10),
+  };
+
   useEffect(() => {
     syncToggle(true);
   }, []);
 
-  useSocketListeners(isListeners, adminPin);
+  useEffect(() => {
+    if (isListeners && adminPin) {
+      if (window.socket !== undefined) {
+        window.socket.on('data', data => {
+          setSocketData(data);
+        });
+      }
+    }
+  }, [isListeners, adminPin]);
+
+  useEffect(() => {
+    console.log('socketData from useEffect inside component', socketData);
+    if (socketData) {
+      const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
+      const listenerActions = {
+        shabad: payload => {
+          loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
+          analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
+        },
+        text: payload =>
+          global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
+        bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
+        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
+        'request-control': () => handleRequestControl(adminPin, fontSizes),
+        settings: payload => {
+          const { settings } = payload;
+          if (settings.action === 'changeFontSize') {
+            changeFontSize(settings.target, settings.value === 'plus');
+          }
+        },
+      };
+      // if its an event from web and not from desktop itself
+      if (socketData.host !== 'sttm-desktop') {
+        listenerActions[isPinCorrect ? socketData.type : 'request-control'](socketData);
+      }
+    }
+  }, [socketData]);
 
   const baniControllerItems = getBaniControllerItems({
     code,
@@ -104,7 +165,7 @@ const BaniController = ({ onScreenClose }) => {
   });
 
   return (
-    <Overlay onScreenClose={onScreenClose}>
+    <Overlay onScreenClose={onScreenClose} className={className}>
       <div className="addon-wrapper sync-wrapper overlay-ui ui-sync-button">
         <ZoomController />
         <div className="sync overlay-ui ui-sync-button">
@@ -142,6 +203,7 @@ const BaniController = ({ onScreenClose }) => {
 
 BaniController.propTypes = {
   onScreenClose: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default BaniController;
