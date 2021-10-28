@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -7,6 +7,8 @@ import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
+
+global.platform = require('../../desktop_scripts');
 
 const Slide = ({
   verseObj,
@@ -30,6 +32,7 @@ const Slide = ({
     displayNextLine,
     isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
+  // const usebakePanktee = bakePanktee();
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -50,6 +53,10 @@ const Slide = ({
     }
     return { fontSize: `${verseType * 3}px` };
   };
+
+  useEffect(() => {
+    global.platform.ipc.send('cast-to-receiver');
+  }, [verseObj, isWaheguruSlide, isMoolMantraSlide, isDhanGuruSlide]);
 
   return (
     <>
@@ -101,7 +108,7 @@ const Slide = ({
                   gurmukhiString={verseObj.Gurmukhi}
                 />
               )}
-              {displayNextLine && nextLineObj.Gurmukhi && nextLineObj.Visraam && (
+              {displayNextLine && nextLineObj && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
                 >

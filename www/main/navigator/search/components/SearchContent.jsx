@@ -157,27 +157,23 @@ const SearchContent = () => {
       </div>
       <div className="search-results">
         <div className="verse-block">
-          <div className="result-list">
-            <ul>
-              {filteredShabads.map(
-                ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
-                  <SearchResults
-                    key={index}
-                    ang={ang}
-                    searchType={currentSearchType}
-                    onClick={changeActiveShabad}
-                    shabadId={shabadId}
-                    raag={raag}
-                    sourceId={sourceId}
-                    searchQuery={searchQuery}
-                    verse={verse}
-                    verseId={verseId}
-                    writer={writer}
-                  />
-                ),
-              )}
-            </ul>
-          </div>
+          {filteredShabads.map(
+            ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
+              <SearchResults
+                key={index}
+                ang={ang}
+                searchType={currentSearchType}
+                onClick={changeActiveShabad}
+                shabadId={shabadId}
+                raag={raag}
+                sourceId={sourceId}
+                searchQuery={searchQuery}
+                verse={verse}
+                verseId={verseId}
+                writer={writer}
+              />
+            ),
+          )}
         </div>
       </div>
     </div>

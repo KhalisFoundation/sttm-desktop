@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
@@ -6,7 +7,7 @@ import { dailyHukamnama } from '../../utils';
 
 const { i18n } = remote.require('./app');
 
-export const OtherPane = () => {
+export const OtherPane = ({ className }) => {
   const { activeShabadId, isRandomShabad } = useStoreState(state => state.navigator);
   const { setActiveShabadId, setIsRandomShabad } = useStoreActions(state => state.navigator);
 
@@ -22,7 +23,7 @@ export const OtherPane = () => {
   };
 
   return (
-    <ul className="list-of-items">
+    <ul className={`list-of-items ${className}`}>
       <li>
         <a onClick={openRandomShabad}>
           <i className="fa fa-random list-icon" />
@@ -37,4 +38,8 @@ export const OtherPane = () => {
       </li>
     </ul>
   );
+};
+
+OtherPane.propTypes = {
+  className: PropTypes.string,
 };

@@ -1,13 +1,23 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-export const HistoryPane = () => {
-  const { verseHistory, activeShabadId, initialVerseId, versesRead } = useStoreState(
-    state => state.navigator,
-  );
-  const { setActiveShabadId, setInitialVerseId, setVersesRead } = useStoreActions(
-    state => state.navigator,
-  );
+export const HistoryPane = ({ className }) => {
+  const {
+    verseHistory,
+    activeShabadId,
+    initialVerseId,
+    versesRead,
+    isCeremonyBani,
+    isSundarGutkaBani,
+  } = useStoreState(state => state.navigator);
+  const {
+    setActiveShabadId,
+    setInitialVerseId,
+    setVersesRead,
+    setIsCeremonyBani,
+    setIsSundarGutkaBani,
+  } = useStoreActions(state => state.navigator);
 
   const openShabadFromHistory = element => {
     if (element.shabadId !== activeShabadId) {
@@ -18,6 +28,24 @@ export const HistoryPane = () => {
     }
     if (element.versesRead !== versesRead) {
       setVersesRead(element.versesRead);
+    }
+    if (element.type === 'shabad') {
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+    }
+    if (element.type === 'ceremony') {
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+    }
+    if (element.type === 'bani') {
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
     }
   };
 
@@ -37,5 +65,9 @@ export const HistoryPane = () => {
     );
   });
 
-  return <div className="history-results">{versesMarkup}</div>;
+  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
+};
+
+HistoryPane.propTypes = {
+  className: PropTypes.string,
 };

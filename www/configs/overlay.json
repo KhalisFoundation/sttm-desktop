@@ -1,0 +1,206 @@
+{
+  "sidebar": {
+    "categories": {
+      "subtitles": {
+        "title": "SUBTITLES",
+        "type": "title",
+        "subcategories": ["gurbani-options", "text-options"]
+      },
+      "gurbani-options": {
+        "title": "GURBANI",
+        "type": "dropdown",
+        "settings": ["gurbani-text-color", "gurbani-font", "gurbani-size"]
+      },
+      "text-options": {
+        "title": "TEXT",
+        "type": "dropdown",
+        "settings": ["text-color", "text-font", "text-size"]
+      },
+
+      "background": {
+        "title": "BACKGROUND",
+        "type": "title",
+        "subcategories": ["background-options"]
+      },
+      "background-options": {
+        "title": "",
+        "type": "size-icon",
+        "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
+      },
+
+      "date-time": {
+        "title": "DATE_AND_TIME",
+        "toggle": true,
+        "subcategories": ["date-time-options"]
+      },
+
+      "date-time-options": {
+        "title": "",
+        "type": "dropdown",
+        "settings": ["date-format", "time-format"]
+      }
+    },
+    "settings": {
+      "gurbani-text-color": {
+        "type": "color-input",
+        "title": "",
+        "initialValue": "#0e2654"
+      },
+      "gurbani-font": {
+        "title": "",
+        "options": {
+          "Anmol Lipi": "Anmol Lipi",
+          "Anmol Lipi Bold": "Anmol Lipi Bold",
+          "Noto Sans": "Noto Sans",
+          "Noto Sans Bold": "Noto Sans Bold",
+          "Gurbani Akhar": "Gurbani Akhar",
+          "Gurbani Akhar Heavy": "Gurbani Akhar Heavy",
+          "Gurbani Akhar Thick": "Gurbani Akhar Thick",
+          "Prabhki": "Prabhki"
+        },
+        "initialValue": "Gurbani Akhar Thick"
+      },
+      "gurbani-size": {
+        "title": "",
+        "type": "size-icon",
+        "initialValue": 5,
+        "max": 15,
+        "min": 1,
+        "step": 0.25
+      },
+      "text-color": {
+        "type": "color-input",
+        "title": "",
+        "initialValue": "#003a8c"
+      },
+      "text-font": {
+        "title": "",
+        "options": {
+          "Muli": "Muli",
+          "Caveat": "Caveat",
+          "PT Serif": "PT Serif"
+        },
+        "initialValue": "Muli"
+      },
+      "text-size": {
+        "title": "",
+        "type": "size-icon",
+        "initialValue": 3,
+        "max": 14,
+        "min": 1,
+        "step": 0.25
+      },
+      "bg-color": {
+        "title": "",
+        "type": "color-input",
+        "initialValue": "#97d6f7"
+      },
+      "padding": {
+        "title": "HEIGHT",
+        "initialValue": 0.5,
+        "max": 5,
+        "min": 0.5,
+        "step": 0.1
+      },
+      "bg-opacity": {
+        "title": "OPACITY",
+        "initialValue": 1,
+        "max": 1,
+        "min": 0.1,
+        "step": 0.1
+      },
+      "overlay-theme": {
+        "title": "",
+        "type": "hidden",
+        "initialValue": "a-new-day"
+      },
+
+      "date-format": {
+        "title": "",
+        "options": {
+          "format1": "MM_DD_YYYY",
+          "format2": "MM_DD_YYYY",
+          "format3": "MM_DD_YYYY"
+        },
+        "initialValue": "format1"
+      },
+      "time-format": {
+        "title": "",
+        "options": {
+          "format1": "12HR",
+          "format2": "24HR"
+        },
+        "initialValue": "format1"
+      }
+    }
+  },
+  "bottomBar": {
+    "categories": {
+      "left-side-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["addons"]
+      },
+      "addons": {
+        "title": "",
+        "type": "icon-toggle",
+        "settings": ["toggle-logo", "toggle-annoucement", "overlayLarivaar", "green-screen-toggle"]
+      },
+      "center-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["layouts"]
+      },
+      "layouts": {
+        "title": "",
+        "type": "custom",
+        "settings": ["layout"]
+      },
+      "right-side-icons": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["reset-options"]
+      },
+      "reset-options": {
+        "title": "",
+        "type": "icon-toggle",
+        "settings": ["reset"]
+      }
+    },
+
+    "settings": {
+      "reset": {
+        "icon": "reset.svg",
+        "initialValue": false
+      },
+      "overlayLarivaar": {
+        "icon": "link.png",
+        "initialValue": false
+      },
+      "larivaarAssist": {
+        "initialValue": false
+      },
+      "layout": {
+        "key": "LayoutSelector",
+        "initialValue": "split"
+      },
+      "toggle-logo": {
+        "icon": "sttm.png",
+        "initialValue": false
+      },
+      "toggle-annoucement": {
+        "icon": "megaphone.png",
+        "initialValue": false
+      },
+      "toggle-link": {
+        "icon": "rectangle.svg",
+        "initialValue": false
+      },
+      "green-screen-toggle": {
+        "type": "icon-toggle",
+        "icon": "rectangle.svg",
+        "initialValue": false
+      }
+    }
+  }
+}

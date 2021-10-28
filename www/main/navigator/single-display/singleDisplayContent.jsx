@@ -7,34 +7,17 @@ import ShabadPane from '../shabad/ShabadPane';
 export const singleDisplayContent = () => {
   const { singleDisplayActiveTab } = useStoreState(state => state.navigator);
   const renderSingleTab = tabName => {
-    let component;
-    switch (tabName) {
-      case 'search':
-        component = <SearchPane />;
-        break;
+    const components = (
+      <>
+        <SearchPane className={tabName === 'search' ? '' : 'd-none'} />
+        <ShabadPane className={tabName === 'shabad' ? '' : 'd-none'} />
+        <HistoryPane className={tabName === 'history' ? '' : 'd-none'} />
+        <OtherPane className={tabName === 'other' ? '' : 'd-none'} />
+        <InsertPane className={tabName === 'insert' ? '' : 'd-none'} />
+      </>
+    );
 
-      case 'shabad':
-        component = <ShabadPane />;
-
-        break;
-
-      case 'history':
-        component = <HistoryPane />;
-        break;
-
-      case 'other':
-        component = <OtherPane />;
-
-        break;
-
-      case 'insert':
-        component = <InsertPane />;
-        break;
-
-      default:
-        break;
-    }
-    return component;
+    return components;
   };
 
   return renderSingleTab(singleDisplayActiveTab);

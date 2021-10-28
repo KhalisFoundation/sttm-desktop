@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+
+const anvaad = require('anvaad-js');
 
 const ShabadContent = () => {
   const {
@@ -36,6 +39,7 @@ const ShabadContent = () => {
     setIsDhanGuruSlide,
     setShortcuts,
     setIsRandomShabad,
+    setVerseHistory,
   } = useStoreActions(state => state.navigator);
 
   const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
@@ -43,6 +47,7 @@ const ShabadContent = () => {
   const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+  const activeVerseRef = useRef(null);
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
@@ -63,6 +68,36 @@ const ShabadContent = () => {
           return {};
         })
       : [];
+  };
+
+  const filterOverlayVerseItems = (verses, verseId = activeVerseId) => {
+    if (verses) {
+      const currentIndex = verses.findIndex(obj => obj.ID === verseId);
+      const currentVerse = verses[currentIndex];
+      if (currentVerse) {
+        const Line = { ...currentVerse.toJSON() };
+        if (Line.Translations) {
+          const lineTranslations = JSON.parse(Line.Translations);
+          Line.English =
+            lineTranslations.en.bdb || lineTranslations.en.ms || lineTranslations.en.ssk;
+          Line.Punjabi =
+            lineTranslations.pu.bdb ||
+            lineTranslations.pu.ss ||
+            lineTranslations.pu.ft ||
+            lineTranslations.pu.ms;
+          Line.Spanish = lineTranslations.es.sn;
+          Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
+        }
+        Line.Transliteration = {
+          English: anvaad.translit(Line.Gurmukhi || ''),
+          Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
+          Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
+        };
+        Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
+        return Line;
+      }
+    }
+    return {};
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
@@ -136,11 +171,15 @@ const ShabadContent = () => {
   };
 
   const openHomeVerse = () => {
-    if (homeVerse >= 0) {
-      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const newVerseIndex = homeVerse;
-      const newVerseId = mappedShabadArray[newVerseIndex].verseId;
-      updateTraversedVerse(newVerseId, newVerseIndex);
+    try {
+      if (homeVerse >= 0) {
+        const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+        const newVerseIndex = homeVerse;
+        const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+        updateTraversedVerse(newVerseId, newVerseIndex);
+      }
+    } catch (e) {
+      console.log('Space is not allowed');
     }
   };
 
@@ -161,11 +200,38 @@ const ShabadContent = () => {
     changeHomeVerse(0);
   };
 
+  const saveToHistory = (verses, verseType) => {
+    const firstVerse = verses[0];
+    const shabadId = firstVerse.Shabads[0].ShabadID;
+    const verseId = firstVerse.ID;
+    const verse = firstVerse.Gurmukhi;
+    const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
+    if (check.length === 0) {
+      const updatedHistory = [
+        ...verseHistory,
+        {
+          shabadId,
+          verseId,
+          label: verse,
+          type: verseType,
+          meta: {
+            baniLength: '',
+          },
+          versesRead: [verseId],
+          continueFrom: verseId,
+          homeVerse: 0,
+        },
+      ];
+      setVerseHistory(updatedHistory);
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
+          saveToHistory(sundarGutkaVerses, 'bani');
           openFirstVerse(sundarGutkaVerses[0].ID);
         },
       );
@@ -173,6 +239,7 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
+          saveToHistory(ceremonyVerses, 'ceremony');
           openFirstVerse(ceremonyVerses[0].ID);
         }
       });
@@ -210,7 +277,21 @@ const ShabadContent = () => {
         // }
       }
     });
+
+    setTimeout(() => {
+      if (activeVerseRef && activeVerseRef.current) {
+        activeVerseRef.current.parentNode.scrollTop =
+          activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
+      }
+    }, 100);
   }, [activeShabad]);
+
+  useEffect(() => {
+    const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
+    ipcRenderer.send('show-line', {
+      Line: overlayVerse,
+    });
+  }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
@@ -255,23 +336,20 @@ const ShabadContent = () => {
   return (
     <div className="shabad-list">
       <div className="verse-block">
-        <div className="result-list">
-          <ul>
-            {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
-              <ShabadVerse
-                key={index}
-                activeVerse={activeVerse}
-                isHomeVerse={homeVerse}
-                lineNumber={index}
-                versesRead={versesRead}
-                verse={verse}
-                verseId={verseId}
-                changeHomeVerse={changeHomeVerse}
-                updateTraversedVerse={updateTraversedVerse}
-              />
-            ))}
-          </ul>
-        </div>
+        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
+          <ShabadVerse
+            key={index}
+            activeVerse={activeVerse}
+            isHomeVerse={homeVerse}
+            lineNumber={index}
+            versesRead={versesRead}
+            verse={verse}
+            verseId={verseId}
+            forwardedRef={activeVerseRef}
+            changeHomeVerse={changeHomeVerse}
+            updateTraversedVerse={updateTraversedVerse}
+          />
+        ))}
       </div>
     </div>
   );
