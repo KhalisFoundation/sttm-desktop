@@ -164,11 +164,15 @@ const ShabadContent = () => {
   };
 
   const openHomeVerse = () => {
-    if (homeVerse >= 0) {
-      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const newVerseIndex = homeVerse;
-      const newVerseId = mappedShabadArray[newVerseIndex].verseId;
-      updateTraversedVerse(newVerseId, newVerseIndex);
+    try {
+      if (homeVerse >= 0) {
+        const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+        const newVerseIndex = homeVerse;
+        const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+        updateTraversedVerse(newVerseId, newVerseIndex);
+      }
+    } catch (e) {
+      console.log('Space is not allowed');
     }
   };
 
