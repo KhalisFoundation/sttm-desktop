@@ -74,6 +74,13 @@ function ShabadDeck() {
     return bakeThemeStyles(themeInstance, themeBg);
   };
 
+  const bakeEmptyVerse = () => {
+    return {
+      Gurmukhi: '',
+      Visraam: '',
+    };
+  };
+
   useEffect(() => {
     if (activeVerseId) {
       if (akhandpatt) {
@@ -84,9 +91,13 @@ function ShabadDeck() {
         );
         // load next line of searched shabad verse from db
         if (displayNextLine) {
-          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result =>
-            result.map(activeRes => setNextVerse(activeRes)),
-          );
+          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result => {
+            if (result.length) {
+              result.map(activeRes => setNextVerse(activeRes));
+            } else {
+              setNextVerse(bakeEmptyVerse());
+            }
+          });
         }
       }
     }
@@ -107,10 +118,10 @@ function ShabadDeck() {
         // load next line of bani
         if (displayNextLine) {
           loadBaniVerse(sundarGutkaBaniId, activeVerseId, displayNextLine).then(rows => {
-            if (rows.length > 1) {
-              setNextVerse(rows[0]);
-            } else if (rows.length === 1) {
+            if (rows.length === 1) {
               setNextVerse(...rows);
+            } else {
+              setNextVerse(bakeEmptyVerse());
             }
           });
         }

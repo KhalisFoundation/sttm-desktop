@@ -108,7 +108,7 @@ const Slide = ({
                   gurmukhiString={verseObj.Gurmukhi}
                 />
               )}
-              {displayNextLine && nextLineObj.Gurmukhi && nextLineObj.Visraam && (
+              {displayNextLine && nextLineObj && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
                 >
