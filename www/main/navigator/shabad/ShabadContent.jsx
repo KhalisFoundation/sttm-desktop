@@ -271,7 +271,7 @@ const ShabadContent = () => {
     });
 
     setTimeout(() => {
-      if (activeVerseRef) {
+      if (activeVerseRef && activeVerseRef.current) {
         activeVerseRef.current.parentNode.scrollTop =
           activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
       }
