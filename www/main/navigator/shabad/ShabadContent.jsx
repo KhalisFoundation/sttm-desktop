@@ -138,7 +138,7 @@ const ShabadContent = () => {
         id: activeShabadId,
         shabadid: activeShabadId, // @deprecated
         highlight: newTraversedVerse,
-        homeId: activeShabad[homeVerse].ID,
+        homeId: homeVerse,
         verseChange: false,
       });
     }
