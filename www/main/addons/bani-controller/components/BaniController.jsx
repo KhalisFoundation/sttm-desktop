@@ -16,6 +16,7 @@ import {
   shareSync,
 } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
+import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
 
 import QrCode from './QrCode';
 
@@ -30,6 +31,8 @@ const analytics = remote.getGlobal('analytics');
 const BaniController = ({ onScreenClose, className }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
+
+  const changeActiveShabad = useNewShabad();
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
@@ -44,6 +47,24 @@ const BaniController = ({ onScreenClose, className }) => {
   const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
+
+  const {
+    activeShabad,
+    activeShabadId,
+    activeVerseId,
+    homeVerse,
+    ceremonyId,
+    sundarGutkaBaniId,
+  } = useStoreState(state => state.navigator);
+
+  const {
+    gurbaniFontSize,
+    translationFontSize,
+    transliterationFontSize,
+    teekaFontSize,
+    baniLength,
+    mangalPosition,
+  } = useStoreState(state => state.userSettings);
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -100,13 +121,6 @@ const BaniController = ({ onScreenClose, className }) => {
     }
   };
 
-  const {
-    gurbaniFontSize,
-    translationFontSize,
-    transliterationFontSize,
-    teekaFontSize,
-  } = useStoreState(state => state.userSettings);
-
   const fontSizes = {
     gurbani: parseInt(gurbaniFontSize, 10),
     translation: parseInt(translationFontSize, 10),
@@ -134,14 +148,26 @@ const BaniController = ({ onScreenClose, className }) => {
       const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
       const listenerActions = {
         shabad: payload => {
-          loadShabad(payload.shabadId, payload.verseId, payload.gurmukhi);
+          changeActiveShabad(payload.shabadId, payload.verseId);
           analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
         },
         text: payload =>
           global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
         bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
         ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
-        'request-control': () => handleRequestControl(adminPin, fontSizes),
+        'request-control': () =>
+          handleRequestControl(
+            adminPin,
+            fontSizes,
+            activeShabad,
+            activeShabadId,
+            activeVerseId,
+            homeVerse,
+            ceremonyId,
+            sundarGutkaBaniId,
+            baniLength,
+            mangalPosition,
+          ),
         settings: payload => {
           const { settings } = payload;
           if (settings.action === 'changeFontSize') {
