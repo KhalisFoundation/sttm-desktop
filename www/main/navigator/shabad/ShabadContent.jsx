@@ -101,7 +101,6 @@ const ShabadContent = () => {
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
-    console.log('update traversed verse runs');
     if (isWaheguruSlide) {
       setIsWaheguruSlide(false);
     }

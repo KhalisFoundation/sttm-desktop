@@ -6,33 +6,27 @@ import isOnline from 'is-online';
 
 import BaniControllerItem from './BaniControllerItem';
 import { Overlay } from '../../../common/sttm-ui';
-import {
-  handleRequestControl,
-  loadBani,
-  loadCeremony,
-  loadShabad,
-  getBaniControllerItems,
-  generateQrCode,
-  shareSync,
-} from '../utils';
-import { changeFontSize } from '../../../quick-tools-utils';
+
+import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
+
 import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
 
 import QrCode from './QrCode';
 
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
+import useSocketListeners from '../hooks/use-socket-listeners';
 
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
-const analytics = remote.getGlobal('analytics');
 
 const BaniController = ({ onScreenClose, className }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
 
   const changeActiveShabad = useNewShabad();
+
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
@@ -55,7 +49,13 @@ const BaniController = ({ onScreenClose, className }) => {
     homeVerse,
     ceremonyId,
     sundarGutkaBaniId,
+    isSundarGutkaBani,
+    isCeremonyBani,
   } = useStoreState(state => state.navigator);
+
+  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
+    state => state.navigator,
+  );
 
   const {
     gurbaniFontSize,
@@ -65,6 +65,13 @@ const BaniController = ({ onScreenClose, className }) => {
     baniLength,
     mangalPosition,
   } = useStoreState(state => state.userSettings);
+
+  const fontSizes = {
+    gurbani: parseInt(gurbaniFontSize, 10),
+    translation: parseInt(translationFontSize, 10),
+    teeka: parseInt(teekaFontSize, 10),
+    transliteration: parseInt(transliterationFontSize, 10),
+  };
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -121,13 +128,6 @@ const BaniController = ({ onScreenClose, className }) => {
     }
   };
 
-  const fontSizes = {
-    gurbani: parseInt(gurbaniFontSize, 10),
-    translation: parseInt(translationFontSize, 10),
-    teeka: parseInt(teekaFontSize, 10),
-    transliteration: parseInt(transliterationFontSize, 10),
-  };
-
   useEffect(() => {
     syncToggle(true);
   }, []);
@@ -143,43 +143,25 @@ const BaniController = ({ onScreenClose, className }) => {
   }, [isListeners, adminPin]);
 
   useEffect(() => {
-    console.log('socketData from useEffect inside component', socketData);
-    if (socketData) {
-      const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
-      const listenerActions = {
-        shabad: payload => {
-          changeActiveShabad(payload.shabadId, payload.verseId);
-          analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
-        },
-        text: payload =>
-          global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
-        bani: payload => loadBani(payload.baniId, payload.verseId, payload.lineCount),
-        ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
-        'request-control': () =>
-          handleRequestControl(
-            adminPin,
-            fontSizes,
-            activeShabad,
-            activeShabadId,
-            activeVerseId,
-            homeVerse,
-            ceremonyId,
-            sundarGutkaBaniId,
-            baniLength,
-            mangalPosition,
-          ),
-        settings: payload => {
-          const { settings } = payload;
-          if (settings.action === 'changeFontSize') {
-            changeFontSize(settings.target, settings.value === 'plus');
-          }
-        },
-      };
-      // if its an event from web and not from desktop itself
-      if (socketData.host !== 'sttm-desktop') {
-        listenerActions[isPinCorrect ? socketData.type : 'request-control'](socketData);
-      }
-    }
+    useSocketListeners(
+      socketData,
+      changeActiveShabad,
+      adminPin,
+      activeShabad,
+      activeShabadId,
+      activeVerseId,
+      homeVerse,
+      ceremonyId,
+      sundarGutkaBaniId,
+      fontSizes,
+      baniLength,
+      mangalPosition,
+      isSundarGutkaBani,
+      isCeremonyBani,
+      setIsCeremonyBani,
+      setIsSundarGutkaBani,
+      setSundarGutkaBaniId,
+    );
   }, [socketData]);
 
   const baniControllerItems = getBaniControllerItems({
