@@ -53,9 +53,12 @@ const BaniController = ({ onScreenClose, className }) => {
     isCeremonyBani,
   } = useStoreState(state => state.navigator);
 
-  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
-    state => state.navigator,
-  );
+  const {
+    setIsSundarGutkaBani,
+    setSundarGutkaBaniId,
+    setIsCeremonyBani,
+    setCeremonyId,
+  } = useStoreActions(state => state.navigator);
 
   const {
     gurbaniFontSize,
@@ -161,6 +164,7 @@ const BaniController = ({ onScreenClose, className }) => {
       setIsCeremonyBani,
       setIsSundarGutkaBani,
       setSundarGutkaBaniId,
+      setCeremonyId,
     );
   }, [socketData]);
 

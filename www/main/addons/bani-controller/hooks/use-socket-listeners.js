@@ -1,6 +1,6 @@
 import { remote } from 'electron';
 
-import { handleRequestControl, loadBani, loadCeremony } from '../utils';
+import { handleRequestControl } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
 
 const analytics = remote.getGlobal('analytics');
@@ -23,6 +23,7 @@ const useSocketListeners = (
   setIsCeremonyBani,
   setIsSundarGutkaBani,
   setSundarGutkaBaniId,
+  setCeremonyId,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
@@ -33,7 +34,7 @@ const useSocketListeners = (
       },
       text: payload =>
         global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
-      bani: payload => () => {
+      bani: payload => {
         if (isCeremonyBani) {
           setIsCeremonyBani(false);
         }
@@ -46,7 +47,19 @@ const useSocketListeners = (
           setSundarGutkaBaniId(payload.baniId);
         }
       },
-      ceremony: payload => loadCeremony(payload.ceremonyId, payload.verseId, payload.lineCount),
+      ceremony: payload => {
+        if (!isCeremonyBani) {
+          setIsCeremonyBani(true);
+        }
+
+        if (isSundarGutkaBani) {
+          setIsSundarGutkaBani(false);
+        }
+
+        if (ceremonyId !== payload.ceremonyId) {
+          setCeremonyId(payload.ceremonyId);
+        }
+      },
       'request-control': () =>
         handleRequestControl(
           adminPin,

@@ -130,16 +130,39 @@ const ShabadContent = () => {
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
     }
+
     if (window.socket !== undefined && window.socket !== null) {
-      window.socket.emit('data', {
-        type: 'shabad',
-        host: 'sttm-desktop',
-        id: activeShabadId,
-        shabadid: activeShabadId, // @deprecated
-        highlight: newTraversedVerse,
-        homeId: homeVerse,
-        verseChange: false,
-      });
+      if (isSundarGutkaBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'bani',
+          id: sundarGutkaBaniId,
+          shabadid: sundarGutkaBaniId, // @deprecated
+          highlight: 0,
+          baniLength,
+          mangalPosition,
+          verseChange: false,
+        });
+      } else if (isCeremonyBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'ceremony',
+          id: ceremonyId,
+          shabadid: ceremonyId, // @deprecated
+          highlight: 0,
+          verseChange: false,
+        });
+      } else {
+        window.socket.emit('data', {
+          type: 'shabad',
+          host: 'sttm-desktop',
+          id: activeShabadId,
+          shabadid: activeShabadId, // @deprecated
+          highlight: newTraversedVerse,
+          homeId: homeVerse,
+          verseChange: false,
+        });
+      }
     }
   };
 
