@@ -7,7 +7,7 @@ import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
 global.platform = require('../../desktop_scripts');
 
-const QuickTools = ({ isAnnouncementSlide, isWaheguruSlide, isMoolMantraSlide }) => {
+const QuickTools = ({ isMiscSlide }) => {
   const {
     setTranslationVisibility,
     setTeekaVisibility,
@@ -96,12 +96,12 @@ const QuickTools = ({ isAnnouncementSlide, isWaheguruSlide, isMoolMantraSlide })
   };
 
   useEffect(() => {
-    if (isAnnouncementSlide || isWaheguruSlide || isMoolMantraSlide) {
+    if (isMiscSlide) {
       setQuickToolsActions(['Announcements']);
     } else {
       setQuickToolsActions(['Gurbani', 'Translation', 'Teeka', 'Transliteration']);
     }
-  }, [isAnnouncementSlide, isWaheguruSlide, isMoolMantraSlide]);
+  }, [isMiscSlide]);
 
   return (
     <div className="slide-quicktools">
@@ -110,11 +110,7 @@ const QuickTools = ({ isAnnouncementSlide, isWaheguruSlide, isMoolMantraSlide })
         <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>
       </div>
       {quickToolsOpen && (
-        <div
-          className={`quicktool-body quicktool-${
-            isAnnouncementSlide || isWaheguruSlide || isMoolMantraSlide ? 'announcement' : 'gurbani'
-          }`}
-        >
+        <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
           {quickToolsActions.map(name => (
             <div key={name} className="quicktool-item">
               <div>{name}</div>
@@ -128,9 +124,7 @@ const QuickTools = ({ isAnnouncementSlide, isWaheguruSlide, isMoolMantraSlide })
 };
 
 QuickTools.propTypes = {
-  isAnnouncementSlide: PropTypes.bool,
-  isWaheguruSlide: PropTypes.bool,
-  isMoolMantraSlide: PropTypes.bool,
+  isMiscSlide: PropTypes.bool,
 };
 
 export default QuickTools;

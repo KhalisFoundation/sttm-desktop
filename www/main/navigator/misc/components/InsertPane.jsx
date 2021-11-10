@@ -5,25 +5,14 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
 export const InsertPane = ({ className }) => {
+  const { isMiscSlide, isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
+    state => state.navigator,
+  );
   const {
-    announcementString,
-    isAnnouncementSlide,
-    announcementGurmukhi,
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
-    dhanGuruString,
-  } = useStoreState(state => state.navigator);
-  const {
-    setAnnouncementString,
-    setIsAnnouncementSlide,
-    setAnnouncementGurmukhi,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
-    setIsMoolMantraSlide,
-    setIsDhanGuruSlide,
-    setDhanGuruString,
+    setIsMiscSlide,
+    setIsMiscSlideGurmukhi,
+    setMiscSlideText,
+    setIsAnnoucement,
   } = useStoreActions(state => state.navigator);
 
   const { i18n } = remote.require('./app');
@@ -31,78 +20,48 @@ export const InsertPane = ({ className }) => {
   const gurus = insertSlide.dropdownStrings;
   const analytics = remote.getGlobal('analytics');
 
+  const addMiscSlide = givenText => {
+    if (!isMiscSlide) {
+      setIsMiscSlide(true);
+    }
+    if (miscSlideText !== givenText) {
+      setMiscSlideText(givenText);
+    }
+  };
+
   const addAnnouncement = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isAnnouncementSlide) {
-      setIsAnnouncementSlide(true);
-    }
-    if (announcementString !== inputRef.current.value) {
-      setAnnouncementString(inputRef.current.value);
+    addMiscSlide(inputRef.current.value);
+    if (!isAnnoucement) {
+      setIsAnnoucement(true);
     }
     analytics.trackEvent('display', 'announcement-slide');
   };
 
   const openWaheguruSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isWaheguruSlide) {
-      setIsWaheguruSlide(true);
-    }
+    addMiscSlide('vwihgurU');
   };
 
   const openBlankViewer = () => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isEmptySlide) {
-      setIsEmptySlide(true);
-    }
+    addMiscSlide('');
   };
 
   const toggleAnnouncementLanguage = event => {
-    setAnnouncementGurmukhi(event.target.checked);
+    if (isMiscSlideGurmukhi !== event.target.checked) {
+      setIsMiscSlideGurmukhi(event.target.checked);
+    }
   };
 
   const addDhanGuruSlide = e => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (!isDhanGuruSlide) {
-      setIsDhanGuruSlide(true);
-    }
-    if (dhanGuruString !== e.target.value) {
-      setDhanGuruString(e.target.value);
-    }
+    addMiscSlide(e.target.value);
   };
 
   return (
@@ -153,9 +112,9 @@ export const InsertPane = ({ className }) => {
           </div>
         </div>
         <textarea
-          className={`${announcementGurmukhi ? 'gurmukhi' : ''} announcement-text`}
+          className={`${isMiscSlideGurmukhi ? 'gurmukhi' : ''} announcement-text`}
           placeholder={
-            !announcementGurmukhi
+            !isMiscSlideGurmukhi
               ? i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')
               : i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI')
           }

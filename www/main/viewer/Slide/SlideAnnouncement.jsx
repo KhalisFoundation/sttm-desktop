@@ -2,45 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
-const SlideAnnouncement = ({
-  getFontSize,
-  isWaheguruSlide,
-  isMoolMantraSlide,
-  isEmptySlide,
-  isDhanGuruSlide,
-}) => {
+const SlideAnnouncement = ({ getFontSize }) => {
   const { announcementsFontSize } = useStoreState(state => state.userSettings);
-  const { announcementString, announcementGurmukhi, dhanGuruString } = useStoreState(
+  const { isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
     state => state.navigator,
   );
+  let gurmukhi = true;
 
-  const getAnnouncementText = (waheguruSlide, moolMantraSlide) => {
-    if (waheguruSlide) {
-      return 'vwihgurU';
-    }
-    if (moolMantraSlide) {
-      return '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]';
-    }
-    if (isEmptySlide) {
-      return '';
-    }
-    if (isDhanGuruSlide) {
-      return dhanGuruString;
-    }
-    return announcementString;
-  };
+  if (isAnnoucement) {
+    gurmukhi = isMiscSlideGurmukhi;
+  }
 
   return (
     <div className="slide-announcement">
       <span
         style={getFontSize(announcementsFontSize)}
-        className={
-          isWaheguruSlide || announcementGurmukhi || isMoolMantraSlide || isDhanGuruSlide
-            ? 'gurmukhi-announcement-slide'
-            : ''
-        }
+        className={gurmukhi ? 'gurmukhi-announcement-slide' : ''}
       >
-        {getAnnouncementText(isWaheguruSlide, isMoolMantraSlide)}
+        {miscSlideText}
       </span>
     </div>
   );
@@ -48,10 +27,6 @@ const SlideAnnouncement = ({
 
 SlideAnnouncement.propTypes = {
   getFontSize: PropTypes.func,
-  isWaheguruSlide: PropTypes.bool,
-  isMoolMantraSlide: PropTypes.bool,
-  isEmptySlide: PropTypes.bool,
-  isDhanGuruSlide: PropTypes.bool,
 };
 
 export default SlideAnnouncement;

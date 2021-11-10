@@ -7,25 +7,23 @@ const { i18n } = remote.require('./app');
 
 export const MiscFooter = () => {
   const {
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isAnnouncementSlide,
+    isMiscSlide,
+    miscSlideText,
+    isAnnoucement,
     isSundarGutkaBani,
     isCeremonyBani,
     ceremonyId,
     shortcuts,
   } = useStoreState(state => state.navigator);
   const {
-    setIsEmptySlide,
-    setIsWaheguruSlide,
     setVerseHistory,
-    setIsMoolMantraSlide,
-    setIsAnnouncementSlide,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setCeremonyId,
     setShortcuts,
+    setIsMiscSlide,
+    setMiscSlideText,
+    setIsAnnoucement,
   } = useStoreActions(state => state.navigator);
   const { akhandpatt } = useStoreState(state => state.userSettings);
   const { setAkhandpatt } = useStoreActions(state => state.userSettings);
@@ -55,58 +53,31 @@ export const MiscFooter = () => {
     }
   };
 
+  const addMiscSlide = givenText => {
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
+    }
+    if (!isMiscSlide) {
+      if (akhandpatt) {
+        setAkhandpatt(false);
+      }
+      setIsMiscSlide(true);
+    }
+    if (miscSlideText !== givenText) {
+      setMiscSlideText(givenText);
+    }
+  };
+
   const openWaheguruSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isWaheguruSlide) {
-      setIsWaheguruSlide(true);
-    }
+    addMiscSlide('vwihgurU');
   };
 
   const openMoolMantraSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isMoolMantraSlide) {
-      setIsMoolMantraSlide(true);
-    }
+    addMiscSlide('mool mantra');
   };
 
   const openBlankViewer = () => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isEmptySlide) {
-      setIsEmptySlide(true);
-    }
+    addMiscSlide('');
   };
 
   useEffect(() => {

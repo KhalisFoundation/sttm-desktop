@@ -6,7 +6,7 @@ const bakePanktee = () => {
     state => state.userSettings,
   );
 
-  return (getFontSize, gurmukhiString = '', isWaheguruSlide, vishraamPlacement, vishraamSource) => {
+  return (getFontSize, gurmukhiString = '', vishraamPlacement, vishraamSource) => {
     const filterAppliedVishraam = () => {
       const activeVishraams = {};
       if (vishraamPlacement) {
@@ -46,18 +46,14 @@ const bakePanktee = () => {
 
     const bakePankteeMarkup = () => {
       // need to set <wbr /> according to larivaar on and off
-      return !isWaheguruSlide ? (
-        breakIntoWords(gurmukhiString).map((word, i) => (
-          <React.Fragment key={i}>
-            <span className={getVishraamStyle(word)} style={getFontSize(gurbaniFontSize)}>
-              {word.text}
-            </span>
-            <wbr />
-          </React.Fragment>
-        ))
-      ) : (
-        <span style={getFontSize(gurbaniFontSize)}>{gurmukhiString}</span>
-      );
+      return breakIntoWords(gurmukhiString).map((word, i) => (
+        <React.Fragment key={i}>
+          <span className={getVishraamStyle(word)} style={getFontSize(gurbaniFontSize)}>
+            {word.text}
+          </span>
+          <wbr />
+        </React.Fragment>
+      ));
     };
 
     return bakePankteeMarkup();
