@@ -14,11 +14,7 @@ const ShabadContent = () => {
     verseHistory,
     versesRead,
     homeVerse,
-    isEmptySlide,
-    isWaheguruSlide,
-    isAnnouncementSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
+    isMiscSlide,
     activeVerseId,
     sundarGutkaBaniId,
     ceremonyId,
@@ -31,15 +27,11 @@ const ShabadContent = () => {
   const {
     setVersesRead,
     setActiveVerseId,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
     setHomeVerse,
-    setIsAnnouncementSlide,
-    setIsMoolMantraSlide,
-    setIsDhanGuruSlide,
     setShortcuts,
     setIsRandomShabad,
     setVerseHistory,
+    setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
   const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
@@ -101,20 +93,8 @@ const ShabadContent = () => {
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(

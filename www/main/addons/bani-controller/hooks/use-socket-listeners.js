@@ -24,6 +24,12 @@ const useSocketListeners = (
   setIsSundarGutkaBani,
   setSundarGutkaBaniId,
   setCeremonyId,
+  isMiscSlide,
+  miscSlideText,
+  isMiscSlideGurmukhi,
+  setIsMiscSlide,
+  setMiscSlideText,
+  setIsMiscSlideGurmukhi,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
@@ -32,8 +38,17 @@ const useSocketListeners = (
         changeActiveShabad(payload.shabadId, payload.verseId);
         analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
       },
-      text: payload =>
-        global.controller.sendText(payload.text, payload.isGurmukhi, payload.isAnnouncement),
+      text: payload => {
+        if (!isMiscSlide) {
+          setIsMiscSlide(true);
+        }
+        if (miscSlideText !== payload.text) {
+          setMiscSlideText(payload.text);
+        }
+        if (isMiscSlideGurmukhi !== payload.isGurmukhi) {
+          setIsMiscSlideGurmukhi(payload.isGurmukhi);
+        }
+      },
       bani: payload => {
         if (isCeremonyBani) {
           setIsCeremonyBani(false);

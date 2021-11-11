@@ -51,6 +51,9 @@ const BaniController = ({ onScreenClose, className }) => {
     sundarGutkaBaniId,
     isSundarGutkaBani,
     isCeremonyBani,
+    isMiscSlide,
+    miscSlideText,
+    isMiscSlideGurmukhi,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -58,6 +61,9 @@ const BaniController = ({ onScreenClose, className }) => {
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setCeremonyId,
+    setIsMiscSlide,
+    setMiscSlideText,
+    setIsMiscSlideGurmukhi,
   } = useStoreActions(state => state.navigator);
 
   const {
@@ -165,6 +171,12 @@ const BaniController = ({ onScreenClose, className }) => {
       setIsSundarGutkaBani,
       setSundarGutkaBaniId,
       setCeremonyId,
+      isMiscSlide,
+      miscSlideText,
+      isMiscSlideGurmukhi,
+      setIsMiscSlide,
+      setMiscSlideText,
+      setIsMiscSlideGurmukhi,
     );
   }, [socketData]);
 

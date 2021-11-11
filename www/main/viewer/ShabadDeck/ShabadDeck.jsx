@@ -17,11 +17,8 @@ function ShabadDeck() {
   const {
     activeShabadId,
     activeVerseId,
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isAnnouncementSlide,
-    isDhanGuruSlide,
+    isMiscSlide,
+    miscSlideText,
     sundarGutkaBaniId,
     isSundarGutkaBani,
     ceremonyId,
@@ -153,32 +150,26 @@ function ShabadDeck() {
     <>
       <div
         className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
-          isEmptySlide ? 'empty-slide' : ''
+          miscSlideText === '' ? 'empty-slide' : ''
         } ${isSingleDisplayMode ? 'single-display-mode' : ''} theme-${
           getCurrentThemeInstance().key
         }`}
         style={applyTheme()}
       >
         {/* show quicktools only on presentation mode */}
-        {!isSingleDisplayMode && (
-          <QuickTools
-            isAnnouncementSlide={isAnnouncementSlide}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-          />
+        {!isSingleDisplayMode && <QuickTools isMiscSlide={isMiscSlide} />}
+        {activeVerse.length ? (
+          activeVerse.map((activeVerseObj, index) => (
+            <Slide
+              key={index}
+              verseObj={activeVerseObj}
+              nextLineObj={nextVerse}
+              isMiscSlide={isMiscSlide}
+            />
+          ))
+        ) : (
+          <Slide isMiscSlide={isMiscSlide} />
         )}
-        {activeVerse.map((activeVerseObj, index) => (
-          <Slide
-            key={index}
-            verseObj={activeVerseObj}
-            nextLineObj={nextVerse}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-            isEmptySlide={isEmptySlide}
-            isAnnouncementSlide={isAnnouncementSlide}
-            isDhanGuruSlide={isDhanGuruSlide}
-          />
-        ))}
       </div>
       <ViewerIcon className="viewer-logo" />
     </>
