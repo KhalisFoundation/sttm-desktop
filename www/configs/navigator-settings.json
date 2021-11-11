@@ -36,7 +36,8 @@
     "nextVerse": false,
     "prevVerse": false,
     "homeVerse": false,
-    "openFirstResult": false
+    "openFirstResult": false,
+    "openDhanGuruSlide": false
   },
   "minimizedBySingleDisplay": false
 }

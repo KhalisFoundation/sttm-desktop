@@ -11,6 +11,11 @@ import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
 
+const electron = require('electron');
+
+const { remote } = electron;
+const main = remote.require('./app');
+
 const Launchpad = () => {
   const { overlayScreen } = useStoreState(state => state.app);
   const { shortcuts } = useStoreState(state => state.navigator);
@@ -82,6 +87,14 @@ const Launchpad = () => {
     }
   };
 
+  const handleCtrlPlus5 = () => {
+    main.openSecondaryWindow('helpWindow');
+  };
+
+  const handleCtrlPlus6 = () => {
+    main.openSecondaryWindow('shortcutLegend');
+  };
+
   // focus on search shabad input shortcut
   const handleCtrlPlusSlash = () => {
     if (!shortcuts.focusInput) {
@@ -132,10 +145,21 @@ const Launchpad = () => {
     }
   };
 
+  const handleCtrlG = () => {
+    if (!shortcuts.openDhanGuruSlide) {
+      setShortcuts({
+        ...shortcuts,
+        openDhanGuruSlide: true,
+      });
+    }
+  };
+
   useKeys('Digit1', 'combination', handleCtrlPlus1);
   useKeys('Digit2', 'combination', handleCtrlPlus2);
   useKeys('Digit3', 'combination', handleCtrlPlus3);
   useKeys('Digit4', 'combination', handleCtrlPlus4);
+  useKeys('Digit5', 'combination', handleCtrlPlus5);
+  useKeys('Digit6', 'combination', handleCtrlPlus6);
   useKeys('Slash', 'combination', handleCtrlPlusSlash);
   useKeys('ArrowDown', 'single', handleDownAndRight);
   useKeys('ArrowRight', 'single', handleDownAndRight);
@@ -143,6 +167,7 @@ const Launchpad = () => {
   useKeys('ArrowLeft', 'single', handleUpAndLeft);
   useKeys('Space', 'single', handleSpacebar);
   useKeys('Enter', 'single', handleEnter);
+  useKeys('KeyG', 'combination', handleCtrlG);
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';
   const isBaniControllerOverlay = overlayScreen === 'sync-button';

@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
+
+const dhanGuruModal = require('../../../insert_slide');
 
 export const InsertPane = ({ className }) => {
   const {
@@ -14,6 +16,7 @@ export const InsertPane = ({ className }) => {
     isMoolMantraSlide,
     isDhanGuruSlide,
     dhanGuruString,
+    shortcuts,
   } = useStoreState(state => state.navigator);
   const {
     setAnnouncementString,
@@ -24,6 +27,7 @@ export const InsertPane = ({ className }) => {
     setIsMoolMantraSlide,
     setIsDhanGuruSlide,
     setDhanGuruString,
+    setShortcuts,
   } = useStoreActions(state => state.navigator);
 
   const { i18n } = remote.require('./app');
@@ -104,6 +108,22 @@ export const InsertPane = ({ className }) => {
       setDhanGuruString(e.target.value);
     }
   };
+
+  const showDhanGuruModal = () => {
+    dhanGuruModal.isAnnouncementTab = false;
+    dhanGuruModal.openModal();
+    dhanGuruModal.buttonOnClick();
+  };
+
+  useEffect(() => {
+    if (shortcuts.openDhanGuruSlide) {
+      showDhanGuruModal();
+      setShortcuts({
+        ...shortcuts,
+        openDhanGuruSlide: false,
+      });
+    }
+  }, [shortcuts]);
 
   return (
     <ul className={`list-of-items ${className}`}>
