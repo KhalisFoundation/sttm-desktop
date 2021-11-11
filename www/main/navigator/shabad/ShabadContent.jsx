@@ -251,9 +251,7 @@ const ShabadContent = () => {
           setActiveShabad(verses);
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
-            if (isRandomShabad) {
-              setIsRandomShabad(false);
-            }
+            setIsRandomShabad(false);
           }
         }
       });
