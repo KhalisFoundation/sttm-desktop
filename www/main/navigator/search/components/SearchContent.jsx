@@ -5,52 +5,29 @@ import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
+import { useNewShabad } from '../hooks/use-new-shabad';
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {
+  const changeActiveShabad = useNewShabad();
+
   const {
     currentLanguage,
     searchData,
     currentWriter,
     currentRaag,
     currentSource,
-    verseHistory,
-    versesRead,
-    isEmptySlide,
-    isWaheguruSlide,
-    activeShabadId,
-    initialVerseId,
-    activeVerseId,
-    isAnnouncementSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
-    noActiveVerse,
     searchQuery,
     currentSearchType,
-    isSundarGutkaBani,
-    isCeremonyBani,
     shortcuts,
   } = useStoreState(state => state.navigator);
   const {
-    setActiveShabadId,
-    setInitialVerseId,
     setCurrentWriter,
     setCurrentRaag,
     setCurrentSource,
-    setVerseHistory,
-    setVersesRead,
-    setActiveVerseId,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
-    setIsMoolMantraSlide,
-    setIsAnnouncementSlide,
-    setIsDhanGuruSlide,
-    setNoActiveVerse,
     setSearchQuery,
-    setIsSundarGutkaBani,
-    setIsCeremonyBani,
     setShortcuts,
   } = useStoreActions(state => state.navigator);
 
@@ -66,67 +43,6 @@ const SearchContent = () => {
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
     analytics.trackEvent('search', 'gurmukhi-keyboard-open', keyboardOpenStatus);
-  };
-
-  const changeActiveShabad = (newSelectedShabad, newSelectedVerse, newVerse = '') => {
-    const check = verseHistory.filter(historyObj => historyObj.shabadId === newSelectedShabad);
-    if (check.length === 0) {
-      const updatedHistory = [
-        ...verseHistory,
-        {
-          shabadId: newSelectedShabad,
-          verseId: newSelectedVerse,
-          label: newVerse,
-          type: 'shabad',
-          meta: {
-            baniLength: '',
-          },
-          versesRead: [newSelectedVerse],
-          continueFrom: newSelectedVerse,
-          homeVerse: 0,
-        },
-      ];
-      setVerseHistory(updatedHistory);
-    }
-    // Push verseId of active Verse to versesRead Array when shabad is changed
-    if (!versesRead.includes(newSelectedVerse)) {
-      setVersesRead([newSelectedVerse]);
-    }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
-    if (isCeremonyBani) {
-      setIsCeremonyBani(false);
-    }
-    if (activeShabadId !== newSelectedShabad) {
-      setActiveShabadId(newSelectedShabad);
-    }
-    if (initialVerseId !== newSelectedVerse) {
-      setInitialVerseId(newSelectedVerse);
-    }
-    if (activeVerseId !== newSelectedVerse) {
-      setActiveVerseId(newSelectedVerse);
-    }
-    if (noActiveVerse) {
-      setNoActiveVerse(false);
-    }
-    analytics.trackEvent('search', currentSearchType, searchQuery);
-    analytics.trackEvent('shabad', newSelectedShabad, newSelectedVerse);
   };
 
   const mapVerseItems = searchedShabadsArray => {

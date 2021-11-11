@@ -5,7 +5,6 @@ import bakePanktee from '../hooks/bakePanktee';
 const SlideGurbani = ({
   getFontSize,
   gurmukhiString,
-  isWaheguruSlide,
   larivaar,
   vishraamPlacement,
   vishraamSource,
@@ -14,13 +13,7 @@ const SlideGurbani = ({
 
   return (
     <span className={larivaar ? 'larivaar' : 'padchhed'}>
-      {useBakePanktee(
-        getFontSize,
-        gurmukhiString,
-        isWaheguruSlide,
-        vishraamPlacement,
-        vishraamSource,
-      )}
+      {useBakePanktee(getFontSize, gurmukhiString, vishraamPlacement, vishraamSource)}
     </span>
   );
 };
@@ -28,7 +21,6 @@ const SlideGurbani = ({
 SlideGurbani.propTypes = {
   getFontSize: PropTypes.func,
   gurmukhiString: PropTypes.string,
-  isWaheguruSlide: PropTypes.bool,
   larivaar: PropTypes.bool,
   vishraamPlacement: PropTypes.object,
   vishraamSource: PropTypes.string,
@@ -37,7 +29,6 @@ SlideGurbani.propTypes = {
 SlideGurbani.defaultProps = {
   getFontSize: () => {},
   gurmukhiString: '',
-  isWaheguruSlide: false,
   larivaar: false,
   vishraamPlacement: {},
   vishraamSource: '',

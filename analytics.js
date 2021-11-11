@@ -30,6 +30,14 @@ class Analytics {
    */
   trackEvent(category, action, label, value) {
     const useragent = this.store.get('user-agent');
+    const params = {
+      ec: category,
+      ea: action,
+      el: label,
+      ev: value,
+      ua: useragent,
+      cd1: appVersion,
+    };
 
     if (process.env.NODE_ENV !== 'development') {
       // TODO: need to add variable that stops statistics collection
@@ -37,21 +45,7 @@ class Analytics {
         isOnline().then(online => {
           // TODO: for offline users, come up with a way of storing and send when online.
           if (online && this.usr) {
-            this.usr
-              .event(
-                {
-                  ec: category,
-                  ea: action,
-                  el: label,
-                  ev: value,
-                  ua: useragent,
-                  cd1: appVersion,
-                },
-                err => {
-                  console.log(err);
-                },
-              )
-              .send();
+            this.usr.event(params).send();
           }
         });
       }

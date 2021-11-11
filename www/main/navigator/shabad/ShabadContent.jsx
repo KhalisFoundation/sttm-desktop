@@ -14,13 +14,8 @@ const ShabadContent = () => {
     verseHistory,
     versesRead,
     homeVerse,
-    isEmptySlide,
-    isWaheguruSlide,
-    isAnnouncementSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
+    isMiscSlide,
     activeVerseId,
-    noActiveVerse,
     sundarGutkaBaniId,
     ceremonyId,
     isCeremonyBani,
@@ -32,16 +27,11 @@ const ShabadContent = () => {
   const {
     setVersesRead,
     setActiveVerseId,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
     setHomeVerse,
-    setIsAnnouncementSlide,
-    setIsMoolMantraSlide,
-    setIsDhanGuruSlide,
-    setNoActiveVerse,
     setShortcuts,
     setIsRandomShabad,
     setVerseHistory,
+    setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
   const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
@@ -103,23 +93,8 @@ const ShabadContent = () => {
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (noActiveVerse) {
-      setNoActiveVerse(false);
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
@@ -134,6 +109,40 @@ const ShabadContent = () => {
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
+    }
+
+    if (window.socket !== undefined && window.socket !== null) {
+      if (isSundarGutkaBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'bani',
+          id: sundarGutkaBaniId,
+          shabadid: sundarGutkaBaniId, // @deprecated
+          highlight: 0,
+          baniLength,
+          mangalPosition,
+          verseChange: false,
+        });
+      } else if (isCeremonyBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'ceremony',
+          id: ceremonyId,
+          shabadid: ceremonyId, // @deprecated
+          highlight: 0,
+          verseChange: false,
+        });
+      } else {
+        window.socket.emit('data', {
+          type: 'shabad',
+          host: 'sttm-desktop',
+          id: activeShabadId,
+          shabadid: activeShabadId, // @deprecated
+          highlight: newTraversedVerse,
+          homeId: homeVerse,
+          verseChange: false,
+        });
+      }
     }
   };
 
@@ -240,11 +249,9 @@ const ShabadContent = () => {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
           setActiveShabad(verses);
-          if (noActiveVerse || isRandomShabad) {
+          if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
-            if (isRandomShabad) {
-              setIsRandomShabad(false);
-            }
+            setIsRandomShabad(false);
           }
         }
       });
@@ -264,9 +271,10 @@ const ShabadContent = () => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
         setActiveVerse({ [verses.ID]: verses.verseId });
-        if (homeVerse !== verses.ID) {
-          setHomeVerse(verses.ID);
-        }
+        changeHomeVerse(initialVerseId);
+        // if (homeVerse !== verses.ID) {
+        //   setHomeVerse(verses.ID);
+        // }
       }
     });
 

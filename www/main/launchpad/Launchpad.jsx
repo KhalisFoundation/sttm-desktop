@@ -181,7 +181,10 @@ const Launchpad = () => {
       <div className={`launchpad${isSingleDisplayMode ? ' single-display misc-pane' : ''}`}>
         <Toolbar />
         {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
-        {isBaniControllerOverlay && <BaniController onScreenClose={onScreenClose} />}
+        <BaniController
+          onScreenClose={onScreenClose}
+          className={isBaniControllerOverlay ? '' : 'd-none'}
+        />
         {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
         {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
