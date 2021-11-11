@@ -16,7 +16,6 @@ const ShabadContent = () => {
     homeVerse,
     isMiscSlide,
     activeVerseId,
-    noActiveVerse,
     sundarGutkaBaniId,
     ceremonyId,
     isCeremonyBani,
@@ -29,7 +28,6 @@ const ShabadContent = () => {
     setVersesRead,
     setActiveVerseId,
     setHomeVerse,
-    setNoActiveVerse,
     setShortcuts,
     setIsRandomShabad,
     setVerseHistory,
@@ -98,10 +96,6 @@ const ShabadContent = () => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
-
-    if (noActiveVerse) {
-      setNoActiveVerse(false);
-    }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
         historyObj => historyObj.shabadId === activeShabadId,
@@ -115,6 +109,40 @@ const ShabadContent = () => {
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
+    }
+
+    if (window.socket !== undefined && window.socket !== null) {
+      if (isSundarGutkaBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'bani',
+          id: sundarGutkaBaniId,
+          shabadid: sundarGutkaBaniId, // @deprecated
+          highlight: 0,
+          baniLength,
+          mangalPosition,
+          verseChange: false,
+        });
+      } else if (isCeremonyBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'ceremony',
+          id: ceremonyId,
+          shabadid: ceremonyId, // @deprecated
+          highlight: 0,
+          verseChange: false,
+        });
+      } else {
+        window.socket.emit('data', {
+          type: 'shabad',
+          host: 'sttm-desktop',
+          id: activeShabadId,
+          shabadid: activeShabadId, // @deprecated
+          highlight: newTraversedVerse,
+          homeId: homeVerse,
+          verseChange: false,
+        });
+      }
     }
   };
 
@@ -221,11 +249,9 @@ const ShabadContent = () => {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
           setActiveShabad(verses);
-          if (noActiveVerse || isRandomShabad) {
+          if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
-            if (isRandomShabad) {
-              setIsRandomShabad(false);
-            }
+            setIsRandomShabad(false);
           }
         }
       });
@@ -245,9 +271,10 @@ const ShabadContent = () => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
         setActiveVerse({ [verses.ID]: verses.verseId });
-        if (homeVerse !== verses.ID) {
-          setHomeVerse(verses.ID);
-        }
+        changeHomeVerse(initialVerseId);
+        // if (homeVerse !== verses.ID) {
+        //   setHomeVerse(verses.ID);
+        // }
       }
     });
 

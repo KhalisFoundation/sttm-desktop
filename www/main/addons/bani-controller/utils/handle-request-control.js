@@ -1,8 +1,19 @@
-import { remote } from 'electron';
+// import { remote } from 'electron';
 
-const analytics = remote.getGlobal('analytics');
+// const analytics = remote.getGlobal('analytics');
 
-const handleRequestControl = (isPinCorrect, fontSizes) => {
+const handleRequestControl = (
+  isPinCorrect,
+  fontSizes,
+  activeShabad,
+  activeShabadId,
+  activeVerseId,
+  homeVerse,
+  ceremonyId,
+  sundarGutkaBaniId,
+  baniLength,
+  mangalPosition,
+) => {
   document.body.classList.toggle(`controller-on`, isPinCorrect);
   window.socket.emit('data', {
     host: 'sttm-desktop',
@@ -14,19 +25,34 @@ const handleRequestControl = (isPinCorrect, fontSizes) => {
   });
   // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
   if (isPinCorrect) {
-    const currentShabad = global.core.search.getCurrentShabadId();
-    const currentVerse = document.querySelector(`#shabad .panktee.current`);
-    const homeVerse = document.querySelector(`#shabad .panktee.main`);
+    const currentShabad = {
+      id: activeShabadId,
+      type: 'shabad',
+      baniLength: '',
+      mangalPosition: '',
+    };
+
+    if (ceremonyId) {
+      currentShabad.id = ceremonyId;
+      currentShabad.type = 'ceremony';
+    }
+    if (sundarGutkaBaniId) {
+      currentShabad.id = sundarGutkaBaniId;
+      currentShabad.type = 'bani';
+      currentShabad.baniLength = baniLength;
+      currentShabad.mangalPosition = mangalPosition;
+    }
     let homeId;
     let highlight;
 
-    if (currentShabad.id && currentVerse) {
+    if (currentShabad.id) {
       if (currentShabad.type === 'shabad') {
-        highlight = currentVerse.dataset.lineId;
-        homeId = homeVerse.dataset.lineId;
-      } else {
-        highlight = currentVerse.dataset.cpId;
-        homeId = homeVerse.dataset.cpId;
+        highlight = activeVerseId;
+        homeId = homeVerse;
+      } else if (currentShabad.type === 'ceremony') {
+        highlight = ceremonyId;
+      } else if (currentShabad.type === 'bani') {
+        highlight = sundarGutkaBaniId;
       }
 
       window.socket.emit('data', {
@@ -41,11 +67,11 @@ const handleRequestControl = (isPinCorrect, fontSizes) => {
       });
     }
   }
-  analytics.trackEvent(
-    'controller',
-    'connection',
-    isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
-  );
+  // analytics.trackEvent(
+  //   'controller',
+  //   'connection',
+  //   isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
+  // );
 };
 
 export default handleRequestControl;

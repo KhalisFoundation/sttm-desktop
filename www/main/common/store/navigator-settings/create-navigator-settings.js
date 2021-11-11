@@ -13,6 +13,7 @@ const createNavigatorSettingsState = settingsSchema => {
       const oldValue = state[stateVarName];
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
+
       if (global.webview) {
         global.webview.send('update-viewer-setting', {
           stateName: stateVarName,
