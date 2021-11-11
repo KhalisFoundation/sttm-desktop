@@ -10,15 +10,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({
-  verseObj,
-  nextLineObj,
-  isAnnouncementSlide,
-  isMoolMantraSlide,
-  isWaheguruSlide,
-  isEmptySlide,
-  isDhanGuruSlide,
-}) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -56,73 +48,53 @@ const Slide = ({
 
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
-  }, [verseObj, isWaheguruSlide, isMoolMantraSlide, isDhanGuruSlide]);
+  }, [verseObj, isMiscSlide]);
 
   return (
     <>
       <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-        {(isWaheguruSlide ||
-          isAnnouncementSlide ||
-          isEmptySlide ||
-          isMoolMantraSlide ||
-          isDhanGuruSlide) && (
-          <SlideAnnouncement
-            getFontSize={getFontSize}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-            isEmptySlide={isEmptySlide}
-            isDhanGuruSlide={isDhanGuruSlide}
-          />
-        )}
-        {verseObj &&
-          !isEmptySlide &&
-          !isWaheguruSlide &&
-          !isMoolMantraSlide &&
-          !isDhanGuruSlide &&
-          !isAnnouncementSlide && (
-            <>
-              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+        {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
+        {verseObj && !isMiscSlide && (
+          <>
+            <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+              <SlideGurbani
+                getFontSize={getFontSize}
+                gurmukhiString={verseObj.Gurmukhi}
+                larivaar={larivaar}
+                vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                vishraamSource={vishraamSource}
+              />
+            </div>
+            {translationVisibility && (
+              <SlideTranslation
+                getFontSize={getFontSize}
+                translationObj={JSON.parse(verseObj.Translations)}
+              />
+            )}
+            {teekaVisibility && (
+              <SlideTeeka
+                getFontSize={getFontSize}
+                teekaObj={JSON.parse(verseObj.Translations).pu}
+              />
+            )}
+            {transliterationVisibility && (
+              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
+            )}
+            {displayNextLine && nextLineObj && (
+              <div
+                className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+              >
                 <SlideGurbani
                   getFontSize={getFontSize}
-                  gurmukhiString={verseObj.Gurmukhi}
+                  gurmukhiString={nextLineObj.Gurmukhi}
                   larivaar={larivaar}
                   vishraamPlacement={JSON.parse(verseObj.Visraam)}
                   vishraamSource={vishraamSource}
                 />
               </div>
-              {translationVisibility && (
-                <SlideTranslation
-                  getFontSize={getFontSize}
-                  translationObj={JSON.parse(verseObj.Translations)}
-                />
-              )}
-              {teekaVisibility && (
-                <SlideTeeka
-                  getFontSize={getFontSize}
-                  teekaObj={JSON.parse(verseObj.Translations).pu}
-                />
-              )}
-              {transliterationVisibility && (
-                <SlideTransliteration
-                  getFontSize={getFontSize}
-                  gurmukhiString={verseObj.Gurmukhi}
-                />
-              )}
-              {displayNextLine && nextLineObj && (
-                <div
-                  className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-                >
-                  <SlideGurbani
-                    getFontSize={getFontSize}
-                    gurmukhiString={nextLineObj.Gurmukhi}
-                    larivaar={larivaar}
-                    vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                    vishraamSource={vishraamSource}
-                  />
-                </div>
-              )}
-            </>
-          )}
+            )}
+          </>
+        )}
       </div>
     </>
   );
@@ -131,11 +103,7 @@ const Slide = ({
 Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
-  isAnnouncementSlide: PropTypes.bool,
-  isMoolMantraSlide: PropTypes.bool,
-  isWaheguruSlide: PropTypes.bool,
-  isEmptySlide: PropTypes.bool,
-  isDhanGuruSlide: PropTypes.bool,
+  isMiscSlide: PropTypes.bool,
 };
 
 export default Slide;

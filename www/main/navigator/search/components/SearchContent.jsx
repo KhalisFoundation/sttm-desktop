@@ -18,19 +18,15 @@ const SearchContent = () => {
     currentSource,
     verseHistory,
     versesRead,
-    isEmptySlide,
-    isWaheguruSlide,
     activeShabadId,
     initialVerseId,
     activeVerseId,
-    isAnnouncementSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
     noActiveVerse,
     searchQuery,
     currentSearchType,
     isSundarGutkaBani,
     isCeremonyBani,
+    isMiscSlide,
     shortcuts,
   } = useStoreState(state => state.navigator);
   const {
@@ -42,11 +38,7 @@ const SearchContent = () => {
     setVerseHistory,
     setVersesRead,
     setActiveVerseId,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
-    setIsMoolMantraSlide,
-    setIsAnnouncementSlide,
-    setIsDhanGuruSlide,
+    setIsMiscSlide,
     setNoActiveVerse,
     setSearchQuery,
     setIsSundarGutkaBani,
@@ -92,20 +84,8 @@ const SearchContent = () => {
     if (!versesRead.includes(newSelectedVerse)) {
       setVersesRead([newSelectedVerse]);
     }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
     }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
