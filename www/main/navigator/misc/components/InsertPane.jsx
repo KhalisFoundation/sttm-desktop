@@ -41,7 +41,7 @@ export const InsertPane = ({ className }) => {
     if (isAnnoucement) {
       setIsAnnoucement(false);
     }
-    addMiscSlide('vwihgurU');
+    addMiscSlide(insertSlide.slideStrings.waheguru);
   };
 
   const openBlankViewer = () => {

@@ -1,6 +1,7 @@
 import { remote } from 'electron';
 import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
+import insertSlide from '../../../common/constants/slidedb';
 
 const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
@@ -69,11 +70,11 @@ export const MiscFooter = () => {
   };
 
   const openWaheguruSlide = () => {
-    addMiscSlide('vwihgurU');
+    addMiscSlide(insertSlide.slideStrings.waheguru);
   };
 
   const openMoolMantraSlide = () => {
-    addMiscSlide('mool mantra');
+    addMiscSlide(insertSlide.slideStrings.moolMantra);
   };
 
   const openBlankViewer = () => {

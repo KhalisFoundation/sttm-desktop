@@ -158,14 +158,18 @@ function ShabadDeck() {
       >
         {/* show quicktools only on presentation mode */}
         {!isSingleDisplayMode && <QuickTools isMiscSlide={isMiscSlide} />}
-        {activeVerse.map((activeVerseObj, index) => (
-          <Slide
-            key={index}
-            verseObj={activeVerseObj}
-            nextLineObj={nextVerse}
-            isMiscSlide={isMiscSlide}
-          />
-        ))}
+        {activeVerse.length ? (
+          activeVerse.map((activeVerseObj, index) => (
+            <Slide
+              key={index}
+              verseObj={activeVerseObj}
+              nextLineObj={nextVerse}
+              isMiscSlide={isMiscSlide}
+            />
+          ))
+        ) : (
+          <Slide isMiscSlide={isMiscSlide} />
+        )}
       </div>
       <ViewerIcon className="viewer-logo" />
     </>
