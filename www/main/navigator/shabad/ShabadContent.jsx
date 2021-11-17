@@ -204,7 +204,7 @@ const ShabadContent = () => {
 
   const saveToHistory = (verses, verseType) => {
     const firstVerse = verses[0];
-    const shabadId = firstVerse.Shabads[0].ShabadID;
+    const shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
     const verseId = firstVerse.ID;
     const verse = firstVerse.Gurmukhi;
     const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
