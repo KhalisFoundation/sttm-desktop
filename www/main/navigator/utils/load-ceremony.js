@@ -12,8 +12,11 @@ export const loadCeremony = ceremonyId => {
 
         if (rowDb.Custom && rowDb.Custom.ID) {
           row = rowDb.Custom;
-          row.shabadID = `ceremony-${rowDb.Ceremony.Token}`;
         }
+
+        row.shabadID = `ceremony-${rowDb.Ceremony.Token}`;
+        row.ceremonyName = rowDb.Ceremony.Gurmukhi;
+        row.ceremonyId = rowDb.Ceremony.ID;
 
         if (rowDb.VerseRange && rowDb.VerseRange.length) {
           row = [...rowDb.VerseRange];

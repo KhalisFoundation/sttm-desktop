@@ -34,9 +34,10 @@ const ShabadContent = () => {
     setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
-  const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
+  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition } = useStoreState(
+    state => state.userSettings,
+  );
 
-  const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
   const activeVerseRef = useRef(null);
@@ -204,11 +205,27 @@ const ShabadContent = () => {
     changeHomeVerse(0);
   };
 
-  const saveToHistory = (verses, verseType) => {
+  const saveToHistory = (verses, verseType, initialVerse = null) => {
     const firstVerse = verses[0];
-    const shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
-    const verseId = firstVerse.ID;
-    const verse = firstVerse.Gurmukhi;
+    let shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
+    const verseId = initialVerse || firstVerse.ID;
+    let verse;
+    if (verseType === 'shabad') {
+      if (initialVerse) {
+        const clickedVerse = verses.filter(verseObj => {
+          return verseObj.ID === initialVerse;
+        });
+        verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
+      } else {
+        verse = firstVerse.Gurmukhi;
+      }
+    } else if (verseType === 'bani') {
+      verse = firstVerse.baniName;
+      shabadId = firstVerse.baniId;
+    } else if (verseType === 'ceremony') {
+      verse = firstVerse.ceremonyName;
+      shabadId = firstVerse.ceremonyId;
+    }
     const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
     if (check.length === 0) {
       const updatedHistory = [
@@ -219,11 +236,11 @@ const ShabadContent = () => {
           label: verse,
           type: verseType,
           meta: {
-            baniLength: '',
+            baniLength,
           },
           versesRead: [verseId],
           continueFrom: verseId,
-          homeVerse: 0,
+          homeVerse: verseId,
         },
       ];
       setVerseHistory(updatedHistory);
@@ -250,6 +267,7 @@ const ShabadContent = () => {
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
+          saveToHistory(verses, 'shabad', initialVerseId);
           setActiveShabad(verses);
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);

@@ -10,6 +10,10 @@ export const HistoryPane = ({ className }) => {
     versesRead,
     isCeremonyBani,
     isSundarGutkaBani,
+    ceremonyId,
+    sundarGutkaBaniId,
+    homeVerse,
+    activeVerseId,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -17,14 +21,18 @@ export const HistoryPane = ({ className }) => {
     setVersesRead,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
+    setCeremonyId,
+    setSundarGutkaBaniId,
+    setHomeVerse,
+    setActiveVerseId,
   } = useStoreActions(state => state.navigator);
 
   const openShabadFromHistory = element => {
-    if (element.shabadId !== activeShabadId) {
-      setActiveShabadId(element.shabadId);
-    }
     if (element.continueFrom !== initialVerseId) {
       setInitialVerseId(element.continueFrom);
+    }
+    if (element.homeVerse !== homeVerse) {
+      setHomeVerse(element.homeVerse);
     }
     if (element.versesRead !== versesRead) {
       setVersesRead(element.versesRead);
@@ -36,15 +44,34 @@ export const HistoryPane = ({ className }) => {
       if (isCeremonyBani) {
         setIsCeremonyBani(false);
       }
+      if (element.shabadId !== activeShabadId) {
+        setActiveShabadId(element.shabadId);
+      }
+      if (element.verseId !== activeVerseId) {
+        setActiveVerseId(element.verseId);
+      }
     }
     if (element.type === 'ceremony') {
       if (isSundarGutkaBani) {
         setIsSundarGutkaBani(false);
       }
+      if (!isCeremonyBani) {
+        setIsCeremonyBani(true);
+      }
+      if (ceremonyId !== element.shabadId) {
+        setCeremonyId(element.shabadId);
+      }
     }
     if (element.type === 'bani') {
       if (isCeremonyBani) {
         setIsCeremonyBani(false);
+      }
+      if (!isSundarGutkaBani) {
+        setIsSundarGutkaBani(true);
+      }
+
+      if (sundarGutkaBaniId !== element.shabadId) {
+        setSundarGutkaBaniId(element.shabadId);
       }
     }
   };

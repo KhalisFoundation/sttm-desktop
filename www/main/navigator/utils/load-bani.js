@@ -11,8 +11,11 @@ export const loadBani = (baniId, baniLength, mangalPosition) => {
         }
         if (rowDb.Custom) {
           row = rowDb.Custom;
-          row.shabadID = rowDb.Bani.Token;
         }
+
+        row.shabadID = rowDb.Bani.Token;
+        row.baniId = rowDb.Bani.ID;
+        row.baniName = rowDb.Bani.Gurmukhi;
         row.crossPlatformID = rowDb.ID;
         return row;
       })
