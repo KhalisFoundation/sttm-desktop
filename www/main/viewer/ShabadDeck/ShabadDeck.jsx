@@ -105,7 +105,13 @@ function ShabadDeck() {
         });
       } else {
         // load current bani verse from db and set in the state
-        loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
+        loadBaniVerse(
+          sundarGutkaBaniId,
+          activeVerseId,
+          false,
+          baniLengthCols[baniLength],
+          mangalPosition,
+        ).then(rows => {
           if (rows.length > 1) {
             setActiveVerse([rows[0]]);
           } else if (rows.length === 1) {

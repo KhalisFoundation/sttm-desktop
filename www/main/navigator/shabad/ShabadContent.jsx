@@ -55,6 +55,8 @@ const ShabadContent = () => {
               ID: index,
               verseId: verse.ID,
               verse: verse.Gurmukhi,
+              english: verse.English ? verse.English : '',
+              crossPlatformId: verse.crossPlatformID,
             };
           }
           return {};
@@ -204,7 +206,7 @@ const ShabadContent = () => {
 
   const saveToHistory = (verses, verseType) => {
     const firstVerse = verses[0];
-    const shabadId = firstVerse.Shabads[0].ShabadID;
+    const shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
     const verseId = firstVerse.ID;
     const verse = firstVerse.Gurmukhi;
     const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
@@ -336,7 +338,7 @@ const ShabadContent = () => {
   return (
     <div className="shabad-list">
       <div className="verse-block">
-        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
+        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse, english }, index) => (
           <ShabadVerse
             key={index}
             activeVerse={activeVerse}
@@ -344,6 +346,7 @@ const ShabadContent = () => {
             lineNumber={index}
             versesRead={versesRead}
             verse={verse}
+            englishVerse={english}
             verseId={verseId}
             forwardedRef={activeVerseRef}
             changeHomeVerse={changeHomeVerse}

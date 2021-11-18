@@ -12,9 +12,11 @@ const SlideGurbani = ({
   const useBakePanktee = bakePanktee();
 
   return (
-    <span className={larivaar ? 'larivaar' : 'padchhed'}>
-      {useBakePanktee(getFontSize, gurmukhiString, vishraamPlacement, vishraamSource)}
-    </span>
+    gurmukhiString && (
+      <span className={larivaar ? 'larivaar' : 'padchhed'}>
+        {useBakePanktee(getFontSize, gurmukhiString, vishraamPlacement, vishraamSource)}
+      </span>
+    )
   );
 };
 
