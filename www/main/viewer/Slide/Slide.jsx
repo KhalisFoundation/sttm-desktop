@@ -56,7 +56,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
         {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
         {verseObj && !isMiscSlide && (
           <>
-            {verseObj.Gurmukhi ? (
+            {verseObj.Gurmukhi && (
               <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
                 <SlideGurbani
                   getFontSize={getFontSize}
@@ -66,11 +66,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   vishraamSource={vishraamSource}
                 />
               </div>
-            ) : (
-              <div
-                className="ceremony-english"
-                dangerouslySetInnerHTML={{ __html: verseObj.English }}
-              />
             )}
 
             {translationVisibility && verseObj.Translations && (
@@ -79,6 +74,11 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                 translationObj={JSON.parse(verseObj.Translations)}
               />
             )}
+
+            {verseObj.English && (
+              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
+            )}
+
             {teekaVisibility && verseObj.Translations && (
               <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
             )}
