@@ -56,26 +56,31 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
         {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
         {verseObj && !isMiscSlide && (
           <>
-            <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
-              <SlideGurbani
-                getFontSize={getFontSize}
-                gurmukhiString={verseObj.Gurmukhi}
-                larivaar={larivaar}
-                vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                vishraamSource={vishraamSource}
-              />
-            </div>
-            {translationVisibility && (
+            {verseObj.Gurmukhi && (
+              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+                <SlideGurbani
+                  getFontSize={getFontSize}
+                  gurmukhiString={verseObj.Gurmukhi}
+                  larivaar={larivaar}
+                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
+                  vishraamSource={vishraamSource}
+                />
+              </div>
+            )}
+
+            {translationVisibility && verseObj.Translations && (
               <SlideTranslation
                 getFontSize={getFontSize}
                 translationObj={JSON.parse(verseObj.Translations)}
               />
             )}
-            {teekaVisibility && (
-              <SlideTeeka
-                getFontSize={getFontSize}
-                teekaObj={JSON.parse(verseObj.Translations).pu}
-              />
+
+            {verseObj.English && (
+              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
+            )}
+
+            {teekaVisibility && verseObj.Translations && (
+              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
             )}
             {transliterationVisibility && (
               <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
@@ -88,7 +93,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   getFontSize={getFontSize}
                   gurmukhiString={nextLineObj.Gurmukhi}
                   larivaar={larivaar}
-                  vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
                   vishraamSource={vishraamSource}
                 />
               </div>

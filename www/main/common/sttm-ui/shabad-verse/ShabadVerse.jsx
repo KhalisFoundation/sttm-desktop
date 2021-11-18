@@ -10,6 +10,7 @@ const ShabadVerse = ({
   versesRead,
   updateTraversedVerse,
   verse,
+  englishVerse,
   verseId,
 }) => {
   const loadActiveClass = (activeVerseObj, activeVerseId, index) => {
@@ -42,14 +43,25 @@ const ShabadVerse = ({
           className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
         />
       </span>
-      <span
-        className="gurmukhi verse-content"
-        onClick={() => {
-          updateTraversedVerse(verseId, lineNumber);
-        }}
-      >
-        {verse}
-      </span>
+      {verse ? (
+        <span
+          className="gurmukhi verse-content"
+          onClick={() => {
+            updateTraversedVerse(verseId, lineNumber);
+          }}
+        >
+          {verse}
+        </span>
+      ) : (
+        <span
+          className="verse-content"
+          onClick={() => {
+            updateTraversedVerse(verseId, lineNumber);
+          }}
+        >
+          {englishVerse && englishVerse.split('<h1>')[1].split('</h1>')[0]}
+        </span>
+      )}
     </li>
   );
 };
@@ -63,6 +75,7 @@ ShabadVerse.propTypes = {
   versesRead: PropTypes.array,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
+  englishVerse: PropTypes.string,
   verseId: PropTypes.number,
 };
 
