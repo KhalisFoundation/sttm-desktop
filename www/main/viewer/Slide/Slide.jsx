@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -24,7 +24,8 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     displayNextLine,
     isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
-  // const usebakePanktee = bakePanktee();
+  const { activeVerseId } = useStoreState(state => state.navigator);
+  const activeVerseRef = useRef(null);
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -50,6 +51,17 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     global.platform.ipc.send('cast-to-receiver');
   }, [verseObj, isMiscSlide]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
+        activeVerseRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 100);
+  }, [verseObj]);
+
   return (
     <>
       <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
@@ -57,7 +69,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
         {verseObj && !isMiscSlide && (
           <>
             {verseObj.Gurmukhi && (
-              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+              <div
+                className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()} ${
+                  activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
+                }`}
+                ref={activeVerseRef}
+              >
                 <SlideGurbani
                   getFontSize={getFontSize}
                   gurmukhiString={verseObj.Gurmukhi}
