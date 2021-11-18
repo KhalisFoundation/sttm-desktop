@@ -12,10 +12,10 @@ export const dailyHukamnama = (activeShabadId, setActiveShabadId) => {
         if (!error) {
           const hukamShabadID = parseInt(response.shabadIds[0], 10);
 
-          analytics.trackEvent('display', 'hukamnama', hukamShabadID);
           if (activeShabadId !== hukamShabadID) {
             setActiveShabadId(hukamShabadID);
           }
+          analytics.trackEvent('display', 'hukamnama', hukamShabadID);
         }
       });
     }
