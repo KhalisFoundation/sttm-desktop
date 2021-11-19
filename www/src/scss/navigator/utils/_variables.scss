@@ -1,0 +1,21 @@
+/* Display Flex   al=align-items jc=justify-content fd=flex-direction */
+@mixin flex($ai-value: center, $jc-value: space-between, $fd-value: row, $width: 100%) {
+  display: flex;
+  align-items: $ai-value;
+  justify-content: $jc-value;
+  flex-direction: $fd-value;
+  width: $width;
+}
+/* Display Inline-Flex   al=align-items jc=justify-content fd=flex-direction */
+@mixin inline-flex($ai-value: center, $jc-value: space-between, $width: 100%) {
+  display: inline-flex;
+  align-items: $ai-value;
+  justify-content: $jc-value;
+  width: $width;
+}
+/* Display pane containers eg. search-pane, shabad pane, etc */
+@mixin pane-containers {
+  padding: 10px;
+  position: relative;
+  width: 100%;
+}

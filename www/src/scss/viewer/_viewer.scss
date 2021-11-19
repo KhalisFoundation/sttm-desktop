@@ -1,0 +1,13 @@
+@import 'shabad-deck/shabad-deck', 'verse-slide/verse-slide';
+
+#viewer-container {
+  border: 1px solid $alt-grey;
+  height: 100%;
+  overflow: scroll;
+  position: fixed;
+  width: 100%;
+
+  * {
+    transition: 0.2s all ease-in;
+  }
+}

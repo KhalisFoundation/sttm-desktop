@@ -1,8 +1,8 @@
+const { ipcRenderer } = require('electron');
 const electron = require('electron');
 const extract = require('extract-zip');
 const fs = require('fs');
 const isOnline = require('is-online');
-const os = require('os');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
@@ -19,24 +19,9 @@ const database = {
     dbSchema: 'realm-schema-evergreen.json',
     md5: 'sttmdesktop-evergreen.md5',
   },
-  sqlite: {
-    dbCompressedName: 'sttmdesktop.zip',
-    dbName: 'sttmdesktop.db',
-    dbSchema: null,
-    md5: 'sttmdesktop.md5',
-  },
 };
 
-let dbPlatform = 'realm';
-
-const platform = os.platform();
-if (platform === 'win32') {
-  const version = /\d+\.\d/.exec(os.release())[0];
-  if (version !== '6.3' && version !== '10.0') {
-    dbPlatform = 'sqlite';
-  }
-}
-
+const dbPlatform = 'realm';
 const dbSchemaPath = schemaPath =>
   !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
 
@@ -122,11 +107,9 @@ module.exports = {
   },
 
   downloadLatestDB(force = false) {
-    const { $search } = global.core.search;
-
     if (force) {
-      $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-      $search.dataset.databaseState = 'loading';
+      // $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
+      // $search.dataset.databaseState = 'loading';
     }
     isOnline().then(online => {
       if (online) {
@@ -140,17 +123,16 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
-                $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-                $search.dataset.databaseState = 'loading';
                 progress(
                   request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),
                 )
                   .on('progress', state => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
-                    global.core.search.updateDLProgress(state);
+                    ipcRenderer.emit('database-progress', state);
                   })
                   .on('end', () => {
+                    ipcRenderer.emit('database-progress', { percent: 1 });
                     extract(dbCompressed, { dir: newDBFolder }, err0 => {
                       if (err0) {
                         // ToDo: Log errors
@@ -201,9 +183,8 @@ module.exports = {
   },
 
   initDB() {
-    if (global.core) {
-      global.core.search.initSearch();
-    }
+    // dbSchema = dbSchemaPath(userDataPath);
+    // newDBSchema = dbSchemaPath(newDBFolder);
   },
 
   updateSettings() {

@@ -176,7 +176,7 @@ body {
   flex-flow: column nowrap;
   height: calc(100% - 250px);
   justify-content: flex-start;
-  opacity: 0;
+  // opacity: 0;
   position: absolute;
   width: 100%;
   z-index: 10;
@@ -240,10 +240,10 @@ h2 {
   line-height: 1.5;
 }
 
-.transtext,
-.translittext {
-  display: none;
-}
+// .transtext,
+// .translittext {
+// display: none;
+// }
 
 .translation-language-English .english-translation,
 .translation-language-Spanish .spanish-translation,
@@ -264,13 +264,13 @@ h2 {
   margin-top: 0.25em;
 }
 
-.translation,
-.transliteration,
-.teeka {
-  display: none;
-  height: 0;
-  opacity: 0;
-}
+// .translation,
+// .transliteration,
+// .teeka {
+// display: none;
+// height: 0;
+// opacity: 0;
+// }
 
 .translation-visibility-true .translation,
 .transliteration-visibility-true .transliteration,

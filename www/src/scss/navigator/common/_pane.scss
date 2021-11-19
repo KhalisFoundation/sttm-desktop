@@ -1,0 +1,33 @@
+@import '../utils/variables';
+.pane {
+  min-width: 500px;
+  position: relative;
+  overflow: hidden;
+  height: 45vh;
+  width: 100%;
+  i {
+    cursor: pointer;
+  }
+}
+.pane-header {
+  height: 40px;
+  @include inline-flex;
+  flex-wrap: wrap;
+  line-height: 40px;
+  font-size: 14px;
+  margin: 0;
+  padding: 0 10px;
+}
+.pane-content {
+  @include flex($fd-value: column, $ai-value: initial);
+  height: 100%;
+  z-index: 5;
+  flex-wrap: nowrap;
+}
+.pane-footer {
+  @include flex($ai-value: center, $jc-value: space-around);
+  bottom: 0;
+  position: absolute;
+  top: auto;
+  z-index: 10;
+}

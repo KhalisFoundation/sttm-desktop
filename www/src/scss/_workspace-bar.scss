@@ -4,12 +4,16 @@
   font-size: 13px;
   height: 30px;
   justify-content: center;
-  left: 0;
   line-height: 30px;
-  position: fixed;
-  top: 0;
   transition: height 600ms cubic-bezier(0.165, 0.84, 0.44, 1);
   width: 100%;
+  z-index: 2;
+
+  .isSingleDisplayMode-true & {
+    left: 0;
+    position: fixed;
+    top: 0;
+  }
 
   div {
     cursor: pointer;
@@ -26,8 +30,6 @@
 
 body.win32 {
   .workspace-bar {
-    height: 50px;
-    line-height: 25px;
-    padding-top: 25px;
+    margin-top: 32px;
   }
 }

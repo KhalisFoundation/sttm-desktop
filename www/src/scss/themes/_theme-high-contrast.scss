@@ -12,4 +12,12 @@ $themeHighContrast: (
 
 .theme-high-contrast {
   @include generateTheme($themeHighContrast...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+
+    &:hover {
+      background: $transparent-blue;
+    }
+  }
 }

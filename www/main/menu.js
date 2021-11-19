@@ -1,24 +1,18 @@
 import { savedSettings } from './common/store/user-settings/get-saved-user-settings';
 import { applyUserSettings } from './common/store/user-settings/apply-user-settings';
 
-const h = require('hyperscript');
-const getJSON = require('get-json');
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
-const sanitizeHtml = require('sanitize-html');
-const isOnline = require('is-online');
 
-const strings = require('./strings');
-const { randomShabad } = require('./banidb');
+// const isOnline = require('is-online');
+
 const settings = require('./settings');
 const tingle = require('../assets/js/vendor/tingle');
-const search = require('./search');
+// const search = require('./search');
 
-const { store, i18n } = electron.remote.require('./app');
+const { i18n } = electron.remote.require('./app');
 const analytics = electron.remote.getGlobal('analytics');
-
-const allowedTags = strings.allowedAnnouncementTags;
 
 const modal = new tingle.Modal({
   footer: true,
@@ -33,11 +27,6 @@ const closeBtn = 'Close';
 modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
   modal.close();
 });
-
-const goToShabadPage = shabadId => {
-  global.core.search.loadShabad(shabadId);
-  document.querySelector('#shabad-pageLink').click();
-};
 
 // format the date default to "Month Day, Year"
 const formatDate = (dateString, format = 'LL') => moment(dateString).format(format);
@@ -108,158 +97,6 @@ const getNotifications = (timeStamp, callback) => {
   );
 };
 
-/* load Shabad buttons */
-const randomShabadButton = h(
-  'li',
-  h(
-    'a.random-shabad-button',
-    {
-      onclick: () => {
-        analytics.trackEvent('display', 'random-shabad');
-        randomShabad().then(goToShabadPage);
-      },
-    },
-    h('i.fa.fa-random.list-icon'),
-    i18n.t('OTHERS.SHOW_RANDOM_SHABAD'),
-  ),
-);
-
-const hukamnamaButton = h(
-  'li',
-  h(
-    'a.hukamnama-button',
-    {
-      onclick: () => {
-        isOnline().then(online => {
-          if (online) {
-            getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
-              if (!error) {
-                const hukamShabadID = parseInt(response.shabadIds[0], 10);
-
-                analytics.trackEvent('display', 'hukamnama', hukamShabadID);
-                goToShabadPage(hukamShabadID);
-              }
-            });
-          }
-        });
-      },
-    },
-    h('i.fa.fa-gavel.list-icon'),
-    i18n.t('OTHERS.DAILY_HUKAMNAMA'),
-  ),
-);
-
-/* load text buttons */
-const emptySlideButton = h(
-  'li',
-  h(
-    'a.empty-slide-button',
-    {
-      onclick: () => {
-        analytics.trackEvent('display', 'empty-slide');
-        global.controller.sendText('');
-      },
-    },
-    h('i.fa.fa-eye-slash.list-icon'),
-    i18n.t('INSERT.ADD_EMPTY_SLIDE'),
-  ),
-);
-const waheguruSlideButton = h(
-  'li',
-  h(
-    'a.waheguru-slide-button',
-    {
-      onclick: () => {
-        analytics.trackEvent('display', 'waheguru-slide');
-        global.controller.sendText('vwihgurU', true);
-      },
-    },
-    h('i.fa.fa-circle.list-icon'),
-    i18n.t('INSERT.ADD_WAHEGURU_SLIDE'),
-  ),
-);
-const dhanGuruSlideButton = h(
-  'li',
-  h(
-    'a.dhanguru-slide-button',
-    {
-      onclick: () => {
-        const guruJi = document.querySelector('#dhan-guru').value;
-        analytics.trackEvent('display', 'dhanguru-slide', guruJi);
-        global.controller.sendText(guruJi, true);
-      },
-    },
-    h('i.fa.fa-circle-o.list-icon'),
-    [
-      h('label', { htmlFor: 'dhan-guru' }, i18n.t('INSERT.ADD_DHAN_GURU')),
-      h('select#dhan-guru', { value: ' ' }, [
-        h('option', { value: ' ' }, i18n.t('INSERT.SELECT')),
-        strings.dropdownStrings.gurus.map((value, index) =>
-          h(
-            'option',
-            { value: strings.slideStrings.dhanguruStrings[index] },
-            i18n.t(`INSERT.DHAN_GURU.${value}`),
-          ),
-        ),
-      ]),
-    ],
-  ),
-);
-const announcementSlideButton = h(
-  'li.announcement-box',
-  h('header', h('i.fa.fa-bullhorn.list-icon'), i18n.t('INSERT.ADD_ANNOUNCEMENT_SLIDE')),
-  h('li', [
-    h('span', i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')),
-    h('div.switch', [
-      h('input#announcement-language', {
-        name: 'announcement-language',
-        type: 'checkbox',
-        onclick: () => {
-          const isGurmukhi = document.querySelector('#announcement-language').checked;
-          const placeholderText = isGurmukhi
-            ? strings.announcemenetPlaceholder.gurmukhi
-            : i18n.t(`INSERT.${strings.announcemenetPlaceholder.english}`);
-
-          const $announcementText = document.querySelector('.announcement-text');
-          $announcementText.classList.toggle('gurmukhi', isGurmukhi);
-          $announcementText.setAttribute('data-placeholder', placeholderText);
-        },
-        value: 'gurmukhi',
-      }),
-      h('label', {
-        htmlFor: 'announcement-language',
-      }),
-    ]),
-  ]),
-  h('div.announcement-text', {
-    contentEditable: true,
-    'data-placeholder': i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT'),
-    oninput: () => {
-      const $announcementInput = document.querySelector('.announcement-text');
-      $announcementInput.innerHTML.replace(
-        /.*/g,
-        sanitizeHtml($announcementInput.innerHTML, { allowedTags }),
-      );
-    },
-  }),
-  h(
-    'button.announcement-slide-btn.button',
-    {
-      onclick: () => {
-        analytics.trackEvent('display', 'announcement-slide');
-        const isGurmukhi = document.querySelector('#announcement-language').checked;
-        const announcementText = sanitizeHtml(
-          document.querySelector('.announcement-text').innerHTML,
-          { allowedTags },
-        );
-        global.controller.sendText(announcementText, isGurmukhi, true);
-        global.core.updateInsertedSlide(true);
-      },
-    },
-    i18n.t('INSERT.ADD_ANNOUNCEMENT'),
-  ),
-);
-
 // On href clicks, open the link in actual browser
 document.body.addEventListener('click', e => {
   const { target } = e;
@@ -279,23 +116,6 @@ module.exports = {
       $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
 
-    const $listOfCustomSlides = document.querySelector('#list-of-custom-slides');
-    $listOfCustomSlides.appendChild(emptySlideButton);
-    $listOfCustomSlides.appendChild(waheguruSlideButton);
-    $listOfCustomSlides.appendChild(dhanGuruSlideButton);
-    $listOfCustomSlides.appendChild(announcementSlideButton);
-
-    const $listOfShabadOptions = document.querySelector('#list-of-shabad-options');
-    $listOfShabadOptions.appendChild(randomShabadButton);
-    $listOfShabadOptions.appendChild(hukamnamaButton);
-
-    isOnline().then(online => {
-      document.querySelector('.hukamnama-button').classList.toggle('is-offline', !online);
-    });
-
-    // when the app is reloaded, enable the control for akhandpaatt
-    store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
-    settings.init();
     applyUserSettings(savedSettings);
   },
 
@@ -304,8 +124,8 @@ module.exports = {
   showNotificationsModal,
 
   showSettingsTab(fromMainMenu) {
-    search.activateNavLink('settings', true);
-    search.activateNavPage('session', { id: 'settings', label: i18n.t('TOOLBAR.SETTINGS') });
+    // search.activateNavLink('settings', true);
+    // search.activateNavPage('session', { id: 'settings', label: i18n.t('TOOLBAR.SETTINGS') });
 
     const isPresenterView = document.body.classList.contains('presenter-view');
     const settingsViewType = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';

@@ -1,0 +1,155 @@
+@import '../utils/variables';
+//Heights
+$misc-header: 40px;
+$misc-footer-inactive: 40px;
+$misc-footer-active: 70px;
+.misc-pane {
+  @include pane-containers;
+  .misc-header {
+    display: inline-flex;
+    width: 100%;
+    a {
+      padding: 0 10px;
+      span {
+        padding: 0 5px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+      }
+    }
+  }
+  .history-results {
+    height: 320px;
+    overflow-y: auto;
+    .history-item {
+      cursor: pointer;
+      margin: 8px 0;
+      padding: 10px;
+    }
+  }
+  .list-of-items {
+    @include flex($fd-value: column, $jc-value: start);
+    margin: 0;
+    padding: 0;
+    height: 320px;
+    overflow: auto;
+    li {
+      overflow: visible;
+      text-overflow: ellipsis;
+      width: 100%;
+      a {
+        display: block;
+        padding: 0.3rem 1rem;
+        width: 100%;
+        i {
+          padding: 8px;
+        }
+        select {
+          margin-left: 12px;
+        }
+      }
+    }
+    .announcement-box {
+      @include flex($fd-value: column);
+      header {
+        border-top: 1px #757575 solid;
+        color: #757575;
+        font-size: 0.8em;
+        font-weight: bold;
+        letter-spacing: 0.2em;
+        margin-bottom: 0.5em;
+        margin-left: 1rem;
+        margin-top: 1em;
+        padding-top: 0.75em;
+        word-spacing: 0.2em;
+        cursor: default;
+        text-transform: uppercase;
+      }
+      .announcement-switch {
+        @include flex($jc-value: space-evenly, $width: initial);
+        padding: 5px;
+        span {
+          padding-right: 3px;
+        }
+      }
+      .announcement-text {
+        border-radius: 10px;
+        display: inline-block;
+        margin: 0 20px 10px;
+        min-height: 100px;
+        min-width: 300px;
+        outline: none;
+        padding: 10px;
+      }
+      .announcement-slide-btn {
+        align-self: center;
+        border: 0;
+        border-radius: 0;
+        font-size: 0.9rem;
+        color: #fff;
+        cursor: pointer;
+        margin: 0 1rem 1rem 0;
+        display: block;
+        background: #29679b;
+        line-height: 1;
+        padding: 0.85em 1em;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+        width: 200px;
+        -webkit-appearance: none;
+      }
+    }
+  }
+  .misc-footer {
+    @include flex($fd-value: column);
+    height: fit-content;
+    transition: 0.5s all ease;
+    .clear-pane {
+      @include flex($jc-value: space-between);
+      height: 40px;
+      transition: 0.5s all ease;
+      .footer-toggler {
+        padding: 12px;
+      }
+      .footer-toggler-inactive {
+        padding: 12px;
+      }
+      .clear-history {
+        cursor: pointer;
+        display: block;
+        padding: 10px;
+        span {
+          margin-left: 5px;
+        }
+      }
+    }
+    .shortcut-drawer-active {
+      transition: 0.5s all ease;
+      @include flex($jc-value: space-around);
+      height: 70px;
+      .tray-item-icon {
+        cursor: pointer;
+        @include flex($jc-value: center, $width: fit-content);
+        padding: 10px;
+        line-height: 30px;
+        transition: 0.5s all ease;
+        &:hover {
+          box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
+          transform: translateY(-4px);
+        }
+
+        &:active {
+          box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
+          transform: translateY(1px);
+        }
+      }
+    }
+    .shortcut-drawer {
+      height: 0;
+      transition: 0.5s all ease;
+      .tray-item-icon {
+        display: none;
+      }
+    }
+  }
+}

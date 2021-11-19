@@ -9,8 +9,7 @@ const { remote } = require('electron');
 const { i18n } = remote.require('./app');
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {
-  const { title } = settingObj;
-  const type = settingObj.type;
+  const { title, type, min, max, step, options } = settingObj;
   const userSettings = useStoreState(state => state.userSettings);
   const userSettingsActions = useStoreActions(state => state.userSettings);
 
@@ -33,9 +32,9 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           type="range"
           data-value={userSettings[stateVar]}
           value={userSettings[stateVar]}
-          min={settingObj.min}
-          max={settingObj.max}
-          step={settingObj.step}
+          min={min}
+          max={max}
+          step={step}
           onChange={handleInputChange}
         ></input>
       );
@@ -43,9 +42,9 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     case 'dropdown':
       settingDOM = (
         <select value={userSettings[stateVar]} onChange={handleInputChange}>
-          {Object.keys(settingObj.options).map((op, opIndex) => (
+          {Object.keys(options).map((op, opIndex) => (
             <option key={`control-dropdown-options-${opIndex}`} value={op}>
-              {i18n.t(`SETTINGS.${settingObj.options[op]}`)}
+              {i18n.t(`SETTINGS.${options[op]}`)}
             </option>
           ))}
         </select>

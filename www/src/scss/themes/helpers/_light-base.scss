@@ -90,6 +90,7 @@
     }
   }
 
+  .pane-header,
   .navigator-header,
   .more-tabs .nav-header-tab,
   .settings-nav {
@@ -100,14 +101,47 @@
   .control-item:hover {
     background-color: $statusbar-bg;
   }
+  .misc-pane {
+    .misc-header {
+      a {
+        color: $grey;
+      }
+      .misc-active {
+        color: $dark-grey;
+      }
+    }
+    .pane-footer {
+      background-color: $alt-bg;
+      .clear-pane {
+        background-color: $not-so-white;
+        .footer-toggler-inactive {
+          background-color: $alt-bg;
+        }
+        .footer-toggler {
+          background-color: $nav-bg;
+        }
+      }
+    }
+  }
 
-  .shortcut-tray {
-    background: $alt-bg;
+  .search-pane {
+    .pane {
+      .pane-footer {
+        background-color: transparent;
+      }
+      .search-footer {
+        background-color: $statusbar-bg;
+      }
+    }
+  }
+
+  .pane-footer {
+    background: $statusbar-bg;
   }
   .tray-item-icon {
     background: lighten($base-text, 30);
   }
-  .tray-item-label {
+  .tray-item-icon {
     color: $nav-bg;
   }
   &.shortcut-tray-true .shortcut-toggle {
@@ -140,9 +174,9 @@
     background-color: $nav-bg;
   }
 
-  .nav-page {
+  .pane {
     background-color: $nav-bg;
-
+    color: $base-text !important;
     a.panktee.current {
       background-color: $current-focus !important;
       color: $base-text !important;
@@ -158,7 +192,12 @@
     background-color: $dialog-bg;
   }
 
-  #search-container {
+  .search-content {
+    background-color: $statusbar-bg;
+    color: $base-text;
+    .input-box {
+      color: $black;
+    }
     input {
       color: $base-text;
 
@@ -167,7 +206,7 @@
         color: $dialog-bg;
 
         &::-webkit-input-placeholder {
-          color: $dialog-bg;
+          color: $black;
 
           @extend .gurmukhi;
         }
@@ -190,18 +229,21 @@
     }
   }
 
-  .block-list {
+  .result-list ul {
     li {
-      > a,
-      > span,
-      > label {
-        color: $base-text;
+      width: 100%;
+      color: $base-text;
 
-        &:hover {
-          background-color: $nav-bg;
-          cursor: pointer;
-        }
+      &:hover {
+        background-color: $statusbar-bg;
+        cursor: pointer;
       }
+    }
+  }
+
+  .history-results {
+    .history-item:hover {
+      background-color: $statusbar-bg;
     }
   }
 
@@ -220,18 +262,5 @@
         color: $active-focus;
       }
     }
-  }
-
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #bdbdbd;
-    border-radius: 6px;
   }
 }

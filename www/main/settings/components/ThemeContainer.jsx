@@ -36,20 +36,22 @@ const ThemeContainer = () => {
         {themeTypes.map(({ type, title }) => (
           <React.Fragment key={type}>
             <header className="options-header">{i18n.t(`THEMES.${title}`)}</header>
-            {groupThemes(type).map(theme => (
-              <Tile
-                key={theme.name}
-                onClick={() => {
-                  if (currentTheme !== theme.key) {
-                    applyTheme(theme, false, setTheme, setThemeBg);
-                  }
-                }}
-                className="theme-instance"
-                theme={theme}
-              >
-                {i18n.t(`THEMES.${theme.name}`)}
-              </Tile>
-            ))}
+            <span className="theme-tile-holder">
+              {groupThemes(type).map(theme => (
+                <Tile
+                  key={theme.name}
+                  onClick={() => {
+                    if (currentTheme !== theme.key) {
+                      applyTheme(theme, false, setTheme, setThemeBg);
+                    }
+                  }}
+                  className="theme-instance"
+                  theme={theme}
+                >
+                  {i18n.t(`THEMES.${theme.name}`)}
+                </Tile>
+              ))}
+            </span>
           </React.Fragment>
         ))}
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
@@ -67,20 +69,22 @@ const ThemeContainer = () => {
           />
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
-        {customThemes.map(tile => (
-          <React.Fragment key={tile.name}>
-            <CustomBgTile
-              customBg={tile}
-              onApply={() => {
-                applyTheme(tile, 'custom', setTheme, setThemeBg);
-              }}
-              onRemove={() => {
-                removeCustomBackgroundFile(tile.path);
-                upsertCustomBackgrounds(setCustomThemes);
-              }}
-            />
-          </React.Fragment>
-        ))}
+        <span className="theme-tile-holder">
+          {customThemes.map(tile => (
+            <React.Fragment key={tile.name}>
+              <CustomBgTile
+                customBg={tile}
+                onApply={() => {
+                  applyTheme(tile, 'custom', setTheme, setThemeBg);
+                }}
+                onRemove={() => {
+                  removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+                  upsertCustomBackgrounds(setCustomThemes);
+                }}
+              />
+            </React.Fragment>
+          ))}
+        </span>
       </div>
     </div>
   );

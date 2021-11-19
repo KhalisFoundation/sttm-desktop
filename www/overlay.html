@@ -8,14 +8,12 @@
     <link rel="stylesheet" href="assets/css/vendor/font-awesome.min.css" />
   </head>
   <body>
-    <main class="canvas">
-      <section class="control-panel"></section>
-      <section class="theme-selector"></section>
-      <section class="preview-container">
-        <div class="text-controls"></div>
-      </section>
-    </main>
+    <div id="overlay-container"></div>
 
-    <script src="js/overlay.js"></script>
+    <script>
+      const app = require('./js/overlay/app.js').default;
+      const { render } = require('react-dom');
+      render(app(), document.getElementById('overlay-container'));
+    </script>
   </body>
 </html>
