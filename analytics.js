@@ -29,13 +29,12 @@ class Analytics {
    * @param value
    */
   trackEvent(category, action, label, value) {
-    const useragent = this.store.get('user-agent');
+    // const useragent = this.store.get('user-agent');
     const params = {
       ec: category,
       ea: action,
       el: label,
       ev: value,
-      ua: useragent,
       cd1: appVersion,
     };
 
@@ -51,7 +50,7 @@ class Analytics {
       }
     } else {
       console.log(
-        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, ua: ${useragent}`,
+        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}`,
       );
     }
   }
@@ -67,14 +66,11 @@ class Analytics {
       if (this.store.get('userPrefs.app.analytics.collectStatistics')) {
         isOnline().then(online => {
           if (online && this.usr) {
-            const useragent = this.store.get('user-agent');
-
             this.usr
               .pageview({
                 dp: path,
                 dt: title,
                 dh: hostname,
-                ua: useragent,
               })
               .send();
           }
