@@ -75,7 +75,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
     "anvaad-js": "^1.4.3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "copy-to-clipboard": "^3.0.8",
     "dotenv": "^10.0.0",
     "easy-peasy": "^3.3.1",
