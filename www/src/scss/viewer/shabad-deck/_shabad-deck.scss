@@ -4,12 +4,16 @@
     background-size: cover;
     height: unset;
     padding-bottom: 10px;
+    position: fixed;
+    overflow-y: scroll;
+    width: 100%;
   }
 }
 
 .shabad-deck {
-  height: 100%;
   background-size: cover;
+  border: 1px solid $alt-grey;
+  height: 100%;
 
   &.single-display-mode {
     padding: 24px 72px;
