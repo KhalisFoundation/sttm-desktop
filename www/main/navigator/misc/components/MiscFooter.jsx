@@ -1,35 +1,14 @@
 import { remote } from 'electron';
-import React, { useState, useEffect } from 'react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
-import insertSlide from '../../../common/constants/slidedb';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { useStoreActions } from 'easy-peasy';
 
 const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
-export const MiscFooter = () => {
-  const {
-    isMiscSlide,
-    miscSlideText,
-    isAnnoucement,
-    isSundarGutkaBani,
-    isCeremonyBani,
-    ceremonyId,
-    shortcuts,
-  } = useStoreState(state => state.navigator);
-  const {
-    setVerseHistory,
-    setIsSundarGutkaBani,
-    setIsCeremonyBani,
-    setCeremonyId,
-    setShortcuts,
-    setIsMiscSlide,
-    setMiscSlideText,
-    setIsAnnoucement,
-  } = useStoreActions(state => state.navigator);
-  const { akhandpatt } = useStoreState(state => state.userSettings);
-  const { setAkhandpatt } = useStoreActions(state => state.userSettings);
-  // For Global States
-  // const navigatorState = useStoreActions(state => state.navigator);
+export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
+  const { setVerseHistory } = useStoreActions(state => state.navigator);
+
   // For shortcut tray
   const [shortcutOpen, setShortcutOpen] = useState(true);
   const HandleChange = () => {
@@ -41,76 +20,6 @@ export const MiscFooter = () => {
   const clearHistory = () => {
     setVerseHistory([]);
   };
-
-  const openAnandSahibBhog = () => {
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
-    if (ceremonyId !== 3) {
-      setCeremonyId(3);
-    }
-    if (!isCeremonyBani) {
-      setIsCeremonyBani(true);
-    }
-  };
-
-  const addMiscSlide = givenText => {
-    if (isAnnoucement) {
-      setIsAnnoucement(false);
-    }
-    if (!isMiscSlide) {
-      if (akhandpatt) {
-        setAkhandpatt(false);
-      }
-      setIsMiscSlide(true);
-    }
-    if (miscSlideText !== givenText) {
-      setMiscSlideText(givenText);
-    }
-  };
-
-  const openWaheguruSlide = () => {
-    addMiscSlide(insertSlide.slideStrings.waheguru);
-  };
-
-  const openMoolMantraSlide = () => {
-    addMiscSlide(insertSlide.slideStrings.moolMantra);
-  };
-
-  const openBlankViewer = () => {
-    addMiscSlide('');
-  };
-
-  useEffect(() => {
-    if (shortcuts.openWaheguruSlide) {
-      openWaheguruSlide();
-      setShortcuts({
-        ...shortcuts,
-        openWaheguruSlide: false,
-      });
-    }
-    if (shortcuts.openMoolMantraSlide) {
-      openMoolMantraSlide();
-      setShortcuts({
-        ...shortcuts,
-        openMoolMantraSlide: false,
-      });
-    }
-    if (shortcuts.openBlankViewer) {
-      openBlankViewer();
-      setShortcuts({
-        ...shortcuts,
-        openBlankViewer: false,
-      });
-    }
-    if (shortcuts.openAnandSahibBhog) {
-      setShortcuts({
-        ...shortcuts,
-        openAnandSahibBhog: false,
-      });
-      openAnandSahibBhog();
-    }
-  }, [shortcuts]);
 
   return (
     <div className="misc-footer">
@@ -127,19 +36,26 @@ export const MiscFooter = () => {
         </a>
       </div>
       <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
-        <button className="tray-item-icon" onClick={openAnandSahibBhog}>
+        <button className="tray-item-icon" onClick={anandSahibBhog}>
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
-        <button className="tray-item-icon" onClick={openMoolMantraSlide}>
+        <button className="tray-item-icon" onClick={moolMantraSlide}>
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
-        <button className="gurmukhi tray-item-icon" onClick={openWaheguruSlide}>
+        <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
           vwihgurU
         </button>
-        <button className="tray-item-icon" onClick={openBlankViewer}>
+        <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
       </div>
     </div>
   );
+};
+
+MiscFooter.propTypes = {
+  waheguruSlide: PropTypes.func,
+  moolMantraSlide: PropTypes.func,
+  blankSlide: PropTypes.func,
+  anandSahibBhog: PropTypes.func,
 };
