@@ -196,17 +196,13 @@
         color: $black;
       }
     }
+
+    &-container {
+      height: calc(100% - 50px);
+    }
   }
   .search-results {
-    height: 178px;
-
-    @include breakpoint(xlarge) {
-      height: 225px;
-    }
-
-    @include breakpoint(xxlarge) {
-      height: 300px;
-    }
+    height: calc(100% - 120px);
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);
