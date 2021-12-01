@@ -45,7 +45,7 @@
     "@babel/preset-react": "^7.9.4",
     "concurrently": "^3.3.0",
     "cross-env": "^3.1.4",
-    "electron": "^7.2.3",
+    "electron": "^11.5.0",
     "electron-builder": "^22.7.0",
     "electron-publisher-s3": "^20.17.2",
     "electron-react-devtools": "^0.5.3",
@@ -66,7 +66,7 @@
     "semver": "^5.6.0",
     "simple-git": "^1.107.0",
     "spectron": "^3.6.1",
-    "ssh2": "^0.5.4",
+    "ssh2": "^1.4.0",
     "stylelint": "^7.9.0",
     "stylelint-config-prettier": "^5.0.0",
     "stylelint-config-standard": "^16.0.0",
@@ -75,7 +75,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
     "anvaad-js": "^1.4.3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "copy-to-clipboard": "^3.0.8",
     "dotenv": "^10.0.0",
     "easy-peasy": "^3.3.1",
@@ -190,6 +190,6 @@
     }
   },
   "optionalDependencies": {
-    "react-native": "^0.61.5"
+    "react-native": "^0.62.3"
   }
 }
