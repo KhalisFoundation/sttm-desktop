@@ -247,6 +247,17 @@ const ShabadContent = () => {
     }
   };
 
+  const scrollToView = () => {
+    if (activeVerseRef && activeVerseRef.current) {
+      setTimeout(() => {
+        activeVerseRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }, 100);
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
@@ -317,6 +328,7 @@ const ShabadContent = () => {
   useEffect(() => {
     if (shortcuts.nextVerse) {
       openNextVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         nextVerse: false,
@@ -324,6 +336,7 @@ const ShabadContent = () => {
     }
     if (shortcuts.prevVerse) {
       openPrevVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         prevVerse: false,
@@ -331,6 +344,7 @@ const ShabadContent = () => {
     }
     if (shortcuts.homeVerse) {
       openHomeVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         homeVerse: false,
