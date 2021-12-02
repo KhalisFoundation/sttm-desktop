@@ -1,41 +1,45 @@
+import React, { useState } from 'react';
 import { remote } from 'electron';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
 import { useStoreActions } from 'easy-peasy';
 
-const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
+  const shortcutsState = JSON.parse(localStorage.getItem('isShortcutsOpen'));
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
   const { setVerseHistory } = useStoreActions(state => state.navigator);
-
-  // For shortcut tray
-  const [shortcutOpen, setShortcutOpen] = useState(true);
-  const HandleChange = () => {
-    setShortcutOpen(!shortcutOpen);
-    analytics.trackEvent('shortcutTrayToggle', shortcutOpen);
-  };
-
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
+  };
+
+  const toggleShortcuts = () => {
+    const event = new CustomEvent('openShortcut', {
+      detail: { value: !shortcutsState },
+    });
+    document.dispatchEvent(event);
+    localStorage.setItem('isShortcutsOpen', !shortcutsState);
+    setIsShortcutsOpen(!shortcutsState);
+    analytics.trackEvent('shortcutTrayToggle', isShortcutsOpen);
   };
 
   return (
     <div className="misc-footer">
       <div className="clear-pane">
         <div
-          className={`${!shortcutOpen ? 'footer-toggler' : 'footer-toggler-inactive '}`}
-          onClick={HandleChange}
+          className={`${!isShortcutsOpen ? 'footer-toggler' : 'footer-toggler-inactive '}`}
+          onClick={toggleShortcuts}
         >
-          <i className={`${shortcutOpen ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
+          <i className={`${isShortcutsOpen ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
         </div>
         <a className="clear-history" onClick={clearHistory}>
           <i className="fa fa-history" />
           <span>Clear History</span>
         </a>
       </div>
-      <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
+      <div className={`${isShortcutsOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
         <button className="tray-item-icon" onClick={anandSahibBhog}>
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
