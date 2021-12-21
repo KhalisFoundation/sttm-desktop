@@ -104,6 +104,7 @@ const SearchContent = () => {
           }
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
+          databaseProgress={databaseProgress}
         />
         <div className="input-buttons">
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
