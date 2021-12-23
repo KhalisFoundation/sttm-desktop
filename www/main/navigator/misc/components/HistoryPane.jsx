@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
@@ -26,6 +26,8 @@ export const HistoryPane = ({ className }) => {
     setHomeVerse,
     setActiveVerseId,
   } = useStoreActions(state => state.navigator);
+  const shortcutsState = localStorage.getItem('isShortcutsOpen');
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
 
   const openShabadFromHistory = element => {
     if (element.continueFrom !== initialVerseId) {
@@ -92,7 +94,30 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
+  useEffect(() => {
+    document.addEventListener(
+      'openShortcut',
+      e => {
+        setIsShortcutsOpen(e.detail.value);
+      },
+      false,
+    );
+    return () => {
+      document.removeEventListener('openShortcut', e => {
+        setIsShortcutsOpen(e.detail.value);
+      });
+    };
+  });
+
+  return (
+    <div
+      className={`history-results ${
+        isShortcutsOpen ? 'history-results-shrinked' : ''
+      } ${className}`}
+    >
+      {versesMarkup}
+    </div>
+  );
 };
 
 HistoryPane.propTypes = {
