@@ -4,7 +4,11 @@ import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
-const dhanGuruModal = require('../../../insert_slide');
+const tingle = require('../../../../assets/js/vendor/tingle');
+
+const { gurus } = insertSlide.dropdownStrings;
+const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 export const InsertPane = ({ className }) => {
   const {
@@ -22,10 +26,7 @@ export const InsertPane = ({ className }) => {
     setShortcuts,
   } = useStoreActions(state => state.navigator);
 
-  const { i18n } = remote.require('./app');
   const inputRef = useRef(null);
-  const gurus = insertSlide.dropdownStrings;
-  const analytics = remote.getGlobal('analytics');
 
   const addMiscSlide = givenText => {
     if (!isMiscSlide) {
@@ -68,13 +69,51 @@ export const InsertPane = ({ className }) => {
     if (isAnnoucement) {
       setIsAnnoucement(false);
     }
-    addMiscSlide(e.target.value);
+    if (e.target) {
+      addMiscSlide(e.target.value);
+    } else {
+      addMiscSlide(e);
+    }
   };
 
+  let slidePage = `<h1 class = "modalTitle">${i18n.t('INSERT.INSERT_DHAN_SLIDE')}</h1>
+  <div class="btn-group" id = "btn-group">`;
+  gurus.forEach((guru, index) => {
+    slidePage += `<button class="guru" id="guru${index}">${i18n.t(
+      `INSERT.DHAN_GURU.${guru}`,
+    )}</button>`;
+  });
+  slidePage += `</div>`;
+
+  const modal = new tingle.Modal({
+    footer: true,
+    stickyFooter: false,
+    closeMethods: ['overlay', 'button', 'escape'],
+    onClose() {
+      modal.modal.classList.remove('tingle-modal--visible');
+    },
+    beforeClose() {
+      return true; // close the modal
+    },
+  });
+
+  const buttonOnClick = () => {
+    gurus.forEach((guru, index) => {
+      document.querySelector(`#guru${index}`).onclick = () => {
+        addDhanGuruSlide(insertSlide.slideStrings.dhanguruStrings[index]);
+        modal.close();
+      };
+    });
+  };
+
+  // sets the default page to Dhan Guru slide page
+  modal.setContent(slidePage);
+  buttonOnClick();
+
   const showDhanGuruModal = () => {
-    dhanGuruModal.isAnnouncementTab = false;
-    dhanGuruModal.openModal();
-    dhanGuruModal.buttonOnClick();
+    if (!modal.isOpen()) {
+      modal.open();
+    }
   };
 
   useEffect(() => {
@@ -109,7 +148,7 @@ export const InsertPane = ({ className }) => {
             <option value="" disabled>
               {i18n.t('INSERT.SELECT')}
             </option>
-            {gurus.gurus.map((value, index) => (
+            {gurus.map((value, index) => (
               <option value={insertSlide.slideStrings.dhanguruStrings[index]} key={index}>
                 {i18n.t(`INSERT.DHAN_GURU.${value}`)}
               </option>
