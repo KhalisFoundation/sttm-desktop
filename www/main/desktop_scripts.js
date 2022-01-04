@@ -108,8 +108,9 @@ module.exports = {
 
   downloadLatestDB(force = false) {
     if (force) {
-      // $search.placeholder = i18n.t('DATABASE.DOWNLOADING');
-      // $search.dataset.databaseState = 'loading';
+      localStorage.setItem('isDbDownloaded', false);
+    } else {
+      localStorage.setItem('isDbDownloaded', true);
     }
     isOnline().then(online => {
       if (online) {

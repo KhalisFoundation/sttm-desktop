@@ -5,6 +5,11 @@ export const loadShabad = (shabadID, lineID) => {
     .loadShabad(shabadID, lineID)
     .then(rows => rows)
     .catch(() => {
-      console.log('err while loading shabad, please contact dev team');
+      const dbStatus = !!localStorage.getItem('isDbDownloaded');
+      if (dbStatus) {
+        console.log('Database is downloading, please wait...');
+      } else {
+        console.log('Error while loading shabad, please contact dev team');
+      }
     });
 };
