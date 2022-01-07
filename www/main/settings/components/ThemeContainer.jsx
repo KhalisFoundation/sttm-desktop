@@ -78,7 +78,7 @@ const ThemeContainer = () => {
                   applyTheme(tile, 'custom', setTheme, setThemeBg);
                 }}
                 onRemove={() => {
-                  removeCustomBackgroundFile(tile['background-image'].replace(/\\(\s)/g, ' '));
+                  removeCustomBackgroundFile(tile['background-image-path'].replace(/\\(\s)/g, ' '));
                   upsertCustomBackgrounds(setCustomThemes);
                 }}
               />
