@@ -281,6 +281,7 @@ const ShabadContent = () => {
           saveToHistory(verses, 'shabad', initialVerseId);
           setActiveShabad(verses);
           if (isRandomShabad) {
+            saveToHistory(verses, 'shabad', verses[0].ID);
             openFirstVerse(verses[0].ID);
             setIsRandomShabad(false);
           }
