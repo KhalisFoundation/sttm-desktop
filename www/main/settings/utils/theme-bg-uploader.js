@@ -37,7 +37,10 @@ const imageCheck = filePath => {
 
 export const removeCustomBackgroundFile = imagePath => {
   fs.unlink(imagePath, deleteError => {
-    if (deleteError) errorAlert('Unable to delete file');
+    if (deleteError) {
+      errorAlert('Unable to delete file');
+      throw deleteError;
+    }
   });
 };
 
