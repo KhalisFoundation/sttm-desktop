@@ -17,6 +17,10 @@
 
   &.single-display-mode {
     padding: 24px 72px;
+
+    &.win32 {
+      padding-top: 56px;
+    }
   }
 }
 
