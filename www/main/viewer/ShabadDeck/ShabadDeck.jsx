@@ -11,6 +11,9 @@ import {
 } from '../../navigator/utils';
 import ViewerIcon from '../icons/ViewerIcon';
 
+const os = require('os');
+
+const platform = os.platform();
 const themes = require('../../../../www/configs/themes.json');
 
 function ShabadDeck() {
@@ -157,9 +160,9 @@ function ShabadDeck() {
       <div
         className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
           miscSlideText === '' ? 'empty-slide' : ''
-        } ${isSingleDisplayMode ? 'single-display-mode' : ''} theme-${
-          getCurrentThemeInstance().key
-        }`}
+        } ${isSingleDisplayMode ? 'single-display-mode' : ''} ${
+          platform === 'win32' ? 'win32' : ''
+        } theme-${getCurrentThemeInstance().key}`}
         style={applyTheme()}
       >
         {/* show quicktools only on presentation mode */}
