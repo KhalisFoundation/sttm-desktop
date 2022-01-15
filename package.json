@@ -101,7 +101,7 @@
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "moment": "^2.22.1",
     "node-fetch": "^2.6.0",
     "node-fetch-progress": "^1.0.2",
