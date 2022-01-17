@@ -14,6 +14,7 @@ export const HistoryPane = ({ className }) => {
     sundarGutkaBaniId,
     homeVerse,
     activeVerseId,
+    singleDisplayActiveTab,
   } = useStoreState(state => state.navigator);
   const {
     setActiveShabadId,
@@ -25,11 +26,15 @@ export const HistoryPane = ({ className }) => {
     setSundarGutkaBaniId,
     setHomeVerse,
     setActiveVerseId,
+    setSingleDisplayActiveTab,
   } = useStoreActions(state => state.navigator);
   const shortcutsState = localStorage.getItem('isShortcutsOpen');
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
 
   const openShabadFromHistory = element => {
+    if (singleDisplayActiveTab !== 'shabad') {
+      setSingleDisplayActiveTab('shabad');
+    }
     if (element.continueFrom !== initialVerseId) {
       setInitialVerseId(element.continueFrom);
     }
