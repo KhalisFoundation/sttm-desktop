@@ -177,19 +177,18 @@ const loadShabad = ShabadID =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
-    } else {
-      Realm.open(realmConfig)
-        .then(realm => {
-          const rows = realm
-            .objects('Verse')
-            .filtered('ANY Shabads.ShabadID == $0', ShabadID)
-            .sorted('ID');
-          if (rows.length > 0) {
-            resolve(rows);
-          }
-        })
-        .catch(reject);
     }
+    Realm.open(realmConfig)
+      .then(realm => {
+        const rows = realm
+          .objects('Verse')
+          .filtered('ANY Shabads.ShabadID == $0', ShabadID)
+          .sorted('ID');
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
   });
 
 /**
