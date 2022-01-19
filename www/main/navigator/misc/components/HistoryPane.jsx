@@ -1,23 +1,85 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-export const HistoryPane = () => {
-  const { verseHistory, activeShabadId, initialVerseId, versesRead } = useStoreState(
-    state => state.navigator,
-  );
-  const { setActiveShabadId, setInitialVerseId, setVersesRead } = useStoreActions(
-    state => state.navigator,
-  );
+export const HistoryPane = ({ className }) => {
+  const {
+    verseHistory,
+    activeShabadId,
+    initialVerseId,
+    versesRead,
+    isCeremonyBani,
+    isSundarGutkaBani,
+    ceremonyId,
+    sundarGutkaBaniId,
+    homeVerse,
+    activeVerseId,
+    singleDisplayActiveTab,
+  } = useStoreState(state => state.navigator);
+  const {
+    setActiveShabadId,
+    setInitialVerseId,
+    setVersesRead,
+    setIsCeremonyBani,
+    setIsSundarGutkaBani,
+    setCeremonyId,
+    setSundarGutkaBaniId,
+    setHomeVerse,
+    setActiveVerseId,
+    setSingleDisplayActiveTab,
+  } = useStoreActions(state => state.navigator);
+  const shortcutsState = localStorage.getItem('isShortcutsOpen');
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
 
   const openShabadFromHistory = element => {
-    if (element.shabadId !== activeShabadId) {
-      setActiveShabadId(element.shabadId);
+    if (singleDisplayActiveTab !== 'shabad') {
+      setSingleDisplayActiveTab('shabad');
     }
     if (element.continueFrom !== initialVerseId) {
       setInitialVerseId(element.continueFrom);
     }
+    if (element.homeVerse !== homeVerse) {
+      setHomeVerse(element.homeVerse);
+    }
     if (element.versesRead !== versesRead) {
       setVersesRead(element.versesRead);
+    }
+    if (element.type === 'shabad') {
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      if (element.shabadId !== activeShabadId) {
+        setActiveShabadId(element.shabadId);
+      }
+      if (element.verseId !== activeVerseId) {
+        setActiveVerseId(element.verseId);
+      }
+    }
+    if (element.type === 'ceremony') {
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (!isCeremonyBani) {
+        setIsCeremonyBani(true);
+      }
+      if (ceremonyId !== element.shabadId) {
+        setCeremonyId(element.shabadId);
+      }
+    }
+    if (element.type === 'bani') {
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      if (!isSundarGutkaBani) {
+        setIsSundarGutkaBani(true);
+      }
+
+      if (sundarGutkaBaniId !== element.shabadId) {
+        setSundarGutkaBaniId(element.shabadId);
+      }
     }
   };
 
@@ -37,5 +99,32 @@ export const HistoryPane = () => {
     );
   });
 
-  return <div className="history-results">{versesMarkup}</div>;
+  useEffect(() => {
+    document.addEventListener(
+      'openShortcut',
+      e => {
+        setIsShortcutsOpen(e.detail.value);
+      },
+      false,
+    );
+    return () => {
+      document.removeEventListener('openShortcut', e => {
+        setIsShortcutsOpen(e.detail.value);
+      });
+    };
+  });
+
+  return (
+    <div
+      className={`history-results ${
+        isShortcutsOpen ? 'history-results-shrinked' : ''
+      } ${className}`}
+    >
+      {versesMarkup}
+    </div>
+  );
+};
+
+HistoryPane.propTypes = {
+  className: PropTypes.string,
 };

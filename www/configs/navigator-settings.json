@@ -12,14 +12,12 @@
   "currentWriter": "ALL",
   "activeShabadId": null,
   "activeVerseId": "",
-  "isEmptySlide": true,
-  "isWaheguruSlide": false,
-  "isAnnouncementSlide": false,
-  "announcementGurmukhi": false,
-  "announcementString": "",
-  "isMoolMantraSlide": false,
-  "isDhanGuruSlide": false,
-  "dhanGuruString": "",
+
+  "isMiscSlide": false,
+  "miscSlideText": "",
+  "isMiscSlideGurmukhi": false,
+  "isAnnoucement": false,
+
   "isRandomShabad": false,
   "isSundarGutkaBani": false,
   "sundarGutkaBaniId": null,
@@ -35,7 +33,8 @@
     "nextVerse": false,
     "prevVerse": false,
     "homeVerse": false,
-    "openFirstResult": false
+    "openFirstResult": false,
+    "openDhanGuruSlide": false
   },
   "minimizedBySingleDisplay": false
 }

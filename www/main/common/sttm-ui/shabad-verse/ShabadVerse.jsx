@@ -4,11 +4,13 @@ import PropTypes from 'prop-types';
 const ShabadVerse = ({
   activeVerse,
   changeHomeVerse,
+  forwardedRef,
   isHomeVerse,
   lineNumber,
   versesRead,
   updateTraversedVerse,
   verse,
+  englishVerse,
   verseId,
 }) => {
   const loadActiveClass = (activeVerseObj, activeVerseId, index) => {
@@ -29,6 +31,7 @@ const ShabadVerse = ({
     <li
       id={`line-${lineNumber}`}
       value={lineNumber}
+      ref={loadActiveClass(activeVerse, verseId, lineNumber) ? forwardedRef : null}
       className={`shabad-pane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
     >
       <span className="shabad-pane-controls">
@@ -40,14 +43,25 @@ const ShabadVerse = ({
           className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
         />
       </span>
-      <span
-        className="gurmukhi verse-content"
-        onClick={() => {
-          updateTraversedVerse(verseId, lineNumber);
-        }}
-      >
-        {verse}
-      </span>
+      {verse ? (
+        <span
+          className="gurmukhi verse-content"
+          onClick={() => {
+            updateTraversedVerse(verseId, lineNumber);
+          }}
+        >
+          {verse}
+        </span>
+      ) : (
+        <span
+          className="verse-content"
+          onClick={() => {
+            updateTraversedVerse(verseId, lineNumber);
+          }}
+        >
+          {englishVerse && englishVerse.split('<h1>')[1].split('</h1>')[0]}
+        </span>
+      )}
     </li>
   );
 };
@@ -55,11 +69,13 @@ const ShabadVerse = ({
 ShabadVerse.propTypes = {
   activeVerse: PropTypes.object,
   changeHomeVerse: PropTypes.func,
+  forwardedRef: PropTypes.any,
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
   versesRead: PropTypes.array,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
+  englishVerse: PropTypes.string,
   verseId: PropTypes.number,
 };
 

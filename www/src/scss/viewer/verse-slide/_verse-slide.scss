@@ -82,10 +82,11 @@
   }
 
   &-body {
-    background-color: rgba(246, 246, 246, 0.84);
+    background-color: $extra-light-grey;
     display: flex;
     flex-direction: column;
     height: 95%;
+    opacity: 0.9;
     padding: 8px;
   }
 

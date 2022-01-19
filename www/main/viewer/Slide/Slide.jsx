@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -10,15 +10,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({
-  verseObj,
-  nextLineObj,
-  isAnnouncementSlide,
-  isMoolMantraSlide,
-  isWaheguruSlide,
-  isEmptySlide,
-  isDhanGuruSlide,
-}) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -32,7 +24,8 @@ const Slide = ({
     displayNextLine,
     isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
-  // const usebakePanktee = bakePanktee();
+  const { activeVerseId } = useStoreState(state => state.navigator);
+  const activeVerseRef = useRef(null);
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -56,73 +49,74 @@ const Slide = ({
 
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
-  }, [verseObj, isWaheguruSlide, isMoolMantraSlide, isDhanGuruSlide]);
+  }, [verseObj, isMiscSlide]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
+        activeVerseRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 100);
+  }, [verseObj]);
 
   return (
     <>
       <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-        {(isWaheguruSlide ||
-          isAnnouncementSlide ||
-          isEmptySlide ||
-          isMoolMantraSlide ||
-          isDhanGuruSlide) && (
-          <SlideAnnouncement
-            getFontSize={getFontSize}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-            isEmptySlide={isEmptySlide}
-            isDhanGuruSlide={isDhanGuruSlide}
-          />
-        )}
-        {verseObj &&
-          !isEmptySlide &&
-          !isWaheguruSlide &&
-          !isMoolMantraSlide &&
-          !isDhanGuruSlide &&
-          !isAnnouncementSlide && (
-            <>
-              <div className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}>
+        {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
+        {verseObj && !isMiscSlide && (
+          <>
+            {verseObj.Gurmukhi && (
+              <div
+                className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()} ${
+                  activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
+                }`}
+                ref={activeVerseRef}
+              >
                 <SlideGurbani
                   getFontSize={getFontSize}
                   gurmukhiString={verseObj.Gurmukhi}
                   larivaar={larivaar}
-                  vishraamPlacement={JSON.parse(verseObj.Visraam)}
+                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
                   vishraamSource={vishraamSource}
                 />
               </div>
-              {translationVisibility && (
-                <SlideTranslation
+            )}
+
+            {translationVisibility && verseObj.Translations && (
+              <SlideTranslation
+                getFontSize={getFontSize}
+                translationObj={JSON.parse(verseObj.Translations)}
+              />
+            )}
+
+            {verseObj.English && (
+              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
+            )}
+
+            {teekaVisibility && verseObj.Translations && (
+              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
+            )}
+            {transliterationVisibility && (
+              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
+            )}
+            {displayNextLine && nextLineObj && (
+              <div
+                className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+              >
+                <SlideGurbani
                   getFontSize={getFontSize}
-                  translationObj={JSON.parse(verseObj.Translations)}
+                  gurmukhiString={nextLineObj.Gurmukhi}
+                  larivaar={larivaar}
+                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
+                  vishraamSource={vishraamSource}
                 />
-              )}
-              {teekaVisibility && (
-                <SlideTeeka
-                  getFontSize={getFontSize}
-                  teekaObj={JSON.parse(verseObj.Translations).pu}
-                />
-              )}
-              {transliterationVisibility && (
-                <SlideTransliteration
-                  getFontSize={getFontSize}
-                  gurmukhiString={verseObj.Gurmukhi}
-                />
-              )}
-              {displayNextLine && nextLineObj.Gurmukhi && nextLineObj.Visraam && (
-                <div
-                  className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-                >
-                  <SlideGurbani
-                    getFontSize={getFontSize}
-                    gurmukhiString={nextLineObj.Gurmukhi}
-                    larivaar={larivaar}
-                    vishraamPlacement={JSON.parse(verseObj.Visraam)}
-                    vishraamSource={vishraamSource}
-                  />
-                </div>
-              )}
-            </>
-          )}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );
@@ -131,11 +125,7 @@ const Slide = ({
 Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
-  isAnnouncementSlide: PropTypes.bool,
-  isMoolMantraSlide: PropTypes.bool,
-  isWaheguruSlide: PropTypes.bool,
-  isEmptySlide: PropTypes.bool,
-  isDhanGuruSlide: PropTypes.bool,
+  isMiscSlide: PropTypes.bool,
 };
 
 export default Slide;

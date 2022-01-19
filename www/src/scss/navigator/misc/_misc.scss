@@ -19,8 +19,12 @@ $misc-footer-active: 70px;
     }
   }
   .history-results {
-    height: 320px;
+    height: calc(100% - 80px);
     overflow-y: auto;
+
+    &-shrinked {
+      height: calc(100% - 160px);
+    }
     .history-item {
       cursor: pointer;
       margin: 8px 0;

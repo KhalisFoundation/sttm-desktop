@@ -11,17 +11,17 @@ import {
 } from '../../navigator/utils';
 import ViewerIcon from '../icons/ViewerIcon';
 
+const os = require('os');
+
+const platform = os.platform();
 const themes = require('../../../../www/configs/themes.json');
 
 function ShabadDeck() {
   const {
     activeShabadId,
     activeVerseId,
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isAnnouncementSlide,
-    isDhanGuruSlide,
+    isMiscSlide,
+    miscSlideText,
     sundarGutkaBaniId,
     isSundarGutkaBani,
     ceremonyId,
@@ -74,6 +74,13 @@ function ShabadDeck() {
     return bakeThemeStyles(themeInstance, themeBg);
   };
 
+  const bakeEmptyVerse = () => {
+    return {
+      Gurmukhi: '',
+      Visraam: '',
+    };
+  };
+
   useEffect(() => {
     if (activeVerseId) {
       if (akhandpatt) {
@@ -84,9 +91,13 @@ function ShabadDeck() {
         );
         // load next line of searched shabad verse from db
         if (displayNextLine) {
-          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result =>
-            result.map(activeRes => setNextVerse(activeRes)),
-          );
+          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result => {
+            if (result.length) {
+              result.map(activeRes => setNextVerse(activeRes));
+            } else {
+              setNextVerse(bakeEmptyVerse());
+            }
+          });
         }
       }
     }
@@ -97,7 +108,13 @@ function ShabadDeck() {
         });
       } else {
         // load current bani verse from db and set in the state
-        loadBaniVerse(sundarGutkaBaniId, activeVerseId).then(rows => {
+        loadBaniVerse(
+          sundarGutkaBaniId,
+          activeVerseId,
+          false,
+          baniLengthCols[baniLength],
+          mangalPosition,
+        ).then(rows => {
           if (rows.length > 1) {
             setActiveVerse([rows[0]]);
           } else if (rows.length === 1) {
@@ -107,10 +124,10 @@ function ShabadDeck() {
         // load next line of bani
         if (displayNextLine) {
           loadBaniVerse(sundarGutkaBaniId, activeVerseId, displayNextLine).then(rows => {
-            if (rows.length > 1) {
-              setNextVerse(rows[0]);
-            } else if (rows.length === 1) {
+            if (rows.length === 1) {
               setNextVerse(...rows);
+            } else {
+              setNextVerse(bakeEmptyVerse());
             }
           });
         }
@@ -142,30 +159,26 @@ function ShabadDeck() {
     <>
       <div
         className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
-          isEmptySlide ? 'empty-slide' : ''
+          miscSlideText === '' ? 'empty-slide' : ''
+        } ${isSingleDisplayMode ? 'single-display-mode' : ''} ${
+          platform === 'win32' ? 'win32' : ''
         } theme-${getCurrentThemeInstance().key}`}
         style={applyTheme()}
       >
         {/* show quicktools only on presentation mode */}
-        {!isSingleDisplayMode && (
-          <QuickTools
-            isAnnouncementSlide={isAnnouncementSlide}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-          />
+        {!isSingleDisplayMode && <QuickTools isMiscSlide={isMiscSlide} />}
+        {activeVerse.length ? (
+          activeVerse.map((activeVerseObj, index) => (
+            <Slide
+              key={index}
+              verseObj={activeVerseObj}
+              nextLineObj={nextVerse}
+              isMiscSlide={isMiscSlide}
+            />
+          ))
+        ) : (
+          <Slide isMiscSlide={isMiscSlide} />
         )}
-        {activeVerse.map((activeVerseObj, index) => (
-          <Slide
-            key={index}
-            verseObj={activeVerseObj}
-            nextLineObj={nextVerse}
-            isWaheguruSlide={isWaheguruSlide}
-            isMoolMantraSlide={isMoolMantraSlide}
-            isEmptySlide={isEmptySlide}
-            isAnnouncementSlide={isAnnouncementSlide}
-            isDhanGuruSlide={isDhanGuruSlide}
-          />
-        ))}
       </div>
       <ViewerIcon className="viewer-logo" />
     </>

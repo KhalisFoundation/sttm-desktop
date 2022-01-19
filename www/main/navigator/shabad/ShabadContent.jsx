@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
@@ -14,11 +14,7 @@ const ShabadContent = () => {
     verseHistory,
     versesRead,
     homeVerse,
-    isEmptySlide,
-    isWaheguruSlide,
-    isAnnouncementSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
+    isMiscSlide,
     activeVerseId,
     sundarGutkaBaniId,
     ceremonyId,
@@ -31,21 +27,20 @@ const ShabadContent = () => {
   const {
     setVersesRead,
     setActiveVerseId,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
     setHomeVerse,
-    setIsAnnouncementSlide,
-    setIsMoolMantraSlide,
-    setIsDhanGuruSlide,
     setShortcuts,
     setIsRandomShabad,
+    setVerseHistory,
+    setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
-  const { autoplayToggle, autoplayDelay } = useStoreState(state => state.userSettings);
+  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition } = useStoreState(
+    state => state.userSettings,
+  );
 
-  const { baniLength, mangalPosition } = useStoreState(state => state.userSettings);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+  const activeVerseRef = useRef(null);
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
@@ -61,6 +56,8 @@ const ShabadContent = () => {
               ID: index,
               verseId: verse.ID,
               verse: verse.Gurmukhi,
+              english: verse.English ? verse.English : '',
+              crossPlatformId: verse.crossPlatformID,
             };
           }
           return {};
@@ -99,21 +96,8 @@ const ShabadContent = () => {
   };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
-    console.log('update traversed verse runs');
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
     }
     if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
       const currentIndex = verseHistory.findIndex(
@@ -129,16 +113,39 @@ const ShabadContent = () => {
     if (activeVerseId !== newTraversedVerse) {
       setActiveVerseId(newTraversedVerse);
     }
+
     if (window.socket !== undefined && window.socket !== null) {
-      window.socket.emit('data', {
-        type: 'shabad',
-        host: 'sttm-desktop',
-        id: activeShabadId,
-        shabadid: activeShabadId, // @deprecated
-        highlight: newTraversedVerse,
-        homeId: activeShabad[homeVerse].ID,
-        verseChange: false,
-      });
+      if (isSundarGutkaBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'bani',
+          id: sundarGutkaBaniId,
+          shabadid: sundarGutkaBaniId, // @deprecated
+          highlight: 0,
+          baniLength,
+          mangalPosition,
+          verseChange: false,
+        });
+      } else if (isCeremonyBani) {
+        window.socket.emit('data', {
+          host: 'sttm-desktop',
+          type: 'ceremony',
+          id: ceremonyId,
+          shabadid: ceremonyId, // @deprecated
+          highlight: 0,
+          verseChange: false,
+        });
+      } else {
+        window.socket.emit('data', {
+          type: 'shabad',
+          host: 'sttm-desktop',
+          id: activeShabadId,
+          shabadid: activeShabadId, // @deprecated
+          highlight: newTraversedVerse,
+          homeId: homeVerse,
+          verseChange: false,
+        });
+      }
     }
   };
 
@@ -169,11 +176,15 @@ const ShabadContent = () => {
   };
 
   const openHomeVerse = () => {
-    if (homeVerse >= 0) {
-      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const newVerseIndex = homeVerse;
-      const newVerseId = mappedShabadArray[newVerseIndex].verseId;
-      updateTraversedVerse(newVerseId, newVerseIndex);
+    try {
+      if (homeVerse >= 0) {
+        const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+        const newVerseIndex = homeVerse;
+        const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+        updateTraversedVerse(newVerseId, newVerseIndex);
+      }
+    } catch (e) {
+      console.log('Space is not allowed');
     }
   };
 
@@ -194,11 +205,65 @@ const ShabadContent = () => {
     changeHomeVerse(0);
   };
 
+  const saveToHistory = (verses, verseType, initialVerse = null) => {
+    const firstVerse = verses[0];
+    let shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
+    const verseId = initialVerse || firstVerse.ID;
+    let verse;
+    if (verseType === 'shabad') {
+      if (initialVerse) {
+        const clickedVerse = verses.filter(verseObj => {
+          return verseObj.ID === initialVerse;
+        });
+        verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
+      } else {
+        verse = firstVerse.Gurmukhi;
+      }
+    } else if (verseType === 'bani') {
+      verse = firstVerse.baniName;
+      shabadId = firstVerse.baniId;
+    } else if (verseType === 'ceremony') {
+      verse = firstVerse.ceremonyName;
+      shabadId = firstVerse.ceremonyId;
+    }
+    const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
+    if (check.length === 0) {
+      const updatedHistory = [
+        ...verseHistory,
+        {
+          shabadId,
+          verseId,
+          label: verse,
+          type: verseType,
+          meta: {
+            baniLength,
+          },
+          versesRead: [verseId],
+          continueFrom: verseId,
+          homeVerse: verseId,
+        },
+      ];
+      setVerseHistory(updatedHistory);
+    }
+  };
+
+  const scrollToView = () => {
+    if (activeVerseRef && activeVerseRef.current) {
+      setTimeout(() => {
+        activeVerseRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }, 100);
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
+          saveToHistory(sundarGutkaVerses, 'bani');
           openFirstVerse(sundarGutkaVerses[0].ID);
         },
       );
@@ -206,18 +271,19 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
+          saveToHistory(ceremonyVerses, 'ceremony');
           openFirstVerse(ceremonyVerses[0].ID);
         }
       });
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
+          saveToHistory(verses, 'shabad', initialVerseId);
           setActiveShabad(verses);
           if (isRandomShabad) {
+            saveToHistory(verses, 'shabad', verses[0].ID);
             openFirstVerse(verses[0].ID);
-            if (isRandomShabad) {
-              setIsRandomShabad(false);
-            }
+            setIsRandomShabad(false);
           }
         }
       });
@@ -243,6 +309,13 @@ const ShabadContent = () => {
         // }
       }
     });
+
+    setTimeout(() => {
+      if (activeVerseRef && activeVerseRef.current) {
+        activeVerseRef.current.parentNode.scrollTop =
+          activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
+      }
+    }, 100);
   }, [activeShabad]);
 
   useEffect(() => {
@@ -256,6 +329,7 @@ const ShabadContent = () => {
   useEffect(() => {
     if (shortcuts.nextVerse) {
       openNextVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         nextVerse: false,
@@ -263,6 +337,7 @@ const ShabadContent = () => {
     }
     if (shortcuts.prevVerse) {
       openPrevVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         prevVerse: false,
@@ -270,6 +345,7 @@ const ShabadContent = () => {
     }
     if (shortcuts.homeVerse) {
       openHomeVerse();
+      scrollToView();
       setShortcuts({
         ...shortcuts,
         homeVerse: false,
@@ -295,23 +371,21 @@ const ShabadContent = () => {
   return (
     <div className="shabad-list">
       <div className="verse-block">
-        <div className="result-list">
-          <ul>
-            {filterRequiredVerseItems(activeShabad).map(({ verseId, verse }, index) => (
-              <ShabadVerse
-                key={index}
-                activeVerse={activeVerse}
-                isHomeVerse={homeVerse}
-                lineNumber={index}
-                versesRead={versesRead}
-                verse={verse}
-                verseId={verseId}
-                changeHomeVerse={changeHomeVerse}
-                updateTraversedVerse={updateTraversedVerse}
-              />
-            ))}
-          </ul>
-        </div>
+        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse, english }, index) => (
+          <ShabadVerse
+            key={index}
+            activeVerse={activeVerse}
+            isHomeVerse={homeVerse}
+            lineNumber={index}
+            versesRead={versesRead}
+            verse={verse}
+            englishVerse={english}
+            verseId={verseId}
+            forwardedRef={activeVerseRef}
+            changeHomeVerse={changeHomeVerse}
+            updateTraversedVerse={updateTraversedVerse}
+          />
+        ))}
       </div>
     </div>
   );

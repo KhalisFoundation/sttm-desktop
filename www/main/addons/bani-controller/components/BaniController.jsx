@@ -4,27 +4,35 @@ import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import isOnline from 'is-online';
 
-import useSocketListeners from '../hooks/use-socket-listeners';
 import BaniControllerItem from './BaniControllerItem';
 import { Overlay } from '../../../common/sttm-ui';
-import QrCode from './QrCode';
 
 import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
+
+import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
+
+import QrCode from './QrCode';
+
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
+import useSocketListeners from '../hooks/use-socket-listeners';
 
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
-// const analytics = remote.getGlobal('analytics');
 
-const BaniController = ({ onScreenClose }) => {
+const BaniController = ({ onScreenClose, className }) => {
   const title = 'Mobile device sync';
   const canvasRef = useRef(null);
+
+  const changeActiveShabad = useNewShabad();
+
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
   const [isFetchingCode, setFetchingCode] = useState(false);
   const [isAdminPinVisible, setAdminPinVisibility] = useState(true);
+  const [socketData, setSocketData] = useState(null);
+
   // Store State
   const { isListeners, overlayScreen } = useStoreState(state => state.app);
   const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
@@ -33,6 +41,46 @@ const BaniController = ({ onScreenClose }) => {
   const { setAdminPin, setCode, setConnection } = useStoreActions(
     actions => actions.baniController,
   );
+
+  const {
+    activeShabad,
+    activeShabadId,
+    activeVerseId,
+    homeVerse,
+    ceremonyId,
+    sundarGutkaBaniId,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    isMiscSlide,
+    miscSlideText,
+    isMiscSlideGurmukhi,
+  } = useStoreState(state => state.navigator);
+
+  const {
+    setIsSundarGutkaBani,
+    setSundarGutkaBaniId,
+    setIsCeremonyBani,
+    setCeremonyId,
+    setIsMiscSlide,
+    setMiscSlideText,
+    setIsMiscSlideGurmukhi,
+  } = useStoreActions(state => state.navigator);
+
+  const {
+    gurbaniFontSize,
+    translationFontSize,
+    transliterationFontSize,
+    teekaFontSize,
+    baniLength,
+    mangalPosition,
+  } = useStoreState(state => state.userSettings);
+
+  const fontSizes = {
+    gurbani: parseInt(gurbaniFontSize, 10),
+    translation: parseInt(translationFontSize, 10),
+    teeka: parseInt(teekaFontSize, 10),
+    transliteration: parseInt(transliterationFontSize, 10),
+  };
 
   const showSyncError = errorMessage => {
     setCodeLabel(errorMessage);
@@ -93,7 +141,44 @@ const BaniController = ({ onScreenClose }) => {
     syncToggle(true);
   }, []);
 
-  useSocketListeners(isListeners, adminPin);
+  useEffect(() => {
+    if (isListeners && adminPin) {
+      if (window.socket !== undefined) {
+        window.socket.on('data', data => {
+          setSocketData(data);
+        });
+      }
+    }
+  }, [isListeners, adminPin]);
+
+  useEffect(() => {
+    useSocketListeners(
+      socketData,
+      changeActiveShabad,
+      adminPin,
+      activeShabad,
+      activeShabadId,
+      activeVerseId,
+      homeVerse,
+      ceremonyId,
+      sundarGutkaBaniId,
+      fontSizes,
+      baniLength,
+      mangalPosition,
+      isSundarGutkaBani,
+      isCeremonyBani,
+      setIsCeremonyBani,
+      setIsSundarGutkaBani,
+      setSundarGutkaBaniId,
+      setCeremonyId,
+      isMiscSlide,
+      miscSlideText,
+      isMiscSlideGurmukhi,
+      setIsMiscSlide,
+      setMiscSlideText,
+      setIsMiscSlideGurmukhi,
+    );
+  }, [socketData]);
 
   const baniControllerItems = getBaniControllerItems({
     code,
@@ -104,7 +189,7 @@ const BaniController = ({ onScreenClose }) => {
   });
 
   return (
-    <Overlay onScreenClose={onScreenClose}>
+    <Overlay onScreenClose={onScreenClose} className={className}>
       <div className="addon-wrapper sync-wrapper overlay-ui ui-sync-button">
         <ZoomController />
         <div className="sync overlay-ui ui-sync-button">
@@ -142,6 +227,7 @@ const BaniController = ({ onScreenClose }) => {
 
 BaniController.propTypes = {
   onScreenClose: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default BaniController;

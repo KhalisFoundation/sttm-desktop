@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads, loadAng } from '../../../navigator/utils';
 
-const InputBox = ({ placeholder, disabled, className }) => {
+const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
   const { currentSearchType, currentSource, searchQuery, shortcuts } = useStoreState(
     state => state.navigator,
   );
@@ -32,12 +32,14 @@ const InputBox = ({ placeholder, disabled, className }) => {
   useEffect(() => {
     const searchTypeInt = parseInt(searchQuery, 10);
     const isAng = !!searchTypeInt;
-    if (isAng) {
-      loadAng(searchTypeInt).then(rows => setSearchData(rows));
-    } else {
-      searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
-        searchQuery ? setSearchData(rows) : setSearchData([]),
-      );
+    if (databaseProgress >= 1) {
+      if (isAng) {
+        loadAng(searchTypeInt).then(rows => setSearchData(rows));
+      } else {
+        searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
+          searchQuery ? setSearchData(rows) : setSearchData([]),
+        );
+      }
     }
   }, [searchQuery, currentSearchType, currentSource]);
 
@@ -60,6 +62,7 @@ InputBox.propTypes = {
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
   className: PropTypes.string,
+  databaseProgress: PropTypes.number,
 };
 
 export default InputBox;

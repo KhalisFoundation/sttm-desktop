@@ -6,14 +6,12 @@ import { OtherPane } from './OtherPane';
 
 export const MiscContent = () => {
   const [{ miscPanel }] = useDataLayerValue();
-  const isHistory = miscPanel === 'History';
-  const isInsert = miscPanel === 'Insert';
-  const isOther = miscPanel === 'Others';
+
   return (
     <>
-      {isHistory && <HistoryPane />}
-      {isInsert && <InsertPane />}
-      {isOther && <OtherPane />}
+      <HistoryPane className={miscPanel === 'History' ? '' : 'd-none'} />
+      <InsertPane className={miscPanel === 'Insert' ? '' : 'd-none'} />
+      <OtherPane className={miscPanel === 'Others' ? '' : 'd-none'} />
     </>
   );
 };

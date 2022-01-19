@@ -21,15 +21,17 @@ const WorkspaceBar = () => {
   const [currentWorkspace, setWorkspace] = useState(defaultWsState);
 
   const handleWorkspaceChange = workspace => {
-    if (!isSingleDisplayMode) {
-      setIsSingleDisplayMode(true);
-    } else if (isSingleDisplayMode) {
-      setIsSingleDisplayMode(false);
-    }
     const moveToPresenter = workspace === presenterIdentifier;
-    store.setUserPref('app.layout.presenter-view', moveToPresenter);
-    global.platform.updateSettings();
-    global.controller['presenter-view']();
+    if (moveToPresenter) {
+      if (isSingleDisplayMode) {
+        setIsSingleDisplayMode(false);
+      }
+      store.setUserPref('app.layout.presenter-view', moveToPresenter);
+      global.platform.updateSettings();
+      global.controller['presenter-view']();
+    } else if (!isSingleDisplayMode) {
+      setIsSingleDisplayMode(true);
+    }
     setWorkspace(workspace);
     analytics.trackEvent('changed workspace', workspace);
     setTimeout(() => {

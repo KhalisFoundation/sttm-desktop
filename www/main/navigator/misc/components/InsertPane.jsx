@@ -1,111 +1,133 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
-export const InsertPane = () => {
+const tingle = require('../../../../assets/js/vendor/tingle');
+
+const { gurus } = insertSlide.dropdownStrings;
+const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
+
+export const InsertPane = ({ className }) => {
   const {
-    announcementString,
-    isAnnouncementSlide,
-    announcementGurmukhi,
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isDhanGuruSlide,
-    dhanGuruString,
+    isMiscSlide,
+    isMiscSlideGurmukhi,
+    miscSlideText,
+    isAnnoucement,
+    shortcuts,
   } = useStoreState(state => state.navigator);
   const {
-    setAnnouncementString,
-    setIsAnnouncementSlide,
-    setAnnouncementGurmukhi,
-    setIsEmptySlide,
-    setIsWaheguruSlide,
-    setIsMoolMantraSlide,
-    setIsDhanGuruSlide,
-    setDhanGuruString,
+    setIsMiscSlide,
+    setIsMiscSlideGurmukhi,
+    setMiscSlideText,
+    setIsAnnoucement,
+    setShortcuts,
   } = useStoreActions(state => state.navigator);
 
-  const { i18n } = remote.require('./app');
   const inputRef = useRef(null);
-  const gurus = insertSlide.dropdownStrings;
-  const analytics = remote.getGlobal('analytics');
+
+  const addMiscSlide = givenText => {
+    if (!isMiscSlide) {
+      setIsMiscSlide(true);
+    }
+    if (miscSlideText !== givenText) {
+      setMiscSlideText(givenText);
+    }
+  };
 
   const addAnnouncement = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isAnnouncementSlide) {
-      setIsAnnouncementSlide(true);
-    }
-    if (announcementString !== inputRef.current.value) {
-      setAnnouncementString(inputRef.current.value);
+    addMiscSlide(inputRef.current.value);
+    if (!isAnnoucement) {
+      setIsAnnoucement(true);
     }
     analytics.trackEvent('display', 'announcement-slide');
   };
 
   const openWaheguruSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isWaheguruSlide) {
-      setIsWaheguruSlide(true);
-    }
+    addMiscSlide(insertSlide.slideStrings.waheguru);
   };
 
   const openBlankViewer = () => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isDhanGuruSlide) {
-      setIsDhanGuruSlide(false);
-    }
-    if (!isEmptySlide) {
-      setIsEmptySlide(true);
-    }
+    addMiscSlide('');
   };
 
   const toggleAnnouncementLanguage = event => {
-    setAnnouncementGurmukhi(event.target.checked);
+    if (isMiscSlideGurmukhi !== event.target.checked) {
+      setIsMiscSlideGurmukhi(event.target.checked);
+    }
   };
 
   const addDhanGuruSlide = e => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
     }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (!isDhanGuruSlide) {
-      setIsDhanGuruSlide(true);
-    }
-    if (dhanGuruString !== e.target.value) {
-      setDhanGuruString(e.target.value);
+    if (e.target) {
+      addMiscSlide(e.target.value);
+    } else {
+      addMiscSlide(e);
     }
   };
 
+  let slidePage = `<h1 class = "modalTitle">${i18n.t('INSERT.INSERT_DHAN_SLIDE')}</h1>
+  <div class="btn-group" id = "btn-group">`;
+  gurus.forEach((guru, index) => {
+    slidePage += `<button class="guru" id="guru${index}">${i18n.t(
+      `INSERT.DHAN_GURU.${guru}`,
+    )}</button>`;
+  });
+  slidePage += `</div>`;
+
+  const modal = new tingle.Modal({
+    footer: true,
+    stickyFooter: false,
+    closeMethods: ['overlay', 'button', 'escape'],
+    onClose() {
+      modal.modal.classList.remove('tingle-modal--visible');
+    },
+    beforeClose() {
+      return true; // close the modal
+    },
+  });
+
+  const buttonOnClick = () => {
+    gurus.forEach((guru, index) => {
+      document.querySelector(`#guru${index}`).onclick = () => {
+        addDhanGuruSlide(insertSlide.slideStrings.dhanguruStrings[index]);
+        modal.close();
+      };
+    });
+  };
+
+  // sets the default page to Dhan Guru slide page
+  modal.setContent(slidePage);
+  buttonOnClick();
+
+  const showDhanGuruModal = () => {
+    if (!modal.isOpen()) {
+      modal.open();
+    }
+  };
+
+  useEffect(() => {
+    if (shortcuts.openDhanGuruSlide) {
+      showDhanGuruModal();
+      setShortcuts({
+        ...shortcuts,
+        openDhanGuruSlide: false,
+      });
+    }
+  }, [shortcuts]);
+
   return (
-    <ul className="list-of-items">
+    <ul className={`list-of-items ${className}`}>
       <li>
         <a onClick={() => openBlankViewer()}>
           <i className="fa fa-eye-slash list-icon" />
@@ -126,7 +148,7 @@ export const InsertPane = () => {
             <option value="" disabled>
               {i18n.t('INSERT.SELECT')}
             </option>
-            {gurus.gurus.map((value, index) => (
+            {gurus.map((value, index) => (
               <option value={insertSlide.slideStrings.dhanguruStrings[index]} key={index}>
                 {i18n.t(`INSERT.DHAN_GURU.${value}`)}
               </option>
@@ -152,9 +174,9 @@ export const InsertPane = () => {
           </div>
         </div>
         <textarea
-          className={`${announcementGurmukhi ? 'gurmukhi' : ''} announcement-text`}
+          className={`${isMiscSlideGurmukhi ? 'gurmukhi' : ''} announcement-text`}
           placeholder={
-            !announcementGurmukhi
+            !isMiscSlideGurmukhi
               ? i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')
               : i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI')
           }
@@ -166,4 +188,8 @@ export const InsertPane = () => {
       </li>
     </ul>
   );
+};
+
+InsertPane.propTypes = {
+  className: PropTypes.string,
 };

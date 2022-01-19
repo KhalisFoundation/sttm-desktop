@@ -20,11 +20,14 @@ const realmConfig = {
 let initialized = false;
 
 const init = () => {
-  const realmSchema = require(realmSchemaPath);
-
-  realmConfig.schema = realmSchema.schemas;
-  realmConfig.schemaVersion = realmSchema.schemaVersion;
-  initialized = true;
+  try {
+    const realmSchema = require(realmSchemaPath);
+    realmConfig.schema = realmSchema.schemas;
+    realmConfig.schemaVersion = realmSchema.schemaVersion;
+    initialized = true;
+  } catch (e) {
+    initialized = false;
+  }
 };
 
 /**
@@ -308,18 +311,20 @@ const loadCeremonies = () =>
  * // => { PageNo: 726, SourceID: 'G' }
  */
 const getAng = ShabadID =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig).then(realm => {
-      const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
-      const { PageNo, Source } = row;
-      resolve({
-        PageNo,
-        SourceID: Source.SourceID,
-      });
-    });
+    Realm.open(realmConfig)
+      .then(realm => {
+        const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
+        const { PageNo, Source } = row;
+        resolve({
+          PageNo,
+          SourceID: Source.SourceID,
+        });
+      })
+      .catch(reject);
   });
 
 /**
@@ -339,16 +344,18 @@ const loadAng = (PageNo, SourceID = 'G') =>
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig).then(realm => {
-      const rows = realm
-        .objects('Verse')
-        .filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
-      if (rows.length > 0) {
-        resolve(rows);
-      } else {
-        reject();
-      }
-    });
+    Realm.open(realmConfig)
+      .then(realm => {
+        const rows = realm
+          .objects('Verse')
+          .filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
+        if (rows.length > 0) {
+          resolve(rows);
+        } else {
+          reject();
+        }
+      })
+      .catch(reject);
   });
 
 /**
@@ -363,14 +370,16 @@ const loadAng = (PageNo, SourceID = 'G') =>
  * // => 1
  */
 const getShabad = VerseID =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
-    Realm.open(realmConfig).then(realm => {
-      const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
-      resolve(shabad.Shabads[0].ShabadID);
-    });
+    Realm.open(realmConfig)
+      .then(realm => {
+        const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
+        resolve(shabad.Shabads[0].ShabadID);
+      })
+      .catch(reject);
   });
 
 /**
@@ -385,12 +394,14 @@ const getShabad = VerseID =>
  * // => 13
  */
 const randomShabad = (SourceID = 'G') =>
-  new Promise(resolve => {
-    Realm.open(realmConfig).then(realm => {
-      const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
-      const row = rows[Math.floor(Math.random() * rows.length)];
-      resolve(row.Shabads[0].ShabadID);
-    });
+  new Promise((resolve, reject) => {
+    Realm.open(realmConfig)
+      .then(realm => {
+        const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
+        const row = rows[Math.floor(Math.random() * rows.length)];
+        resolve(row.Shabads[0].ShabadID);
+      })
+      .catch(reject);
   });
 
 // Re-export CONSTS for use in other areas

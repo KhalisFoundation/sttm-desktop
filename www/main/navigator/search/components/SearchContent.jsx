@@ -67,8 +67,8 @@ const SearchContent = () => {
   const openFirstResult = () => {
     if (searchQuery.length > 0 && filteredShabads.length > 0) {
       // Takes { shabadId, verseId, verse } from the first shabad in search result
-      const { shabadId, verseId, verse } = filteredShabads[0];
-      changeActiveShabad(shabadId, verseId, verse);
+      const { shabadId, verseId } = filteredShabads[0];
+      changeActiveShabad(shabadId, verseId);
     }
   };
 
@@ -104,6 +104,7 @@ const SearchContent = () => {
           }
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
+          databaseProgress={databaseProgress}
         />
         <div className="input-buttons">
           <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
@@ -157,27 +158,23 @@ const SearchContent = () => {
       </div>
       <div className="search-results">
         <div className="verse-block">
-          <div className="result-list">
-            <ul>
-              {filteredShabads.map(
-                ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
-                  <SearchResults
-                    key={index}
-                    ang={ang}
-                    searchType={currentSearchType}
-                    onClick={changeActiveShabad}
-                    shabadId={shabadId}
-                    raag={raag}
-                    sourceId={sourceId}
-                    searchQuery={searchQuery}
-                    verse={verse}
-                    verseId={verseId}
-                    writer={writer}
-                  />
-                ),
-              )}
-            </ul>
-          </div>
+          {filteredShabads.map(
+            ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
+              <SearchResults
+                key={index}
+                ang={ang}
+                searchType={currentSearchType}
+                onClick={changeActiveShabad}
+                shabadId={shabadId}
+                raag={raag}
+                sourceId={sourceId}
+                searchQuery={searchQuery}
+                verse={verse}
+                verseId={verseId}
+                writer={writer}
+              />
+            ),
+          )}
         </div>
       </div>
     </div>

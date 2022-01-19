@@ -1,173 +1,65 @@
+import React, { useState } from 'react';
 import { remote } from 'electron';
-import React, { useState, useEffect } from 'react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import PropTypes from 'prop-types';
+import { useStoreActions } from 'easy-peasy';
 
-const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
-export const MiscFooter = () => {
-  const {
-    isEmptySlide,
-    isWaheguruSlide,
-    isMoolMantraSlide,
-    isAnnouncementSlide,
-    isSundarGutkaBani,
-    isCeremonyBani,
-    ceremonyId,
-    shortcuts,
-  } = useStoreState(state => state.navigator);
-  const {
-    setIsEmptySlide,
-    setIsWaheguruSlide,
-    setVerseHistory,
-    setIsMoolMantraSlide,
-    setIsAnnouncementSlide,
-    setIsSundarGutkaBani,
-    setIsCeremonyBani,
-    setCeremonyId,
-    setShortcuts,
-  } = useStoreActions(state => state.navigator);
-  const { akhandpatt } = useStoreState(state => state.userSettings);
-  const { setAkhandpatt } = useStoreActions(state => state.userSettings);
-  // For Global States
-  // const navigatorState = useStoreActions(state => state.navigator);
-  // For shortcut tray
-  const [shortcutOpen, setShortcutOpen] = useState(true);
-  const HandleChange = () => {
-    setShortcutOpen(!shortcutOpen);
-    analytics.trackEvent('shortcutTrayToggle', shortcutOpen);
-  };
-
+export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
+  const shortcutsState = JSON.parse(localStorage.getItem('isShortcutsOpen'));
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
+  const { setVerseHistory } = useStoreActions(state => state.navigator);
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
   };
 
-  const openAnandSahibBhog = () => {
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
-    if (ceremonyId !== 3) {
-      setCeremonyId(3);
-    }
-    if (!isCeremonyBani) {
-      setIsCeremonyBani(true);
-    }
+  const toggleShortcuts = () => {
+    const event = new CustomEvent('openShortcut', {
+      detail: { value: !shortcutsState },
+    });
+    document.dispatchEvent(event);
+    localStorage.setItem('isShortcutsOpen', !shortcutsState);
+    setIsShortcutsOpen(!shortcutsState);
+    analytics.trackEvent('shortcutTrayToggle', isShortcutsOpen);
   };
-
-  const openWaheguruSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isWaheguruSlide) {
-      setIsWaheguruSlide(true);
-    }
-  };
-
-  const openMoolMantraSlide = () => {
-    if (isEmptySlide) {
-      setIsEmptySlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isMoolMantraSlide) {
-      setIsMoolMantraSlide(true);
-    }
-  };
-
-  const openBlankViewer = () => {
-    if (isWaheguruSlide) {
-      setIsWaheguruSlide(false);
-    }
-    if (isAnnouncementSlide) {
-      setIsAnnouncementSlide(false);
-    }
-    if (isMoolMantraSlide) {
-      setIsMoolMantraSlide(false);
-    }
-    if (akhandpatt) {
-      setAkhandpatt(false);
-    }
-    if (!isEmptySlide) {
-      setIsEmptySlide(true);
-    }
-  };
-
-  useEffect(() => {
-    if (shortcuts.openWaheguruSlide) {
-      openWaheguruSlide();
-      setShortcuts({
-        ...shortcuts,
-        openWaheguruSlide: false,
-      });
-    }
-    if (shortcuts.openMoolMantraSlide) {
-      openMoolMantraSlide();
-      setShortcuts({
-        ...shortcuts,
-        openMoolMantraSlide: false,
-      });
-    }
-    if (shortcuts.openBlankViewer) {
-      openBlankViewer();
-      setShortcuts({
-        ...shortcuts,
-        openBlankViewer: false,
-      });
-    }
-    if (shortcuts.openAnandSahibBhog) {
-      setShortcuts({
-        ...shortcuts,
-        openAnandSahibBhog: false,
-      });
-      openAnandSahibBhog();
-    }
-  }, [shortcuts]);
 
   return (
     <div className="misc-footer">
       <div className="clear-pane">
         <div
-          className={`${!shortcutOpen ? 'footer-toggler' : 'footer-toggler-inactive '}`}
-          onClick={HandleChange}
+          className={`${!isShortcutsOpen ? 'footer-toggler' : 'footer-toggler-inactive '}`}
+          onClick={toggleShortcuts}
         >
-          <i className={`${shortcutOpen ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
+          <i className={`${isShortcutsOpen ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
         </div>
         <a className="clear-history" onClick={clearHistory}>
           <i className="fa fa-history" />
           <span>Clear History</span>
         </a>
       </div>
-      <div className={`${shortcutOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
-        <button className="tray-item-icon" onClick={openAnandSahibBhog}>
+      <div className={`${isShortcutsOpen ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
+        <button className="tray-item-icon" onClick={anandSahibBhog}>
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
-        <button className="tray-item-icon" onClick={openMoolMantraSlide}>
+        <button className="tray-item-icon" onClick={moolMantraSlide}>
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
-        <button className="gurmukhi tray-item-icon" onClick={openWaheguruSlide}>
+        <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
           vwihgurU
         </button>
-        <button className="tray-item-icon" onClick={openBlankViewer}>
+        <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
       </div>
     </div>
   );
+};
+
+MiscFooter.propTypes = {
+  waheguruSlide: PropTypes.func,
+  moolMantraSlide: PropTypes.func,
+  blankSlide: PropTypes.func,
+  anandSahibBhog: PropTypes.func,
 };
