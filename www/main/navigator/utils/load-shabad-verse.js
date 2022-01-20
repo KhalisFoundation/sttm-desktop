@@ -17,7 +17,7 @@ export const loadShabadVerse = (shabadID, lineID, nextLine = false) => {
     .catch(err => {
       new Noty({
         type: 'error',
-        text: `${i18n.t('BANI.LOAD_SHABAD_VERSE_ERROR')} : ${err}`,
+        text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Shabad verse' })} : ${err}`,
         timeout: 5000,
         modal: true,
       }).show();

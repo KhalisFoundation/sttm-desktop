@@ -490,13 +490,7 @@
   },
 
   "BANI": {
-    "LOAD_SHABAD_ERROR": "Error loading shabad. Please restart the application. If error persists, report it at www.sttm.co",
-    "OPEN_SHABAD_ERROR": "Error opening shabad. Please restart the application. If error persists, report it at www.sttm.co",
-    "LOAD_SHABAD_VERSE_ERROR": "Error loading shabad verse. Please restart the application. If error persists, report it at www.sttm.co",
-    "LOAD_CEREMONY_ERROR": "Error loading ceremony. Please restart the application. If error persists, report it at www.sttm.co",
-    "LOAD_ANG_ERROR": "Error loading ang. Please restart the application. If error persists, report it at www.sttm.co",
-    "LOAD_BANI_ERROR": "Error loading bani. Please restart the application. If error persists, report it at www.sttm.co",
-    "LOAD_BANI_VERSE_ERROR": "Error loading bani verse. Please restart the application. If error persists, report it at www.sttm.co",
+    "LOAD_ERROR": "Error loading {{erroneousOperation}}. Please restart the application. If error persists, report it at www.sttm.co",
     "DATABASE_DOWNLOADING": "Database is downloading, please wait..."
   }
 }

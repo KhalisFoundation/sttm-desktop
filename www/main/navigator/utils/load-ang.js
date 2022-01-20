@@ -11,7 +11,7 @@ export const loadAng = angNo => {
     .catch(err => {
       new Noty({
         type: 'error',
-        text: `${i18n.t('BANI.LOAD_ANG_ERROR')} : ${err}`,
+        text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Ang' })} : ${err}`,
         timeout: 5000,
         modal: true,
       }).show();
