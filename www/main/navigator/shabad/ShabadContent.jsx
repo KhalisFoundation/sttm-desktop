@@ -95,7 +95,7 @@ const ShabadContent = () => {
     return {};
   };
 
-  const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
@@ -115,13 +115,18 @@ const ShabadContent = () => {
     }
 
     if (window.socket !== undefined && window.socket !== null) {
+      let baniVerse;
+      if (!crossPlatformId) {
+        baniVerse = activeShabad.find(obj => obj.ID === newTraversedVerse);
+        console.log(baniVerse);
+      }
       if (isSundarGutkaBani) {
         window.socket.emit('data', {
           host: 'sttm-desktop',
           type: 'bani',
           id: sundarGutkaBaniId,
           shabadid: sundarGutkaBaniId, // @deprecated
-          highlight: 0,
+          highlight: crossPlatformId || baniVerse.crossPlatformID,
           baniLength,
           mangalPosition,
           verseChange: false,
@@ -132,7 +137,7 @@ const ShabadContent = () => {
           type: 'ceremony',
           id: ceremonyId,
           shabadid: ceremonyId, // @deprecated
-          highlight: 0,
+          highlight: crossPlatformId || baniVerse.crossPlatformID,
           verseChange: false,
         });
       } else {
@@ -200,8 +205,8 @@ const ShabadContent = () => {
     }
   };
 
-  const openFirstVerse = firstVerse => {
-    updateTraversedVerse(firstVerse, 0);
+  const openFirstVerse = (firstVerse, crossPlatformID = null) => {
+    updateTraversedVerse(firstVerse, 0, crossPlatformID);
     changeHomeVerse(0);
   };
 
@@ -264,7 +269,7 @@ const ShabadContent = () => {
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
           saveToHistory(sundarGutkaVerses, 'bani');
-          openFirstVerse(sundarGutkaVerses[0].ID);
+          openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
         },
       );
     } else if (isCeremonyBani && ceremonyId) {
@@ -272,7 +277,7 @@ const ShabadContent = () => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
           saveToHistory(ceremonyVerses, 'ceremony');
-          openFirstVerse(ceremonyVerses[0].ID);
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {
