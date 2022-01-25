@@ -278,10 +278,13 @@ const ShabadContent = () => {
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
-          saveToHistory(verses, 'shabad', initialVerseId);
           setActiveShabad(verses);
-          if (isRandomShabad) {
+          if (initialVerseId) {
+            saveToHistory(verses, 'shabad', initialVerseId);
+          } else {
             saveToHistory(verses, 'shabad', verses[0].ID);
+          }
+          if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
             setIsRandomShabad(false);
           }
