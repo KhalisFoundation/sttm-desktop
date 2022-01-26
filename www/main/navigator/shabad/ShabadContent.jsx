@@ -34,7 +34,7 @@ const ShabadContent = () => {
     setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
-  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition } = useStoreState(
+  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition, liveFeed } = useStoreState(
     state => state.userSettings,
   );
 
@@ -278,10 +278,13 @@ const ShabadContent = () => {
     } else {
       loadShabad(activeShabadId, initialVerseId).then(verses => {
         if (verses) {
-          saveToHistory(verses, 'shabad', initialVerseId);
           setActiveShabad(verses);
-          if (isRandomShabad) {
+          if (initialVerseId) {
+            saveToHistory(verses, 'shabad', initialVerseId);
+          } else {
             saveToHistory(verses, 'shabad', verses[0].ID);
+          }
+          if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
             setIsRandomShabad(false);
           }
@@ -322,6 +325,7 @@ const ShabadContent = () => {
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
     ipcRenderer.send('show-line', {
       Line: overlayVerse,
+      live: liveFeed,
     });
   }, [activeShabad, activeVerseId]);
 

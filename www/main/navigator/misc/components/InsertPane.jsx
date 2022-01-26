@@ -144,7 +144,7 @@ export const InsertPane = ({ className }) => {
         <a>
           <i className="fa fa-circle-o list-icon" />
           <label>{i18n.t('INSERT.ADD_DHAN_GURU')} </label>
-          <select onClick={addDhanGuruSlide}>
+          <select onChange={addDhanGuruSlide}>
             <option value="" disabled>
               {i18n.t('INSERT.SELECT')}
             </option>
