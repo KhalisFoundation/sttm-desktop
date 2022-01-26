@@ -34,7 +34,7 @@ const ShabadContent = () => {
     setIsMiscSlide,
   } = useStoreActions(state => state.navigator);
 
-  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition } = useStoreState(
+  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition, liveFeed } = useStoreState(
     state => state.userSettings,
   );
 
@@ -325,6 +325,7 @@ const ShabadContent = () => {
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
     ipcRenderer.send('show-line', {
       Line: overlayVerse,
+      live: liveFeed,
     });
   }, [activeShabad, activeVerseId]);
 
