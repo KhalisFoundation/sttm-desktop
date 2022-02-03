@@ -129,6 +129,11 @@ ul {
     &-minimize {
       .pane {
         height: auto !important;
+
+        &-content,
+        &-footer {
+          display: none;
+        }
       }
     }
 

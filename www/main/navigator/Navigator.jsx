@@ -112,8 +112,8 @@ const Navigator = () => {
           >
             <Pane
               header={singleDisplayHeader}
-              content={!minimizedBySingleDisplay && singleDisplayContent}
-              footer={!minimizedBySingleDisplay && singleDisplayFooter}
+              content={singleDisplayContent}
+              footer={singleDisplayFooter}
             />
           </div>
           <div className="single-display-viewer">
