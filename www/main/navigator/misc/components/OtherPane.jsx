@@ -30,6 +30,9 @@ export const OtherPane = ({ className }) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
+    if (!isRandomShabad) {
+      setIsRandomShabad(true);
+    }
   };
 
   return (
