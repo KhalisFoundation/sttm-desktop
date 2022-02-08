@@ -281,12 +281,11 @@ const ShabadContent = () => {
           setActiveShabad(verses);
           if (initialVerseId) {
             saveToHistory(verses, 'shabad', initialVerseId);
-          } else {
-            saveToHistory(verses, 'shabad', verses[0].ID);
           }
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
             setIsRandomShabad(false);
+            saveToHistory(verses, 'shabad');
           }
         }
       });
