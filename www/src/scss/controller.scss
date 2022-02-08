@@ -128,7 +128,23 @@ ul {
 
     &-minimize {
       .pane {
-        height: auto !important;
+        height: 40px;
+        transition: 0.3s ease all;
+
+        &-footer {
+          display: none;
+        }
+      }
+    }
+
+    &-maximize {
+      .pane {
+        height: 45vh;
+        transition: 0.3s ease all;
+
+        &-footer {
+          display: block;
+        }
       }
     }
 
@@ -152,6 +168,20 @@ ul {
           height: 100vh;
           width: 100%;
         }
+      }
+    }
+
+    &-hide {
+      &-left {
+        left: -75px !important;
+        transition: 0.3s ease all;
+      }
+    }
+
+    &-show {
+      &-left {
+        left: 0 !important;
+        transition: 0.3s ease all;
       }
     }
   }

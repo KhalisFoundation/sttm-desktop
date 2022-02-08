@@ -9,10 +9,21 @@
   width: 100%;
   z-index: 2;
 
-  .isSingleDisplayMode-true & {
-    left: 0;
-    position: fixed;
-    top: 0;
+  &.single-display {
+    &-hide {
+      &-top {
+        position: relative;
+        top: -75px;
+        transition: 0.3s ease all;
+      }
+    }
+    &-show {
+      &-top {
+        position: relative;
+        top: 0;
+        transition: 0.3s ease all;
+      }
+    }
   }
 
   div {
