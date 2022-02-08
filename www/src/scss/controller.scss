@@ -127,13 +127,23 @@ ul {
     }
 
     &-minimize {
-      bottom: -41%;
-      transition: 0.3s ease all;
+      .pane {
+        height: 40px;
+        transition: 0.3s ease all;
+      }
+      .pane-footer {
+        display: none;
+      }
     }
 
     &-maximize {
-      bottom: 0;
-      transition: 0.3s ease all;
+      .pane {
+        height: 45vh;
+        transition: 0.3s ease all;
+      }
+      .pane-footer {
+        display: block;
+      }
     }
 
     &-switches {
