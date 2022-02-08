@@ -107,7 +107,7 @@ const Navigator = () => {
         <>
           <div
             className={`single-display-controller ${
-              minimizedBySingleDisplay ? 'single-display-minimize' : ''
+              minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
             }`}
           >
             <Pane

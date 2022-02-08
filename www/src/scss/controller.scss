@@ -127,14 +127,13 @@ ul {
     }
 
     &-minimize {
-      .pane {
-        height: auto !important;
+      bottom: -355px;
+      transition: 0.3s ease all;
+    }
 
-        &-content,
-        &-footer {
-          display: none;
-        }
-      }
+    &-maximize {
+      bottom: 0;
+      transition: 0.3s ease all;
     }
 
     &-switches {
@@ -157,6 +156,20 @@ ul {
           height: 100vh;
           width: 100%;
         }
+      }
+    }
+
+    &-hide {
+      &-left {
+        left: -75px !important;
+        transition: 0.3s ease all;
+      }
+    }
+
+    &-show {
+      &-left {
+        left: 0 !important;
+        transition: 0.3s ease all;
       }
     }
   }

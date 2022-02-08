@@ -8,13 +8,16 @@ const Toolbar = () => {
   const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen', 'settings'];
 
   return (
-    !minimizedBySingleDisplay && (
-      <div id="toolbar-nav">
-        {toolbarItems.map((itemName, index) => {
-          return <ToolbarItem key={index} itemName={itemName} />;
-        })}
-      </div>
-    )
+    <div
+      id="toolbar-nav"
+      className={`${
+        minimizedBySingleDisplay ? 'single-display-hide-left' : 'single-display-show-left'
+      }`}
+    >
+      {toolbarItems.map((itemName, index) => {
+        return <ToolbarItem key={index} itemName={itemName} />;
+      })}
+    </div>
   );
 };
 
