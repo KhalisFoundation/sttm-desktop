@@ -203,9 +203,9 @@
   }
   .search-results {
     height: calc(100% - 120px);
-    .gurmukhi-keyboard + .search-result-controls + & {
-      height: calc(100% - 281px);
-    }
+  }
+  .gurmukhi-keyboard + .search-result-controls + .search-results {
+    height: calc(100% - 281px);
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);
