@@ -86,7 +86,7 @@ const SearchResults = ({
     <li onClick={() => onClick(shabadId, verseId)} className="search-li">
       <div className={`search-list ${getBorderColorClass(sourceId)}`}>
         <a className="panktee">
-          {ang !== null && (
+          {Boolean(ang) !== false && (
             <span className={`${getClassForAng(sourceId)}`}>{`${i18n.t(
               `SEARCH.ANG`,
             )} ${ang} `}</span>
