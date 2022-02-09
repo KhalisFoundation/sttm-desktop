@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
+import copy from 'copy-to-clipboard';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
@@ -258,6 +259,14 @@ const ShabadContent = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    if (activeVerseRef && activeVerseRef.current) {
+      const nonUniCodePanktee = activeVerseRef.current.childNodes[1].innerText;
+      const uniCodePanktee = anvaad.unicode(nonUniCodePanktee);
+      copy(uniCodePanktee);
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
@@ -352,6 +361,13 @@ const ShabadContent = () => {
       setShortcuts({
         ...shortcuts,
         homeVerse: false,
+      });
+    }
+    if (shortcuts.copyToClipboard) {
+      copyToClipboard();
+      setShortcuts({
+        ...shortcuts,
+        copyToClipboard: false,
       });
     }
   }, [shortcuts]);
