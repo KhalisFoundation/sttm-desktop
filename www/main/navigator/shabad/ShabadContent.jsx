@@ -1,10 +1,13 @@
+import Noty from 'noty';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 
 import copy from 'copy-to-clipboard';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+
+const { i18n } = remote.require('./app');
 
 const anvaad = require('anvaad-js');
 
@@ -264,6 +267,11 @@ const ShabadContent = () => {
       const nonUniCodePanktee = activeVerseRef.current.childNodes[1].innerText;
       const uniCodePanktee = anvaad.unicode(nonUniCodePanktee);
       copy(uniCodePanktee);
+      new Noty({
+        type: 'info',
+        text: `${i18n.t('SHORTCUT.COPY_TO_CLIPBOARD')}`,
+        timeout: 2000,
+      }).show();
     }
   };
 
