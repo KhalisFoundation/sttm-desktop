@@ -154,6 +154,15 @@ const Launchpad = () => {
     }
   };
 
+  const handleCtrlC = () => {
+    if (!shortcuts.copyToClipboard) {
+      setShortcuts({
+        ...shortcuts,
+        copyToClipboard: true,
+      });
+    }
+  };
+
   useKeys('Digit1', 'combination', handleCtrlPlus1);
   useKeys('Digit2', 'combination', handleCtrlPlus2);
   useKeys('Digit3', 'combination', handleCtrlPlus3);
@@ -168,6 +177,7 @@ const Launchpad = () => {
   useKeys('Space', 'single', handleSpacebar);
   useKeys('Enter', 'single', handleEnter);
   useKeys('KeyG', 'combination', handleCtrlG);
+  useKeys('KeyC', 'combination', handleCtrlC);
 
   const isSundarGutkaOverlay = overlayScreen === 'sunder-gutka';
   const isBaniControllerOverlay = overlayScreen === 'sync-button';
