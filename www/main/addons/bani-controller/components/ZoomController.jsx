@@ -13,6 +13,8 @@ const ZoomController = () => {
     if (event.target.value) {
       setShowSaveBtn(true);
       setApiCode(event.target.value);
+    } else {
+      setApiCode('');
     }
   };
 

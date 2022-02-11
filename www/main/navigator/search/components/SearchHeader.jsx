@@ -53,7 +53,6 @@ function SearchHeader() {
   return (
     <>
       <div className="left-pane">
-        <i className="fa fa-search" />
         <div className="language-selector">
           <label className="gurmukhi language-btn-label">
             <span className="label-text">gurmuKI</span>
