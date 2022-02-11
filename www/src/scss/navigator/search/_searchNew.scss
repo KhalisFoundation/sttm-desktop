@@ -165,7 +165,7 @@
   }
 
   .search-content {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    border-top: 1px solid $lighter-grey;
     @include flex;
     margin: 0;
     width: 100%;
@@ -203,6 +203,9 @@
   }
   .search-results {
     height: calc(100% - 120px);
+  }
+  .gurmukhi-keyboard + .search-result-controls + .search-results {
+    height: calc(100% - 281px);
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);

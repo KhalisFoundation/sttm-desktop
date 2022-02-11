@@ -307,7 +307,8 @@
         "TEXT": "Others",
         "VALUE": "Others"
       }
-    }
+    },
+    "ERROR": "Error occured while searching. Please try again or restart the application."
   },
 
   "SETTINGS": {
@@ -486,5 +487,14 @@
         "Paste and save the API token in SikhiToTheMax."
       ]
     }
+  },
+
+  "BANI": {
+    "LOAD_ERROR": "Error loading {{erroneousOperation}}. Please restart the application. If error persists, report it at www.sttm.co",
+    "DATABASE_DOWNLOADING": "Database is downloading, please wait..."
+  },
+
+  "SHORTCUT": {
+    "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
   }
 }

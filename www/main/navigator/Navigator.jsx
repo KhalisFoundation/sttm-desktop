@@ -107,13 +107,13 @@ const Navigator = () => {
         <>
           <div
             className={`single-display-controller ${
-              minimizedBySingleDisplay ? 'single-display-minimize' : ''
+              minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
             }`}
           >
             <Pane
               header={singleDisplayHeader}
-              content={!minimizedBySingleDisplay && singleDisplayContent}
-              footer={!minimizedBySingleDisplay && singleDisplayFooter}
+              content={singleDisplayContent}
+              footer={singleDisplayFooter}
             />
           </div>
           <div className="single-display-viewer">
