@@ -1,3 +1,5 @@
+@import 'themes/helpers/variables';
+
 .settings-wrapper {
   display: flex;
   height: 95vh;
@@ -43,6 +45,15 @@
       flex-grow: 1;
       padding: 16px;
       text-align: center;
+
+      &:hover {
+        background-color: $extra-light-grey;
+        cursor: pointer;
+      }
+    }
+
+    &.active {
+      background-color: $extra-light-grey;
     }
   }
 
