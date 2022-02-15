@@ -52,8 +52,9 @@
       }
     }
 
-    &.active {
+    &-active {
       background-color: $extra-light-grey;
+      cursor: pointer;
     }
   }
 
