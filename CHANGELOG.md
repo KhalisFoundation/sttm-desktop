@@ -1,5 +1,28 @@
 ## New Updates
 
+### 9.0.0 - _Feb 27, 2022_
+
+### Redesigned search experience:
+
+- You can now filter by writer, raag and source
+- Labelling of source in search results
+  ![](./assets/img/help_images/search-results.png)
+
+- Improved design of on-screen keyboard
+  ![](./assets/img/help_images/keyboard.gif)
+
+### Other changes:
+
+- Code Enhancements
+- Improved design of Bani Overlay screen
+- Minor Design improvements.
+
+</br>
+
+**Have a question or an idea for a new feature? Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 8.4.0 - _August 9, 2021_
 
 ### Improved:
