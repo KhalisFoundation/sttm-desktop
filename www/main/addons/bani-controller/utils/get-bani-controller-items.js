@@ -15,7 +15,7 @@ const getBaniControllerItems = ({
     title: i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),
     description: (
       <>
-        {i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.1')},<strong>sttm.co/sync</strong>
+        {i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.1')} <strong>sttm.co/sync</strong>
         {i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_DESC.2')}
       </>
     ),
@@ -38,11 +38,8 @@ const getBaniControllerItems = ({
     title: i18n.t('TOOLBAR.BANI_CONTROLLER'),
     description: (
       <>
-        {i18n.t('TOOLBAR.BANI_DESC.1')},
-        <strong>
-          <a href="https//sttm.co/control">sttm.co/control</a>
-        </strong>
-        ,{i18n.t('TOOLBAR.BANI_DESC.2')}
+        {i18n.t('TOOLBAR.BANI_DESC.1')}
+        <strong>sttm.co/control</strong> {i18n.t('TOOLBAR.BANI_DESC.2')}
       </>
     ),
     control: (

@@ -100,15 +100,17 @@ const SearchContent = () => {
           placeholder={
             databaseProgress < 1
               ? i18n.t('DATABASE.DOWNLOADING')
-              : 'Enter Search term here or ang number'
+              : 'Enter search term here or ang number'
           }
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
           databaseProgress={databaseProgress}
         />
-        <div className="input-buttons">
-          <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
-        </div>
+        {currentLanguage !== 'en' && (
+          <div className="input-buttons">
+            <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
+          </div>
+        )}
       </div>
       <div id="search-bg">
         <div
@@ -119,7 +121,7 @@ const SearchContent = () => {
           }}
         ></div>
       </div>
-      {keyboardOpenStatus && (
+      {keyboardOpenStatus && currentLanguage !== 'en' && (
         <GurmukhiKeyboard
           value={searchQuery}
           setValue={setSearchQuery}

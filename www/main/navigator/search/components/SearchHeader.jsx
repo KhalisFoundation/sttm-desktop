@@ -53,7 +53,6 @@ function SearchHeader() {
   return (
     <>
       <div className="left-pane">
-        <i className="fa fa-search" />
         <div className="language-selector">
           <label className="gurmukhi language-btn-label">
             <span className="label-text">gurmuKI</span>
@@ -101,9 +100,11 @@ function SearchHeader() {
                     <input
                       className="search-type-checkbox"
                       id={value}
-                      type="checkbox"
+                      type="radio"
                       value={value}
                       onChangeCapture={handleSearchOption}
+                      name="search-input"
+                      checked={parseInt(value, 10) === currentSearchType}
                     />
                     <span className="search-type-checkmark"></span>
                     <label htmlFor={value} className="search-type-label">
@@ -133,8 +134,10 @@ function SearchHeader() {
                     <input
                       className="search-type-checkbox"
                       id={value}
-                      type="checkbox"
+                      type="radio"
                       value={value}
+                      checked={true}
+                      disabled={true}
                     />
                     <span className="search-type-checkmark"></span>
                     <label htmlFor={value} className="search-type-label">

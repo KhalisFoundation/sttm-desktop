@@ -1,9 +1,13 @@
+import Noty from 'noty';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 
+import copy from 'copy-to-clipboard';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+
+const { i18n } = remote.require('./app');
 
 const anvaad = require('anvaad-js');
 
@@ -95,7 +99,7 @@ const ShabadContent = () => {
     return {};
   };
 
-  const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
@@ -115,13 +119,18 @@ const ShabadContent = () => {
     }
 
     if (window.socket !== undefined && window.socket !== null) {
+      let baniVerse;
+      if (!crossPlatformId) {
+        baniVerse = activeShabad.find(obj => obj.ID === newTraversedVerse);
+        console.log(baniVerse);
+      }
       if (isSundarGutkaBani) {
         window.socket.emit('data', {
           host: 'sttm-desktop',
           type: 'bani',
           id: sundarGutkaBaniId,
           shabadid: sundarGutkaBaniId, // @deprecated
-          highlight: 0,
+          highlight: crossPlatformId || baniVerse.crossPlatformID,
           baniLength,
           mangalPosition,
           verseChange: false,
@@ -132,7 +141,7 @@ const ShabadContent = () => {
           type: 'ceremony',
           id: ceremonyId,
           shabadid: ceremonyId, // @deprecated
-          highlight: 0,
+          highlight: crossPlatformId || baniVerse.crossPlatformID,
           verseChange: false,
         });
       } else {
@@ -200,8 +209,8 @@ const ShabadContent = () => {
     }
   };
 
-  const openFirstVerse = firstVerse => {
-    updateTraversedVerse(firstVerse, 0);
+  const openFirstVerse = (firstVerse, crossPlatformID = null) => {
+    updateTraversedVerse(firstVerse, 0, crossPlatformID);
     changeHomeVerse(0);
   };
 
@@ -258,13 +267,26 @@ const ShabadContent = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    if (activeVerseRef && activeVerseRef.current) {
+      const nonUniCodePanktee = activeVerseRef.current.childNodes[1].innerText;
+      const uniCodePanktee = anvaad.unicode(nonUniCodePanktee);
+      copy(uniCodePanktee);
+      new Noty({
+        type: 'info',
+        text: `${i18n.t('SHORTCUT.COPY_TO_CLIPBOARD')}`,
+        timeout: 2000,
+      }).show();
+    }
+  };
+
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
         sundarGutkaVerses => {
           setActiveShabad(sundarGutkaVerses);
           saveToHistory(sundarGutkaVerses, 'bani');
-          openFirstVerse(sundarGutkaVerses[0].ID);
+          openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
         },
       );
     } else if (isCeremonyBani && ceremonyId) {
@@ -272,7 +294,7 @@ const ShabadContent = () => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
           saveToHistory(ceremonyVerses, 'ceremony');
-          openFirstVerse(ceremonyVerses[0].ID);
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {
@@ -281,12 +303,11 @@ const ShabadContent = () => {
           setActiveShabad(verses);
           if (initialVerseId) {
             saveToHistory(verses, 'shabad', initialVerseId);
-          } else {
-            saveToHistory(verses, 'shabad', verses[0].ID);
           }
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);
             setIsRandomShabad(false);
+            saveToHistory(verses, 'shabad');
           }
         }
       });
@@ -353,6 +374,13 @@ const ShabadContent = () => {
       setShortcuts({
         ...shortcuts,
         homeVerse: false,
+      });
+    }
+    if (shortcuts.copyToClipboard) {
+      copyToClipboard();
+      setShortcuts({
+        ...shortcuts,
+        copyToClipboard: false,
       });
     }
   }, [shortcuts]);
