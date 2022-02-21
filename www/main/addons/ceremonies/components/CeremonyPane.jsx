@@ -6,17 +6,23 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Switch, Tile } from '../../../common/sttm-ui';
 import { ceremoniesFilter } from '../../../common/constants';
 
-import { getUserPreferenceFor, loadCeremonyGlobal } from '../utils';
+import { getUserPreferenceFor } from '../utils';
 import { applyTheme } from '../../../settings/utils';
+// import { loadCeremony } from '../../../navigator/utils';
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { getTheme } = require('../../../theme_editor');
 
-const CeremonyPane = props => {
+const CeremonyPane = ({ token, name, id, onScreenClose }) => {
   const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
   const { theme: currentTheme } = useStoreState(state => state.userSettings);
-  const { token, name, id, onScreenClose } = props;
+
+  const { ceremonyId, isCeremonyBani, isSundarGutkaBani } = useStoreState(state => state.navigator);
+  const { setCeremonyId, setIsCeremonyBani, setIsSundarGutkaBani } = useStoreActions(
+    state => state.navigator,
+  );
+
   const paneId = token;
   const [currentCeremony, setCurrentCeremony] = useState(id);
 
@@ -27,17 +33,22 @@ const CeremonyPane = props => {
     }
   }, []);
 
-  const loadCeremony = () => {
-    analytics.trackEvent('ceremony', token);
-    loadCeremonyGlobal(currentCeremony);
-    onScreenClose();
-  };
-
   const onThemeClick = theme => {
-    loadCeremony();
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+
+    if (ceremonyId !== currentCeremony) {
+      setCeremonyId(currentCeremony);
+    }
+    if (!isCeremonyBani) {
+      setIsCeremonyBani(true);
+    }
+    onScreenClose();
     if (currentTheme !== theme.key) {
       applyTheme(theme, null, setTheme, setThemeBg);
     }
+    analytics.trackEvent('ceremony', token);
   };
 
   const toggleOptions = (toggleType, toggleVar) => {
@@ -45,7 +56,7 @@ const CeremonyPane = props => {
     global.platform.updateSettings();
     const ceremonyToLoad =
       toggleType === 'rm' && !toggleVar ? ceremoniesFilter.raagmalaMap[id] : id;
-    loadCeremonyGlobal(ceremonyToLoad);
+    // loadCeremony(ceremonyToLoad);
     // make sure when clicked on theme, the correct version is loaded
     setCurrentCeremony(ceremonyToLoad);
   };

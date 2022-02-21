@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 import { remote } from 'electron';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
@@ -9,11 +10,18 @@ import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
-import loadBani from '../utils/load-bani';
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
+  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
+    state => state.navigator,
+  );
+  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
+    state => state.navigator,
+  );
+
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
 
@@ -40,6 +48,22 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     return b;
   });
 
+  const loadBani = baniId => {
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+
+    if (!isSundarGutkaBani) {
+      setIsSundarGutkaBani(true);
+    }
+
+    if (sundarGutkaBaniId !== baniId) {
+      setSundarGutkaBaniId(baniId);
+    }
+    analytics.trackEvent('sunderGutkaBanis', baniId);
+    onScreenClose();
+  };
+
   return (
     <Overlay onScreenClose={onScreenClose}>
       <div className={`addon-wrapper ${hyphenedTitle}-wrapper`}>
@@ -61,15 +85,15 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">
-                  {taggedBanis.map(b => (
+                  {taggedBanis.map(bani => (
                     <li
-                      key={b.name}
+                      key={bani.name}
                       className={blockListItemClassName}
-                      onClick={loadBani(b, onScreenClose)}
+                      onClick={() => loadBani(bani.id)}
                     >
-                      <span className={`tag tag-${b.baniTag}`} />
-                      <span>{b.name}</span>
-                      <span className="translit-bani">{anvaad.translit(b.name)}</span>
+                      <span className={`tag tag-${bani.baniTag}`} />
+                      <span>{bani.name}</span>
+                      <span className="translit-bani">{anvaad.translit(bani.name)}</span>
                     </li>
                   ))}
                 </ul>
@@ -80,10 +104,10 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
-            {nitnemBanis && (
+            {nitnemBanis.length > 0 && (
               <ExtraBani onScreenClose={onScreenClose} title="Nitnem Banis" banis={nitnemBanis} />
             )}
-            {popularBanis && (
+            {popularBanis.length > 0 && (
               <ExtraBani onScreenClose={onScreenClose} title="Popular Banis" banis={popularBanis} />
             )}
           </div>

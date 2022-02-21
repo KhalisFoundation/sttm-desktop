@@ -1,0 +1,13 @@
+.icon-button {
+  @include flex($ai-value: center, $jc-value: center);
+  background-color: #e1802f;
+  padding: 0;
+  height: 40px;
+  color: #fff;
+  font-size: 26px;
+  width: 40px;
+  border: none;
+  i {
+    padding-bottom: 2px;
+  }
+}

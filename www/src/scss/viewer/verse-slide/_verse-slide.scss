@@ -1,0 +1,123 @@
+.akhandpatt-view {
+  .verse-slide {
+    height: auto !important;
+    padding: 0 10px !important;
+  }
+}
+
+.verse-slide {
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  padding: 20px 10px;
+  text-align: center;
+}
+
+.slide-gurbani {
+  @extend .gurmukhi-vaak-thick;
+  font-size: 45px;
+}
+
+.slide-announcement {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+
+  .gurmukhi-announcement-slide {
+    @extend .gurmukhi-vaak-thick;
+    line-height: 1.15em;
+  }
+}
+
+.padchhed span {
+  margin: 0 5px;
+}
+
+.slide-translation {
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.slide-teeka {
+  @extend .gurmukhi-vaak;
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.slide-transliteration {
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.slide-next-line {
+  opacity: 0.5;
+  margin: 10px 0;
+}
+
+.slide-left-align {
+  text-align: left;
+}
+
+// Quick Tools Styles
+
+.slide-quicktools {
+  font-size: 12px;
+  font-weight: bold;
+  height: 98%;
+  position: fixed;
+  width: 18%;
+  max-width: 150px;
+  z-index: 2;
+}
+
+.quicktool {
+  &-header {
+    background-color: #0000001a;
+    display: flex;
+    justify-content: space-around;
+    padding: 6px;
+  }
+
+  &-body {
+    background-color: $extra-light-grey;
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+    opacity: 0.9;
+    padding: 8px;
+  }
+
+  &-gurbani {
+    justify-content: space-between;
+  }
+
+  &-announcement {
+    justify-content: center;
+  }
+
+  &-item {
+    text-align: center;
+  }
+
+  &-icons {
+    display: flex;
+    justify-content: space-around;
+    padding: 5px 0;
+
+    & i {
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 75px;
+      font-size: 16px;
+      padding: 2px;
+      height: 22px;
+      width: 22px;
+    }
+
+    &-hidden {
+      display: none;
+    }
+  }
+}

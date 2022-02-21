@@ -1,4 +1,6 @@
 /* global Mousetrap */
+import { updateViewerScale } from './viewer/utils';
+
 const electron = require('electron');
 const anvaad = require('anvaad-js');
 
@@ -7,7 +9,6 @@ const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
 const analytics = remote.getGlobal('analytics');
-const shortcutFunctions = require('./keyboard-shortcuts/shortcut-functions');
 const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
@@ -114,6 +115,7 @@ const menuTemplate = [
     submenu: [
       {
         label: i18n.t('MENU.WINDOW.BANI_OVERLAY'),
+        accelerator: 'CmdOrCtrl+Alt+O',
         click: () => {
           main.openSecondaryWindow('overlayWindow');
         },
@@ -358,69 +360,6 @@ $menuButton.addEventListener('click', () => {
   return !$menuButton.dispatchEvent(e);
 });
 
-function updateViewerScale() {
-  if (global.externalDisplay) {
-    global.viewer = global.externalDisplay;
-  } else {
-    global.viewer = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-  }
-  const $fitInsideWindow = document.body.classList.contains('presenter-view')
-    ? document.getElementById('navigator')
-    : document.body;
-  let scale = 1;
-  let previewStyles = '';
-  let previewWinStyles = '';
-  previewStyles += `width: ${global.viewer.width}px;`;
-  previewStyles += `height: ${global.viewer.height}px;`;
-  previewStyles += `font-size: ${global.viewer.height / 100}px;`;
-
-  const fitInsideWidth = $fitInsideWindow.offsetWidth;
-  const fitInsideHeight = $fitInsideWindow.offsetHeight;
-  const fitInsideStyle = window.getComputedStyle($fitInsideWindow);
-  const fitInsidePadding = fitInsideStyle.getPropertyValue('right');
-  const viewerRatio = global.viewer.width / global.viewer.height;
-
-  // Try scaling by width first
-  const proposedHeight = fitInsideWidth / viewerRatio;
-  const workspaceHeight = '40px';
-  if (fitInsideHeight > proposedHeight) {
-    scale = fitInsideWidth / global.viewer.width;
-    previewStyles += `right: ${fitInsidePadding};`;
-    previewStyles += `top: calc(${workspaceHeight} + ${fitInsidePadding} + ${(fitInsideHeight -
-      proposedHeight) /
-      2}px);`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} + 25px + ${(fitInsideHeight -
-      proposedHeight) /
-      2}px);`;
-  } else {
-    scale = fitInsideHeight / global.viewer.height;
-    const proposedWidth = fitInsideHeight * viewerRatio;
-    previewStyles += `top: calc(${fitInsidePadding} + ${workspaceHeight} );`;
-    previewWinStyles += `top: calc(${fitInsidePadding} + 35px);`;
-    previewStyles += `right: calc(${fitInsidePadding} + ${(fitInsideWidth - proposedWidth) /
-      2}px);`;
-  }
-  previewStyles += `transform: scale(${scale});`;
-  previewStyles = document.createTextNode(
-    `.scale-viewer #main-viewer { ${previewStyles} }
-    .scale-viewer.win32 #main-viewer { ${previewWinStyles} }`,
-  );
-  const $previewStyles = document.getElementById('preview-styles');
-
-  if ($previewStyles) {
-    $previewStyles.innerHTML = '';
-    $previewStyles.appendChild(previewStyles);
-  } else {
-    const style = document.createElement('style');
-    style.id = 'preview-styles';
-    style.appendChild(previewStyles);
-    document.head.appendChild(style);
-  }
-}
-
 function checkPresenterView() {
   const inPresenterView = store.getUserPref('app.layout.presenter-view');
   const { classList } = document.body;
@@ -429,20 +368,8 @@ function checkPresenterView() {
   classList.toggle('home', !inPresenterView);
   classList.toggle('scale-viewer', inPresenterView);
 
-  // hide header-tabs for non presenter view
-  document.querySelector('.nav-header-tabs').classList.toggle('hidden', !inPresenterView);
   global.platform.ipc.send('presenter-view', inPresenterView);
   global.webview.send('presenter-view', inPresenterView);
-}
-
-function reloadBani(resume = false) {
-  const $shabad = document.getElementById('shabad');
-  const currentBani = $shabad.dataset.bani;
-  const $currentLine = $shabad.querySelector('.current');
-  const lineID = resume && $currentLine ? $currentLine.dataset.lineId : null;
-  if (currentBani) {
-    global.core.search.loadBani(currentBani, lineID);
-  }
 }
 
 global.platform.ipc.on('presenter-view', () => {
@@ -493,10 +420,6 @@ global.platform.ipc.on('send-scroll', (event, arg) => {
 });
 global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(arg.PageNo, arg.SourceID);
-});
-
-global.platform.ipc.on('shortcuts', (event, arg) => {
-  shortcutFunctions[arg.actionName](arg.event);
 });
 
 global.platform.ipc.on('cast-session-active', () => {
@@ -607,18 +530,6 @@ module.exports = {
   'gradient-bg': function gradientBg() {
     const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
     store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
-  },
-
-  'bani-length': function gurbaniBaniLength() {
-    reloadBani();
-  },
-
-  'mangal-position': function gurbaniMangalPosition() {
-    reloadBani(true);
-  },
-
-  'autoplay-toggle': function autoPlayToggle() {
-    global.core.search.checkAutoPlay();
   },
 
   'live-feed': function livefeed(val) {

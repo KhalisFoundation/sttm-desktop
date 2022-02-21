@@ -1,0 +1,126 @@
+.verse-block {
+  z-index: 5;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  max-height: inherit;
+  overflow-x: hidden;
+  overflow-y: scroll;
+
+  .shabad-pane-list {
+    display: flex;
+
+    .hoverIcon {
+      display: none;
+    }
+
+    .verse-content {
+      flex-grow: 1;
+      padding: 5px 0;
+    }
+
+    &:hover {
+      .hoverIcon {
+        display: inline;
+        opacity: 0.5;
+      }
+    }
+    .shabad-pane-controls {
+      display: inline-flex;
+      width: 8%;
+      justify-content: center;
+      align-items: center;
+      i {
+        font-size: 1rem;
+      }
+      .fa-check {
+        font-size: 10px;
+      }
+    }
+  }
+  .shabad-pane-active {
+    .theme-light-theme & {
+      background-color: $transparent-blue;
+    }
+    .theme-dark-theme & {
+      background-color: $dull-blue;
+    }
+  }
+  .search-list {
+    display: inline-flex;
+    padding: 0 5px;
+    .sggs-color {
+      color: $cadmium-orange;
+    }
+    .sdg-color {
+      color: $picton-blue;
+    }
+    .ak-color {
+      color: $apple-green;
+    }
+    .other-color {
+      color: $dark-silver;
+    }
+  }
+  .sggs-border {
+    border-left: 3px solid $cadmium-orange;
+  }
+  .sdg-border {
+    border-left: 3px solid $picton-blue;
+  }
+  .ak-border {
+    border-left: 3px solid $apple-green;
+  }
+  .other-border {
+    border-left: 3px solid $dark-silver;
+  }
+  li {
+    position: relative;
+    cursor: pointer;
+    font-size: 1rem;
+
+    &.search-li {
+      padding: 2px 10px;
+      list-style: none;
+    }
+
+    &.shabad-li {
+      padding: 5px 10px;
+    }
+
+    div {
+      display: inline-flex;
+      a {
+        padding: 5px;
+        font-size: 1rem;
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+    .search-list-footer {
+      display: flex;
+      color: #929292;
+    }
+  }
+  .history-pane-controls {
+    position: absolute;
+    right: 20px;
+  }
+  i {
+    z-index: 100;
+  }
+}
+
+.single-display-controller {
+  .search-pane {
+    .verse-block {
+      padding-bottom: 35px;
+    }
+  }
+  .shabad-pane {
+    .verse-block {
+      padding-bottom: 70px;
+    }
+  }
+}

@@ -12,4 +12,8 @@ $themeKhalsaRush: (
 
 .theme-khalsa-rush {
   @include generateTheme($themeKhalsaRush...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+  }
 }

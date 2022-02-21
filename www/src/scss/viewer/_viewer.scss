@@ -1,0 +1,11 @@
+@import 'shabad-deck/shabad-deck', 'verse-slide/verse-slide';
+
+#viewer-container {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+
+  * {
+    transition: 0.2s all ease-in;
+  }
+}

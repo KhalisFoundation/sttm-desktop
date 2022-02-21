@@ -1,0 +1,37 @@
+.akhandpatt-view {
+  &.shabad-deck {
+    background-attachment: fixed;
+    background-size: cover;
+    height: unset;
+    overflow-y: scroll;
+    padding-bottom: 10px;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+.shabad-deck {
+  background-size: cover;
+  border: 1px solid $alt-grey;
+  height: 100%;
+
+  &.single-display-mode {
+    padding: 24px 72px;
+
+    &.win32 {
+      padding-top: 56px;
+    }
+  }
+}
+
+.empty-slide {
+  height: 100% !important;
+}
+
+.viewer-logo {
+  fill: $grey;
+  bottom: 12px;
+  position: fixed;
+  left: 12px;
+  z-index: 1;
+}

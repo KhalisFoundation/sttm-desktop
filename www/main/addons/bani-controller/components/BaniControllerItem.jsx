@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const BaniControllerItem = ({ title, description, control }) => {
   return (
@@ -10,6 +11,12 @@ const BaniControllerItem = ({ title, description, control }) => {
       <div className="sync-item-right"> {control} </div>
     </div>
   );
+};
+
+BaniControllerItem.propTypes = {
+  title: PropTypes.string,
+  description: PropTypes.object,
+  control: PropTypes.object,
 };
 
 export default BaniControllerItem;

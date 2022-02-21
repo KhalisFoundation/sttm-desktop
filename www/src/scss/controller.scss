@@ -1,5 +1,6 @@
 $sttm-orange: #f39c1d;
 $sttm-blue: #29679b;
+$transparent-black: rgba(0, 0, 0, 0.16);
 
 $transition-time: 600ms;
 $transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -83,7 +84,129 @@ ul {
 }
 
 .launchpad {
+  display: flex;
+  flex-direction: row;
   height: 100%;
+  overflow-x: auto;
+  padding: 30px;
+  padding-left: 75px;
+  padding-top: 10px;
+  width: 100%;
+
+  &.single-display {
+    display: unset;
+    height: unset;
+    overflow-x: unset;
+    padding: unset;
+    width: unset;
+  }
+
+  .single-display {
+    &-controller {
+      bottom: 0;
+      box-shadow: 0 10px 20px $transparent-black;
+      position: fixed;
+      right: 0;
+      z-index: 2;
+
+      .pane {
+        .pane-header {
+          .header-controller {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+          }
+        }
+
+        .pane-content {
+          > div {
+            padding: 0;
+          }
+        }
+      }
+    }
+
+    &-minimize {
+      .pane {
+        height: 40px;
+        transition: 0.3s ease all;
+
+        &-footer {
+          display: none;
+        }
+      }
+    }
+
+    &-maximize {
+      .pane {
+        height: 45vh;
+        transition: 0.3s ease all;
+
+        &-footer {
+          display: block;
+        }
+      }
+    }
+
+    &-switches {
+      display: flex;
+      height: 40px;
+      width: 100%;
+    }
+
+    &-viewer {
+      height: 100%;
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+
+      & > .viewer-pane {
+        padding: 0;
+
+        & .pane {
+          height: 100vh;
+          width: 100%;
+        }
+      }
+    }
+
+    &-hide {
+      &-left {
+        left: -75px !important;
+        transition: 0.3s ease all;
+      }
+    }
+
+    &-show {
+      &-left {
+        left: 0 !important;
+        transition: 0.3s ease all;
+      }
+    }
+  }
+
+  .single-display-switches {
+    background: rgba(221, 221, 221, 1);
+
+    button.tab-switch {
+      padding: 6px 14px;
+
+      &.active {
+        background: #f5f5f5;
+        color: #41c2f9;
+      }
+    }
+  }
+
+  .navigator-row {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    width: 50vw;
+  }
 }
 
 .minimized {

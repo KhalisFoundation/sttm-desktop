@@ -1,9 +1,11 @@
+@import 'themes/helpers/variables';
+
 .settings-wrapper {
   display: flex;
   height: 95vh;
   left: 100px;
   margin-top: 24px;
-  overflow: scroll;
+  overflow: auto;
   position: relative;
   scroll-behavior: smooth;
   width: 82vw;
@@ -19,6 +21,7 @@
     height: 300px;
     justify-content: space-between;
     margin-bottom: 20px;
+    overflow: auto;
     padding: 12px;
     width: 500px;
   }
@@ -42,6 +45,16 @@
       flex-grow: 1;
       padding: 16px;
       text-align: center;
+
+      &:hover {
+        background-color: $extra-light-grey;
+        cursor: pointer;
+      }
+    }
+
+    &-active {
+      background-color: $extra-light-grey;
+      cursor: pointer;
     }
   }
 
@@ -49,6 +62,11 @@
     margin-bottom: 20px;
     max-width: 500px;
     padding: 12px;
+
+    .theme-tile-holder {
+      display: flex;
+      flex-wrap: wrap;
+    }
 
     .controls-container {
       h4 {
@@ -124,6 +142,10 @@
       }
     }
   }
+}
+
+.settings-preview-title {
+  padding: 4px;
 }
 
 #settings,
