@@ -41,7 +41,7 @@ const ShabadContent = () => {
   const { autoplayToggle, autoplayDelay, baniLength, mangalPosition, liveFeed } = useStoreState(
     state => state.userSettings,
   );
-
+  const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
   const activeVerseRef = useRef(null);
@@ -122,7 +122,6 @@ const ShabadContent = () => {
       let baniVerse;
       if (!crossPlatformId) {
         baniVerse = activeShabad.find(obj => obj.ID === newTraversedVerse);
-        console.log(baniVerse);
       }
       if (isSundarGutkaBani) {
         window.socket.emit('data', {
@@ -188,9 +187,18 @@ const ShabadContent = () => {
     try {
       if (homeVerse >= 0) {
         const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-        const newVerseIndex = homeVerse;
-        const newVerseId = mappedShabadArray[newVerseIndex].verseId;
-        updateTraversedVerse(newVerseId, newVerseIndex);
+        const homeVerseIndex = homeVerse;
+        const homeVerseId = mappedShabadArray[homeVerseIndex].verseId;
+        setPreviousActiveVerse(activeVerseId);
+
+        if (homeVerseId === activeVerseId) {
+          const previousVerseIndex = activeShabad.findIndex(
+            verseObj => verseObj.ID === previousActiveVerse,
+          );
+          updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+        } else {
+          updateTraversedVerse(homeVerseId, homeVerseIndex);
+        }
       }
     } catch (e) {
       console.log('Space is not allowed');
