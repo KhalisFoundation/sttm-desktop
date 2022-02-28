@@ -61,6 +61,18 @@
     color: $text-base;
   }
 
+  .settings-nav {
+    span {
+      &:hover {
+        background-color: $not-so-black;
+      }
+    }
+
+    &-active {
+      background-color: $not-so-black;
+    }
+  }
+
   .misc-pane {
     .misc-header {
       a {
