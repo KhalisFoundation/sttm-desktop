@@ -15,7 +15,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
   };
 
   const handleSpace = event => {
-    if (event.keyCode === 32) {
+    if (event.keyCode === 32 && [2, 3].includes(currentSearchType)) {
       setSearchQuery(`${searchQuery} `);
     }
   };
