@@ -27,6 +27,7 @@ const QuickTools = ({ isMiscSlide }) => {
     teekaFontSize,
     transliterationFontSize,
     announcementsFontSize,
+    quickTools,
   } = useStoreState(state => state.userSettings);
   const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
@@ -104,7 +105,7 @@ const QuickTools = ({ isMiscSlide }) => {
   }, [isMiscSlide]);
 
   return (
-    <div className="slide-quicktools">
+    <div className={`slide-quicktools ${!quickTools ? 'hide-quicktools' : ''}`.trim()}>
       <div className="quicktool-header" onClick={() => setQuickToolsOpen(!quickToolsOpen)}>
         Quick Tools
         <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>

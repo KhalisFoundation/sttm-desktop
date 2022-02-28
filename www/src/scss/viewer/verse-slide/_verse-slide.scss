@@ -71,6 +71,10 @@
   width: 18%;
   max-width: 150px;
   z-index: 2;
+
+  &.hide-quicktools {
+    left: -18%;
+  }
 }
 
 .quicktool {

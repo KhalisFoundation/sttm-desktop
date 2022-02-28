@@ -123,7 +123,13 @@ function ShabadDeck() {
         });
         // load next line of bani
         if (displayNextLine) {
-          loadBaniVerse(sundarGutkaBaniId, activeVerseId, displayNextLine).then(rows => {
+          loadBaniVerse(
+            sundarGutkaBaniId,
+            activeVerseId,
+            displayNextLine,
+            baniLengthCols[baniLength],
+            mangalPosition,
+          ).then(rows => {
             if (rows.length === 1) {
               setNextVerse(...rows);
             } else {
