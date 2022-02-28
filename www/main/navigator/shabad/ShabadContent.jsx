@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer, remote } from 'electron';
 
 import copy from 'copy-to-clipboard';
+import { Virtuoso } from 'react-virtuoso';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
 
@@ -45,6 +46,7 @@ const ShabadContent = () => {
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
   const activeVerseRef = useRef(null);
+  const virtuosoRef = useRef(null);
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
@@ -68,6 +70,8 @@ const ShabadContent = () => {
         })
       : [];
   };
+
+  const [filteredItems, setFilteredItems] = useState(filterRequiredVerseItems(activeShabad));
 
   const filterOverlayVerseItems = (verses, verseId = activeVerseId) => {
     if (verses) {
@@ -122,7 +126,6 @@ const ShabadContent = () => {
       let baniVerse;
       if (!crossPlatformId) {
         baniVerse = activeShabad.find(obj => obj.ID === newTraversedVerse);
-        console.log(baniVerse);
       }
       if (isSundarGutkaBani) {
         window.socket.emit('data', {
@@ -340,6 +343,8 @@ const ShabadContent = () => {
           activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
       }
     }, 100);
+
+    setFilteredItems(filterRequiredVerseItems(activeShabad));
   }, [activeShabad]);
 
   useEffect(() => {
@@ -403,21 +408,28 @@ const ShabadContent = () => {
   return (
     <div className="shabad-list">
       <div className="verse-block">
-        {filterRequiredVerseItems(activeShabad).map(({ verseId, verse, english }, index) => (
-          <ShabadVerse
-            key={index}
-            activeVerse={activeVerse}
-            isHomeVerse={homeVerse}
-            lineNumber={index}
-            versesRead={versesRead}
-            verse={verse}
-            englishVerse={english}
-            verseId={verseId}
-            forwardedRef={activeVerseRef}
-            changeHomeVerse={changeHomeVerse}
-            updateTraversedVerse={updateTraversedVerse}
-          />
-        ))}
+        <Virtuoso
+          data={filteredItems}
+          ref={virtuosoRef}
+          itemContent={(index, verses) => {
+            const { verseId, verse, english } = verses;
+            return (
+              <ShabadVerse
+                key={index}
+                activeVerse={activeVerse}
+                isHomeVerse={homeVerse}
+                lineNumber={index}
+                versesRead={versesRead}
+                verse={verse}
+                englishVerse={english}
+                verseId={verseId}
+                forwardedRef={activeVerseRef}
+                changeHomeVerse={changeHomeVerse}
+                updateTraversedVerse={updateTraversedVerse}
+              />
+            );
+          }}
+        ></Virtuoso>
       </div>
     </div>
   );
