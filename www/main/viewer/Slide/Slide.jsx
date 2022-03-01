@@ -22,7 +22,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     vishraamSource,
     vishraamType,
     displayNextLine,
-    isSingleDisplayMode,
   } = useStoreState(state => state.userSettings);
   const { activeVerseId } = useStoreState(state => state.navigator);
   const activeVerseRef = useRef(null);
@@ -41,10 +40,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
   };
 
   const getFontSize = verseType => {
-    if (isSingleDisplayMode) {
-      return { fontSize: `${verseType}vh` };
-    }
-    return { fontSize: `${verseType * 3}px` };
+    return { fontSize: `${verseType}vh` };
   };
 
   useEffect(() => {
