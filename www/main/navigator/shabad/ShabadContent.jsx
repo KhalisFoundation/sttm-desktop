@@ -337,13 +337,6 @@ const ShabadContent = () => {
       }
     });
 
-    setTimeout(() => {
-      if (activeVerseRef && activeVerseRef.current) {
-        activeVerseRef.current.parentNode.scrollTop =
-          activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
-      }
-    }, 100);
-
     setFilteredItems(filterRequiredVerseItems(activeShabad));
   }, [activeShabad]);
 
@@ -353,6 +346,15 @@ const ShabadContent = () => {
       Line: overlayVerse,
       live: liveFeed,
     });
+
+    setTimeout(() => {
+      const currentIndex = activeShabad.findIndex(obj => obj.ID === activeVerseId);
+      virtuosoRef.current.scrollToIndex({
+        index: currentIndex,
+        behavior: 'smooth',
+        align: 'end',
+      });
+    }, 100);
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
@@ -423,7 +425,6 @@ const ShabadContent = () => {
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
-                forwardedRef={activeVerseRef}
                 changeHomeVerse={changeHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />
