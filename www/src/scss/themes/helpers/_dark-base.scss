@@ -113,6 +113,23 @@
         background-color: $not-so-black;
       }
     }
+
+    .search-type {
+      &-label {
+        &::before {
+          border: 1px solid $light-grey;
+        }
+      }
+      &-checkbox {
+        &:checked {
+          + {
+            .search-type-checkmark {
+              filter: brightness(0) invert(0.9);
+            }
+          }
+        }
+      }
+    }
   }
 
   .pane-footer {
