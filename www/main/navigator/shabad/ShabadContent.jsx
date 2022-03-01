@@ -184,10 +184,10 @@ const ShabadContent = () => {
   };
 
   const openHomeVerse = () => {
-    try {
-      if (homeVerse >= 0) {
-        const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-        const homeVerseIndex = homeVerse;
+    if (homeVerse >= 0) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      const homeVerseIndex = homeVerse;
+      if (mappedShabadArray[homeVerseIndex]) {
         const homeVerseId = mappedShabadArray[homeVerseIndex].verseId;
         setPreviousActiveVerse(activeVerseId);
 
@@ -200,8 +200,6 @@ const ShabadContent = () => {
           updateTraversedVerse(homeVerseId, homeVerseIndex);
         }
       }
-    } catch (e) {
-      console.log('Space is not allowed');
     }
   };
 
