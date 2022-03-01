@@ -61,6 +61,18 @@
     color: $text-base;
   }
 
+  .settings-nav {
+    span {
+      &:hover {
+        background-color: $not-so-black;
+      }
+    }
+
+    &-active {
+      background-color: $not-so-black;
+    }
+  }
+
   .misc-pane {
     .misc-header {
       a {
@@ -99,6 +111,23 @@
     .pane {
       .pane-footer {
         background-color: $not-so-black;
+      }
+    }
+
+    .search-type {
+      &-label {
+        &::before {
+          border: 1px solid $light-grey;
+        }
+      }
+      &-checkbox {
+        &:checked {
+          + {
+            .search-type-checkmark {
+              filter: brightness(0) invert(0.9);
+            }
+          }
+        }
       }
     }
   }
