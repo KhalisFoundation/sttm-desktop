@@ -89,6 +89,12 @@ const SearchContent = () => {
     }
   }, [shortcuts]);
 
+  useEffect(() => {
+    if (searchQuery.length === 0) {
+      setFilteredShabads([]);
+    }
+  }, [searchQuery]);
+
   ipcRenderer.on('database-progress', data => {
     setDatabaseProgress(data.percent);
   });
