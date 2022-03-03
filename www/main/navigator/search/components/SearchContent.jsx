@@ -99,15 +99,21 @@ const SearchContent = () => {
     setDatabaseProgress(data.percent);
   });
 
+  let placeholder = '';
+
+  if (databaseProgress < 1) {
+    placeholder = i18n.t('DATABASE.DOWNLOADING');
+  } else if (currentSearchType === 3) {
+    placeholder = i18n.t('SEARCH.PLACEHOLDER_ENGLISH');
+  } else {
+    placeholder = i18n.t('SEARCH.PLACEHOLDER_GURMUKHI');
+  }
+
   return (
     <div className="search-content-container">
       <div className="search-content">
         <InputBox
-          placeholder={
-            databaseProgress < 1
-              ? i18n.t('DATABASE.DOWNLOADING')
-              : 'Enter search term here or ang number'
-          }
+          placeholder={placeholder}
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
           databaseProgress={databaseProgress}
