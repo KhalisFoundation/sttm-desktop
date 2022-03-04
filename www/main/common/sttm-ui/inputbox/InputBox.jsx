@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads, loadAng } from '../../../navigator/utils';
@@ -8,15 +8,16 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
     state => state.navigator,
   );
   const { setSearchData, setSearchQuery, setShortcuts } = useStoreActions(state => state.navigator);
+  const [query, setQuery] = useState('');
 
   const inputRef = useRef(null);
   const handleChange = event => {
-    setSearchQuery(event.target.value);
+    setQuery(event.target.value);
   };
 
   const handleSpace = event => {
     if (event.keyCode === 32 && [2, 3].includes(currentSearchType)) {
-      setSearchQuery(`${searchQuery} `);
+      setQuery(`${query} `);
     }
   };
 
@@ -36,9 +37,20 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
   }, [shortcuts]);
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (query !== searchQuery) {
+        setSearchQuery(query);
+      }
+    }, 50);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [query]);
+
+  useEffect(() => {
     const searchTypeInt = parseInt(searchQuery, 10);
     const isAng = !!searchTypeInt;
-    if (databaseProgress >= 1) {
+    if (databaseProgress >= 1 && searchQuery) {
       if (isAng) {
         loadAng(searchTypeInt).then(rows => setSearchData(rows));
       } else {
@@ -56,7 +68,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
         type="search"
         ref={inputRef}
         placeholder={placeholder}
-        value={searchQuery}
+        value={query}
         onChange={handleChange}
         onKeyDown={handleSpace}
         disabled={disabled}
