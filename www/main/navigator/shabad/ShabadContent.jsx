@@ -352,7 +352,7 @@ const ShabadContent = () => {
       virtuosoRef.current.scrollToIndex({
         index: currentIndex,
         behavior: 'smooth',
-        align: 'end',
+        align: 'center',
       });
     }, 100);
   }, [activeShabad, activeVerseId]);
