@@ -72,6 +72,16 @@ const SearchContent = () => {
     }
   };
 
+  const getPlaceholder = () => {
+    if (databaseProgress < 1) {
+      return i18n.t('DATABASE.DOWNLOADING');
+    }
+    if (currentSearchType === 3) {
+      return i18n.t('SEARCH.PLACEHOLDER_ENGLISH');
+    }
+    return i18n.t('SEARCH.PLACEHOLDER_GURMUKHI');
+  };
+
   useEffect(() => {
     setFilteredShabads(
       filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
@@ -99,21 +109,11 @@ const SearchContent = () => {
     setDatabaseProgress(data.percent);
   });
 
-  let placeholder = '';
-
-  if (databaseProgress < 1) {
-    placeholder = i18n.t('DATABASE.DOWNLOADING');
-  } else if (currentSearchType === 3) {
-    placeholder = i18n.t('SEARCH.PLACEHOLDER_ENGLISH');
-  } else {
-    placeholder = i18n.t('SEARCH.PLACEHOLDER_GURMUKHI');
-  }
-
   return (
     <div className="search-content-container">
       <div className="search-content">
         <InputBox
-          placeholder={placeholder}
+          placeholder={getPlaceholder()}
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
           databaseProgress={databaseProgress}
