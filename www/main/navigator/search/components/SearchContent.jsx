@@ -72,6 +72,16 @@ const SearchContent = () => {
     }
   };
 
+  const getPlaceholder = () => {
+    if (databaseProgress < 1) {
+      return i18n.t('DATABASE.DOWNLOADING');
+    }
+    if (currentSearchType === 3) {
+      return i18n.t('SEARCH.PLACEHOLDER_ENGLISH');
+    }
+    return i18n.t('SEARCH.PLACEHOLDER_GURMUKHI');
+  };
+
   useEffect(() => {
     setFilteredShabads(
       filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
@@ -103,11 +113,7 @@ const SearchContent = () => {
     <div className="search-content-container">
       <div className="search-content">
         <InputBox
-          placeholder={
-            databaseProgress < 1
-              ? i18n.t('DATABASE.DOWNLOADING')
-              : 'Enter search term here or ang number'
-          }
+          placeholder={getPlaceholder()}
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
           databaseProgress={databaseProgress}
