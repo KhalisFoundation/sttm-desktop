@@ -33,6 +33,7 @@ const SearchContent = () => {
 
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
+  const [query, setQuery] = useState('');
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -109,6 +110,17 @@ const SearchContent = () => {
     setDatabaseProgress(data.percent);
   });
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (query !== searchQuery) {
+        setSearchQuery(query);
+      }
+    }, 50);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [query]);
+
   return (
     <div className="search-content-container">
       <div className="search-content">
@@ -117,6 +129,8 @@ const SearchContent = () => {
           disabled={databaseProgress < 1}
           className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
           databaseProgress={databaseProgress}
+          query={query}
+          setQuery={setQuery}
         />
         {currentLanguage !== 'en' && (
           <div className="input-buttons">
@@ -134,11 +148,7 @@ const SearchContent = () => {
         ></div>
       </div>
       {keyboardOpenStatus && currentLanguage !== 'en' && (
-        <GurmukhiKeyboard
-          value={searchQuery}
-          setValue={setSearchQuery}
-          searchType={currentSearchType}
-        />
+        <GurmukhiKeyboard searchType={currentSearchType} query={query} setQuery={setQuery} />
       )}
       <div className="search-result-controls">
         <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
