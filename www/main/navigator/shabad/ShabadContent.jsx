@@ -26,6 +26,7 @@ const ShabadContent = () => {
     isSundarGutkaBani,
     shortcuts,
     isRandomShabad,
+    minimizedBySingleDisplay,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -263,7 +264,7 @@ const ShabadContent = () => {
   };
 
   const scrollToView = () => {
-    if (activeVerseRef && activeVerseRef.current) {
+    if (!minimizedBySingleDisplay && activeVerseRef && activeVerseRef.current) {
       setTimeout(() => {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
@@ -340,12 +341,14 @@ const ShabadContent = () => {
       }
     });
 
-    setTimeout(() => {
-      if (activeVerseRef && activeVerseRef.current) {
-        activeVerseRef.current.parentNode.scrollTop =
-          activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
-      }
-    }, 100);
+    if (!minimizedBySingleDisplay) {
+      setTimeout(() => {
+        if (activeVerseRef && activeVerseRef.current) {
+          activeVerseRef.current.parentNode.scrollTop =
+            activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
+        }
+      }, 100);
+    }
   }, [activeShabad]);
 
   useEffect(() => {
