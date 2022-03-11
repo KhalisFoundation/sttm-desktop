@@ -15,9 +15,7 @@ const WorkspaceBar = () => {
 
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
   const workspaces = [presenterIdentifier, i18n.t('WORKSPACES.SINGLE_DISPLAY')];
-  const defaultWsState = store.getUserPref('app.layout.presenter-view')
-    ? workspaces[0]
-    : workspaces[1];
+  const defaultWsState = !isSingleDisplayMode ? workspaces[0] : workspaces[1];
   const [currentWorkspace, setWorkspace] = useState(defaultWsState);
 
   const handleWorkspaceChange = workspace => {

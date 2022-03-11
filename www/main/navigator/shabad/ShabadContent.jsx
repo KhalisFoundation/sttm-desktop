@@ -27,6 +27,7 @@ const ShabadContent = () => {
     isSundarGutkaBani,
     shortcuts,
     isRandomShabad,
+    minimizedBySingleDisplay,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -267,14 +268,14 @@ const ShabadContent = () => {
   };
 
   const scrollToView = () => {
-    if (activeVerseRef && activeVerseRef.current) {
-      setTimeout(() => {
-        activeVerseRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-        });
-      }, 100);
-    }
+    setTimeout(() => {
+      const currentIndex = activeShabad.findIndex(obj => obj.ID === activeVerseId);
+      virtuosoRef.current.scrollToIndex({
+        index: currentIndex,
+        behavior: 'smooth',
+        align: 'center',
+      });
+    }, 100);
   };
 
   const copyToClipboard = () => {
@@ -334,6 +335,10 @@ const ShabadContent = () => {
   ]);
 
   useEffect(() => {
+    scrollToView();
+  }, [minimizedBySingleDisplay]);
+
+  useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach(verses => {
       if (initialVerseId === verses.verseId) {
         setActiveVerse({ [verses.ID]: verses.verseId });
@@ -344,6 +349,14 @@ const ShabadContent = () => {
       }
     });
 
+    if (!minimizedBySingleDisplay) {
+      setTimeout(() => {
+        if (activeVerseRef && activeVerseRef.current) {
+          activeVerseRef.current.parentNode.scrollTop =
+            activeVerseRef.current.offsetTop - activeVerseRef.current.parentNode.offsetTop;
+        }
+      }, 100);
+    }
     setFilteredItems(filterRequiredVerseItems(activeShabad));
   }, [activeShabad]);
 
@@ -354,14 +367,7 @@ const ShabadContent = () => {
       live: liveFeed,
     });
 
-    setTimeout(() => {
-      const currentIndex = activeShabad.findIndex(obj => obj.ID === activeVerseId);
-      virtuosoRef.current.scrollToIndex({
-        index: currentIndex,
-        behavior: 'smooth',
-        align: 'center',
-      });
-    }, 100);
+    scrollToView();
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function

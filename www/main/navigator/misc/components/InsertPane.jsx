@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
@@ -27,6 +27,7 @@ export const InsertPane = ({ className }) => {
   } = useStoreActions(state => state.navigator);
 
   const inputRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const addMiscSlide = givenText => {
     if (!isMiscSlide) {
@@ -85,34 +86,39 @@ export const InsertPane = ({ className }) => {
   });
   slidePage += `</div>`;
 
-  const modal = new tingle.Modal({
-    footer: true,
-    stickyFooter: false,
-    closeMethods: ['overlay', 'button', 'escape'],
-    onClose() {
-      modal.modal.classList.remove('tingle-modal--visible');
-    },
-    beforeClose() {
-      return true; // close the modal
-    },
-  });
-
-  const buttonOnClick = () => {
-    gurus.forEach((guru, index) => {
-      document.querySelector(`#guru${index}`).onclick = () => {
-        addDhanGuruSlide(insertSlide.slideStrings.dhanguruStrings[index]);
-        modal.close();
-      };
-    });
-  };
-
-  // sets the default page to Dhan Guru slide page
-  modal.setContent(slidePage);
-  buttonOnClick();
-
   const showDhanGuruModal = () => {
-    if (!modal.isOpen()) {
-      modal.open();
+    if (!isModalOpen) {
+      const modal = new tingle.Modal({
+        footer: true,
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+        onClose() {
+          modal.modal.classList.remove('tingle-modal--visible');
+          setIsModalOpen(false);
+          modal.destroy();
+        },
+        beforeClose() {
+          return true; // close the modal
+        },
+      });
+      if (!modal.isOpen()) {
+        setIsModalOpen(true);
+        const buttonOnClick = () => {
+          gurus.forEach((guru, index) => {
+            document.querySelector(`#guru${index}`).onclick = () => {
+              addDhanGuruSlide(insertSlide.slideStrings.dhanguruStrings[index]);
+              modal.close();
+              setIsModalOpen(false);
+              modal.destroy();
+            };
+          });
+        };
+
+        // sets the default page to Dhan Guru slide page
+        modal.setContent(slidePage);
+        buttonOnClick();
+        modal.open();
+      }
     }
   };
 

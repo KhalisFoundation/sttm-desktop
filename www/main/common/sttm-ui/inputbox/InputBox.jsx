@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { searchShabads, loadAng } from '../../../navigator/utils';
 
-const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
+const InputBox = ({ placeholder, disabled, className, databaseProgress, query, setQuery }) => {
   const { currentSearchType, currentSource, searchQuery, shortcuts } = useStoreState(
     state => state.navigator,
   );
-  const { setSearchData, setSearchQuery, setShortcuts } = useStoreActions(state => state.navigator);
-  const [query, setQuery] = useState('');
+  const { setSearchData, setShortcuts } = useStoreActions(state => state.navigator);
 
   const inputRef = useRef(null);
   const handleChange = event => {
@@ -35,17 +34,6 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress }) => {
       });
     }
   }, [shortcuts]);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (query !== searchQuery) {
-        setSearchQuery(query);
-      }
-    }, 50);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [query]);
 
   useEffect(() => {
     const searchTypeInt = parseInt(searchQuery, 10);
@@ -82,6 +70,8 @@ InputBox.propTypes = {
   disabled: PropTypes.bool,
   className: PropTypes.string,
   databaseProgress: PropTypes.number,
+  query: PropTypes.string,
+  setQuery: PropTypes.func,
 };
 
 export default InputBox;
