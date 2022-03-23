@@ -17,7 +17,6 @@ import { convertToLegacySettingsObj } from './js/common/utils';
 const { store } = require('electron').remote.require('./app');
 const { ipcRenderer } = require('electron');
 const tingle = require('./assets/js/vendor/tingle.js');
-global.platform = require('./main/desktop_scripts');
 
 // Find receiver and show to viewer
 let trigID = 0;
@@ -116,7 +115,7 @@ function onSuccess(message) {
 function onRequestSessionSuccess(e) {
   appendMessage('onRequestSessionSuccess');
   session = e;
-  global.platform.ipc.send('cast-session-active');
+  ipcRenderer.send('cast-session-active');
   castToReceiver();
 }
 
@@ -136,7 +135,7 @@ function sessionUpdateListener(isAlive) {
   appendMessage(message);
   if (!isAlive) {
     session = null;
-    global.platform.ipc.send('cast-session-stopped');
+    ipcRenderer.send('cast-session-stopped');
   }
 }
 
@@ -224,7 +223,7 @@ function onStopAppSuccess() {
  * stop app/session
  */
 function stopApp() {
-  global.platform.ipc.send('cast-session-stopped');
+  ipcRenderer.send('cast-session-stopped');
   session.stop(onStopAppSuccess, onError);
 }
 
@@ -247,13 +246,13 @@ function sendMessage(message) {
 }
 
 // IPC
-global.platform.ipc.on('search-cast', (event, pos) => {
+ipcRenderer.on('search-cast', (event, pos) => {
   requestSession();
   appendMessage(event);
   appendMessage(pos);
 });
 
-global.platform.ipc.on('stop-cast', (event, pos) => {
+ipcRenderer.on('stop-cast', (event, pos) => {
   stopApp();
 });
 
