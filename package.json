@@ -192,7 +192,7 @@
     }
   },
   "optionalDependencies": {
-    "react-native": "^0.61.5"
+    "react-native": "^0.62.3"
   },
   "extendInfo": {
     "NSAppTransportSecurity": {
