@@ -52,7 +52,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
       if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'center',
         });
       }
     }, 100);
