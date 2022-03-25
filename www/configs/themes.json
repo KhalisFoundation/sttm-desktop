@@ -20,6 +20,18 @@
     "key": "dark-theme"
   },
   {
+    "name": "VAISAKHI",
+    "background-color": "#fec43c",
+    "gurbani-color": "#06185d",
+    "translation-color": "#06185d",
+    "transliteration-color": "#06185d",
+    "teeka-color": "#fff",
+    "background-image": "vaisakhi.jpg",
+    "background-image-full": "vaisakhi.jpg",
+    "type": "BACKGROUND",
+    "key": "vaisakhi"
+  },
+  {
     "name": "KHALSA_GOLD",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",

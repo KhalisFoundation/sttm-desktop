@@ -1,0 +1,19 @@
+$themeVaisakhi: (
+  type: 'light',
+  background-color: #fec43c,
+  background-image: url('../../assets/img/custom_backgrounds/vaisakhi.jpg'),
+  gurbani: #06185d,
+  translation: #06185d,
+  teeka: #fff,
+  transliteration: #06185d,
+  visraam: #bd0d0d,
+  yamki: #9a6914,
+);
+
+.theme-vaisakhi {
+  @include generateTheme($themeVaisakhi...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+  }
+}

@@ -52,5 +52,11 @@
     "bgColor": "#000000",
     "textColor": "#ff0000",
     "gurbaniTextColor": "#ff0000"
+  },
+  "vaisakhi": {
+    "label": "VAISAKHI",
+    "bgColor": "#ffa61a",
+    "textColor": "#06185d",
+    "gurbaniTextColor": "#06185d"
   }
 }
