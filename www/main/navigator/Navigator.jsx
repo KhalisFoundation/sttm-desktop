@@ -114,6 +114,7 @@ const Navigator = () => {
               header={singleDisplayHeader}
               content={singleDisplayContent}
               footer={singleDisplayFooter}
+              className="single-display-pane"
             />
           </div>
           <div className="single-display-viewer">
