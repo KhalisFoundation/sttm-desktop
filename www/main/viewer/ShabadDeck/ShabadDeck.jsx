@@ -26,6 +26,7 @@ function ShabadDeck() {
     isSundarGutkaBani,
     ceremonyId,
     isCeremonyBani,
+    minimizedBySingleDisplay,
   } = useStoreState(state => state.navigator);
   const {
     theme: currentTheme,
@@ -80,6 +81,8 @@ function ShabadDeck() {
       Visraam: '',
     };
   };
+
+  const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
   useEffect(() => {
     if (activeVerseId) {
@@ -164,15 +167,18 @@ function ShabadDeck() {
   return (
     <>
       <div
-        className={`shabad-deck ${akhandpatt ? 'akhandpatt-view' : ''} ${
-          miscSlideText === '' ? 'empty-slide' : ''
-        } ${isSingleDisplayMode ? 'single-display-mode' : ''} ${
-          platform === 'win32' ? 'win32' : ''
-        } theme-${getCurrentThemeInstance().key}`}
+        className={classNames(
+          'shabad-deck',
+          isSingleDisplayMode && 'single-display-mode',
+          miscSlideText === '' && 'empty-slide',
+          minimizedBySingleDisplay && 'single-display-minimized',
+          akhandpatt && 'akhandpatt-view',
+          platform === 'win32' && 'win32',
+          `theme-${getCurrentThemeInstance().key}`,
+        )}
         style={applyTheme()}
       >
-        {/* show quicktools only on presentation mode */}
-        {!isSingleDisplayMode && <QuickTools isMiscSlide={isMiscSlide} />}
+        <QuickTools isMiscSlide={isMiscSlide} />
         {activeVerse.length ? (
           activeVerse.map((activeVerseObj, index) => (
             <Slide

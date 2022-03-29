@@ -1,7 +1,13 @@
 .akhandpatt-view {
   .verse-slide {
     height: auto !important;
-    padding: 0 10px !important;
+    padding: 10px !important;
+  }
+}
+
+.single-display-mode {
+  .verse-slide {
+    padding: 30px 10px;
   }
 }
 
@@ -66,7 +72,7 @@
 .slide-quicktools {
   font-size: 12px;
   font-weight: bold;
-  height: 98%;
+  height: 99%;
   position: fixed;
   width: 18%;
   max-width: 150px;
