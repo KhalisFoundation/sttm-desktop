@@ -20,6 +20,18 @@
     "key": "dark-theme"
   },
   {
+    "name": "IMMORTAL_ORANGE",
+    "background-color": "#fec43c",
+    "gurbani-color": "#06185d",
+    "translation-color": "#06185d",
+    "transliteration-color": "#06185d",
+    "teeka-color": "#fff",
+    "background-image": "immortal-orange.jpg",
+    "background-image-full": "immortal-orange.jpg",
+    "type": "BACKGROUND",
+    "key": "immortal-orange"
+  },
+  {
     "name": "KHALSA_GOLD",
     "background-color": "#ffda39",
     "gurbani-color": "#ffffff",
