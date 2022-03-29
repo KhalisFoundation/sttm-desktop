@@ -1,7 +1,7 @@
-$themeVaisakhi: (
+$themeImmortalOrange: (
   type: 'light',
   background-color: #fec43c,
-  background-image: url('../../assets/img/custom_backgrounds/vaisakhi.jpg'),
+  background-image: url('../../assets/img/custom_backgrounds/immortal-orange.jpg'),
   gurbani: #06185d,
   translation: #06185d,
   teeka: #fff,
@@ -10,8 +10,8 @@ $themeVaisakhi: (
   yamki: #9a6914,
 );
 
-.theme-vaisakhi {
-  @include generateTheme($themeVaisakhi...);
+.theme-immortal-orange {
+  @include generateTheme($themeImmortalOrange...);
 
   .shabad-pane .shabad-pane-active {
     background: $transparent-blue;
