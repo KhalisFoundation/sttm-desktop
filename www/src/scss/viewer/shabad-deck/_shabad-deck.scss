@@ -12,14 +12,28 @@
 
 .shabad-deck {
   background-size: cover;
+  background-position: center;
   border: 1px solid $alt-grey;
   height: 100%;
 
   &.single-display-mode {
-    padding: 24px 72px;
+    padding: 30px 72px 24px 72px;
+    border: none;
 
     &.win32 {
       padding-top: 56px;
+    }
+
+    + .viewer-logo {
+      left: 80px;
+    }
+  }
+
+  &.single-display-minimized {
+    padding: 0 !important;
+
+    & + .viewer-logo {
+      left: 12px;
     }
   }
 }

@@ -22,6 +22,7 @@ const SettingViewer = () => {
   const commonStyles = {
     textAlign: leftAlign ? 'left' : 'center',
     backgroundImage: `${themeBg && themeBg.url ? `url(${themeBg.url})` : 'none'}`,
+    backgroundPosition: 'center',
   };
 
   const gurbaniStyles = {

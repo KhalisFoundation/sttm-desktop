@@ -540,10 +540,6 @@ module.exports = {
       });
       if (path) {
         store.set('userPrefs.app.live-feed-location', path[0]);
-        const locationLabel = document.querySelectorAll('.control-item#live-feed > .notes');
-        for (let i = 0, len = locationLabel.length; i < len; i += 1) {
-          locationLabel[i].innerText = path;
-        }
       }
     } else {
       store.set('userPrefs.app.live-feed-location', false);

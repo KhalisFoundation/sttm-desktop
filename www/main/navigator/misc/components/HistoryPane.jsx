@@ -28,6 +28,7 @@ export const HistoryPane = ({ className }) => {
     setActiveVerseId,
     setSingleDisplayActiveTab,
   } = useStoreActions(state => state.navigator);
+  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
   const shortcutsState = localStorage.getItem('isShortcutsOpen');
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
 
@@ -117,7 +118,7 @@ export const HistoryPane = ({ className }) => {
   return (
     <div
       className={`history-results ${
-        isShortcutsOpen ? 'history-results-shrinked' : ''
+        isShortcutsOpen && !isSingleDisplayMode ? 'history-results-shrinked' : ''
       } ${className}`}
     >
       {versesMarkup}

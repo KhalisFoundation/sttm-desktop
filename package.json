@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -127,7 +127,7 @@
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
-    "copyright": "Copyright © 2021 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -193,5 +193,10 @@
   },
   "optionalDependencies": {
     "react-native": "^0.61.5"
+  },
+  "extendInfo": {
+    "NSAppTransportSecurity": {
+      "NSAllowsArbitraryLoads": true
+    }
   }
 }

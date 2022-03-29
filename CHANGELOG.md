@@ -1,10 +1,13 @@
 ## New Updates
 
-### 9.0.0 - _March 8, 2022_
+### 9.0.0 - _March 29, 2022_
 
 We are excited to launch the latest version of SikhiToTheMax 9.0, which features several enhancements and performance improvements.
 
 ### Enhancements
+
+- A new Vaisakhi theme has been added (Immortal Orange).
+  ![](./assets/img/help_images/desktop-vaisakhi.png)
 
 - Redesigned search experience
 - You can now filter by writer, raag and source

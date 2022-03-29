@@ -126,6 +126,10 @@ ul {
       }
     }
 
+    &-pane {
+      min-width: 550px;
+    }
+
     &-minimize {
       .pane {
         height: 40px;
