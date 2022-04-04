@@ -111,6 +111,7 @@
     "qrcode": "^1.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-html-parser": "^2.0.2",
     "react-virtuoso": "^2.7.2",
     "read-chunk": "^3.0.0",
     "realm": "^5.0.5",
