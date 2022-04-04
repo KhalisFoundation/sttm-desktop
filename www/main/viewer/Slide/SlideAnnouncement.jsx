@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
+import ReactHtmlParser from 'react-html-parser';
 
 const SlideAnnouncement = ({ getFontSize }) => {
   const { announcementsFontSize } = useStoreState(state => state.userSettings);
@@ -19,7 +20,7 @@ const SlideAnnouncement = ({ getFontSize }) => {
         style={getFontSize(announcementsFontSize)}
         className={gurmukhi ? 'gurmukhi-announcement-slide' : ''}
       >
-        {miscSlideText}
+        {ReactHtmlParser(miscSlideText)}
       </span>
     </div>
   );
