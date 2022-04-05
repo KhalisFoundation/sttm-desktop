@@ -358,6 +358,7 @@ const ShabadContent = () => {
       }, 100);
     }
     setFilteredItems(filterRequiredVerseItems(activeShabad));
+    scrollToView();
   }, [activeShabad]);
 
   useEffect(() => {
@@ -366,8 +367,6 @@ const ShabadContent = () => {
       Line: overlayVerse,
       live: liveFeed,
     });
-
-    scrollToView();
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
