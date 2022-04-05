@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
@@ -28,9 +28,7 @@ export const HistoryPane = ({ className }) => {
     setActiveVerseId,
     setSingleDisplayActiveTab,
   } = useStoreActions(state => state.navigator);
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
-  const shortcutsState = localStorage.getItem('isShortcutsOpen');
-  const [isShortcutsOpen, setIsShortcutsOpen] = useState(shortcutsState);
+  const { isSingleDisplayMode, shortcutTray } = useStoreState(state => state.userSettings);
 
   const openShabadFromHistory = element => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -100,25 +98,10 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  useEffect(() => {
-    document.addEventListener(
-      'openShortcut',
-      e => {
-        setIsShortcutsOpen(e.detail.value);
-      },
-      false,
-    );
-    return () => {
-      document.removeEventListener('openShortcut', e => {
-        setIsShortcutsOpen(e.detail.value);
-      });
-    };
-  });
-
   return (
     <div
       className={`history-results ${
-        isShortcutsOpen && !isSingleDisplayMode ? 'history-results-shrinked' : ''
+        shortcutTray && !isSingleDisplayMode ? 'history-results-shrinked' : ''
       } ${className}`}
     >
       {versesMarkup}
