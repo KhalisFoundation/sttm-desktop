@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { remote } from 'electron';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
@@ -10,13 +10,19 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
   const { shortcutTray } = useStoreState(state => state.userSettings);
   const { setShortcutTray } = useStoreActions(state => state.userSettings);
   const { setVerseHistory } = useStoreActions(state => state.navigator);
+  const drawerRef = useRef(null);
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
   };
 
   const toggleShortcuts = () => {
-    setShortcutTray(!shortcutTray);
+    drawerRef.current.classList.toggle('shortcut-drawer-active');
+    const changeState = () => {
+      setShortcutTray(!shortcutTray);
+    };
+    drawerRef.current.removeEventListener('transitionend', changeState);
+    drawerRef.current.addEventListener('transitionend', changeState);
     analytics.trackEvent('shortcutTrayToggle', shortcutTray);
   };
 
@@ -24,7 +30,7 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
     <div className="misc-footer">
       <div className="clear-pane">
         <div
-          className={`${!shortcutTray ? 'footer-toggler' : 'footer-toggler-inactive '}`}
+          className={`${shortcutTray ? 'footer-toggler-inactive' : 'footer-toggler'}`}
           onClick={toggleShortcuts}
         >
           <i className={`${shortcutTray ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
@@ -34,7 +40,10 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
           <span>Clear History</span>
         </a>
       </div>
-      <div className={`${shortcutTray ? 'shortcut-drawer-active' : 'shortcut-drawer'}`}>
+      <div
+        ref={drawerRef}
+        className={`shortcut-drawer ${shortcutTray ? 'shortcut-drawer-active' : ''}`}
+      >
         <button className="tray-item-icon" onClick={anandSahibBhog}>
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
