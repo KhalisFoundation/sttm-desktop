@@ -127,8 +127,7 @@ $misc-footer-active: 70px;
         }
       }
     }
-    .shortcut-drawer-active {
-      transition: 0.5s all ease;
+    .shortcut-drawer.shortcut-drawer-active {
       @include flex($jc-value: space-around);
       height: 70px;
       .tray-item-icon {
