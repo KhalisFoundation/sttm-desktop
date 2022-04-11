@@ -2,7 +2,7 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
 const bakePanktee = () => {
-  const { displayVishraams, larivaarAssist, gurbaniFontSize } = useStoreState(
+  const { displayVishraams, larivaarAssist, larivaar, gurbaniFontSize } = useStoreState(
     state => state.userSettings,
   );
 
@@ -35,12 +35,11 @@ const bakePanktee = () => {
     };
 
     const getVishraamStyle = word => {
+      if (larivaar && larivaarAssist) {
+        return null;
+      }
       return (
-        (displayVishraams &&
-          !larivaarAssist &&
-          word.vishraamType &&
-          `vishraam vishraam-${word.vishraamType}`) ||
-        null
+        (displayVishraams && word.vishraamType && `vishraam vishraam-${word.vishraamType}`) || null
       );
     };
 
