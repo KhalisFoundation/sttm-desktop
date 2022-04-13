@@ -28,6 +28,7 @@ const ShabadContent = () => {
     shortcuts,
     isRandomShabad,
     minimizedBySingleDisplay,
+    isDontSaveHistory,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -38,6 +39,7 @@ const ShabadContent = () => {
     setIsRandomShabad,
     setVerseHistory,
     setIsMiscSlide,
+    setIsDontSaveHistory,
   } = useStoreActions(state => state.navigator);
 
   const { autoplayToggle, autoplayDelay, baniLength, mangalPosition, liveFeed } = useStoreState(
@@ -313,7 +315,12 @@ const ShabadContent = () => {
         if (verses) {
           setActiveShabad(verses);
           if (initialVerseId) {
-            saveToHistory(verses, 'shabad', initialVerseId);
+            if (!isDontSaveHistory) {
+              saveToHistory(verses, 'shabad', initialVerseId);
+            }
+            if (isDontSaveHistory) {
+              setIsDontSaveHistory(false);
+            }
           }
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);

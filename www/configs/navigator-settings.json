@@ -37,5 +37,6 @@
     "openDhanGuruSlide": false,
     "copyToClipboard": false
   },
-  "minimizedBySingleDisplay": false
+  "minimizedBySingleDisplay": false,
+  "isDontSaveHistory": false
 }
