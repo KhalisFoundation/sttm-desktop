@@ -17,7 +17,6 @@
   "UPDATE_DOWNLOADED": "Update downloaded and ready to install",
   "VIEWER_TITLE": "{{appName}} Viewer",
   "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
-
   "BANI_OVERLAY": {
     "SUBTITLES": "Subtitles",
     "GURBANI": "Gurbani",
@@ -51,12 +50,10 @@
     "24HR": "24Hr",
     "THEME_HEADING": "Themes"
   },
-
   "WORKSPACES": {
     "PRESENTER": "Presentation",
     "SINGLE_DISPLAY": "Single Display"
   },
-
   "CHROMECAST": {
     "CANCEL": "Cancel",
     "MSG_SENT": "Message sent: ",
@@ -71,12 +68,10 @@
     "SESSION_UPDATED": "Session Updated",
     "TRY_AGAIN": "An error occurred. Please try again."
   },
-
   "DATABASE": {
     "COULDNT_DELETE": "Could not delete old database {{oldDB}}: {{err1}}",
     "DOWNLOADING": "Downloading database..."
   },
-
   "INSERT": {
     "ADD_ANNOUNCEMENT": "Add Announcement",
     "ADD_ANNOUNCEMENT_SLIDE": "Add Announcement Slide",
@@ -106,7 +101,6 @@
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
     }
   },
-
   "MENU": {
     "APP": {
       "ABOUT": "About {{appName}}",
@@ -158,13 +152,11 @@
       "SELF": "Window"
     }
   },
-
   "OTHERS": {
     "DAILY_HUKAMNAMA": "Daily Hukamnama",
     "SHOW_RANDOM_SHABAD": "Show Random Shabad",
     "WHATS_NEW": "What's New"
   },
-
   "QUICK_TOOLS": {
     "ANNOUNCEMENTS": "Announcements",
     "BANI": "Bani",
@@ -173,7 +165,6 @@
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration"
   },
-
   "SEARCH": {
     "ANG": "Ang",
     "FIRST_LETTER_ANYWHERE": "First Letter (Anywhere)",
@@ -312,7 +303,6 @@
     },
     "ERROR": "Error occured while searching. Please try again or restart the application."
   },
-
   "SETTINGS": {
     "APP_SETTINGS": "App Settings",
     "ASSIST_TYPE": "Assist Type",
@@ -331,14 +321,12 @@
     "VISHRAAM_SOURCE": "Vishraam Source",
     "SLIDE_OPTIONS": "Slide Options",
     "BANI_AND_LANGUAGES": "Bani & Languages",
-
     "FONT_SIZES": "Font Sizes",
     "ANNOUNCEMENTS": "Announcements",
     "BANI": "Bani",
     "PUNJABI_TEEKA": "Punjabi Teeka",
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration",
-
     "DISPLAY_OPTIONS": "Display Options",
     "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
     "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
@@ -347,11 +335,9 @@
     "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
     "LEFT_ALIGN": "Left-Align",
     "NEXT_LINE": "Next Line",
-
     "AUTOPLAY_OPTIONS": "Autoplay Options",
     "AUTO_PLAY": "Auto Play",
     "DELAY": "Delay (Seconds)",
-
     "BANI_SETTINGS": "Bani Settings",
     "MANGAL_POSITION": "Mangal Position",
     "BANI_LENGTH": "Bani Length",
@@ -361,7 +347,6 @@
     "LONG_BANI_LENGTH": "Long",
     "MEDIUM_BANI_LENGTH": "Medium",
     "SHORT_BANI_LENGTH": "Short",
-
     "LANGUAGE_SETTINGS": "Language Settings",
     "TRANSLATION_LANGUAGE": "Translation Language",
     "TRANSLITERATION_LANGUAGE": "Transliteration Language",
@@ -369,18 +354,15 @@
     "ENGLISH_LANGUAGE": "English",
     "SPANISH_LANGUAGE": "Spanish",
     "HINDI_LANGUAGE": "Hindi",
-
     "APP_LAYOUT": "App Layout",
     "PRESENTER_VIEW": "Presenter View",
     "QUICK_TOOLS": "Quick Tools",
     "SHORTCUT_TRAY": "Shortcut Tray",
     "LIVE_FEED": "Live Feed Text Files",
-
     "OTHER_OPTIONS": "Other Options",
     "COLLECT_STATISTICS": "Collect Statistics",
     "LIMIT_CHANGELOG": "Limit Changelog",
     "LIMIT_CHANGELOG_MSG": "Only see changelog once per version",
-
     "FIELDS_TO_DISPLAY": {
       "NEXT_LINE": "Next Line",
       "PUNJABI_TEEKA": "Punjabi Teeka",
@@ -389,13 +371,11 @@
       "TRANSLITERATION": "Transliteration"
     }
   },
-
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (Bhog)",
     "BLANK": "Blank",
     "MOOL_MANTRA": "Mool Mantr"
   },
-
   "THEMES": {
     "A_NEW_DAY": "A New Day",
     "BAAGI_BLUE": "Baagi Blue",
@@ -418,7 +398,6 @@
     "CURRENT_THEME": "Current Theme",
     "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
     "SPECIAL_CONDITIONS": "Special Conditions",
-
     "ALLOWED_IMGS_MSG": "Only .png and .jpg images are allowed.",
     "DELETE_ERR": "Unable to delete that image. - {{error}}",
     "DIR_CREATE_ERR": " Error creating directory for user backgrounds. {{error}} - If error persists, report it at www.sttm.co:",
@@ -433,7 +412,6 @@
     "UNABLE_TO_GET": "Unable to get existing custom background files - {{error}}",
     "USING_ERR": "There was an error using this file. {{error}} -\nIf error persists, report it at www.sttm.co"
   },
-
   "TOOLBAR": {
     "BANI_CONTROLLER": "Bani Controller",
     "CEREMONIES": "Ceremonies",
@@ -454,7 +432,6 @@
     "SETTINGS": "Settings",
     "SUNDAR_GUTKA": "Sundar Gutka",
     "THEMES": "Themes",
-
     "BANI_DESC": {
       "1": "Connect to SikhiToTheMax by visiting ",
       "2": " from a mobile device to search, navigate, and control the entire app."
@@ -466,7 +443,7 @@
       "PIN": "Pin",
       "PRESENT_CODE": "Present Code to Sangat",
       "SANGAT_SYNC": "Sangat Sync",
-      "SYNC_STRING": "<p>Visit <strong>sttm.co/sync</strong> on your mobile device and enter the code below to follow along</p><h1>{{code}}</h1>",
+      "SYNC_STRING": "<p>Visit <strong>sttm.co/sync</strong> on your mobile device and enter the code below to follow along</p><h1>{{code}}</h1><span class='d-none'>{{garbageValue}}</span>",
       "UNIQUE_CODE_LABEL": "Your unique sync code is:",
       "SYNC_DESC": {
         "1": "Allow the Sangat to visit ",
@@ -491,12 +468,10 @@
       ]
     }
   },
-
   "BANI": {
     "LOAD_ERROR": "Error loading {{erroneousOperation}}. Please restart the application. If error persists, report it at www.sttm.co",
     "DATABASE_DOWNLOADING": "Database is downloading, please wait..."
   },
-
   "SHORTCUT": {
     "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
   }
