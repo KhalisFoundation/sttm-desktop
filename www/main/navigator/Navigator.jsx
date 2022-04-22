@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { remote } from 'electron';
 import SearchPane from './search/components/SearchPane';
 import ShabadPane from './shabad/ShabadPane';
 import { MiscPane } from './misc/components';
@@ -7,6 +8,8 @@ import ViewerPane from './viewer/ViewerPane';
 import { Pane } from '../common/sttm-ui/pane';
 import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
 import insertSlide from '../common/constants/slidedb';
+
+const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
   const { isSingleDisplayMode, akhandpatt } = useStoreState(state => state.userSettings);
@@ -48,14 +51,17 @@ const Navigator = () => {
 
   const openWaheguruSlide = () => {
     addMiscSlide(insertSlide.slideStrings.waheguru);
+    analytics.trackEvent('display', 'waheguru-slide');
   };
 
   const openMoolMantraSlide = () => {
     addMiscSlide(insertSlide.slideStrings.moolMantra);
+    analytics.trackEvent('display', 'mool-mantra-slide');
   };
 
   const openBlankViewer = () => {
     addMiscSlide('');
+    analytics.trackEvent('display', 'empty-slide');
   };
 
   const openAnandSahibBhog = () => {

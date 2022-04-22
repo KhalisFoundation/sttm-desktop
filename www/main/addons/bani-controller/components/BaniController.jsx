@@ -17,6 +17,7 @@ import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
 
+const analytics = remote.getGlobal('analytics');
 const { tryConnection, onEnd } = shareSync;
 
 const { i18n } = remote.require('./app');
@@ -108,6 +109,7 @@ const BaniController = ({ onScreenClose, className }) => {
         setListeners(true);
       } else {
         showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
+        analytics.trackEvent('sync', 'error');
       }
     } else {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
@@ -125,7 +127,7 @@ const BaniController = ({ onScreenClose, className }) => {
       onEnd(code);
       setCode(null);
       setAdminPin(null);
-      // analytics.trackEvent('syncStopped', true);
+      analytics.trackEvent('syncStopped', true);
     } else {
       await remoteSyncInit();
     }

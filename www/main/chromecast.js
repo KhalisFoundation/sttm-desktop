@@ -11,12 +11,15 @@
 */
 
 import chromecast from 'electron-chromecast';
+import { remote } from 'electron';
 import { CHROMECAST } from './locales/en.json';
 import { convertToLegacySettingsObj } from './js/common/utils';
 
 const { store } = require('electron').remote.require('./app');
 const { ipcRenderer } = require('electron');
 const tingle = require('./assets/js/vendor/tingle.js');
+
+const analytics = remote.getGlobal('analytics');
 
 // Find receiver and show to viewer
 let trigID = 0;
@@ -210,6 +213,7 @@ function initializeCastApi() {
   const sessionRequest = new chrome.cast.SessionRequest(applicationID);
   const apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
   chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+  analytics.trackEvent('chromecast', 'start');
 }
 
 /**

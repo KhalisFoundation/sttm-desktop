@@ -75,6 +75,7 @@ export const InsertPane = ({ className }) => {
     } else {
       addMiscSlide(e);
     }
+    analytics.trackEvent('display', 'dhanguru-slide', e.target.value);
   };
 
   let slidePage = `<h1 class = "modalTitle">${i18n.t('INSERT.INSERT_DHAN_SLIDE')}</h1>

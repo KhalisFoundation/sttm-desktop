@@ -1,6 +1,6 @@
-// import { remote } from 'electron';
+import { remote } from 'electron';
 
-// const analytics = remote.getGlobal('analytics');
+const analytics = remote.getGlobal('analytics');
 
 const handleRequestControl = (
   isPinCorrect,
@@ -67,11 +67,11 @@ const handleRequestControl = (
       });
     }
   }
-  // analytics.trackEvent(
-  //   'controller',
-  //   'connection',
-  //   isPinCorrect ? 'Connection Succesful' : 'Connection Failed',
-  // );
+  analytics.trackEvent(
+    'controller',
+    'connection',
+    isPinCorrect ? 'Connection Succesfull' : 'Connection Failed',
+  );
 };
 
 export default handleRequestControl;

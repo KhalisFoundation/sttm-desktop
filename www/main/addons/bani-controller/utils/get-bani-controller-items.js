@@ -44,7 +44,12 @@ const getBaniControllerItems = ({
               if (isMiscSlideGurmukhi) {
                 setIsMiscSlideGurmukhi(false);
               }
-              const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', { code });
+              // ToDo: Remove Math.random() and fix easy peasy state update issue
+              const garbageValue = Math.random();
+              const syncString = i18n.t('TOOLBAR.SYNC_CONTROLLER.SYNC_STRING', {
+                garbageValue,
+                code,
+              });
               setMiscSlideText(syncString);
               analytics.trackEvent('controller', 'codePresented', true);
             }

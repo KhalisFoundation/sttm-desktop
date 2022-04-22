@@ -274,6 +274,9 @@ function createViewer(ipcData) {
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     viewerWindow.webContents.on('did-finish-load', () => {
+      viewerWindow.webContents.insertCSS(
+        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
+      );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
       mainWindow.webContents.send('external-display', {

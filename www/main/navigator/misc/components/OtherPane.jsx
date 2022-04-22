@@ -7,6 +7,8 @@ import { dailyHukamnama } from '../../utils';
 
 const { i18n } = remote.require('./app');
 
+const analytics = remote.getGlobal('analytics');
+
 export const OtherPane = ({ className }) => {
   const { activeShabadId, isRandomShabad, singleDisplayActiveTab } = useStoreState(
     state => state.navigator,
@@ -23,6 +25,7 @@ export const OtherPane = ({ className }) => {
       setSingleDisplayActiveTab('shabad');
     }
     randomShabad().then(randomId => activeShabadId !== randomId && setActiveShabadId(randomId));
+    analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
