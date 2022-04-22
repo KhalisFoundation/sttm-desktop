@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.0.0 - _April 23, 2022_
+### 9.0.0 - _April 22, 2022_
 
 We are excited to launch the latest version of SikhiToTheMax 9.0, which features several enhancements and performance improvements.
 
