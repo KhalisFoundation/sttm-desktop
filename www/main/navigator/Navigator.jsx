@@ -1,107 +1,149 @@
-import React from 'react';
-import { useStoreState } from 'easy-peasy';
+import React, { useEffect } from 'react';
+import { useStoreState, useStoreActions } from 'easy-peasy';
+import { remote } from 'electron';
+import SearchPane from './search/components/SearchPane';
+import ShabadPane from './shabad/ShabadPane';
+import { MiscPane } from './misc/components';
+import ViewerPane from './viewer/ViewerPane';
+import { Pane } from '../common/sttm-ui/pane';
+import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
+import insertSlide from '../common/constants/slidedb';
+
+const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
-  const { isConnected } = useStoreState(state => state.baniController);
+  const { isSingleDisplayMode, akhandpatt } = useStoreState(state => state.userSettings);
+  const { setAkhandpatt } = useStoreState(state => state.userSettings);
+  const {
+    minimizedBySingleDisplay,
+    shortcuts,
+    isMiscSlide,
+    miscSlideText,
+    isAnnoucement,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    ceremonyId,
+  } = useStoreState(state => state.navigator);
+  const {
+    setShortcuts,
+    setIsMiscSlide,
+    setMiscSlideText,
+    setIsAnnoucement,
+    setIsSundarGutkaBani,
+    setIsCeremonyBani,
+    setCeremonyId,
+  } = useStoreActions(state => state.navigator);
+
+  const addMiscSlide = givenText => {
+    if (isAnnoucement) {
+      setIsAnnoucement(false);
+    }
+    if (!isMiscSlide) {
+      if (akhandpatt) {
+        setAkhandpatt(false);
+      }
+      setIsMiscSlide(true);
+    }
+    if (miscSlideText !== givenText) {
+      setMiscSlideText(givenText);
+    }
+  };
+
+  const openWaheguruSlide = () => {
+    addMiscSlide(insertSlide.slideStrings.waheguru);
+    analytics.trackEvent('display', 'waheguru-slide');
+  };
+
+  const openMoolMantraSlide = () => {
+    addMiscSlide(insertSlide.slideStrings.moolMantra);
+    analytics.trackEvent('display', 'mool-mantra-slide');
+  };
+
+  const openBlankViewer = () => {
+    addMiscSlide('');
+    analytics.trackEvent('display', 'empty-slide');
+  };
+
+  const openAnandSahibBhog = () => {
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    if (ceremonyId !== 3) {
+      setCeremonyId(3);
+    }
+    if (!isCeremonyBani) {
+      setIsCeremonyBani(true);
+    }
+  };
+
+  useEffect(() => {
+    if (shortcuts.openWaheguruSlide) {
+      openWaheguruSlide();
+      setShortcuts({
+        ...shortcuts,
+        openWaheguruSlide: false,
+      });
+    }
+    if (shortcuts.openMoolMantraSlide) {
+      openMoolMantraSlide();
+      setShortcuts({
+        ...shortcuts,
+        openMoolMantraSlide: false,
+      });
+    }
+    if (shortcuts.openBlankViewer) {
+      openBlankViewer();
+      setShortcuts({
+        ...shortcuts,
+        openBlankViewer: false,
+      });
+    }
+    if (shortcuts.openAnandSahibBhog) {
+      setShortcuts({
+        ...shortcuts,
+        openAnandSahibBhog: false,
+      });
+      openAnandSahibBhog();
+    }
+  }, [shortcuts]);
 
   return (
     <>
-      <div id="main-ui" className="base-ui">
-        <div className="nav-page" id="search-page">
-          <div className="navigator-header">
-            <div className="preferences-open"></div>
-            <div className="toggle-minimize">
-              <i className="fa fa-window-minimize"></i>
-              <i className="fa fa-window-maximize disabled"></i>
-            </div>
-            <span className="nav-header-text" data-key="SEARCH"></span>
-            <div id="search-type"></div>
+      {isSingleDisplayMode ? (
+        <>
+          <div
+            className={`single-display-controller ${
+              minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
+            }`}
+          >
+            <Pane
+              header={singleDisplayHeader}
+              content={singleDisplayContent}
+              footer={singleDisplayFooter}
+              className="single-display-pane"
+            />
           </div>
-          <div className="search-div"></div>
-          <section className="block-list">
-            <ul id="results" className="gurmukhi"></ul>
-          </section>
-        </div>
-        <div className="nav-page" id="session-page">
-          <div className="navigator-header navigator-header-tabs">
-            <div className="preferences-open"></div>
-            <div className="toggle-minimize">
-              <i className="fa fa-window-minimize"></i>
-              <i className="fa fa-window-maximize disabled"></i>
-            </div>
-            <span className="nav-header-text"> </span>
-            <div className="nav-header-tabs">
-              <span
-                className="nav-header-tab nav-header-text active"
-                id="history-tab"
-                data-title="history"
-              >
-                <i className="fa fa-clock-o"></i> <span data-key="HISTORY"></span>
-              </span>
-              <span className="nav-header-tab nav-header-text" id="insert-tab" data-title="insert">
-                <i className="fa fa-desktop"></i> <span data-key="INSERT"></span>
-              </span>
-              <span className="nav-header-tab nav-header-text" id="others-tab" data-title="others">
-                <i className="fa fa-ellipsis-h"></i> <span data-key="OTHERS"></span>
-              </span>
-            </div>
+          <div className="single-display-viewer">
+            <ViewerPane />
           </div>
-          <section className="block-list">
-            <div className="tab-content active" id="history-tab-content">
-              <ul id="session" className="gurmukhi"></ul>
-            </div>
-            <div className="tab-content" id="themes-tab-content">
-              <ul className="options-list" id="custom-theme-options"></ul>
-            </div>
-            <div className="tab-content" id="insert-tab-content">
-              <ul id="list-of-custom-slides"></ul>
-            </div>
-            <div className="tab-content" id="settings-tab-content"></div>
-            <div className="tab-content" id="others-tab-content">
-              <ul id="list-of-shabad-options"></ul>
-            </div>
-          </section>
-        </div>
-        <div className="nav-page" id="shabad-page" tabIndex="0">
-          <div className="navigator-header">
-            <div className="preferences-open"></div>
-            <div className="toggle-minimize">
-              <i className="fa fa-window-minimize"></i>
-              <i className="fa fa-window-maximize disabled"></i>
-            </div>
-            <div className="current-shabad-header">
-              <div className="shabad-prev"></div>
-              <span className="nav-header-text" data-key="CURRENT_SHABAD"></span>
-              <div className="shabad-next"></div>
-            </div>
-            <div id="current-shabad-menu"></div>
+        </>
+      ) : (
+        <>
+          <div className="navigator-row">
+            <SearchPane />
+            <ShabadPane />
           </div>
-          <section className="block-list">
-            <ul id="shabad" className="gurmukhi"></ul>
-          </section>
-          {isConnected && (
-            <div className="controller-signal" title="Bani controller in use">
-              <img alt="sync" src="assets/img/icons/sync.svg" />
-            </div>
-          )}
-        </div>
-        <div className="takeover-page" id="menu-page">
-          <div className="navigator-header">
-            <div className="preferences-close"></div>
-            <div className="toggle-minimize">
-              <i className="fa fa-window-minimize"></i>
-              <i className="fa fa-window-maximize disabled"></i>
-            </div>
-            <span className="nav-header-text" data-key="SETTINGS"></span>
+          <div className="navigator-row">
+            <ViewerPane />
+            <MiscPane
+              waheguruSlide={openWaheguruSlide}
+              moolMantraSlide={openMoolMantraSlide}
+              blankSlide={openBlankViewer}
+              anandSahibBhog={openAnandSahibBhog}
+            />
           </div>
-        </div>
-      </div>
-      <div id="footer" className="base-ui">
-        <div className="menu-group">
-          <div className="menu-group-left"></div>
-        </div>
-      </div>
-      <section className="shortcut-tray base-ui"></section>
+        </>
+      )}
     </>
   );
 };

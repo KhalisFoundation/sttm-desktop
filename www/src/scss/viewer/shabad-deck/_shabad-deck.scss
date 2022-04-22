@@ -1,0 +1,51 @@
+.akhandpatt-view {
+  &.shabad-deck {
+    background-attachment: fixed;
+    background-size: cover;
+    height: unset;
+    overflow-y: scroll;
+    padding-bottom: 10px;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+.shabad-deck {
+  background-size: cover;
+  background-position: center;
+  border: 1px solid $alt-grey;
+  height: 100%;
+
+  &.single-display-mode {
+    padding: 30px 72px 24px 72px;
+    border: none;
+
+    &.win32 {
+      padding-top: 56px;
+    }
+
+    + .viewer-logo {
+      left: 80px;
+    }
+  }
+
+  &.single-display-minimized {
+    padding: 0 !important;
+
+    & + .viewer-logo {
+      left: 12px;
+    }
+  }
+}
+
+.empty-slide {
+  height: 100% !important;
+}
+
+.viewer-logo {
+  fill: $grey;
+  bottom: 12px;
+  position: fixed;
+  left: 12px;
+  z-index: 1;
+}

@@ -1,0 +1,253 @@
+@import '../utils/variables';
+
+.search-pane {
+  @include pane-containers;
+  .left-pane {
+    @include inline-flex($jc-value: initial, $width: fit-content);
+    i {
+      font-size: 22px;
+      color: $mild-dark;
+    }
+    .language-selector {
+      justify-content: space-between;
+      display: inline-flex;
+      align-items: center;
+
+      .language-btn-label {
+        $size: 14px;
+        align-items: center;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        height: $size;
+        justify-content: center;
+        margin-left: 10px;
+        min-width: $size;
+        padding-left: $size;
+        position: relative;
+
+        input {
+          display: none;
+        }
+
+        .label-text {
+          margin-left: 5px;
+        }
+
+        &[aria-label]::after {
+          display: inline-block;
+          margin-left: 5px;
+        }
+
+        .checkmark {
+          border: 2px solid $light-green;
+          border-radius: 50%;
+          display: inline-block;
+          height: $size;
+          left: 0;
+          padding: 3px;
+          position: absolute;
+          top: 0;
+          transition: opacity 0.3s ease;
+          width: $size;
+        }
+
+        input:checked ~ .checkmark {
+          background-image: url('../img/icons/check-circle.svg');
+          background-origin: border-box;
+          background-repeat: no-repeat;
+          background-size: $size;
+        }
+      }
+    }
+  }
+  .search {
+    &-type {
+      &-checkbox {
+        display: none;
+      }
+
+      &-checkmark {
+        display: inline-block;
+        height: 14px;
+        background-color: transparent;
+        background-size: contain;
+        width: 14px;
+        position: relative;
+        top: 2px;
+        left: 19px;
+      }
+
+      &-label {
+        margin: 5px;
+        cursor: pointer;
+
+        &::before {
+          content: '';
+          height: 15px;
+          background-color: transparent;
+          background-size: contain;
+          width: 14px;
+          border: 1px solid $black;
+          display: inline-block;
+          border-radius: 3px;
+          position: relative;
+          top: 2px;
+          margin-right: 3px;
+        }
+      }
+    }
+  }
+  .search-type-checkbox:checked + .search-type-checkmark {
+    background-image: url('../img/icons/checkbox-check.svg');
+  }
+  .search-result-controls {
+    @include flex;
+    padding: 0 0 0 10px;
+    font-style: italic;
+
+    & span {
+      color: $mild-dark;
+    }
+
+    .filters {
+      padding-right: 12px;
+      color: $mild-dark;
+
+      .select-bani {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: transparent;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28255, 128, 47%29'></polygon></svg>");
+        background-origin: content-box;
+        background-position: right -1rem center;
+        background-repeat: no-repeat;
+        background-size: 15px 10px;
+        border: none;
+        border-radius: 0;
+        color: #0a0a0a;
+        font-family: inherit;
+        font-size: 1rem;
+        height: 40px;
+        margin: 0;
+        padding: 0.5rem;
+        padding-right: 1.5rem;
+        width: 0;
+
+        &:disabled {
+          background-color: #eee;
+        }
+        &:focus {
+          outline: none;
+        }
+        label {
+          font-style: italic;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+            Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+          font-weight: 400;
+          -webkit-font-smoothing: antialiased;
+        }
+      }
+      select {
+        option {
+          font-style: initial;
+        }
+      }
+    }
+  }
+  .search-select {
+    width: 53%;
+
+    select {
+      cursor: pointer;
+      width: 100%;
+    }
+  }
+
+  .search-content {
+    border-top: 1px solid $lighter-grey;
+    @include flex;
+    margin: 0;
+    width: 100%;
+    .input-buttons {
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+    span {
+      align-self: center;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      display: inline-block;
+      flex-grow: 1;
+      height: 40px;
+      margin: 0;
+      position: relative;
+      width: max-content;
+      padding: 0 8px;
+
+      &::-webkit-input-placeholder {
+        font-family: $body-font-family;
+        font-size: 0.8em;
+        color: $black;
+      }
+    }
+
+    &-container {
+      height: calc(100% - 50px);
+    }
+  }
+  .search-results {
+    height: calc(100% - 120px);
+  }
+  .gurmukhi-keyboard + .search-result-controls + .search-results {
+    height: calc(100% - 281px);
+  }
+  .search-footer {
+    @include flex($ai-value: start, $jc-value: initial, $width: 99%);
+    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 5px;
+    span {
+      @include inline-flex($width: initial);
+      padding: 5px;
+      height: 20px;
+      border-left: 3px solid;
+    }
+    .search-footer-span1 {
+      color: #e1802f;
+    }
+    .search-footer-span2 {
+      color: #348ce7;
+    }
+    .search-footer-span3 {
+      color: #65a757;
+    }
+    .search-footer-span4 {
+      color: #717171;
+    }
+  }
+}
+
+.bani-words {
+  margin: 0 2px !important;
+  &.highlight {
+    font-weight: bold;
+  }
+}
+
+#search-bg {
+  width: 100%;
+  z-index: -1;
+}
+
+#db-download-progress {
+  background-color: green;
+  height: 2px;
+  transition: all $transition-time $transition-easing;
+  width: 10px;
+}

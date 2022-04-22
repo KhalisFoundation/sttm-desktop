@@ -1,265 +1,261 @@
-.search-div {
-  position: relative;
-}
+// .search-div {
+//   position: relative;
+// }
 
-#search-container {
-  align-content: center;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-  display: flex;
-  height: 40px;
-  justify-content: space-between;
-  margin: 0;
-  width: 100%;
+// #search-container {
+//   align-content: center;
+//   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+//   display: flex;
+//   height: 40px;
+//   justify-content: space-between;
+//   margin: 0;
+//   width: 100%;
 
-  span {
-    align-self: center;
-  }
+//   span {
+//     align-self: center;
+//   }
 
-  input {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    display: inline-block;
-    flex-grow: 1;
-    float: left;
-    height: 40px;
-    margin: 0;
-    position: relative;
-    width: 100%;
+//   input {
+//     background: transparent;
+//     border: none;
+//     box-shadow: none;
+//     display: inline-block;
+//     flex-grow: 1;
+//     height: 40px;
+//     margin: 0;
+//     position: relative;
+//     width: 100%;
 
-    &::-webkit-input-placeholder {
-      font-family: $body-font-family;
-      font-size: 0.8em;
-    }
+//     &::-webkit-input-placeholder {
+//       font-family: $body-font-family;
+//       font-size: 0.8em;
+//     }
 
-    &[type='number'] {
-      margin-left: 12px;
-      max-width: 80px;
+//     &[type='number'] {
+//       margin-left: 12px;
+//       max-width: 80px;
+//       &::-webkit-input-placeholder {
+//         @extend .gurmukhi;
 
-      &::-webkit-input-placeholder {
-        @extend .gurmukhi;
+//         opacity: 0.4;
+//       }
+//     }
+//   }
+//   > button {
+//     background-color: #e1802f;
+//     display: inline-block;
+//     height: 40px;
+//     padding: 0.5rem;
+//     width: 40px;
+//   }
+// }
+// #search-bg {
+//   height: 55%;
+//   left: 0;
+//   position: absolute;
+//   top: 0;
+//   width: 100%;
+//   z-index: -1;
+// }
 
-        opacity: 0.4;
-      }
-    }
-  }
+// #db-download-progress {
+//   background-color: green;
+//   bottom: 0;
+//   height: 0;
+//   position: absolute;
+//   transition: all $transition-time $transition-easing;
+//   width: 0;
+// }
 
-  > button {
-    background-color: #e1802f;
-    display: inline-block;
-    height: 40px;
-    padding: 0.5rem;
-    width: 40px;
-  }
-}
+// #gurmukhi-keyboard {
+//   background-color: #fff;
+//   border-radius: 2px;
+//   display: none;
+//   font-size: 0;
+//   overflow: hidden;
+//   width: calc(100% + 2px);
+//   z-index: 2;
 
-#search-bg {
-  height: 55%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: -1;
-}
+//   .page {
+//     display: none;
 
-#db-download-progress {
-  background-color: green;
-  bottom: 0;
-  height: 0;
-  position: absolute;
-  transition: all $transition-time $transition-easing;
-  width: 0;
-}
+//     &.active {
+//       display: block;
+//     }
+//   }
 
-#gurmukhi-keyboard {
-  background-color: #fff;
-  border-radius: 2px;
-  display: none;
-  font-size: 0;
-  overflow: hidden;
-  width: calc(100% + 2px);
-  z-index: 2;
+//   .keyboard-row-set {
+//     display: inline-block;
+//     width: 50%;
+//   }
 
-  .page {
-    display: none;
+//   .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
+//   .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
+//     background-color: #ccc;
+//   }
 
-    &.active {
-      display: block;
-    }
-  }
+//   button {
+//     color: #333;
+//     font-size: 1rem;
+//     line-height: 2;
+//     text-align: center;
+//     width: 20%;
 
-  .keyboard-row-set {
-    display: inline-block;
-    width: 50%;
-  }
+//     &:hover {
+//       background-blend-mode: exclusion;
+//       background-color: white;
+//       mix-blend-mode: difference;
+//     }
+//   }
+// }
 
-  .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
-  .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
-    background-color: #ccc;
-  }
+// #navigator.kb-active {
+//   height: calc(300px + 128px);
 
-  button {
-    color: #333;
-    font-size: 1rem;
-    line-height: 2;
-    text-align: center;
-    width: 20%;
+//   #gurmukhi-keyboard {
+//     display: block;
+//   }
 
-    &:hover {
-      background-blend-mode: exclusion;
-      background-color: white;
-      mix-blend-mode: difference;
-    }
-  }
-}
+//   #search-page .block-list {
+//     height: calc(100% - 158px - 128px);
+//   }
+// }
 
-#navigator.kb-active {
-  height: calc(300px + 128px);
+// #search-options-toggle i {
+//   transition: transform 250ms linear;
+// }
 
-  #gurmukhi-keyboard {
-    display: block;
-  }
+// #search-options {
+//   height: 36px;
+//   overflow: hidden;
+//   padding-right: 12px;
+//   text-align: left;
+//   transition: height 250ms linear;
 
-  #search-page .block-list {
-    height: calc(100% - 158px - 128px);
-  }
-}
+//   .filter-text {
+//     font-style: italic;
+//   }
 
-#search-options-toggle i {
-  transition: transform 250ms linear;
-}
+//   select {
+//     -webkit-appearance: none;
+//     -moz-appearance: none;
+//     background-color: transparent;
+//     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28255, 128, 47%29'></polygon></svg>");
+//     background-origin: content-box;
+//     background-position: right -1rem center;
+//     background-repeat: no-repeat;
+//     background-size: 15px 10px;
+//     border: none;
+//     border-radius: 0;
+//     color: #0a0a0a;
+//     font-family: inherit;
+//     font-size: 1rem;
+//     height: 40px;
+//     line-height: normal;
+//     margin: 0;
+//     padding: 0.5rem;
+//     padding-right: 1.5rem;
+//     width: 0;
 
-#search-options {
-  height: 36px;
-  overflow: hidden;
-  padding-right: 12px;
-  text-align: left;
-  transition: height 250ms linear;
+//     &:disabled {
+//       background-color: #eee;
+//     }
+//   }
+// }
 
-  .filter-text {
-    font-style: italic;
-  }
+// button {
+//   -webkit-appearance: none;
+//   -moz-appearance: none;
+//   background: transparent;
+//   border: 0;
+//   border-radius: 0;
+//   line-height: 1;
+//   padding: 0;
+// }
 
-  select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: transparent;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28255, 128, 47%29'></polygon></svg>");
-    background-origin: content-box;
-    background-position: right -1rem center;
-    background-repeat: no-repeat;
-    background-size: 15px 10px;
-    border: none;
-    border-radius: 0;
-    color: #0a0a0a;
-    font-family: inherit;
-    font-size: 1rem;
-    height: 40px;
-    line-height: normal;
-    margin: 0;
-    padding: 0.5rem;
-    padding-right: 1.5rem;
-    width: 0;
+// #search-page {
+//   overflow: hidden;
 
-    &:disabled {
-      background-color: #eee;
-    }
-  }
-}
+//   #language-selector {
+//     flex-grow: 1;
+//     text-align: left;
 
-button {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  line-height: 1;
-  padding: 0;
-}
+//     label {
+//       line-height: 0;
+//       margin-right: 5px;
+//     }
 
-#search-page {
-  overflow: hidden;
+//     input {
+//       vertical-align: text-bottom;
+//     }
+//   }
 
-  #language-selector {
-    flex-grow: 1;
-    text-align: left;
+//   .navigator-header {
+//     flex-wrap: wrap;
+//     height: initial;
+//     justify-content: space-around;
+//   }
 
-    label {
-      line-height: 0;
-      margin-right: 5px;
-    }
+//   .block-list {
+//     height: calc(100% - 158px);
+//     transition: height $transition-time $transition-easing;
+//     z-index: 5;
+//   }
+// }
 
-    input {
-      vertical-align: text-bottom;
-    }
-  }
+// .panktee.search-result {
+//   span {
+//     display: none;
+//     line-height: normal;
+//   }
 
-  .navigator-header {
-    flex-wrap: wrap;
-    height: initial;
-    justify-content: space-around;
-  }
+//   span.gurmukhi {
+//     display: block;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//     span.highlight {
+//       display: inline;
+//       font-weight: bold;
+//       text-shadow: 0.5px 0.5px rgba(0, 0, 0, 0.5);
+//     }
+//   }
 
-  .block-list {
-    height: calc(100% - 158px);
-    transition: height $transition-time $transition-easing;
-    z-index: 5;
-  }
-}
+//   .translation,
+//   .transliteration {
+//     color: #222;
+//     font-size: 0.8em;
+//     line-height: 1.5em;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: normal;
+//   }
 
-.panktee.search-result {
-  span {
-    display: none;
-    line-height: normal;
-  }
+//   .meta {
+//     color: grey;
+//     font-size: 0.9em;
+//   }
+// }
 
-  span.gurmukhi {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    span.highlight {
-      display: inline;
-      font-weight: bold;
-      text-shadow: .5px .5px rgba(0, 0, 0, 0.5);
-    }
-  }
+// #custom-theme-options {
+//   display: flex;
+//   flex-wrap: wrap;
+//   transition: 0.5s all ease;
 
-  .translation,
-  .transliteration {
-    color: #222;
-    font-size: 0.8em;
-    line-height: 1.5em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-  }
+//   header {
+//     flex-basis: 100%;
+//   }
+// }
 
-  .meta {
-    color: grey;
-    font-size: 0.9em;
-  }
-}
+// body.searchResults_transliteration .search-result .transliteration,
+// body.searchResults_translationEnglish .search-result .translation.english,
+// body.searchResults_meta .search-result .meta {
+//   display: block;
+// }
 
-#custom-theme-options {
-  display: flex;
-  flex-wrap: wrap;
-  transition: 0.5s all ease;
-
-  header {
-    flex-basis: 100%;
-  }
-}
-
-body.searchResults_transliteration .search-result .transliteration,
-body.searchResults_translationEnglish .search-result .translation.english,
-body.searchResults_meta .search-result .meta {
-  display: block;
-}
-
-#gurmukhi-keyboard-toggle {
-  i {
-    color: #fff;
-    font-size: 25px;
-  }
-}
+// #gurmukhi-keyboard-toggle {
+//   i {
+//     color: #fff;
+//     font-size: 25px;
+//   }
+// }

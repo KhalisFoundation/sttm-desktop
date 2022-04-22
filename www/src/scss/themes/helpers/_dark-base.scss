@@ -51,34 +51,105 @@
     }
   }
 
-  .navigator-header,
+  .pane-header,
+  .misc .navigator-header,
   .more-tabs .nav-header-tab,
   .settings-nav,
-  .clear-history {
+  .clear-pane,
+  .settings-preview-title {
     background-color: $bg-main;
     color: $text-base;
   }
 
+  .settings-nav {
+    span {
+      &:hover {
+        background-color: $not-so-black;
+      }
+    }
+
+    &-active {
+      background-color: $not-so-black;
+    }
+  }
+
+  .misc-pane {
+    .misc-header {
+      a {
+        color: $grey;
+      }
+      .misc-active {
+        color: $white;
+      }
+    }
+  }
+  .pane-content {
+    background-color: $bg-alt;
+  }
+
+  .viewer-pane {
+    .pane-content {
+      background: none !important;
+    }
+  }
   .control-item:hover {
     background-color: $bg-main;
   }
 
   .announcement-text {
-    border: 1px solid $white;
+    background-color: $bg-alt;
     color: $white;
   }
 
   .slide#announcement-slide .announcements {
     color: $white;
   }
+  .search-footer {
+    background: $bg-main;
+  }
+  .search-pane {
+    .pane {
+      .pane-footer {
+        background-color: $not-so-black;
+      }
+    }
 
-  .shortcut-tray {
-    background: darken($bg-main, 10);
+    .search-type {
+      &-label {
+        &::before {
+          border: 1px solid $light-grey;
+        }
+      }
+      &-checkbox {
+        &:checked {
+          + {
+            .search-type-checkmark {
+              filter: brightness(0) invert(0.9);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pane-footer {
+    .clear-pane {
+      background-color: $black;
+      .footer-toggler-inactive {
+        background: darken($bg-main, 10);
+      }
+      .footer-toggler {
+        background-color: $bg-alt;
+      }
+    }
+    .shortcut-drawer-active {
+      background: darken($bg-main, 10);
+    }
   }
   .tray-item-icon {
     background: $text-bright;
   }
-  .tray-item-label {
+  .tray-item-icon {
     color: $bg-main;
   }
   &.shortcut-tray-true .shortcut-toggle {
@@ -111,9 +182,9 @@
     background: $bg-alt;
   }
 
-  .nav-page,
+  .pane,
   .takeover-page {
-    background: $bg-alt;
+    background: $bg-main;
 
     h2 {
       border-top: 1px $border solid;
@@ -125,7 +196,7 @@
     }
   }
 
-  .nav-page {
+  .pane {
     a.panktee.current {
       background-color: $highlight-bg !important;
       color: $text-base !important;
@@ -155,17 +226,17 @@
     border-color: $accent;
   }
 
-  #search-container {
-    input {
+  .search-content {
+    input.input-box {
       color: $text-bright;
 
-      &[type='number'] {
-        background-color: $white;
-        color: $bg-main;
+      &::placeholder {
+        color: $darker-grey;
+      }
 
-        &::-webkit-input-placeholder {
-          color: $bg-main;
-        }
+      &[type='number'] {
+        background-color: white;
+        color: $bg-main;
       }
     }
 
@@ -178,16 +249,18 @@
     }
   }
 
-  #search-container:focus {
+  .search-container:focus {
     background: white;
   }
+  .filters {
+    select {
+      border: $bg-main;
+      color: $bg-main;
 
-  #search-options select {
-    border: $bg-main;
-    color: $text-bright;
-
-    option {
-      background-color: $bg-main;
+      option {
+        background-color: $bg-main;
+        color: $white;
+      }
     }
   }
 
@@ -199,18 +272,19 @@
     color: #fff;
   }
 
-  .block-list {
-    li {
-      > a,
-      > span,
-      > label {
-        color: $text-base;
+  .result-list ul li {
+    a {
+      color: $text-base;
+    }
+    &:hover {
+      background-color: $bg-bright;
+      cursor: pointer;
+    }
+  }
 
-        &:hover {
-          background-color: $bg-bright;
-          cursor: pointer;
-        }
-      }
+  .history-results {
+    .history-item:hover {
+      background-color: $bg-bright;
     }
   }
 
@@ -230,25 +304,15 @@
       }
     }
   }
-
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: $scrollbar;
-    border-radius: 6px;
-  }
-
   .workspace-bar {
     background-color: $bg-main;
     div:hover {
       color: $text-base;
       background-color: $bg-bright;
     }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: $scrollbar;
   }
 }

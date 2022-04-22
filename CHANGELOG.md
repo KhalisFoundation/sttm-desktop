@@ -1,5 +1,27 @@
 ## New Updates
 
+### 9.0.0 - _April 22, 2022_
+
+We are excited to launch the latest version of SikhiToTheMax 9.0, which features several enhancements and performance improvements.
+
+### Enhancements
+
+- Redesigned search experience
+- You can now filter by writer, raag and source
+- Improved labelling of source in search results
+  ![](./assets/img/help_images/search-results.png)
+
+- Resigned and improved on-screen keyboard
+- Improved design of the Bani Overlay screen
+- Minor design improvements
+  ![](./assets/img/help_images/keyboard.gif)
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 8.4.0 - _August 9, 2021_
 
 ### Improved:

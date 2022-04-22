@@ -1,9 +1,11 @@
 const ua = require('universal-analytics'); // https://www.npmjs.com/package/universal-analytics
 const isOnline = require('is-online');
+// require('dotenv').config();
 
 const pjson = require('./package.json');
 
 const appVersion = pjson.version;
+// ToDo: Revert back to .env after setting up on AWS build server
 const trackingId = 'UA-45513519-12';
 
 class Analytics {
@@ -29,28 +31,26 @@ class Analytics {
    */
   trackEvent(category, action, label, value) {
     const useragent = this.store.get('user-agent');
+    const params = {
+      ec: category,
+      ea: action,
+      el: label,
+      ev: value,
+      cd1: appVersion,
+      useragent,
+    };
 
     if (process.env.NODE_ENV !== 'development') {
-      if (this.store.get('userPrefs.app.analytics.collectStatistics')) {
-        isOnline().then(online => {
-          // TODO: for offline users, come up with a way of storing and send when online.
-          if (online && this.usr) {
-            this.usr
-              .event({
-                ec: category,
-                ea: action,
-                el: label,
-                ev: value,
-                ua: useragent,
-                cd1: appVersion,
-              })
-              .send();
-          }
-        });
-      }
+      // TODO: need to add variable that stops statistics collection
+      isOnline().then(online => {
+        // TODO: for offline users, come up with a way of storing and send when online.
+        if (online && this.usr) {
+          this.usr.event(params).send();
+        }
+      });
     } else {
       console.log(
-        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, ua: ${useragent}`,
+        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}, useragent: ${useragent}`,
       );
     }
   }
@@ -66,14 +66,11 @@ class Analytics {
       if (this.store.get('userPrefs.app.analytics.collectStatistics')) {
         isOnline().then(online => {
           if (online && this.usr) {
-            const useragent = this.store.get('user-agent');
-
             this.usr
               .pageview({
                 dp: path,
                 dt: title,
                 dh: hostname,
-                ua: useragent,
               })
               .send();
           }

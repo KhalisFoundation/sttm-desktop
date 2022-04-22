@@ -3,3 +3,8 @@ export { default as Tile } from './tile';
 export { default as Overlay } from './overlay';
 export { default as Checkbox } from './checkbox';
 export { default as CustomBgTile } from './custom-tile';
+export { default as InputBox } from './inputbox';
+export { default as IconButton } from './iconbutton';
+export { default as SearchResults } from './search-results';
+export { default as ShabadVerse } from './shabad-verse';
+export { default as FilterDropdown } from './filter-dropdown';

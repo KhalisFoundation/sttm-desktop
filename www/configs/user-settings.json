@@ -250,6 +250,10 @@
       "title": "THEME_BG",
       "initialValue": false,
       "dontApplyClass": true
+    },
+    "isSingleDisplayMode": {
+      "title": "SINGLE_DISPLAY",
+      "initialValue": false
     }
   }
 }

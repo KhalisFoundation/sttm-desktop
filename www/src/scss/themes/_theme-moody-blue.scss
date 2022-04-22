@@ -12,4 +12,27 @@ $themeMoodyBlue: (
 
 .theme-moody-blue {
   @include generateTheme($themeMoodyBlue...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $light-blue-30;
+
+    &:hover {
+      background: $light-blue-30;
+    }
+  }
+
+  .launchpad .single-display-switches {
+    .tab-switch,
+    & {
+      background: $darker-grey;
+    }
+    .tab-switch.active {
+      background: $black !important;
+      color: $light-grey !important;
+    }
+  }
+
+  .quicktool-body {
+    background-color: $black;
+  }
 }

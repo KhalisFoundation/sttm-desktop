@@ -1,0 +1,1 @@
+export { updateViewerScale } from './ScaleViewer';

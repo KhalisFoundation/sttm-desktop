@@ -30,6 +30,7 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
             name: file,
             path: `${userBackgroundsPath}/${file}`,
             'background-image': `${userBackgroundsURL}/${file.replace(/(\s)/g, '\\ ')}`,
+            'background-image-path': `${userBackgroundsPath}/${file.replace(/(\s)/g, '\\ ')}`,
             time: fs.statSync(path.resolve(userBackgroundsPath, file)).mtime.getTime(),
           }))
           .sort((a, b) => b.time - a.time),

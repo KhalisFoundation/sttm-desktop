@@ -17,12 +17,15 @@
   "UPDATE_DOWNLOADED": "Update downloaded and ready to install",
   "VIEWER_TITLE": "{{appName}} Viewer",
   "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
-
   "BANI_OVERLAY": {
+    "SUBTITLES": "Subtitles",
+    "GURBANI": "Gurbani",
+    "TEXT": "Text",
+    "BACKGROUND": "Background",
+    "DATE_AND_TIME": "Date & Time",
     "ANNOUNCEMENT": "Announcement",
     "BG": "BG",
     "COPY_URL": "Copy URL",
-    "GURBANI": "Gurbani",
     "LARIVAAR": "Larivaar",
     "LAYOUT": "Layout",
     "LOGO": "Logo",
@@ -32,15 +35,25 @@
     "PADCHED": "Padched",
     "PRESETS": "Presets",
     "SIZE": "Size",
-    "TEXT": "Text",
-    "GREEN_SCREEN": "Green Screen"
+    "GREEN_SCREEN": "Green Screen",
+    "LIVE_URL": "Live URL",
+    "HEIGHT": "Height",
+    "POSITION": "Position",
+    "ANMOL_LIPI": "Anmol Lipi",
+    "MULI": "Muli",
+    "TOP_LEFT": "Top Left",
+    "TOP_RIGHT": "Top Right",
+    "BOTTOM_LEFT": "Bottom Left",
+    "BOTTOM_RIGHT": "Bottom Right",
+    "MM_DD_YYYY": "MM/DD/YYYY",
+    "12HR": "12Hr",
+    "24HR": "24Hr",
+    "THEME_HEADING": "Themes"
   },
-
   "WORKSPACES": {
     "PRESENTER": "Presentation",
     "SINGLE_DISPLAY": "Single Display"
   },
-
   "CHROMECAST": {
     "CANCEL": "Cancel",
     "MSG_SENT": "Message sent: ",
@@ -55,16 +68,15 @@
     "SESSION_UPDATED": "Session Updated",
     "TRY_AGAIN": "An error occurred. Please try again."
   },
-
   "DATABASE": {
     "COULDNT_DELETE": "Could not delete old database {{oldDB}}: {{err1}}",
     "DOWNLOADING": "Downloading database..."
   },
-
   "INSERT": {
     "ADD_ANNOUNCEMENT": "Add Announcement",
     "ADD_ANNOUNCEMENT_SLIDE": "Add Announcement Slide",
     "ADD_ANNOUNCEMENT_TEXT": "Add announcement text here ...",
+    "ADD_ANNOUNCEMENT_TEXT_GURMUKHI": "GoSxw ie`Qy ilKo ...",
     "ADD_DHAN_GURU": "Add Dhan Guru",
     "ADD_EMPTY_SLIDE": "Add Empty Slide",
     "ADD_WAHEGURU_SLIDE": "Add Waheguru Slide",
@@ -89,7 +101,6 @@
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
     }
   },
-
   "MENU": {
     "APP": {
       "ABOUT": "About {{appName}}",
@@ -141,13 +152,11 @@
       "SELF": "Window"
     }
   },
-
   "OTHERS": {
     "DAILY_HUKAMNAMA": "Daily Hukamnama",
     "SHOW_RANDOM_SHABAD": "Show Random Shabad",
     "WHATS_NEW": "What's New"
   },
-
   "QUICK_TOOLS": {
     "ANNOUNCEMENTS": "Announcements",
     "BANI": "Bani",
@@ -156,7 +165,6 @@
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration"
   },
-
   "SEARCH": {
     "ANG": "Ang",
     "FIRST_LETTER_ANYWHERE": "First Letter (Anywhere)",
@@ -165,18 +173,136 @@
     "FULL_WORDS_ENGLISH": "Full Word(s) - English",
     "FULL_WORDS_GURMUKHI": "Full Word(s) - Gurmukhi",
     "MAIN_LETTERS": "Main Letters - Gurmukhi",
+    "PLACEHOLDER_GURMUKHI": "Enter search term here or ang number",
+    "PLACEHOLDER_ENGLISH": "Enter search term [Translations Only] or ang number",
     "SOURCES": {
-      "ALL_SOURCES": "All Sources",
-      "AMRIT_KEERTAN": "Amrit Keertan",
-      "DASAM_GRANTH": "Dasam Granth Sahib",
-      "GURDAS_JI_VAARAN": "Bhai Gurdas Singh Ji Vaaran",
-      "GURDAS_VAARAN": "Bhai Gurdas Ji Vaaran",
-      "GURU_GRANTH_SAHIB": "Guru Granth Sahib Ji",
-      "NAND_LAL_VAARAN": "Bhai Nand Lal Ji Vaaran",
-      "REHATNAMAS": "Rehatnamas & Panthic Sources"
-    }
+      "ALL_SOURCES": {
+        "TEXT": "All Sources",
+        "VALUE": "all"
+      },
+      "AMRIT_KEERTAN": {
+        "TEXT": "Amrit Keertan",
+        "VALUE": "Amrit Keertan"
+      },
+      "DASAM_GRANTH": {
+        "TEXT": "Dasam Granth Sahib",
+        "VALUE": "Dasam Bani"
+      },
+      "GURDAS_JI_VAARAN": {
+        "TEXT": "Bhai Gurdas Singh Ji Vaaran",
+        "VALUE": "Bhai Gurdas Singh Ji Vaaran"
+      },
+      "GURDAS_VAARAN": {
+        "TEXT": "Bhai Gurdas Ji Vaaran",
+        "VALUE": "Bhai Gurdas Ji Vaaran"
+      },
+      "GURU_GRANTH_SAHIB": {
+        "TEXT": "Guru Granth Sahib Ji",
+        "VALUE": "Sri Guru Granth Sahib Ji"
+      },
+      "NAND_LAL_VAARAN": {
+        "TEXT": "Bhai Nand Lal Ji Vaaran",
+        "VALUE": "Bhai Nand Lal Ji Vaaran"
+      },
+      "REHATNAMAS": {
+        "TEXT": "Rehatnamas & Panthic Sources",
+        "VALUE": "Codes of Conduct and Other Panthic Sources"
+      }
+    },
+    "RAAGS": {
+      "ALL_RAAGS": {
+        "TEXT": "All Raags",
+        "VALUE": "ALL"
+      },
+      "ASA": {
+        "TEXT": "Asa",
+        "VALUE": "Raag Aasaa"
+      },
+      "GUJARI": {
+        "TEXT": "Gujari",
+        "VALUE": "Raag Gujari"
+      },
+      "GAURI_DEEPAKI": {
+        "TEXT": "Gauri Deepaki",
+        "VALUE": "Raag Gauree Deepaki"
+      },
+      "DHANASARI": {
+        "TEXT": "Dhanasri",
+        "VALUE": "Raag Dhanasri"
+      },
+      "GAURI_POORABI": {
+        "TEXT": "Gauri Poorabi",
+        "VALUE": "Raag Gauree Poorabi"
+      },
+      "SRI": {
+        "TEXT": "Sri",
+        "VALUE": "Raag Sri"
+      },
+      "MAJH": {
+        "TEXT": "Majh",
+        "VALUE": "Raag Maajh"
+      },
+      "GAURI_GAURAIREE": {
+        "TEXT": "Gauri Guarairee",
+        "VALUE": "Raag Gauree Guarairee"
+      },
+      "GAURI": {
+        "TEXT": "Gauri",
+        "VALUE": "Raag Gauree"
+      },
+      "GAURI_DAKHANI": {
+        "TEXT": "Gauri Dakhani",
+        "VALUE": "Gauree Dakhani"
+      },
+      "OTHERS": {
+        "TEXT": "Others",
+        "VALUE": "Others"
+      }
+    },
+    "WRITERS": {
+      "ALL_WRITERS": {
+        "TEXT": "All Writers",
+        "VALUE": "ALL"
+      },
+      "GURU_AMAR_DAS": {
+        "TEXT": "Guru Amar Das",
+        "VALUE": "Guru Amar Das Ji"
+      },
+      "GURU_ANGAD_DEV": {
+        "TEXT": "Guru Angad Dev",
+        "VALUE": "Guru Angad Dev Ji"
+      },
+      "GURU_ARJAN_DEV": {
+        "TEXT": "Guru Arjan Dev",
+        "VALUE": "Guru Arjan Dev Ji"
+      },
+      "GURU_HAR_RAI": {
+        "TEXT": "Guru Har Rai",
+        "VALUE": "Guru Har Rai Ji"
+      },
+      "GURU_HARGOBIND": {
+        "TEXT": "Guru Hargobind",
+        "VALUE": "Guru Hargobind Ji"
+      },
+      "GURU_NANAK_DEV": {
+        "TEXT": "Guru Nanak Dev",
+        "VALUE": "Guru Nanak Dev Ji"
+      },
+      "GURU_RAM_DAS": {
+        "TEXT": "Guru Ram Das",
+        "VALUE": "Guru Ram Das Ji"
+      },
+      "GURU_TEGH_BAHADUR": {
+        "TEXT": "Guru Tegh Bahadur",
+        "VALUE": "Guru Tegh Bahadur Ji"
+      },
+      "OTHERS": {
+        "TEXT": "Others",
+        "VALUE": "Others"
+      }
+    },
+    "ERROR": "Error occured while searching. Please try again or restart the application."
   },
-
   "SETTINGS": {
     "APP_SETTINGS": "App Settings",
     "ASSIST_TYPE": "Assist Type",
@@ -195,14 +321,12 @@
     "VISHRAAM_SOURCE": "Vishraam Source",
     "SLIDE_OPTIONS": "Slide Options",
     "BANI_AND_LANGUAGES": "Bani & Languages",
-
     "FONT_SIZES": "Font Sizes",
     "ANNOUNCEMENTS": "Announcements",
     "BANI": "Bani",
     "PUNJABI_TEEKA": "Punjabi Teeka",
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration",
-
     "DISPLAY_OPTIONS": "Display Options",
     "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
     "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
@@ -211,11 +335,9 @@
     "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
     "LEFT_ALIGN": "Left-Align",
     "NEXT_LINE": "Next Line",
-
     "AUTOPLAY_OPTIONS": "Autoplay Options",
     "AUTO_PLAY": "Auto Play",
     "DELAY": "Delay (Seconds)",
-
     "BANI_SETTINGS": "Bani Settings",
     "MANGAL_POSITION": "Mangal Position",
     "BANI_LENGTH": "Bani Length",
@@ -225,7 +347,6 @@
     "LONG_BANI_LENGTH": "Long",
     "MEDIUM_BANI_LENGTH": "Medium",
     "SHORT_BANI_LENGTH": "Short",
-
     "LANGUAGE_SETTINGS": "Language Settings",
     "TRANSLATION_LANGUAGE": "Translation Language",
     "TRANSLITERATION_LANGUAGE": "Transliteration Language",
@@ -233,18 +354,15 @@
     "ENGLISH_LANGUAGE": "English",
     "SPANISH_LANGUAGE": "Spanish",
     "HINDI_LANGUAGE": "Hindi",
-
     "APP_LAYOUT": "App Layout",
     "PRESENTER_VIEW": "Presenter View",
     "QUICK_TOOLS": "Quick Tools",
     "SHORTCUT_TRAY": "Shortcut Tray",
     "LIVE_FEED": "Live Feed Text Files",
-
     "OTHER_OPTIONS": "Other Options",
     "COLLECT_STATISTICS": "Collect Statistics",
     "LIMIT_CHANGELOG": "Limit Changelog",
     "LIMIT_CHANGELOG_MSG": "Only see changelog once per version",
-
     "FIELDS_TO_DISPLAY": {
       "NEXT_LINE": "Next Line",
       "PUNJABI_TEEKA": "Punjabi Teeka",
@@ -253,17 +371,15 @@
       "TRANSLITERATION": "Transliteration"
     }
   },
-
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (Bhog)",
     "BLANK": "Blank",
     "MOOL_MANTRA": "Mool Mantr"
   },
-
   "THEMES": {
     "A_NEW_DAY": "A New Day",
     "BAAGI_BLUE": "Baagi Blue",
-    "BLACK_&_BLUE": "Black & Blue",
+    "BLACK_AND_BLUE": "Black & Blue",
     "DARBAR_BLUE": "Darbar Blue",
     "DARK": "Dark",
     "FLORAL": "Floral",
@@ -275,13 +391,13 @@
     "MOODY_BLUE": "Moody Blue",
     "NEVER_FORGET": "Never Forget",
     "NIRBAAN": "Nirbaan",
+    "IMMORTAL_ORANGE": "Immortal Orange",
     "NEW_IMAGE": "New Image",
     "BACKGROUNDS": "Backgrounds",
     "COLORS": "Colors",
     "CURRENT_THEME": "Current Theme",
     "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
     "SPECIAL_CONDITIONS": "Special Conditions",
-
     "ALLOWED_IMGS_MSG": "Only .png and .jpg images are allowed.",
     "DELETE_ERR": "Unable to delete that image. - {{error}}",
     "DIR_CREATE_ERR": " Error creating directory for user backgrounds. {{error}} - If error persists, report it at www.sttm.co:",
@@ -296,7 +412,6 @@
     "UNABLE_TO_GET": "Unable to get existing custom background files - {{error}}",
     "USING_ERR": "There was an error using this file. {{error}} -\nIf error persists, report it at www.sttm.co"
   },
-
   "TOOLBAR": {
     "BANI_CONTROLLER": "Bani Controller",
     "CEREMONIES": "Ceremonies",
@@ -317,7 +432,6 @@
     "SETTINGS": "Settings",
     "SUNDAR_GUTKA": "Sundar Gutka",
     "THEMES": "Themes",
-
     "BANI_DESC": {
       "1": "Connect to SikhiToTheMax by visiting ",
       "2": " from a mobile device to search, navigate, and control the entire app."
@@ -329,7 +443,7 @@
       "PIN": "Pin",
       "PRESENT_CODE": "Present Code to Sangat",
       "SANGAT_SYNC": "Sangat Sync",
-      "SYNC_STRING": "<p>Visit <strong>sttm.co/sync</strong> on your mobile device and enter the code below to follow along</p><h1>{{code}}</h1>",
+      "SYNC_STRING": "<p>Visit <strong>sttm.co/sync</strong> on your mobile device and enter the code below to follow along</p><h1>{{code}}</h1><span class='d-none'>{{garbageValue}}</span>",
       "UNIQUE_CODE_LABEL": "Your unique sync code is:",
       "SYNC_DESC": {
         "1": "Allow the Sangat to visit ",
@@ -353,5 +467,12 @@
         "Paste and save the API token in SikhiToTheMax."
       ]
     }
+  },
+  "BANI": {
+    "LOAD_ERROR": "Error loading {{erroneousOperation}}. Please restart the application. If error persists, report it at www.sttm.co",
+    "DATABASE_DOWNLOADING": "Database is downloading, please wait..."
+  },
+  "SHORTCUT": {
+    "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
   }
 }
