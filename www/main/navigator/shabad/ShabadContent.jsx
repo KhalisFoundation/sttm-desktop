@@ -450,6 +450,9 @@ const ShabadContent = () => {
             );
           }}
         ></Virtuoso>
+        <div className="controller-signal" title="Bani controller in use">
+          <img alt="sync" src="assets/img/icons/sync.svg" />
+        </div>
       </div>
     </div>
   );
