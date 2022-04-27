@@ -474,5 +474,9 @@
   },
   "SHORTCUT": {
     "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
+  },
+  "SHABAD_PANE": {
+    "SHOW_DISPLAY": "SHOW DISPLAY",
+    "HIDE_SCREEN": "HIDE SCREEN"
   }
 }
