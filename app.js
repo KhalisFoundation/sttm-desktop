@@ -644,6 +644,16 @@ ipcMain.on('show-text', (event, arg) => {
   }
 });
 
+ipcMain.on('toggle-viewer-window', (event, arg) => {
+  if (viewerWindow) {
+    if (arg) {
+      viewerWindow.show();
+    } else {
+      viewerWindow.hide();
+    }
+  }
+});
+
 ipcMain.on('presenter-view', (event, arg) => {
   if (viewerWindow) {
     if (!arg) {
