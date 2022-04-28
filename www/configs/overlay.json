@@ -171,10 +171,12 @@
     "settings": {
       "reset": {
         "icon": "reset.svg",
+        "tooltip": "Reset Defaults",
         "initialValue": false
       },
       "overlayLarivaar": {
         "icon": "link.png",
+        "tooltip": "Toggle Larivaar",
         "initialValue": false
       },
       "larivaarAssist": {
@@ -186,10 +188,12 @@
       },
       "toggle-logo": {
         "icon": "sttm.png",
+        "tooltip": "Toggle Logo",
         "initialValue": false
       },
       "toggle-annoucement": {
         "icon": "megaphone.png",
+        "tooltip": "Toggle Annoucement",
         "initialValue": false
       },
       "toggle-link": {
@@ -198,6 +202,7 @@
       },
       "green-screen-toggle": {
         "type": "icon-toggle",
+        "tooltip": "Toggle Green Screen",
         "icon": "rectangle.svg",
         "initialValue": false
       }
