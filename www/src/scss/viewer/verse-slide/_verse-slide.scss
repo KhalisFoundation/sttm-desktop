@@ -24,6 +24,8 @@
 .slide-gurbani {
   @extend .gurmukhi-vaak-thick;
   font-size: 45px;
+  font-weight: normal;
+  line-height: 1.15;
 }
 
 .slide-announcement {
@@ -39,7 +41,9 @@
 }
 
 .padchhed span {
-  margin: 0 5px;
+  display: inline-block;
+  margin: 0 0.15em;
+  white-space: nowrap;
 }
 
 .slide-translation {

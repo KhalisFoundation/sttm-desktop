@@ -65,7 +65,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
         {verseObj && !isMiscSlide && (
           <>
             {verseObj.Gurmukhi && (
-              <div
+              <h1
                 className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()} ${
                   activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
                 }`}
@@ -78,7 +78,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
                   vishraamSource={vishraamSource}
                 />
-              </div>
+              </h1>
             )}
 
             {translationVisibility && verseObj.Translations && (
