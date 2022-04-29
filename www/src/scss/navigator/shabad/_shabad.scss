@@ -6,9 +6,6 @@
 
   &:hover {
     outline: 0;
-    .pane-header {
-      border-bottom: 1px solid #01579b;
-    }
   }
   .shabad-list {
     height: calc(100% - 40px);
@@ -16,5 +13,28 @@
 
   .fa-check {
     color: $grey;
+  }
+
+  &-header {
+    @include flex($ai-value: center, $jc-value: flex-end);
+
+    :nth-child(n) {
+      margin-left: 10px;
+    }
+
+    .toggle-viewer-btn {
+      height: 30px;
+      padding: 0 0.9em;
+      margin: unset;
+      background: $dark-grey;
+
+      &.btn-danger {
+        background: $bright-red;
+      }
+    }
+
+    i {
+      font-size: 16px;
+    }
   }
 }

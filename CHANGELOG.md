@@ -1,5 +1,15 @@
 ## New Updates
 
+### 9.0.2 - _May 2, 2022_
+
+Based on user feedback, are happy to announce some updates to SikhiToTheMax Desktop.
+
+- Ability to hide shabad (refer to screenshot below). This feature will hide the currently selected shabad and its panktee from the display, as well as from the video overlay capability.
+  ![](./assets/img/help_images/search-results.png)
+
+- We have made some improvements to shabad rendered to support smaller screen sizes.
+- An icon will now display when Bani Controller (Mobile Device Sync) is live.
+
 ### 9.0.0 - _April 22, 2022_
 
 We are excited to launch the latest version of SikhiToTheMax 9.0, which features several enhancements and performance improvements.
