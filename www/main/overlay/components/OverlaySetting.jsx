@@ -101,6 +101,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
         <div className="size-icon-container" onClick={handleToggleChange}>
           <span
             className="icon-toggle"
+            title={settingObj.tooltip}
             style={{
               backgroundImage: `url('assets/img/icons/${settingObj.icon}')`,
             }}
