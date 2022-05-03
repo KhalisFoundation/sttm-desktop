@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.0.2 - _May 1, 2022_
+### 9.0.2 - _May 3, 2022_
 
 Based on user feedback, are happy to announce some updates to SikhiToTheMax Desktop.
 
