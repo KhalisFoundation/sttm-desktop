@@ -17,7 +17,7 @@ const useSocketListeners = (
   sundarGutkaBaniId,
   fontSizes,
   baniLength,
-  mangalPosition,
+  // mangalPosition,
   isSundarGutkaBani,
   isCeremonyBani,
   setIsCeremonyBani,
@@ -86,7 +86,7 @@ const useSocketListeners = (
           ceremonyId,
           sundarGutkaBaniId,
           baniLength,
-          mangalPosition,
+          // mangalPosition,
         ),
       settings: payload => {
         const { settings } = payload;

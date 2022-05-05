@@ -3,12 +3,14 @@ import { remote } from 'electron';
 import banidb from '../../banidb';
 
 const { i18n } = remote.require('./app');
-export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength, mangalPosition) => {
+export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength) => {
+  // mangalPosition was removed from arguments and filter
+  // mangalPosition = 'current',
+  // .filter(result => result.MangalPosition !== mangalPosition)
   return banidb
     .loadBani(baniId, baniLength)
     .then(allVerses =>
       allVerses
-        .filter(result => result.MangalPosition !== mangalPosition)
         .map(rowDb => {
           let row = rowDb;
           if (rowDb.Verse) {

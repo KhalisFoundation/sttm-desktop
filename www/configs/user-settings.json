@@ -52,7 +52,7 @@
     "bani": {
       "title": "BANI_SETTINGS",
       "type": "dropdown",
-      "settings": ["bani-length", "mangal-position"]
+      "settings": ["bani-length"]
     },
     "language": {
       "title": "LANGUAGE_SETTINGS",

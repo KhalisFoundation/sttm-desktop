@@ -73,7 +73,7 @@ const BaniController = ({ onScreenClose, className }) => {
     transliterationFontSize,
     teekaFontSize,
     baniLength,
-    mangalPosition,
+    // mangalPosition,
   } = useStoreState(state => state.userSettings);
 
   const fontSizes = {
@@ -166,7 +166,7 @@ const BaniController = ({ onScreenClose, className }) => {
       sundarGutkaBaniId,
       fontSizes,
       baniLength,
-      mangalPosition,
+      // mangalPosition,
       isSundarGutkaBani,
       isCeremonyBani,
       setIsCeremonyBani,
