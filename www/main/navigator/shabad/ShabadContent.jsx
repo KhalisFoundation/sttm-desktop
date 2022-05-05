@@ -42,7 +42,8 @@ const ShabadContent = () => {
     setIsDontSaveHistory,
   } = useStoreActions(state => state.navigator);
 
-  const { autoplayToggle, autoplayDelay, baniLength, mangalPosition, liveFeed } = useStoreState(
+  // mangalPosition was removed from below settings
+  const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
     state => state.userSettings,
   );
   const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
@@ -138,7 +139,7 @@ const ShabadContent = () => {
           shabadid: sundarGutkaBaniId, // @deprecated
           highlight: crossPlatformId || baniVerse.crossPlatformID,
           baniLength,
-          mangalPosition,
+          // mangalPosition,
           verseChange: false,
         });
       } else if (isCeremonyBani) {
@@ -295,13 +296,12 @@ const ShabadContent = () => {
 
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
-      loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(
-        sundarGutkaVerses => {
-          setActiveShabad(sundarGutkaVerses);
-          saveToHistory(sundarGutkaVerses, 'bani');
-          openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
-        },
-      );
+      // mangalPosition was removed from loadBani 3rd argument
+      loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
+        setActiveShabad(sundarGutkaVerses);
+        saveToHistory(sundarGutkaVerses, 'bani');
+        openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
+      });
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
@@ -336,7 +336,7 @@ const ShabadContent = () => {
     sundarGutkaBaniId,
     ceremonyId,
     baniLength,
-    mangalPosition,
+    // mangalPosition,
     isCeremonyBani,
     isSundarGutkaBani,
   ]);
