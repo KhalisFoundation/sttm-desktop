@@ -32,7 +32,7 @@ function ShabadDeck() {
     theme: currentTheme,
     akhandpatt,
     baniLength,
-    mangalPosition,
+    // mangalPosition,
     displayNextLine,
     isSingleDisplayMode,
     themeBg,
@@ -106,7 +106,8 @@ function ShabadDeck() {
     }
     if (sundarGutkaBaniId && isSundarGutkaBani) {
       if (akhandpatt) {
-        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength], mangalPosition).then(baniRows => {
+        // mangalPosition was removed from 3rd argument of loadBani
+        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(baniRows => {
           setActiveVerse([...baniRows]);
         });
       } else {
@@ -116,7 +117,7 @@ function ShabadDeck() {
           activeVerseId,
           false,
           baniLengthCols[baniLength],
-          mangalPosition,
+          // mangalPosition,
         ).then(rows => {
           if (rows.length > 1) {
             setActiveVerse([rows[0]]);
@@ -131,7 +132,7 @@ function ShabadDeck() {
             activeVerseId,
             displayNextLine,
             baniLengthCols[baniLength],
-            mangalPosition,
+            // mangalPosition,
           ).then(rows => {
             if (rows.length === 1) {
               setNextVerse(...rows);
