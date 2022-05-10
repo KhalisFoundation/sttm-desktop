@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.0.3 - _May 6, 2022_
+### 9.0.3 - _May 10, 2022_
 
 - We have added some additional analytics to the settings so we can better understand our users and how they customize the application.
 
