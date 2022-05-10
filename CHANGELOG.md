@@ -1,5 +1,15 @@
 ## New Updates
 
+### 9.0.3 - _May 10, 2022_
+
+- We have added some additional analytics to the settings so we can better understand our users and how they customize the application.
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.0.2 - _May 3, 2022_
 
 Based on user feedback, are happy to announce some updates to SikhiToTheMax Desktop.

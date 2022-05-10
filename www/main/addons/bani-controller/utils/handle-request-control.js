@@ -12,7 +12,7 @@ const handleRequestControl = (
   ceremonyId,
   sundarGutkaBaniId,
   baniLength,
-  mangalPosition,
+  // mangalPosition,
 ) => {
   document.body.classList.toggle(`controller-on`, isPinCorrect);
   window.socket.emit('data', {
@@ -29,7 +29,7 @@ const handleRequestControl = (
       id: activeShabadId,
       type: 'shabad',
       baniLength: '',
-      mangalPosition: '',
+      // mangalPosition: '',
     };
 
     if (ceremonyId) {
@@ -40,7 +40,7 @@ const handleRequestControl = (
       currentShabad.id = sundarGutkaBaniId;
       currentShabad.type = 'bani';
       currentShabad.baniLength = baniLength;
-      currentShabad.mangalPosition = mangalPosition;
+      // currentShabad.mangalPosition = mangalPosition;
     }
     let homeId;
     let highlight;
@@ -63,7 +63,7 @@ const handleRequestControl = (
         highlight: parseInt(highlight, 10),
         homeId: parseInt(homeId, 10),
         baniLength: currentShabad.baniLength,
-        mangalPosition: currentShabad.mangalPosition,
+        // mangalPosition: currentShabad.mangalPosition,
       });
     }
   }

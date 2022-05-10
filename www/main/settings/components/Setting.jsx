@@ -7,6 +7,7 @@ import { Switch, Checkbox } from '../../common/sttm-ui';
 const { remote } = require('electron');
 
 const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
@@ -16,11 +17,13 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const handleInputChange = event => {
     const value = event.target ? event.target.value : event;
     userSettingsActions[stateFunction](value);
+    analytics.trackEvent('setting', stateVar, value);
   };
 
   const handleCheckboxChange = event => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
+    analytics.trackEvent('setting', stateVar, value);
   };
 
   let settingDOM;
