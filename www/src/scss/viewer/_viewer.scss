@@ -8,4 +8,9 @@
   * {
     transition: 0.2s all ease-in;
   }
+
+  span {
+    transition: 0s color linear;
+    transition: 0s border-radius linear;
+  }
 }
