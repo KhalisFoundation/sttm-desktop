@@ -114,7 +114,7 @@
     "react-html-parser": "^2.0.2",
     "react-virtuoso": "^2.7.2",
     "read-chunk": "^3.0.0",
-    "realm": "^5.0.5",
+    "realm": "^10.0.5",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",

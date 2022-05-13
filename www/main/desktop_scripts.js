@@ -14,10 +14,10 @@ const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
   realm: {
-    dbCompressedName: 'sttmdesktop-evergreen.zip',
-    dbName: 'sttmdesktop-evergreen.realm',
+    dbCompressedName: 'sttmdesktop-evergreen-v2.zip',
+    dbName: 'sttmdesktop-evergreen-v2.realm',
     dbSchema: 'realm-schema-evergreen.json',
-    md5: 'sttmdesktop-evergreen.md5',
+    md5: 'sttmdesktop-evergreen-v2.md5',
   },
 };
 

@@ -7,7 +7,7 @@ const CONSTS = require('./constants');
 
 const { remote } = electron;
 const userDataPath = remote.app.getPath('userData');
-const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
+const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen-v2.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 
 // TODO: Investigate possible memory issues from multiple Realm.open calls
