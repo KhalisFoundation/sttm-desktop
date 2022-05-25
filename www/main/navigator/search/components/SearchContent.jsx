@@ -22,6 +22,7 @@ const SearchContent = () => {
     searchQuery,
     currentSearchType,
     shortcuts,
+    searchShabadsCount,
   } = useStoreState(state => state.navigator);
   const {
     setCurrentWriter,
@@ -29,6 +30,7 @@ const SearchContent = () => {
     setCurrentSource,
     setSearchQuery,
     setShortcuts,
+    setSearchShabadsCount,
   } = useStoreActions(state => state.navigator);
 
   // Local State
@@ -105,6 +107,12 @@ const SearchContent = () => {
       setFilteredShabads([]);
     }
   }, [searchQuery]);
+
+  useEffect(() => {
+    if (searchShabadsCount !== filteredShabads.length) {
+      setSearchShabadsCount(filteredShabads.length);
+    }
+  }, [filteredShabads]);
 
   ipcRenderer.on('database-progress', data => {
     setDatabaseProgress(data.percent);

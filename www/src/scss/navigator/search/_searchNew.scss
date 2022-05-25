@@ -213,10 +213,18 @@
     padding: 10px;
     margin-bottom: 5px;
     span {
-      @include inline-flex($width: initial);
-      padding: 5px;
-      height: 20px;
-      border-left: 3px solid;
+      &:not(:last-child) {
+        @include inline-flex($width: initial);
+        padding: 5px;
+        height: 20px;
+        border-left: 3px solid;
+      }
+      &:last-child {
+        margin-left: auto;
+        display: flex;
+        align-self: center;
+        font-style: italic;
+      }
     }
     .search-footer-span1 {
       color: #e1802f;
