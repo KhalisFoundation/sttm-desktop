@@ -13,38 +13,33 @@ $foundation-version: '1.2.0';
 //   "vendor/normalize";
 
 // Helpers
-@import
-  "helpers/functions",
-  "helpers/mixins",
-  "helpers/breakpoints",
-  "helpers/images";
+@import 'helpers/functions', 'helpers/mixins', 'helpers/breakpoints', 'helpers/images';
 
 // Global styles
-@import
-  "global";
+@import 'global';
 
 // Components
-@import
-  // "components/iconic",
-  // "components/action-sheet",
-  "components/block-list",
-// "components/button",
-// "components/button-group",
-// "components/card",
-// "components/extras",
-// "components/forms",
-// "components/grid",
-// "components/title-bar",
-// "components/label",
-// "components/list",
-   "components/loader",
-// "components/menu-bar",
-// "components/modal",
-// "components/motion",
-// "components/notification",
-// "components/off-canvas",
-// "components/popup",
-  "components/switch";
+@import // "components/iconic",
+    // "components/action-sheet",
+    'components/block-list',
+  // "components/button",
+    // "components/button-group",
+    // "components/card",
+    // "components/extras",
+    // "components/forms",
+    // "components/grid",
+    // "components/title-bar",
+    // "components/label",
+    // "components/list",
+    'components/loader',
+  // "components/menu-bar",
+    // "components/modal",
+    // "components/motion",
+    // "components/notification",
+    // "components/off-canvas",
+    // "components/popup",
+    'components/switch',
+  'components/filter-tag';
 // "components/tabs",
 // "components/accordion",
 // "components/typography",

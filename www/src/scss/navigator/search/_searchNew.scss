@@ -103,16 +103,31 @@
   }
   .search-result-controls {
     @include flex;
-    padding: 0 0 0 10px;
+    align-items: baseline;
+    display: flex;
+    flex-direction: column;
     font-style: italic;
+    padding: 0 0 0 10px;
+
+    @include breakpoint(xlarge) {
+      flex-direction: row;
+    }
 
     & span {
       color: $mild-dark;
     }
 
     .filters {
-      padding-right: 12px;
+      align-items: center;
       color: $mild-dark;
+      display: flex;
+      justify-content: end;
+      padding-right: 12px;
+      width: 100%;
+
+      @include breakpoint(xlarge) {
+        justify-content: flex-end;
+      }
 
       .select-bani {
         -webkit-appearance: none;

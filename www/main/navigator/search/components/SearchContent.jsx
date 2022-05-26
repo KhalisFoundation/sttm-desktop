@@ -3,7 +3,13 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { remote, ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
-import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
+import {
+  IconButton,
+  InputBox,
+  FilterDropdown,
+  SearchResults,
+  FilterTag,
+} from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 
@@ -159,7 +165,22 @@ const SearchContent = () => {
         <GurmukhiKeyboard searchType={currentSearchType} query={query} setQuery={setQuery} />
       )}
       <div className="search-result-controls">
-        <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
+        {(currentWriter !== 'ALL' || currentRaag !== 'ALL' || currentSource !== 'all') && (
+          <div className="filter-tag--container">
+            {currentWriter !== 'ALL' && (
+              <FilterTag close={() => setCurrentWriter('ALL')} title={currentWriter} />
+            )}
+            {currentRaag !== 'ALL' && (
+              <FilterTag close={() => setCurrentRaag('ALL')} title={currentRaag} />
+            )}
+            {currentSource !== 'all' && (
+              <FilterTag
+                close={() => setCurrentSource('all')}
+                title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
+              />
+            )}
+          </div>
+        )}
         <div className="filters">
           <span>Filter by </span>
           <FilterDropdown

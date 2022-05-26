@@ -24,7 +24,7 @@ const FilterDropdown = ({ title, onChange, optionsObj }) => {
             key={keyName}
             value={i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
           >
-            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)}
+            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
           </option>
         ))}
       </select>
