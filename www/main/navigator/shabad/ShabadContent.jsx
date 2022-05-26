@@ -253,7 +253,6 @@ const ShabadContent = () => {
     const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
     if (check.length === 0) {
       const updatedHistory = [
-        ...verseHistory,
         {
           shabadId,
           verseId,
@@ -266,6 +265,7 @@ const ShabadContent = () => {
           continueFrom: verseId,
           homeVerse: verseId,
         },
+        ...verseHistory,
       ];
       setVerseHistory(updatedHistory);
     }
