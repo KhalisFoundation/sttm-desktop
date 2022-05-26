@@ -53,8 +53,8 @@ export const HistoryPane = ({ className }) => {
       if (element.shabadId !== activeShabadId) {
         setActiveShabadId(element.shabadId);
       }
-      if (element.verseId !== activeVerseId) {
-        setActiveVerseId(element.verseId);
+      if (element.continueFrom !== activeVerseId) {
+        setActiveVerseId(element.continueFrom);
       }
     }
     if (element.type === 'ceremony') {
