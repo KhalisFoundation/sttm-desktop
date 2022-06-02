@@ -1,0 +1,42 @@
+.filter-tag {
+  align-items: center;
+  background: #9e9e9e;
+  border-radius: 6px;
+  color: #fff;
+  display: flex;
+  padding: 2px;
+
+  &:nth-child(2n) {
+    margin: 0 8px;
+  }
+
+  &--container {
+    display: flex;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  &--remove {
+    align-items: center;
+    background: #e3494d;
+    border-radius: 100%;
+    color: #fff !important;
+    display: flex;
+    height: 18px;
+    justify-content: center;
+    margin: 0 4px 0 2px;
+    padding: 4px;
+    width: 18px;
+
+    i {
+      margin: 0 auto;
+    }
+  }
+
+  &--title {
+    color: #fff !important;
+    font-style: normal;
+    font-size: 14px;
+    margin-right: 4px;
+  }
+}
