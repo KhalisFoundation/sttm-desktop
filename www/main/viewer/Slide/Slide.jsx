@@ -106,7 +106,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   getFontSize={getFontSize}
                   gurmukhiString={nextLineObj.Gurmukhi}
                   larivaar={larivaar}
-                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
+                  vishraamPlacement={nextLineObj.Visraam ? JSON.parse(nextLineObj.Visraam) : {}}
                   vishraamSource={vishraamSource}
                 />
               </div>
