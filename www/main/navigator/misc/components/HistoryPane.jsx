@@ -34,8 +34,8 @@ export const HistoryPane = ({ className }) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
-    if (element.continueFrom !== initialVerseId) {
-      setInitialVerseId(element.continueFrom);
+    if (element.verseId !== initialVerseId) {
+      setInitialVerseId(element.verseId);
     }
     if (element.homeVerse !== homeVerse) {
       setHomeVerse(element.homeVerse);

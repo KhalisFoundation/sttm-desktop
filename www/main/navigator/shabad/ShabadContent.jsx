@@ -233,6 +233,7 @@ const ShabadContent = () => {
     const firstVerse = verses[0];
     let shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
     const verseId = initialVerse || firstVerse.ID;
+    const firstVerseIndex = verses.findIndex(v => v.ID === verseId);
     let verse;
     if (verseType === 'shabad') {
       if (initialVerse) {
@@ -263,7 +264,7 @@ const ShabadContent = () => {
           },
           versesRead: [verseId],
           continueFrom: verseId,
-          homeVerse: verseId,
+          homeVerse: firstVerseIndex,
         },
         ...verseHistory,
       ];
@@ -349,10 +350,12 @@ const ShabadContent = () => {
   useEffect(() => {
     filterRequiredVerseItems(activeShabad).forEach((verses, index) => {
       if (initialVerseId === verses.verseId) {
-        setActiveVerse({ [verses.ID]: verses.verseId });
         if (homeVerse !== index) {
           changeHomeVerse(index);
         }
+      }
+      if (activeVerseId === verses.verseId) {
+        setActiveVerse({ [verses.ID]: verses.verseId });
       }
     });
 
