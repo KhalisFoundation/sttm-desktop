@@ -4,12 +4,12 @@ import { remote } from 'electron';
 
 const { i18n } = remote.require('./app');
 
-const FilterDropdown = ({ title, onChange, optionsObj }) => {
+const FilterDropdown = ({ title, onChange, currentValue, optionsObj }) => {
   const isSource = title === 'Source';
 
   return (
     <>
-      <select className="select-bani" onChange={onChange}>
+      <select className="select-bani" onChange={onChange} value={currentValue}>
         {Object.keys(optionsObj).map(keyName => (
           <option
             key={keyName}
@@ -34,6 +34,7 @@ FilterDropdown.propTypes = {
   title: PropTypes.string,
   onChange: PropTypes.func,
   optionsObj: PropTypes.object,
+  currentValue: PropTypes.string,
 };
 
 export default FilterDropdown;
