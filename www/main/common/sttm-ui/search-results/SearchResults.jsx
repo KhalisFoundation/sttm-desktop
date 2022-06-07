@@ -1,6 +1,7 @@
 import React from 'react';
 import { remote } from 'electron';
 import PropTypes from 'prop-types';
+import anvaad from 'anvaad-js';
 
 const { i18n } = remote.require('./app');
 
@@ -42,12 +43,26 @@ const SearchResults = ({
     return 'other-border';
   };
 
-  const isHighlightRequired = (word, wordIndex, searchCharacters) => {
+  const isHighlightRequired = (gurbaniVerse, word, wordIndex, searchCharacters) => {
     const wordsToHightlight = searchCharacters.length;
+    const mainLetters = anvaad.mainLetters(gurbaniVerse);
+    const firstLetters = mainLetters
+      .split(' ')
+      .map(d => d[0])
+      .join('');
+    const queryStart = firstLetters.indexOf(searchCharacters);
+    const queryEnd = queryStart + searchCharacters.length;
     switch (searchType) {
       // searchType value 0 represents First letter (start) option
       case 0:
         if (wordsToHightlight > wordIndex) {
+          return true;
+        }
+        break;
+
+      // searchType value 1 represents First Letter (anywhere) option
+      case 1:
+        if (wordIndex >= queryStart && wordIndex < queryEnd) {
           return true;
         }
         break;
@@ -72,7 +87,7 @@ const SearchResults = ({
         <span
           key={index}
           className={`bani-words ${
-            isHighlightRequired(word, index, searchCharacters) ? 'highlight' : ''
+            isHighlightRequired(gurbaniVerse, word, index, searchCharacters) ? 'highlight' : ''
           }`}
         >
           {word}
