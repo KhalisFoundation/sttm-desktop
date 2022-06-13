@@ -168,15 +168,24 @@ const SearchContent = () => {
         {(currentWriter !== 'ALL' || currentRaag !== 'ALL' || currentSource !== 'all') && (
           <div className="filter-tag--container">
             {currentWriter !== 'ALL' && (
-              <FilterTag close={() => setCurrentWriter('ALL')} title={currentWriter} />
+              <FilterTag
+                close={() => setCurrentWriter('ALL')}
+                title={currentWriter}
+                filterType={i18n.t('SEARCH.WRITER')}
+              />
             )}
             {currentRaag !== 'ALL' && (
-              <FilterTag close={() => setCurrentRaag('ALL')} title={currentRaag} />
+              <FilterTag
+                close={() => setCurrentRaag('ALL')}
+                title={currentRaag}
+                filterType={i18n.t('SEARCH.RAAG')}
+              />
             )}
             {currentSource !== 'all' && (
               <FilterTag
                 close={() => setCurrentSource('all')}
                 title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
+                filterType={i18n.t('SEARCH.SOURCE')}
               />
             )}
           </div>
@@ -190,6 +199,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchWriter', event.target.value);
             }}
             optionsObj={writersObj}
+            currentValue={currentWriter}
           />
           <FilterDropdown
             title="Raag"
@@ -198,6 +208,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchRaag', event.target.value);
             }}
             optionsObj={raagsObj}
+            currentValue={currentRaag}
           />
           <FilterDropdown
             title="Source"
@@ -206,6 +217,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchSource', event.target.value);
             }}
             optionsObj={sourcesObj}
+            currentValue={currentSource}
           />
         </div>
       </div>

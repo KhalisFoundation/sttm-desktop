@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FilterTag = ({ close, title }) => {
+const FilterTag = ({ close, title, filterType }) => {
   return (
-    <div className="filter-tag">
+    <div className="filter-tag" title={filterType}>
       <span className="filter-tag--remove" onClick={close}>
         <i className="fa fa-times" />
       </span>
@@ -13,8 +13,9 @@ const FilterTag = ({ close, title }) => {
 };
 
 FilterTag.propTypes = {
-  close: PropTypes.func,
-  title: PropTypes.string,
+  close: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  filterType: PropTypes.string.isRequired,
 };
 
 export default FilterTag;
