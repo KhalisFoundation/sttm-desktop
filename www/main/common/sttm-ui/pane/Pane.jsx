@@ -4,7 +4,7 @@ import PaneContent from './PaneContent';
 import PaneFooter from './PaneFooter';
 import PaneHeader from './PaneHeader';
 
-function Pane({ content, header, footer, className }) {
+const Pane = ({ content, header, footer, className }) => {
   return (
     <div className={`pane ${className}`.trim()}>
       {header ? <PaneHeader Header={header} /> : ''}
@@ -12,7 +12,7 @@ function Pane({ content, header, footer, className }) {
       {footer ? <PaneFooter Footer={footer} /> : ''}
     </div>
   );
-}
+};
 
 Pane.propTypes = {
   content: PropTypes.any,

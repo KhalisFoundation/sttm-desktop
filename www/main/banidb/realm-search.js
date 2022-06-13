@@ -150,6 +150,13 @@ const query = (searchQuery, searchType, searchSource) =>
         }
 
         break;
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ENGLISH:
+        searchCol = 'FirstLetterEng';
+        condition = `${searchCol} CONTAINS '${saniQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND Source.SourceID = '${searchSource}'`;
+        }
+        break;
       default:
         break;
     }

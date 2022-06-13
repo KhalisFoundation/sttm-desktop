@@ -4,27 +4,24 @@ import { remote } from 'electron';
 
 const { i18n } = remote.require('./app');
 
-const FilterDropdown = ({ title, onChange, optionsObj }) => {
-  return title === 'Source' ? (
+const FilterDropdown = ({ title, onChange, currentValue, optionsObj }) => {
+  const isSource = title === 'Source';
+
+  return (
     <>
-      <select className="select-bani" onChange={onChange}>
-        {Object.keys(optionsObj).map(keyName => (
-          <option key={keyName} value={keyName}>
-            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)}
-          </option>
-        ))}
-      </select>
-      <span>{title}</span>
-    </>
-  ) : (
-    <>
-      <select className="select-bani" onChange={onChange}>
+      <select className="select-bani" onChange={onChange} value={currentValue}>
         {Object.keys(optionsObj).map(keyName => (
           <option
             key={keyName}
-            value={i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
+            value={
+              isSource
+                ? keyName
+                : i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)
+            }
           >
-            {i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)}
+            {isSource
+              ? i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)
+              : i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
           </option>
         ))}
       </select>
@@ -37,6 +34,7 @@ FilterDropdown.propTypes = {
   title: PropTypes.string,
   onChange: PropTypes.func,
   optionsObj: PropTypes.object,
+  currentValue: PropTypes.string,
 };
 
 export default FilterDropdown;

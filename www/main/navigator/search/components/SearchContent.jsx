@@ -3,7 +3,13 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { remote, ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
-import { IconButton, InputBox, FilterDropdown, SearchResults } from '../../../common/sttm-ui';
+import {
+  IconButton,
+  InputBox,
+  FilterDropdown,
+  SearchResults,
+  FilterTag,
+} from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 
@@ -22,6 +28,7 @@ const SearchContent = () => {
     searchQuery,
     currentSearchType,
     shortcuts,
+    searchShabadsCount,
   } = useStoreState(state => state.navigator);
   const {
     setCurrentWriter,
@@ -29,6 +36,7 @@ const SearchContent = () => {
     setCurrentSource,
     setSearchQuery,
     setShortcuts,
+    setSearchShabadsCount,
   } = useStoreActions(state => state.navigator);
 
   // Local State
@@ -38,7 +46,14 @@ const SearchContent = () => {
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
+  const allWriterText = i18n.t(`SEARCH.WRITERS.ALL_WRITERS.VALUE`);
+  const allRaagText = i18n.t(`SEARCH.RAAGS.ALL_RAAGS.VALUE`);
+  const allSourceText = i18n.t(`SEARCH.SOURCES.ALL_SOURCES.VALUE`);
 
+  const isShowFiltersTag =
+    currentWriter !== allWriterText ||
+    currentRaag !== allRaagText ||
+    currentSource !== allSourceText;
   // Gurmukhi Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
@@ -106,6 +121,12 @@ const SearchContent = () => {
     }
   }, [searchQuery]);
 
+  useEffect(() => {
+    if (searchShabadsCount !== filteredShabads.length) {
+      setSearchShabadsCount(filteredShabads.length);
+    }
+  }, [filteredShabads]);
+
   ipcRenderer.on('database-progress', data => {
     setDatabaseProgress(data.percent);
   });
@@ -151,7 +172,31 @@ const SearchContent = () => {
         <GurmukhiKeyboard searchType={currentSearchType} query={query} setQuery={setQuery} />
       )}
       <div className="search-result-controls">
-        <span>{filteredShabads.length ? `${filteredShabads.length} Results` : ''}</span>
+        {isShowFiltersTag && (
+          <div className="filter-tag--container">
+            {currentWriter !== allWriterText && (
+              <FilterTag
+                close={() => setCurrentWriter(allWriterText)}
+                title={currentWriter}
+                filterType={i18n.t('SEARCH.WRITER')}
+              />
+            )}
+            {currentRaag !== allRaagText && (
+              <FilterTag
+                close={() => setCurrentRaag(allRaagText)}
+                title={currentRaag}
+                filterType={i18n.t('SEARCH.RAAG')}
+              />
+            )}
+            {currentSource !== allSourceText && (
+              <FilterTag
+                close={() => setCurrentSource(allSourceText)}
+                title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
+                filterType={i18n.t('SEARCH.SOURCE')}
+              />
+            )}
+          </div>
+        )}
         <div className="filters">
           <span>Filter by </span>
           <FilterDropdown
@@ -161,6 +206,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchWriter', event.target.value);
             }}
             optionsObj={writersObj}
+            currentValue={currentWriter}
           />
           <FilterDropdown
             title="Raag"
@@ -169,6 +215,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchRaag', event.target.value);
             }}
             optionsObj={raagsObj}
+            currentValue={currentRaag}
           />
           <FilterDropdown
             title="Source"
@@ -177,6 +224,7 @@ const SearchContent = () => {
               analytics.trackEvent('search', 'searchSource', event.target.value);
             }}
             optionsObj={sourcesObj}
+            currentValue={currentSource}
           />
         </div>
       </div>

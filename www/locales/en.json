@@ -175,6 +175,9 @@
     "MAIN_LETTERS": "Main Letters - Gurmukhi",
     "PLACEHOLDER_GURMUKHI": "Enter search term here or ang number",
     "PLACEHOLDER_ENGLISH": "Enter search term [Translations Only] or ang number",
+    "SOURCE": "Source",
+    "RAAG": "Raag",
+    "WRITER": "Writer",
     "SOURCES": {
       "ALL_SOURCES": {
         "TEXT": "All Sources",

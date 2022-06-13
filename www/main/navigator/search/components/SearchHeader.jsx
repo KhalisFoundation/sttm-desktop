@@ -132,12 +132,13 @@ function SearchHeader() {
                 {englishSearchTypes.map(value => (
                   <React.Fragment key={value}>
                     <input
-                      className="search-type-checkbox"
                       id={value}
                       type="radio"
                       value={value}
-                      defaultChecked={true}
-                      disabled={true}
+                      name="search-input"
+                      className="search-type-checkbox"
+                      onChangeCapture={handleSearchOption}
+                      checked={parseInt(value, 10) === currentSearchType}
                     />
                     <span className="search-type-checkmark"></span>
                     <label htmlFor={value} className="search-type-label">
