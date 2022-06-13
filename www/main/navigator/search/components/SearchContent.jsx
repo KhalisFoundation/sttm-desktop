@@ -46,7 +46,14 @@ const SearchContent = () => {
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
+  const allWriterText = i18n.t(`SEARCH.WRITERS.ALL_WRITERS.VALUE`);
+  const allRaagText = i18n.t(`SEARCH.RAAGS.ALL_RAAGS.VALUE`);
+  const allSourceText = i18n.t(`SEARCH.SOURCES.ALL_SOURCES.VALUE`);
 
+  const isShowFiltersTag =
+    currentWriter !== allWriterText ||
+    currentRaag !== allRaagText ||
+    currentSource !== allSourceText;
   // Gurmukhi Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
@@ -165,25 +172,25 @@ const SearchContent = () => {
         <GurmukhiKeyboard searchType={currentSearchType} query={query} setQuery={setQuery} />
       )}
       <div className="search-result-controls">
-        {(currentWriter !== 'ALL' || currentRaag !== 'ALL' || currentSource !== 'all') && (
+        {isShowFiltersTag && (
           <div className="filter-tag--container">
-            {currentWriter !== 'ALL' && (
+            {currentWriter !== allWriterText && (
               <FilterTag
-                close={() => setCurrentWriter('ALL')}
+                close={() => setCurrentWriter(allWriterText)}
                 title={currentWriter}
                 filterType={i18n.t('SEARCH.WRITER')}
               />
             )}
-            {currentRaag !== 'ALL' && (
+            {currentRaag !== allRaagText && (
               <FilterTag
-                close={() => setCurrentRaag('ALL')}
+                close={() => setCurrentRaag(allRaagText)}
                 title={currentRaag}
                 filterType={i18n.t('SEARCH.RAAG')}
               />
             )}
-            {currentSource !== 'all' && (
+            {currentSource !== allSourceText && (
               <FilterTag
-                close={() => setCurrentSource('all')}
+                close={() => setCurrentSource(allSourceText)}
                 title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
