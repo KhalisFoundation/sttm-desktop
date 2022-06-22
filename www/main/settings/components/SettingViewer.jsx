@@ -57,8 +57,10 @@ const SettingViewer = () => {
   };
 
   const getVishraamType = () => {
-    if (displayVishraams && !larivaarAssist) {
-      return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
+    if (displayVishraams) {
+      if (!(larivaar && larivaarAssist)) {
+        return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
+      }
     }
     return '';
   };
