@@ -51,7 +51,9 @@ $gurmukhi-font-family-thick: 'gurbaniakharthick';
   }
 
   .english {
-    font-size: 1.1em;
+    &::placeholder {
+      font-size: 14px;
+    }
   }
 }
 
