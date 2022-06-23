@@ -148,7 +148,7 @@ const SearchContent = () => {
         <InputBox
           placeholder={getPlaceholder()}
           disabled={databaseProgress < 1}
-          className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
+          className={`${currentLanguage === 'gr' ? 'gurmukhi' : 'english'} mousetrap`}
           databaseProgress={databaseProgress}
           query={query}
           setQuery={setQuery}
