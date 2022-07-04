@@ -181,127 +181,108 @@
     "SOURCES": {
       "ALL_SOURCES": {
         "TEXT": "All Sources",
-        "VALUE": "all"
+        "VALUE": "all",
+        "DB_ID": null
       },
       "AMRIT_KEERTAN": {
         "TEXT": "Amrit Keertan",
-        "VALUE": "Amrit Keertan"
+        "DB_ID": "A"
       },
       "DASAM_GRANTH": {
         "TEXT": "Dasam Granth Sahib",
-        "VALUE": "Dasam Bani"
+        "DB_ID": "D"
       },
       "GURDAS_JI_VAARAN": {
         "TEXT": "Bhai Gurdas Singh Ji Vaaran",
-        "VALUE": "Bhai Gurdas Singh Ji Vaaran"
+        "DB_ID": "S"
       },
       "GURDAS_VAARAN": {
         "TEXT": "Bhai Gurdas Ji Vaaran",
-        "VALUE": "Bhai Gurdas Ji Vaaran"
+        "DB_ID": "B"
       },
       "GURU_GRANTH_SAHIB": {
         "TEXT": "Guru Granth Sahib Ji",
-        "VALUE": "Sri Guru Granth Sahib Ji"
+        "DB_ID": "G"
       },
       "NAND_LAL_VAARAN": {
         "TEXT": "Bhai Nand Lal Ji Vaaran",
-        "VALUE": "Bhai Nand Lal Ji Vaaran"
+        "DB_ID": "N"
       },
       "REHATNAMAS": {
         "TEXT": "Rehatnamas & Panthic Sources",
-        "VALUE": "Codes of Conduct and Other Panthic Sources"
+        "DB_ID": "R"
       }
     },
     "RAAGS": {
       "ALL_RAAGS": {
         "TEXT": "All Raags",
-        "VALUE": "ALL"
+        "VALUE": "ALL",
+        "DB_ID": null
       },
       "ASA": {
         "TEXT": "Asa",
-        "VALUE": "Raag Aasaa"
+        "DB_ID": 8
       },
       "GUJARI": {
         "TEXT": "Gujari",
-        "VALUE": "Raag Gujari"
-      },
-      "GAURI_DEEPAKI": {
-        "TEXT": "Gauri Deepaki",
-        "VALUE": "Raag Gauree Deepaki"
+        "DB_ID": 9
       },
       "DHANASARI": {
         "TEXT": "Dhanasri",
-        "VALUE": "Raag Dhanasri"
-      },
-      "GAURI_POORABI": {
-        "TEXT": "Gauri Poorabi",
-        "VALUE": "Raag Gauree Poorabi"
+        "DB_ID": 14
       },
       "SRI": {
         "TEXT": "Sri",
-        "VALUE": "Raag Sri"
+        "DB_ID": 5
       },
       "MAJH": {
         "TEXT": "Majh",
-        "VALUE": "Raag Maajh"
-      },
-      "GAURI_GAURAIREE": {
-        "TEXT": "Gauri Guarairee",
-        "VALUE": "Raag Gauree Guarairee"
+        "DB_ID": 6
       },
       "GAURI": {
         "TEXT": "Gauri",
-        "VALUE": "Raag Gauree"
-      },
-      "GAURI_DAKHANI": {
-        "TEXT": "Gauri Dakhani",
-        "VALUE": "Gauree Dakhani"
+        "DB_ID": 7
       },
       "OTHERS": {
         "TEXT": "Others",
-        "VALUE": "Others"
+        "VALUE": "Others",
+        "DB_ID": null
       }
     },
     "WRITERS": {
       "ALL_WRITERS": {
         "TEXT": "All Writers",
-        "VALUE": "ALL"
-      },
-      "GURU_AMAR_DAS": {
-        "TEXT": "Guru Amar Das",
-        "VALUE": "Guru Amar Das Ji"
-      },
-      "GURU_ANGAD_DEV": {
-        "TEXT": "Guru Angad Dev",
-        "VALUE": "Guru Angad Dev Ji"
-      },
-      "GURU_ARJAN_DEV": {
-        "TEXT": "Guru Arjan Dev",
-        "VALUE": "Guru Arjan Dev Ji"
-      },
-      "GURU_HAR_RAI": {
-        "TEXT": "Guru Har Rai",
-        "VALUE": "Guru Har Rai Ji"
-      },
-      "GURU_HARGOBIND": {
-        "TEXT": "Guru Hargobind",
-        "VALUE": "Guru Hargobind Ji"
+        "VALUE": "ALL",
+        "DB_ID": null
       },
       "GURU_NANAK_DEV": {
         "TEXT": "Guru Nanak Dev",
-        "VALUE": "Guru Nanak Dev Ji"
+        "DB_ID": 1
+      },
+      "GURU_ANGAD_DEV": {
+        "TEXT": "Guru Angad Dev",
+        "DB_ID": 2
+      },
+      "GURU_AMAR_DAS": {
+        "TEXT": "Guru Amar Daas",
+        "DB_ID": 3
       },
       "GURU_RAM_DAS": {
         "TEXT": "Guru Ram Das",
-        "VALUE": "Guru Ram Das Ji"
+        "DB_ID": 4
+      },
+      "GURU_ARJAN_DEV": {
+        "TEXT": "Guru Arjan Dev",
+        "DB_ID": 5
       },
       "GURU_TEGH_BAHADUR": {
         "TEXT": "Guru Tegh Bahadur",
-        "VALUE": "Guru Tegh Bahadur Ji"
+        "DB_ID": 6
       },
       "OTHERS": {
         "TEXT": "Others",
-        "VALUE": "Others"
+        "VALUE": "Others",
+        "DB_ID": null
       }
     },
     "ERROR": "Error occured while searching. Please try again or restart the application."

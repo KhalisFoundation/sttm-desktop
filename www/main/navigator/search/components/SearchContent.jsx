@@ -3,6 +3,8 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { remote, ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
+import { retrieveFilterOption } from '../utils';
+
 import {
   IconButton,
   InputBox,
@@ -42,6 +44,9 @@ const SearchContent = () => {
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
   const [query, setQuery] = useState('');
+  const [writerArray, setWriterArray] = useState([]);
+  const [raagArray, setRaagArray] = useState([]);
+  const [sourceArray, setSourceArray] = useState([]);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -78,7 +83,7 @@ const SearchContent = () => {
       : [];
   };
 
-  const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchData))]);
+  const [filteredShabads, setFilteredShabads] = useState([]);
 
   const openFirstResult = () => {
     if (searchQuery.length > 0 && filteredShabads.length > 0) {
@@ -100,7 +105,14 @@ const SearchContent = () => {
 
   useEffect(() => {
     setFilteredShabads(
-      filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
+      filters(
+        mapVerseItems(searchData),
+        currentWriter,
+        currentRaag,
+        currentSource,
+        writerArray,
+        raagArray,
+      ),
     );
   }, [searchData, currentWriter, currentRaag, currentSource]);
 
@@ -141,6 +153,21 @@ const SearchContent = () => {
       clearTimeout(timeoutId);
     };
   }, [query]);
+
+  useEffect(() => {
+    const wData = retrieveFilterOption(writersObj, 'writer');
+    wData.then(d => {
+      setWriterArray(d);
+    });
+    const rData = retrieveFilterOption(raagsObj, 'raag');
+    rData.then(d => {
+      setRaagArray(d);
+    });
+    const sData = retrieveFilterOption(sourcesObj, 'source');
+    sData.then(d => {
+      setSourceArray(d);
+    });
+  }, []);
 
   return (
     <div className="search-content-container">
@@ -191,7 +218,7 @@ const SearchContent = () => {
             {currentSource !== allSourceText && (
               <FilterTag
                 close={() => setCurrentSource(allSourceText)}
-                title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
+                title={currentSource}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
             )}
@@ -205,7 +232,7 @@ const SearchContent = () => {
               setCurrentWriter(event.target.value);
               analytics.trackEvent('search', 'searchWriter', event.target.value);
             }}
-            optionsObj={writersObj}
+            optionsArray={writerArray}
             currentValue={currentWriter}
           />
           <FilterDropdown
@@ -214,7 +241,7 @@ const SearchContent = () => {
               setCurrentRaag(event.target.value);
               analytics.trackEvent('search', 'searchRaag', event.target.value);
             }}
-            optionsObj={raagsObj}
+            optionsArray={raagArray}
             currentValue={currentRaag}
           />
           <FilterDropdown
@@ -223,7 +250,7 @@ const SearchContent = () => {
               setCurrentSource(event.target.value);
               analytics.trackEvent('search', 'searchSource', event.target.value);
             }}
-            optionsObj={sourcesObj}
+            optionsArray={sourceArray}
             currentValue={currentSource}
           />
         </div>

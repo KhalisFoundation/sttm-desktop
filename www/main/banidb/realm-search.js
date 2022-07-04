@@ -411,6 +411,49 @@ const randomShabad = (SourceID = 'G') =>
       .catch(reject);
   });
 
+/**
+ * Retrieve all writers with given id from the database
+ *
+ * @param {array} writerIds An array of ids to fetch
+ * @returns {object} Returns array of objects for each writer
+ * @example
+ *
+ * getWriters([1,2]);
+ * // => [{ Writer: { WriterID: 1, WriterEnglish:'Guru Nanak Dev Ji',...},...}]
+ */
+
+const getFilterOption = (type, idArray) =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    let collectionName;
+    let columnName;
+    if (type === 'writer') {
+      collectionName = 'Writer';
+      columnName = 'WriterID';
+    } else if (type === 'raag') {
+      collectionName = 'Raag';
+      columnName = 'RaagID';
+    } else if (type === 'source') {
+      collectionName = 'Source';
+      columnName = 'SourceID';
+    }
+    Realm.open(realmConfig)
+      .then(realm => {
+        const idsQuery = idArray
+          .map(id => {
+            return type === 'source' ? `${columnName} = '${id}'` : `${columnName} = ${id}`;
+          })
+          .join(' OR ');
+        const rows = realm.objects(collectionName).filtered(`(${idsQuery})`);
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  });
+
 // Re-export CONSTS for use in other areas
 module.exports = {
   CONSTS,
@@ -424,4 +467,5 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  getFilterOption,
 };

@@ -54,7 +54,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
         );
       }
     }
-  }, [searchQuery, currentSearchType, currentSource]);
+  }, [searchQuery, currentSearchType]);
 
   return (
     <>
