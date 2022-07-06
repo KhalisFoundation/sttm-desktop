@@ -412,13 +412,14 @@ const randomShabad = (SourceID = 'G') =>
   });
 
 /**
- * Retrieve all writers with given id from the database
+ * Retrieve the filter options; writer, raag, and source
  *
+ * @param {string} type Type of filter option to retrieve
  * @param {array} writerIds An array of ids to fetch
- * @returns {object} Returns array of objects for each writer
+ * @returns {object} Returns array of objects for given type of filter option
  * @example
  *
- * getWriters([1,2]);
+ * getFilterOption('writer', [1,2]);
  * // => [{ Writer: { WriterID: 1, WriterEnglish:'Guru Nanak Dev Ji',...},...}]
  */
 
@@ -438,6 +439,8 @@ const getFilterOption = (type, idArray) =>
     } else if (type === 'source') {
       collectionName = 'Source';
       columnName = 'SourceID';
+    } else {
+      resolve({ error: `Unable to find a filter option with type: ${type}` });
     }
     Realm.open(realmConfig)
       .then(realm => {

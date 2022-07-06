@@ -59,14 +59,14 @@ const SOURCE_TEXTS = {
 };
 
 const WRITER_TYPES = {
-  ALL_WRITERS: 'ALL',
-  GURU_NANAK_DEV: 'GND',
-  GURU_ANGAD_DEV: 'AN',
-  GURU_AMAR_DAS: 'AM',
-  GURU_RAM_DAS: 'R',
-  GURU_ARJAN_DEV: 'AR',
-  GURU_TEGH_BAHADUR: 'TG',
-  OTHERS: 'O',
+  ALL_WRITERS: 'all',
+  GURU_NANAK_DEV: 1,
+  GURU_ANGAD_DEV: 2,
+  GURU_AMAR_DAS: 3,
+  GURU_RAM_DAS: 4,
+  GURU_ARJAN_DEV: 5,
+  GURU_TEGH_BAHADUR: 6,
+  OTHERS: 'others',
 };
 
 const WRITER_TEXTS = {
@@ -81,14 +81,14 @@ const WRITER_TEXTS = {
 };
 
 const RAAG_TYPES = {
-  ALL_RAAGS: 'ALL',
-  ASA: 'ASA',
-  GUJARI: 'GU',
-  DHANASARI: 'DH',
-  SRI: 'SR',
-  MAJH: 'MA',
-  GAURI: 'GA',
-  OTHERS: 'O',
+  ALL_RAAGS: 'all',
+  ASA: 8,
+  GUJARI: 9,
+  DHANASARI: 14,
+  SRI: 5,
+  MAJH: 6,
+  GAURI: 7,
+  OTHERS: 'others',
 };
 
 const RAAG_TEXTS = {

@@ -4,37 +4,46 @@ import { getFilterOption } from '../../../banidb/realm-search';
 const { i18n } = remote.require('./app');
 
 export const retrieveFilterOption = async (optionsObj, type) => {
-  const optionIds = [];
-  let optionArr = [];
+  const idArray = Object.keys(optionsObj).filter(
+    option => option.toLowerCase() !== 'all' && option.toLowerCase() !== 'others',
+  );
+  const retrievedObj = await getFilterOption(type, idArray);
+  const valueObj = Object.assign({}, retrievedObj);
 
-  optionArr = Object.values(optionsObj).map(option => {
-    const dbId = i18n.t(`SEARCH.${type.toUpperCase()}S.${option}.DB_ID`);
-    if (dbId) {
-      optionIds.push(dbId);
-      return dbId;
-    }
-    return i18n.t(`SEARCH.${type.toUpperCase()}S.${option}.VALUE`);
-  });
-  const data = await getFilterOption(type, optionIds);
-  const optionObject = Object.assign({}, data);
-  const retrievedObj = {};
-  Object.keys(optionObject).forEach(idx => {
+  const finalArray = [
+    {
+      value: 'all',
+      text: i18n.t(`SEARCH.${type.toUpperCase()}S.${optionsObj.all}.TEXT`),
+    },
+  ];
+
+  Object.keys(valueObj).forEach(idx => {
     if (type === 'source') {
-      const { SourceEnglish, SourceID } = optionObject[idx];
-      retrievedObj[SourceID] = SourceEnglish;
+      const { SourceID } = valueObj[idx];
+      finalArray.push({
+        value: SourceID,
+        text: i18n.t(`SEARCH.${type.toUpperCase()}S.${optionsObj[SourceID]}.TEXT`),
+      });
     } else if (type === 'raag') {
-      const { RaagEnglish, RaagID } = optionObject[idx];
-      retrievedObj[RaagID] = RaagEnglish;
+      const { RaagEnglish, RaagID } = valueObj[idx];
+      finalArray.push({
+        value: RaagEnglish,
+        text: i18n.t(`SEARCH.${type.toUpperCase()}S.${optionsObj[RaagID]}.TEXT`),
+      });
     } else if (type === 'writer') {
-      const { WriterEnglish, WriterID } = optionObject[idx];
-      retrievedObj[WriterID] = WriterEnglish;
+      const { WriterEnglish, WriterID } = valueObj[idx];
+      finalArray.push({
+        value: WriterEnglish,
+        text: i18n.t(`SEARCH.${type.toUpperCase()}S.${optionsObj[WriterID]}.TEXT`),
+      });
     }
   });
-  optionArr = optionArr.map(option => {
-    if (option in retrievedObj) {
-      return retrievedObj[option];
-    }
-    return option;
-  });
-  return optionArr;
+
+  if (type !== 'source') {
+    finalArray.push({
+      value: 'others',
+      text: i18n.t(`SEARCH.${type.toUpperCase()}S.${optionsObj.others}.TEXT`),
+    });
+  }
+  return finalArray;
 };

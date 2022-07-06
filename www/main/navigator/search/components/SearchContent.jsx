@@ -51,14 +51,9 @@ const SearchContent = () => {
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
-  const allWriterText = i18n.t(`SEARCH.WRITERS.ALL_WRITERS.VALUE`);
-  const allRaagText = i18n.t(`SEARCH.RAAGS.ALL_RAAGS.VALUE`);
-  const allSourceText = i18n.t(`SEARCH.SOURCES.ALL_SOURCES.VALUE`);
 
   const isShowFiltersTag =
-    currentWriter !== allWriterText ||
-    currentRaag !== allRaagText ||
-    currentSource !== allSourceText;
+    currentWriter !== 'all' || currentRaag !== 'all' || currentSource !== 'all';
   // Gurmukhi Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
@@ -105,16 +100,9 @@ const SearchContent = () => {
 
   useEffect(() => {
     setFilteredShabads(
-      filters(
-        mapVerseItems(searchData),
-        currentWriter,
-        currentRaag,
-        currentSource,
-        writerArray,
-        raagArray,
-      ),
+      filters(mapVerseItems(searchData), currentWriter, currentRaag, writerArray, raagArray),
     );
-  }, [searchData, currentWriter, currentRaag, currentSource]);
+  }, [searchData, currentWriter, currentRaag]);
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
@@ -201,24 +189,24 @@ const SearchContent = () => {
       <div className="search-result-controls">
         {isShowFiltersTag && (
           <div className="filter-tag--container">
-            {currentWriter !== allWriterText && (
+            {currentWriter !== 'all' && (
               <FilterTag
-                close={() => setCurrentWriter(allWriterText)}
+                close={() => setCurrentWriter('all')}
                 title={currentWriter}
                 filterType={i18n.t('SEARCH.WRITER')}
               />
             )}
-            {currentRaag !== allRaagText && (
+            {currentRaag !== 'all' && (
               <FilterTag
-                close={() => setCurrentRaag(allRaagText)}
+                close={() => setCurrentRaag('all')}
                 title={currentRaag}
                 filterType={i18n.t('SEARCH.RAAG')}
               />
             )}
-            {currentSource !== allSourceText && (
+            {currentSource !== 'all' && (
               <FilterTag
-                close={() => setCurrentSource(allSourceText)}
-                title={currentSource}
+                close={() => setCurrentSource('all')}
+                title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
             )}

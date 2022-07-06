@@ -180,109 +180,80 @@
     "WRITER": "Writer",
     "SOURCES": {
       "ALL_SOURCES": {
-        "TEXT": "All Sources",
-        "VALUE": "all",
-        "DB_ID": null
+        "TEXT": "All Sources"
       },
       "AMRIT_KEERTAN": {
-        "TEXT": "Amrit Keertan",
-        "DB_ID": "A"
+        "TEXT": "Amrit Keertan"
       },
       "DASAM_GRANTH": {
-        "TEXT": "Dasam Granth Sahib",
-        "DB_ID": "D"
+        "TEXT": "Dasam Granth Sahib"
       },
       "GURDAS_JI_VAARAN": {
-        "TEXT": "Bhai Gurdas Singh Ji Vaaran",
-        "DB_ID": "S"
+        "TEXT": "Bhai Gurdas Singh Ji Vaaran"
       },
       "GURDAS_VAARAN": {
-        "TEXT": "Bhai Gurdas Ji Vaaran",
-        "DB_ID": "B"
+        "TEXT": "Bhai Gurdas Ji Vaaran"
       },
       "GURU_GRANTH_SAHIB": {
-        "TEXT": "Guru Granth Sahib Ji",
-        "DB_ID": "G"
+        "TEXT": "Guru Granth Sahib Ji"
       },
       "NAND_LAL_VAARAN": {
-        "TEXT": "Bhai Nand Lal Ji Vaaran",
-        "DB_ID": "N"
+        "TEXT": "Bhai Nand Lal Ji Vaaran"
       },
       "REHATNAMAS": {
-        "TEXT": "Rehatnamas & Panthic Sources",
-        "DB_ID": "R"
+        "TEXT": "Rehatnamas & Panthic Sources"
       }
     },
     "RAAGS": {
       "ALL_RAAGS": {
-        "TEXT": "All Raags",
-        "VALUE": "ALL",
-        "DB_ID": null
+        "TEXT": "All Raags"
       },
       "ASA": {
-        "TEXT": "Asa",
-        "DB_ID": 8
+        "TEXT": "Asa"
       },
       "GUJARI": {
-        "TEXT": "Gujari",
-        "DB_ID": 9
+        "TEXT": "Gujari"
       },
       "DHANASARI": {
-        "TEXT": "Dhanasri",
-        "DB_ID": 14
+        "TEXT": "Dhanasri"
       },
       "SRI": {
-        "TEXT": "Sri",
-        "DB_ID": 5
+        "TEXT": "Sri"
       },
       "MAJH": {
-        "TEXT": "Majh",
-        "DB_ID": 6
+        "TEXT": "Majh"
       },
       "GAURI": {
-        "TEXT": "Gauri",
-        "DB_ID": 7
+        "TEXT": "Gauri"
       },
       "OTHERS": {
-        "TEXT": "Others",
-        "VALUE": "Others",
-        "DB_ID": null
+        "TEXT": "Others"
       }
     },
     "WRITERS": {
       "ALL_WRITERS": {
-        "TEXT": "All Writers",
-        "VALUE": "ALL",
-        "DB_ID": null
+        "TEXT": "All Writers"
       },
       "GURU_NANAK_DEV": {
-        "TEXT": "Guru Nanak Dev",
-        "DB_ID": 1
+        "TEXT": "Guru Nanak Dev"
       },
       "GURU_ANGAD_DEV": {
-        "TEXT": "Guru Angad Dev",
-        "DB_ID": 2
+        "TEXT": "Guru Angad Dev"
       },
       "GURU_AMAR_DAS": {
-        "TEXT": "Guru Amar Daas",
-        "DB_ID": 3
+        "TEXT": "Guru Amar Daas"
       },
       "GURU_RAM_DAS": {
-        "TEXT": "Guru Ram Das",
-        "DB_ID": 4
+        "TEXT": "Guru Ram Das"
       },
       "GURU_ARJAN_DEV": {
-        "TEXT": "Guru Arjan Dev",
-        "DB_ID": 5
+        "TEXT": "Guru Arjan Dev"
       },
       "GURU_TEGH_BAHADUR": {
-        "TEXT": "Guru Tegh Bahadur",
-        "DB_ID": 6
+        "TEXT": "Guru Tegh Bahadur"
       },
       "OTHERS": {
-        "TEXT": "Others",
-        "VALUE": "Others",
-        "DB_ID": null
+        "TEXT": "Others"
       }
     },
     "ERROR": "Error occured while searching. Please try again or restart the application."
