@@ -7,7 +7,7 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
       return verse.writer.includes(currentWriter);
     });
   } else if (currentWriter !== 'all' && currentWriter === 'others') {
-    const allWriters = writerArray.filter(d => d !== 'all' && d !== 'others');
+    const allWriters = writerArray.filter(writer => writer !== 'all' && writer !== 'others');
     filteredResult = allSearchedVerses.filter(verse => {
       return !allWriters.includes(verse.writer);
     });

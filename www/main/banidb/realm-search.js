@@ -430,18 +430,23 @@ const getFilterOption = (type, idArray) =>
     }
     let collectionName;
     let columnName;
-    if (type === 'writer') {
-      collectionName = 'Writer';
-      columnName = 'WriterID';
-    } else if (type === 'raag') {
-      collectionName = 'Raag';
-      columnName = 'RaagID';
-    } else if (type === 'source') {
-      collectionName = 'Source';
-      columnName = 'SourceID';
-    } else {
-      resolve({ error: `Unable to find a filter option with type: ${type}` });
+    switch (type) {
+      case 'writer':
+        collectionName = 'Writer';
+        columnName = 'WriterID';
+        break;
+      case 'raag':
+        collectionName = 'Raag';
+        columnName = 'RaagID';
+        break;
+      case 'source':
+        collectionName = 'Source';
+        columnName = 'SourceID';
+        break;
+      default:
+        resolve({ error: `Unable to find a filter option with type: ${type}` });
     }
+
     Realm.open(realmConfig)
       .then(realm => {
         const idsQuery = idArray
