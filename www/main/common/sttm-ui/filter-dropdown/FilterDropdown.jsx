@@ -1,29 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
 
-const { i18n } = remote.require('./app');
-
-const FilterDropdown = ({ title, onChange, currentValue, optionsObj }) => {
-  const isSource = title === 'Source';
-
+const FilterDropdown = ({ title, onChange, currentValue, optionsArray }) => {
   return (
     <>
       <select className="select-bani" onChange={onChange} value={currentValue}>
-        {Object.keys(optionsObj).map(keyName => (
-          <option
-            key={keyName}
-            value={
-              isSource
-                ? keyName
-                : i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)
-            }
-          >
-            {isSource
-              ? i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.TEXT`)
-              : i18n.t(`SEARCH.${title.toUpperCase()}S.${optionsObj[keyName]}.VALUE`)}
-          </option>
-        ))}
+        {optionsArray.length &&
+          optionsArray.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.text}
+            </option>
+          ))}
       </select>
       <span>{title}</span>
     </>
@@ -33,7 +20,7 @@ const FilterDropdown = ({ title, onChange, currentValue, optionsObj }) => {
 FilterDropdown.propTypes = {
   title: PropTypes.string,
   onChange: PropTypes.func,
-  optionsObj: PropTypes.object,
+  optionsArray: PropTypes.array,
   currentValue: PropTypes.string,
 };
 

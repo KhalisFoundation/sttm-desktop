@@ -3,6 +3,8 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { remote, ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
+import { retrieveFilterOption } from '../utils';
+
 import { classNames } from '../../../common/utils';
 import {
   IconButton,
@@ -43,18 +45,16 @@ const SearchContent = () => {
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
   const [query, setQuery] = useState('');
+  const [writerArray, setWriterArray] = useState([]);
+  const [raagArray, setRaagArray] = useState([]);
+  const [sourceArray, setSourceArray] = useState([]);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
-  const allWriterText = i18n.t(`SEARCH.WRITERS.ALL_WRITERS.VALUE`);
-  const allRaagText = i18n.t(`SEARCH.RAAGS.ALL_RAAGS.VALUE`);
-  const allSourceText = i18n.t(`SEARCH.SOURCES.ALL_SOURCES.VALUE`);
 
   const isShowFiltersTag =
-    currentWriter !== allWriterText ||
-    currentRaag !== allRaagText ||
-    currentSource !== allSourceText;
+    currentWriter !== 'all' || currentRaag !== 'all' || currentSource !== 'all';
   // Gurmukhi Keyboard
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
@@ -79,7 +79,7 @@ const SearchContent = () => {
       : [];
   };
 
-  const [filteredShabads, setFilteredShabads] = useState([filters(mapVerseItems(searchData))]);
+  const [filteredShabads, setFilteredShabads] = useState([]);
 
   const openFirstResult = () => {
     if (searchQuery.length > 0 && filteredShabads.length > 0) {
@@ -101,9 +101,9 @@ const SearchContent = () => {
 
   useEffect(() => {
     setFilteredShabads(
-      filters(mapVerseItems(searchData), currentWriter, currentRaag, currentSource),
+      filters(mapVerseItems(searchData), currentWriter, currentRaag, writerArray, raagArray),
     );
-  }, [searchData, currentWriter, currentRaag, currentSource]);
+  }, [searchData, currentWriter, currentRaag]);
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
@@ -143,6 +143,21 @@ const SearchContent = () => {
     };
   }, [query]);
 
+  useEffect(() => {
+    const wData = retrieveFilterOption(writersObj, 'writer');
+    wData.then(d => {
+      setWriterArray(d);
+    });
+    const rData = retrieveFilterOption(raagsObj, 'raag');
+    rData.then(d => {
+      setRaagArray(d);
+    });
+    const sData = retrieveFilterOption(sourcesObj, 'source');
+    sData.then(d => {
+      setSourceArray(d);
+    });
+  }, []);
+
   return (
     <div className="search-content-container">
       <div className="search-content">
@@ -175,23 +190,23 @@ const SearchContent = () => {
       <div className="search-result-controls">
         {isShowFiltersTag && (
           <div className="filter-tag--container">
-            {currentWriter !== allWriterText && (
+            {currentWriter !== 'all' && (
               <FilterTag
-                close={() => setCurrentWriter(allWriterText)}
+                close={() => setCurrentWriter('all')}
                 title={currentWriter}
                 filterType={i18n.t('SEARCH.WRITER')}
               />
             )}
-            {currentRaag !== allRaagText && (
+            {currentRaag !== 'all' && (
               <FilterTag
-                close={() => setCurrentRaag(allRaagText)}
+                close={() => setCurrentRaag('all')}
                 title={currentRaag}
                 filterType={i18n.t('SEARCH.RAAG')}
               />
             )}
-            {currentSource !== allSourceText && (
+            {currentSource !== 'all' && (
               <FilterTag
-                close={() => setCurrentSource(allSourceText)}
+                close={() => setCurrentSource('all')}
                 title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
@@ -206,7 +221,7 @@ const SearchContent = () => {
               setCurrentWriter(event.target.value);
               analytics.trackEvent('search', 'searchWriter', event.target.value);
             }}
-            optionsObj={writersObj}
+            optionsArray={writerArray}
             currentValue={currentWriter}
           />
           <FilterDropdown
@@ -215,7 +230,7 @@ const SearchContent = () => {
               setCurrentRaag(event.target.value);
               analytics.trackEvent('search', 'searchRaag', event.target.value);
             }}
-            optionsObj={raagsObj}
+            optionsArray={raagArray}
             currentValue={currentRaag}
           />
           <FilterDropdown
@@ -224,7 +239,7 @@ const SearchContent = () => {
               setCurrentSource(event.target.value);
               analytics.trackEvent('search', 'searchSource', event.target.value);
             }}
-            optionsObj={sourcesObj}
+            optionsArray={sourceArray}
             currentValue={currentSource}
           />
         </div>

@@ -180,128 +180,80 @@
     "WRITER": "Writer",
     "SOURCES": {
       "ALL_SOURCES": {
-        "TEXT": "All Sources",
-        "VALUE": "all"
+        "TEXT": "All Sources"
       },
       "AMRIT_KEERTAN": {
-        "TEXT": "Amrit Keertan",
-        "VALUE": "Amrit Keertan"
+        "TEXT": "Amrit Keertan"
       },
       "DASAM_GRANTH": {
-        "TEXT": "Dasam Granth Sahib",
-        "VALUE": "Dasam Bani"
+        "TEXT": "Dasam Granth Sahib"
       },
       "GURDAS_JI_VAARAN": {
-        "TEXT": "Bhai Gurdas Singh Ji Vaaran",
-        "VALUE": "Bhai Gurdas Singh Ji Vaaran"
+        "TEXT": "Bhai Gurdas Singh Ji Vaaran"
       },
       "GURDAS_VAARAN": {
-        "TEXT": "Bhai Gurdas Ji Vaaran",
-        "VALUE": "Bhai Gurdas Ji Vaaran"
+        "TEXT": "Bhai Gurdas Ji Vaaran"
       },
       "GURU_GRANTH_SAHIB": {
-        "TEXT": "Guru Granth Sahib Ji",
-        "VALUE": "Sri Guru Granth Sahib Ji"
+        "TEXT": "Guru Granth Sahib Ji"
       },
       "NAND_LAL_VAARAN": {
-        "TEXT": "Bhai Nand Lal Ji Vaaran",
-        "VALUE": "Bhai Nand Lal Ji Vaaran"
+        "TEXT": "Bhai Nand Lal Ji Vaaran"
       },
       "REHATNAMAS": {
-        "TEXT": "Rehatnamas & Panthic Sources",
-        "VALUE": "Codes of Conduct and Other Panthic Sources"
+        "TEXT": "Rehatnamas & Panthic Sources"
       }
     },
     "RAAGS": {
       "ALL_RAAGS": {
-        "TEXT": "All Raags",
-        "VALUE": "ALL"
+        "TEXT": "All Raags"
       },
       "ASA": {
-        "TEXT": "Asa",
-        "VALUE": "Raag Aasaa"
+        "TEXT": "Asa"
       },
       "GUJARI": {
-        "TEXT": "Gujari",
-        "VALUE": "Raag Gujari"
-      },
-      "GAURI_DEEPAKI": {
-        "TEXT": "Gauri Deepaki",
-        "VALUE": "Raag Gauree Deepaki"
+        "TEXT": "Gujari"
       },
       "DHANASARI": {
-        "TEXT": "Dhanasri",
-        "VALUE": "Raag Dhanasri"
-      },
-      "GAURI_POORABI": {
-        "TEXT": "Gauri Poorabi",
-        "VALUE": "Raag Gauree Poorabi"
+        "TEXT": "Dhanasri"
       },
       "SRI": {
-        "TEXT": "Sri",
-        "VALUE": "Raag Sri"
+        "TEXT": "Sri"
       },
       "MAJH": {
-        "TEXT": "Majh",
-        "VALUE": "Raag Maajh"
-      },
-      "GAURI_GAURAIREE": {
-        "TEXT": "Gauri Guarairee",
-        "VALUE": "Raag Gauree Guarairee"
+        "TEXT": "Majh"
       },
       "GAURI": {
-        "TEXT": "Gauri",
-        "VALUE": "Raag Gauree"
-      },
-      "GAURI_DAKHANI": {
-        "TEXT": "Gauri Dakhani",
-        "VALUE": "Gauree Dakhani"
+        "TEXT": "Gauri"
       },
       "OTHERS": {
-        "TEXT": "Others",
-        "VALUE": "Others"
+        "TEXT": "Others"
       }
     },
     "WRITERS": {
       "ALL_WRITERS": {
-        "TEXT": "All Writers",
-        "VALUE": "ALL"
-      },
-      "GURU_AMAR_DAS": {
-        "TEXT": "Guru Amar Das",
-        "VALUE": "Guru Amar Das Ji"
-      },
-      "GURU_ANGAD_DEV": {
-        "TEXT": "Guru Angad Dev",
-        "VALUE": "Guru Angad Dev Ji"
-      },
-      "GURU_ARJAN_DEV": {
-        "TEXT": "Guru Arjan Dev",
-        "VALUE": "Guru Arjan Dev Ji"
-      },
-      "GURU_HAR_RAI": {
-        "TEXT": "Guru Har Rai",
-        "VALUE": "Guru Har Rai Ji"
-      },
-      "GURU_HARGOBIND": {
-        "TEXT": "Guru Hargobind",
-        "VALUE": "Guru Hargobind Ji"
+        "TEXT": "All Writers"
       },
       "GURU_NANAK_DEV": {
-        "TEXT": "Guru Nanak Dev",
-        "VALUE": "Guru Nanak Dev Ji"
+        "TEXT": "Guru Nanak Dev"
+      },
+      "GURU_ANGAD_DEV": {
+        "TEXT": "Guru Angad Dev"
+      },
+      "GURU_AMAR_DAS": {
+        "TEXT": "Guru Amar Daas"
       },
       "GURU_RAM_DAS": {
-        "TEXT": "Guru Ram Das",
-        "VALUE": "Guru Ram Das Ji"
+        "TEXT": "Guru Ram Das"
+      },
+      "GURU_ARJAN_DEV": {
+        "TEXT": "Guru Arjan Dev"
       },
       "GURU_TEGH_BAHADUR": {
-        "TEXT": "Guru Tegh Bahadur",
-        "VALUE": "Guru Tegh Bahadur Ji"
+        "TEXT": "Guru Tegh Bahadur"
       },
       "OTHERS": {
-        "TEXT": "Others",
-        "VALUE": "Others"
+        "TEXT": "Others"
       }
     },
     "ERROR": "Error occured while searching. Please try again or restart the application."
