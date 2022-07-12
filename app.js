@@ -125,6 +125,7 @@ function openSecondaryWindow(windowName) {
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
+        enableRemoteModule: true,
       },
     });
     window.obj.setMenu(null);
@@ -270,6 +271,7 @@ function createViewer(ipcData) {
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
+        enableRemoteModule: true,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
@@ -477,6 +479,7 @@ app.on('ready', () => {
     webPreferences: {
       nodeIntegration: true,
       webviewTag: true,
+      enableRemoteModule: true,
     },
   });
   mainWindow.webContents.on('dom-ready', () => {
