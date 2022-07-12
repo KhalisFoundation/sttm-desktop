@@ -5,6 +5,7 @@ import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { retrieveFilterOption } from '../utils';
 
+import { classNames } from '../../../common/utils';
 import {
   IconButton,
   InputBox,
@@ -163,7 +164,7 @@ const SearchContent = () => {
         <InputBox
           placeholder={getPlaceholder()}
           disabled={databaseProgress < 1}
-          className={`${currentLanguage === 'gr' && 'gurmukhi'} mousetrap`}
+          className={`${currentLanguage === 'gr' ? 'gurmukhi' : 'english'} mousetrap`}
           databaseProgress={databaseProgress}
           query={query}
           setQuery={setQuery}
@@ -243,7 +244,7 @@ const SearchContent = () => {
           />
         </div>
       </div>
-      <div className="search-results">
+      <div className={classNames('search-results', isShowFiltersTag && 'filter-applied')}>
         <div className="verse-block">
           {filteredShabads.map(
             ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
