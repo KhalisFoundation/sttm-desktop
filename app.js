@@ -279,10 +279,13 @@ function createViewer(ipcData) {
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('external-display', {
-        width,
-        height,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width,
+          height,
+        }),
+      );
       mainWindow.focus();
       if (showChangelog() && secondaryWindows.changelogWindow.obj) {
         secondaryWindows.changelogWindow.obj.focus();
@@ -307,10 +310,13 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('external-display', {
-        width,
-        height,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width,
+          height,
+        }),
+      );
     });
   }
   mainWindow.webContents.send('presenter-view');
@@ -475,10 +481,13 @@ app.on('ready', () => {
   });
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
-      mainWindow.webContents.send('external-display', {
-        width: viewerWindowPos.w,
-        height: viewerWindowPos.h,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width: viewerWindowPos.w,
+          height: viewerWindowPos.h,
+        }),
+      );
     }
     mainWindow.show();
     // Platform-specific app stores have their own update mechanism
@@ -558,7 +567,7 @@ ipcMain.on('clear-apv', () => {
 let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
-  updateOverlayVars(overlayPrefs);
+  updateOverlayVars(JSON.parse(overlayPrefs));
 });
 
 io.on('connection', socket => {
@@ -569,18 +578,18 @@ io.on('connection', socket => {
 });
 
 ipcMain.on('show-line', (event, arg) => {
-  lastLine = arg;
-  showLine(arg);
+  lastLine = JSON.parse(arg);
+  showLine(JSON.parse(arg));
   if (viewerWindow) {
-    viewerWindow.webContents.send('show-line', arg);
+    viewerWindow.webContents.send('show-line', JSON.parse(arg));
   } else {
     createViewer({
       send: 'show-line',
-      data: arg,
+      data: JSON.parse(arg),
     });
   }
-  if (arg.live) {
-    createBroadcastFiles(arg);
+  if (JSON.parse(arg).live) {
+    createBroadcastFiles(JSON.parse(arg));
   }
 });
 
@@ -589,11 +598,12 @@ ipcMain.on('show-empty-slide', () => {
 });
 
 ipcMain.on('show-text', (event, arg) => {
+  const { isGurmukhi, text, unicode } = JSON.parse(arg);
   const textLine = {
     Line: {
-      Gurmukhi: arg.isGurmukhi ? arg.text : '',
-      English: !arg.isGurmukhi ? arg.text : '',
-      Unicode: arg.unicode,
+      Gurmukhi: isGurmukhi ? text : '',
+      English: !isGurmukhi ? text : '',
+      Unicode: unicode,
       Punjabi: '',
       Transliteration: {
         devanagari: '',

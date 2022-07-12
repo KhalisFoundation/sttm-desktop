@@ -72,13 +72,13 @@ const GlobalState = createStore({
 });
 
 global.platform.ipc.on('update-global-setting', (event, setting) => {
-  const { settingType, actionName, payload } = setting;
+  const { settingType, actionName, payload } = JSON.parse(setting);
   GlobalState.getActions()[settingType][actionName](payload);
 });
 
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
-  global.platform.ipc.send('save-overlay-settings', overlayState);
+  global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
 });
 
 export default GlobalState;

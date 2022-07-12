@@ -370,10 +370,13 @@ const ShabadContent = () => {
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
-    ipcRenderer.send('show-line', {
-      Line: overlayVerse,
-      live: liveFeed,
-    });
+    ipcRenderer.send(
+      'show-line',
+      JSON.stringify({
+        Line: overlayVerse,
+        live: liveFeed,
+      }),
+    );
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function

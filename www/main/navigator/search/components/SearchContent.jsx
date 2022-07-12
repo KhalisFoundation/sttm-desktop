@@ -107,7 +107,8 @@ const SearchContent = () => {
   }, [searchQuery]);
 
   ipcRenderer.on('database-progress', data => {
-    setDatabaseProgress(data.percent);
+    const { percent } = JSON.parse(data);
+    setDatabaseProgress(percent);
   });
 
   useEffect(() => {

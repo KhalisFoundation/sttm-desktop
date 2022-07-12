@@ -130,10 +130,10 @@ module.exports = {
                   .on('progress', state => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
-                    ipcRenderer.emit('database-progress', state);
+                    ipcRenderer.emit('database-progress', JSON.stringify(state));
                   })
                   .on('end', () => {
-                    ipcRenderer.emit('database-progress', { percent: 1 });
+                    ipcRenderer.emit('database-progress', JSON.stringify({ percent: 1 }));
                     extract(dbCompressed, { dir: newDBFolder }, err0 => {
                       if (err0) {
                         // ToDo: Log errors

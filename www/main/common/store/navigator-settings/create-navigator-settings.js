@@ -15,23 +15,29 @@ const createNavigatorSettingsState = settingsSchema => {
       state[stateVarName] = payload;
 
       if (global.webview) {
-        global.webview.send('update-viewer-setting', {
-          stateName: stateVarName,
-          payload,
-          oldValue,
-          actionName: stateFuncName,
-          settingType: 'navigator',
-        });
+        global.webview.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: stateVarName,
+            payload,
+            oldValue,
+            actionName: stateFuncName,
+            settingType: 'navigator',
+          }),
+        );
       }
 
       if (global.platform) {
-        global.platform.ipc.send('update-viewer-setting', {
-          stateName: stateVarName,
-          payload,
-          oldValue,
-          actionName: stateFuncName,
-          settingType: 'navigator',
-        });
+        global.platform.ipc.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: stateVarName,
+            payload,
+            oldValue,
+            actionName: stateFuncName,
+            settingType: 'navigator',
+          }),
+        );
       }
 
       return state;
