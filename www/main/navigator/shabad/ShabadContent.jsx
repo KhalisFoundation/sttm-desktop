@@ -115,11 +115,12 @@ const ShabadContent = () => {
       const currentIndex = verseHistory.findIndex(
         historyObj => historyObj.shabadId === activeShabadId,
       );
+      setVersesRead([...versesRead, newTraversedVerse]);
+
       if (verseHistory[currentIndex]) {
         verseHistory[currentIndex].continueFrom = newTraversedVerse;
-        verseHistory[currentIndex].versesRead = versesRead;
+        verseHistory[currentIndex].versesRead = [...versesRead, newTraversedVerse];
       }
-      setVersesRead([...versesRead, newTraversedVerse]);
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
@@ -232,6 +233,7 @@ const ShabadContent = () => {
     const firstVerse = verses[0];
     let shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
     const verseId = initialVerse || firstVerse.ID;
+    const firstVerseIndex = verses.findIndex(v => v.ID === verseId);
     let verse;
     if (verseType === 'shabad') {
       if (initialVerse) {
@@ -252,7 +254,6 @@ const ShabadContent = () => {
     const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
     if (check.length === 0) {
       const updatedHistory = [
-        ...verseHistory,
         {
           shabadId,
           verseId,
@@ -263,8 +264,9 @@ const ShabadContent = () => {
           },
           versesRead: [verseId],
           continueFrom: verseId,
-          homeVerse: verseId,
+          homeVerse: firstVerseIndex,
         },
+        ...verseHistory,
       ];
       setVerseHistory(updatedHistory);
     }
@@ -346,13 +348,14 @@ const ShabadContent = () => {
   }, [minimizedBySingleDisplay]);
 
   useEffect(() => {
-    filterRequiredVerseItems(activeShabad).forEach(verses => {
+    filterRequiredVerseItems(activeShabad).forEach((verses, index) => {
       if (initialVerseId === verses.verseId) {
+        if (homeVerse !== index) {
+          changeHomeVerse(index);
+        }
+      }
+      if (activeVerseId === verses.verseId) {
         setActiveVerse({ [verses.ID]: verses.verseId });
-        changeHomeVerse(initialVerseId);
-        // if (homeVerse !== verses.ID) {
-        //   setHomeVerse(verses.ID);
-        // }
       }
     });
 
