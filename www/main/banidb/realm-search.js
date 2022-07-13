@@ -153,14 +153,20 @@ const query = (searchQuery, searchType, searchSource) =>
       default:
         break;
     }
-    order.push('Shabads');
-    condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
+    //  order.push('Shabads');
+    const orderArray = Array.from(order, el => [el, false]);
     Realm.open(realmConfig)
       .then(realm => {
-        const rows = realm.objects('Verse').filtered(condition);
+        const rows = realm
+          .objects('Verse')
+          .filtered(condition)
+          .sorted(orderArray);
         resolve(rows.slice(0, howManyRows));
       })
-      .catch(reject);
+      .catch(e => {
+        console.log(e);
+        reject();
+      });
   });
 
 /**
