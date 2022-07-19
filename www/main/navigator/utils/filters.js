@@ -7,9 +7,8 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
       return verse.writer.includes(currentWriter);
     });
   } else if (currentWriter !== 'all' && currentWriter === 'others') {
-    const allWriters = writerArray.filter(writer => writer !== 'all' && writer !== 'others');
     filteredResult = allSearchedVerses.filter(verse => {
-      return !allWriters.includes(verse.writer);
+      return writerArray.every(writer => !verse.writer.includes(writer.value));
     });
   }
 
@@ -27,7 +26,7 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
       if (!verse.raag) {
         return true;
       }
-      return !allRaags.includes(verse.raag);
+      return allRaags.every(raag => !verse.raag.includes(raag.value));
     });
   }
 
