@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
+const remote = require('@electron/remote');
 const tingle = require('../../../../assets/js/vendor/tingle');
 
 const { gurus } = insertSlide.dropdownStrings;

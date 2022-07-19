@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { remote } from 'electron';
 import banidb from '../../../common/constants/banidb';
+
+const remote = require('@electron/remote');
 
 function SearchHeader() {
   // For responsiveness

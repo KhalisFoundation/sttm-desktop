@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
 import { Switch } from '../../../common/sttm-ui';
 
+const remote = require('@electron/remote');
 const analytics = remote.getGlobal('analytics');
 
 const ConnectionSwitch = props => {

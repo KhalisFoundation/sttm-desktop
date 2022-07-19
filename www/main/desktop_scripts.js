@@ -7,8 +7,8 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 const tingle = require('../assets/js/vendor/tingle');
+const remote = require("@electron/remote");
 
-const { remote } = electron;
 const { i18n, isUnsupportedWindow } = remote.require('./app');
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');

@@ -3,7 +3,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import getThemeMarkup from '../utils/get-theme-markup';
 
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const themeObjects = require('../../../configs/overlay_presets.json');

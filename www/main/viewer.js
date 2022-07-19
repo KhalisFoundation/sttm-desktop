@@ -13,8 +13,9 @@ import { convertToLegacySettingsObj } from './js/common/utils';
 global.platform = require('./js/desktop_scripts');
 const h = require('hyperscript');
 const scroll = require('scroll');
-// const { remote } = require('electron');
-const { store, i18n } = require('electron').remote.require('./app');
+const remote = require('@electron/remote');
+
+const { store, i18n } = remote.require('./app');
 const core = require('./js/index');
 
 const shortcuts = require('./js/keyboard-shortcuts/shortcuts');

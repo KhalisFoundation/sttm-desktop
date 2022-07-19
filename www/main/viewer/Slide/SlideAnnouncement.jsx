@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
-import ReactHtmlParser from 'react-html-parser';
+import ReactHtmlParser from 'html-react-parser';
 
 const SlideAnnouncement = ({ getFontSize }) => {
   const { announcementsFontSize } = useStoreState(state => state.userSettings);

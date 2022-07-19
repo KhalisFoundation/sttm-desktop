@@ -1,4 +1,5 @@
-const { remote } = require('electron');
+const remote = require('@electron/remote');
+
 const settings = require('../configs/settings.json');
 
 const { store } = remote.require('./app');

@@ -1,7 +1,8 @@
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
+const remote = require('@electron/remote');
+
 import isOnline from 'is-online';
 
 import BaniControllerItem from './BaniControllerItem';

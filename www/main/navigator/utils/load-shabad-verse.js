@@ -1,6 +1,7 @@
 import Noty from 'noty';
-import { remote } from 'electron';
 import banidb from '../../banidb';
+
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 export const loadShabadVerse = (shabadID, lineID, nextLine = false) => {

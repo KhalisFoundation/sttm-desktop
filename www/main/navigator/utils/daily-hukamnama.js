@@ -1,9 +1,9 @@
 import getJSON from 'get-json';
 import isOnline from 'is-online';
 
-const electron = require('electron');
+const remote = require('@electron/remote');
 
-const analytics = electron.remote.getGlobal('analytics');
+const analytics = remote.getGlobal('analytics');
 
 export const dailyHukamnama = (activeShabadId, setActiveShabadId) => {
   isOnline().then(online => {

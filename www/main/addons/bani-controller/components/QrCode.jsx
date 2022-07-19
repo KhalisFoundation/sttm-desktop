@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const QrCode = props => {

@@ -5,7 +5,15 @@ const fs = require('fs');
 const path = require('path');
 const { settings } = require('../../../../configs/user-settings.json');
 
-const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+let userDataPath;
+
+if (electron.app) {
+  userDataPath = electron.app.getPath('userData');
+} else {
+  const app = require('@electron/remote').app;
+  userDataPath = app.getPath('userData');
+}
+
 export const userConfigPath = path.join(userDataPath, 'user-data.json');
 
 function parseDataFile(filePath) {

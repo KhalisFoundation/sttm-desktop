@@ -11,11 +11,11 @@
 */
 
 import chromecast from 'electron-chromecast';
-import { remote } from 'electron';
 import { CHROMECAST } from './locales/en.json';
 import { convertToLegacySettingsObj } from './js/common/utils';
+const remote = require('@electron/remote');
 
-const { store } = require('electron').remote.require('./app');
+const { store } = remote.require('./app');
 const { ipcRenderer } = require('electron');
 const tingle = require('./assets/js/vendor/tingle.js');
 

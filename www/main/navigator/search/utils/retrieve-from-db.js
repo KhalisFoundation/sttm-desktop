@@ -1,4 +1,5 @@
-import { remote } from 'electron';
+const remote = require('@electron/remote');
+
 import { getFilterOption } from '../../../banidb/realm-search';
 
 const { i18n } = remote.require('./app');

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 import { searchShabads, loadAng } from '../../../navigator/utils';
 
 const analytics = remote.getGlobal('analytics');

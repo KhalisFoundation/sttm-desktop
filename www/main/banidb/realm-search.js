@@ -5,8 +5,15 @@ const Realm = require('realm');
 
 const CONSTS = require('./constants');
 
-const { remote } = electron;
-const userDataPath = remote.app.getPath('userData');
+let userDataPath;
+
+if (electron.app) {
+  userDataPath = electron.app.getPath('userData');
+} else {
+  const app = require('@electron/remote').app;
+  userDataPath = app.getPath('userData');
+}
+
 const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen-v2.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 

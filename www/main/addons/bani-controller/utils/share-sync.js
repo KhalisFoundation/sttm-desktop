@@ -1,6 +1,8 @@
 import axios from 'axios';
 import request from 'request-promise';
-import { remote } from 'electron';
+
+const remote = require('@electron/remote');
+
 import Noty from 'noty';
 
 import { API_ENDPOINT as SYNC_API_URL } from '../../../common/constants';

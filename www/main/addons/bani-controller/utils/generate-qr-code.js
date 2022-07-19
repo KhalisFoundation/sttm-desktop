@@ -1,7 +1,7 @@
 import Noty from 'noty';
 import qrCode from 'qrcode';
-import { remote } from 'electron';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const generateQrCode = (canvas, syncCode) => {

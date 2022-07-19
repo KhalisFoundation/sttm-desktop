@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 

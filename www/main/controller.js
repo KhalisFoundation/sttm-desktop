@@ -4,7 +4,8 @@ import { updateViewerScale } from './viewer/utils';
 const electron = require('electron');
 const anvaad = require('anvaad-js');
 
-const { remote } = electron;
+const remote = require('@electron/remote');
+
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;

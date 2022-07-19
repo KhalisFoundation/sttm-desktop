@@ -1,8 +1,8 @@
 import React from 'react';
-import { remote } from 'electron';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const SearchResults = ({

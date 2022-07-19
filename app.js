@@ -4,8 +4,8 @@ const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const uuid = require('uuid/v4');
-const op = require('openport');
+const { v4: uuidv4 } = require('uuid');
+const op = require('portfinder');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
@@ -14,6 +14,8 @@ const fetch = require('node-fetch');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
+const remote = require("@electron/remote/main");
+remote.initialize()
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -126,8 +128,10 @@ function openSecondaryWindow(windowName) {
         nodeIntegration: true,
         webviewTag: true,
         enableRemoteModule: true,
+        contextIsolation: false,
       },
     });
+    remote.enable(window.obj.webContents);
     window.obj.setMenu(null);
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
@@ -272,9 +276,11 @@ function createViewer(ipcData) {
         nodeIntegration: true,
         webviewTag: true,
         enableRemoteModule: true,
+        contextIsolation: false,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
         '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
@@ -404,7 +410,7 @@ const emptyOverlay = () => {
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
-  op.find(
+  op.getPort(
     {
       // Re: http://www.sikhiwiki.org/index.php/Gurgadi
       ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
@@ -459,7 +465,7 @@ app.on('ready', () => {
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {
-    userId = uuid();
+    userId = uuidv4();
     store.set('userId', userId);
   }
   const analytics = new Analytics(userId, store);
@@ -480,8 +486,10 @@ app.on('ready', () => {
       nodeIntegration: true,
       webviewTag: true,
       enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
+  remote.enable(mainWindow.webContents);
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send(

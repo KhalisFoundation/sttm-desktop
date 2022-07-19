@@ -1,5 +1,4 @@
-import { remote } from 'electron';
-
+const remote = require('@electron/remote');
 import { handleRequestControl } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
 

@@ -1,7 +1,9 @@
 import Noty from 'noty';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
+
+const remote = require('@electron/remote');
 
 import copy from 'copy-to-clipboard';
 import { Virtuoso } from 'react-virtuoso';

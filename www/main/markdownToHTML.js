@@ -1,7 +1,7 @@
 const marked = require('marked');
 const fs = require('fs');
 const path = require('path');
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
