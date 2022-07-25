@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.0.4 - _July 18, 2022_
+### 9.0.4 - _July 25, 2022_
 
 - Anytime a filter is applied to the search, you will be able to remove it easily through filter tags.
 - Enhanced search capability now allows you to search by English letters (romanized first letter search).
