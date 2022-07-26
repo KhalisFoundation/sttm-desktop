@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
+import { ipcRenderer } from 'electron';
 
 const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
@@ -28,6 +29,13 @@ const WorkspaceBar = () => {
       global.platform.updateSettings();
       global.controller['presenter-view']();
     } else if (!isSingleDisplayMode) {
+      const boundsObj = {
+        x: 0,
+        y: 40,
+        width: 1920,
+        height: 1080,
+      }
+      ipcRenderer.send('update-viewer-size', JSON.stringify(boundsObj));
       setIsSingleDisplayMode(true);
     }
     setWorkspace(workspace);

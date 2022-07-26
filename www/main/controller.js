@@ -14,13 +14,13 @@ const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
-global.webview = document.querySelector('webview');
+global.webview = remote.getGlobal('viewer');
 
-global.webview.addEventListener('dom-ready', () => {
+global.webview.once('dom-ready', () => {
   global.webview.send('is-webview');
 });
 
-global.webview.addEventListener('ipc-message', event => {
+global.webview.on('ipc-message', event => {
   switch (event.channel) {
     case 'scroll-pos': {
       const pos = event.args[0];
@@ -458,88 +458,9 @@ global.platform.ipc.on('set-user-setting', (event, settingChanger) => {
 });
 
 module.exports = {
-  clearAPV() {
-    global.webview.send('clear-apv');
-    global.platform.ipc.send('clear-apv');
-  },
-
-  remapLine(rawLine) {
-    const Line = { ...rawLine.toJSON() };
-    if (Line.Translations) {
-      const lineTranslations = JSON.parse(Line.Translations);
-      Line.English = lineTranslations.en.bdb;
-      Line.Punjabi = lineTranslations.pu.bdb || lineTranslations.pu.ss;
-      Line.Spanish = lineTranslations.es.sn;
-      Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
-    }
-    Line.Transliteration = {
-      English: anvaad.translit(Line.Gurmukhi || ''),
-      Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
-      Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
-    };
-    Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
-    return Line;
-  },
-
-  sendLine(shabadID, lineID, rawLine, rawRows, mode, start, fromScroll) {
-    const Line = this.remapLine(rawLine);
-    const rows = rawRows.map(row => this.remapLine(row));
-    global.webview.send('show-line', JSON.stringify({ shabadID, lineID, rows, mode }));
-    const showLinePayload = {
-      shabadID,
-      lineID,
-      Line,
-      live: false,
-      larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'),
-      rows,
-      mode,
-      fromScroll,
-    };
-    if (store.getUserPref('app.live-feed-location')) {
-      showLinePayload.live = true;
-    }
-    global.platform.ipc.send('show-line', JSON.stringify(showLinePayload));
-  },
-
-  sendText(text, isGurmukhi, isAnnouncement = false) {
-    global.webview.send('show-empty-slide');
-    global.webview.send(
-      'show-text',
-      JSON.stringify({
-        unicode: isGurmukhi ? anvaad.unicode(text) : '',
-        text,
-        isGurmukhi,
-        isAnnouncement,
-      }),
-    );
-    global.platform.ipc.send('show-empty-slide');
-    global.platform.ipc.send(
-      'show-text',
-      JSON.stringify({
-        unicode: isGurmukhi ? anvaad.unicode(text) : '',
-        text,
-        isGurmukhi,
-        isAnnouncement,
-      }),
-    );
-  },
-  sendScroll(pos) {
-    global.platform.ipc.send('send-scroll', JSON.stringify({ pos }));
-  },
-
   'presenter-view': function presenterView() {
     checkPresenterView();
     updateViewerScale();
-  },
-
-  'colored-words': function coloredWords() {
-    const coloredWordsVal = store.getUserPref('slide-layout.display-options.colored-words');
-    store.setUserPref('slide-layout.display-options.gradient-bg', !coloredWordsVal);
-  },
-
-  'gradient-bg': function gradientBg() {
-    const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
-    store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
   'live-feed': function livefeed(val) {

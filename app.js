@@ -14,8 +14,8 @@ const fetch = require('node-fetch');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
-const remote = require("@electron/remote/main");
-remote.initialize()
+const remote = require('@electron/remote/main');
+remote.initialize();
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -58,7 +58,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, BrowserWindow, dialog, ipcMain } = electron;
+const { app, BrowserView, BrowserWindow, dialog, ipcMain } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -70,7 +70,7 @@ const appVersion = app.getVersion();
 const overlayCast = true;
 
 // Reset to default theme if theme not found
-const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+const currentTheme = themes.find((theme) => theme.key === store.getUserPref('app.theme'));
 if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
@@ -79,6 +79,8 @@ let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
+let viewerView;
+
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
@@ -116,7 +118,7 @@ const viewerWindowPos = {};
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
-  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
+  const openWindow = BrowserWindow.getAllWindows().filter((item) => item.getURL() === window.url);
   if (openWindow.length > 0) {
     openWindow[0].show();
   } else {
@@ -126,7 +128,6 @@ function openSecondaryWindow(windowName) {
       show: false,
       webPreferences: {
         nodeIntegration: true,
-        webviewTag: true,
         enableRemoteModule: true,
         contextIsolation: false,
       },
@@ -196,7 +197,7 @@ autoUpdater.on('update-downloaded', () => {
         detail: i18n.t('UPDATE_DOWNLOADED'),
         cancelId: 0,
       },
-      response => {
+      (response) => {
         if (response === 1) {
           autoUpdater.quitAndInstall();
         }
@@ -234,7 +235,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach(i => {
+  Object.keys(displays).forEach((i) => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -274,7 +275,6 @@ function createViewer(ipcData) {
       backgroundColor: '#000000',
       webPreferences: {
         nodeIntegration: true,
-        webviewTag: true,
         enableRemoteModule: true,
         contextIsolation: false,
       },
@@ -384,7 +384,7 @@ const showLine = async (line, socket = io) => {
   }
 };
 
-const updateOverlayVars = overlayPrefs => {
+const updateOverlayVars = (overlayPrefs) => {
   if (overlayPrefs) {
     io.emit('update-prefs', overlayPrefs);
   } else {
@@ -484,7 +484,6 @@ app.on('ready', () => {
     titleBarStyle: 'hidden',
     webPreferences: {
       nodeIntegration: true,
-      webviewTag: true,
       enableRemoteModule: true,
       contextIsolation: false,
     },
@@ -521,6 +520,25 @@ app.on('ready', () => {
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
+  viewerView = new BrowserView({
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
+    },
+  });
+  global.viewer = viewerView.webContents;
+  mainWindow.addBrowserView(viewerView);
+  remote.enable(viewerView.webContents);
+  viewerView.webContents.loadURL(`file://${__dirname}/www/viewer.html`);
+  // viewerView.webContents.openDevTools();
+  viewerView.setAutoResize({
+    width: true,
+    height: true,
+    horizontal: true,
+    vertical: true,
+  });
+
   if (!store.get('user-agent')) {
     store.set('user-agent', mainWindow.webContents.getUserAgent());
   }
@@ -554,6 +572,16 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.on('update-viewer-size', (event, data) => {
+  const { x, y, width, height } = JSON.parse(data);
+  viewerView.setBounds({
+    x: parseInt(x),
+    y: parseInt(y),
+    width: parseInt(width),
+    height: parseInt(height),
+  });
+});
+
 ipcMain.on('cast-session-active', () => {
   mainWindow.webContents.send('cast-session-active');
 });
@@ -562,7 +590,7 @@ ipcMain.on('cast-session-stopped', () => {
   mainWindow.webContents.send('cast-session-stopped');
 });
 
-ipcMain.on('cast-to-receiver', event => {
+ipcMain.on('cast-to-receiver', (event) => {
   event.reply('cast-verse', 'update verse');
 });
 
@@ -581,7 +609,7 @@ ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
 });
 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   updateOverlayVars();
   if (lastLine) {
     showLine(lastLine, socket);
