@@ -1,5 +1,18 @@
 ## New Updates
 
+### 9.0.4 - _July 25, 2022_
+
+- Anytime a filter is applied to the search, you will be able to remove it easily through filter tags.
+- Enhanced search capability now allows you to search by English letters (romanized first letter search).
+- History pane has been reorganized to show the latest shabad at the top.
+- Number of bugs and performance improvements.
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.0.3 - _May 10, 2022_
 
 - We have added some additional analytics to the settings so we can better understand our users and how they customize the application.

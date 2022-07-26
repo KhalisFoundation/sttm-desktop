@@ -103,16 +103,31 @@
   }
   .search-result-controls {
     @include flex;
-    padding: 0 0 0 10px;
+    align-items: baseline;
+    display: flex;
+    flex-direction: column;
     font-style: italic;
+    padding: 0 0 0 10px;
+
+    @include breakpoint(xxlarge) {
+      flex-direction: row;
+    }
 
     & span {
       color: $mild-dark;
     }
 
     .filters {
-      padding-right: 12px;
+      align-items: center;
       color: $mild-dark;
+      display: flex;
+      justify-content: end;
+      padding-right: 12px;
+      width: 100%;
+
+      @include breakpoint(xxlarge) {
+        justify-content: flex-end;
+      }
 
       .select-bani {
         -webkit-appearance: none;
@@ -126,6 +141,7 @@
         border: none;
         border-radius: 0;
         color: #0a0a0a;
+        cursor: pointer;
         font-family: inherit;
         font-size: 1rem;
         height: 40px;
@@ -203,6 +219,10 @@
   }
   .search-results {
     height: calc(100% - 120px);
+
+    &.filter-applied {
+      height: calc(100% - 150px);
+    }
   }
   .gurmukhi-keyboard + .search-result-controls + .search-results {
     height: calc(100% - 281px);
@@ -213,10 +233,18 @@
     padding: 10px;
     margin-bottom: 5px;
     span {
-      @include inline-flex($width: initial);
-      padding: 5px;
-      height: 20px;
-      border-left: 3px solid;
+      &:not(:last-child) {
+        @include inline-flex($width: initial);
+        padding: 5px;
+        height: 20px;
+        border-left: 3px solid;
+      }
+      &:last-child {
+        margin-left: auto;
+        display: flex;
+        align-self: center;
+        font-style: italic;
+      }
     }
     .search-footer-span1 {
       color: #e1802f;

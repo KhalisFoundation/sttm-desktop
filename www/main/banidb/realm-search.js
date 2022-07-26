@@ -150,6 +150,13 @@ const query = (searchQuery, searchType, searchSource) =>
         }
 
         break;
+      case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ENGLISH:
+        searchCol = 'FirstLetterEng';
+        condition = `${searchCol} CONTAINS '${saniQuery}'`;
+        if (searchSource !== 'all') {
+          condition += ` AND Source.SourceID = '${searchSource}'`;
+        }
+        break;
       default:
         break;
     }
@@ -404,6 +411,57 @@ const randomShabad = (SourceID = 'G') =>
       .catch(reject);
   });
 
+/**
+ * Retrieve the filter options; writer, raag, and source
+ *
+ * @param {string} type Type of filter option to retrieve
+ * @param {array} writerIds An array of ids to fetch
+ * @returns {object} Returns array of objects for given type of filter option
+ * @example
+ *
+ * getFilterOption('writer', [1,2]);
+ * // => [{ Writer: { WriterID: 1, WriterEnglish:'Guru Nanak Dev Ji',...},...}]
+ */
+
+const getFilterOption = (type, idArray) =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    let collectionName;
+    let columnName;
+    switch (type) {
+      case 'writer':
+        collectionName = 'Writer';
+        columnName = 'WriterID';
+        break;
+      case 'raag':
+        collectionName = 'Raag';
+        columnName = 'RaagID';
+        break;
+      case 'source':
+        collectionName = 'Source';
+        columnName = 'SourceID';
+        break;
+      default:
+        resolve({ error: `Unable to find a filter option with type: ${type}` });
+    }
+
+    Realm.open(realmConfig)
+      .then(realm => {
+        const idsQuery = idArray
+          .map(id => {
+            return type === 'source' ? `${columnName} = '${id}'` : `${columnName} = ${id}`;
+          })
+          .join(' OR ');
+        const rows = realm.objects(collectionName).filtered(`(${idsQuery})`);
+        if (rows.length > 0) {
+          resolve(rows);
+        }
+      })
+      .catch(reject);
+  });
+
 // Re-export CONSTS for use in other areas
 module.exports = {
   CONSTS,
@@ -417,4 +475,5 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  getFilterOption,
 };

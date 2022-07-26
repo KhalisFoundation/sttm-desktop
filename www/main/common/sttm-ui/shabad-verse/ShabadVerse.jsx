@@ -12,12 +12,9 @@ const ShabadVerse = ({
   englishVerse,
   verseId,
 }) => {
-  const loadActiveClass = (activeVerseObj, activeVerseId, index) => {
-    return Object.keys(activeVerseObj).map(activeVerseKey => {
-      if (
-        parseInt(activeVerseKey, 10) === index &&
-        activeVerseObj[activeVerseKey] === activeVerseId
-      ) {
+  const loadActiveClass = (verseObj, currentVerseId, verseIndex) => {
+    return Object.keys(verseObj).map(verseKey => {
+      if (Number(verseKey) === verseIndex && verseObj[verseKey] === currentVerseId) {
         return 1;
       }
       return 0;

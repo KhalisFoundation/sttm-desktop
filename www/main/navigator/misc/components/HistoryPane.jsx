@@ -34,8 +34,8 @@ export const HistoryPane = ({ className }) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
-    if (element.continueFrom !== initialVerseId) {
-      setInitialVerseId(element.continueFrom);
+    if (element.verseId !== initialVerseId) {
+      setInitialVerseId(element.verseId);
     }
     if (element.homeVerse !== homeVerse) {
       setHomeVerse(element.homeVerse);
@@ -53,8 +53,8 @@ export const HistoryPane = ({ className }) => {
       if (element.shabadId !== activeShabadId) {
         setActiveShabadId(element.shabadId);
       }
-      if (element.verseId !== activeVerseId) {
-        setActiveVerseId(element.verseId);
+      if (element.continueFrom !== activeVerseId) {
+        setActiveVerseId(element.continueFrom);
       }
     }
     if (element.type === 'ceremony') {
