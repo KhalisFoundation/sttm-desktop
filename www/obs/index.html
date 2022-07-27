@@ -88,6 +88,21 @@
           Line.Gurmukhi === '' && Line.English === '';
       };
 
+      var writeText = function(text, isGurmukhi, isAnnoucement) {
+        let htmlCode;
+        if (isAnnoucement && !isGurmukhi) {
+          htmlCode = `<span>${text}</span>`;
+          document.querySelector('.o-translation').innerHTML = htmlCode;
+          document.querySelector('.o-gurbani').innerHTML = '';
+        } else {
+          htmlCode = `<span>${text}</span>`;
+          document.querySelector('.o-gurbani').innerHTML = htmlCode;
+          document.querySelector('.o-translation').innerHTML = '';
+        }
+        document.querySelector('.o-teeka').innerHTML = '';
+        document.querySelector('.o-transliteration').innerHTML = '';
+      };
+
       var applyOverlayPrefs = function() {
         const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
@@ -177,6 +192,14 @@
           if (overlayPrefs) {
             const { overlayLarivaar, larivaarAssist } = overlayPrefs;
             writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          }
+        }
+      });
+
+      socket.on('show-misc-text', function(request) {
+        if (!preview) {
+          if (overlayPrefs) {
+            writeText(request.text, request.isGurmukhi, request.isAnnoucement);
           }
         }
       });
