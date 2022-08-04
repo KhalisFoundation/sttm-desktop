@@ -1,8 +1,34 @@
-import React from 'react';
-import { useStoreState } from 'easy-peasy';
+import React, { useEffect, useState } from 'react';
+import { useStoreActions, useStoreState } from 'easy-peasy';
+
+import { buttonMarkup } from '../utils';
 
 const SettingViewer = () => {
   const { themeBg } = useStoreState(state => state.userSettings);
+  const { slideOrder } = useStoreState(state => state.viewerSettings);
+  const { setSlideOrder } = useStoreActions(state => state.viewerSettings);
+
+  const [translationOrder, setTranslationOrder] = useState();
+  const [teekaOrder, setTeekaOrder] = useState();
+  const [transliterationOrder, setTransliterationOrder] = useState();
+
+  const orderFunctions = {
+    translation: item => {
+      if (translationOrder !== item) {
+        setTranslationOrder(item);
+      }
+    },
+    transliteration: item => {
+      if (transliterationOrder !== item) {
+        setTransliterationOrder(item);
+      }
+    },
+    teeka: item => {
+      if (teekaOrder !== item) {
+        setTeekaOrder(item);
+      }
+    },
+  };
 
   const {
     gurbaniFontSize,
@@ -47,6 +73,12 @@ const SettingViewer = () => {
     display: displayNextLine ? 'block' : 'none',
   };
 
+  useEffect(() => {
+    slideOrder.forEach((element, index) => {
+      orderFunctions[element](index + 2);
+    });
+  }, [slideOrder]);
+
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
       return larivaarAssistType === 'single-color'
@@ -71,7 +103,7 @@ const SettingViewer = () => {
         <span>Preview</span>
       </div>
       <div className={`settings-viewer theme-${theme}`} style={commonStyles}>
-        <h1 className="gurbani gurmukhi" style={gurbaniStyles}>
+        <h1 className="slide-gurbani gurbani gurmukhi" style={gurbaniStyles}>
           <div className={`settings-verse ${getLarivaarAssistClass()} ${getVishraamType()}`}>
             {!larivaar ? (
               <span className="padchhed">
@@ -114,7 +146,11 @@ const SettingViewer = () => {
             )}
           </div>
         </h1>
-        <h2 className="translation" style={translationStyles}>
+        <h2
+          className="slide-translation translation"
+          style={{ ...translationStyles, order: translationOrder }}
+        >
+          {buttonMarkup('translation', slideOrder, setSlideOrder)}
           <div>
             <div className="english-translation transtext">
               Whatever I ask for from my Lord and Master, he gives that to me.
@@ -127,10 +163,15 @@ const SettingViewer = () => {
             </div>
           </div>
         </h2>
-        <h2 className="teeka" style={teekaStyles}>
+        <h2 className="slide-teeka teeka" style={{ ...teekaStyles, order: teekaOrder }}>
+          {buttonMarkup('teeka', slideOrder, setSlideOrder)}
           hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
         </h2>
-        <h2 className="transliteration" style={transliterationStyles}>
+        <h2
+          className="slide-transliteration transliteration"
+          style={{ ...transliterationStyles, order: transliterationOrder }}
+        >
+          {buttonMarkup('transliteration', slideOrder, setSlideOrder)}
           <div>
             <div className="english-transliteration translittext">
               jo maageh Thaakur apune te soiee soiee dhevai ||
@@ -143,7 +184,10 @@ const SettingViewer = () => {
             </div>
           </div>
         </h2>
-        <h1 className="gurbani gurmukhi next-line" style={nextLineStyles}>
+        <h1
+          className="slide-next-line slide-gurbani gurbani gurmukhi next-line"
+          style={nextLineStyles}
+        >
           <div>
             <span className="padchhed">
               <span>jo</span>

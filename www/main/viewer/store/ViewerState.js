@@ -30,6 +30,13 @@ const ViewerState = createStore({
   },
   viewerSettings: {
     quickToolsOpen: false,
+    slideOrder: ['translation', 'teeka', 'transliteration'],
+    setSlideOrder: action((state, slideOrder) => {
+      return {
+        ...state,
+        slideOrder,
+      };
+    }),
     setQuickToolsOpen: action((state, payload) => {
       return {
         ...state,
@@ -39,7 +46,7 @@ const ViewerState = createStore({
   },
 });
 
-// Whenever a setting is chagned in GlobalState, call the respective action here as well.
+// Whenever a setting is changed in GlobalState, call the respective action here as well.
 global.platform.ipc.on('update-viewer-setting', (event, setting) => {
   const { actionName, payload, settingType } = setting;
   ViewerState.getActions()[settingType][actionName](payload);
