@@ -38,10 +38,9 @@ const ViewerState = createStore({
       };
     }),
     setQuickToolsOpen: action((state, payload) => {
-      return {
-        ...state,
-        quickToolsOpen: payload,
-      };
+      const newState = state;
+      newState.quickToolsOpen = payload;
+      return newState;
     }),
   },
 });
