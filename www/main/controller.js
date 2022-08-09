@@ -1,4 +1,5 @@
 /* global Mousetrap */
+import { ipcRenderer } from 'electron';
 import { updateViewerScale } from './viewer/utils';
 
 const electron = require('electron');
@@ -14,22 +15,11 @@ const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
-global.webview = remote.getGlobal('viewer');
+global.webview = document.querySelector('webview');
 
-global.webview.once('dom-ready', () => {
+global.webview.addEventListener('dom-ready', () => {
+  ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
   global.webview.send('is-webview');
-});
-
-global.webview.on('ipc-message', event => {
-  switch (event.channel) {
-    case 'scroll-pos': {
-      const pos = event.args[0];
-      global.platform.ipc.send('scroll-from-main', pos);
-      break;
-    }
-    default:
-      break;
-  }
 });
 
 const updateMenu = [];
@@ -370,7 +360,7 @@ function checkPresenterView() {
   classList.toggle('scale-viewer', inPresenterView);
 
   global.platform.ipc.send('presenter-view', inPresenterView);
-  global.webview.send('presenter-view', inPresenterView);
+  // global.webview.send('presenter-view', inPresenterView);
 }
 
 global.platform.ipc.on('presenter-view', () => {

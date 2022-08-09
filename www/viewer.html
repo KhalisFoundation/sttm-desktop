@@ -12,9 +12,11 @@
   <body class="viewer">
     <div id="viewer-container"></div>
     <script>
-      const app = require('./js/viewer/viewerApp.js').default;
-      const { render } = require('react-dom');
-      render(app(), document.getElementById('viewer-container'));
+      setTimeout(() => {
+        const app = require('./js/viewer/viewerApp.js').default;
+        const { render } = require('react-dom');
+        render(app(), document.getElementById('viewer-container'));
+      }, 100);
     </script>
     <script type="text/javascript" src="js/chromecast.js"></script>
   </body>

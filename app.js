@@ -58,7 +58,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, BrowserView, BrowserWindow, dialog, ipcMain } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -79,7 +79,6 @@ let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
-let viewerView;
 
 const secondaryWindows = {
   changelogWindow: {
@@ -486,6 +485,9 @@ app.on('ready', () => {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
+      webviewTag: true,
+      nodeIntegrationInSubFrames: true,
+      nodeIntegrationInWorker: true,
     },
   });
   remote.enable(mainWindow.webContents);
@@ -520,25 +522,6 @@ app.on('ready', () => {
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
-  viewerView = new BrowserView({
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-      contextIsolation: false,
-    },
-  });
-  global.viewer = viewerView.webContents;
-  mainWindow.addBrowserView(viewerView);
-  remote.enable(viewerView.webContents);
-  viewerView.webContents.loadURL(`file://${__dirname}/www/viewer.html`);
-  // viewerView.webContents.openDevTools();
-  viewerView.setAutoResize({
-    width: true,
-    height: true,
-    horizontal: true,
-    vertical: true,
-  });
-
   if (!store.get('user-agent')) {
     store.set('user-agent', mainWindow.webContents.getUserAgent());
   }
@@ -572,14 +555,9 @@ app.on('window-all-closed', () => {
   // }
 });
 
-ipcMain.on('update-viewer-size', (event, data) => {
-  const { x, y, width, height } = JSON.parse(data);
-  viewerView.setBounds({
-    x: parseInt(x),
-    y: parseInt(y),
-    width: parseInt(width),
-    height: parseInt(height),
-  });
+ipcMain.on('enable-wc-webview', (event, data) => {
+  const webView_wc = webContents.fromId(parseInt(data, 10));
+  remote.enable(webView_wc);
 });
 
 ipcMain.on('cast-session-active', () => {

@@ -3,7 +3,14 @@ import React from 'react';
 const ViewerContent = () => {
   return (
     <div className="viewer-content">
-      <webview id="webview-viewer" webpreferences="nodeintegration" src="viewer.html" className="base-ui" />
+      <webview 
+        src="viewer.html"
+        className="base-ui"
+        id="webview-viewer"
+        nodeintegration="true"
+        nodeintegrationinsubframes="true"
+        webpreferences="contextIsolation=no"
+      />
     </div>
   );
 };

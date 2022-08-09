@@ -12,15 +12,6 @@ import { MiscHeader } from './MiscHeader';
 
 export const MiscPane = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
   const paneRef = React.createRef();
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
-  const [isIntersecting, setIntersecting] = useState(false);
-
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      // Update our state when observer callback fires
-      setIntersecting(entry.isIntersecting);
-    }, { rootMargin: '0px' },
-  );
 
   const footerComponent = () => (
     <MiscFooter
@@ -30,27 +21,6 @@ export const MiscPane = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahi
       anandSahibBhog={anandSahibBhog}
     />
   );
-
-  useEffect(() => {
-    if (paneRef.current) {
-      observer.observe(paneRef.current);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isIntersecting) {
-      const paneBound = paneRef.current.getBoundingClientRect();
-      console.log(paneBound);
-      const boundsObj = {
-        x: paneBound.x,
-        y: 50,
-        width: paneBound.width,
-        height: paneBound.height,
-      }
-      ipcRenderer.send('update-viewer-size', JSON.stringify(boundsObj));
-      observer.unobserve(paneRef.current);
-    }
-  }, [isIntersecting]);
 
   return (
     <div className="misc-pane" ref={paneRef}>
