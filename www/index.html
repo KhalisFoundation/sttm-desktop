@@ -70,8 +70,9 @@
     </div>
     <script>
       const app = require('./js/app.js').default;
-      const { render } = require('react-dom');
-      render(app(), document.getElementById('navigator'));
+      const { createRoot } = require('react-dom/client');
+      const root = createRoot(document.getElementById('navigator'));
+      root.render(app());
     </script>
     <script src="assets/js/vendor/mousetrap.min.js"></script>
     <script src="js/desktop_index.js"></script>

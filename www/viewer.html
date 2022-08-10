@@ -12,11 +12,14 @@
   <body class="viewer">
     <div id="viewer-container"></div>
     <script>
-      setTimeout(() => {
-        const app = require('./js/viewer/viewerApp.js').default;
-        const { render } = require('react-dom');
-        render(app(), document.getElementById('viewer-container'));
-      }, 100);
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('wc-webview-enabled', () => { 
+          const app = require('./js/viewer/viewerApp.js').default;
+          const { createRoot } = require('react-dom/client');
+          const root = createRoot(document.getElementById('viewer-container'));
+          root.render(app());
+        });
     </script>
     <script type="text/javascript" src="js/chromecast.js"></script>
   </body>

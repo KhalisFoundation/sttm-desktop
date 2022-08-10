@@ -16,7 +16,6 @@ import { convertToLegacySettingsObj } from './js/common/utils';
 const remote = require('@electron/remote');
 
 const { store } = remote.require('./app');
-const { ipcRenderer } = require('electron');
 const tingle = require('./assets/js/vendor/tingle.js');
 
 const analytics = remote.getGlobal('analytics');
