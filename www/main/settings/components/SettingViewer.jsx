@@ -150,7 +150,6 @@ const SettingViewer = () => {
           className="slide-translation translation"
           style={{ ...translationStyles, order: translationOrder }}
         >
-          {buttonMarkup('translation', slideOrder, setSlideOrder)}
           <div>
             <div className="english-translation transtext">
               Whatever I ask for from my Lord and Master, he gives that to me.
@@ -162,16 +161,18 @@ const SettingViewer = () => {
               हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
             </div>
           </div>
+          {buttonMarkup('translation', slideOrder, setSlideOrder)}
         </h2>
         <h2 className="slide-teeka teeka" style={{ ...teekaStyles, order: teekaOrder }}>
+          <div>
+            hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
+          </div>
           {buttonMarkup('teeka', slideOrder, setSlideOrder)}
-          hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
         </h2>
         <h2
           className="slide-transliteration transliteration"
           style={{ ...transliterationStyles, order: transliterationOrder }}
         >
-          {buttonMarkup('transliteration', slideOrder, setSlideOrder)}
           <div>
             <div className="english-transliteration translittext">
               jo maageh Thaakur apune te soiee soiee dhevai ||
@@ -183,6 +184,7 @@ const SettingViewer = () => {
               जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
             </div>
           </div>
+          {buttonMarkup('transliteration', slideOrder, setSlideOrder)}
         </h2>
         <h1
           className="slide-next-line slide-gurbani gurbani gurmukhi next-line"
