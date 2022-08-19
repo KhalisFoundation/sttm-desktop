@@ -70,6 +70,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
                 }`}
                 ref={activeVerseRef}
+                style={{
+                  'font-weight': 'normal', // adding style here to reach chromecast
+                }}
               >
                 <SlideGurbani
                   getFontSize={getFontSize}
