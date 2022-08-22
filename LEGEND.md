@@ -36,6 +36,7 @@
 | CMD + G                                                                          | Add Dhan slide or announcement              |
 | Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
+| CMD + ALT + C                                                                    | Search for chromecast devices               |
 
 #### <a name="windows-slides">Windows:</a>
 
@@ -51,6 +52,7 @@
 | CTRL + G                                                                         | Add Dhan slide or announcement              |
 | Spacebar (when in a shabad)                                                      | Switch between main line and unchecked line |
 | Spacebar (when a special slide [ie waheguru slide, announcement, etc] is active) | Switch back to shabad                       |
+| CTRL + ALT + C                                                                   | Search for chromecast devices               |
 
 ### <a name="others">Others</a>
 
