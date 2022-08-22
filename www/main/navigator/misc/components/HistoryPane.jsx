@@ -53,9 +53,6 @@ export const HistoryPane = ({ className }) => {
       if (element.shabadId !== activeShabadId) {
         setActiveShabadId(element.shabadId);
       }
-      if (element.continueFrom !== activeVerseId) {
-        setActiveVerseId(element.continueFrom);
-      }
     }
     if (element.type === 'ceremony') {
       if (isSundarGutkaBani) {
@@ -79,6 +76,9 @@ export const HistoryPane = ({ className }) => {
       if (sundarGutkaBaniId !== element.shabadId) {
         setSundarGutkaBaniId(element.shabadId);
       }
+    }
+    if (element.continueFrom !== activeVerseId) {
+      setActiveVerseId(element.continueFrom);
     }
   };
 

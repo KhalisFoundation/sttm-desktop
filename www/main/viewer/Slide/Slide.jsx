@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -24,7 +24,30 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     displayNextLine,
   } = useStoreState(state => state.userSettings);
   const { activeVerseId } = useStoreState(state => state.navigator);
+  const { slideOrder } = useStoreState(state => state.viewerSettings);
   const activeVerseRef = useRef(null);
+
+  const [translationOrder, setTranslationOrder] = useState();
+  const [teekaOrder, setTeekaOrder] = useState();
+  const [transliterationOrder, setTransliterationOrder] = useState();
+
+  const orderFunctions = {
+    translation: item => {
+      if (translationOrder !== item) {
+        setTranslationOrder(item);
+      }
+    },
+    transliteration: item => {
+      if (transliterationOrder !== item) {
+        setTransliterationOrder(item);
+      }
+    },
+    teeka: item => {
+      if (teekaOrder !== item) {
+        setTeekaOrder(item);
+      }
+    },
+  };
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -58,6 +81,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     }, 100);
   }, [verseObj]);
 
+  useEffect(() => {
+    slideOrder.forEach((element, index) => {
+      orderFunctions[element](index + 2);
+    });
+  }, [slideOrder]);
+
   return (
     <>
       <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
@@ -70,6 +99,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                   activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
                 }`}
                 ref={activeVerseRef}
+                style={{
+                  'font-weight': 'normal', // adding style here to reach chromecast
+                }}
               >
                 <SlideGurbani
                   getFontSize={getFontSize}
@@ -85,18 +117,31 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
               <SlideTranslation
                 getFontSize={getFontSize}
                 translationObj={JSON.parse(verseObj.Translations)}
+                order={translationOrder}
               />
             )}
 
             {verseObj.English && (
-              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
+              <SlideTranslation
+                getFontSize={getFontSize}
+                translationHTML={verseObj.English}
+                order={translationOrder}
+              />
             )}
 
             {teekaVisibility && verseObj.Translations && (
-              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
+              <SlideTeeka
+                getFontSize={getFontSize}
+                teekaObj={JSON.parse(verseObj.Translations)}
+                order={teekaOrder}
+              />
             )}
             {transliterationVisibility && (
-              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
+              <SlideTransliteration
+                getFontSize={getFontSize}
+                gurmukhiString={verseObj.Gurmukhi}
+                order={transliterationOrder}
+              />
             )}
             {displayNextLine && nextLineObj && (
               <div
