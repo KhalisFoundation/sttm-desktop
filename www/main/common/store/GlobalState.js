@@ -62,6 +62,31 @@ const GlobalState = createStore({
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
     quickTools: false,
+    slideOrder: ['translation', 'teeka', 'transliteration'],
+    setSlideOrder: action((state, payload) => {
+      const oldValue = state.slideOrder;
+      if (global.webview) {
+        global.webview.send('update-viewer-setting', {
+          stateName: 'slideOrder',
+          payload,
+          oldValue,
+          actionName: 'setSlideOrder',
+          settingType: 'viewerSettings',
+        });
+      }
+
+      if (global.platform) {
+        global.platform.ipc.send('update-viewer-setting', {
+          stateName: 'slideOrder',
+          payload,
+          oldValue,
+          actionName: 'setSlideOrder',
+          settingType: 'viewerSettings',
+        });
+      }
+      state.slideOrder = payload;
+      return state;
+    }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
   baniOverlay: createOverlaySettingsState(
