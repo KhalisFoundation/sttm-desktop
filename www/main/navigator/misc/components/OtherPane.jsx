@@ -10,12 +10,20 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const OtherPane = ({ className }) => {
-  const { activeShabadId, isRandomShabad, singleDisplayActiveTab } = useStoreState(
-    state => state.navigator,
-  );
-  const { setActiveShabadId, setIsRandomShabad, setSingleDisplayActiveTab } = useStoreActions(
-    state => state.navigator,
-  );
+  const {
+    activeShabadId,
+    isRandomShabad,
+    singleDisplayActiveTab,
+    isSundarGutkaBani,
+    isCeremonyBani,
+  } = useStoreState(state => state.navigator);
+  const {
+    setActiveShabadId,
+    setIsRandomShabad,
+    setSingleDisplayActiveTab,
+    setIsSundarGutkaBani,
+    setIsCeremonyBani,
+  } = useStoreActions(state => state.navigator);
 
   const openRandomShabad = () => {
     if (!isRandomShabad) {
@@ -24,12 +32,32 @@ export const OtherPane = ({ className }) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
-    randomShabad().then(randomId => activeShabadId !== randomId && setActiveShabadId(randomId));
+    randomShabad().then(randomId => {
+      if (activeShabadId !== randomId) {
+        setActiveShabadId(randomId);
+      }
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+    });
     analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
-    dailyHukamnama(activeShabadId, setActiveShabadId);
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    dailyHukamnama(
+      activeShabadId,
+      setActiveShabadId,
+      isSundarGutkaBani,
+      setIsSundarGutkaBani,
+      isCeremonyBani,
+      setIsCeremonyBani,
+    );
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
