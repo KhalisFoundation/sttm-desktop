@@ -29,6 +29,7 @@ const ShabadContent = () => {
     isRandomShabad,
     minimizedBySingleDisplay,
     isDontSaveHistory,
+    savedCrossPlatformId,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -295,6 +296,15 @@ const ShabadContent = () => {
       }).show();
     }
   };
+
+  useEffect(() => {
+    const baniVerseIndex = activeShabad.findIndex(
+      obj => obj.crossPlatformID === savedCrossPlatformId,
+    );
+    if (baniVerseIndex >= 0) {
+      updateTraversedVerse(activeShabad[baniVerseIndex].ID, baniVerseIndex);
+    }
+  }, [savedCrossPlatformId]);
 
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
