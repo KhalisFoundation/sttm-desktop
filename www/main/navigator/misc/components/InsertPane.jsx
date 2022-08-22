@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 
@@ -133,6 +133,16 @@ export const InsertPane = ({ className }) => {
       });
     }
   }, [shortcuts]);
+
+  useEffect(() => {
+    if (isMiscSlide) {
+      ipcRenderer.send('show-misc-text', {
+        text: miscSlideText,
+        isGurmukhi: isMiscSlideGurmukhi,
+        isAnnoucement,
+      });
+    }
+  }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnoucement]);
 
   return (
     <ul className={`list-of-items ${className}`}>
