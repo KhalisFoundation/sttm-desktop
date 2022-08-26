@@ -24,6 +24,63 @@
     overflow: auto;
     padding: 12px;
     width: 500px;
+
+    .slide-transliteration,
+    .slide-translation,
+    .slide-teeka {
+      position: relative;
+
+      .verse-controls {
+        cursor: pointer;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+
+        .left-control,
+        .right-control {
+          display: inline-block;
+          height: 100%;
+          width: 50%;
+
+          img {
+            fill: salmon;
+            height: 100%;
+            opacity: 0;
+            width: auto;
+          }
+        }
+
+        .left-control:hover {
+          background-color: $transparent-black;
+
+          img {
+            opacity: 1;
+          }
+        }
+
+        .right-control:hover {
+          background-color: $transparent-black;
+
+          img {
+            opacity: 1;
+          }
+        }
+      }
+
+      > div {
+        display: inline-block;
+      }
+
+      &::before {
+        background-image: url('../../assets/img/icons/sort.svg');
+        content: ' ';
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+      }
+    }
   }
 
   .main-settings-wrapper,

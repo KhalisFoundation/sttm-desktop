@@ -31,6 +31,7 @@ const ShabadContent = () => {
     isRandomShabad,
     minimizedBySingleDisplay,
     isDontSaveHistory,
+    savedCrossPlatformId,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -113,15 +114,22 @@ const ShabadContent = () => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
-    if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
-      const currentIndex = verseHistory.findIndex(
-        historyObj => historyObj.shabadId === activeShabadId,
-      );
-      setVersesRead([...versesRead, newTraversedVerse]);
-
-      if (verseHistory[currentIndex]) {
-        verseHistory[currentIndex].continueFrom = newTraversedVerse;
+    let currentShabad;
+    if (isSundarGutkaBani) {
+      currentShabad = sundarGutkaBaniId;
+    } else if (isCeremonyBani) {
+      currentShabad = ceremonyId;
+    } else {
+      currentShabad = activeShabadId;
+    }
+    const currentIndex = verseHistory.findIndex(
+      historyObj => historyObj.shabadId === currentShabad,
+    );
+    if (verseHistory[currentIndex]) {
+      verseHistory[currentIndex].continueFrom = newTraversedVerse;
+      if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
         verseHistory[currentIndex].versesRead = [...versesRead, newTraversedVerse];
+        setVersesRead([...versesRead, newTraversedVerse]);
       }
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
@@ -271,7 +279,9 @@ const ShabadContent = () => {
         ...verseHistory,
       ];
       setVerseHistory(updatedHistory);
+      return true;
     }
+    return false;
   };
 
   const scrollToView = () => {
@@ -299,19 +309,32 @@ const ShabadContent = () => {
   };
 
   useEffect(() => {
+    const baniVerseIndex = activeShabad.findIndex(
+      obj => obj.crossPlatformID === savedCrossPlatformId,
+    );
+    if (baniVerseIndex >= 0) {
+      updateTraversedVerse(activeShabad[baniVerseIndex].ID, baniVerseIndex);
+    }
+  }, [savedCrossPlatformId]);
+
+  useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       // mangalPosition was removed from loadBani 3rd argument
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
         setActiveShabad(sundarGutkaVerses);
-        saveToHistory(sundarGutkaVerses, 'bani');
-        openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
+        const newEntry = saveToHistory(sundarGutkaVerses, 'bani');
+        if (newEntry) {
+          openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
+        }
       });
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          saveToHistory(ceremonyVerses, 'ceremony');
-          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
+          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
+          if (newEntry) {
+            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
+          }
         }
       });
     } else {

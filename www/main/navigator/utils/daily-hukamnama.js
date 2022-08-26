@@ -5,7 +5,14 @@ const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 
-export const dailyHukamnama = (activeShabadId, setActiveShabadId) => {
+export const dailyHukamnama = (
+  activeShabadId,
+  setActiveShabadId,
+  isSundarGutkaBani,
+  setIsSundarGutkaBani,
+  isCeremonyBani,
+  setIsCeremonyBani,
+) => {
   isOnline().then(online => {
     if (online) {
       getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
@@ -14,6 +21,12 @@ export const dailyHukamnama = (activeShabadId, setActiveShabadId) => {
 
           if (activeShabadId !== hukamShabadID) {
             setActiveShabadId(hukamShabadID);
+          }
+          if (isSundarGutkaBani) {
+            setIsSundarGutkaBani(false);
+          }
+          if (isCeremonyBani) {
+            setIsCeremonyBani(false);
           }
           analytics.trackEvent('display', 'hukamnama', hukamShabadID);
         }

@@ -61,6 +61,18 @@
     color: $text-base;
   }
 
+  .settings-wrapper {
+    .settings-viewer {
+      .slide-transliteration,
+      .slide-translation,
+      .slide-teeka {
+        &::before {
+          filter: invert(1);
+        }
+      }
+    }
+  }
+
   .settings-nav {
     span {
       &:hover {

@@ -56,6 +56,7 @@ const BaniController = ({ onScreenClose, className }) => {
     isMiscSlide,
     miscSlideText,
     isMiscSlideGurmukhi,
+    savedCrossPlatformId,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -66,6 +67,7 @@ const BaniController = ({ onScreenClose, className }) => {
     setIsMiscSlide,
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
+    setSavedCrossPlatformId,
   } = useStoreActions(state => state.navigator);
 
   const {
@@ -170,6 +172,7 @@ const BaniController = ({ onScreenClose, className }) => {
       // mangalPosition,
       isSundarGutkaBani,
       isCeremonyBani,
+      savedCrossPlatformId,
       setIsCeremonyBani,
       setIsSundarGutkaBani,
       setSundarGutkaBaniId,
@@ -180,6 +183,7 @@ const BaniController = ({ onScreenClose, className }) => {
       setIsMiscSlide,
       setMiscSlideText,
       setIsMiscSlideGurmukhi,
+      setSavedCrossPlatformId,
     );
   }, [socketData]);
 
