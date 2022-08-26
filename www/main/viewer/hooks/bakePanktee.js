@@ -44,10 +44,21 @@ const bakePanktee = () => {
     };
 
     const bakePankteeMarkup = () => {
-      // need to set <wbr /> according to larivaar on and off
+      let customStyles;
+      if (larivaar) {
+        customStyles = getFontSize(gurbaniFontSize);
+      } else {
+        // adding custom styles here to reach chromecast
+        customStyles = {
+          ...getFontSize(gurbaniFontSize),
+          display: 'inline-block',
+          margin: '0 0.15em',
+          'white-space': 'nowrap',
+        };
+      }
       return breakIntoWords(gurmukhiString).map((word, i) => (
         <React.Fragment key={i}>
-          <span className={getVishraamStyle(word)} style={getFontSize(gurbaniFontSize)}>
+          <span className={getVishraamStyle(word)} style={customStyles}>
             {word.text}
           </span>
           <wbr />

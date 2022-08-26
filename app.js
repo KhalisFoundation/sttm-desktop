@@ -611,6 +611,10 @@ ipcMain.on('show-line', (event, arg) => {
   }
 });
 
+ipcMain.on('show-misc-text', (event, arg) => {
+  io.emit('show-misc-text', arg);
+});
+
 ipcMain.on('show-empty-slide', () => {
   emptyOverlay();
 });

@@ -49,6 +49,7 @@ const ShabadHeader = () => {
       <button
         className={`button toggle-viewer-btn ${!showViewer ? 'btn-danger' : ''}`.trim()}
         onClick={() => setShowViewer(!showViewer)}
+        title={showViewer ? i18n.t('SHABAD_PANE.HIDE_BUTTON_TOOLTIP') : ''}
       >
         {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
       </button>

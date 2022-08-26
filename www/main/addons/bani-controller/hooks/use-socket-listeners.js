@@ -19,6 +19,7 @@ const useSocketListeners = (
   // mangalPosition,
   isSundarGutkaBani,
   isCeremonyBani,
+  savedCrossPlatformId,
   setIsCeremonyBani,
   setIsSundarGutkaBani,
   setSundarGutkaBaniId,
@@ -29,6 +30,7 @@ const useSocketListeners = (
   setIsMiscSlide,
   setMiscSlideText,
   setIsMiscSlideGurmukhi,
+  setSavedCrossPlatformId,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
@@ -59,6 +61,12 @@ const useSocketListeners = (
 
         if (sundarGutkaBaniId !== payload.baniId) {
           setSundarGutkaBaniId(payload.baniId);
+        }
+
+        if (payload.verseId && activeVerseId !== payload.verseId) {
+          if (savedCrossPlatformId !== payload.verseId) {
+            setSavedCrossPlatformId(payload.verseId);
+          }
         }
       },
       ceremony: payload => {

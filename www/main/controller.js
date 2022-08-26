@@ -128,6 +128,7 @@ const menuTemplate = [
     submenu: [
       {
         label: i18n.t('MENU.CAST.SEARCH'),
+        accelerator: 'CmdOrCtrl+Alt+C',
         click: () => {
           global.webview.send('search-cast');
         },

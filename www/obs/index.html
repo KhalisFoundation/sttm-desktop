@@ -8,7 +8,7 @@
     <script src="socket.io.js"></script>
 
     <script>
-      var previewData = {
+      const previewData = {
         English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
         Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
         PageNo: 589,
@@ -36,10 +36,10 @@
           WriterGurmukhi: 'mÚ 3',
         },
       };
-      var socket = io();
-      var preview = document.location.href.indexOf('preview') > -1;
-      var overlayPrefs;
-      function hexToRgb(hex) {
+      const socket = io();
+      const preview = document.location.href.indexOf('preview') > -1;
+      let overlayPrefs;
+      const hexToRgb = hex => {
         if (hex === '#000') {
           return '0, 0, 0';
         }
@@ -48,9 +48,9 @@
         return result
           ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
           : null;
-      }
+      };
 
-      var assist = (line, overlayLarivaar, larivaarAssist) => {
+      const assist = (line, overlayLarivaar, larivaarAssist) => {
         return line
           .split(' ')
           .map((word, index) => {
@@ -63,7 +63,7 @@
           .join(overlayLarivaar ? '' : ' ');
       };
 
-      var writeLine = function(Line, larivaar, larivaarAssist, languageSettings) {
+      const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
         document.querySelector('.o-gurbani').innerHTML = assist(
           Line.Gurmukhi,
           larivaar,
@@ -88,7 +88,22 @@
           Line.Gurmukhi === '' && Line.English === '';
       };
 
-      var applyOverlayPrefs = function() {
+      const writeText = (text, isGurmukhi, isAnnoucement) => {
+        let htmlCode;
+        if (isAnnoucement && !isGurmukhi) {
+          htmlCode = `<span>${text}</span>`;
+          document.querySelector('.o-translation').innerHTML = htmlCode;
+          document.querySelector('.o-gurbani').innerHTML = '';
+        } else {
+          htmlCode = `<span>${text}</span>`;
+          document.querySelector('.o-gurbani').innerHTML = htmlCode;
+          document.querySelector('.o-translation').innerHTML = '';
+        }
+        document.querySelector('.o-teeka').innerHTML = '';
+        document.querySelector('.o-transliteration').innerHTML = '';
+      };
+
+      const applyOverlayPrefs = () => {
         const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
 
@@ -172,7 +187,7 @@
         $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
       };
 
-      socket.on('show-line', function(request) {
+      socket.on('show-line', request => {
         if (!preview) {
           if (overlayPrefs) {
             const { overlayLarivaar, larivaarAssist } = overlayPrefs;
@@ -181,7 +196,15 @@
         }
       });
 
-      socket.on('update-prefs', function(data) {
+      socket.on('show-misc-text', request => {
+        if (!preview) {
+          if (overlayPrefs) {
+            writeText(request.text, request.isGurmukhi, request.isAnnoucement);
+          }
+        }
+      });
+
+      socket.on('update-prefs', data => {
         overlayPrefs = data;
         applyOverlayPrefs();
       });

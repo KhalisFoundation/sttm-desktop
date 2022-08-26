@@ -26,6 +26,7 @@
   font-size: 45px;
   font-weight: normal;
   line-height: 1.15;
+  order: 1;
 }
 
 .slide-announcement {
@@ -49,22 +50,26 @@
 .slide-translation {
   font-weight: 600;
   margin: 10px 0;
+  order: 2;
 }
 
 .slide-teeka {
   @extend .gurmukhi-vaak;
   font-weight: 600;
   margin: 10px 0;
+  order: 3;
 }
 
 .slide-transliteration {
   font-weight: 600;
   margin: 10px 0;
+  order: 4;
 }
 
 .slide-next-line {
   opacity: 0.5;
   margin: 10px 0;
+  order: 5;
 }
 
 .slide-left-align {
