@@ -8,22 +8,20 @@ const analytics = electron.remote.getGlobal('analytics');
 export const dailyHukamnama = (
   activeShabadId,
   setActiveShabadId,
-  isSundarGutkaBani,
-  setIsSundarGutkaBani,
   isCeremonyBani,
   setIsCeremonyBani,
+  setIsHukamnamaLoading,
 ) => {
   isOnline().then(online => {
     if (online) {
+      setIsHukamnamaLoading(true);
       getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
         if (!error) {
+          setIsHukamnamaLoading(false);
           const hukamShabadID = parseInt(response.shabadIds[0], 10);
 
           if (activeShabadId !== hukamShabadID) {
             setActiveShabadId(hukamShabadID);
-          }
-          if (isSundarGutkaBani) {
-            setIsSundarGutkaBani(false);
           }
           if (isCeremonyBani) {
             setIsCeremonyBani(false);
