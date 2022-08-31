@@ -1,40 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useStoreState, useStoreActions } from 'easy-peasy';
-import { remote } from 'electron';
 import { Tile } from '../../../common/sttm-ui';
 import { convertToHyphenCase } from '../../../common/utils';
 
-const analytics = remote.getGlobal('analytics');
-
-const ExtraBani = ({ title, banis = [], onScreenClose }) => {
-  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
-    state => state.navigator,
-  );
-  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
-    state => state.navigator,
-  );
-
+const ExtraBani = ({ title, banis = [], loadBani }) => {
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const groupHeaderClassName = `${hyphenedTitle}-heading`;
   const groupClassName = hyphenedTitle;
   const groupItemClassName = hyphenedTitle.slice(0, -1); // removes last character from string.
-
-  const loadBani = baniId => {
-    if (isCeremonyBani) {
-      setIsCeremonyBani(false);
-    }
-
-    if (!isSundarGutkaBani) {
-      setIsSundarGutkaBani(true);
-    }
-
-    if (sundarGutkaBaniId !== baniId) {
-      setSundarGutkaBaniId(baniId);
-    }
-    analytics.trackEvent('sunderGutkaBanis', baniId);
-    onScreenClose();
-  };
 
   return (
     <div className="bani-group-container">
@@ -57,8 +30,8 @@ const ExtraBani = ({ title, banis = [], onScreenClose }) => {
 
 ExtraBani.propTypes = {
   title: PropTypes.string,
-  onScreenClose: PropTypes.func,
   banis: PropTypes.array,
+  loadBani: PropTypes.func,
 };
 
 export default ExtraBani;

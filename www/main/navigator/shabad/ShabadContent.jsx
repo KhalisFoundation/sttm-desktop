@@ -47,6 +47,7 @@ const ShabadContent = () => {
   const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
     state => state.userSettings,
   );
+
   const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -200,20 +201,25 @@ const ShabadContent = () => {
     }
   };
 
-  const openHomeVerse = () => {
+  const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
       const homeVerseIndex = homeVerse;
       if (mappedShabadArray[homeVerseIndex]) {
         const homeVerseId = mappedShabadArray[homeVerseIndex].verseId;
-        setPreviousActiveVerse(activeVerseId);
 
         if (homeVerseId === activeVerseId) {
           const previousVerseIndex = activeShabad.findIndex(
             verseObj => verseObj.ID === previousActiveVerse,
           );
-          updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+
+          if (previousVerseIndex >= 0) {
+            updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+          }
         } else {
+          if (previousActiveVerse !== activeVerseId) {
+            setPreviousActiveVerse(activeVerseId);
+          }
           updateTraversedVerse(homeVerseId, homeVerseIndex);
         }
       }
@@ -235,6 +241,11 @@ const ShabadContent = () => {
   const openFirstVerse = (firstVerse, crossPlatformID = null) => {
     updateTraversedVerse(firstVerse, 0, crossPlatformID);
     changeHomeVerse(0);
+    virtuosoRef.current.scrollToIndex({
+      index: 0,
+      behavior: 'smooth',
+      align: 'center',
+    });
   };
 
   const saveToHistory = (verses, verseType, initialVerse = null) => {
@@ -421,7 +432,7 @@ const ShabadContent = () => {
       });
     }
     if (shortcuts.homeVerse) {
-      openHomeVerse();
+      toggleHomeVerse();
       scrollToView();
       setShortcuts({
         ...shortcuts,

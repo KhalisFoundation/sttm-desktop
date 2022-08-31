@@ -15,12 +15,27 @@ const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
-  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
-    state => state.navigator,
-  );
-  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
-    state => state.navigator,
-  );
+  const {
+    isSundarGutkaBani,
+    sundarGutkaBaniId,
+    isCeremonyBani,
+    singleDisplayActiveTab,
+    activeVerseId,
+    homeVerse,
+    verseHistory,
+    versesRead,
+    initialVerseId,
+  } = useStoreState(state => state.navigator);
+  const {
+    setIsSundarGutkaBani,
+    setSundarGutkaBaniId,
+    setIsCeremonyBani,
+    setSingleDisplayActiveTab,
+    setInitialVerseId,
+    setHomeVerse,
+    setActiveVerseId,
+    setVersesRead,
+  } = useStoreActions(state => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
@@ -59,6 +74,27 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
     if (sundarGutkaBaniId !== baniId) {
       setSundarGutkaBaniId(baniId);
+    }
+
+    if (singleDisplayActiveTab !== 'shabad') {
+      setSingleDisplayActiveTab('shabad');
+    }
+
+    const check = verseHistory.filter(historyObj => historyObj.shabadId === baniId);
+    if (check.length) {
+      const element = check[0];
+      if (element.continueFrom !== activeVerseId) {
+        setActiveVerseId(element.continueFrom);
+      }
+      if (element.verseId !== initialVerseId) {
+        setInitialVerseId(element.verseId);
+      }
+      if (element.homeVerse !== homeVerse) {
+        setHomeVerse(element.homeVerse);
+      }
+      if (element.versesRead !== versesRead) {
+        setVersesRead(element.versesRead);
+      }
     }
     analytics.trackEvent('sunderGutkaBanis', baniId);
     onScreenClose();
@@ -105,10 +141,10 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
             {nitnemBanis.length > 0 && (
-              <ExtraBani onScreenClose={onScreenClose} title="Nitnem Banis" banis={nitnemBanis} />
+              <ExtraBani title="Nitnem Banis" banis={nitnemBanis} loadBani={loadBani} />
             )}
             {popularBanis.length > 0 && (
-              <ExtraBani onScreenClose={onScreenClose} title="Popular Banis" banis={popularBanis} />
+              <ExtraBani title="Popular Banis" banis={popularBanis} loadBani={loadBani} />
             )}
           </div>
         )}
