@@ -331,8 +331,9 @@ const ShabadContent = () => {
       // mangalPosition was removed from loadBani 3rd argument
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
         setActiveShabad(sundarGutkaVerses);
-        const newEntry = saveToHistory(sundarGutkaVerses, 'bani');
-        if (newEntry) {
+        saveToHistory(sundarGutkaVerses, 'bani');
+        const check = sundarGutkaVerses.findIndex(verse => verse.ID === activeVerseId);
+        if (check < 0) {
           openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
         }
       });

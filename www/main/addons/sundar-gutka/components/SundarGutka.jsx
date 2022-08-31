@@ -20,21 +20,12 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     sundarGutkaBaniId,
     isCeremonyBani,
     singleDisplayActiveTab,
-    activeVerseId,
-    homeVerse,
-    verseHistory,
-    versesRead,
-    initialVerseId,
   } = useStoreState(state => state.navigator);
   const {
     setIsSundarGutkaBani,
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
-    setInitialVerseId,
-    setHomeVerse,
-    setActiveVerseId,
-    setVersesRead,
   } = useStoreActions(state => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
@@ -80,22 +71,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
       setSingleDisplayActiveTab('shabad');
     }
 
-    const check = verseHistory.filter(historyObj => historyObj.shabadId === baniId);
-    if (check.length) {
-      const element = check[0];
-      if (element.continueFrom !== activeVerseId) {
-        setActiveVerseId(element.continueFrom);
-      }
-      if (element.verseId !== initialVerseId) {
-        setInitialVerseId(element.verseId);
-      }
-      if (element.homeVerse !== homeVerse) {
-        setHomeVerse(element.homeVerse);
-      }
-      if (element.versesRead !== versesRead) {
-        setVersesRead(element.versesRead);
-      }
-    }
     analytics.trackEvent('sunderGutkaBanis', baniId);
     onScreenClose();
   };
