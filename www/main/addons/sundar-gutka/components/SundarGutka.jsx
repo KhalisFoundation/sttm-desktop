@@ -15,12 +15,18 @@ const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
-  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani } = useStoreState(
-    state => state.navigator,
-  );
-  const { setIsSundarGutkaBani, setSundarGutkaBaniId, setIsCeremonyBani } = useStoreActions(
-    state => state.navigator,
-  );
+  const {
+    isSundarGutkaBani,
+    sundarGutkaBaniId,
+    isCeremonyBani,
+    singleDisplayActiveTab,
+  } = useStoreState(state => state.navigator);
+  const {
+    setIsSundarGutkaBani,
+    setSundarGutkaBaniId,
+    setIsCeremonyBani,
+    setSingleDisplayActiveTab,
+  } = useStoreActions(state => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
@@ -60,6 +66,11 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     if (sundarGutkaBaniId !== baniId) {
       setSundarGutkaBaniId(baniId);
     }
+
+    if (singleDisplayActiveTab !== 'shabad') {
+      setSingleDisplayActiveTab('shabad');
+    }
+
     analytics.trackEvent('sunderGutkaBanis', baniId);
     onScreenClose();
   };
@@ -105,10 +116,10 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
             {nitnemBanis.length > 0 && (
-              <ExtraBani onScreenClose={onScreenClose} title="Nitnem Banis" banis={nitnemBanis} />
+              <ExtraBani title="Nitnem Banis" banis={nitnemBanis} loadBani={loadBani} />
             )}
             {popularBanis.length > 0 && (
-              <ExtraBani onScreenClose={onScreenClose} title="Popular Banis" banis={popularBanis} />
+              <ExtraBani title="Popular Banis" banis={popularBanis} loadBani={loadBani} />
             )}
           </div>
         )}

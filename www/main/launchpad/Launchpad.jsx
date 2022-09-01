@@ -105,7 +105,6 @@ const Launchpad = () => {
     }
   };
 
-  // handle down and right arrow key
   const handleDownAndRight = () => {
     if (!shortcuts.nextVerse) {
       setShortcuts({
@@ -115,7 +114,6 @@ const Launchpad = () => {
     }
   };
 
-  // handle down and right arrow key
   const handleUpAndLeft = () => {
     if (!shortcuts.prevVerse) {
       setShortcuts({
@@ -125,7 +123,6 @@ const Launchpad = () => {
     }
   };
 
-  // handle down and right arrow key
   const handleSpacebar = () => {
     if (!shortcuts.homeVerse) {
       setShortcuts({
@@ -135,7 +132,6 @@ const Launchpad = () => {
     }
   };
 
-  // handle down and right arrow key
   const handleEnter = () => {
     if (!shortcuts.openFirstResult) {
       setShortcuts({
