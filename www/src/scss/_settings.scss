@@ -72,14 +72,6 @@
       > div {
         display: inline-block;
       }
-
-      &::before {
-        background-image: url('../../assets/img/icons/sort.svg');
-        content: ' ';
-        display: inline-block;
-        height: 16px;
-        width: 16px;
-      }
     }
   }
 
