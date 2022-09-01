@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
@@ -10,6 +10,7 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const OtherPane = ({ className }) => {
+  const [isHukamnamaLoading, setIsHukamnamaLoading] = useState(false);
   const {
     activeShabadId,
     isRandomShabad,
@@ -50,14 +51,15 @@ export const OtherPane = ({ className }) => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
-    dailyHukamnama(
-      activeShabadId,
-      setActiveShabadId,
-      isSundarGutkaBani,
-      setIsSundarGutkaBani,
-      isCeremonyBani,
-      setIsCeremonyBani,
-    );
+    if (!isHukamnamaLoading) {
+      dailyHukamnama(
+        activeShabadId,
+        setActiveShabadId,
+        isCeremonyBani,
+        setIsCeremonyBani,
+        setIsHukamnamaLoading,
+      );
+    }
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
