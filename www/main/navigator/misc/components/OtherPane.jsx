@@ -26,46 +26,40 @@ export const OtherPane = ({ className }) => {
     setIsCeremonyBani,
   } = useStoreActions(state => state.navigator);
 
-  const openRandomShabad = () => {
+  const setShabadId = shabadId => {
     if (!isRandomShabad) {
       setIsRandomShabad(true);
     }
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
+    if (activeShabadId !== shabadId) {
+      setActiveShabadId(shabadId);
+    }
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+  };
+
+  const openRandomShabad = () => {
     randomShabad().then(randomId => {
-      if (activeShabadId !== randomId) {
-        setActiveShabadId(randomId);
-      }
-      if (isSundarGutkaBani) {
-        setIsSundarGutkaBani(false);
-      }
-      if (isCeremonyBani) {
-        setIsCeremonyBani(false);
-      }
+      setShabadId(randomId);
     });
     analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
     if (!isHukamnamaLoading) {
-      dailyHukamnama(
-        activeShabadId,
-        setActiveShabadId,
-        isCeremonyBani,
-        setIsCeremonyBani,
-        setIsHukamnamaLoading,
-      );
+      dailyHukamnama(setIsHukamnamaLoading).then(hukamId => {
+        setIsHukamnamaLoading(false);
+        setShabadId(hukamId);
+        analytics.trackEvent('display', 'hukamnama', hukamId);
+      });
     }
-    if (singleDisplayActiveTab !== 'shabad') {
-      setSingleDisplayActiveTab('shabad');
-    }
-    if (!isRandomShabad) {
-      setIsRandomShabad(true);
-    }
+    setIsHukamnamaLoading(true);
   };
 
   return (
