@@ -41,9 +41,6 @@ const $scroll = window;
 
 $body.classList.add(process.platform);
 
-core.menu.settings.applySettings(prefs);
-applyUserSettings(savedSettings);
-
 // Synchronize scrolling to presenter window
 $scroll.addEventListener(
   'wheel',
@@ -198,7 +195,6 @@ global.platform.ipc.on('send-scroll', (event, pos) => {
 global.platform.ipc.on('update-settings', () => {
   prefs = store.get('userPrefs');
   applyThemebg();
-  core.menu.settings.applySettings(prefs);
   castToReceiver();
 });
 
