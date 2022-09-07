@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
@@ -10,6 +10,7 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const OtherPane = ({ className }) => {
+  const [isHukamnamaLoading, setIsHukamnamaLoading] = useState(false);
   const {
     activeShabadId,
     isRandomShabad,
@@ -25,45 +26,40 @@ export const OtherPane = ({ className }) => {
     setIsCeremonyBani,
   } = useStoreActions(state => state.navigator);
 
-  const openRandomShabad = () => {
+  const setShabadId = shabadId => {
     if (!isRandomShabad) {
       setIsRandomShabad(true);
     }
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
+    if (activeShabadId !== shabadId) {
+      setActiveShabadId(shabadId);
+    }
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+  };
+
+  const openRandomShabad = () => {
     randomShabad().then(randomId => {
-      if (activeShabadId !== randomId) {
-        setActiveShabadId(randomId);
-      }
-      if (isSundarGutkaBani) {
-        setIsSundarGutkaBani(false);
-      }
-      if (isCeremonyBani) {
-        setIsCeremonyBani(false);
-      }
+      setShabadId(randomId);
     });
     analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
+    if (!isHukamnamaLoading) {
+      dailyHukamnama(setIsHukamnamaLoading).then(hukamId => {
+        setIsHukamnamaLoading(false);
+        setShabadId(hukamId);
+        analytics.trackEvent('display', 'hukamnama', hukamId);
+      });
     }
-    dailyHukamnama(
-      activeShabadId,
-      setActiveShabadId,
-      isSundarGutkaBani,
-      setIsSundarGutkaBani,
-      isCeremonyBani,
-      setIsCeremonyBani,
-    );
-    if (singleDisplayActiveTab !== 'shabad') {
-      setSingleDisplayActiveTab('shabad');
-    }
-    if (!isRandomShabad) {
-      setIsRandomShabad(true);
-    }
+    setIsHukamnamaLoading(true);
   };
 
   return (
