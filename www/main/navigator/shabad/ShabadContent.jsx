@@ -51,6 +51,7 @@ const ShabadContent = () => {
   const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+
   const activeVerseRef = useRef(null);
   const virtuosoRef = useRef(null);
   const baniLengthCols = {
@@ -201,6 +202,15 @@ const ShabadContent = () => {
     }
   };
 
+  const scrollToVerse = verseId => {
+    const verseIndex = activeShabad.findIndex(obj => obj.ID === verseId);
+    virtuosoRef.current.scrollToIndex({
+      index: verseIndex,
+      behavior: 'smooth',
+      align: 'center',
+    });
+  };
+
   const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
@@ -215,11 +225,13 @@ const ShabadContent = () => {
 
           if (previousVerseIndex >= 0) {
             updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+            scrollToVerse(previousActiveVerse);
           }
         } else {
           if (previousActiveVerse !== activeVerseId) {
             setPreviousActiveVerse(activeVerseId);
           }
+          scrollToVerse(homeVerseId);
           updateTraversedVerse(homeVerseId, homeVerseIndex);
         }
       }
@@ -434,7 +446,6 @@ const ShabadContent = () => {
     }
     if (shortcuts.homeVerse) {
       toggleHomeVerse();
-      scrollToView();
       setShortcuts({
         ...shortcuts,
         homeVerse: false,
