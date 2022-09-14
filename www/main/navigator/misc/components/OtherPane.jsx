@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
@@ -10,32 +10,56 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const OtherPane = ({ className }) => {
-  const { activeShabadId, isRandomShabad, singleDisplayActiveTab } = useStoreState(
-    state => state.navigator,
-  );
-  const { setActiveShabadId, setIsRandomShabad, setSingleDisplayActiveTab } = useStoreActions(
-    state => state.navigator,
-  );
+  const [isHukamnamaLoading, setIsHukamnamaLoading] = useState(false);
+  const {
+    activeShabadId,
+    isRandomShabad,
+    singleDisplayActiveTab,
+    isSundarGutkaBani,
+    isCeremonyBani,
+  } = useStoreState(state => state.navigator);
+  const {
+    setActiveShabadId,
+    setIsRandomShabad,
+    setSingleDisplayActiveTab,
+    setIsSundarGutkaBani,
+    setIsCeremonyBani,
+  } = useStoreActions(state => state.navigator);
 
-  const openRandomShabad = () => {
+  const setShabadId = shabadId => {
     if (!isRandomShabad) {
       setIsRandomShabad(true);
     }
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
-    randomShabad().then(randomId => activeShabadId !== randomId && setActiveShabadId(randomId));
+    if (activeShabadId !== shabadId) {
+      setActiveShabadId(shabadId);
+    }
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
+    }
+    if (isCeremonyBani) {
+      setIsCeremonyBani(false);
+    }
+  };
+
+  const openRandomShabad = () => {
+    randomShabad().then(randomId => {
+      setShabadId(randomId);
+    });
     analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
-    dailyHukamnama(activeShabadId, setActiveShabadId);
-    if (singleDisplayActiveTab !== 'shabad') {
-      setSingleDisplayActiveTab('shabad');
+    if (!isHukamnamaLoading) {
+      dailyHukamnama(setIsHukamnamaLoading).then(hukamId => {
+        setIsHukamnamaLoading(false);
+        setShabadId(hukamId);
+        analytics.trackEvent('display', 'hukamnama', hukamId);
+      });
     }
-    if (!isRandomShabad) {
-      setIsRandomShabad(true);
-    }
+    setIsHukamnamaLoading(true);
   };
 
   return (

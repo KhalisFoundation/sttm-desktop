@@ -29,6 +29,7 @@ const ShabadContent = () => {
     isRandomShabad,
     minimizedBySingleDisplay,
     isDontSaveHistory,
+    savedCrossPlatformId,
   } = useStoreState(state => state.navigator);
 
   const {
@@ -46,9 +47,11 @@ const ShabadContent = () => {
   const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
     state => state.userSettings,
   );
+
   const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+
   const activeVerseRef = useRef(null);
   const virtuosoRef = useRef(null);
   const baniLengthCols = {
@@ -111,15 +114,22 @@ const ShabadContent = () => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
-    if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
-      const currentIndex = verseHistory.findIndex(
-        historyObj => historyObj.shabadId === activeShabadId,
-      );
-      setVersesRead([...versesRead, newTraversedVerse]);
-
-      if (verseHistory[currentIndex]) {
-        verseHistory[currentIndex].continueFrom = newTraversedVerse;
+    let currentShabad;
+    if (isSundarGutkaBani) {
+      currentShabad = sundarGutkaBaniId;
+    } else if (isCeremonyBani) {
+      currentShabad = ceremonyId;
+    } else {
+      currentShabad = activeShabadId;
+    }
+    const currentIndex = verseHistory.findIndex(
+      historyObj => historyObj.shabadId === currentShabad,
+    );
+    if (verseHistory[currentIndex]) {
+      verseHistory[currentIndex].continueFrom = newTraversedVerse;
+      if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
         verseHistory[currentIndex].versesRead = [...versesRead, newTraversedVerse];
+        setVersesRead([...versesRead, newTraversedVerse]);
       }
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
@@ -192,20 +202,36 @@ const ShabadContent = () => {
     }
   };
 
-  const openHomeVerse = () => {
+  const scrollToVerse = verseId => {
+    const verseIndex = activeShabad.findIndex(obj => obj.ID === verseId);
+    virtuosoRef.current.scrollToIndex({
+      index: verseIndex,
+      behavior: 'smooth',
+      align: 'center',
+    });
+  };
+
+  const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
       const homeVerseIndex = homeVerse;
       if (mappedShabadArray[homeVerseIndex]) {
         const homeVerseId = mappedShabadArray[homeVerseIndex].verseId;
-        setPreviousActiveVerse(activeVerseId);
 
         if (homeVerseId === activeVerseId) {
           const previousVerseIndex = activeShabad.findIndex(
             verseObj => verseObj.ID === previousActiveVerse,
           );
-          updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+
+          if (previousVerseIndex >= 0) {
+            updateTraversedVerse(previousActiveVerse, previousVerseIndex);
+            scrollToVerse(previousActiveVerse);
+          }
         } else {
+          if (previousActiveVerse !== activeVerseId) {
+            setPreviousActiveVerse(activeVerseId);
+          }
+          scrollToVerse(homeVerseId);
           updateTraversedVerse(homeVerseId, homeVerseIndex);
         }
       }
@@ -227,6 +253,11 @@ const ShabadContent = () => {
   const openFirstVerse = (firstVerse, crossPlatformID = null) => {
     updateTraversedVerse(firstVerse, 0, crossPlatformID);
     changeHomeVerse(0);
+    virtuosoRef.current.scrollToIndex({
+      index: 0,
+      behavior: 'smooth',
+      align: 'center',
+    });
   };
 
   const saveToHistory = (verses, verseType, initialVerse = null) => {
@@ -269,7 +300,9 @@ const ShabadContent = () => {
         ...verseHistory,
       ];
       setVerseHistory(updatedHistory);
+      return true;
     }
+    return false;
   };
 
   const scrollToView = () => {
@@ -297,19 +330,33 @@ const ShabadContent = () => {
   };
 
   useEffect(() => {
+    const baniVerseIndex = activeShabad.findIndex(
+      obj => obj.crossPlatformID === savedCrossPlatformId,
+    );
+    if (baniVerseIndex >= 0) {
+      updateTraversedVerse(activeShabad[baniVerseIndex].ID, baniVerseIndex);
+    }
+  }, [savedCrossPlatformId]);
+
+  useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       // mangalPosition was removed from loadBani 3rd argument
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
         setActiveShabad(sundarGutkaVerses);
         saveToHistory(sundarGutkaVerses, 'bani');
-        openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
+        const check = sundarGutkaVerses.findIndex(verse => verse.ID === activeVerseId);
+        if (check < 0) {
+          openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
+        }
       });
     } else if (isCeremonyBani && ceremonyId) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          saveToHistory(ceremonyVerses, 'ceremony');
-          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
+          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
+          if (newEntry) {
+            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
+          }
         }
       });
     } else {
@@ -398,8 +445,7 @@ const ShabadContent = () => {
       });
     }
     if (shortcuts.homeVerse) {
-      openHomeVerse();
-      scrollToView();
+      toggleHomeVerse();
       setShortcuts({
         ...shortcuts,
         homeVerse: false,

@@ -432,6 +432,7 @@
   },
   "SHABAD_PANE": {
     "SHOW_DISPLAY": "SHOW DISPLAY",
-    "HIDE_SCREEN": "HIDE SCREEN"
+    "HIDE_SCREEN": "HIDE SCREEN",
+    "HIDE_BUTTON_TOOLTIP": "Hides the secondary screen when not needed. This will show the default desktop background on your secondary screen. Once hidden, you can unhide the STTM screen again by clicking the \"Show Display\" button which will appear here."
   }
 }

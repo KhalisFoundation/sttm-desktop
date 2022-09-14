@@ -61,6 +61,18 @@
     color: $text-base;
   }
 
+  .settings-wrapper {
+    .settings-viewer {
+      .slide-transliteration,
+      .slide-translation,
+      .slide-teeka {
+        &::before {
+          filter: invert(1);
+        }
+      }
+    }
+  }
+
   .settings-nav {
     span {
       &:hover {
@@ -142,7 +154,7 @@
         background-color: $bg-alt;
       }
     }
-    .shortcut-drawer-active {
+    .shortcut-drawer {
       background: darken($bg-main, 10);
     }
   }
