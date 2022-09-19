@@ -477,7 +477,7 @@ app.on('ready', () => {
     minHeight: 600,
     width,
     height,
-    frame: false,
+    frame: process.platform === 'linux', //show frame only on linux
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
