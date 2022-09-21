@@ -1,5 +1,35 @@
 ## New Updates
 
+### 9.0.5 - _September 14, 2022_
+
+The latest release provide the ability to display Waheguru and other slides like Mool Mantar, blank slide, and announcement on Gurbani Overlay. A number of reported bugs have also been addressed.
+
+#### General
+
+- Information will now be displayed when you hover over the “hide screen” button.
+- Fixed the animation when changing gurbani font size.
+- Fixed the app crash issue when clicked on hukamnama option multiple times.
+- Fixed the app crash when minimizing the shortcut tray in dark mode.
+- Fixed the spacebar key shortcut to toggle between the home verse and the last read verse.
+
+#### Sundar Gutka
+
+- Fixed the issue of random shabad not working after a bani is opened.
+- Sundar Gutka bani will now resume from where its left when opened from the history tab.
+- Fixed font spacing issue in Chromecast display.
+- Opening sundar gutka bani switches the pane to shabad list in single display mode.
+
+#### Bani Controller
+
+- Fixed the bani controller bug when traversing through Sundar Gutka banis.
+- Fixed the bani controller issue where changing the theme disconnected the Bani Controller.
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.0.4 - _July 25, 2022_
 
 - Anytime a filter is applied to the search, you will be able to remove it easily through filter tags.
