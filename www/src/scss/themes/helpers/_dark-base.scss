@@ -102,6 +102,19 @@
   .viewer-pane {
     .pane-content {
       background: none !important;
+      border: 1px solid $border;
+    }
+  }
+
+  .control-item {
+    .custom-checkbox {
+      input[type='checkbox']:checked+label::before {
+        filter: invert(0.7);
+      }
+    }
+
+    input[type='range']::before {
+      color: $white;
     }
   }
   .control-item:hover {
@@ -239,8 +252,11 @@
   }
 
   .search-content {
+    border-top: 1px solid $border;
+
     input.input-box {
       color: $text-bright;
+      background-color: $bg-main;
 
       &::placeholder {
         color: $darker-grey;

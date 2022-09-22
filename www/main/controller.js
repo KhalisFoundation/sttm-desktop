@@ -15,12 +15,14 @@ const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
-global.webview = document.querySelector('webview');
+setTimeout(() => {
+  global.webview = document.querySelector('webview');
 
-global.webview.addEventListener('dom-ready', () => {
-  ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
-  global.webview.send('is-webview');
-});
+  global.webview.addEventListener('dom-ready', () => {
+    ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
+    global.webview.send('is-webview');
+  });
+}, 300);
 
 const updateMenu = [];
 

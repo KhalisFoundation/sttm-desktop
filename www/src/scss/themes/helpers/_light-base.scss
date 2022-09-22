@@ -98,7 +98,11 @@
     background-color: $statusbar-bg;
     color: $base-text;
   }
-
+  .control-item {
+    input[type='range']::before {
+      color: $base-text;
+    }
+  }
   .control-item:hover {
     background-color: $statusbar-bg;
   }
@@ -133,6 +137,12 @@
       .search-footer {
         background-color: $statusbar-bg;
       }
+    }
+  }
+
+  .viewer-pane {
+    .pane-content {
+      border: 1px solid $alt-grey;
     }
   }
 
@@ -195,6 +205,7 @@
 
   .search-content {
     background-color: $statusbar-bg;
+    border-top: 1px solid $lighter-grey;
     color: $base-text;
     .input-box {
       color: $black;
