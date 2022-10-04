@@ -129,6 +129,9 @@ function openSecondaryWindow(windowName) {
         nodeIntegration: true,
         enableRemoteModule: true,
         contextIsolation: false,
+        webviewTag: true,
+        nodeIntegrationInSubFrames: true,
+        nodeIntegrationInWorker: true,
       },
     });
     remote.enable(window.obj.webContents);
@@ -559,7 +562,9 @@ ipcMain.on('enable-wc-webview', (event, data) => {
   const webView_wc = webContents.fromId(parseInt(data, 10));
   remote.enable(webView_wc);
   webView_wc.send('wc-webview-enabled');
-  viewerWindow.send('wc-webview-enabled');
+  if (checkForExternalDisplay()) {
+    viewerWindow.send('wc-webview-enabled');
+  }
 });
 
 ipcMain.on('cast-session-active', () => {
