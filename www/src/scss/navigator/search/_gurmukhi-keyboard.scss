@@ -1,5 +1,4 @@
 .gurmukhi-keyboard {
-  border: 1px solid $disabled-light;
   border-top: none;
   border-radius: 2px;
   box-shadow: 0 2px 2px 0 $transparent-black, 0 0 0 1px $transparent-light-black;
@@ -13,11 +12,6 @@
   .keyboard-row-set {
     display: inline-block;
     width: 100%;
-  }
-
-  .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
-  .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
-    background-color: $lighter-grey;
   }
 
   button {
@@ -36,10 +30,6 @@
 
     &:hover {
       border-color: $darker-grey;
-    }
-
-    &.matra-button {
-      background-color: $light-blue-30;
     }
   }
 }
