@@ -96,13 +96,6 @@ const castText = (text, isGurmukhi) => {
   }
 };
 
-// IPC
-global.platform.ipc.on('search-cast', (event, pos) => {
-  requestSession();
-  appendMessage(event);
-  appendMessage(pos);
-});
-
 global.platform.ipc.on('stop-cast', () => {
   stopApp();
 });
