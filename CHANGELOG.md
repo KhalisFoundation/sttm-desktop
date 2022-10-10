@@ -1,5 +1,9 @@
 ## New Updates
 
+### 9.1.0 - _October 17, 2022_
+
+__coming soon__
+
 ### 9.0.5 - _September 14, 2022_
 
 The latest release provide the ability to display Waheguru and other slides like Mool Mantar, blank slide, and announcement on Gurbani Overlay. A number of reported bugs have also been addressed.
