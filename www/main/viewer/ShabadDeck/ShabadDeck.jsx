@@ -145,6 +145,9 @@ function ShabadDeck() {
     }
     if (ceremonyId && isCeremonyBani) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
+				if (ceremonyVerses.flat) {
+					ceremonyVerses = ceremonyVerses.flat(1);
+				}
         const activeCeremonyVerse = ceremonyVerses.filter(ceremonyVerse => {
           if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
             return true;

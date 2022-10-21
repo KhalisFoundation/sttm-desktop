@@ -64,6 +64,10 @@ const ShabadContent = () => {
   };
 
   const filterRequiredVerseItems = verses => {
+		if (verses.flat) {
+			verses = verses.flat(1);
+		}
+
     return verses
       ? verses.map((verse, index) => {
           if (verse) {
@@ -72,7 +76,7 @@ const ShabadContent = () => {
               verseId: verse.ID,
               verse: verse.Gurmukhi,
               english: verse.English ? verse.English : '',
-              crossPlatformId: verse.crossPlatformID,
+              crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
             };
           }
           return {};
