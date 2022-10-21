@@ -363,7 +363,6 @@ function checkPresenterView() {
   classList.toggle('scale-viewer', inPresenterView);
 
   global.platform.ipc.send('presenter-view', inPresenterView);
-  // global.webview.send('presenter-view', inPresenterView);
 }
 
 global.platform.ipc.on('presenter-view', () => {

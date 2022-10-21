@@ -167,7 +167,6 @@ const query = (searchQuery, searchType, searchSource) =>
       default:
         break;
     }
-    //  order.push('Shabads');
     const orderArray = Array.from(order, el => [el, false]);
     Realm.open(realmConfig)
       .then(realm => {
