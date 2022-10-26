@@ -1,7 +1,7 @@
 /* eslint-disable no-console, import/no-extraneous-dependencies */
 const fs = require('fs');
 const path = require('path');
-const SSH = require('ssh2').Client;
+const { Client } = require('ssh2');
 const { version } = require('../package.json');
 
 const files = {
@@ -12,7 +12,7 @@ const files = {
 
 module.exports = platform => {
   const file = files[platform];
-  const conn = new SSH();
+  const conn = new Client();
   conn
     .on('ready', () => {
       console.log('Client :: ready');
@@ -31,8 +31,7 @@ module.exports = platform => {
             .stderr.on('data', data => {
               console.log(`STDERR: ${data}`);
             });
-        },
-      );
+        });
     })
     .connect({
       host: 'khalis.net',
