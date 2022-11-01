@@ -63,25 +63,25 @@ const ShabadContent = () => {
     extralong: 'existsBuddhaDal',
   };
 
-  const filterRequiredVerseItems = verses => {
-		if (verses.flat) {
-			verses = verses.flat(1);
-		}
-
-    return verses
-      ? verses.map((verse, index) => {
-          if (verse) {
-            return {
-              ID: index,
-              verseId: verse.ID,
-              verse: verse.Gurmukhi,
-              english: verse.English ? verse.English : '',
-              crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
-            };
-          }
-          return {};
-        })
-      : [];
+  const filterRequiredVerseItems = (verses) => {
+    try {
+      verses = verses.flat(1);
+    } finally {
+      return verses
+        ? verses.map((verse, index) => {
+            if (verse) {
+              return {
+                ID: index,
+                verseId: verse.ID,
+                verse: verse.Gurmukhi,
+                english: verse.English ? verse.English : '',
+                crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
+              };
+            }
+            return {};
+          })
+        : [];
+    }
   };
 
   const [filteredItems, setFilteredItems] = useState(filterRequiredVerseItems(activeShabad));
