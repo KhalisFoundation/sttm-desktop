@@ -40,5 +40,7 @@
     "copyToClipboard": false
   },
   "minimizedBySingleDisplay": false,
-  "isDontSaveHistory": false
+  "isDontSaveHistory": false,
+  "favShabad": [],
+  "searchVerse": ""
 }

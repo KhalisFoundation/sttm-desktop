@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
-import { HistoryPane, OtherPane, InsertPane } from '../misc/components';
+import { HistoryPane, OtherPane, InsertPane, FavoritePane } from '../misc/components';
 import SearchPane from '../search/components/SearchPane';
 import ShabadPane from '../shabad/ShabadPane';
 
@@ -14,6 +14,7 @@ export const singleDisplayContent = () => {
         <HistoryPane className={tabName === 'history' ? '' : 'd-none'} />
         <OtherPane className={tabName === 'other' ? '' : 'd-none'} />
         <InsertPane className={tabName === 'insert' ? '' : 'd-none'} />
+        <FavoritePane className={tabName === 'favorite' ? '' : 'd-none'} />
       </>
     );
 

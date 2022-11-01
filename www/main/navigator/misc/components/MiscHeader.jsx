@@ -12,6 +12,7 @@ export const MiscHeader = () => {
   const isHistory = miscPanel === 'History';
   const isInsert = miscPanel === 'Insert';
   const isOther = miscPanel === 'Others';
+  const isFav = miscPanel === 'Favorite';
   return (
     <div className="misc-header">
       <a
@@ -32,6 +33,16 @@ export const MiscHeader = () => {
         <i className="fa fa-desktop">
           <span className="Icon-label" key="Insert">
             Insert
+          </span>
+        </i>
+      </a>
+      <a
+        className={`misc-button ${isFav ? 'misc-active' : ''}`}
+        onClick={event => SetOpenTab(event)}
+      >
+        <i className="fa fa-heart">
+          <span className="Icon-label" key="Favorite">
+            Favorite
           </span>
         </i>
       </a>

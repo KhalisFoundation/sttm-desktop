@@ -38,3 +38,18 @@
     }
   }
 }
+
+.fav-btn {
+	background: $red;
+	height: 30px;
+	margin: 0 10px;
+	padding: 0px 10px 0 0;
+
+	i {
+		padding-right: 4px;
+	}
+
+	&.unfav-btn {
+		background-color: $dark-grey;
+	}
+}
