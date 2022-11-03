@@ -145,21 +145,25 @@ function ShabadDeck() {
     }
     if (ceremonyId && isCeremonyBani) {
       loadCeremony(ceremonyId).then(ceremonyVerses => {
-        const activeCeremonyVerse = ceremonyVerses.filter(ceremonyVerse => {
-          if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
-            return true;
+        try {
+          ceremonyVerses = ceremonyVerses.flat(1);
+        } finally {
+          const activeCeremonyVerse = ceremonyVerses.filter((ceremonyVerse) => {
+            if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
+              return true;
+            }
+            return false;
+          });
+          // filters next line of ceremony verse
+          const nextCeremonyVerse = ceremonyVerses.filter((ceremonyVerse) => {
+            return ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1;
+          });
+          setNextVerse(...nextCeremonyVerse);
+          if (akhandpatt) {
+            setActiveVerse([...ceremonyVerses]);
+          } else {
+            setActiveVerse([...activeCeremonyVerse]);
           }
-          return false;
-        });
-        // filters next line of ceremony verse
-        const nextCeremonyVerse = ceremonyVerses.filter(ceremonyVerse => {
-          return ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1;
-        });
-        setNextVerse(...nextCeremonyVerse);
-        if (akhandpatt) {
-          setActiveVerse([...ceremonyVerses]);
-        } else {
-          setActiveVerse([...activeCeremonyVerse]);
         }
       });
     }
