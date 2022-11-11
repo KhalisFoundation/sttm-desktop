@@ -51,14 +51,15 @@
   font-weight: 600;
   margin: 10px 0;
   order: 2;
-	&.custom-english {
-		display: flex;
-		flex-direction: column;
-		flex-wrap: wrap;
-		height: 100%;
-		overflow-y: auto;
-		justify-content: space-evenly;
-	}
+
+  &.custom-english {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100%;
+    overflow-y: auto;
+    justify-content: space-evenly;
+  }
 }
 
 .slide-teeka {
