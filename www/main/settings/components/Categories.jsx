@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { remote } from 'electron';
 import Setting from './Setting';
 import { convertToCamelCase } from '../../common/utils';
 
+const remote = require('@electron/remote');
 const { store, i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {

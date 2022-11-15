@@ -66,23 +66,23 @@ const GlobalState = createStore({
     setSlideOrder: action((state, payload) => {
       const oldValue = state.slideOrder;
       if (global.webview) {
-        global.webview.send('update-viewer-setting', {
+        global.webview.send('update-viewer-setting', JSON.stringify({
           stateName: 'slideOrder',
           payload,
           oldValue,
           actionName: 'setSlideOrder',
           settingType: 'viewerSettings',
-        });
+        }));
       }
 
       if (global.platform) {
-        global.platform.ipc.send('update-viewer-setting', {
+        global.platform.ipc.send('update-viewer-setting', JSON.stringify({
           stateName: 'slideOrder',
           payload,
           oldValue,
           actionName: 'setSlideOrder',
           settingType: 'viewerSettings',
-        });
+        }));
       }
       state.slideOrder = payload;
       return state;
@@ -97,13 +97,13 @@ const GlobalState = createStore({
 });
 
 global.platform.ipc.on('update-global-setting', (event, setting) => {
-  const { settingType, actionName, payload } = setting;
+  const { settingType, actionName, payload } = JSON.parse(setting);
   GlobalState.getActions()[settingType][actionName](payload);
 });
 
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
-  global.platform.ipc.send('save-overlay-settings', overlayState);
+  global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
 });
 
 export default GlobalState;

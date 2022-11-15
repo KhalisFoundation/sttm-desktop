@@ -1,7 +1,7 @@
 const marked = require('marked');
 const fs = require('fs');
 const path = require('path');
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
@@ -15,7 +15,7 @@ function markdownToHTML(file) {
   const fileMD = fs.readFileSync(path.resolve(__dirname, markdownFiles[file]), 'utf8');
   const $file = document.getElementById(file);
   if ($file) {
-    $file.innerHTML = marked(fileMD);
+    $file.innerHTML = marked.parse(fileMD);
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { remote, shell } from 'electron';
+import { shell } from 'electron';
 
+const remote = require('@electron/remote');
 import { ZOOM_LINK } from '../../../common/constants';
 
 const { store, i18n } = remote.require('./app');

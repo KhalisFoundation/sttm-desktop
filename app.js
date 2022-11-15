@@ -4,8 +4,8 @@ const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const uuid = require('uuid/v4');
-const op = require('openport');
+const { v4: uuidv4 } = require('uuid');
+const op = require('portfinder');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
@@ -14,6 +14,8 @@ const fetch = require('node-fetch');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
+const remote = require('@electron/remote/main');
+remote.initialize();
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -56,7 +58,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, BrowserWindow, dialog, ipcMain } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -68,7 +70,7 @@ const appVersion = app.getVersion();
 const overlayCast = true;
 
 // Reset to default theme if theme not found
-const currentTheme = themes.find(theme => theme.key === store.getUserPref('app.theme'));
+const currentTheme = themes.find((theme) => theme.key === store.getUserPref('app.theme'));
 if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
 }
@@ -77,6 +79,7 @@ let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
+
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
@@ -114,7 +117,7 @@ const viewerWindowPos = {};
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
-  const openWindow = BrowserWindow.getAllWindows().filter(item => item.getURL() === window.url);
+  const openWindow = BrowserWindow.getAllWindows().filter((item) => item.getURL() === window.url);
   if (openWindow.length > 0) {
     openWindow[0].show();
   } else {
@@ -124,9 +127,14 @@ function openSecondaryWindow(windowName) {
       show: false,
       webPreferences: {
         nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
         webviewTag: true,
+        nodeIntegrationInSubFrames: true,
+        nodeIntegrationInWorker: true,
       },
     });
+    remote.enable(window.obj.webContents);
     window.obj.setMenu(null);
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
@@ -191,7 +199,7 @@ autoUpdater.on('update-downloaded', () => {
         detail: i18n.t('UPDATE_DOWNLOADED'),
         cancelId: 0,
       },
-      response => {
+      (response) => {
         if (response === 1) {
           autoUpdater.quitAndInstall();
         }
@@ -229,7 +237,7 @@ function checkForExternalDisplay() {
   const electronScreen = electron.screen;
   const displays = electronScreen.getAllDisplays();
   let externalDisplay = null;
-  Object.keys(displays).forEach(i => {
+  Object.keys(displays).forEach((i) => {
     if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
       externalDisplay = displays[i];
     }
@@ -269,20 +277,25 @@ function createViewer(ipcData) {
       backgroundColor: '#000000',
       webPreferences: {
         nodeIntegration: true,
-        webviewTag: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+    remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
         '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('external-display', {
-        width,
-        height,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width,
+          height,
+        }),
+      );
       mainWindow.focus();
       if (showChangelog() && secondaryWindows.changelogWindow.obj) {
         secondaryWindows.changelogWindow.obj.focus();
@@ -307,10 +320,13 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send('external-display', {
-        width,
-        height,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width,
+          height,
+        }),
+      );
     });
   }
   mainWindow.webContents.send('presenter-view');
@@ -370,7 +386,7 @@ const showLine = async (line, socket = io) => {
   }
 };
 
-const updateOverlayVars = overlayPrefs => {
+const updateOverlayVars = (overlayPrefs) => {
   if (overlayPrefs) {
     io.emit('update-prefs', overlayPrefs);
   } else {
@@ -396,7 +412,7 @@ const emptyOverlay = () => {
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
-  op.find(
+  op.getPort(
     {
       // Re: http://www.sikhiwiki.org/index.php/Gurgadi
       ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
@@ -451,7 +467,7 @@ app.on('ready', () => {
 
   store.setUserPref('toolbar.language-settings', null);
   if (!userId) {
-    userId = uuid();
+    userId = uuidv4();
     store.set('userId', userId);
   }
   const analytics = new Analytics(userId, store);
@@ -464,21 +480,29 @@ app.on('ready', () => {
     minHeight: 600,
     width,
     height,
-    frame: false,
+    frame: process.platform === 'linux', //show frame only on linux
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
       webviewTag: true,
+      nodeIntegrationInSubFrames: true,
+      nodeIntegrationInWorker: true,
     },
   });
+  remote.enable(mainWindow.webContents);
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
-      mainWindow.webContents.send('external-display', {
-        width: viewerWindowPos.w,
-        height: viewerWindowPos.h,
-      });
+      mainWindow.webContents.send(
+        'external-display',
+        JSON.stringify({
+          width: viewerWindowPos.w,
+          height: viewerWindowPos.h,
+        }),
+      );
     }
     mainWindow.show();
     // Platform-specific app stores have their own update mechanism
@@ -534,6 +558,15 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.on('enable-wc-webview', (event, data) => {
+  const webView_wc = webContents.fromId(parseInt(data, 10));
+  remote.enable(webView_wc);
+  webView_wc.send('wc-webview-enabled');
+  if (checkForExternalDisplay()) {
+    viewerWindow.send('wc-webview-enabled');
+  }
+});
+
 ipcMain.on('cast-session-active', () => {
   mainWindow.webContents.send('cast-session-active');
 });
@@ -542,7 +575,7 @@ ipcMain.on('cast-session-stopped', () => {
   mainWindow.webContents.send('cast-session-stopped');
 });
 
-ipcMain.on('cast-to-receiver', event => {
+ipcMain.on('cast-to-receiver', (event) => {
   event.reply('cast-verse', 'update verse');
 });
 
@@ -558,10 +591,10 @@ ipcMain.on('clear-apv', () => {
 let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
-  updateOverlayVars(overlayPrefs);
+  updateOverlayVars(JSON.parse(overlayPrefs));
 });
 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   updateOverlayVars();
   if (lastLine) {
     showLine(lastLine, socket);
@@ -569,18 +602,18 @@ io.on('connection', socket => {
 });
 
 ipcMain.on('show-line', (event, arg) => {
-  lastLine = arg;
-  showLine(arg);
+  lastLine = JSON.parse(arg);
+  showLine(JSON.parse(arg));
   if (viewerWindow) {
-    viewerWindow.webContents.send('show-line', arg);
+    viewerWindow.webContents.send('show-line', JSON.parse(arg));
   } else {
     createViewer({
       send: 'show-line',
-      data: arg,
+      data: JSON.parse(arg),
     });
   }
-  if (arg.live) {
-    createBroadcastFiles(arg);
+  if (JSON.parse(arg).live) {
+    createBroadcastFiles(JSON.parse(arg));
   }
 });
 
@@ -593,11 +626,12 @@ ipcMain.on('show-empty-slide', () => {
 });
 
 ipcMain.on('show-text', (event, arg) => {
+  const { isGurmukhi, text, unicode } = JSON.parse(arg);
   const textLine = {
     Line: {
-      Gurmukhi: arg.isGurmukhi ? arg.text : '',
-      English: !arg.isGurmukhi ? arg.text : '',
-      Unicode: arg.unicode,
+      Gurmukhi: isGurmukhi ? text : '',
+      English: !isGurmukhi ? text : '',
+      Unicode: unicode,
       Punjabi: '',
       Transliteration: {
         devanagari: '',

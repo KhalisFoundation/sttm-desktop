@@ -102,6 +102,19 @@
   .viewer-pane {
     .pane-content {
       background: none !important;
+      border: 1px solid $border;
+    }
+  }
+
+  .control-item {
+    .custom-checkbox {
+      input[type='checkbox']:checked+label::before {
+        filter: invert(0.7);
+      }
+    }
+
+    input[type='range']::before {
+      color: $white;
     }
   }
   .control-item:hover {
@@ -238,9 +251,38 @@
     border-color: $accent;
   }
 
+  .gurmukhi-keyboard {
+    border: 1px solid $bg-main;
+
+    button {
+      background-color: $bg-main;
+      color: $text-base;
+
+      svg {
+        filter: invert(0.6);
+      }
+
+      &.matra-button {
+        background-color: rgba(0, 96, 148, 0.4);
+      }
+    }
+
+    .keyboard-row-set {
+      background-color: $dark-silver;
+    }
+
+    .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
+    .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
+      background-color: $not-so-black;
+    }
+  }
+
   .search-content {
+    border-top: 1px solid $border;
+
     input.input-box {
       color: $text-bright;
+      background-color: $bg-main;
 
       &::placeholder {
         color: $darker-grey;

@@ -8,7 +8,7 @@ const shortcutsApplied = {
 
 const shortcutFactory = (keys, actionName) => {
   Mousetrap.bind(keys, event => {
-    global.platform.ipc.send('shortcuts', { actionName, event });
+    global.platform.ipc.send('shortcuts', JSON.stringify({ actionName, event }));
     event.preventDefault();
   });
 };

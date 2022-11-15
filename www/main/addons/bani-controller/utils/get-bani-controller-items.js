@@ -1,5 +1,6 @@
 import React from 'react';
-import { remote } from 'electron';
+const remote = require('@electron/remote');
+
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 const { i18n } = remote.require('./app');

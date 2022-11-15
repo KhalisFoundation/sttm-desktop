@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const { remote } = require('electron');
-
+const remote = require('@electron/remote');
 const copy = require('copy-to-clipboard');
 
 const { i18n } = remote.require('./app');

@@ -5,9 +5,16 @@ const Realm = require('realm');
 
 const CONSTS = require('./constants');
 
-const { remote } = electron;
-const userDataPath = remote.app.getPath('userData');
-const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
+let userDataPath;
+
+if (electron.app) {
+  userDataPath = electron.app.getPath('userData');
+} else {
+  const app = require('@electron/remote').app;
+  userDataPath = app.getPath('userData');
+}
+
+const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen-v2.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 
 // TODO: Investigate possible memory issues from multiple Realm.open calls
@@ -160,14 +167,19 @@ const query = (searchQuery, searchType, searchSource) =>
       default:
         break;
     }
-    order.push('Shabads');
-    condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
+    const orderArray = Array.from(order, el => [el, false]);
     Realm.open(realmConfig)
       .then(realm => {
-        const rows = realm.objects('Verse').filtered(condition);
+        const rows = realm
+          .objects('Verse')
+          .filtered(condition)
+          .sorted(orderArray);
         resolve(rows.slice(0, howManyRows));
       })
-      .catch(reject);
+      .catch(e => {
+        console.log(e);
+        reject();
+      });
   });
 
 /**

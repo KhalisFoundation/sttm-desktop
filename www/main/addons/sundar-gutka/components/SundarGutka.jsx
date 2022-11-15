@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';

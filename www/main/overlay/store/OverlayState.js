@@ -12,11 +12,14 @@ const createOverlayActions = () => {
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
 
-      global.platform.ipc.send('update-global-setting', {
-        actionName: stateActionName,
-        payload,
-        settingType: 'baniOverlay',
-      });
+      global.platform.ipc.send(
+        'update-global-setting',
+        JSON.stringify({
+          actionName: stateActionName,
+          payload,
+          settingType: 'baniOverlay',
+        }),
+      );
 
       return state;
     });

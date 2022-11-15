@@ -1,10 +1,12 @@
 /* global Mousetrap */
+import { ipcRenderer } from 'electron';
 import { updateViewerScale } from './viewer/utils';
 
 const electron = require('electron');
 const anvaad = require('anvaad-js');
 
-const { remote } = electron;
+const remote = require('@electron/remote');
+
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
@@ -13,23 +15,14 @@ const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
 
-global.webview = document.querySelector('webview');
+setTimeout(() => {
+  global.webview = document.querySelector('webview');
 
-global.webview.addEventListener('dom-ready', () => {
-  global.webview.send('is-webview');
-});
-
-global.webview.addEventListener('ipc-message', event => {
-  switch (event.channel) {
-    case 'scroll-pos': {
-      const pos = event.args[0];
-      global.platform.ipc.send('scroll-from-main', pos);
-      break;
-    }
-    default:
-      break;
-  }
-});
+  global.webview.addEventListener('dom-ready', () => {
+    ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
+    global.webview.send('is-webview');
+  });
+}, 300);
 
 const updateMenu = [];
 
@@ -370,7 +363,6 @@ function checkPresenterView() {
   classList.toggle('scale-viewer', inPresenterView);
 
   global.platform.ipc.send('presenter-view', inPresenterView);
-  global.webview.send('presenter-view', inPresenterView);
 }
 
 global.platform.ipc.on('presenter-view', () => {
@@ -379,9 +371,10 @@ global.platform.ipc.on('presenter-view', () => {
 });
 
 global.platform.ipc.on('external-display', (e, args) => {
+  const { width, height } = JSON.parse(args);
   global.externalDisplay = {
-    width: args.width,
-    height: args.height,
+    width,
+    height,
   };
   checkPresenterView();
   updateViewerScale();
@@ -417,10 +410,11 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[5].visible = true;
 });
 global.platform.ipc.on('send-scroll', (event, arg) => {
-  global.webview.send('send-scroll', arg);
+  global.webview.send('send-scroll', JSON.stringify(arg));
 });
 global.platform.ipc.on('next-ang', (event, arg) => {
-  global.core.search.loadAng(arg.PageNo, arg.SourceID);
+  const { PageNo, SourceID } = JSON.parse(arg);
+  global.core.search.loadAng(PageNo, SourceID);
 });
 
 global.platform.ipc.on('cast-session-active', () => {
@@ -447,90 +441,18 @@ global.platform.ipc.on('cast-session-stopped', () => {
 });
 
 global.platform.ipc.on('set-user-setting', (event, settingChanger) => {
-  if (settingChanger.func === 'size') {
-    changeFontSize(settingChanger.iconType, settingChanger.operation === 'plus');
-  } else if (settingChanger.func === 'visibility') {
-    changeVisibility(settingChanger.iconType);
+  const { func, iconType, operation } = JSON.parse(settingChanger);
+  if (func === 'size') {
+    changeFontSize(iconType, operation === 'plus');
+  } else if (func === 'visibility') {
+    changeVisibility(iconType);
   }
 });
 
 module.exports = {
-  clearAPV() {
-    global.webview.send('clear-apv');
-    global.platform.ipc.send('clear-apv');
-  },
-
-  remapLine(rawLine) {
-    const Line = { ...rawLine.toJSON() };
-    if (Line.Translations) {
-      const lineTranslations = JSON.parse(Line.Translations);
-      Line.English = lineTranslations.en.bdb;
-      Line.Punjabi = lineTranslations.pu.bdb || lineTranslations.pu.ss;
-      Line.Spanish = lineTranslations.es.sn;
-      Line.Hindi = (lineTranslations.hi && lineTranslations.hi.ss) || '';
-    }
-    Line.Transliteration = {
-      English: anvaad.translit(Line.Gurmukhi || ''),
-      Shahmukhi: anvaad.translit(Line.Gurmukhi || '', 'shahmukhi'),
-      Devanagari: anvaad.translit(Line.Gurmukhi || '', 'devnagri'),
-    };
-    Line.Unicode = anvaad.unicode(Line.Gurmukhi || '');
-    return Line;
-  },
-
-  sendLine(shabadID, lineID, rawLine, rawRows, mode, start, fromScroll) {
-    const Line = this.remapLine(rawLine);
-    const rows = rawRows.map(row => this.remapLine(row));
-    global.webview.send('show-line', { shabadID, lineID, rows, mode });
-    const showLinePayload = {
-      shabadID,
-      lineID,
-      Line,
-      live: false,
-      larivaar: store.get('userPrefs.slide-layout.display-options.larivaar'),
-      rows,
-      mode,
-      fromScroll,
-    };
-    if (store.getUserPref('app.live-feed-location')) {
-      showLinePayload.live = true;
-    }
-    global.platform.ipc.send('show-line', showLinePayload);
-  },
-
-  sendText(text, isGurmukhi, isAnnouncement = false) {
-    global.webview.send('show-empty-slide');
-    global.webview.send('show-text', {
-      unicode: isGurmukhi ? anvaad.unicode(text) : '',
-      text,
-      isGurmukhi,
-      isAnnouncement,
-    });
-    global.platform.ipc.send('show-empty-slide');
-    global.platform.ipc.send('show-text', {
-      unicode: isGurmukhi ? anvaad.unicode(text) : '',
-      text,
-      isGurmukhi,
-      isAnnouncement,
-    });
-  },
-  sendScroll(pos) {
-    global.platform.ipc.send('send-scroll', { pos });
-  },
-
   'presenter-view': function presenterView() {
     checkPresenterView();
     updateViewerScale();
-  },
-
-  'colored-words': function coloredWords() {
-    const coloredWordsVal = store.getUserPref('slide-layout.display-options.colored-words');
-    store.setUserPref('slide-layout.display-options.gradient-bg', !coloredWordsVal);
-  },
-
-  'gradient-bg': function gradientBg() {
-    const gradientBgVal = store.getUserPref('slide-layout.display-options.gradient-bg');
-    store.setUserPref('slide-layout.display-options.colored-words', !gradientBgVal);
   },
 
   'live-feed': function livefeed(val) {

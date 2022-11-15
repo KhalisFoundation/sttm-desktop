@@ -10,9 +10,10 @@ const electron = require('electron');
 const settings = require('./settings');
 const tingle = require('../assets/js/vendor/tingle');
 // const search = require('./search');
+const remote = require('@electron/remote');
 
-const { i18n } = electron.remote.require('./app');
-const analytics = electron.remote.getGlobal('analytics');
+const { i18n } = remote.require('./app');
+const analytics = remote.getGlobal('analytics');
 
 const modal = new tingle.Modal({
   footer: true,

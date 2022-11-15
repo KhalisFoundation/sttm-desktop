@@ -96,13 +96,6 @@ const castText = (text, isGurmukhi) => {
   }
 };
 
-// IPC
-global.platform.ipc.on('search-cast', (event, pos) => {
-  requestSession();
-  appendMessage(event);
-  appendMessage(pos);
-});
-
 global.platform.ipc.on('stop-cast', () => {
   stopApp();
 });
@@ -130,18 +123,21 @@ global.platform.ipc.on('clear-apv', () => {
 
 global.platform.ipc.on('show-line', (event, data) => {
   apv = document.body.classList.contains('akhandpaatt');
-  showLine(data.shabadID, data.lineID, data.rows, data.mode);
+  const { shabadId, lineID, rows, mode } = JSON.parse(data);
+  showLine(shabadId, lineID, rows, mode);
 });
 
 global.platform.ipc.on('show-text', (event, data) => {
   document.querySelector('.viewer-controls').innerHTML = '';
-  showText(data.text, data.isGurmukhi);
+  const { text, isGurmukhi } = JSON.parse(data);
+  showText(text, isGurmukhi);
 });
 
 global.platform.ipc.on('send-scroll', (event, pos) => {
   $scroll.scrollTo(
     0,
-    (document.documentElement.scrollHeight - document.documentElement.offsetHeight) * pos,
+    (document.documentElement.scrollHeight - document.documentElement.offsetHeight) *
+      JSON.parse(pos),
   );
 });
 
@@ -152,7 +148,7 @@ global.platform.ipc.on('update-settings', () => {
 });
 
 global.platform.ipc.on('save-settings', (event, setting) => {
-  const { key, payload, oldValue } = setting;
+  const { key, payload, oldValue } = JSON.parse(setting);
   // checking typeof savedSettings[key] so that classs should not apply while custom background
   if (typeof savedSettings[key] !== 'object') {
     document.body.classList.remove(`${key}-${oldValue}`);
@@ -174,7 +170,7 @@ const nextAng = () => {
   const next = apvCur.PageNo + 1;
   $apvObserver.unobserve($apvObserving);
   // showAng(next, apvCur.SourceID);
-  global.platform.ipc.send('next-ang', { PageNo: next, SourceID: apvCur.SourceID });
+  global.platform.ipc.send('next-ang', JSON.stringify({ PageNo: next, SourceID: apvCur.SourceID }));
 };
 
 const createAPVContainer = () => {
@@ -210,7 +206,7 @@ const iconsetHtml = (classname, content) => {
         {
           onclick: () => {
             const settingChanger = { iconType, func: 'visibility' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
+            global.platform.ipc.send('set-user-setting', JSON.stringify(settingChanger));
           },
         },
         h('i.fa.fa-eye-slash'),
@@ -220,7 +216,7 @@ const iconsetHtml = (classname, content) => {
         {
           onclick: () => {
             const settingChanger = { iconType, func: 'size', operation: 'minus' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
+            global.platform.ipc.send('set-user-setting', JSON.stringify(settingChanger));
           },
         },
         h('i.fa.fa-minus-circle'),
@@ -230,7 +226,7 @@ const iconsetHtml = (classname, content) => {
         {
           onclick: () => {
             const settingChanger = { iconType, func: 'size', operation: 'plus' };
-            global.platform.ipc.send('set-user-setting', settingChanger);
+            global.platform.ipc.send('set-user-setting', JSON.stringify(settingChanger));
           },
         },
         h('i.fa.fa-plus-circle'),
