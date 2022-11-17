@@ -23,7 +23,19 @@ export const FavoritePane = ({ className }) => {
     setHomeVerse,
     setActiveVerseId,
     setSingleDisplayActiveTab,
+    setFavShabad,
   } = useStoreActions((state) => state.navigator);
+
+  const deleteFromFav = (inputElement) => {
+    const favShabadIndex = favShabad.findIndex(
+      (element) => element.shabadId === inputElement.shabadId,
+    );
+
+    if (favShabadIndex >= 0) {
+      favShabad.splice(favShabadIndex, 1);
+      setFavShabad([...favShabad]);
+    }
+  };
 
   const openShabadFromFav = (element) => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -61,16 +73,40 @@ export const FavoritePane = ({ className }) => {
   return (
     <div className={'history-results ' + className}>
       {favShabad.map((element, index) => {
+        const dateString = element.timestamp.toLocaleDateString('en-us', {
+          day: 'numeric',
+          year: 'numeric',
+          month: 'short',
+        });
+        const timeString = element.timestamp.toLocaleTimeString('en-us', {
+          hour: 'numeric',
+          minute: 'numeric',
+        });
         return (
-          <p
-            className="history-item gurmukhi"
-            key={`favshabad-${index}`}
-            onClick={() => {
-              openShabadFromFav(element);
-            }}
-          >
-            {element.text}
-          </p>
+          <div className="fav-shabad-container">
+            <div className="fav-shabad-text">
+              <p
+                className="fav-item gurmukhi"
+                key={`favshabad-${index}`}
+                onClick={() => {
+                  openShabadFromFav(element);
+                }}
+              >
+                {element.text}
+              </p>
+            </div>
+            <div className="fav-shabad-options">
+              <p className="date">{dateString}</p>
+              <p className="time">{timeString}</p>
+              <button
+                onClick={() => {
+                  deleteFromFav(element);
+                }}
+              >
+                <i class="fa-solid fa-x"></i>
+              </button>
+            </div>
+          </div>
         );
       })}
     </div>

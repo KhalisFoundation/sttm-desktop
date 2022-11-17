@@ -432,9 +432,10 @@
   },
   "SHABAD_PANE": {
     "SHOW_DISPLAY": "Show Display",
-    "HIDE_SCREEN": "Hide Screen",
-		"MARK_FAV": "Mark as favorite",
-		"UNMARK_FAV": "Remove from favorite",
+    "HIDE_SCREEN": "Hide Display",
+		"MARK_FAV": "Add to favorites",
+		"UNMARK_FAV": "Remove from favorites",
+		"FAV_BTN_TOOLTIP":"Add or remove the current displayed Shabad to your list of favorites. Your favorites are available under the tabs in the bottom right hand panel.",
     "HIDE_BUTTON_TOOLTIP": "Hides the secondary screen when not needed. This will show the default desktop background on your secondary screen. Once hidden, you can unhide the STTM screen again by clicking the \"Show Display\" button which will appear here."
   }
 }

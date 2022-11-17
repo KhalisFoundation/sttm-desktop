@@ -50,12 +50,15 @@ const ShabadHeader = () => {
         <button
           className={favShabadIndex < 0 ? 'button fav-btn' : 'button fav-btn unfav-btn'}
           ref={favBtnRef}
+					title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
           onClick={() => {
             if (favShabadIndex < 0) {
+							const timestamp = new Date();
               const shabadObj = {
                 text: searchVerse,
                 shabadId: activeShabadId,
                 verseId: activeVerseId,
+								timestamp
               };
               setFavShabad([shabadObj, ...favShabad]);
             } else {
@@ -64,7 +67,7 @@ const ShabadHeader = () => {
             }
           }}
         >
-          <i className="fa fa-heart"></i>
+          <i className={favShabadIndex < 0 ? "fa-solid fa-star" : "fa-regular fa-star"}></i>
           {favShabadIndex < 0 ? i18n.t('SHABAD_PANE.MARK_FAV') : i18n.t('SHABAD_PANE.UNMARK_FAV')}
         </button>
       )}
@@ -73,6 +76,7 @@ const ShabadHeader = () => {
         onClick={() => setShowViewer(!showViewer)}
         title={showViewer ? i18n.t('SHABAD_PANE.HIDE_BUTTON_TOOLTIP') : ''}
       >
+				<i class="fa fa-display"></i>
         {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
       </button>
       <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>

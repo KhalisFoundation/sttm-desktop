@@ -28,6 +28,10 @@
       margin: unset;
       background: $dark-grey;
 
+			i {
+				padding-right: 8px;
+			}
+
       &.btn-danger {
         background: $bright-red;
       }
@@ -46,7 +50,7 @@
 	padding: 0px 10px 0 0;
 
 	i {
-		padding-right: 4px;
+		padding-right: 8px;
 	}
 
 	&.unfav-btn {
