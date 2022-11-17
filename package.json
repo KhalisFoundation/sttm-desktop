@@ -10,7 +10,6 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
-    "test:lint:css": "stylelint \"www/src/scss/*.scss\" --syntax scss --fix",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
