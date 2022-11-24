@@ -3,7 +3,6 @@ import convertObjToCamelCase from '../../utils/convert-object-to-camel-case';
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
-const { app } = require('@electron/remote');
 
 const { settings } = require('../../../../configs/user-settings.json');
 
@@ -12,6 +11,9 @@ let userDataPath;
 if (electron.app) {
   userDataPath = electron.app.getPath('userData');
 } else {
+  /* eslint-disable global-require */
+  const { app } = require('@electron/remote');
+  /* eslint-enable */
   userDataPath = app.getPath('userData');
 }
 
