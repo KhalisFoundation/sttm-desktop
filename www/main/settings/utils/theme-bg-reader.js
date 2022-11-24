@@ -8,8 +8,10 @@ const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const userBackgroundsURL = new URL(`file:///${userBackgroundsPath}`).href;
 
-const errorAlert = error => {
+const errorAlert = (error) => {
+  /* eslint-disable no-alert */
   alert(error);
+  /* eslint-enable */
 };
 
 export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
@@ -25,7 +27,7 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
     } else {
       responseCallback(
         files
-          .map(file => ({
+          .map((file) => ({
             name: file,
             path: `${userBackgroundsPath}/${file}`,
             'background-image': `${userBackgroundsURL}/${file.replace(/(\s)/g, '\\ ')}`,

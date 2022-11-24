@@ -6,7 +6,7 @@ global.platform = require('../../desktop_scripts');
 
 const createOverlayActions = () => {
   const overlayActions = {};
-  Object.keys(GlobalState.getState().baniOverlay).forEach(stateVarName => {
+  Object.keys(GlobalState.getState().baniOverlay).forEach((stateVarName) => {
     const stateActionName = `set${convertToCamelCase(stateVarName, true)}`;
     overlayActions[stateActionName] = action((state, payload) => {
       // eslint-disable-next-line no-param-reassign

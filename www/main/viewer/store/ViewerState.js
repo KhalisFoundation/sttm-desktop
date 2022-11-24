@@ -4,9 +4,9 @@ import GlobalState from '../../common/store/GlobalState';
 global.platform = require('../../desktop_scripts');
 
 /* TODO: remove the settingsType argument */
-const createSettingsActions = settingsType => {
+const createSettingsActions = (settingsType) => {
   const userSettingsActions = {};
-  Object.keys(GlobalState.getState()[settingsType]).forEach(stateVarName => {
+  Object.keys(GlobalState.getState()[settingsType]).forEach((stateVarName) => {
     // convert state name ex- larivaar to action name ex- setLarivaar
     const stateActionName = `set${stateVarName.charAt(0).toUpperCase()}${stateVarName.slice(1)}`;
     userSettingsActions[stateActionName] = action((state, payload) => {
@@ -31,12 +31,10 @@ const ViewerState = createStore({
   viewerSettings: {
     quickToolsOpen: false,
     slideOrder: ['translation', 'teeka', 'transliteration'],
-    setSlideOrder: action((state, slideOrder) => {
-      return {
-        ...state,
-        slideOrder,
-      };
-    }),
+    setSlideOrder: action((state, slideOrder) => ({
+      ...state,
+      slideOrder,
+    })),
     setQuickToolsOpen: action((state, payload) => {
       const newState = state;
       newState.quickToolsOpen = payload;

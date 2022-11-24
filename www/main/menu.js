@@ -1,16 +1,14 @@
-import { savedSettings } from './common/store/user-settings/get-saved-user-settings';
-import { applyUserSettings } from './common/store/user-settings/apply-user-settings';
-
 const request = require('request');
 const moment = require('moment');
 const electron = require('electron');
 
 // const isOnline = require('is-online');
 
+const remote = require('@electron/remote');
 const settings = require('./settings');
 const tingle = require('../assets/js/vendor/tingle');
-// const search = require('./search');
-const remote = require('@electron/remote');
+const { savedSettings } = require('./common/store/user-settings/get-saved-user-settings');
+const { applyUserSettings } = require('./common/store/user-settings/apply-user-settings');
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -32,7 +30,7 @@ modal.addFooterBtn(closeBtn, 'tingle-btn tingle-btn--pull-right tingle-btn--defa
 // format the date default to "Month Day, Year"
 const formatDate = (dateString, format = 'LL') => moment(dateString).format(format);
 
-const stripScripts = string => {
+const stripScripts = (string) => {
   const div = document.createElement('div');
   div.innerHTML = string;
   const scripts = div.getElementsByTagName('script');
@@ -46,17 +44,17 @@ const stripScripts = string => {
 
 const scriptTagCheckRegEx = /<[^>]*script/i;
 
-const parseContent = contentString => {
+const parseContent = (contentString) => {
   if (scriptTagCheckRegEx.test(contentString)) {
     return stripScripts(contentString); // this might be overkill.
   }
   return contentString;
 };
 
-const createNotificationContent = msgList => {
+const createNotificationContent = (msgList) => {
   let html = `<h1 class="model-title">${i18n.t('OTHERS.WHATS_NEW')}</h1> <div class="messages">`;
 
-  msgList.forEach(item => {
+  msgList.forEach((item) => {
     html += '<div class="row">';
     html += `<div class="date">${formatDate(item.Created)}</div>`;
     html += `<div class="title">${item.Title}</div>`;
@@ -68,7 +66,7 @@ const createNotificationContent = msgList => {
   return html;
 };
 
-const showNotificationsModal = message => {
+const showNotificationsModal = (message) => {
   if (message && message.rows && message.rows.length > 0) {
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
     global.core.platformMethod('updateNotificationsTimestamp', time);
@@ -99,7 +97,7 @@ const getNotifications = (timeStamp, callback) => {
 };
 
 // On href clicks, open the link in actual browser
-document.body.addEventListener('click', e => {
+document.body.addEventListener('click', (e) => {
   const { target } = e;
   const link = target.href;
   if (target.href) {
@@ -113,7 +111,7 @@ module.exports = {
 
   init() {
     const $preferencesOpen = document.querySelectorAll('.preferences-open');
-    $preferencesOpen.forEach($menuToggle => {
+    $preferencesOpen.forEach(($menuToggle) => {
       $menuToggle.addEventListener('click', module.exports.showSettingsTab);
     });
 

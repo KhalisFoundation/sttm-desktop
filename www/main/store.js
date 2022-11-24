@@ -4,12 +4,15 @@ const ldDefaultsDeep = require('lodash.defaultsdeep');
 const ldGet = require('lodash.get');
 const ldSet = require('lodash.set');
 const path = require('path');
+
+/* eslint-disable global-require */
 let remote;
 if (electron.app) {
   remote = require('@electron/remote/main');
 } else {
   remote = require('@electron/remote');
 }
+/* eslint-enable */
 
 function parseDataFile(filePath, defaults) {
   // We'll try/catch it in case the file doesn't exist yet,
@@ -34,7 +37,7 @@ class Store {
     } else {
       userDataPath = remote.app.getPath('userData');
     }
-    
+
     // We'll use the `configName` property to set the file name and path.join
     // to bring it all together as a string
     this.path = path.join(userDataPath, `${opts.configName}.json`);

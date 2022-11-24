@@ -1,4 +1,5 @@
 const remote = require('@electron/remote');
+
 const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 

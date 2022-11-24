@@ -115,7 +115,6 @@ function ShabadDeck() {
         loadBaniVerse(
           sundarGutkaBaniId,
           activeVerseId,
-          false,
           baniLengthCols[baniLength],
           // mangalPosition,
         ).then(rows => {
@@ -130,8 +129,8 @@ function ShabadDeck() {
           loadBaniVerse(
             sundarGutkaBaniId,
             activeVerseId,
-            displayNextLine,
             baniLengthCols[baniLength],
+            displayNextLine,
             // mangalPosition,
           ).then(rows => {
             if (rows.length === 1) {

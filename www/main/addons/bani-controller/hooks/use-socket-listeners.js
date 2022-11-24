@@ -1,6 +1,7 @@
-const remote = require('@electron/remote');
 import { handleRequestControl } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 
@@ -35,11 +36,11 @@ const useSocketListeners = (
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
     const listenerActions = {
-      shabad: payload => {
+      shabad: (payload) => {
         changeActiveShabad(payload.shabadId, payload.verseId);
         analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
       },
-      text: payload => {
+      text: (payload) => {
         if (!isMiscSlide) {
           setIsMiscSlide(true);
         }
@@ -50,7 +51,7 @@ const useSocketListeners = (
           setIsMiscSlideGurmukhi(payload.isGurmukhi);
         }
       },
-      bani: payload => {
+      bani: (payload) => {
         if (isCeremonyBani) {
           setIsCeremonyBani(false);
         }
@@ -69,7 +70,7 @@ const useSocketListeners = (
           }
         }
       },
-      ceremony: payload => {
+      ceremony: (payload) => {
         if (!isCeremonyBani) {
           setIsCeremonyBani(true);
         }
@@ -95,7 +96,7 @@ const useSocketListeners = (
           baniLength,
           // mangalPosition,
         ),
-      settings: payload => {
+      settings: (payload) => {
         const { settings } = payload;
         if (settings.action === 'changeFontSize') {
           changeFontSize(settings.target, settings.value === 'plus');

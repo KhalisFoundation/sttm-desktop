@@ -10,7 +10,7 @@ const files = {
   win32: 'sttm-win-ia32',
 };
 
-module.exports = platform => {
+module.exports = (platform) => {
   const file = files[platform];
   const conn = new Client();
   conn
@@ -25,13 +25,14 @@ module.exports = platform => {
               console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
               conn.end();
             })
-            .on('data', data => {
+            .on('data', (data) => {
               console.log(`STDOUT: ${data}`);
             })
-            .stderr.on('data', data => {
+            .stderr.on('data', (data) => {
               console.log(`STDERR: ${data}`);
             });
-        });
+        },
+      );
     })
     .connect({
       host: 'khalis.net',

@@ -3,18 +3,16 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
 
   // filteres searchedData with selected currentWriter
   if (currentWriter !== 'all' && currentWriter !== 'others') {
-    filteredResult = allSearchedVerses.filter(verse => {
-      return verse.writer.includes(currentWriter);
-    });
+    filteredResult = allSearchedVerses.filter((verse) => verse.writer.includes(currentWriter));
   } else if (currentWriter !== 'all' && currentWriter === 'others') {
-    filteredResult = allSearchedVerses.filter(verse => {
-      return writerArray.every(writer => !verse.writer.includes(writer.value));
-    });
+    filteredResult = allSearchedVerses.filter((verse) =>
+      writerArray.every((writer) => !verse.writer.includes(writer.value)),
+    );
   }
 
   // filters searchedData with selected currentRaag
   if (currentRaag !== 'all' && currentRaag !== 'others') {
-    filteredResult = filteredResult.filter(verse => {
+    filteredResult = filteredResult.filter((verse) => {
       if (!verse.raag) {
         return false;
       }
@@ -22,11 +20,11 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
     });
   } else if (currentRaag !== 'all' && currentRaag === 'others') {
     const allRaags = raagArray;
-    filteredResult = filteredResult.filter(verse => {
+    filteredResult = filteredResult.filter((verse) => {
       if (!verse.raag) {
         return true;
       }
-      return allRaags.every(raag => !verse.raag.includes(raag.value));
+      return allRaags.every((raag) => !verse.raag.includes(raag.value));
     });
   }
 

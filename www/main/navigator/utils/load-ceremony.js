@@ -5,12 +5,12 @@ const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
-export const loadCeremony = ceremonyId => {
-  return banidb
+export const loadCeremony = (ceremonyId) =>
+  banidb
     .loadCeremony(ceremonyId)
-    .then(result =>
+    .then((result) =>
       result
-        .map(rowDb => {
+        .map((rowDb) => {
           let row = rowDb;
 
           if (rowDb.Verse) {
@@ -35,14 +35,14 @@ export const loadCeremony = ceremonyId => {
           row.sessionKey = `ceremony-${ceremonyId}`;
           return row;
         })
-        .filter(verse => {
+        .filter((verse) => {
           if (verse) {
             return true;
           }
           return false;
         }),
     )
-    .catch(err => {
+    .catch((err) => {
       new Noty({
         type: 'error',
         text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Ceremony' })} : ${err}`,
@@ -50,4 +50,3 @@ export const loadCeremony = ceremonyId => {
         modal: true,
       }).show();
     });
-};
