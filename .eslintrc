@@ -12,7 +12,7 @@
     "import/prefer-default-export": "off",
     "no-plusplus": "off",
     "class-methods-use-this": "off",
-		"no-restricted-exports": "off"
+    "no-restricted-exports": "off"
   },
   "settings": {
     "import/core-modules": "electron",
