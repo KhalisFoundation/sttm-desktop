@@ -3,9 +3,8 @@ import { ipcRenderer } from 'electron';
 
 const remote = require('@electron/remote');
 
-/* eslint-disable global-require */
+/* eslint-disable-next-line global-require */
 export const tingle = require('../../../assets/js/vendor/tingle');
-/* eslint-enable */
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -20,9 +19,8 @@ let isCastInitialized = false;
  * @param {string} message A message string
  */
 export const appendMessage = (message) => {
-  /* eslint-disable no-console */
+  /* eslint-disable-next-line no-console */
   console.log(message);
-  /* eslint-enable */
 };
 
 const displayError = (errorMessage) => {

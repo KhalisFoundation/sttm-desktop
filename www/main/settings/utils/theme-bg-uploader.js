@@ -15,9 +15,8 @@ const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
 const errorAlert = (error) => {
-  /* eslint-disable no-alert */
+  /* eslint-disable-next-line no-alert */
   alert(error);
-  /* eslint-enable */
 };
 
 const imageCheck = (filePath) => {

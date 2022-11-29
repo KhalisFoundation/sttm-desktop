@@ -9,9 +9,8 @@ const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const userBackgroundsURL = new URL(`file:///${userBackgroundsPath}`).href;
 
 const errorAlert = (error) => {
-  /* eslint-disable no-alert */
+  /* eslint-disable-next-line no-alert */
   alert(error);
-  /* eslint-enable */
 };
 
 export const upsertCustomBackgrounds = (responseCallback = () => {}) => {

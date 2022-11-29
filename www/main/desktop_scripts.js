@@ -169,9 +169,8 @@ module.exports = {
                       });
                     } catch (err) {
                       // handle any errors
-                      /* eslint-disable no-console */
+                      /* eslint-disable-next-line no-console */
                       console.log(err);
-                      /* eslint-enable */
                     }
                   })
                   .pipe(fs.createWriteStream(dbCompressed));

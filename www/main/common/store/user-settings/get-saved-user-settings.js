@@ -11,9 +11,8 @@ let userDataPath;
 if (electron.app) {
   userDataPath = electron.app.getPath('userData');
 } else {
-  /* eslint-disable global-require */
+  /* eslint-disable-next-line global-require */
   const { app } = require('@electron/remote');
-  /* eslint-enable */
   userDataPath = app.getPath('userData');
 }
 

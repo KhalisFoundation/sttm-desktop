@@ -174,9 +174,8 @@ const query = (searchQuery, searchType, searchSource) =>
         resolve(rows.slice(0, howManyRows));
       })
       .catch((e) => {
-        /* eslint-disable no-console */
+        /* eslint-disable-next-line no-console */
         console.log(e);
-        /* eslint-enable */
         reject();
       });
   });
