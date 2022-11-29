@@ -8,7 +8,7 @@ const settings = { ...sidebar.settings, ...bottomBar.settings };
 
 export const getDefaultSettings = () => {
   const defaultSettings = {};
-  Object.keys(settings).forEach(key => {
+  Object.keys(settings).forEach((key) => {
     defaultSettings[key] = settings[key].initialValue;
   });
   return convertObjToCamelCase(defaultSettings);
@@ -19,7 +19,7 @@ const getOverlaySettings = () => {
     return savedSettings;
   }
   const defaultSettings = {};
-  Object.keys(settings).forEach(key => {
+  Object.keys(settings).forEach((key) => {
     defaultSettings[key] = settings[key].initialValue;
   });
   savedSettings.baniOverlay = defaultSettings;

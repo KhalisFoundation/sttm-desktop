@@ -1,6 +1,6 @@
 export const changeOrder = (element, direction, orderArray) => {
   const initialOrder = [...orderArray];
-  const currentOrder = initialOrder.findIndex(item => item === element);
+  const currentOrder = initialOrder.findIndex((item) => item === element);
   if (currentOrder >= 0) {
     const maxIndex = initialOrder.length - 1;
     if (direction === 'up' && currentOrder > 0) {

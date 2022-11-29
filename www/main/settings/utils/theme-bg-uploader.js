@@ -14,11 +14,12 @@ const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
-const errorAlert = error => {
+const errorAlert = (error) => {
+  /* eslint-disable-next-line no-alert */
   alert(error);
 };
 
-const imageCheck = filePath => {
+const imageCheck = (filePath) => {
   const acceptedExtensions = ['png', 'jpg'];
   const acceptedMimeTypes = ['image/png', 'image/jpeg'];
 
@@ -35,8 +36,8 @@ const imageCheck = filePath => {
   return false;
 };
 
-export const removeCustomBackgroundFile = imagePath => {
-  fs.unlink(imagePath, deleteError => {
+export const removeCustomBackgroundFile = (imagePath) => {
+  fs.unlink(imagePath, (deleteError) => {
     if (deleteError) {
       errorAlert('Unable to delete file');
       throw deleteError;
@@ -44,7 +45,7 @@ export const removeCustomBackgroundFile = imagePath => {
   });
 };
 
-export const uploadImage = async evt => {
+export const uploadImage = async (evt) => {
   try {
     if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
   } catch (error) {

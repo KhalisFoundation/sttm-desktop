@@ -10,16 +10,9 @@ const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
-
-const defaultPrefs = require('./www/configs/defaults.json');
-const themes = require('./www/configs/themes.json');
-const Analytics = require('./analytics');
 const remote = require('@electron/remote/main');
-remote.initialize();
 
-// Are we packaging for a platform's app store?
-const appstore = false;
-const maxChangeLogSeenCount = 5;
+remote.initialize();
 
 const expressApp = express();
 /* eslint-disable import/order */
@@ -28,8 +21,16 @@ const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
 
+const defaultPrefs = require('./www/configs/defaults.json');
+const themes = require('./www/configs/themes.json');
+const Analytics = require('./analytics');
+
+// Are we packaging for a platform's app store?
+const appstore = false;
+const maxChangeLogSeenCount = 5;
+
 /* eslint-disable import/no-unresolved */
-const Store = require('./www/js/store.js');
+const Store = require('./www/js/store');
 const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
@@ -480,7 +481,7 @@ app.on('ready', () => {
     minHeight: 600,
     width,
     height,
-    frame: process.platform === 'linux', //show frame only on linux
+    frame: process.platform === 'linux', // show frame only on linux
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
@@ -559,9 +560,9 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
-  const webView_wc = webContents.fromId(parseInt(data, 10));
-  remote.enable(webView_wc);
-  webView_wc.send('wc-webview-enabled');
+  const webViewWC = webContents.fromId(parseInt(data, 10));
+  remote.enable(webViewWC);
+  webViewWC.send('wc-webview-enabled');
   if (checkForExternalDisplay()) {
     viewerWindow.send('wc-webview-enabled');
   }

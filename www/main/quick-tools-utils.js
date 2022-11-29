@@ -1,4 +1,4 @@
-const firstCharToUpperCase = str => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
+const firstCharToUpperCase = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
 
 export const changeFontSize = (iconType, increase = true) => {
   const setterAction = `set${firstCharToUpperCase(iconType)}FontSize`;
@@ -8,7 +8,7 @@ export const changeFontSize = (iconType, increase = true) => {
   global.setUserSettings[setterAction](newValue);
 };
 
-export const changeVisibility = iconType => {
+export const changeVisibility = (iconType) => {
   const setterAction = `set${firstCharToUpperCase(iconType)}Visibility`;
   const getterVar = `${iconType}Visibility`;
   const oldValue = global.getUserSettings[getterVar];

@@ -6,8 +6,8 @@ const isOnline = require('is-online');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
-const tingle = require('../assets/js/vendor/tingle');
 const remote = require('@electron/remote');
+const tingle = require('../assets/js/vendor/tingle');
 
 const { i18n, isUnsupportedWindow } = remote.require('./app');
 const ipc = electron.ipcRenderer;
@@ -165,11 +165,12 @@ module.exports = {
                           });
                         });
                         const win = remote.getCurrentWindow();
-                        win.setProgressBar(-1); 
+                        win.setProgressBar(-1);
                       });
                     } catch (err) {
                       // handle any errors
-                      console.log(err0);
+                      /* eslint-disable-next-line no-console */
+                      console.log(err);
                     }
                   })
                   .pipe(fs.createWriteStream(dbCompressed));

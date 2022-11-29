@@ -5,11 +5,11 @@ const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
-export const loadAng = angNo => {
-  return banidb
+export const loadAng = (angNo) =>
+  banidb
     .loadAng(angNo)
-    .then(verses => verses)
-    .catch(err => {
+    .then((verses) => verses)
+    .catch((err) => {
       new Noty({
         type: 'error',
         text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Ang' })} : ${err}`,
@@ -17,4 +17,3 @@ export const loadAng = angNo => {
         modal: true,
       }).show();
     });
-};

@@ -1,6 +1,6 @@
-const convertDbProxyToArray = dbProxyObj => {
-  const banisObject = Object.assign({}, dbProxyObj);
-  const banisArr = Object.keys(banisObject).map(idx => {
+const convertDbProxyToArray = (dbProxyObj) => {
+  const banisObject = { ...dbProxyObj };
+  const banisArr = Object.keys(banisObject).map((idx) => {
     const { ID, Gurmukhi, Token } = banisObject[idx];
     return {
       id: ID,

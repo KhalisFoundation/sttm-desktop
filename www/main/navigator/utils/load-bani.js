@@ -4,15 +4,15 @@ import banidb from '../../banidb';
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
-export const loadBani = (baniId, baniLength) => {
+export const loadBani = (baniId, baniLength) =>
   // mangalPosition was removed from arguments and filter
   // .filter(result => result.MangalPosition !== mangalPosition)
   // mangalPosition
-  return banidb
+  banidb
     .loadBani(baniId, baniLength)
-    .then(rows => {
-      return rows
-        .map(rowDb => {
+    .then((rows) =>
+      rows
+        .map((rowDb) => {
           let row = rowDb;
           if (rowDb.Verse) {
             row = rowDb.Verse;
@@ -27,9 +27,9 @@ export const loadBani = (baniId, baniLength) => {
           row.crossPlatformID = rowDb.ID;
           return row;
         })
-        .filter(row => row);
-    })
-    .catch(err => {
+        .filter((row) => row),
+    )
+    .catch((err) => {
       new Noty({
         type: 'error',
         text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Bani' })} : ${err}`,
@@ -37,4 +37,3 @@ export const loadBani = (baniId, baniLength) => {
         modal: true,
       }).show();
     });
-};

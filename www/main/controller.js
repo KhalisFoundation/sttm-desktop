@@ -1,12 +1,10 @@
 /* global Mousetrap */
-import { ipcRenderer } from 'electron';
-import { updateViewerScale } from './viewer/utils';
 
 const electron = require('electron');
-const anvaad = require('anvaad-js');
-
 const remote = require('@electron/remote');
+const { updateViewerScale } = require('./viewer/utils');
 
+const { ipcRenderer } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
@@ -327,7 +325,7 @@ Mousetrap.bindGlobal('mod+q', () => {
 });
 
 const $menuButton = document.querySelector('.menu-button');
-$menuButton.addEventListener('contextmenu', e => {
+$menuButton.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   e.stopPropagation();
   menu.popup(remote.getCurrentWindow());

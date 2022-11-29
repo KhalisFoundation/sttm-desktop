@@ -3,6 +3,7 @@ import convertObjToCamelCase from '../../utils/convert-object-to-camel-case';
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
+
 const { settings } = require('../../../../configs/user-settings.json');
 
 let userDataPath;
@@ -10,7 +11,8 @@ let userDataPath;
 if (electron.app) {
   userDataPath = electron.app.getPath('userData');
 } else {
-  const app = require('@electron/remote').app;
+  /* eslint-disable-next-line global-require */
+  const { app } = require('@electron/remote');
   userDataPath = app.getPath('userData');
 }
 
@@ -25,7 +27,7 @@ function parseDataFile(filePath) {
   } catch (error) {
     // if there was some kind of error, return the passed in defaults instead.
     const defaultSettings = {};
-    Object.keys(settings).forEach(key => {
+    Object.keys(settings).forEach((key) => {
       defaultSettings[key] = settings[key].initialValue;
     });
     return defaultSettings;
@@ -34,6 +36,4 @@ function parseDataFile(filePath) {
 
 export const savedSettings = parseDataFile(userConfigPath);
 
-export const savedSettingsCamelCase = () => {
-  return convertObjToCamelCase(parseDataFile(userConfigPath));
-};
+export const savedSettingsCamelCase = () => convertObjToCamelCase(parseDataFile(userConfigPath));

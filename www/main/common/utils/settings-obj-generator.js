@@ -1,4 +1,4 @@
-export const settingsObjGenerator = obj => {
+export const settingsObjGenerator = (obj) => {
   const { categories, settings } = obj;
 
   const settingsNewObj = {};
@@ -9,14 +9,14 @@ export const settingsObjGenerator = obj => {
                 |___Setting
                     |_____Addon
     */
-  Object.keys(categories).forEach(category => {
+  Object.keys(categories).forEach((category) => {
     if (categories[category].type === 'title') {
       settingsNewObj[category] = categories[category];
       settingsNewObj[category].subCatObjs = {};
-      categories[category].subcategories.forEach(subCategory => {
+      categories[category].subcategories.forEach((subCategory) => {
         settingsNewObj[category].subCatObjs[subCategory] = categories[subCategory];
         settingsNewObj[category].subCatObjs[subCategory].settingObjs = {};
-        settingsNewObj[category].subCatObjs[subCategory].settings.forEach(setting => {
+        settingsNewObj[category].subCatObjs[subCategory].settings.forEach((setting) => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
           const { addon } = settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting];
           if (addon) {

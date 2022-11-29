@@ -2,16 +2,13 @@ import React from 'react';
 import convertToCamelCase from '../../common/utils/convert-to-camel-case';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const getThemeMarkup = (themeObjects, handleThemeChange) =>
-  Object.keys(themeObjects).map(theme => {
+  Object.keys(themeObjects).map((theme) => {
     const currentTheme = themeObjects[theme];
-    const themeClass = i18n
-      .t(`THEMES.${currentTheme.label}`)
-      .toLowerCase()
-      .split(' ')
-      .join('-');
+    const themeClass = i18n.t(`THEMES.${currentTheme.label}`).toLowerCase().split(' ').join('-');
 
     return (
       <div

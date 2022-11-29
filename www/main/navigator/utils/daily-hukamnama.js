@@ -1,9 +1,9 @@
 import getJSON from 'get-json';
 import isOnline from 'is-online';
 
-export const dailyHukamnama = setIsHukamnamaLoading =>
+export const dailyHukamnama = (setIsHukamnamaLoading) =>
   new Promise((resolve, reject) => {
-    isOnline().then(online => {
+    isOnline().then((online) => {
       if (online) {
         setIsHukamnamaLoading(true);
         getJSON('https://api.banidb.com/v2/hukamnamas/today', (error, response) => {
