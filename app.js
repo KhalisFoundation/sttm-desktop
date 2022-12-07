@@ -29,7 +29,7 @@ const Analytics = require('./analytics');
 const appstore = false;
 const maxChangeLogSeenCount = 5;
 
-/* eslint-disable import/no-unresolved */
+/* eslint-disable import/no-unresolved import/extensions */
 const Store = require('./www/js/store');
 const {
   savedSettingsCamelCase,
