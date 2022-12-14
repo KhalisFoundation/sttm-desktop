@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Tile, CustomBgTile } from '../../common/sttm-ui';
 

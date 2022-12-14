@@ -88,7 +88,7 @@ const QuickTools = ({ isMiscSlide }) => {
           onClick={() => {
             global.platform.ipc.send(
               'update-global-setting',
-              createGlobalPlatformObj(name, toolName, actionName),
+              JSON.stringify(createGlobalPlatformObj(name, toolName, actionName)),
             );
           }}
         />

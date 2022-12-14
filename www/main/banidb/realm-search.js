@@ -5,9 +5,16 @@ const Realm = require('realm');
 
 const CONSTS = require('./constants');
 
-const { remote } = electron;
-const userDataPath = remote.app.getPath('userData');
-const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen.realm');
+let userDataPath;
+
+if (electron.app) {
+  userDataPath = electron.app.getPath('userData');
+} else {
+  const { app } = require('@electron/remote');
+  userDataPath = app.getPath('userData');
+}
+
+const realmPath = path.resolve(userDataPath, 'sttmdesktop-evergreen-v2.realm');
 const realmSchemaPath = path.resolve(userDataPath, 'realm-schema-evergreen.json');
 
 // TODO: Investigate possible memory issues from multiple Realm.open calls
@@ -108,7 +115,7 @@ const query = (searchQuery, searchType, searchSource) =>
         const words = saniQuery
           .split(' ')
           .map(
-            word =>
+            (word) =>
               `(${searchCol} CONTAINS${
                 caseInsensitive ? '[c]' : ''
               } ' ${word}' OR ${searchCol} BEGINSWITH${caseInsensitive ? '[c]' : ''} '${word}')`,
@@ -160,14 +167,17 @@ const query = (searchQuery, searchType, searchSource) =>
       default:
         break;
     }
-    order.push('Shabads');
-    condition = `${condition} SORT(${order.join(' ASC, ')} ASC)`;
+    const orderArray = Array.from(order, (el) => [el, false]);
     Realm.open(realmConfig)
-      .then(realm => {
-        const rows = realm.objects('Verse').filtered(condition);
+      .then((realm) => {
+        const rows = realm.objects('Verse').filtered(condition).sorted(orderArray);
         resolve(rows.slice(0, howManyRows));
       })
-      .catch(reject);
+      .catch((e) => {
+        /* eslint-disable-next-line no-console */
+        console.log(e);
+        reject();
+      });
   });
 
 /**
@@ -180,13 +190,13 @@ const query = (searchQuery, searchType, searchSource) =>
  * loadShabad(2776);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const loadShabad = ShabadID =>
+const loadShabad = (ShabadID) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const rows = realm
           .objects('Verse')
           .filtered('ANY Shabads.ShabadID == $0', ShabadID)
@@ -214,12 +224,9 @@ const loadBani = (BaniID, BaniLength) =>
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const condition = `Bani.ID == ${BaniID} AND ${BaniLength} == true`;
-        const rows = realm
-          .objects('Banis_Shabad')
-          .filtered(condition)
-          .sorted('Seq');
+        const rows = realm.objects('Banis_Shabad').filtered(condition).sorted('Seq');
         if (rows.length > 0) {
           resolve(rows);
         }
@@ -238,13 +245,13 @@ const loadBani = (BaniID, BaniLength) =>
  * // => [{ Ceremony: { ID: 26106, Seq:2,...},...}]
  */
 
-const loadCeremony = ceremonyID =>
+const loadCeremony = (ceremonyID) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const rows = realm
           .objects('Ceremonies_Shabad')
           .filtered('Ceremony.ID == $0', ceremonyID)
@@ -271,11 +278,8 @@ const loadBanis = () =>
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
-        const rows = realm
-          .objects('Banis')
-          .filtered('ID < 10000')
-          .sorted('ID');
+      .then((realm) => {
+        const rows = realm.objects('Banis').filtered('ID < 10000').sorted('ID');
         if (rows.length > 0) {
           resolve(rows);
         }
@@ -299,7 +303,7 @@ const loadCeremonies = () =>
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const rows = realm.objects('Ceremonies').sorted('ID');
         if (rows.length > 0) {
           resolve(rows);
@@ -317,13 +321,13 @@ const loadCeremonies = () =>
  * getAng(2776);
  * // => { PageNo: 726, SourceID: 'G' }
  */
-const getAng = ShabadID =>
+const getAng = (ShabadID) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const row = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', ShabadID)[0];
         const { PageNo, Source } = row;
         resolve({
@@ -352,7 +356,7 @@ const loadAng = (PageNo, SourceID = 'G') =>
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const rows = realm
           .objects('Verse')
           .filtered('PageNo = $0 AND Source.SourceID = $1', PageNo, SourceID);
@@ -376,13 +380,13 @@ const loadAng = (PageNo, SourceID = 'G') =>
  * getShabad(1);
  * // => 1
  */
-const getShabad = VerseID =>
+const getShabad = (VerseID) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
     }
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const shabad = realm.objects('Verse').filtered('ID = $0', VerseID)[0];
         resolve(shabad.Shabads[0].ShabadID);
       })
@@ -403,7 +407,7 @@ const getShabad = VerseID =>
 const randomShabad = (SourceID = 'G') =>
   new Promise((resolve, reject) => {
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const rows = realm.objects('Verse').filtered('Source.SourceID = $0', SourceID);
         const row = rows[Math.floor(Math.random() * rows.length)];
         resolve(row.Shabads[0].ShabadID);
@@ -448,11 +452,9 @@ const getFilterOption = (type, idArray) =>
     }
 
     Realm.open(realmConfig)
-      .then(realm => {
+      .then((realm) => {
         const idsQuery = idArray
-          .map(id => {
-            return type === 'source' ? `${columnName} = '${id}'` : `${columnName} = ${id}`;
-          })
+          .map((id) => (type === 'source' ? `${columnName} = '${id}'` : `${columnName} = ${id}`))
           .join(' OR ');
         const rows = realm.objects(collectionName).filtered(`(${idsQuery})`);
         if (rows.length > 0) {

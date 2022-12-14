@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { remote } from 'electron';
 import SearchPane from './search/components/SearchPane';
 import ShabadPane from './shabad/ShabadPane';
 import { MiscPane } from './misc/components';
@@ -9,6 +8,7 @@ import { Pane } from '../common/sttm-ui/pane';
 import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
 import insertSlide from '../common/constants/slidedb';
 
+const remote = require('@electron/remote');
 const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {

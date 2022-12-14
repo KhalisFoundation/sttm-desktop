@@ -37,7 +37,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, order 
   if (translationHTML) {
     translationMarkup = (
       <div
-        className={`slide-translation language-${translationLanguage}`}
+        className={`slide-translation custom-english language-${translationLanguage}`}
         style={customStyle}
         dangerouslySetInnerHTML={{ __html: translationHTML }}
       />

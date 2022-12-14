@@ -13,7 +13,7 @@ import { DEFAULT_OVERLAY } from '../common/constants';
 
 const electron = require('electron');
 
-const { remote } = electron;
+const remote = require('@electron/remote');
 const main = remote.require('./app');
 
 const Launchpad = () => {

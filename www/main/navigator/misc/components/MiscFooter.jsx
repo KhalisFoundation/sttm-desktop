@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
-import { remote } from 'electron';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 

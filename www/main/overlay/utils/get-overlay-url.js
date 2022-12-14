@@ -1,7 +1,5 @@
 const ip = require('ip');
-const electron = require('electron');
-
-const { remote } = electron;
+const remote = require('@electron/remote');
 
 const getOverlayUrl = () => {
   const overlayPort = remote.getGlobal('overlayPort');

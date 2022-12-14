@@ -10,8 +10,10 @@
     "no-mixed-operators": "off",
     "prettier/prettier": ["error"],
     "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": "off",
     "no-plusplus": "off",
-    "class-methods-use-this": "off"
+    "class-methods-use-this": "off",
+    "no-restricted-exports": "off"
   },
   "settings": {
     "import/core-modules": "electron",

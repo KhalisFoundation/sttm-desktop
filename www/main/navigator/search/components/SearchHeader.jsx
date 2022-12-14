@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { remote } from 'electron';
 import banidb from '../../../common/constants/banidb';
+
+const remote = require('@electron/remote');
 
 function SearchHeader() {
   // For responsiveness
@@ -102,7 +103,7 @@ function SearchHeader() {
                       id={value}
                       type="radio"
                       value={value}
-                      onChangeCapture={handleSearchOption}
+                      onChange={handleSearchOption}
                       name="search-input"
                       checked={parseInt(value, 10) === currentSearchType}
                     />
@@ -137,7 +138,7 @@ function SearchHeader() {
                       value={value}
                       name="search-input"
                       className="search-type-checkbox"
-                      onChangeCapture={handleSearchOption}
+                      onChange={handleSearchOption}
                       checked={parseInt(value, 10) === currentSearchType}
                     />
                     <span className="search-type-checkmark"></span>

@@ -4,7 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');

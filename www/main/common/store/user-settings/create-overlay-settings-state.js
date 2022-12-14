@@ -7,7 +7,7 @@ const { ipcRenderer } = require('electron');
 
 const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
-  Object.keys(settingsSchema).forEach(settingKey => {
+  Object.keys(settingsSchema).forEach((settingKey) => {
     const stateVarName = convertToCamelCase(settingKey);
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 
@@ -23,7 +23,7 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
       updatedSettings.baniOverlay[settingKey] = payload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-      ipcRenderer.send('save-overlay-settings', state);
+      ipcRenderer.send('save-overlay-settings', JSON.stringify(state));
 
       return state;
     });

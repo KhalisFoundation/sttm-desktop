@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import OverlaySetting from './OverlaySetting';
 import { convertToCamelCase } from '../../common/utils';
 
-const { remote } = require('electron');
-
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {

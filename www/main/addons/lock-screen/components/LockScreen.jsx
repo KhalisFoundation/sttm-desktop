@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 
 import { Overlay } from '../../../common/sttm-ui';
 

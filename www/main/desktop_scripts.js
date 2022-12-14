@@ -6,23 +6,23 @@ const isOnline = require('is-online');
 const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
+const remote = require('@electron/remote');
 const tingle = require('../assets/js/vendor/tingle');
 
-const { remote } = electron;
 const { i18n, isUnsupportedWindow } = remote.require('./app');
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
   realm: {
-    dbCompressedName: 'sttmdesktop-evergreen.zip',
-    dbName: 'sttmdesktop-evergreen.realm',
+    dbCompressedName: 'sttmdesktop-evergreen-v2.zip',
+    dbName: 'sttmdesktop-evergreen-v2.realm',
     dbSchema: 'realm-schema-evergreen.json',
-    md5: 'sttmdesktop-evergreen.md5',
+    md5: 'sttmdesktop-evergreen-v2.md5',
   },
 };
 
 const dbPlatform = 'realm';
-const dbSchemaPath = schemaPath =>
+const dbSchemaPath = (schemaPath) =>
   !database[dbPlatform].dbSchema || path.resolve(schemaPath, database[dbPlatform].dbSchema);
 
 const dbPath = path.resolve(userDataPath, database[dbPlatform].dbName);
@@ -112,7 +112,7 @@ module.exports = {
     } else {
       localStorage.setItem('isDbDownloaded', true);
     }
-    isOnline().then(online => {
+    isOnline().then((online) => {
       if (online) {
         request(
           `https://banidb.com/databases/${database[dbPlatform].md5}`,
@@ -127,50 +127,51 @@ module.exports = {
                 progress(
                   request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),
                 )
-                  .on('progress', state => {
+                  .on('progress', (state) => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
-                    ipcRenderer.emit('database-progress', state);
+                    ipcRenderer.emit('database-progress', JSON.stringify(state));
                   })
                   .on('end', () => {
-                    ipcRenderer.emit('database-progress', { percent: 1 });
-                    extract(dbCompressed, { dir: newDBFolder }, err0 => {
-                      if (err0) {
-                        // ToDo: Log errors
-                        // eslint-disable-next-line no-console
-                        console.log(err0);
-                      }
-                      fs.chmodSync(newDBPath, '755');
-                      // Save the hash for comparison next time
-                      store.set('curDBHash', newestDBHash);
-                      // Delete compressed database
-                      fs.unlinkSync(dbCompressed);
-                      // Replace current DB file with new version
-                      fs.renameSync(newDBPath, dbPath);
-                      if (dbPlatform === 'realm') {
-                        fs.renameSync(newDBSchema, dbSchema);
-                      }
-                      module.exports.initDB();
-                      // Delete old DBs
-                      // TODO: Update to check if directory and use fs.rmdir
-                      // TODO: Add sttmdesktop.realm.management
-                      const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
-                      oldDBs.forEach(oldDB => {
-                        const oldDBPath = path.resolve(userDataPath, oldDB);
-                        fs.access(oldDBPath, err => {
-                          if (!err) {
-                            fs.unlink(oldDBPath, err1 => {
-                              if (err1) {
-                                // eslint-disable-next-line no-console
-                                console.log(`Could not delete old database ${oldDB}: ${err1}`);
-                              }
-                            });
-                          }
+                    ipcRenderer.emit('database-progress', JSON.stringify({ percent: 1 }));
+                    try {
+                      extract(dbCompressed, { dir: newDBFolder }).then(() => {
+                        fs.chmodSync(newDBPath, '755');
+                        // Save the hash for comparison next time
+                        store.set('curDBHash', newestDBHash);
+                        // Delete compressed database
+                        fs.unlinkSync(dbCompressed);
+                        // Replace current DB file with new version
+                        fs.renameSync(newDBPath, dbPath);
+                        if (dbPlatform === 'realm') {
+                          fs.renameSync(newDBSchema, dbSchema);
+                        }
+                        module.exports.initDB();
+                        // Delete old DBs
+                        // TODO: Update to check if directory and use fs.rmdir
+                        // TODO: Add sttmdesktop.realm.management
+                        const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
+                        oldDBs.forEach((oldDB) => {
+                          const oldDBPath = path.resolve(userDataPath, oldDB);
+                          fs.access(oldDBPath, (err) => {
+                            if (!err) {
+                              fs.unlink(oldDBPath, (err1) => {
+                                if (err1) {
+                                  // eslint-disable-next-line no-console
+                                  console.log(`Could not delete old database ${oldDB}: ${err1}`);
+                                }
+                              });
+                            }
+                          });
                         });
+                        const win = remote.getCurrentWindow();
+                        win.setProgressBar(-1);
                       });
-                      const win = remote.getCurrentWindow();
-                      win.setProgressBar(-1);
-                    });
+                    } catch (err) {
+                      // handle any errors
+                      /* eslint-disable-next-line no-console */
+                      console.log(err);
+                    }
                   })
                   .pipe(fs.createWriteStream(dbCompressed));
               }
@@ -199,17 +200,17 @@ module.exports = {
 };
 
 const $titleButtons = document.querySelectorAll('#titlebar .controls a');
-Array.from($titleButtons).forEach(el => {
-  el.addEventListener('click', e => windowAction(e));
+Array.from($titleButtons).forEach((el) => {
+  el.addEventListener('click', (e) => windowAction(e));
 });
 
 const $minimize = document.querySelectorAll('.navigator-header .toggle-minimize');
 const $minimizeIcons = document.querySelectorAll('.navigator-header .toggle-minimize i');
 
 if ($minimize) {
-  Array.prototype.forEach.call($minimize, minimize => {
+  Array.prototype.forEach.call($minimize, (minimize) => {
     minimize.addEventListener('click', () => {
-      Array.prototype.forEach.call($minimizeIcons, element => {
+      Array.prototype.forEach.call($minimizeIcons, (element) => {
         element.classList.toggle('disabled');
       });
       document.getElementById('navigator').classList.toggle('minimized');

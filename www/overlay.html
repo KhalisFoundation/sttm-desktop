@@ -12,8 +12,9 @@
 
     <script>
       const app = require('./js/overlay/app.js').default;
-      const { render } = require('react-dom');
-      render(app(), document.getElementById('overlay-container'));
+      const { createRoot } = require('react-dom/client');
+      const root = createRoot(document.getElementById('overlay-container'));
+      root.render(app());
     </script>
   </body>
 </html>

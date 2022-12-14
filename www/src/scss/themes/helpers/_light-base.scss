@@ -98,7 +98,11 @@
     background-color: $statusbar-bg;
     color: $base-text;
   }
-
+  .control-item {
+    input[type='range']::before {
+      color: $base-text;
+    }
+  }
   .control-item:hover {
     background-color: $statusbar-bg;
   }
@@ -133,6 +137,12 @@
       .search-footer {
         background-color: $statusbar-bg;
       }
+    }
+  }
+
+  .viewer-pane {
+    .pane-content {
+      border: 1px solid $alt-grey;
     }
   }
 
@@ -193,8 +203,24 @@
     background-color: $dialog-bg;
   }
 
+  .gurmukhi-keyboard {
+    border: 1px solid $disabled-light;
+
+    .keyboard-row:nth-child(2n-1) .keyboard-row-set:nth-child(1),
+    .keyboard-row:nth-child(2n) .keyboard-row-set:nth-child(2) {
+      background-color: $lighter-grey;
+    }
+
+    button {
+      &.matra-button {
+        background-color: $light-blue-30;
+      }
+    }
+  }
+
   .search-content {
     background-color: $statusbar-bg;
+    border-top: 1px solid $lighter-grey;
     color: $base-text;
     .input-box {
       color: $black;

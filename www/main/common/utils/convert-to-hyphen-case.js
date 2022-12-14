@@ -1,5 +1,3 @@
-const convertToHyphenCase = name => {
-  return name.split(' ').join('-');
-};
+const convertToHyphenCase = (name) => name.split(' ').join('-');
 
 export default convertToHyphenCase;
