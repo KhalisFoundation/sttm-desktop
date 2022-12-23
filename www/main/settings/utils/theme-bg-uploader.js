@@ -4,9 +4,10 @@ const remote = require('@electron/remote');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const imagemin = require('imagemin');
+const sharp = require('sharp');
 const readChunk = require('read-chunk');
 const imageType = require('image-type');
+const url = require('url');
 
 const { store } = remote.require('./app');
 
@@ -30,7 +31,7 @@ const imageCheck = (filePath) => {
       return acceptedExtensions.includes(fileMeta.ext) && acceptedMimeTypes.includes(fileMeta.mime);
     }
   } catch (error) {
-    errorAlert(errorAlert);
+    errorAlert(error);
   }
 
   return false;
@@ -51,29 +52,39 @@ export const uploadImage = async (evt) => {
   } catch (error) {
     errorAlert('Unable to create folder');
   }
+  return new Promise((resolve, reject) => {
+    try {
+      const filePath = evt.target.files[0].path;
+      const newPath = path.resolve(userBackgroundsPath, evt.target.files[0].name);
+      // eslint-disable-next-line no-param-reassign
+      evt.target.value = '';
 
-  try {
-    const filePath = evt.target.files[0].path;
-    // eslint-disable-next-line no-param-reassign
-    evt.target.value = '';
+      if (imageCheck(filePath)) {
+        sharp(filePath)
+          .jpeg({ mozjpeg: true })
+          .toFile(newPath, (err) => {
+            if (err) {
+              errorAlert('Unable to save file');
+              reject();
+            } else {
+              const customThemeObj = {
+                type: 'custom',
+                url: url.pathToFileURL(newPath),
+              };
 
-    if (imageCheck(filePath)) {
-      const files = await imagemin([filePath], userBackgroundsPath);
-      if (files) {
-        const fileUrl = new URL(`file:///${files[0].path}`).href;
-        const customThemeObj = {
-          type: 'custom',
-          url: `${fileUrl}`.replace(/(%20)/g, '\\ '),
-        };
-
-        store.setUserPref('app.themebg', customThemeObj);
-        GlobalState.getActions().userSettings.setThemeBg(customThemeObj);
-        global.core.platformMethod('updateSettings');
+              store.setUserPref('app.themebg', customThemeObj);
+              GlobalState.getActions().userSettings.setThemeBg(customThemeObj);
+              global.core.platformMethod('updateSettings');
+              resolve();
+            }
+          });
+      } else {
+        errorAlert('File must be in .png or .jpg format');
+        reject();
       }
-    } else {
-      errorAlert('File must be in .png or .jpg format');
+    } catch (error) {
+      errorAlert('Unknown error occured');
+      reject();
     }
-  } catch (error) {
-    errorAlert('Unknown error occured');
-  }
+  });
 };

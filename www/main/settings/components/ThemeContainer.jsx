@@ -8,6 +8,7 @@ import { themes } from '../../theme_editor';
 import {
   applyTheme,
   uploadImage,
+  setDefaultBg,
   upsertCustomBackgrounds,
   removeCustomBackgroundFile,
 } from '../utils';
@@ -22,9 +23,9 @@ const themeTypes = [
 
 const ThemeContainer = () => {
   const [customThemes, setCustomThemes] = useState([]);
-  const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
-  const { theme: currentTheme } = useStoreState(state => state.userSettings);
-  const groupThemes = themeType => themes.filter(({ type }) => type.includes(themeType));
+  const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
+  const { theme: currentTheme, themeBg } = useStoreState((state) => state.userSettings);
+  const groupThemes = (themeType) => themes.filter(({ type }) => type.includes(themeType));
 
   useEffect(() => {
     upsertCustomBackgrounds(setCustomThemes);
@@ -37,12 +38,12 @@ const ThemeContainer = () => {
           <React.Fragment key={type}>
             <header className="options-header">{i18n.t(`THEMES.${title}`)}</header>
             <span className="theme-tile-holder">
-              {groupThemes(type).map(theme => (
+              {groupThemes(type).map((theme) => (
                 <Tile
                   key={theme.name}
                   onClick={() => {
                     if (currentTheme !== theme.key) {
-                      applyTheme(theme, false, setTheme, setThemeBg);
+                      applyTheme(theme, false, setTheme, setThemeBg, themeBg);
                     }
                   }}
                   className="theme-instance"
@@ -59,7 +60,7 @@ const ThemeContainer = () => {
           {i18n.t('THEMES.NEW_IMAGE')}
           <input
             className="file-input"
-            onChange={async e => {
+            onChange={async (e) => {
               await uploadImage(e);
               upsertCustomBackgrounds(setCustomThemes);
             }}
@@ -70,7 +71,7 @@ const ThemeContainer = () => {
         </label>
         <p className="helper-text">{i18n.t('THEMES.RECOMMENDED')}</p>
         <span className="theme-tile-holder">
-          {customThemes.map(tile => (
+          {customThemes.map((tile) => (
             <React.Fragment key={tile.name}>
               <CustomBgTile
                 customBg={tile}
@@ -80,6 +81,8 @@ const ThemeContainer = () => {
                 onRemove={() => {
                   removeCustomBackgroundFile(tile['background-image-path'].replace(/\\(\s)/g, ' '));
                   upsertCustomBackgrounds(setCustomThemes);
+                  const currentThemeInstance = themes.filter((theme) => theme.key === currentTheme);
+                  setDefaultBg(currentThemeInstance, setThemeBg, themeBg);
                 }}
               />
             </React.Fragment>
