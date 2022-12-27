@@ -15,6 +15,8 @@ const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 
+const { i18n } = remote.require('./app');
+
 const errorAlert = (error) => {
   /* eslint-disable-next-line no-alert */
   alert(error);
@@ -40,7 +42,7 @@ const imageCheck = (filePath) => {
 export const removeCustomBackgroundFile = (imagePath) => {
   fs.unlink(imagePath, (deleteError) => {
     if (deleteError) {
-      errorAlert('Unable to delete file');
+      errorAlert(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
       throw deleteError;
     }
   });
@@ -50,7 +52,7 @@ export const uploadImage = async (evt) => {
   try {
     if (!fs.existsSync(userBackgroundsPath)) await mkdir(userBackgroundsPath);
   } catch (error) {
-    errorAlert('Unable to create folder');
+    errorAlert(i18n.t('THEMES.DIR_CREATE_ERR', { error }));
   }
   return new Promise((resolve, reject) => {
     try {
@@ -62,9 +64,9 @@ export const uploadImage = async (evt) => {
       if (imageCheck(filePath)) {
         sharp(filePath)
           .jpeg({ mozjpeg: true })
-          .toFile(newPath, (err) => {
-            if (err) {
-              errorAlert('Unable to save file');
+          .toFile(newPath, (error) => {
+            if (error) {
+              errorAlert(i18n.t('THEMES.FILE_VALIDATE_ERR', { error }));
               reject();
             } else {
               const customThemeObj = {
@@ -79,11 +81,11 @@ export const uploadImage = async (evt) => {
             }
           });
       } else {
-        errorAlert('File must be in .png or .jpg format');
+        errorAlert(i18n.t('THEMES.ALLOWED_IMGS_MSG'));
         reject();
       }
     } catch (error) {
-      errorAlert('Unknown error occured');
+      errorAlert(i18n.t('THEMES.USING_ERR', { error }));
       reject();
     }
   });
