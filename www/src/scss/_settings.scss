@@ -141,10 +141,9 @@
         padding: 6px;
         transition: 0.2s background-color ease;
 
-        input[type='range']::before {
-          content: attr(data-value);
-          display: inherit;
-          transform: translateX(-150%);
+        .range-value {
+          margin: 8px;
+          font-size: 18px;
         }
 
         .notes {
@@ -259,10 +258,9 @@
     top: 50%;
     transform: translateY(-50%);
 
-    input::before {
-      content: attr(data-value);
-      display: inherit;
-      transform: translateX(-150%);
+    .range-value {
+      margin: 8px;
+      font-size: 18px;
     }
   }
 
