@@ -15,12 +15,13 @@ export const setDefaultBg = (themeInstance, setThemeBg, themeBg) => {
   if (themeBg !== themeBgObj) {
     setThemeBg(themeBgObj);
   }
+  return themeBgObj;
 };
 
 export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg, themeBg) => {
   if (!isCustom) {
     setTheme(themeInstance.key);
-    setDefaultBg(themeInstance, setThemeBg, themeBg);
+    const themeBgObj = setDefaultBg(themeInstance, setThemeBg, themeBg);
     /* TODO: move this to react state when porting viewer to react */
     store.setUserPref('app.themebg', themeBgObj);
   } else {
@@ -28,7 +29,7 @@ export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg, themeB
       type: 'custom',
       url: themeInstance['background-image'],
     };
-    if(themeBg !== themeBgObj) {
+    if (themeBg !== themeBgObj) {
       setThemeBg(themeBgObj);
     }
     store.setUserPref('app.themebg', themeBgObj);
