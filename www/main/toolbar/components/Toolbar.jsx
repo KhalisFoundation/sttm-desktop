@@ -9,7 +9,7 @@ const Toolbar = () => {
     'sunder-gutka',
     'ceremonies',
     'sync-button',
-    'login',
+    'sso',
     'lock-screen',
     'settings',
   ];

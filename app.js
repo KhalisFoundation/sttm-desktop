@@ -112,6 +112,10 @@ const secondaryWindows = {
     obj: false,
     url: `file://${__dirname}/www/legend.html`,
   },
+  ssoWindow: {
+    obj: false,
+    url: `https://sso.khalis.net/`,
+  },
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
@@ -593,6 +597,10 @@ let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
+});
+
+ipcMain.on('open-sso-window', () => {
+  openSecondaryWindow('ssoWindow');
 });
 
 io.on('connection', (socket) => {
