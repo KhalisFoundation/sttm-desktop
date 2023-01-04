@@ -430,6 +430,14 @@ button {
     position: fixed;
   }
 
+  #tool-login {
+    background-image: url('../../assets/img/icons/settings.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    bottom: 150px;
+    position: fixed;
+  }
+
   #tool-ceremonies {
     background-color: rebeccapurple;
     background-image: url('../../assets/img/icons/ceremonies.svg');
