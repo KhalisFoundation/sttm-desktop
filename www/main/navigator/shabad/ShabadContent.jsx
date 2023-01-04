@@ -32,7 +32,7 @@ const ShabadContent = () => {
     minimizedBySingleDisplay,
     isDontSaveHistory,
     savedCrossPlatformId,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
 
   const {
     setVersesRead,
@@ -43,16 +43,17 @@ const ShabadContent = () => {
     setVerseHistory,
     setIsMiscSlide,
     setIsDontSaveHistory,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   // mangalPosition was removed from below settings
   const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
-    state => state.userSettings,
+    (state) => state.userSettings,
   );
 
-  const [previousActiveVerse, setPreviousActiveVerse] = useState(activeVerseId);
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
+  const [atHome, setHome] = useState(true);
+  const [previousVerseIndex, setPreviousIndex] = useState();
 
   const activeVerseRef = useRef(null);
   const virtuosoRef = useRef(null);
@@ -75,6 +76,7 @@ const ShabadContent = () => {
                 verseId: verse.ID,
                 verse: verse.Gurmukhi,
                 english: verse.English ? verse.English : '',
+                lineNo: verse.LineNo,
                 crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
               };
             }
@@ -88,7 +90,7 @@ const ShabadContent = () => {
 
   const filterOverlayVerseItems = (verses, verseId = activeVerseId) => {
     if (verses) {
-      const currentIndex = verses.findIndex(obj => obj.ID === verseId);
+      const currentIndex = verses.findIndex((obj) => obj.ID === verseId);
       const currentVerse = verses[currentIndex];
       if (currentVerse) {
         const Line = { ...currentVerse.toJSON() };
@@ -129,11 +131,11 @@ const ShabadContent = () => {
       currentShabad = activeShabadId;
     }
     const currentIndex = verseHistory.findIndex(
-      historyObj => historyObj.shabadId === currentShabad,
+      (historyObj) => historyObj.shabadId === currentShabad,
     );
     if (verseHistory[currentIndex]) {
       verseHistory[currentIndex].continueFrom = newTraversedVerse;
-      if (!versesRead.some(traversedVerse => traversedVerse === newTraversedVerse)) {
+      if (!versesRead.some((traversedVerse) => traversedVerse === newTraversedVerse)) {
         verseHistory[currentIndex].versesRead = [...versesRead, newTraversedVerse];
         setVersesRead([...versesRead, newTraversedVerse]);
       }
@@ -146,7 +148,7 @@ const ShabadContent = () => {
     if (window.socket !== undefined && window.socket !== null) {
       let baniVerse;
       if (!crossPlatformId) {
-        baniVerse = activeShabad.find(obj => obj.ID === newTraversedVerse);
+        baniVerse = activeShabad.find((obj) => obj.ID === newTraversedVerse);
       }
       if (isSundarGutkaBani) {
         window.socket.emit('data', {
@@ -185,7 +187,7 @@ const ShabadContent = () => {
   const openNextVerse = () => {
     if (Object.entries(activeVerse).length !== 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      Object.keys(activeVerse).forEach(activeVerseIndex => {
+      Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (mappedShabadArray.length - 1 > parseInt(activeVerseIndex, 10)) {
           const newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           const newVerseId = mappedShabadArray[newVerseIndex].verseId;
@@ -198,7 +200,7 @@ const ShabadContent = () => {
   const openPrevVerse = () => {
     if (Object.entries(activeVerse).length !== 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      Object.keys(activeVerse).forEach(activeVerseIndex => {
+      Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (parseInt(activeVerseIndex, 10) > 0) {
           const newVerseIndex = parseInt(activeVerseIndex, 10) - 1;
           const newVerseId = mappedShabadArray[newVerseIndex].verseId;
@@ -208,8 +210,8 @@ const ShabadContent = () => {
     }
   };
 
-  const scrollToVerse = verseId => {
-    const verseIndex = activeShabad.findIndex(obj => obj.ID === verseId);
+  const scrollToVerse = (verseId) => {
+    const verseIndex = activeShabad.findIndex((obj) => obj.ID === verseId);
     virtuosoRef.current.scrollToIndex({
       index: verseIndex,
       behavior: 'smooth',
@@ -220,34 +222,49 @@ const ShabadContent = () => {
   const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const homeVerseIndex = homeVerse;
-      if (mappedShabadArray[homeVerseIndex]) {
-        const homeVerseId = mappedShabadArray[homeVerseIndex].verseId;
+      const currentVerseIndex = mappedShabadArray.findIndex((s) => s.verseId === activeVerseId);
+      let nextVerseId;
+      let nextVerseIndex;
 
-        if (homeVerseId === activeVerseId) {
-          const previousVerseIndex = activeShabad.findIndex(
-            verseObj => verseObj.ID === previousActiveVerse,
-          );
-
-          if (previousVerseIndex >= 0) {
-            updateTraversedVerse(previousActiveVerse, previousVerseIndex);
-            scrollToVerse(previousActiveVerse);
-          }
+      if (atHome) {
+        if (previousVerseIndex) {
+          nextVerseId = mappedShabadArray[previousVerseIndex + 1].verseId;
+          nextVerseIndex = previousVerseIndex + 1;
         } else {
-          if (previousActiveVerse !== activeVerseId) {
-            setPreviousActiveVerse(activeVerseId);
+          nextVerseIndex = 1;
+          nextVerseId = mappedShabadArray[1].verseId;
+        }
+        setPreviousIndex(nextVerseIndex);
+        setHome(false);
+      } else {
+        nextVerseIndex = currentVerseIndex + 1;
+        if (nextVerseIndex < mappedShabadArray.length) {
+          const currentVerseObj = mappedShabadArray[currentVerseIndex];
+          const nextVerseObj = mappedShabadArray[nextVerseIndex];
+          const homeVerseObj = mappedShabadArray[homeVerse];
+
+          if (currentVerseObj.lineNo !== nextVerseObj.lineNo) {
+            nextVerseIndex = homeVerse;
+            nextVerseId = homeVerseObj.verseId;
+            setHome(true);
+          } else {
+            nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
+            setPreviousIndex(nextVerseIndex);
           }
-          scrollToVerse(homeVerseId);
-          updateTraversedVerse(homeVerseId, homeVerseIndex);
         }
       }
+      scrollToVerse(nextVerseId);
+      updateTraversedVerse(nextVerseId, nextVerseIndex);
+
+      // let nextVerseIndex = currentVerseIndex + 1;
+      // let nextVerseId;
     }
   };
 
-  const changeHomeVerse = verseIndex => {
+  const changeHomeVerse = (verseIndex) => {
     if (homeVerse !== verseIndex) {
       const currentIndex = verseHistory.findIndex(
-        historyObj => historyObj.shabadId === activeShabadId,
+        (historyObj) => historyObj.shabadId === activeShabadId,
       );
       if (verseHistory[currentIndex]) {
         verseHistory[currentIndex].homeVerse = verseIndex;
@@ -270,11 +287,11 @@ const ShabadContent = () => {
     const firstVerse = verses[0];
     let shabadId = firstVerse.Shabads ? firstVerse.Shabads[0].ShabadID : firstVerse.shabadId;
     const verseId = initialVerse || firstVerse.ID;
-    const firstVerseIndex = verses.findIndex(v => v.ID === verseId);
+    const firstVerseIndex = verses.findIndex((v) => v.ID === verseId);
     let verse;
     if (verseType === 'shabad') {
       if (initialVerse) {
-        const clickedVerse = verses.filter(verseObj => {
+        const clickedVerse = verses.filter((verseObj) => {
           return verseObj.ID === initialVerse;
         });
         verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
@@ -288,7 +305,7 @@ const ShabadContent = () => {
       verse = firstVerse.ceremonyName;
       shabadId = firstVerse.ceremonyId;
     }
-    const check = verseHistory.filter(historyObj => historyObj.shabadId === shabadId);
+    const check = verseHistory.filter((historyObj) => historyObj.shabadId === shabadId);
     if (check.length === 0) {
       const updatedHistory = [
         {
@@ -313,7 +330,7 @@ const ShabadContent = () => {
 
   const scrollToView = () => {
     setTimeout(() => {
-      const currentIndex = activeShabad.findIndex(obj => obj.ID === activeVerseId);
+      const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
       virtuosoRef.current.scrollToIndex({
         index: currentIndex,
         behavior: 'smooth',
@@ -337,7 +354,7 @@ const ShabadContent = () => {
 
   useEffect(() => {
     const baniVerseIndex = activeShabad.findIndex(
-      obj => obj.crossPlatformID === savedCrossPlatformId,
+      (obj) => obj.crossPlatformID === savedCrossPlatformId,
     );
     if (baniVerseIndex >= 0) {
       updateTraversedVerse(activeShabad[baniVerseIndex].ID, baniVerseIndex);
@@ -347,16 +364,16 @@ const ShabadContent = () => {
   useEffect(() => {
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       // mangalPosition was removed from loadBani 3rd argument
-      loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(sundarGutkaVerses => {
+      loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((sundarGutkaVerses) => {
         setActiveShabad(sundarGutkaVerses);
         saveToHistory(sundarGutkaVerses, 'bani');
-        const check = sundarGutkaVerses.findIndex(verse => verse.ID === activeVerseId);
+        const check = sundarGutkaVerses.findIndex((verse) => verse.ID === activeVerseId);
         if (check < 0) {
           openFirstVerse(sundarGutkaVerses[0].ID, sundarGutkaVerses[0].crossPlatformID);
         }
       });
     } else if (isCeremonyBani && ceremonyId) {
-      loadCeremony(ceremonyId).then(ceremonyVerses => {
+      loadCeremony(ceremonyId).then((ceremonyVerses) => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
           const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
@@ -366,7 +383,7 @@ const ShabadContent = () => {
         }
       });
     } else {
-      loadShabad(activeShabadId, initialVerseId).then(verses => {
+      loadShabad(activeShabadId, initialVerseId).then((verses) => {
         if (verses) {
           setActiveShabad(verses);
           if (initialVerseId) {
@@ -491,8 +508,10 @@ const ShabadContent = () => {
           data={filteredItems}
           ref={virtuosoRef}
           itemContent={(index, verses) => {
-            const { verseId, verse, english } = verses;
+            const { verseId, verse, english, lineNo } = verses;
             return (
+              <>
+              <span>{lineNo}</span>
               <ShabadVerse
                 key={index}
                 activeVerse={activeVerse}
@@ -505,6 +524,7 @@ const ShabadContent = () => {
                 changeHomeVerse={changeHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />
+              </>
             );
           }}
         ></Virtuoso>
