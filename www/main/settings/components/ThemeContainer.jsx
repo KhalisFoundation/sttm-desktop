@@ -81,8 +81,12 @@ const ThemeContainer = () => {
                 onRemove={() => {
                   removeCustomBackgroundFile(tile['background-image-path'].replace(/\\(\s)/g, ' '));
                   upsertCustomBackgrounds(setCustomThemes);
-                  const currentThemeInstance = themes.filter((theme) => theme.key === currentTheme);
-                  setDefaultBg(currentThemeInstance, setThemeBg, themeBg);
+                  if (tile['background-image'] === themeBg.url.href) {
+                    const currentThemeInstance = themes.filter(
+                      (theme) => theme.key === currentTheme,
+                    );
+                    setDefaultBg(currentThemeInstance, setThemeBg, themeBg);
+                  }
                 }}
               />
             </React.Fragment>
