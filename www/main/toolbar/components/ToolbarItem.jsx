@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-import { ipcRenderer } from 'electron';
 import { DEFAULT_OVERLAY } from '../../common/constants';
 
 const ToolbarItem = ({ itemName }) => {
@@ -16,9 +15,6 @@ const ToolbarItem = ({ itemName }) => {
       className="toolbar-item"
       onClick={() => {
         document.body.classList.toggle(`overlay-${itemName}-active`, !isSelectedOverlay);
-        if (itemName === 'sso') {
-          ipcRenderer.send('open-sso-window');
-        }
         if (isSelectedOverlay) {
           return setOverlayScreen(DEFAULT_OVERLAY);
         }

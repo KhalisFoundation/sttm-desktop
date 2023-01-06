@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
@@ -10,21 +11,23 @@ import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
 import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
+import { SsoOverlay } from '../addons/sso/components/SsoOverlay';
 
 const electron = require('electron');
 
 const remote = require('@electron/remote');
+
 const main = remote.require('./app');
 
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { shortcuts } = useStoreState(state => state.navigator);
-  const { setShortcuts } = useStoreActions(state => state.navigator);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
+  const { overlayScreen } = useStoreState((state) => state.app);
+  const { shortcuts } = useStoreState((state) => state.navigator);
+  const { setShortcuts } = useStoreActions((state) => state.navigator);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
+  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
 
   const onScreenClose = React.useCallback(
-    evt => {
+    (evt) => {
       let isFromBackdrop = false;
       if (evt) {
         isFromBackdrop = evt.currentTarget.classList.contains('backdrop');
@@ -180,6 +183,7 @@ const Launchpad = () => {
   const isCeremoniesOverlay = overlayScreen === 'ceremonies';
   const isLockScreen = overlayScreen === 'lock-screen';
   const isSettingsOverlay = overlayScreen === 'settings';
+  const isSsoOverlay = overlayScreen === 'sso';
 
   return (
     <>
@@ -194,7 +198,7 @@ const Launchpad = () => {
         {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
         {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
-
+        {isSsoOverlay && <SsoOverlay onScreenClose={onScreenClose} />}
         <Navigator />
       </div>
     </>

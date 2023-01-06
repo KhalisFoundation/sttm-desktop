@@ -1,0 +1,67 @@
+.sso {
+  &-wrapper {
+    bottom: 0;
+    left: 85px;
+    position: fixed;
+    z-index: 999;
+  }
+
+  &-container {
+    background: $not-so-black;
+    width: 35vw;
+  }
+
+  &-header {
+    color: $white;
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px 0;
+  }
+
+  &-nav {
+    display: flex;
+    margin-bottom: 25px;
+
+    &-item {
+      background: $black;
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      padding: 16px;
+
+      &.active {
+        background: $not-so-black;
+      }
+    }
+  }
+
+  &-login, &-signup {
+    &-heading {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      input {
+        margin: auto 20px;
+      }
+    }
+
+    .login-btn {
+      margin: auto 40px 25px auto;
+      width: 25%;
+    }
+  }
+}
