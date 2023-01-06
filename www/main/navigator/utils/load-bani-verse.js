@@ -4,15 +4,15 @@ import banidb from '../../banidb';
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
-export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength) => {
+export const loadBaniVerse = (baniId, verseId, baniLength, nextLine = false) =>
   // mangalPosition was removed from arguments and filter
   // mangalPosition = 'current',
   // .filter(result => result.MangalPosition !== mangalPosition)
-  return banidb
+  banidb
     .loadBani(baniId, baniLength)
-    .then(allVerses =>
+    .then((allVerses) =>
       allVerses
-        .map(rowDb => {
+        .map((rowDb) => {
           let row = rowDb;
           if (rowDb.Verse) {
             row = rowDb.Verse;
@@ -24,7 +24,7 @@ export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength) => 
           row.crossPlatformID = rowDb.ID;
           return row;
         })
-        .filter(verse => {
+        .filter((verse) => {
           if (verse !== null) {
             const id = verse.ID;
             if (nextLine) {
@@ -35,7 +35,7 @@ export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength) => 
           return false;
         }),
     )
-    .catch(err => {
+    .catch((err) => {
       new Noty({
         type: 'error',
         text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Bani verse' })} : ${err}`,
@@ -43,4 +43,3 @@ export const loadBaniVerse = (baniId, verseId, nextLine = false, baniLength) => 
         modal: true,
       }).show();
     });
-};

@@ -10,7 +10,6 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
-    "test:lint:css": "stylelint \"www/src/scss/*.scss\" --syntax scss --fix",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
@@ -93,7 +92,6 @@
     "i18next": "^21.8.14",
     "i18next-node-fs-backend": "^2.1.3",
     "image-type": "^4.1.0",
-    "imagemin": "^7.0.1",
     "ip": "^1.1.8",
     "is-electron": "^2.2.1",
     "is-online": "^9.0.0",
@@ -122,6 +120,7 @@
     "request-promise": "^4.2.4",
     "sanitize-html": "^2.7.0",
     "scroll": "^3.0.1",
+    "sharp": "^0.31.3",
     "socket.io": "^4.5.1",
     "tippy.js": "^6.3.7",
     "universal-analytics": "^0.5.3",
@@ -201,4 +200,3 @@
     }
   }
 }
-

@@ -1,9 +1,9 @@
 import { action } from 'easy-peasy';
 import { convertToCamelCase } from '../../utils';
 
-const createNavigatorSettingsState = settingsSchema => {
+const createNavigatorSettingsState = (settingsSchema) => {
   const navigatorSettingsState = {};
-  Object.keys(settingsSchema).forEach(settingKey => {
+  Object.keys(settingsSchema).forEach((settingKey) => {
     const stateVarName = convertToCamelCase(settingKey);
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 

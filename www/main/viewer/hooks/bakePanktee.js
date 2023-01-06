@@ -3,17 +3,17 @@ import { useStoreState } from 'easy-peasy';
 
 const bakePanktee = () => {
   const { displayVishraams, larivaarAssist, larivaar, gurbaniFontSize } = useStoreState(
-    state => state.userSettings,
+    (state) => state.userSettings,
   );
 
-  return (getFontSize, gurmukhiString = '', vishraamPlacement, vishraamSource) => {
+  return (getFontSize, vishraamPlacement, vishraamSource, gurmukhiString = '') => {
     const filterAppliedVishraam = () => {
       const activeVishraams = {};
       if (vishraamPlacement) {
-        Object.keys(vishraamPlacement).forEach(appliedVishraam => {
+        Object.keys(vishraamPlacement).forEach((appliedVishraam) => {
           if (vishraamSource === appliedVishraam) {
             const rawActiveVishraams = vishraamPlacement[appliedVishraam];
-            rawActiveVishraams.forEach(rav => {
+            rawActiveVishraams.forEach((rav) => {
               activeVishraams[rav.p] = rav.t;
             });
           }
@@ -22,7 +22,7 @@ const bakePanktee = () => {
       return activeVishraams;
     };
 
-    const breakIntoWords = fullLine => {
+    const breakIntoWords = (fullLine) => {
       let wordsObj = [];
       const splittedWords = fullLine.split(' ');
       const activeVishraams = filterAppliedVishraam();
@@ -34,7 +34,7 @@ const bakePanktee = () => {
       return wordsObj;
     };
 
-    const getVishraamStyle = word => {
+    const getVishraamStyle = (word) => {
       if (larivaar && larivaarAssist) {
         return null;
       }

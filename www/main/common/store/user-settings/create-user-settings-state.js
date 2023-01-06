@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
-  Object.keys(settingsSchema).forEach(settingKey => {
+  Object.keys(settingsSchema).forEach((settingKey) => {
     const stateVarName = convertToCamelCase(settingKey);
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 

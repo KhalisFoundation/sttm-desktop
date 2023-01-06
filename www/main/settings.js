@@ -20,14 +20,14 @@ module.exports = {
         },
       });
     }
-    Object.keys(settings).forEach(catKey => {
+    Object.keys(settings).forEach((catKey) => {
       const cat = settings[catKey];
-      Object.keys(cat.settings).forEach(settingKey => {
+      Object.keys(cat.settings).forEach((settingKey) => {
         const setting = cat.settings[settingKey];
         switch (setting.type) {
           case 'checkbox':
           case 'switch':
-            Object.keys(setting.options).forEach(option => {
+            Object.keys(setting.options).forEach((option) => {
               if (newUserPrefs[catKey][settingKey][option]) {
                 document.body.classList.add(option);
               } else {
@@ -36,15 +36,15 @@ module.exports = {
             });
             break;
           case 'radio':
-            Object.keys(setting.options).forEach(optionToRemove => {
+            Object.keys(setting.options).forEach((optionToRemove) => {
               document.body.classList.remove(optionToRemove);
             });
             document.body.classList.add(newUserPrefs[catKey][settingKey]);
             break;
 
           case 'dropdown':
-            Object.keys(setting.options).forEach(dropdown => {
-              Object.keys(setting.options[dropdown].options).forEach(option => {
+            Object.keys(setting.options).forEach((dropdown) => {
+              Object.keys(setting.options[dropdown].options).forEach((option) => {
                 document.body.classList.remove(`${settingKey}-${dropdown}-${option}`);
                 if (newUserPrefs[catKey][settingKey][dropdown] === option) {
                   document.body.classList.add(`${settingKey}-${dropdown}-${option}`);
@@ -54,7 +54,7 @@ module.exports = {
             break;
 
           case 'range':
-            Object.keys(setting.options).forEach(optionKey => {
+            Object.keys(setting.options).forEach((optionKey) => {
               const option = setting.options[optionKey];
               for (let i = option.min; i <= option.max; i += option.step) {
                 document.body.classList.remove(`${optionKey}-${i}`);

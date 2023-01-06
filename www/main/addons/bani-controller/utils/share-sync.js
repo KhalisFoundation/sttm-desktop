@@ -1,11 +1,11 @@
 import axios from 'axios';
 import request from 'request-promise';
 
-const remote = require('@electron/remote');
-
 import Noty from 'noty';
 
 import { API_ENDPOINT as SYNC_API_URL } from '../../../common/constants';
+
+const remote = require('@electron/remote');
 
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');

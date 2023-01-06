@@ -2,6 +2,7 @@ import Noty from 'noty';
 import qrCode from 'qrcode';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const generateQrCode = (canvas, syncCode) => {
@@ -12,7 +13,7 @@ const generateQrCode = (canvas, syncCode) => {
     } else {
       url = `https://sttm.co/control/${syncCode}`;
     }
-    qrCode.toCanvas(canvas, url, error => {
+    qrCode.toCanvas(canvas, url, (error) => {
       if (error) {
         new Noty({
           type: 'error',
