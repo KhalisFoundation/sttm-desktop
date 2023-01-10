@@ -1,8 +1,26 @@
 ## New Updates
 
-### 9.1.0 - _October 17, 2022_
+### 9.1.0 - _January 11, 2023_
 
-__coming soon__
+### General
+
+- SikhiToTheMax now supports Raspberry pi 64bit Ubuntu
+
+### Enhancements
+
+- Optimized and enhanced the application performance.
+
+### Bug fixes
+
+- Fixed the issue while setting custom background image for gurbani viewer.
+- Fixed issue of sorting in Shabads search result.
+- UI bug fixes in dark theme.
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
 
 ### 9.0.5 - _September 14, 2022_
 
