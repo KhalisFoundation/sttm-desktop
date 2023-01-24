@@ -1,29 +1,33 @@
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 
-const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg) => {
+export const setDefaultBg = (themeInstance, setThemeBg, themeBg) => {
+  const hasBackgroundImage = !!themeInstance['background-image'];
+  const imageUrl = hasBackgroundImage
+    ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
+    : false;
+  const themeBgObj = {
+    type: 'default',
+    url: imageUrl,
+  };
+  if (themeBg !== themeBgObj) {
+    setThemeBg(themeBgObj);
+  }
+};
+
+export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg, themeBg) => {
   if (!isCustom) {
     setTheme(themeInstance.key);
-    const hasBackgroundImage = !!themeInstance['background-image'];
-    const imageUrl = hasBackgroundImage
-      ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
-      : false;
-    const themeBgObj = {
-      type: 'default',
-      url: imageUrl,
-    };
-    setThemeBg(themeBgObj);
-    /* TODO: move this to react state when porting viewer to react */
-    store.setUserPref('app.themebg', themeBgObj);
+    setDefaultBg(themeInstance, setThemeBg, themeBg);
   } else {
     const themeBgObj = {
       type: 'custom',
       url: themeInstance['background-image'],
     };
-    setThemeBg(themeBgObj);
-    store.setUserPref('app.themebg', themeBgObj);
+    if (themeBg !== themeBgObj) {
+      setThemeBg(themeBgObj);
+    }
   }
   global.core.platformMethod('updateSettings');
   analytics.trackEvent('theme', themeInstance.key);

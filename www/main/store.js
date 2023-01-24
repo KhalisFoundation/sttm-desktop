@@ -5,6 +5,15 @@ const ldGet = require('lodash.get');
 const ldSet = require('lodash.set');
 const path = require('path');
 
+/* eslint-disable global-require */
+let remote;
+if (electron.app) {
+  remote = require('@electron/remote/main');
+} else {
+  remote = require('@electron/remote');
+}
+/* eslint-enable */
+
 function parseDataFile(filePath, defaults) {
   // We'll try/catch it in case the file doesn't exist yet,
   // which will be the case on the first application run.
@@ -22,7 +31,13 @@ class Store {
     // Renderer process has to get `app` module via `remote`,
     // whereas the main process can get it directly
     // app.getPath('userData') will return a string of the user's app data directory path.
-    const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+    let userDataPath;
+    if (electron.app) {
+      userDataPath = electron.app.getPath('userData');
+    } else {
+      userDataPath = remote.app.getPath('userData');
+    }
+
     // We'll use the `configName` property to set the file name and path.join
     // to bring it all together as a string
     this.path = path.join(userDataPath, `${opts.configName}.json`);

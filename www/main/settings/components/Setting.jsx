@@ -4,23 +4,23 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
-  const userSettings = useStoreState(state => state.userSettings);
-  const userSettingsActions = useStoreActions(state => state.userSettings);
+  const userSettings = useStoreState((state) => state.userSettings);
+  const userSettingsActions = useStoreActions((state) => state.userSettings);
 
-  const handleInputChange = event => {
+  const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
     userSettingsActions[stateFunction](value);
     analytics.trackEvent('setting', stateVar, value);
   };
 
-  const handleCheckboxChange = event => {
+  const handleCheckboxChange = (event) => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
     analytics.trackEvent('setting', stateVar, value);
@@ -31,15 +31,18 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   switch (type) {
     case 'range':
       settingDOM = (
-        <input
-          type="range"
-          data-value={userSettings[stateVar]}
-          value={userSettings[stateVar]}
-          min={min}
-          max={max}
-          step={step}
-          onChange={handleInputChange}
-        ></input>
+        <>
+          <p className='range-value'>{userSettings[stateVar]}</p>
+          <input
+            type="range"
+            data-value={userSettings[stateVar]}
+            value={userSettings[stateVar]}
+            min={min}
+            max={max}
+            step={step}
+            onChange={handleInputChange}
+          ></input>
+        </>
       );
       break;
     case 'dropdown':

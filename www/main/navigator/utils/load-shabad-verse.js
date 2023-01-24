@@ -1,20 +1,21 @@
 import Noty from 'noty';
-import { remote } from 'electron';
 import banidb from '../../banidb';
 
+const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
-export const loadShabadVerse = (shabadID, lineID, nextLine = false) => {
-  return banidb
+export const loadShabadVerse = (shabadID, lineID, nextLine = false) =>
+  banidb
     .loadShabad(shabadID, lineID)
-    .then(rows =>
-      rows.filter(verse => {
+    .then((rows) =>
+      rows.filter((verse) => {
         if (nextLine) {
           return verse.ID === lineID + 1;
         }
         return verse.ID === lineID;
       }),
     )
-    .catch(err => {
+    .catch((err) => {
       new Noty({
         type: 'error',
         text: `${i18n.t('BANI.LOAD_ERROR', { erroneousOperation: 'Shabad verse' })} : ${err}`,
@@ -22,4 +23,3 @@ export const loadShabadVerse = (shabadID, lineID, nextLine = false) => {
         modal: true,
       }).show();
     });
-};

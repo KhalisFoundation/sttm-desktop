@@ -23,41 +23,31 @@ const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
-    setOverlayScreen: action((state, payload) => {
-      return {
-        ...state,
-        overlayScreen: payload,
-      };
-    }),
-    setListeners: action((state, listenersState) => {
-      return {
-        ...state,
-        isListeners: listenersState,
-      };
-    }),
+    setOverlayScreen: action((state, payload) => ({
+      ...state,
+      overlayScreen: payload,
+    })),
+    setListeners: action((state, listenersState) => ({
+      ...state,
+      isListeners: listenersState,
+    })),
   },
   baniController: {
     adminPin: null,
     code: null,
     isConnected: false,
-    setAdminPin: action((state, adminPin) => {
-      return {
-        ...state,
-        adminPin,
-      };
-    }),
-    setCode: action((state, code) => {
-      return {
-        ...state,
-        code,
-      };
-    }),
-    setConnection: action((state, connectionState) => {
-      return {
-        ...state,
-        isConnected: connectionState,
-      };
-    }),
+    setAdminPin: action((state, adminPin) => ({
+      ...state,
+      adminPin,
+    })),
+    setCode: action((state, code) => ({
+      ...state,
+      code,
+    })),
+    setConnection: action((state, connectionState) => ({
+      ...state,
+      isConnected: connectionState,
+    })),
   },
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
@@ -66,23 +56,29 @@ const GlobalState = createStore({
     setSlideOrder: action((state, payload) => {
       const oldValue = state.slideOrder;
       if (global.webview) {
-        global.webview.send('update-viewer-setting', {
-          stateName: 'slideOrder',
-          payload,
-          oldValue,
-          actionName: 'setSlideOrder',
-          settingType: 'viewerSettings',
-        });
+        global.webview.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: 'slideOrder',
+            payload,
+            oldValue,
+            actionName: 'setSlideOrder',
+            settingType: 'viewerSettings',
+          }),
+        );
       }
 
       if (global.platform) {
-        global.platform.ipc.send('update-viewer-setting', {
-          stateName: 'slideOrder',
-          payload,
-          oldValue,
-          actionName: 'setSlideOrder',
-          settingType: 'viewerSettings',
-        });
+        global.platform.ipc.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: 'slideOrder',
+            payload,
+            oldValue,
+            actionName: 'setSlideOrder',
+            settingType: 'viewerSettings',
+          }),
+        );
       }
       state.slideOrder = payload;
       return state;
@@ -97,13 +93,13 @@ const GlobalState = createStore({
 });
 
 global.platform.ipc.on('update-global-setting', (event, setting) => {
-  const { settingType, actionName, payload } = setting;
+  const { settingType, actionName, payload } = JSON.parse(setting);
   GlobalState.getActions()[settingType][actionName](payload);
 });
 
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
-  global.platform.ipc.send('save-overlay-settings', overlayState);
+  global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
 });
 
 export default GlobalState;

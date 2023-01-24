@@ -13,7 +13,7 @@ Acknowledgements: Bhai Tarsem Singh UK, SHARE UK, Khalis Foundation, Khalsa Foun
 
 Powered by [<img height="30" src="http://www.banidb.com/wp-content/uploads/2018/03/full-banidb-logo.png">](http://banidb.com)
 
-[![Build Status](https://travis-ci.com/KhalisFoundation/sttm-desktop.svg?branch=release)](https://travis-ci.com/KhalisFoundation/sttm-desktop) 
+[![Build Status](https://travis-ci.com/KhalisFoundation/sttm-desktop.svg?branch=release)](https://travis-ci.com/KhalisFoundation/sttm-desktop)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/khalisfoundation/sttm-desktop?branch=release&svg=true)](https://ci.appveyor.com/project/navdeepsinghkhalsa/sttm-desktop)
 
 ## Prerequisites

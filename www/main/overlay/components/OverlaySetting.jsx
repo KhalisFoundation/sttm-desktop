@@ -5,8 +5,7 @@ import LayoutSelector from './LayoutSelector';
 import { getDefaultSettings } from '../../common/store/user-settings/get-saved-overlay-settings';
 import { convertToCamelCase } from '../../common/utils';
 
-const { remote } = require('electron');
-
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {

@@ -1,7 +1,7 @@
 /* eslint-disable no-console, import/no-extraneous-dependencies */
 const fs = require('fs');
 const path = require('path');
-const SSH = require('ssh2').Client;
+const { Client } = require('ssh2');
 const { version } = require('../package.json');
 
 const files = {
@@ -10,9 +10,9 @@ const files = {
   win32: 'sttm-win-ia32',
 };
 
-module.exports = platform => {
+module.exports = (platform) => {
   const file = files[platform];
-  const conn = new SSH();
+  const conn = new Client();
   conn
     .on('ready', () => {
       console.log('Client :: ready');
@@ -25,10 +25,10 @@ module.exports = platform => {
               console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
               conn.end();
             })
-            .on('data', data => {
+            .on('data', (data) => {
               console.log(`STDOUT: ${data}`);
             })
-            .stderr.on('data', data => {
+            .stderr.on('data', (data) => {
               console.log(`STDERR: ${data}`);
             });
         },

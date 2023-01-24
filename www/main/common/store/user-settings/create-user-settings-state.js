@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
-  Object.keys(settingsSchema).forEach(settingKey => {
+  Object.keys(settingsSchema).forEach((settingKey) => {
     const stateVarName = convertToCamelCase(settingKey);
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 
@@ -21,23 +21,29 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
       if (global.webview) {
-        global.webview.send('update-viewer-setting', {
-          stateName: stateVarName,
-          payload,
-          oldValue,
-          actionName: stateFuncName,
-          settingType: 'userSettings',
-        });
+        global.webview.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: stateVarName,
+            payload,
+            oldValue,
+            actionName: stateFuncName,
+            settingType: 'userSettings',
+          }),
+        );
       }
 
       if (global.platform) {
-        global.platform.ipc.send('update-viewer-setting', {
-          stateName: stateVarName,
-          payload,
-          oldValue,
-          actionName: stateFuncName,
-          settingType: 'userSettings',
-        });
+        global.platform.ipc.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            stateName: stateVarName,
+            payload,
+            oldValue,
+            actionName: stateFuncName,
+            settingType: 'userSettings',
+          }),
+        );
       }
 
       // Save settings to file

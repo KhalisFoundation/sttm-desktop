@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { remote, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import banidb from '../../../common/constants/banidb';
 import { filters } from '../../utils';
 import { retrieveFilterOption } from '../utils';
@@ -16,6 +16,7 @@ import {
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -129,7 +130,8 @@ const SearchContent = () => {
   }, [filteredShabads]);
 
   ipcRenderer.on('database-progress', data => {
-    setDatabaseProgress(data.percent);
+    const { percent } = JSON.parse(data);
+    setDatabaseProgress(percent);
   });
 
   useEffect(() => {

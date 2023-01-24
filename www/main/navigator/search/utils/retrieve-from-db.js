@@ -1,14 +1,15 @@
-import { remote } from 'electron';
 import { getFilterOption } from '../../../banidb/realm-search';
+
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
 export const retrieveFilterOption = async (optionsObj, type) => {
   const idArray = Object.keys(optionsObj).filter(
-    option => option.toLowerCase() !== 'all' && option.toLowerCase() !== 'others',
+    (option) => option.toLowerCase() !== 'all' && option.toLowerCase() !== 'others',
   );
   const retrievedObj = await getFilterOption(type, idArray);
-  const valueObj = Object.assign({}, retrievedObj);
+  const valueObj = { ...retrievedObj };
 
   const finalArray = [
     {
@@ -17,7 +18,7 @@ export const retrieveFilterOption = async (optionsObj, type) => {
     },
   ];
 
-  Object.keys(valueObj).forEach(idx => {
+  Object.keys(valueObj).forEach((idx) => {
     if (type === 'source') {
       const { SourceID } = valueObj[idx];
       finalArray.push({

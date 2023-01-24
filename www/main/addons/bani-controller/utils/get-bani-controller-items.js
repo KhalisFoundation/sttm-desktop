@@ -1,6 +1,8 @@
 import React from 'react';
-import { remote } from 'electron';
+
 import { useStoreState, useStoreActions } from 'easy-peasy';
+
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
@@ -13,14 +15,10 @@ const getBaniControllerItems = ({
   toggleLockScreen,
 }) => {
   const { isMiscSlide, isMiscSlideGurmukhi, isAnnoucement } = useStoreState(
-    state => state.navigator,
+    (state) => state.navigator,
   );
-  const {
-    setMiscSlideText,
-    setIsMiscSlide,
-    setIsMiscSlideGurmukhi,
-    setIsAnnoucement,
-  } = useStoreActions(state => state.navigator);
+  const { setMiscSlideText, setIsMiscSlide, setIsMiscSlideGurmukhi, setIsAnnoucement } =
+    useStoreActions((state) => state.navigator);
   return [
     {
       title: i18n.t('TOOLBAR.SYNC_CONTROLLER.SANGAT_SYNC'),

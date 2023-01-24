@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+const remote = require('@electron/remote');
 
 const moment = require('moment');
 
@@ -17,7 +17,7 @@ const modal = new tingle.Modal({
 const formatDate = (dateString, format = 'LL') => moment(dateString).format(format);
 const scriptTagCheckRegEx = /<[^>]*script/i;
 
-const stripScripts = string => {
+const stripScripts = (string) => {
   const div = document.createElement('div');
   div.innerHTML = string;
   const scripts = div.getElementsByTagName('script');
@@ -29,7 +29,7 @@ const stripScripts = string => {
   return div.innerHTML;
 };
 
-const parseContent = contentString => {
+const parseContent = (contentString) => {
   if (scriptTagCheckRegEx.test(contentString)) {
     return stripScripts(contentString); // this might be overkill.
   }
@@ -54,10 +54,10 @@ export const getNotifications = (timeStamp, callback) => {
   );
 };
 
-const createNotificationContent = msgList => {
+const createNotificationContent = (msgList) => {
   let html = `<h1 class="model-title">${i18n.t('OTHERS.WHATS_NEW')}</h1> <div class="messages">`;
 
-  msgList.forEach(item => {
+  msgList.forEach((item) => {
     html += '<div class="row">';
     html += `<div class="date">${formatDate(item.Created)}</div>`;
     html += `<div class="title">${item.Title}</div>`;
@@ -69,7 +69,7 @@ const createNotificationContent = msgList => {
   return html;
 };
 
-export const showNotificationsModal = message => {
+export const showNotificationsModal = (message) => {
   if (message && message.rows && message.rows.length > 0) {
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
     global.core.platformMethod('updateNotificationsTimestamp', time);

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 
-const { remote } = require('electron');
-
+const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const SettingsNav = ({ settingsNavObj }) => {

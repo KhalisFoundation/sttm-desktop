@@ -7,15 +7,15 @@ const shortcutsApplied = {
 };
 
 const shortcutFactory = (keys, actionName) => {
-  Mousetrap.bind(keys, event => {
-    global.platform.ipc.send('shortcuts', { actionName, event });
+  Mousetrap.bind(keys, (event) => {
+    global.platform.ipc.send('shortcuts', JSON.stringify({ actionName, event }));
     event.preventDefault();
   });
 };
 
-const applyShortcuts = source => {
+const applyShortcuts = (source) => {
   if (!shortcutsApplied[source]) {
-    Object.keys(shortcutsMap).forEach(actionName => {
+    Object.keys(shortcutsMap).forEach((actionName) => {
       shortcutFactory(shortcutsMap[actionName], actionName);
     });
     shortcutsApplied[source] = true;

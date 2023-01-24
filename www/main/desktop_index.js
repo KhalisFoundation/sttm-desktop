@@ -1,4 +1,4 @@
-/* eslint import/no-unresolved: 0 */
+/* eslint import/no-unresolved: 0, import/extensions: 0 */
 import GlobalState from './js/common/store/GlobalState';
 
 global.platform = require('./js/desktop_scripts');

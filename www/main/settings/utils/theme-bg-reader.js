@@ -1,5 +1,4 @@
-import { remote } from 'electron';
-
+const remote = require('@electron/remote');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -9,7 +8,8 @@ const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const userBackgroundsURL = new URL(`file:///${userBackgroundsPath}`).href;
 
-const errorAlert = error => {
+const errorAlert = (error) => {
+  /* eslint-disable-next-line no-alert */
   alert(error);
 };
 
@@ -26,7 +26,7 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
     } else {
       responseCallback(
         files
-          .map(file => ({
+          .map((file) => ({
             name: file,
             path: `${userBackgroundsPath}/${file}`,
             'background-image': `${userBackgroundsURL}/${file.replace(/(\s)/g, '\\ ')}`,
