@@ -2,19 +2,7 @@
 
 ### 9.1.0 - _January 11, 2023_
 
-### General
-
-- SikhiToTheMax now supports Raspberry pi 64bit Ubuntu
-
-### Enhancements
-
-- Optimized and enhanced the application performance.
-
-### Bug fixes
-
-- Fixed the issue while setting custom background image for gurbani viewer.
-- Fixed issue of sorting in Shabads search result.
-- UI bug fixes in dark theme.
+The latest application includes improved performance, and several bug fixes related to custom background image upload, shabad sorting and dark theme setting.
 
 </br>
 
