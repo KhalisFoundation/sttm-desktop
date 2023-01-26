@@ -65,20 +65,25 @@ const ShabadContent = () => {
   };
 
   const filterRequiredVerseItems = (verses) => {
+    let currentLine = 0;
     try {
       verses = verses.flat(1);
     } finally {
+      const checkPauri = verses.filter((verse) => /]\d*]/.test(verse.Gurmukhi));
+      let regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
       return verses
         ? verses.map((verse, index) => {
             if (verse) {
-              return {
+              const verseObj = {
                 ID: index,
                 verseId: verse.ID,
                 verse: verse.Gurmukhi,
                 english: verse.English ? verse.English : '',
-                lineNo: verse.LineNo,
+                lineNo: currentLine,
                 crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
               };
+              regex.test(verse.Gurmukhi) && currentLine++;
+              return verseObj;
             }
             return {};
           })
@@ -228,36 +233,37 @@ const ShabadContent = () => {
 
       if (atHome) {
         if (previousVerseIndex) {
-          nextVerseId = mappedShabadArray[previousVerseIndex + 1].verseId;
           nextVerseIndex = previousVerseIndex + 1;
+          if (nextVerseIndex >= mappedShabadArray.length) {
+            nextVerseIndex = 0;
+          }
+          nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
         } else {
-          nextVerseIndex = 1;
-          nextVerseId = mappedShabadArray[1].verseId;
+          nextVerseIndex = 0;
+          nextVerseId = mappedShabadArray[0].verseId;
         }
         setPreviousIndex(nextVerseIndex);
         setHome(false);
       } else {
         nextVerseIndex = currentVerseIndex + 1;
-        if (nextVerseIndex < mappedShabadArray.length) {
-          const currentVerseObj = mappedShabadArray[currentVerseIndex];
-          const nextVerseObj = mappedShabadArray[nextVerseIndex];
-          const homeVerseObj = mappedShabadArray[homeVerse];
+        if (nextVerseIndex >= mappedShabadArray.length) {
+          nextVerseIndex = 0;
+        }
+        const currentVerseObj = mappedShabadArray[currentVerseIndex];
+        const nextVerseObj = mappedShabadArray[nextVerseIndex];
+        const homeVerseObj = mappedShabadArray[homeVerse];
 
-          if (currentVerseObj.lineNo !== nextVerseObj.lineNo) {
-            nextVerseIndex = homeVerse;
-            nextVerseId = homeVerseObj.verseId;
-            setHome(true);
-          } else {
-            nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
-            setPreviousIndex(nextVerseIndex);
-          }
+        if (currentVerseObj.lineNo !== nextVerseObj.lineNo) {
+          nextVerseIndex = homeVerse;
+          nextVerseId = homeVerseObj.verseId;
+          setHome(true);
+        } else {
+          nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
+          setPreviousIndex(nextVerseIndex);
         }
       }
       scrollToVerse(nextVerseId);
       updateTraversedVerse(nextVerseId, nextVerseIndex);
-
-      // let nextVerseIndex = currentVerseIndex + 1;
-      // let nextVerseId;
     }
   };
 
@@ -362,6 +368,7 @@ const ShabadContent = () => {
   }, [savedCrossPlatformId]);
 
   useEffect(() => {
+    setPreviousIndex(null);
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       // mangalPosition was removed from loadBani 3rd argument
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((sundarGutkaVerses) => {
@@ -510,8 +517,6 @@ const ShabadContent = () => {
           itemContent={(index, verses) => {
             const { verseId, verse, english, lineNo } = verses;
             return (
-              <>
-              <span>{lineNo}</span>
               <ShabadVerse
                 key={index}
                 activeVerse={activeVerse}
@@ -524,7 +529,6 @@ const ShabadContent = () => {
                 changeHomeVerse={changeHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />
-              </>
             );
           }}
         ></Virtuoso>
