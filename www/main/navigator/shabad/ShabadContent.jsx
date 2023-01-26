@@ -232,15 +232,16 @@ const ShabadContent = () => {
       let nextVerseIndex;
 
       if (atHome) {
-        if (previousVerseIndex) {
+        if (previousVerseIndex !== null) {
           nextVerseIndex = previousVerseIndex + 1;
           if (nextVerseIndex >= mappedShabadArray.length) {
             nextVerseIndex = 0;
           }
-          nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
         } else {
           nextVerseIndex = 0;
-          nextVerseId = mappedShabadArray[0].verseId;
+        }
+        if (nextVerseIndex === homeVerse) {
+          nextVerseIndex++;
         }
         setPreviousIndex(nextVerseIndex);
         setHome(false);
@@ -251,17 +252,15 @@ const ShabadContent = () => {
         }
         const currentVerseObj = mappedShabadArray[currentVerseIndex];
         const nextVerseObj = mappedShabadArray[nextVerseIndex];
-        const homeVerseObj = mappedShabadArray[homeVerse];
 
         if (currentVerseObj.lineNo !== nextVerseObj.lineNo) {
           nextVerseIndex = homeVerse;
-          nextVerseId = homeVerseObj.verseId;
           setHome(true);
         } else {
-          nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
           setPreviousIndex(nextVerseIndex);
         }
       }
+      nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
       scrollToVerse(nextVerseId);
       updateTraversedVerse(nextVerseId, nextVerseIndex);
     }
