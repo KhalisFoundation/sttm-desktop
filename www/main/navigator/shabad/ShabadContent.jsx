@@ -70,7 +70,7 @@ const ShabadContent = () => {
       verses = verses.flat(1);
     } finally {
       const checkPauri = verses.filter((verse) => /]\d*]/.test(verse.Gurmukhi));
-      let regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
+      const regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
       return verses
         ? verses.map((verse, index) => {
             if (verse) {
