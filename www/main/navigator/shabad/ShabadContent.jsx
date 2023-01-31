@@ -224,6 +224,14 @@ const ShabadContent = () => {
     });
   };
 
+  const skipMangla = (shabadVerses, index) => {
+    const gurmukhi = shabadVerses[index]?.verse;
+    if (/(mhlw [\w])|(mÚ [\w])/.test(gurmukhi) || (index === 0 && /sloku/.test(gurmukhi))) {
+      return index + 1;
+    }
+    return index;
+  };
+
   const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
@@ -240,6 +248,7 @@ const ShabadContent = () => {
         } else {
           nextVerseIndex = 0;
         }
+        nextVerseIndex = skipMangla(mappedShabadArray, nextVerseIndex);
         if (nextVerseIndex === homeVerse) {
           nextVerseIndex++;
         }
@@ -247,6 +256,8 @@ const ShabadContent = () => {
         setHome(false);
       } else {
         nextVerseIndex = currentVerseIndex + 1;
+        nextVerseIndex = skipMangla(mappedShabadArray, nextVerseIndex);
+
         if (nextVerseIndex >= mappedShabadArray.length) {
           nextVerseIndex = 0;
         }
@@ -368,6 +379,7 @@ const ShabadContent = () => {
 
   useEffect(() => {
     setPreviousIndex(null);
+    setHome(true);
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       // mangalPosition was removed from loadBani 3rd argument
       loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((sundarGutkaVerses) => {
