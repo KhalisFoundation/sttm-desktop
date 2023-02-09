@@ -1,9 +1,13 @@
 import React from 'react';
 import { useDataLayerValue } from '../state-manager/DataLayer';
+import classNames from '../../../common/utils/classnames';
+
+const remote = require('@electron/remote');
+const { i18n } = remote.require('./app');
 
 export const MiscHeader = () => {
   const [{ miscPanel }, dispatch] = useDataLayerValue();
-  const SetOpenTab = event => {
+  const SetOpenTab = (event) => {
     dispatch({
       type: 'SET_PANEL',
       miscPanel: event.target.textContent,
@@ -16,43 +20,43 @@ export const MiscHeader = () => {
   return (
     <div className="misc-header">
       <a
-        className={`misc-button ${isHistory ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        className={classNames('misc-button', isHistory && 'misc-active')}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-clock-o">
           <span className="Icon-label" key="History">
-            History
+            {i18n.t('TOOLBAR.HISTORY')}
           </span>
         </i>
       </a>
 
       <a
-        className={`misc-button ${isInsert ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        className={classNames('misc-button', isInsert && 'misc-active')}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-desktop">
           <span className="Icon-label" key="Insert">
-            Insert
+            {i18n.t('TOOLBAR.INSERT')}
           </span>
         </i>
       </a>
       <a
-        className={`misc-button ${isFav ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        className={classNames('misc-button', isFav && 'misc-active')}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-heart">
           <span className="Icon-label" key="Favorite">
-            Favorite
+            {i18n.t('TOOLBAR.FAVORITE')}
           </span>
         </i>
       </a>
       <a
-        className={`misc-button ${isOther ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        className={classNames('misc-button', isOther && 'misc-active')}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
-            Others
+            {i18n.t('TOOLBAR.OTHERS')}
           </span>
         </i>
       </a>

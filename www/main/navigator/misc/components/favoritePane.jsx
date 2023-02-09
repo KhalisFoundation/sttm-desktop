@@ -71,7 +71,7 @@ export const FavoritePane = ({ className }) => {
   };
 
   return (
-    <div className={'history-results ' + className}>
+    <div className={`history-results ${className}`}>
       {favShabad.map((element, index) => {
         const dateString = element.timestamp.toLocaleDateString('en-us', {
           day: 'numeric',
