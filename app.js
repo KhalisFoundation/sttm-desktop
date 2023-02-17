@@ -752,6 +752,10 @@ ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });
 
+ipcMain.on('download-subtitle', (event, filename) => {
+  mainWindow.webContents.downloadURL(filename);
+})
+
 module.exports = {
   openSecondaryWindow,
   appVersion,

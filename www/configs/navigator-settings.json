@@ -40,5 +40,7 @@
     "copyToClipboard": false
   },
   "minimizedBySingleDisplay": false,
-  "isDontSaveHistory": false
+  "isDontSaveHistory": false,
+  "isSubtitleRecording": false,
+  "subtitleData": []
 }

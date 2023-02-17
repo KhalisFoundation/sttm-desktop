@@ -12,8 +12,8 @@ const remote = require('@electron/remote');
 const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
-  const { isSingleDisplayMode, akhandpatt } = useStoreState(state => state.userSettings);
-  const { setAkhandpatt } = useStoreState(state => state.userSettings);
+  const { isSingleDisplayMode, akhandpatt } = useStoreState((state) => state.userSettings);
+  const { setAkhandpatt } = useStoreState((state) => state.userSettings);
   const {
     minimizedBySingleDisplay,
     shortcuts,
@@ -23,7 +23,8 @@ const Navigator = () => {
     isSundarGutkaBani,
     isCeremonyBani,
     ceremonyId,
-  } = useStoreState(state => state.navigator);
+    isSubtitleRecording,
+  } = useStoreState((state) => state.navigator);
   const {
     setShortcuts,
     setIsMiscSlide,
@@ -32,9 +33,9 @@ const Navigator = () => {
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setCeremonyId,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
-  const addMiscSlide = givenText => {
+  const addMiscSlide = (givenText) => {
     if (isAnnoucement) {
       setIsAnnoucement(false);
     }
@@ -134,6 +135,12 @@ const Navigator = () => {
             <ShabadPane />
           </div>
           <div className="navigator-row">
+            {isSubtitleRecording && (
+              <div className="subtitle-status">
+                <i class="fa fa-circle"></i>
+                <span>Recording</span>
+              </div>
+            )}
             <ViewerPane />
             <MiscPane
               waheguruSlide={openWaheguruSlide}

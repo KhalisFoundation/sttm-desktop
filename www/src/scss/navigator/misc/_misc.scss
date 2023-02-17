@@ -155,4 +155,36 @@ $misc-footer-active: 70px;
       }
     }
   }
+  .subtitle-pane {
+    padding: 0 16px 80px 16px;
+    overflow-y: auto;
+
+    .subtitle-item {
+      border-bottom: 1px dashed $not-so-black;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      button {
+        background-color: $dull-blue;
+        border-radius: 8px;
+        margin: 8px;
+      }
+    }
+
+  }
+}
+.subtitle-status {
+  background-color: white;
+  border: 2px dashed $red;
+  color: $red;
+  display: flex;
+  padding: 8px;
+  position: absolute;
+  right: 20px;
+  z-index: 100;
+
+  > span {
+    margin-left: 8px;
+  }
 }

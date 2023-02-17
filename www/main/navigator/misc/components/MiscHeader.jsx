@@ -3,7 +3,7 @@ import { useDataLayerValue } from '../state-manager/DataLayer';
 
 export const MiscHeader = () => {
   const [{ miscPanel }, dispatch] = useDataLayerValue();
-  const SetOpenTab = event => {
+  const SetOpenTab = (event) => {
     dispatch({
       type: 'SET_PANEL',
       miscPanel: event.target.textContent,
@@ -12,11 +12,12 @@ export const MiscHeader = () => {
   const isHistory = miscPanel === 'History';
   const isInsert = miscPanel === 'Insert';
   const isOther = miscPanel === 'Others';
+  const isRecord = miscPanel === 'Record';
   return (
     <div className="misc-header">
       <a
         className={`misc-button ${isHistory ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-clock-o">
           <span className="Icon-label" key="History">
@@ -27,7 +28,7 @@ export const MiscHeader = () => {
 
       <a
         className={`misc-button ${isInsert ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-desktop">
           <span className="Icon-label" key="Insert">
@@ -36,8 +37,18 @@ export const MiscHeader = () => {
         </i>
       </a>
       <a
+        className={`misc-button ${isRecord ? 'misc-active' : ''}`}
+        onClick={(event) => SetOpenTab(event)}
+      >
+        <i className="fa fa-circle">
+          <span className="Icon-label" key="Record">
+            Record
+          </span>
+        </i>
+      </a>
+      <a
         className={`misc-button ${isOther ? 'misc-active' : ''}`}
-        onClick={event => SetOpenTab(event)}
+        onClick={(event) => SetOpenTab(event)}
       >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
