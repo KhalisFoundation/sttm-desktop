@@ -49,7 +49,7 @@ const ShabadHeader = () => {
     <div className="shabad-pane-header">
       {activeShabadId && (
         <button
-          className={classNames('button fav-btn', favShabadIndex > 0 && 'unfav-btn')}
+          className={classNames('button fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
           ref={favBtnRef}
           title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
           onClick={() => {

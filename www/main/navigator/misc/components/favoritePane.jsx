@@ -96,6 +96,7 @@ export const FavoritePane = ({ className }) => {
               </p>
             </div>
             <div className="fav-shabad-options">
+              <i className='fa-regular fa-clock'></i>
               <p className="date">{dateString}</p>
               <p className="time">{timeString}</p>
               <button

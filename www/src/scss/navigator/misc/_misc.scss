@@ -166,10 +166,22 @@ $misc-footer-active: 70px;
   padding: 0px 8px;
 
   .fav-shabad-options {
+    align-items: center;
+    color: $sky-blue;
     display: flex;
     > p,
     > button {
       margin: 0px 4px;
+    }
+
+    > button {
+      background-color: $red;
+      border-radius: 50%;
+      color: $white;
+      font-size: 14px;
+      height: 24px;
+      padding: 4px;
+      width: 24px;
     }
   }
 }
