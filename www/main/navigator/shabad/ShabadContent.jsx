@@ -9,6 +9,7 @@ import copy from 'copy-to-clipboard';
 import { Virtuoso } from 'react-virtuoso';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+import shabadVerse from '../../common/sttm-ui/shabad-verse';
 
 const { i18n } = remote.require('./app');
 
@@ -227,6 +228,15 @@ const ShabadContent = () => {
   const skipMangla = (shabadVerses, index) => {
     const gurmukhi = shabadVerses[index]?.verse;
     if (/(mhlw [\w])|(mÚ [\w])/.test(gurmukhi) || (index === 0 && /sloku/.test(gurmukhi))) {
+      return skipIkOnkar(shabadVerses, index + 1);
+    }
+    return skipIkOnkar(shabadVerses, index);
+  };
+
+  const skipIkOnkar = (shabadVerses, index) => {
+    const gurmukhi = shabadVerses[index]?.verse;
+    const verseId = shabadVerses[index]?.verseId;
+    if (verseId !== 1 && /^(<>)/gm.test(gurmukhi)) {
       return index + 1;
     }
     return index;
@@ -235,7 +245,9 @@ const ShabadContent = () => {
   const toggleHomeVerse = () => {
     if (homeVerse >= 0) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const currentVerseIndex = mappedShabadArray.findIndex((s) => s.verseId === activeVerseId);
+      const currentVerseIndex = mappedShabadArray.findIndex(
+        ({ verseId }) => verseId === activeVerseId,
+      );
       let nextVerseId;
       let nextVerseIndex;
 
@@ -255,8 +267,7 @@ const ShabadContent = () => {
         setPreviousIndex(nextVerseIndex);
         setHome(false);
       } else {
-        nextVerseIndex = currentVerseIndex + 1;
-        nextVerseIndex = skipMangla(mappedShabadArray, nextVerseIndex);
+        nextVerseIndex = skipMangla(mappedShabadArray, currentVerseIndex + 1);
 
         if (nextVerseIndex >= mappedShabadArray.length) {
           nextVerseIndex = 0;
