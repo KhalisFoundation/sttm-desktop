@@ -5,7 +5,7 @@ const git = require('simple-git');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const {
-  argv: { branch, platform, token },
+  argv: { branch, platform, token, appleIdEmail, appleAppPassword },
 } = require('yargs');
 const checkVersion = require('./check-version');
 const updateRemoteVersion = require('./update-remote');
@@ -23,7 +23,7 @@ const release = async () => {
   if (platform !== 'win32') {
     // Get all tags, sort in desc order, and get latest from current track
     const gitTags = await git().tags();
-    const gitTag = gitTags.all.reverse().find(tag => tag.indexOf(track) > -1);
+    const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
     console.log(`Last Git tag: ${gitTag}`);
 
     // Get a new release version and update package.json
@@ -42,6 +42,42 @@ const release = async () => {
 
   // Only push git tag if on Travis
   if (platform === 'mac') {
+    console.log('Notarizing app with Apple...');
+    try {
+      const { stdout } = await exec(
+        `xcrun altool --notarize-app --primary-bundle-id "org.khalisfoundation.sttm" --username "${appleIdEmail}" --password "${appleAppPassword}" --file SikhiToTheMax-${releaseVersion}-arm64.zip --output-format xml > notarization.plist`,
+      );
+      console.log(stdout);
+      const requestUUID = /<key>RequestUUID<\/key>[\s\S]*?<string>([\w-]+)<\/string>/.exec(
+        stdout,
+      )[1];
+      console.log(`Request UUID: ${requestUUID}`);
+
+      // Wait for notarization to complete
+      console.log('Waiting for notarization to complete...');
+      const waitForNotarization = async () => {
+        const { stdout: notarizationInfo } = await exec(
+          `xcrun altool --notarization-info ${requestUUID} --username "${appleIdEmail}" --password "${appleAppPassword}" --output-format xml`,
+        );
+        const notarizationStatus = /<key>Status<\/key>[\s\S]*?<string>([\w\s]+)<\/string>/.exec(
+          notarizationInfo,
+        )[1];
+        console.log(`Notarization status: ${notarizationStatus}`);
+        if (notarizationStatus === 'success') {
+          console.log('Notarization succeeded!');
+          return;
+        }
+        if (notarizationStatus === 'invalid' || notarizationStatus === 'failed') {
+          throw new Error(`Notarization failed with status: ${notarizationStatus}`);
+        }
+        console.log('Waiting for 30 seconds...');
+        setTimeout(waitForNotarization, 30000);
+      };
+      await waitForNotarization();
+    } catch (error) {
+      console.error('Notarization failed:', error);
+    }
+
     console.log('Configure Git for Travis CI user');
     await git().raw(['config', '--global', 'user.email', 'travis@travis-ci.org']);
     await git().raw(['config', '--global', 'user.name', 'Travis CI']);
