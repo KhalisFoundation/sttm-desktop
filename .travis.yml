@@ -19,4 +19,4 @@ before_install:
     -in id_rsa.enc -out packaging/id_rsa -d; fi
 script:
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then npm test; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN --appleIdEmail=$APPLE_ID_EMAIL --appleAppPassword=$APPLE_APP_PASSWORD; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN; --appleIdEmail=$APPLE_ID_EMAIL --appleAppPassword=$APPLE_APP_PASSWORD fi'
