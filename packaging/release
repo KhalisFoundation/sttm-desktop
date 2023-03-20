@@ -42,10 +42,26 @@ const release = async () => {
 
   // Only push git tag if on Travis
   if (platform === 'mac') {
+    console.log('Configure Git for Travis CI user');
+    await git().raw(['config', '--global', 'user.email', 'travis@travis-ci.org']);
+    await git().raw(['config', '--global', 'user.name', 'Travis CI']);
+    await git().raw(['config', '--global', 'push.default', 'current']);
+    await git().checkout(branch);
+
+    console.log('git tag new version and push');
+    await git().addTag(releaseVersion);
+    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
+  }
+
+  if (branch === 'release') {
+    updateRemoteVersion(platform);
+  }
+
+  if (platform === 'mac') {
     console.log('Notarizing app with Apple...');
     try {
       const { stdout } = await exec(
-        `xcrun altool --notarize-app --primary-bundle-id "org.khalisfoundation.sttm" --username "${appleIdEmail}" --password "${appleAppPassword}" --file SikhiToTheMax-${releaseVersion}-arm64.zip --output-format xml > notarization.plist`,
+        `xcrun altool --notarize-app --primary-bundle-id "org.khalisfoundation.sttm" --username "${appleIdEmail}" --password "${appleAppPassword}" --file sttm.zip --output-format xml > notarization.plist`,
       );
       console.log(stdout);
       const requestUUID = /<key>RequestUUID<\/key>[\s\S]*?<string>([\w-]+)<\/string>/.exec(
@@ -76,21 +92,8 @@ const release = async () => {
       await waitForNotarization();
     } catch (error) {
       console.error('Notarization failed:', error);
+      process.exit(1);
     }
-
-    console.log('Configure Git for Travis CI user');
-    await git().raw(['config', '--global', 'user.email', 'travis@travis-ci.org']);
-    await git().raw(['config', '--global', 'user.name', 'Travis CI']);
-    await git().raw(['config', '--global', 'push.default', 'current']);
-    await git().checkout(branch);
-
-    console.log('git tag new version and push');
-    await git().addTag(releaseVersion);
-    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
-  }
-
-  if (branch === 'release') {
-    updateRemoteVersion(platform);
   }
 };
 
