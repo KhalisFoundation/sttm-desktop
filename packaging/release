@@ -44,9 +44,8 @@ const release = async () => {
   if (platform === 'mac') {
     console.log('Notarizing app with Apple...');
     try {
-      await exec('ls');
       const { stdout } = await exec(
-        `xcrun altool --notarize-app --primary-bundle-id "org.khalisfoundation.sttm" --username "${appleIdEmail}" --password "${appleAppPassword}" --file ./builds/SikhiToTheMax-${releaseVersion}-arm64.zip --output-format xml > notarization.plist`,
+        `xcrun altool --notarize-app --primary-bundle-id "org.khalisfoundation.sttm" --username "${appleIdEmail}" --password "${appleAppPassword}" --file SikhiToTheMax-${releaseVersion}-arm64.zip --output-format xml > notarization.plist`,
       );
       console.log(stdout);
       const requestUUID = /<key>RequestUUID<\/key>[\s\S]*?<string>([\w-]+)<\/string>/.exec(
