@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 const remote = require('@electron/remote');
 import { searchShabads, loadAng } from '../../../navigator/utils';
+import { InputContext } from '../../../launchpad';
 
 const analytics = remote.getGlobal('analytics');
 
@@ -12,7 +13,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
   );
   const { setSearchData, setShortcuts } = useStoreActions(state => state.navigator);
 
-  const inputRef = useRef(null);
+  const inputContextRef = useContext(InputContext);
   const handleChange = event => {
     setQuery(event.target.value);
   };
@@ -25,7 +26,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
 
   // keyboard shortcut to focus on search input
   const focusInputbox = () => {
-    inputRef.current.focus();
+    inputContextRef.current.focus();
   };
 
   const sendAnalytics = () => {
@@ -61,7 +62,7 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
       <input
         className={`input-box ${className}`}
         type="search"
-        ref={inputRef}
+        ref={inputContextRef}
         placeholder={placeholder}
         value={query}
         onBlur={sendAnalytics}

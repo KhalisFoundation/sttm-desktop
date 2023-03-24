@@ -197,6 +197,7 @@ const ShabadContent = () => {
         if (mappedShabadArray.length - 1 > parseInt(activeVerseIndex, 10)) {
           const newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          scrollToVerse(newVerseId);
           updateTraversedVerse(newVerseId, newVerseIndex);
         }
       });
@@ -243,7 +244,9 @@ const ShabadContent = () => {
   };
 
   const toggleHomeVerse = () => {
-    if (homeVerse >= 0) {
+    if (isSundarGutkaBani || isCeremonyBani) {
+      openNextVerse();
+    } else if (homeVerse) {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
       const currentVerseIndex = mappedShabadArray.findIndex(
         ({ verseId }) => verseId === activeVerseId,
