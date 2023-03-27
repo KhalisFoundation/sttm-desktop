@@ -11,24 +11,23 @@ import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
 
-const electron = require('electron');
-
 const remote = require('@electron/remote');
+
 const main = remote.require('./app');
 
 export const InputContext = createContext();
 
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { shortcuts } = useStoreState(state => state.navigator);
-  const { setShortcuts } = useStoreActions(state => state.navigator);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
+  const { overlayScreen } = useStoreState((state) => state.app);
+  const { shortcuts } = useStoreState((state) => state.navigator);
+  const { setShortcuts } = useStoreActions((state) => state.navigator);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
+  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
 
   const ref = useRef();
 
   const onScreenClose = React.useCallback(
-    evt => {
+    (evt) => {
       let isFromBackdrop = false;
       if (evt) {
         isFromBackdrop = evt.currentTarget.classList.contains('backdrop');

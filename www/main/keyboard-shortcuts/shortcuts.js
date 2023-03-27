@@ -10,7 +10,7 @@ const shortcutFactory = (keys, actionName) => {
   Mousetrap.bind(keys, (event) => {
     global.platform.ipc.send('shortcuts', JSON.stringify({ actionName, event }));
     // prevents the default action for all keys, except left and right arrow keys
-    if (!['left', 'right'].some(k => keys.includes(k))) {
+    if (!['left', 'right'].some((k) => keys.includes(k))) {
       event.preventDefault();
     }
   });
