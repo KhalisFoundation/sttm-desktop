@@ -1,24 +1,25 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-const remote = require('@electron/remote');
 import { searchShabads, loadAng } from '../../../navigator/utils';
 import { InputContext } from '../../../launchpad';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 
 const InputBox = ({ placeholder, disabled, className, databaseProgress, query, setQuery }) => {
   const { currentSearchType, currentSource, searchQuery, shortcuts } = useStoreState(
-    state => state.navigator,
+    (state) => state.navigator,
   );
-  const { setSearchData, setShortcuts } = useStoreActions(state => state.navigator);
+  const { setSearchData, setShortcuts } = useStoreActions((state) => state.navigator);
 
   const inputContextRef = useContext(InputContext);
-  const handleChange = event => {
+  const handleChange = (event) => {
     setQuery(event.target.value);
   };
 
-  const handleSpace = event => {
+  const handleSpace = (event) => {
     if (event.keyCode === 32 && [2, 3].includes(currentSearchType)) {
       setQuery(`${query} `);
     }
@@ -48,9 +49,9 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
     const isAng = !!searchTypeInt;
     if (databaseProgress >= 1 && searchQuery) {
       if (isAng) {
-        loadAng(searchTypeInt).then(rows => setSearchData(rows));
+        loadAng(searchTypeInt).then((rows) => setSearchData(rows));
       } else {
-        searchShabads(searchQuery, currentSearchType, currentSource).then(rows =>
+        searchShabads(searchQuery, currentSearchType, currentSource).then((rows) =>
           searchQuery ? setSearchData(rows) : setSearchData([]),
         );
       }
