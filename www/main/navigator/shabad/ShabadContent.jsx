@@ -145,6 +145,10 @@ const ShabadContent = () => {
         verseHistory[currentIndex].versesRead = [...versesRead, newTraversedVerse];
         setVersesRead([...versesRead, newTraversedVerse]);
       }
+    } else {
+      if (!versesRead.some((traversedVerse) => traversedVerse === newTraversedVerse)) {
+        setVersesRead([...versesRead, newTraversedVerse]);
+      }
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
