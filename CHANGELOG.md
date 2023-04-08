@@ -1,5 +1,15 @@
 ## New Updates
 
+### 9.1.1 - _March 24, 2023_
+
+Changelog will go here!
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.1.0 - _January 11, 2023_
 
 The latest application includes improved performance, and several bug fixes related to custom background image upload, shabad sorting and dark theme setting.
