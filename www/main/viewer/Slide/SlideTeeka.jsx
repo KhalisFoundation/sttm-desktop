@@ -23,7 +23,6 @@ const SlideTeeka = ({ getFontSize, teekaObj, order }) => {
   }, [teekaObj]);
 
   const customStyle = getFontSize(teekaFontSize);
-  customStyle.order = order;
 
   return (
     teekaString && (

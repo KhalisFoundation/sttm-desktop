@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import Toolbar from '../toolbar';
@@ -11,20 +11,23 @@ import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
 
-const electron = require('electron');
-
 const remote = require('@electron/remote');
+
 const main = remote.require('./app');
 
+export const InputContext = createContext();
+
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { shortcuts } = useStoreState(state => state.navigator);
-  const { setShortcuts } = useStoreActions(state => state.navigator);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
+  const { overlayScreen } = useStoreState((state) => state.app);
+  const { shortcuts } = useStoreState((state) => state.navigator);
+  const { setShortcuts } = useStoreActions((state) => state.navigator);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
+  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
+
+  const ref = useRef();
 
   const onScreenClose = React.useCallback(
-    evt => {
+    (evt) => {
       let isFromBackdrop = false;
       if (evt) {
         isFromBackdrop = evt.currentTarget.classList.contains('backdrop');
@@ -106,7 +109,7 @@ const Launchpad = () => {
   };
 
   const handleDownAndRight = () => {
-    if (!shortcuts.nextVerse) {
+    if (!shortcuts.nextVerse && document.activeElement !== ref.current) {
       setShortcuts({
         ...shortcuts,
         nextVerse: true,
@@ -115,7 +118,7 @@ const Launchpad = () => {
   };
 
   const handleUpAndLeft = () => {
-    if (!shortcuts.prevVerse) {
+    if (!shortcuts.prevVerse && document.activeElement !== ref.current) {
       setShortcuts({
         ...shortcuts,
         prevVerse: true,
@@ -124,7 +127,7 @@ const Launchpad = () => {
   };
 
   const handleSpacebar = () => {
-    if (!shortcuts.homeVerse) {
+    if (!shortcuts.homeVerse && document.activeElement !== ref.current) {
       setShortcuts({
         ...shortcuts,
         homeVerse: true,
@@ -134,6 +137,7 @@ const Launchpad = () => {
 
   const handleEnter = () => {
     if (!shortcuts.openFirstResult) {
+      ref.current.blur();
       setShortcuts({
         ...shortcuts,
         openFirstResult: true,
@@ -172,6 +176,7 @@ const Launchpad = () => {
   useKeys('ArrowLeft', 'single', handleUpAndLeft);
   useKeys('Space', 'single', handleSpacebar);
   useKeys('Enter', 'single', handleEnter);
+  useKeys('NumpadEnter', 'single', handleEnter);
   useKeys('KeyG', 'combination', handleCtrlG);
   useKeys('KeyC', 'combination', handleCtrlC);
 
@@ -195,7 +200,9 @@ const Launchpad = () => {
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
         {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
 
-        <Navigator />
+        <InputContext.Provider value={ref}>
+          <Navigator />
+        </InputContext.Provider>
       </div>
     </>
   );

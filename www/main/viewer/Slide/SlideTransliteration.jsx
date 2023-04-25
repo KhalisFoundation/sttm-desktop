@@ -31,7 +31,6 @@ const SlideTransliteration = ({ getFontSize, gurmukhiString, order }) => {
   }, [gurmukhiString, transliterationLanguage]);
 
   const customStyle = getFontSize(transliterationFontSize);
-  customStyle.order = order;
 
   return (
     transliterationString && (

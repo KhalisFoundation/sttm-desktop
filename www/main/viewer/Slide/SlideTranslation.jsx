@@ -32,7 +32,6 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, order 
   let translationMarkup;
 
   const customStyle = getFontSize(translationFontSize);
-  customStyle.order = order;
 
   if (translationHTML) {
     translationMarkup = (

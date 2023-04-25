@@ -1,5 +1,18 @@
 ## New Updates
 
+### 9.1.1 - _April 25, 2023_
+
+#### Improvements
+
+- INTELLIGENT SPACEBAR - The spacebar can now be used to go back to the 'home' verse after each pankti.
+- FIX - The positioning of the next line feature using Chromecast has been fixed.
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.1.0 - _January 11, 2023_
 
 The latest application includes improved performance, and several bug fixes related to custom background image upload, shabad sorting and dark theme setting.
