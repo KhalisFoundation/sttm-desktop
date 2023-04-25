@@ -1,8 +1,11 @@
 ## New Updates
 
-### 9.1.1 - _March 24, 2023_
+### 9.1.1 - _April 25, 2023_
 
-Changelog will go here!
+#### Improvements
+
+- INTELLIGENT SPACEBAR - The spacebar can now be used to go back to the 'home' verse after each pankti.
+- FIX - The positioning of the next line feature using Chromecast has been fixed.
 
 </br>
 
