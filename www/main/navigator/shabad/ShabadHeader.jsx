@@ -10,12 +10,11 @@ const { i18n } = remote.require('./app');
 
 const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
-  const { activeShabadId, activeVerseId, isDontSaveHistory } = useStoreState(
-    state => state.navigator,
+  const { activeShabadId, activeVerseId, isDontSaveHistory, homeVerse } = useStoreState(
+    (state) => state.navigator,
   );
-  const { setActiveShabadId, setActiveVerseId, setIsDontSaveHistory } = useStoreActions(
-    state => state.navigator,
-  );
+  const { setActiveShabadId, setActiveVerseId, setIsDontSaveHistory, setHomeVerse } =
+    useStoreActions((state) => state.navigator);
 
   const navigateVerseLeft = () => {
     if (activeShabadId) {
@@ -25,6 +24,9 @@ const ShabadHeader = () => {
       setActiveShabadId(activeShabadId - 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (homeVerse !== 0) {
+        setHomeVerse(0);
       }
     }
   };
@@ -36,6 +38,9 @@ const ShabadHeader = () => {
       setActiveShabadId(activeShabadId + 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (homeVerse !== 0) {
+        setHomeVerse(0);
       }
     }
   };
