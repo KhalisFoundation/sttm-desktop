@@ -1,15 +1,15 @@
+/* eslint-disable no-unsafe-finally */
 import Noty from 'noty';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
-const remote = require('@electron/remote');
-
 import copy from 'copy-to-clipboard';
 import { Virtuoso } from 'react-virtuoso';
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
-import shabadVerse from '../../common/sttm-ui/shabad-verse';
+
+const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
@@ -65,15 +65,36 @@ const ShabadContent = () => {
     extralong: 'existsBuddhaDal',
   };
 
+  const scrollToVerse = (verseId) => {
+    const verseIndex = activeShabad.findIndex((obj) => obj.ID === verseId);
+    virtuosoRef.current.scrollToIndex({
+      index: verseIndex,
+      behavior: 'smooth',
+      align: 'center',
+    });
+  };
+
+  const skipIkOnkar = (shabadVerses, index) => {
+    const { verse: gurmukhi } = shabadVerses[index].verse;
+    const { verseId } = shabadVerses[index];
+    if (verseId !== 1 && /^(<>)/gm.test(gurmukhi)) {
+      return index + 1;
+    }
+    return index;
+  };
+
   const filterRequiredVerseItems = (verses) => {
+    let versesNew;
     let currentLine = 0;
     try {
-      verses = verses.flat(1);
+      versesNew = verses.flat(1);
+    } catch (error) {
+      versesNew = verses;
     } finally {
-      const checkPauri = verses.filter((verse) => /]\d*]/.test(verse.Gurmukhi));
+      const checkPauri = versesNew.filter((verse) => /]\d*]/.test(verse.Gurmukhi));
       const regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
-      return verses
-        ? verses.map((verse, index) => {
+      return versesNew
+        ? versesNew.map((verse, index) => {
             if (verse) {
               const verseObj = {
                 ID: index,
@@ -83,6 +104,7 @@ const ShabadContent = () => {
                 lineNo: currentLine,
                 crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
               };
+              // eslint-disable-next-line no-unused-expressions
               regex.test(verse.Gurmukhi) && currentLine++;
               return verseObj;
             }
@@ -148,6 +170,7 @@ const ShabadContent = () => {
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
+      console.log('newTraversedVerse', newTraversedVerse);
       setActiveVerseId(newTraversedVerse);
     }
 
@@ -217,30 +240,12 @@ const ShabadContent = () => {
     }
   };
 
-  const scrollToVerse = (verseId) => {
-    const verseIndex = activeShabad.findIndex((obj) => obj.ID === verseId);
-    virtuosoRef.current.scrollToIndex({
-      index: verseIndex,
-      behavior: 'smooth',
-      align: 'center',
-    });
-  };
-
   const skipMangla = (shabadVerses, index) => {
-    const gurmukhi = shabadVerses[index]?.verse;
+    const gurmukhi = shabadVerses[index].verse;
     if (/(mhlw [\w])|(mÚ [\w])/.test(gurmukhi) || (index === 0 && /sloku/.test(gurmukhi))) {
       return skipIkOnkar(shabadVerses, index + 1);
     }
     return skipIkOnkar(shabadVerses, index);
-  };
-
-  const skipIkOnkar = (shabadVerses, index) => {
-    const gurmukhi = shabadVerses[index]?.verse;
-    const verseId = shabadVerses[index]?.verseId;
-    if (verseId !== 1 && /^(<>)/gm.test(gurmukhi)) {
-      return index + 1;
-    }
-    return index;
   };
 
   const toggleHomeVerse = () => {
@@ -251,7 +256,6 @@ const ShabadContent = () => {
       const currentVerseIndex = mappedShabadArray.findIndex(
         ({ verseId }) => verseId === activeVerseId,
       );
-      let nextVerseId;
       let nextVerseIndex;
 
       if (atHome) {
@@ -285,7 +289,7 @@ const ShabadContent = () => {
           setPreviousIndex(nextVerseIndex);
         }
       }
-      nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
+      const nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
       scrollToVerse(nextVerseId);
       updateTraversedVerse(nextVerseId, nextVerseIndex);
     }
@@ -321,9 +325,7 @@ const ShabadContent = () => {
     let verse;
     if (verseType === 'shabad') {
       if (initialVerse) {
-        const clickedVerse = verses.filter((verseObj) => {
-          return verseObj.ID === initialVerse;
-        });
+        const clickedVerse = verses.filter((verseObj) => verseObj.ID === initialVerse);
         verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
       } else {
         verse = firstVerse.Gurmukhi;
@@ -474,6 +476,9 @@ const ShabadContent = () => {
   }, [activeShabad]);
 
   useEffect(() => {
+    console.log('activeShabad', activeShabad);
+    console.log('activeVerseId', activeVerseId);
+
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
     ipcRenderer.send(
       'show-line',
@@ -540,7 +545,7 @@ const ShabadContent = () => {
           data={filteredItems}
           ref={virtuosoRef}
           itemContent={(index, verses) => {
-            const { verseId, verse, english, lineNo } = verses;
+            const { verseId, verse, english } = verses;
             return (
               <ShabadVerse
                 key={index}
