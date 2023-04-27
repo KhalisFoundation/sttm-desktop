@@ -479,9 +479,6 @@ const ShabadContent = () => {
   }, [activeShabad]);
 
   useEffect(() => {
-    console.log('activeShabad', activeShabad);
-    console.log('activeVerseId', activeVerseId);
-
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
     ipcRenderer.send(
       'show-line',
