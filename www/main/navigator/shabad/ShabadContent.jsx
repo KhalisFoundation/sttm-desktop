@@ -362,12 +362,15 @@ const ShabadContent = () => {
 
   const scrollToView = () => {
     setTimeout(() => {
-      const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
-      virtuosoRef.current.scrollToIndex({
-        index: currentIndex,
-        behavior: 'smooth',
-        align: 'center',
-      });
+      // Ignoring 61th verse to avoid unwanted scroll during asa di vaar
+      if (activeVerseId !== 61) {
+        const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
+        virtuosoRef.current.scrollToIndex({
+          index: currentIndex,
+          behavior: 'smooth',
+          align: 'center',
+        });
+      }
     }, 100);
   };
 
