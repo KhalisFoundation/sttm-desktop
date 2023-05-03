@@ -220,7 +220,6 @@ const ShabadContent = () => {
         if (mappedShabadArray.length - 1 > parseInt(activeVerseIndex, 10)) {
           const newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           const newVerseId = mappedShabadArray[newVerseIndex].verseId;
-          scrollToVerse(newVerseId);
           updateTraversedVerse(newVerseId, newVerseIndex);
         }
       });
@@ -362,9 +361,9 @@ const ShabadContent = () => {
 
   const scrollToView = () => {
     setTimeout(() => {
-      // Ignoring 61th verse to avoid unwanted scroll during asa di vaar
-      if (activeVerseId !== 61) {
-        const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
+      const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
+      // Ignoring flower verse to avoid unwanted scroll during asa di vaar
+      if (activeVerseId !== 61 && activeShabad[currentIndex].Gurmukhi !== ',') {
         virtuosoRef.current.scrollToIndex({
           index: currentIndex,
           behavior: 'smooth',
@@ -475,10 +474,10 @@ const ShabadContent = () => {
       }, 100);
     }
     setFilteredItems(filterRequiredVerseItems(activeShabad));
-    scrollToView();
   }, [activeShabad]);
 
   useEffect(() => {
+    scrollToView();
     const overlayVerse = filterOverlayVerseItems(activeShabad, activeVerseId);
     ipcRenderer.send(
       'show-line',
