@@ -6,6 +6,9 @@
     "node": true
   },
   "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "rules": {
     "no-mixed-operators": "off",
     "prettier/prettier": ["error"],

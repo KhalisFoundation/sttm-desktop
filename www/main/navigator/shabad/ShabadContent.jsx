@@ -170,7 +170,6 @@ const ShabadContent = () => {
     }
     setActiveVerse({ [verseIndex]: newTraversedVerse });
     if (activeVerseId !== newTraversedVerse) {
-      console.log('newTraversedVerse', newTraversedVerse);
       setActiveVerseId(newTraversedVerse);
     }
 
@@ -240,7 +239,7 @@ const ShabadContent = () => {
   };
 
   const skipMangla = (shabadVerses, index) => {
-    const gurmukhi = shabadVerses[index].verse;
+    const gurmukhi = shabadVerses[index]?.verse;
     if (/(mhlw [\w])|(mÚ [\w])/.test(gurmukhi) || (index === 0 && /sloku/.test(gurmukhi))) {
       return skipIkOnkar(shabadVerses, index + 1);
     }
