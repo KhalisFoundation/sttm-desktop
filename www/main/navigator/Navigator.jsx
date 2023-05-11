@@ -9,11 +9,12 @@ import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from '
 import insertSlide from '../common/constants/slidedb';
 
 const remote = require('@electron/remote');
+
 const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
-  const { isSingleDisplayMode, akhandpatt } = useStoreState(state => state.userSettings);
-  const { setAkhandpatt } = useStoreState(state => state.userSettings);
+  const { isSingleDisplayMode, akhandpatt } = useStoreState((state) => state.userSettings);
+  const { setAkhandpatt } = useStoreState((state) => state.userSettings);
   const {
     minimizedBySingleDisplay,
     shortcuts,
@@ -23,7 +24,7 @@ const Navigator = () => {
     isSundarGutkaBani,
     isCeremonyBani,
     ceremonyId,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     setShortcuts,
     setIsMiscSlide,
@@ -32,9 +33,9 @@ const Navigator = () => {
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setCeremonyId,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
-  const addMiscSlide = givenText => {
+  const addMiscSlide = (givenText) => {
     if (isAnnoucement) {
       setIsAnnoucement(false);
     }

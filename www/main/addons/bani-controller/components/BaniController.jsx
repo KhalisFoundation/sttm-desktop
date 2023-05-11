@@ -1,7 +1,6 @@
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-const remote = require('@electron/remote');
 
 import isOnline from 'is-online';
 
@@ -17,6 +16,8 @@ import QrCode from './QrCode';
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { tryConnection, onEnd } = shareSync;
@@ -36,12 +37,12 @@ const BaniController = ({ onScreenClose, className }) => {
   const [socketData, setSocketData] = useState(null);
 
   // Store State
-  const { isListeners, overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
+  const { isListeners, overlayScreen } = useStoreState((state) => state.app);
+  const { setOverlayScreen, setListeners } = useStoreActions((actions) => actions.app);
 
-  const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
+  const { adminPin, code, isConnected } = useStoreState((state) => state.baniController);
   const { setAdminPin, setCode, setConnection } = useStoreActions(
-    actions => actions.baniController,
+    (actions) => actions.baniController,
   );
 
   const {
@@ -57,7 +58,7 @@ const BaniController = ({ onScreenClose, className }) => {
     miscSlideText,
     isMiscSlideGurmukhi,
     savedCrossPlatformId,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
 
   const {
     setIsSundarGutkaBani,
@@ -68,7 +69,7 @@ const BaniController = ({ onScreenClose, className }) => {
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
     setSavedCrossPlatformId,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   const {
     gurbaniFontSize,
@@ -77,7 +78,7 @@ const BaniController = ({ onScreenClose, className }) => {
     teekaFontSize,
     baniLength,
     // mangalPosition,
-  } = useStoreState(state => state.userSettings);
+  } = useStoreState((state) => state.userSettings);
 
   const fontSizes = {
     gurbani: parseInt(gurbaniFontSize, 10),
@@ -86,7 +87,7 @@ const BaniController = ({ onScreenClose, className }) => {
     transliteration: parseInt(transliterationFontSize, 10),
   };
 
-  const showSyncError = errorMessage => {
+  const showSyncError = (errorMessage) => {
     setCodeLabel(errorMessage);
     setCode(null);
     setAdminPin(null);
@@ -149,7 +150,7 @@ const BaniController = ({ onScreenClose, className }) => {
   useEffect(() => {
     if (isListeners && adminPin) {
       if (window.socket !== undefined) {
-        window.socket.on('data', data => {
+        window.socket.on('data', (data) => {
           setSocketData(data);
         });
       }
@@ -215,7 +216,7 @@ const BaniController = ({ onScreenClose, className }) => {
 
                   <div className="sync-code-num"> {code || '...'} </div>
 
-                  {baniControllerItems.map(item => (
+                  {baniControllerItems.map((item) => (
                     <BaniControllerItem key={item.title} {...item} />
                   ))}
 
