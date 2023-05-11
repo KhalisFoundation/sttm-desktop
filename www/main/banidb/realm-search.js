@@ -416,6 +416,33 @@ const randomShabad = (SourceID = 'G') =>
   });
 
 /**
+ * Retrieve a particular text of a verse in a shabad
+ *
+ * @since 9.1.2
+ * @param {number} shabadId id of the shabad containing the verse
+ * @param {number} verseId id of the particular verse
+ * @returns {string} Returns the text of that verse
+ * @example
+ *
+ * getVerse(13);
+ * // => hukmI auqmu nIcu hukim iliK duK suK pweIAih ]
+ */
+const getVerse = (shabadId, verseId) =>
+  new Promise((resolve, reject) => {
+    Realm.open(realmConfig)
+      .then((realm) => {
+        if (verseId) {
+          const rows = realm.objects('Verse').filtered('ID = $0', verseId);
+          resolve(rows[0].Gurmukhi);
+        } else {
+          const rows = realm.objects('Verse').filtered('ANY Shabads.ShabadID == $0', shabadId);
+          resolve(rows[0].Gurmukhi);
+        }
+      })
+      .catch(reject);
+  });
+
+/**
  * Retrieve the filter options; writer, raag, and source
  *
  * @param {string} type Type of filter option to retrieve
@@ -477,5 +504,6 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  getVerse,
   getFilterOption,
 };

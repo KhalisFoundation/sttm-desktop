@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import classNames from '../../common/utils/classnames';
+import { addToFav, fetchFavShabad, removeFromFav } from '../misc/utils';
 
 const electron = require('electron');
 
@@ -11,12 +12,16 @@ const { i18n } = remote.require('./app');
 
 const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const favBtnRef = useRef(null);
-  const { activeShabadId, activeVerseId, isDontSaveHistory, favShabad, searchVerse } =
-    useStoreState((state) => state.navigator);
+  const { activeShabadId, activeVerseId, isDontSaveHistory, favShabad } = useStoreState(
+    (state) => state.navigator,
+  );
   const { setActiveShabadId, setActiveVerseId, setIsDontSaveHistory, setFavShabad } =
     useStoreActions((state) => state.navigator);
-  const favShabadIndex = favShabad.findIndex((element) => element.shabadId === activeShabadId);
+
+  const { userToken } = useStoreState((state) => state.app);
+  const favShabadIndex = favShabad.findIndex((element) => element.shabad_id === activeShabadId);
 
   const navigateVerseLeft = () => {
     if (activeShabadId) {
@@ -47,25 +52,25 @@ const ShabadHeader = () => {
 
   return (
     <div className="shabad-pane-header">
-      {activeShabadId && (
+      {activeShabadId && !isLoading && userToken && (
         <button
           className={classNames('button fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
           ref={favBtnRef}
           title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
           onClick={() => {
             if (favShabadIndex < 0) {
-              const timestamp = new Date();
-              const shabadObj = {
-                text: searchVerse,
-                shabadId: activeShabadId,
-                verseId: activeVerseId,
-                timestamp,
-              };
-              setFavShabad([shabadObj, ...favShabad]);
+              addToFav(activeShabadId, activeVerseId, userToken);
             } else {
               favShabad.splice(favShabadIndex, 1);
+              removeFromFav(activeShabadId, userToken);
               setFavShabad([...favShabad]);
             }
+            const fetchProgress = fetchFavShabad(userToken);
+            setLoading(true);
+            fetchProgress.then((data) => {
+              setFavShabad([...data]);
+              setLoading(false);
+            });
           }}
         >
           <i className={favShabadIndex < 0 ? 'fa-solid fa-star' : 'fa-regular fa-star'}></i>
@@ -77,7 +82,7 @@ const ShabadHeader = () => {
         onClick={() => setShowViewer(!showViewer)}
         title={showViewer ? i18n.t('SHABAD_PANE.HIDE_BUTTON_TOOLTIP') : ''}
       >
-        <i class="fa fa-display"></i>
+        <i className="fa fa-display"></i>
         {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
       </button>
       <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>

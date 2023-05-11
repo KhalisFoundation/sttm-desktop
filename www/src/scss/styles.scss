@@ -112,6 +112,14 @@ button {
   border-radius: 50%;
   height: 60px;
   width: 60px;
+
+  .fav-results > & {
+    margin: auto;
+  }
+}
+
+.fav-results .error {
+  margin: 14px;
 }
 
 @keyframes spin {
@@ -139,7 +147,7 @@ button {
   flex-direction: column;
 }
 
-.sync-wrapper {
+.sync-wrapper, .auth-wrapper {
   bottom: 0;
   height: 100vh;
   left: 100px;
@@ -412,6 +420,13 @@ button {
     &:active {
       transform: translateY(1px);
     }
+  }
+
+  #tool-auth-dialog {
+    background-color: #e3e3e3;
+    background-image: url('../../assets/img/icons/user.png');
+    bottom: 160px;
+    position: fixed;
   }
 
   #tool-sunder-gutka {
@@ -709,6 +724,16 @@ button {
 
   &.hidden {
     display: none;
+  }
+}
+
+.auth-wrapper {
+  .auth-content {
+    align-items: flex-start;
+
+    button i {
+      margin-right: 8px;
+    }
   }
 }
 

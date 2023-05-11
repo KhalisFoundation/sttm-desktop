@@ -50,6 +50,10 @@
     "24HR": "24Hr",
     "THEME_HEADING": "Themes"
   },
+  "FAV_SHABAD": {
+    "LOGGED_OUT": "You need to login to view the favorite shabads",
+    "INTERNET_ERR": "Sorry, You seem to be offline. Favorite shabads only work when you are connected to the internet."
+  },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
     "SINGLE_DISPLAY": "Single Display"

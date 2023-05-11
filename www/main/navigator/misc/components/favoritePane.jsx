@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import isOnline from 'is-online';
 import { useStoreActions, useStoreState } from 'easy-peasy';
+
+import { fetchFavShabad, removeFromFav } from '../utils';
+import banidb from '../../../banidb';
+
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 export const FavoritePane = ({ className }) => {
   const {
@@ -26,10 +34,38 @@ export const FavoritePane = ({ className }) => {
     setFavShabad,
   } = useStoreActions((state) => state.navigator);
 
+  const { userToken } = useStoreState((state) => state.app);
+  const [parsedFav, setParsedFav] = useState([]);
+  const [isFetching, setFetching] = useState(false);
+  const [errorMessage, setError] = useState('');
+
+  const initialFetch = async () => {
+    const onlineValue = await isOnline();
+    if (onlineValue) {
+      if (userToken) {
+        setError('');
+        setFetching(true);
+        const data = await fetchFavShabad(userToken);
+        setFetching(false);
+        setFavShabad([...data]);
+      } else {
+        setError(i18n.t('FAV_SHABAD.LOGGED_OUT'));
+        setFavShabad([]);
+      }
+    } else {
+      setError(i18n.t('FAV_SHABAD.INTERNET_ERR'));
+    }
+  };
+
+  useEffect(() => {
+    initialFetch();
+  }, [userToken]);
+
   const deleteFromFav = (inputElement) => {
     const favShabadIndex = favShabad.findIndex(
-      (element) => element.shabadId === inputElement.shabadId,
+      (element) => element.shabad_id === inputElement.shabadId,
     );
+    removeFromFav(inputElement.shabadId, userToken);
 
     if (favShabadIndex >= 0) {
       favShabad.splice(favShabadIndex, 1);
@@ -70,41 +106,66 @@ export const FavoritePane = ({ className }) => {
     }
   };
 
-  return (
-    <div className={`history-results ${className}`}>
-      {favShabad.map((element, index) => {
-        const dateString = element.timestamp.toLocaleDateString('en-us', {
+  useEffect(() => {
+    const fetchData = async () => {
+      const promises = favShabad.map(async (element) => {
+        const elementDate = new Date(element.created_at);
+        const dateString = elementDate.toLocaleDateString('en-us', {
           day: 'numeric',
           year: 'numeric',
           month: 'short',
         });
-        const timeString = element.timestamp.toLocaleTimeString('en-us', {
+        const timeString = elementDate.toLocaleTimeString('en-us', {
           hour: 'numeric',
           minute: 'numeric',
         });
+        const row = await banidb.getVerse(element.shabad_id, element.verse_id);
+        return {
+          date: dateString,
+          time: timeString,
+          shabadId: element.shabad_id,
+          verseId: element.verse_id,
+          verse: row,
+          id: element.id,
+        };
+      });
+      Promise.all(promises).then((data) => {
+        setParsedFav(data);
+      });
+    };
+    fetchData();
+  }, [favShabad]);
+
+  return (
+    <div className={`fav-results ${className}`}>
+      <p>{errorMessage}</p>
+      {isFetching && <div className="sttm-loader" />}
+      {parsedFav.map((element, index) => {
+        const { shabadId, verseId, date, time, verse, id } = element;
         return (
-          <div className="fav-shabad-container">
+          <div className="fav-shabad-container" key={`fav-shabad-${index}`}>
             <div className="fav-shabad-text">
               <p
                 className="fav-item gurmukhi"
                 key={`favshabad-${index}`}
+                data-id={id}
                 onClick={() => {
-                  openShabadFromFav(element);
+                  openShabadFromFav(shabadId, verseId);
                 }}
               >
-                {element.text}
+                {verse}
               </p>
             </div>
             <div className="fav-shabad-options">
-              <i className='fa-regular fa-clock'></i>
-              <p className="date">{dateString}</p>
-              <p className="time">{timeString}</p>
+              <i className="fa-regular fa-clock"></i>
+              <p className="date">{date}</p>
+              <p className="time">{time}</p>
               <button
                 onClick={() => {
                   deleteFromFav(element);
                 }}
               >
-                <i class="fa-solid fa-x"></i>
+                <i className="fa-solid fa-x"></i>
               </button>
             </div>
           </div>

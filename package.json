@@ -95,6 +95,7 @@
     "ip": "^1.1.8",
     "is-electron": "^2.2.1",
     "is-online": "^9.0.0",
+    "keytar": "^7.9.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.capitalize": "^4.2.1",
     "lodash.debounce": "^4.0.8",
@@ -129,6 +130,12 @@
   },
   "build": {
     "appId": "org.khalisfoundation.sttm",
+    "protocols": {
+      "name": "SikhiToTheMax",
+      "schemes": [
+        "sttm-desktop"
+      ]
+    },
     "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",

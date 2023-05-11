@@ -14,6 +14,7 @@ const {
   loadAng,
   getShabad,
   randomShabad,
+  getVerse,
 } = search;
 
 // Re-export CONSTS for use in other areas
@@ -30,4 +31,5 @@ module.exports = {
   loadAng,
   getShabad,
   randomShabad,
+  getVerse,
 };
