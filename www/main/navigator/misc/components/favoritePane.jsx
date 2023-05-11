@@ -73,23 +73,23 @@ export const FavoritePane = ({ className }) => {
     }
   };
 
-  const openShabadFromFav = (element) => {
+  const openShabadFromFav = (shabadId, verseId) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
-    if (element.shabadId !== activeShabadId) {
-      setActiveShabadId(element.shabadId);
+    if (shabadId !== activeShabadId) {
+      setActiveShabadId(shabadId);
 
-      if (element.verseId !== activeVerseId) {
-        setActiveVerseId(element.verseId);
+      if (verseId !== activeVerseId) {
+        setActiveVerseId(verseId);
       }
 
-      if (element.verseId !== initialVerseId) {
-        setInitialVerseId(element.verseId);
+      if (verseId !== initialVerseId) {
+        setInitialVerseId(verseId);
       }
 
-      if (element.verseId !== homeVerse) {
-        setHomeVerse(element.verseId);
+      if (verseId !== homeVerse) {
+        setHomeVerse(verseId);
       }
 
       if (versesRead !== []) {
