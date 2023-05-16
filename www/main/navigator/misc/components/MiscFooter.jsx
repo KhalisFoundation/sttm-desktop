@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+import { uploadImage } from '../../../settings/utils/theme-bg-uploader';
+
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
@@ -63,9 +65,18 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
         <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
-          {i18n.t(`SHORTCUT_TRAY.CUSTOM_IMAGE`)}
-        </button>
+        <label className="tray-item-icon">
+          {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
+          <input
+            className="file-input"
+            onChange={async (e) => {
+              await uploadImage(e);
+            }}
+            id="themebg-upload"
+            type="file"
+            accept="image/png, image/jpeg"
+          />
+        </label>
         <button className="tray-item-icon" onClick={() => setTab('Insert')}>
           {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
