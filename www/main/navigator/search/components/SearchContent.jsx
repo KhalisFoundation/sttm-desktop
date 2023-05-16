@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
+import { Virtuoso } from 'react-virtuoso';
 import banidb from '../../../common/constants/banidb';
-import { filters } from '../../utils';
+import { filters, searchShabads } from '../../utils';
 import { retrieveFilterOption } from '../utils';
 
 import { classNames } from '../../../common/utils';
@@ -41,7 +42,7 @@ const SearchContent = () => {
     setSearchQuery,
     setShortcuts,
     setSearchShabadsCount,
-  } = useStoreActions(state => state.navigator);
+    setSearchData,
 
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
@@ -49,6 +50,7 @@ const SearchContent = () => {
   const [writerArray, setWriterArray] = useState([]);
   const [raagArray, setRaagArray] = useState([]);
   const [sourceArray, setSourceArray] = useState([]);
+  const [searchResultsCount, setSearchResultsCount] = useState(40);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -63,7 +65,15 @@ const SearchContent = () => {
     analytics.trackEvent('search', 'gurmukhi-keyboard-open', keyboardOpenStatus);
   };
 
-  const mapVerseItems = searchedShabadsArray => {
+  const loadMoreSearchResults = useCallback(() => {
+    setTimeout(() => {
+      setSearchResultsCount(searchResultsCount + 20);
+      searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) =>
+        query ? setSearchData(rows) : setSearchData([]),
+      );
+    }, 200);
+  });
+
     return searchedShabadsArray
       ? searchedShabadsArray.map(verse => {
           return {
@@ -138,6 +148,7 @@ const SearchContent = () => {
     const timeoutId = setTimeout(() => {
       if (query !== searchQuery) {
         setSearchQuery(query);
+        setSearchResultsCount(40);
       }
     }, 50);
     return () => {
@@ -248,8 +259,11 @@ const SearchContent = () => {
       </div>
       <div className={classNames('search-results', isShowFiltersTag && 'filter-applied')}>
         <div className="verse-block">
-          {filteredShabads.map(
-            ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
+          <Virtuoso
+            data={filteredShabads}
+            overscan={200}
+            endReached={loadMoreSearchResults}
+            itemContent={(index, { ang, shabadId, sourceId, verse, verseId, writer, raag }) => (
               <SearchResults
                 key={index}
                 ang={ang}
@@ -263,8 +277,8 @@ const SearchContent = () => {
                 verseId={verseId}
                 writer={writer}
               />
-            ),
           )}
+          ></Virtuoso>
         </div>
       </div>
     </div>
