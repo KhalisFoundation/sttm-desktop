@@ -114,6 +114,7 @@ $misc-footer-active: 70px;
       transition: 0.5s all ease;
       .quick-tray {
         span {
+          color: $white;
           margin-left: 6px;
         }
       }
@@ -136,7 +137,6 @@ $misc-footer-active: 70px;
       @include flex($jc-value: space-evenly);
       height: 70px;
       .tray-item-icon {
-        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
         cursor: pointer;
         font-size: 14px;
         height: 54px;
@@ -147,7 +147,6 @@ $misc-footer-active: 70px;
         @include flex($jc-value: center, $width: fit-content);
 
         &:hover {
-          box-shadow: 0 2px 7px -2px rgba(0, 0, 0, 0.5);
           height: 60px;
           padding: 14px; 
         }

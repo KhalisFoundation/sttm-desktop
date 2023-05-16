@@ -13,6 +13,7 @@
   $active-focus: $sky-blue;
   $scrollbar-bg: $light-grey;
   $button-bg: $princeton-orange;
+  $tray-bg: $philippine-gray;
 
   a {
     color: $black;
@@ -118,14 +119,23 @@
     }
     .pane-footer {
       background-color: $alt-bg;
+
       .clear-pane {
         background-color: $not-so-white;
+
+        .quick-tray > i { 
+          color: $white;
+        }
         .footer-toggler-inactive {
-          background-color: $alt-bg;
+          background-color: $tray-bg;
         }
         .footer-toggler {
-          background-color: $nav-bg;
+          background-color: $tray-bg;
         }
+      }
+
+      .shortcut-drawer {
+        background: $tray-bg;
       }
     }
   }
