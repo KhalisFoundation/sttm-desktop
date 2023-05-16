@@ -3,19 +3,26 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
-  const { shortcutTray } = useStoreState(state => state.userSettings);
-  const { setShortcutTray } = useStoreActions(state => state.userSettings);
-  const { setVerseHistory } = useStoreActions(state => state.navigator);
+  const { shortcutTray } = useStoreState((state) => state.userSettings);
+  const { setShortcutTray } = useStoreActions((state) => state.userSettings);
+  const { currentMiscPanel } = useStoreState((state) => state.navigator);
+  const { setVerseHistory, setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
   const drawerRef = useRef(null);
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
   };
 
+  const setTab = (tabName) => {
+    if (tabName !== currentMiscPanel) {
+      setCurrentMiscPanel(tabName);
+    }
+  };
   const toggleShortcuts = () => {
     drawerRef.current.classList.toggle('shortcut-drawer-active');
     const changeState = () => {
@@ -55,6 +62,12 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
         </button>
         <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+        </button>
+        <button className="tray-item-icon" onClick={blankSlide}>
+          {i18n.t(`SHORTCUT_TRAY.CUSTOM_IMAGE`)}
+        </button>
+        <button className="tray-item-icon" onClick={() => setTab('Insert')}>
+          {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
       </div>
     </div>

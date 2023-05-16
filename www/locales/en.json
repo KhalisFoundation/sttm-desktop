@@ -329,7 +329,9 @@
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (Bhog)",
     "BLANK": "Blank",
-    "MOOL_MANTRA": "Mool Mantr"
+    "MOOL_MANTRA": "Mool Mantr",
+    "CUSTOM_IMAGE": "Custom Image",
+    "ANNOUNCEMENT": "Announcement"
   },
   "THEMES": {
     "A_NEW_DAY": "A New Day",
