@@ -18,6 +18,7 @@ import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -34,7 +35,7 @@ const SearchContent = () => {
     currentSearchType,
     shortcuts,
     searchShabadsCount,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     setCurrentWriter,
     setCurrentRaag,
@@ -43,6 +44,7 @@ const SearchContent = () => {
     setShortcuts,
     setSearchShabadsCount,
     setSearchData,
+  } = useStoreActions((state) => state.navigator);
 
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
@@ -74,21 +76,19 @@ const SearchContent = () => {
     }, 200);
   });
 
-    return searchedShabadsArray
-      ? searchedShabadsArray.map(verse => {
-          return {
-            ang: verse.PageNo,
-            raag: verse.Raag ? verse.Raag.RaagEnglish : '',
-            shabadId: verse.Shabads[0].ShabadID,
-            source: verse.Source ? verse.Source.SourceEnglish : '',
-            sourceId: verse.Source ? verse.Source.SourceID : '',
-            verse: verse.Gurmukhi,
-            verseId: verse.ID,
-            writer: verse.Writer ? verse.Writer.WriterEnglish : '',
-          };
-        })
+  const mapVerseItems = (searchedShabadsArray) =>
+    searchedShabadsArray
+      ? searchedShabadsArray.map((verse) => ({
+          ang: verse.PageNo,
+          raag: verse.Raag ? verse.Raag.RaagEnglish : '',
+          shabadId: verse.Shabads[0].ShabadID,
+          source: verse.Source ? verse.Source.SourceEnglish : '',
+          sourceId: verse.Source ? verse.Source.SourceID : '',
+          verse: verse.Gurmukhi,
+          verseId: verse.ID,
+          writer: verse.Writer ? verse.Writer.WriterEnglish : '',
+        }))
       : [];
-  };
 
   const [filteredShabads, setFilteredShabads] = useState([]);
 
@@ -139,7 +139,7 @@ const SearchContent = () => {
     }
   }, [filteredShabads]);
 
-  ipcRenderer.on('database-progress', data => {
+  ipcRenderer.on('database-progress', (data) => {
     const { percent } = JSON.parse(data);
     setDatabaseProgress(percent);
   });
@@ -158,15 +158,15 @@ const SearchContent = () => {
 
   useEffect(() => {
     const wData = retrieveFilterOption(writersObj, 'writer');
-    wData.then(d => {
+    wData.then((d) => {
       setWriterArray(d);
     });
     const rData = retrieveFilterOption(raagsObj, 'raag');
-    rData.then(d => {
+    rData.then((d) => {
       setRaagArray(d);
     });
     const sData = retrieveFilterOption(sourcesObj, 'source');
-    sData.then(d => {
+    sData.then((d) => {
       setSourceArray(d);
     });
   }, []);
@@ -230,7 +230,7 @@ const SearchContent = () => {
           <span>Filter by </span>
           <FilterDropdown
             title="Writer"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentWriter(event.target.value);
               analytics.trackEvent('search', 'searchWriter', event.target.value);
             }}
@@ -239,7 +239,7 @@ const SearchContent = () => {
           />
           <FilterDropdown
             title="Raag"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentRaag(event.target.value);
               analytics.trackEvent('search', 'searchRaag', event.target.value);
             }}
@@ -248,7 +248,7 @@ const SearchContent = () => {
           />
           <FilterDropdown
             title="Source"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentSource(event.target.value);
               analytics.trackEvent('search', 'searchSource', event.target.value);
             }}
@@ -277,7 +277,7 @@ const SearchContent = () => {
                 verseId={verseId}
                 writer={writer}
               />
-          )}
+            )}
           ></Virtuoso>
         </div>
       </div>
