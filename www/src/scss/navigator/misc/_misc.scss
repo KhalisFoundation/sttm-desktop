@@ -112,6 +112,11 @@ $misc-footer-active: 70px;
       @include flex($jc-value: space-between);
       height: 40px;
       transition: 0.5s all ease;
+      .quick-tray {
+        span {
+          margin-left: 6px;
+        }
+      }
       .footer-toggler {
         padding: 12px;
       }
@@ -123,27 +128,28 @@ $misc-footer-active: 70px;
         display: block;
         padding: 10px;
         span {
-          margin-left: 5px;
+          margin-left: 6px;
         }
       }
     }
     .shortcut-drawer.shortcut-drawer-active {
-      @include flex($jc-value: space-around);
+      @include flex($jc-value: space-evenly);
       height: 70px;
       .tray-item-icon {
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
         cursor: pointer;
-        @include flex($jc-value: center, $width: fit-content);
+        font-size: 14px;
+        height: 54px;
+        line-height: 1.15em;
         padding: 10px;
-        line-height: 30px;
-        transition: 0.5s all ease;
-        &:hover {
-          box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2);
-          transform: translateY(-4px);
-        }
+        transition: 0.3s all ease;
 
-        &:active {
-          box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.2);
-          transform: translateY(1px);
+        @include flex($jc-value: center, $width: fit-content);
+
+        &:hover {
+          box-shadow: 0 2px 7px -2px rgba(0, 0, 0, 0.5);
+          height: 60px;
+          padding: 14px; 
         }
       }
     }

@@ -13,6 +13,7 @@
   $highlight-bg: $dull-blue;
   $highlight-text: $transparent-blue;
   color: $text-base;
+  $button-bg: $princeton-orange;
 
   a {
     color: $white;
@@ -172,10 +173,10 @@
     }
   }
   .tray-item-icon {
-    background: $text-bright;
+    background: $button-bg;
   }
   .tray-item-icon {
-    color: $bg-main;
+    color: $white;
   }
   &.shortcut-tray-true .shortcut-toggle {
     background: darken($bg-main, 10);

@@ -12,6 +12,7 @@
   $current-focus: $transparent-blue;
   $active-focus: $sky-blue;
   $scrollbar-bg: $light-grey;
+  $button-bg: $princeton-orange;
 
   a {
     color: $black;
@@ -150,10 +151,10 @@
     background: $statusbar-bg;
   }
   .tray-item-icon {
-    background: lighten($base-text, 30);
+    background: $button-bg;
   }
   .tray-item-icon {
-    color: $nav-bg;
+    color: $white;
   }
   &.shortcut-tray-true .shortcut-toggle {
     background: $alt-bg;

@@ -39,14 +39,15 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
     <div className="misc-footer">
       <div className="clear-pane">
         <div
-          className={`${shortcutTray ? 'footer-toggler-inactive' : 'footer-toggler'}`}
+          className={`quick-tray ${shortcutTray ? 'footer-toggler-inactive' : 'footer-toggler'}`}
           onClick={toggleShortcuts}
         >
           <i className={`${shortcutTray ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
+          <span>{i18n.t(`SHORTCUT_TRAY.QUICK_INSERT`)}</span>
         </div>
         <a className="clear-history" onClick={clearHistory}>
           <i className="fa fa-history" />
-          <span>Clear History</span>
+          <span>{i18n.t(`SHORTCUT_TRAY.CLEAR_HISTORY`)}</span>
         </a>
       </div>
       <div
@@ -65,18 +66,20 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
         <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
-        <label className="tray-item-icon">
-          {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
-          <input
-            className="file-input"
-            onChange={async (e) => {
-              await uploadImage(e);
-            }}
-            id="themebg-upload"
-            type="file"
-            accept="image/png, image/jpeg"
-          />
-        </label>
+        <button className="tray-item-icon" onClick={blankSlide}>
+          <label htmlFor="themebg-upload">
+            {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
+            <input
+              className="file-input"
+              onChange={async (e) => {
+                await uploadImage(e);
+              }}
+              id="themebg-upload"
+              type="file"
+              accept="image/png, image/jpeg"
+            />
+          </label>
+        </button>
         <button className="tray-item-icon" onClick={() => setTab('Insert')}>
           {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
