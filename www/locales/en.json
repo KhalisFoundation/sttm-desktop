@@ -54,6 +54,14 @@
     "LOGGED_OUT": "You need to login to view the favorite shabads",
     "INTERNET_ERR": "Sorry, You seem to be offline. Favorite shabads only work when you are connected to the internet."
   },
+  "AUTH": {
+    "LOGIN_LABEL": "Login",
+    "LOGOUT_LABEL": "Logout",
+    "LOGIN_DESC": "Click the following button to login. It will take you to an external page in a web browser.",
+    "LOGGED_IN_GREETING": "Welcome {{firstName}}",
+    "LOGGED_IN_DESC": "Logged in as {{email}}",
+    "INTERNET_ERR": "Sorry, You seem to be offline. You can login once you are connected to the internet."
+  },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
     "SINGLE_DISPLAY": "Single Display"
