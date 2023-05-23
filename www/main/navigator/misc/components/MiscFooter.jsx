@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { uploadImage } from '../../../settings/utils/theme-bg-uploader';
+import { classNames } from '../../../common/utils';
 
 const remote = require('@electron/remote');
 
@@ -25,22 +26,30 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
       setCurrentMiscPanel(tabName);
     }
   };
-  const toggleShortcuts = () => {
-    drawerRef.current.classList.toggle('shortcut-drawer-active');
-    const changeState = () => {
-      setShortcutTray(!shortcutTray);
-    };
-    drawerRef.current.removeEventListener('transitionend', changeState);
-    drawerRef.current.addEventListener('transitionend', changeState);
-    analytics.trackEvent('shortcutTrayToggle', shortcutTray);
+
+  const toggleTray = (toggleValue) => {
+    setShortcutTray(toggleValue);
+    if (toggleValue) {
+      analytics.trackEvent('shortcutTray', 'toggleTray', 'openTray', toggleValue);
+    } else {
+      analytics.trackEvent('shortcutTray', 'toggleTray', 'closeTray', toggleValue);
+    }
   };
 
   return (
-    <div className="misc-footer">
+    <div
+      className={classNames(
+        'misc-footer',
+        shortcutTray ? 'shortcut-tray-active' : 'shortcut-tray-inactive',
+      )}
+      ref={drawerRef}
+    >
       <div className="clear-pane">
         <div
           className={`quick-tray ${shortcutTray ? 'footer-toggler-inactive' : 'footer-toggler'}`}
-          onClick={toggleShortcuts}
+          onClick={() => {
+            toggleTray(!shortcutTray);
+          }}
         >
           <i className={`${shortcutTray ? 'fa fa-caret-down' : 'fa fa-caret-up'}`} />
           <span>{i18n.t(`SHORTCUT_TRAY.QUICK_INSERT`)}</span>
@@ -50,10 +59,7 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
           <span>{i18n.t(`SHORTCUT_TRAY.CLEAR_HISTORY`)}</span>
         </a>
       </div>
-      <div
-        ref={drawerRef}
-        className={`shortcut-drawer ${shortcutTray ? 'shortcut-drawer-active' : ''}`}
-      >
+      <div className={`shortcut-drawer shortcut-drawer-active`}>
         <button className="tray-item-icon" onClick={anandSahibBhog}>
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>

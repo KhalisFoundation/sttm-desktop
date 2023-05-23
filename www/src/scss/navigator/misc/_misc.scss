@@ -106,13 +106,17 @@ $misc-footer-active: 70px;
   }
   .misc-footer {
     @include flex($fd-value: column);
+    bottom: -70px;
     height: fit-content;
+    position: relative;
     transition: 0.5s all ease;
     .clear-pane {
       @include flex($jc-value: space-between);
       height: 40px;
       transition: 0.5s all ease;
       .quick-tray {
+        cursor: pointer;
+        
         span {
           color: $white;
           margin-left: 6px;
@@ -132,6 +136,9 @@ $misc-footer-active: 70px;
           margin-left: 6px;
         }
       }
+    }
+    &.shortcut-tray-active {
+      bottom: 0px;
     }
     .shortcut-drawer.shortcut-drawer-active {
       @include flex($jc-value: space-evenly);
