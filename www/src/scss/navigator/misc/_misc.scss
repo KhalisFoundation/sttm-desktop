@@ -3,6 +3,7 @@
 $misc-header: 40px;
 $misc-footer-inactive: 40px;
 $misc-footer-active: 70px;
+
 .misc-pane {
   @include pane-containers;
   .misc-header {
@@ -17,6 +18,16 @@ $misc-footer-active: 70px;
         font-size: 16px;
       }
     }
+
+    .misc-button {
+      @include flex($jc-value: center, $width: fit-content);
+    }
+
+    .turban {
+      &-icon {
+        height: 16px;
+      }
+    }
   }
   .history-results {
     height: calc(100% - 80px);
@@ -26,6 +37,45 @@ $misc-footer-active: 70px;
       cursor: pointer;
       margin: 8px 0;
       padding: 10px;
+    }
+  }
+  .dhan-guru {
+    &-pane {
+      height: calc(100% - 70px);
+      padding: 16px 32px;
+      display: grid;
+      column-gap: 20px;
+      grid-auto-flow: column;
+      grid-template-rows: repeat(6, 1fr);
+      overflow: scroll;
+    }
+
+    &-button {
+      color: $white;
+      display: grid;
+      grid-template-columns: 1fr 6fr;
+      height: 40px;
+      margin-bottom: 16px;
+      width: 250px;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &-prefix {
+        @include flex($jc-value: center, $width: auto);
+        background: $cadmium-orange;
+      }
+
+      &-text {
+        @include flex($jc-value: start, $width: auto);
+        background: $darker-grey;
+        padding-left: 8px;
+
+        &:hover {
+          background: $rust;
+        }
+      }
     }
   }
   .list-of-items {
