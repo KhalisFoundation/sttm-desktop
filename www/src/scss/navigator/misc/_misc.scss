@@ -106,7 +106,6 @@ $misc-footer-active: 70px;
   }
   .misc-footer {
     @include flex($fd-value: column);
-    bottom: -70px;
     height: fit-content;
     position: relative;
     transition: 0.5s all ease;
@@ -116,7 +115,7 @@ $misc-footer-active: 70px;
       transition: 0.5s all ease;
       .quick-tray {
         cursor: pointer;
-        
+
         span {
           color: $white;
           margin-left: 6px;
@@ -155,7 +154,7 @@ $misc-footer-active: 70px;
 
         &:hover {
           height: 60px;
-          padding: 14px; 
+          padding: 14px;
         }
       }
     }

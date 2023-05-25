@@ -59,37 +59,40 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
           <span>{i18n.t(`SHORTCUT_TRAY.CLEAR_HISTORY`)}</span>
         </a>
       </div>
-      <div className={`shortcut-drawer shortcut-drawer-active`}>
-        <button className="tray-item-icon" onClick={anandSahibBhog}>
-          {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
-        </button>
-        <button className="tray-item-icon" onClick={moolMantraSlide}>
-          {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
-        </button>
-        <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
-          vwihgurU
-        </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
-          {i18n.t(`SHORTCUT_TRAY.BLANK`)}
-        </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
-          <label htmlFor="themebg-upload">
-            {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
-            <input
-              className="file-input"
-              onChange={async (e) => {
-                await uploadImage(e);
-              }}
-              id="themebg-upload"
-              type="file"
-              accept="image/png, image/jpeg"
-            />
-          </label>
-        </button>
-        <button className="tray-item-icon" onClick={() => setTab('Insert')}>
-          {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
-        </button>
-      </div>
+      {/* below condition should be removed on making the transition work */}
+      {shortcutTray && (
+        <div className={`shortcut-drawer shortcut-drawer-active`}>
+          <button className="tray-item-icon" onClick={anandSahibBhog}>
+            {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
+          </button>
+          <button className="tray-item-icon" onClick={moolMantraSlide}>
+            {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
+          </button>
+          <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
+            vwihgurU
+          </button>
+          <button className="tray-item-icon" onClick={blankSlide}>
+            {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+          </button>
+          <button className="tray-item-icon" onClick={blankSlide}>
+            <label htmlFor="themebg-upload">
+              {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
+              <input
+                className="file-input"
+                onChange={async (e) => {
+                  await uploadImage(e);
+                }}
+                id="themebg-upload"
+                type="file"
+                accept="image/png, image/jpeg"
+              />
+            </label>
+          </button>
+          <button className="tray-item-icon" onClick={() => setTab('Insert')}>
+            {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
