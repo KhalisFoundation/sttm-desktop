@@ -170,7 +170,7 @@ export const DhanGuruPane = ({ className }) => {
           <label htmlFor="dhan-guru-language" />
         </div>
       </div>
-      <div className={classNames('dhan-guru-pane', shortcutTray && 'misc-pane-shrinked')}>
+      <div className={classNames('dhan-guru-pane', shortcutTray && 'misc-pane-shrinked-more')}>
         {gurus.map((guru, index) => (
           <div
             className="dhan-guru-button"
