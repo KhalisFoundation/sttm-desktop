@@ -41,8 +41,8 @@ $misc-footer-active: 70px;
   }
   .dhan-guru {
     &-pane {
-      height: calc(100% - 70px);
-      padding: 16px 32px;
+      height: calc(100% - 80px);
+      padding: 0 32px 16px 32px;
       display: grid;
       column-gap: 20px;
       grid-auto-flow: column;
@@ -50,6 +50,15 @@ $misc-footer-active: 70px;
       overflow: scroll;
     }
 
+    &-language-switch {
+      @include flex($width: fit-content);
+      padding: 6px;
+      margin: 4px auto;
+
+      span {
+        padding-right: 6px;
+      }
+    }
     &-button {
       color: $white;
       display: grid;
