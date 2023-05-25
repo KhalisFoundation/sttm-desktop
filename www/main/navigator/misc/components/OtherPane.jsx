@@ -5,6 +5,7 @@ import { randomShabad } from '../../../banidb';
 import { dailyHukamnama } from '../../utils';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
@@ -17,16 +18,16 @@ export const OtherPane = ({ className }) => {
     singleDisplayActiveTab,
     isSundarGutkaBani,
     isCeremonyBani,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
     setIsRandomShabad,
     setSingleDisplayActiveTab,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
-  const setShabadId = shabadId => {
+  const setShabadId = (shabadId) => {
     if (!isRandomShabad) {
       setIsRandomShabad(true);
     }
@@ -45,7 +46,7 @@ export const OtherPane = ({ className }) => {
   };
 
   const openRandomShabad = () => {
-    randomShabad().then(randomId => {
+    randomShabad().then((randomId) => {
       setShabadId(randomId);
     });
     analytics.trackEvent('display', 'random-shabad');
@@ -53,7 +54,7 @@ export const OtherPane = ({ className }) => {
 
   const openDailyHukamnana = () => {
     if (!isHukamnamaLoading) {
-      dailyHukamnama(setIsHukamnamaLoading).then(hukamId => {
+      dailyHukamnama(setIsHukamnamaLoading).then((hukamId) => {
         setIsHukamnamaLoading(false);
         setShabadId(hukamId);
         analytics.trackEvent('display', 'hukamnama', hukamId);
