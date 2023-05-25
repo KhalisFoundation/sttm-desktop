@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import insertSlide from '../../../common/constants/slidedb';
 import { classNames } from '../../../common/utils';
+import tingle from '../../../../assets/js/vendor/tingle';
 
 const remote = require('@electron/remote');
 
@@ -12,11 +13,14 @@ const analytics = remote.getGlobal('analytics');
 const { gurus } = insertSlide.dropdownStrings;
 
 export const DhanGuruPane = ({ className }) => {
-  const { isMiscSlide, miscSlideText, isAnnoucement } = useStoreState((state) => state.navigator);
-  const { setIsMiscSlide, setMiscSlideText, setIsAnnoucement } = useStoreActions(
+  const { isMiscSlide, miscSlideText, isAnnoucement, shortcuts } = useStoreState(
+    (state) => state.navigator,
+  );
+  const { setIsMiscSlide, setMiscSlideText, setIsAnnoucement, setShortcuts } = useStoreActions(
     (state) => state.navigator,
   );
   const { shortcutTray } = useStoreState((state) => state.userSettings);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const refsByGuruIndex = useMemo(() => {
     const refs = {};
@@ -47,6 +51,61 @@ export const DhanGuruPane = ({ className }) => {
       analytics.trackEvent('display', 'dhanguru-slide', e);
     }
   };
+
+  let slidePage = `<h1 class = "modalTitle">${i18n.t('INSERT.INSERT_DHAN_SLIDE')}</h1>
+  <div class="btn-group" id = "btn-group">`;
+  gurus.forEach((guru, index) => {
+    slidePage += `<button class="guru" id="guru${index}">${i18n.t(
+      `INSERT.DHAN_GURU.${guru}`,
+    )}</button>`;
+  });
+  slidePage += `</div>`;
+
+  const showDhanGuruModal = () => {
+    if (!isModalOpen) {
+      const modal = new tingle.Modal({
+        footer: true,
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+        onClose() {
+          modal.modal.classList.remove('tingle-modal--visible');
+          setIsModalOpen(false);
+          modal.destroy();
+        },
+        beforeClose() {
+          return true; // close the modal
+        },
+      });
+      if (!modal.isOpen()) {
+        setIsModalOpen(true);
+        const buttonOnClick = () => {
+          gurus.forEach((guru, index) => {
+            document.querySelector(`#guru${index}`).onclick = () => {
+              addDhanGuruSlide(insertSlide.slideStrings.dhanguruStrings[index]);
+              modal.close();
+              setIsModalOpen(false);
+              modal.destroy();
+            };
+          });
+        };
+
+        // sets the default page to Dhan Guru slide page
+        modal.setContent(slidePage);
+        buttonOnClick();
+        modal.open();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (shortcuts.openDhanGuruSlide) {
+      showDhanGuruModal();
+      setShortcuts({
+        ...shortcuts,
+        openDhanGuruSlide: false,
+      });
+    }
+  }, [shortcuts]);
 
   const getGuruIndex = (index) => {
     if (index < 9) {
