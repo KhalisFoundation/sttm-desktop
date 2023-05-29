@@ -3,11 +3,11 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 export const singleDisplayHeader = () => {
   const { singleDisplayActiveTab, minimizedBySingleDisplay } = useStoreState(
-    state => state.navigator,
+    (state) => state.navigator,
   );
-  const { setMinimizedBySingleDisplay } = useStoreActions(state => state.navigator);
+  const { setMinimizedBySingleDisplay } = useStoreActions((state) => state.navigator);
 
-  const getActiveTab = tabName => {
+  const getActiveTab = (tabName) => {
     let component;
     switch (tabName) {
       case 'search':
@@ -28,8 +28,8 @@ export const singleDisplayHeader = () => {
 
         break;
 
-      case 'insert':
-        component = 'Insert';
+      case 'announcement':
+        component = 'Announcement';
         break;
 
       default:

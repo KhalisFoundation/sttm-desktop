@@ -2,8 +2,8 @@ import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 export const singleDisplayFooter = () => {
-  const { singleDisplayActiveTab } = useStoreState(state => state.navigator);
-  const { setSingleDisplayActiveTab } = useStoreActions(state => state.navigator);
+  const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
+  const { setSingleDisplayActiveTab } = useStoreActions((state) => state.navigator);
   const openSearchPane = () => {
     if (singleDisplayActiveTab !== 'search') {
       setSingleDisplayActiveTab('search');
@@ -15,9 +15,9 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('shabad');
     }
   };
-  const openInsertPane = () => {
-    if (singleDisplayActiveTab !== 'insert') {
-      setSingleDisplayActiveTab('insert');
+  const openAnnouncementPane = () => {
+    if (singleDisplayActiveTab !== 'announcement') {
+      setSingleDisplayActiveTab('announcement');
     }
   };
   const openOtherPane = () => {
@@ -52,8 +52,8 @@ export const singleDisplayFooter = () => {
         <i className="fa fa-dot-circle-o" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'insert' ? 'active' : ''}`}
-        onClick={openInsertPane}
+        className={`tab-switch ${singleDisplayActiveTab === 'announcement' ? 'active' : ''}`}
+        onClick={openAnnouncementPane}
       >
         <i className="fa fa-desktop" />
       </button>

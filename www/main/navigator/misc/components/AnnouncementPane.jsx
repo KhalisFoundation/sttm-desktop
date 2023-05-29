@@ -8,7 +8,7 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-export const InsertPane = ({ className }) => {
+export const AnnouncementPane = ({ className }) => {
   const { isMiscSlide, isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
     (state) => state.navigator,
   );
@@ -86,6 +86,6 @@ export const InsertPane = ({ className }) => {
   );
 };
 
-InsertPane.propTypes = {
+AnnouncementPane.propTypes = {
   className: PropTypes.string,
 };

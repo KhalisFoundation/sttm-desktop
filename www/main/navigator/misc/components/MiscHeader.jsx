@@ -6,7 +6,7 @@ export const MiscHeader = () => {
   const { setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
 
   const isHistory = currentMiscPanel === 'History';
-  const isInsert = currentMiscPanel === 'Insert';
+  const isAnnouncement = currentMiscPanel === 'Announcement';
   const isOther = currentMiscPanel === 'Others';
   const isDhanGuru = currentMiscPanel === 'DhanGuru';
 
@@ -33,12 +33,12 @@ export const MiscHeader = () => {
       </a>
 
       <a
-        className={`misc-button ${isInsert ? 'misc-active' : ''}`}
-        onClick={() => setTab('Insert')}
+        className={`misc-button ${isAnnouncement ? 'misc-active' : ''}`}
+        onClick={() => setTab('Announcement')}
       >
         <i className="fa fa-desktop">
-          <span className="Icon-label" key="Insert">
-            Insert
+          <span className="Icon-label" key="Announcement">
+            Announcement
           </span>
         </i>
       </a>

@@ -88,7 +88,7 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
               />
             </label>
           </button>
-          <button className="tray-item-icon" onClick={() => setTab('Insert')}>
+          <button className="tray-item-icon" onClick={() => setTab('Announcement')}>
             {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
           </button>
         </div>
