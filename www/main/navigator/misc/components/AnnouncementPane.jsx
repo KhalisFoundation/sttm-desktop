@@ -31,13 +31,31 @@ export const AnnouncementPane = ({ className }) => {
     if (!isAnnoucement) {
       setIsAnnoucement(true);
     }
-    analytics.trackEvent('display', 'announcement-slide');
+    analytics.trackEvent(
+      'display',
+      'announcement-slide',
+      'announcement-content',
+      inputRef.current.value,
+    );
   };
 
   const toggleAnnouncementLanguage = (event) => {
     if (isMiscSlideGurmukhi !== event.target.checked) {
       setIsMiscSlideGurmukhi(event.target.checked);
     }
+    analytics.trackEvent(
+      'display',
+      'announcement-slide',
+      'announcement-in-gurmukhi',
+      event.target.checked,
+    );
+  };
+
+  const getPlaceholderText = (gurmukhiPlaceholder) => {
+    if (gurmukhiPlaceholder) {
+      return i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI');
+    }
+    return i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT');
   };
 
   useEffect(() => {
@@ -57,30 +75,30 @@ export const AnnouncementPane = ({ className }) => {
           <i className="fa fa-bullhorn list-icon" />
           {i18n.t('INSERT.ADD_ANNOUNCEMENT_SLIDE')}
         </header>
-        <div className="announcement-switch">
-          <span>{i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')}</span>
-          <div className="switch">
-            <input
-              id="announcement-language"
-              name="announcement-language"
-              type="checkbox"
-              onChange={toggleAnnouncementLanguage}
-            />
-            <label htmlFor="announcement-language" />
+        <div className="announcement-body">
+          <textarea
+            className={`${isMiscSlideGurmukhi ? 'gurmukhi' : ''} announcement-text`}
+            placeholder={getPlaceholderText(isMiscSlideGurmukhi)}
+            ref={inputRef}
+          />
+          <div className="announcement-actions">
+            <div className="announcement-switch">
+              <span>{i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')}</span>
+              <div className="switch">
+                <input
+                  id="announcement-language"
+                  name="announcement-language"
+                  type="checkbox"
+                  onChange={toggleAnnouncementLanguage}
+                />
+                <label htmlFor="announcement-language" />
+              </div>
+            </div>
+            <button className="announcement-slide-btn" onClick={addAnnouncement}>
+              {i18n.t('INSERT.ADD_ANNOUNCEMENT')}
+            </button>
           </div>
         </div>
-        <textarea
-          className={`${isMiscSlideGurmukhi ? 'gurmukhi' : ''} announcement-text`}
-          placeholder={
-            !isMiscSlideGurmukhi
-              ? i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT')
-              : i18n.t('INSERT.ADD_ANNOUNCEMENT_TEXT_GURMUKHI')
-          }
-          ref={inputRef}
-        />
-        <button className="announcement-slide-btn" onClick={addAnnouncement}>
-          {i18n.t('INSERT.ADD_ANNOUNCEMENT')}
-        </button>
       </li>
     </ul>
   );

@@ -117,54 +117,61 @@ $misc-footer-active: 70px;
         }
       }
     }
-    .announcement-box {
-      @include flex($fd-value: column);
-      header {
-        border-top: 1px #757575 solid;
-        color: #757575;
-        font-size: 0.8em;
-        font-weight: bold;
-        letter-spacing: 0.2em;
-        margin-bottom: 0.5em;
-        margin-left: 1rem;
-        margin-top: 1em;
-        padding-top: 0.75em;
-        word-spacing: 0.2em;
-        cursor: default;
-        text-transform: uppercase;
-      }
-      .announcement-switch {
-        @include flex($jc-value: space-evenly, $width: initial);
-        padding: 5px;
-        span {
-          padding-right: 3px;
+    .announcement {
+      &-box {
+        @include flex($fd-value: column);
+        gap: 22px;
+        padding: 22px 12px;
+
+        header {
+          color: #757575;
+          font-size: 0.8em;
+          font-weight: bold;
+          letter-spacing: 0.15em;
+          text-align: center;
+          text-transform: uppercase;
+          word-spacing: 0.15em;
+          width: 80%;
+
+          i {
+            padding-right: 6px;
+          }
         }
       }
-      .announcement-text {
+      &-switch {
+        @include flex($jc-value: space-between, $ai-value: center, $width: 100%);
+      }
+      &-text {
         border-radius: 10px;
         display: inline-block;
-        margin: 0 20px 10px;
         min-height: 100px;
         min-width: 300px;
         outline: none;
         padding: 10px;
       }
-      .announcement-slide-btn {
+      &-slide-btn {
         align-self: center;
+        background: #29679b;
         border: 0;
         border-radius: 0;
         font-size: 0.9rem;
         color: #fff;
         cursor: pointer;
-        margin: 0 1rem 1rem 0;
         display: block;
-        background: #29679b;
         line-height: 1;
         padding: 0.85em 1em;
         text-align: center;
         -webkit-font-smoothing: antialiased;
-        width: 200px;
+        width: 180px;
         -webkit-appearance: none;
+      }
+      &-body {
+        @include flex($jc-value: center, $ai-value: center, $width: fit-content);
+        gap: 12px;
+      }
+      &-actions {
+        @include flex($ai-value: center, $jc-value: space-around, $fd-value: column, $width: 100%);
+        height: 100px;
       }
     }
   }
