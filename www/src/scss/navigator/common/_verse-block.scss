@@ -112,16 +112,3 @@
     z-index: 100;
   }
 }
-
-.single-display-controller {
-  .search-pane {
-    .verse-block {
-      padding-bottom: 35px;
-    }
-  }
-  .shabad-pane {
-    .verse-block {
-      max-height: calc(100% - 80px);
-    }
-  }
-}
