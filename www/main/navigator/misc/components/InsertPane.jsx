@@ -12,25 +12,20 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const InsertPane = ({ className }) => {
-  const {
-    isMiscSlide,
-    isMiscSlideGurmukhi,
-    miscSlideText,
-    isAnnoucement,
-    shortcuts,
-  } = useStoreState(state => state.navigator);
+  const { isMiscSlide, isMiscSlideGurmukhi, miscSlideText, isAnnoucement, shortcuts } =
+    useStoreState((state) => state.navigator);
   const {
     setIsMiscSlide,
     setIsMiscSlideGurmukhi,
     setMiscSlideText,
     setIsAnnoucement,
     setShortcuts,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   const inputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const addMiscSlide = givenText => {
+  const addMiscSlide = (givenText) => {
     if (!isMiscSlide) {
       setIsMiscSlide(true);
     }
@@ -47,27 +42,13 @@ export const InsertPane = ({ className }) => {
     analytics.trackEvent('display', 'announcement-slide');
   };
 
-  const openWaheguruSlide = () => {
-    if (isAnnoucement) {
-      setIsAnnoucement(false);
-    }
-    addMiscSlide(insertSlide.slideStrings.waheguru);
-  };
-
-  const openBlankViewer = () => {
-    if (isAnnoucement) {
-      setIsAnnoucement(false);
-    }
-    addMiscSlide('');
-  };
-
-  const toggleAnnouncementLanguage = event => {
+  const toggleAnnouncementLanguage = (event) => {
     if (isMiscSlideGurmukhi !== event.target.checked) {
       setIsMiscSlideGurmukhi(event.target.checked);
     }
   };
 
-  const addDhanGuruSlide = e => {
+  const addDhanGuruSlide = (e) => {
     if (isAnnoucement) {
       setIsAnnoucement(false);
     }
@@ -147,18 +128,6 @@ export const InsertPane = ({ className }) => {
 
   return (
     <ul className={`list-of-items ${className}`}>
-      <li>
-        <a onClick={() => openBlankViewer()}>
-          <i className="fa fa-eye-slash list-icon" />
-          {i18n.t('INSERT.ADD_EMPTY_SLIDE')}
-        </a>
-      </li>
-      <li>
-        <a onClick={() => openWaheguruSlide()}>
-          <i className="fa fa-circle list-icon" />
-          {i18n.t('INSERT.ADD_WAHEGURU_SLIDE')}
-        </a>
-      </li>
       <li>
         <a>
           <i className="fa fa-circle-o list-icon" />

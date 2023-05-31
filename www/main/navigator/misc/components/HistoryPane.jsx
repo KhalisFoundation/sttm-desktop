@@ -28,7 +28,6 @@ export const HistoryPane = ({ className }) => {
     setActiveVerseId,
     setSingleDisplayActiveTab,
   } = useStoreActions(state => state.navigator);
-  const { isSingleDisplayMode, shortcutTray } = useStoreState(state => state.userSettings);
 
   const openShabadFromHistory = element => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -98,15 +97,7 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  return (
-    <div
-      className={`history-results ${
-        shortcutTray && !isSingleDisplayMode ? 'history-results-shrinked' : ''
-      } ${className}`}
-    >
-      {versesMarkup}
-    </div>
-  );
+  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
 };
 
 HistoryPane.propTypes = {

@@ -327,9 +327,13 @@
     }
   },
   "SHORTCUT_TRAY": {
-    "ANAND_SAHIB": "Anand Sahib (Bhog)",
-    "BLANK": "Blank",
-    "MOOL_MANTRA": "Mool Mantr"
+    "ANAND_SAHIB": "Anand Sahib (6 Pauris)",
+    "BLANK": "[blank]",
+    "MOOL_MANTRA": "Mool Mantr",
+    "CUSTOM_IMAGE": "Custom Image",
+    "ANNOUNCEMENT": "Announcement",
+    "CLEAR_HISTORY": "Clear History",
+    "QUICK_INSERT": "Quick Insert"
   },
   "THEMES": {
     "A_NEW_DAY": "A New Day",
