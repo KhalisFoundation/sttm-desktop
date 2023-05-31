@@ -49,7 +49,7 @@ const init = () => {
  * search('jggsspp', 0, 'all');
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
-const query = (searchQuery, searchType, searchSource) =>
+const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
       init();
@@ -62,7 +62,7 @@ const query = (searchQuery, searchType, searchSource) =>
     // default source for ang search to GURU_GRANTH_SAHIB
     let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
     const order = [];
-    let howManyRows = 20;
+    let howManyRows = resultRows;
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: {
