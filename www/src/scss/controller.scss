@@ -148,6 +148,18 @@ ul {
     }
 
     &-maximize {
+      .search-pane {
+        height: 100%;
+
+        .pane {
+          height: inherit;
+        }
+        .search-footer {
+          margin: 0;
+          width: 100%;
+        }
+      }
+
       .pane {
         height: 45vh;
         transition: 0.3s ease all;
