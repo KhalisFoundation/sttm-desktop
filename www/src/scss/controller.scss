@@ -115,6 +115,17 @@ ul {
       right: 0;
       z-index: 2;
 
+      .shabad-pane {
+        height: 100%;
+
+        .pane {
+          height: inherit;
+        }
+        .shabad-list {
+          height: inherit;
+        }
+      }
+
       .pane {
         .pane-header {
           .header-controller {
@@ -162,6 +173,7 @@ ul {
 
       .pane {
         height: 45vh;
+        min-height: 390px;
         transition: 0.3s ease all;
 
         &-footer {
