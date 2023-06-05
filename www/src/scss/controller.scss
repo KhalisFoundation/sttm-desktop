@@ -111,6 +111,8 @@ ul {
     &-controller {
       bottom: 0;
       box-shadow: 0 10px 20px $transparent-black;
+      min-height: 390px;
+      height: 45vh;
       position: fixed;
       right: 0;
       z-index: 2;
@@ -172,8 +174,7 @@ ul {
       }
 
       .pane {
-        height: 45vh;
-        min-height: 390px;
+        height: 100%;
         transition: 0.3s ease all;
 
         &-footer {
