@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { ipcRenderer } from 'electron/renderer';
-import { useStoreState } from 'easy-peasy';
 
 import Pane from '../../../common/sttm-ui/pane/Pane';
 import { DataLayer } from '../state-manager/DataLayer';
