@@ -9,6 +9,10 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('search');
     }
   };
+  const getTurbanIcon = () =>
+    singleDisplayActiveTab === 'dhan-guru'
+      ? 'assets/img/icons/turban-filled-blue.png'
+      : 'assets/img/icons/turban-filled.png';
 
   const openShabadPane = () => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -28,6 +32,11 @@ export const singleDisplayFooter = () => {
   const openHistoryPane = () => {
     if (singleDisplayActiveTab !== 'history') {
       setSingleDisplayActiveTab('history');
+    }
+  };
+  const openDhanGuruPane = () => {
+    if (singleDisplayActiveTab !== 'dhan-guru') {
+      setSingleDisplayActiveTab('dhan-guru');
     }
   };
 
@@ -56,6 +65,12 @@ export const singleDisplayFooter = () => {
         onClick={openAnnouncementPane}
       >
         <i className="fa fa-desktop" />
+      </button>
+      <button
+        className={`tab-switch ${singleDisplayActiveTab === 'dhan-guru' ? 'active' : ''}`}
+        onClick={openDhanGuruPane}
+      >
+        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
       </button>
       <button
         className={`tab-switch ${singleDisplayActiveTab === 'other' ? 'active' : ''}`}

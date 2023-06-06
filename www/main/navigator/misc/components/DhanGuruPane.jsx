@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 import insertSlide from '../../../common/constants/slidedb';
-import { classNames } from '../../../common/utils';
 import tingle from '../../../../assets/js/vendor/tingle';
 
 const remote = require('@electron/remote');
@@ -23,17 +22,8 @@ export const DhanGuruPane = ({ className }) => {
     setIsMiscSlideGurmukhi,
     setShortcuts,
   } = useStoreActions((state) => state.navigator);
-  const { shortcutTray } = useStoreState((state) => state.userSettings);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDhanGuruIndex, setCurrentDhanGuruIndex] = useState(null);
-
-  const refsByGuruIndex = useMemo(() => {
-    const refs = {};
-    gurus.forEach((guru) => {
-      refs[guru] = React.createRef(null);
-    });
-    return refs;
-  }, [gurus]);
 
   const addMiscSlide = (givenText) => {
     if (!isMiscSlide) {
@@ -170,7 +160,7 @@ export const DhanGuruPane = ({ className }) => {
           <label htmlFor="dhan-guru-language" />
         </div>
       </div>
-      <div className={classNames('dhan-guru-pane', shortcutTray && 'misc-pane-shrinked-more')}>
+      <div className="dhan-guru-pane">
         {gurus.map((guru, index) => (
           <div
             className="dhan-guru-button"
@@ -178,18 +168,8 @@ export const DhanGuruPane = ({ className }) => {
             onClick={() => {
               insertDhanGuru(index);
             }}
-            onMouseEnter={() => {
-              refsByGuruIndex[guru].current.classList.add('dhan-guru-button-prefix-hover');
-              refsByGuruIndex[guru].current.innerHTML = '';
-            }}
-            onMouseLeave={() => {
-              refsByGuruIndex[guru].current.classList.remove('dhan-guru-button-prefix-hover');
-              refsByGuruIndex[guru].current.innerHTML = getGuruIndex(index);
-            }}
           >
-            <span className="dhan-guru-button-prefix" ref={refsByGuruIndex[guru]}>
-              {getGuruIndex(index)}
-            </span>
+            <span className="dhan-guru-button-prefix">{getGuruIndex(index)}</span>
             <span className="dhan-guru-button-text">{i18n.t(`INSERT.DHAN_GURU.${guru}`)}</span>
           </div>
         ))}
