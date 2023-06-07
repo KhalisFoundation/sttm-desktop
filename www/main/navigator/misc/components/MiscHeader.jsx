@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { classNames } from '../../../common/utils';
 
 export const MiscHeader = () => {
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
@@ -22,7 +23,7 @@ export const MiscHeader = () => {
   return (
     <div className="misc-header">
       <a
-        className={`misc-button ${isHistory ? 'misc-active' : ''}`}
+        className={classNames('misc-button', isHistory && 'misc-active')}
         onClick={() => setTab('History')}
       >
         <i className="fa fa-clock-o">
@@ -33,7 +34,7 @@ export const MiscHeader = () => {
       </a>
 
       <a
-        className={`misc-button ${isAnnouncement ? 'misc-active' : ''}`}
+        className={classNames('misc-button', isAnnouncement && 'misc-active')}
         onClick={() => setTab('Announcement')}
       >
         <i className="fa fa-desktop">
@@ -43,7 +44,7 @@ export const MiscHeader = () => {
         </i>
       </a>
       <a
-        className={`misc-button ${isDhanGuru ? 'misc-active' : ''}`}
+        className={classNames('misc-button', isDhanGuru && 'misc-active')}
         onClick={() => setTab('DhanGuru')}
       >
         <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
@@ -51,7 +52,10 @@ export const MiscHeader = () => {
           Gurus
         </span>
       </a>
-      <a className={`misc-button ${isOther ? 'misc-active' : ''}`} onClick={() => setTab('Others')}>
+      <a
+        className={classNames('misc-button', isOther && 'misc-active')}
+        onClick={() => setTab('Others')}
+      >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
             Others
