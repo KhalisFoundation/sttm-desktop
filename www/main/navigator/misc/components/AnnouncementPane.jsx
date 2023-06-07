@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ipcRenderer } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { classNames } from '../../../common/utils';
 
 const remote = require('@electron/remote');
 
@@ -77,7 +78,7 @@ export const AnnouncementPane = ({ className }) => {
         </header>
         <div className="announcement-body">
           <textarea
-            className={`${isMiscSlideGurmukhi ? 'gurmukhi' : ''} announcement-text`}
+            className={classNames('announcement-text', 'gurmukhi' && isMiscSlideGurmukhi)}
             placeholder={getPlaceholderText(isMiscSlideGurmukhi)}
             ref={inputRef}
           />
