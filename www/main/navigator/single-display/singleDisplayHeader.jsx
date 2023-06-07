@@ -28,8 +28,8 @@ export const singleDisplayHeader = () => {
 
         break;
 
-      case 'insert':
-        component = 'Insert';
+      case 'announcement':
+        component = 'Announcement';
         break;
 
       case 'dhan-guru':

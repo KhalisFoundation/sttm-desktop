@@ -1,19 +1,20 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
 import { HistoryPane } from './HistoryPane';
-import { InsertPane } from './InsertPane';
+import { AnnouncementPane } from './AnnouncementPane';
 import { OtherPane } from './OtherPane';
 import { DhanGuruPane } from './DhanGuruPane';
+import { classNames } from '../../../common/utils';
 
 export const MiscContent = () => {
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
 
   return (
     <>
-      <HistoryPane className={currentMiscPanel === 'History' ? '' : 'd-none'} />
-      <InsertPane className={currentMiscPanel === 'Insert' ? '' : 'd-none'} />
-      <OtherPane className={currentMiscPanel === 'Others' ? '' : 'd-none'} />
-      <DhanGuruPane className={currentMiscPanel === 'DhanGuru' ? '' : 'd-none'} />
+      <HistoryPane className={classNames(currentMiscPanel !== 'History' && 'd-none')} />
+      <AnnouncementPane className={classNames(currentMiscPanel !== 'Announcement' && 'd-none')} />
+      <OtherPane className={classNames(currentMiscPanel !== 'Others' && 'd-none')} />
+      <DhanGuruPane className={classNames(currentMiscPanel !== 'DhanGuru' && 'd-none')} />
     </>
   );
 };

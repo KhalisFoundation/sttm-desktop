@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { classNames } from '../../common/utils';
 
 export const singleDisplayFooter = () => {
   const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
@@ -19,9 +20,9 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('shabad');
     }
   };
-  const openInsertPane = () => {
-    if (singleDisplayActiveTab !== 'insert') {
-      setSingleDisplayActiveTab('insert');
+  const openAnnouncementPane = () => {
+    if (singleDisplayActiveTab !== 'announcement') {
+      setSingleDisplayActiveTab('announcement');
     }
   };
   const openOtherPane = () => {
@@ -43,37 +44,37 @@ export const singleDisplayFooter = () => {
   return (
     <div className="single-display-switches">
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'search' ? 'active' : ''}`}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'search' && 'active')}
         onClick={openSearchPane}
       >
         <i className="fa fa-search" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'history' ? 'active' : ''}`}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'history' && 'active')}
         onClick={openHistoryPane}
       >
         <i className="fa fa-history" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'shabad' ? 'active' : ''}`}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'shabad' && 'active')}
         onClick={openShabadPane}
       >
         <i className="fa fa-dot-circle-o" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'insert' ? 'active' : ''}`}
-        onClick={openInsertPane}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'announcement' && 'active')}
+        onClick={openAnnouncementPane}
       >
         <i className="fa fa-desktop" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'dhan-guru' ? 'active' : ''}`}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'dhan-guru' && 'active')}
         onClick={openDhanGuruPane}
       >
         <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
       </button>
       <button
-        className={`tab-switch ${singleDisplayActiveTab === 'other' ? 'active' : ''}`}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
         onClick={openOtherPane}
       >
         <i className="fa fa-ellipsis-h" />

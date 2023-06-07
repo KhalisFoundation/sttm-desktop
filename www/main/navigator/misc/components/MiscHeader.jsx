@@ -1,12 +1,13 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { classNames } from '../../../common/utils';
 
 export const MiscHeader = () => {
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
   const { setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
 
   const isHistory = currentMiscPanel === 'History';
-  const isInsert = currentMiscPanel === 'Insert';
+  const isAnnouncement = currentMiscPanel === 'Announcement';
   const isOther = currentMiscPanel === 'Others';
   const isDhanGuru = currentMiscPanel === 'DhanGuru';
 
@@ -22,7 +23,7 @@ export const MiscHeader = () => {
   return (
     <div className="misc-header">
       <a
-        className={`misc-button ${isHistory ? 'misc-active' : ''}`}
+        className={classNames('misc-button', isHistory && 'misc-active')}
         onClick={() => setTab('History')}
       >
         <i className="fa fa-clock-o">
@@ -33,17 +34,17 @@ export const MiscHeader = () => {
       </a>
 
       <a
-        className={`misc-button ${isInsert ? 'misc-active' : ''}`}
-        onClick={() => setTab('Insert')}
+        className={classNames('misc-button', isAnnouncement && 'misc-active')}
+        onClick={() => setTab('Announcement')}
       >
         <i className="fa fa-desktop">
-          <span className="Icon-label" key="Insert">
-            Insert
+          <span className="Icon-label" key="Announcement">
+            Announcement
           </span>
         </i>
       </a>
       <a
-        className={`misc-button ${isDhanGuru ? 'misc-active' : ''}`}
+        className={classNames('misc-button', isDhanGuru && 'misc-active')}
         onClick={() => setTab('DhanGuru')}
       >
         <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
@@ -51,7 +52,10 @@ export const MiscHeader = () => {
           Gurus
         </span>
       </a>
-      <a className={`misc-button ${isOther ? 'misc-active' : ''}`} onClick={() => setTab('Others')}>
+      <a
+        className={classNames('misc-button', isOther && 'misc-active')}
+        onClick={() => setTab('Others')}
+      >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
             Others

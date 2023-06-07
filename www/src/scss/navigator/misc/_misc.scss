@@ -116,54 +116,81 @@ $misc-footer-active: 70px;
         }
       }
     }
-    .announcement-box {
-      @include flex($fd-value: column);
-      header {
-        border-top: 1px #757575 solid;
-        color: #757575;
-        font-size: 0.8em;
-        font-weight: bold;
-        letter-spacing: 0.2em;
-        margin-bottom: 0.5em;
-        margin-left: 1rem;
-        margin-top: 1em;
-        padding-top: 0.75em;
-        word-spacing: 0.2em;
-        cursor: default;
-        text-transform: uppercase;
-      }
-      .announcement-switch {
-        @include flex($jc-value: space-evenly, $width: initial);
-        padding: 5px;
-        span {
-          padding-right: 3px;
+    .announcement {
+      &-box {
+        @include flex($fd-value: column);
+        gap: 22px;
+        padding: 22px 12px;
+
+        header {
+          color: $sonic-silver;
+          font-size: 0.8em;
+          font-weight: bold;
+          letter-spacing: 0.15em;
+          text-align: center;
+          text-transform: uppercase;
+          word-spacing: 0.15em;
+          width: 80%;
+
+          i {
+            padding-right: 6px;
+          }
         }
       }
-      .announcement-text {
+      &-switch {
+        @include flex($jc-value: start, $ai-value: center, $width: 100%);
+        gap: 8px;
+
+        .switch {
+          height: 1.2em;
+          width: 2em;
+
+          label:after {
+            height: 1.2em;
+            width: 1.2em;
+          }
+
+          input:checked {
+            + label:after {
+              left: 0.8em;
+            }
+          }
+        }
+      }
+      &-text {
         border-radius: 10px;
         display: inline-block;
-        margin: 0 20px 10px;
+        height: 150px;
         min-height: 100px;
         min-width: 300px;
         outline: none;
         padding: 10px;
+        width: inherit;
       }
-      .announcement-slide-btn {
+      &-slide-btn {
         align-self: center;
+        background: $lapis-lazuli;
         border: 0;
         border-radius: 0;
         font-size: 0.9rem;
-        color: #fff;
+        color: $white;
         cursor: pointer;
-        margin: 0 1rem 1rem 0;
         display: block;
-        background: #29679b;
         line-height: 1;
         padding: 0.85em 1em;
         text-align: center;
         -webkit-font-smoothing: antialiased;
-        width: 200px;
+        width: 300px;
         -webkit-appearance: none;
+      }
+      &-body {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        width: 450px;
+      }
+      &-actions {
+        @include flex($ai-value: center, $jc-value: space-around, $width: 100%);
       }
     }
   }
