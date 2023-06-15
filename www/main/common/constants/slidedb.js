@@ -2,17 +2,50 @@ const slideStrings = {
   waheguru: 'vwihgurU',
   moolMantra: '<> siq nwmu krqw purKu inrBau inrvYru Akwl mUriq AjUnI sYBM gur pRswid ]',
   dhanguruStrings: [
-    'DMn gurU nwnk dyv jI',
-    'DMn gurU AMgd dyv jI',
-    'DMn gurU Amrdwsu swihb jI',
-    'DMn gurU rwmdws swihb jI',
-    'DMn gurU Arjun dyv jI',
-    'DMn gurU hirgoibMd swihb jI',
-    'DMn gurU hirrwie swihb jI',
-    'DMn gurU hirikRSn swihb jI',
-    'DMn gurU qyg bhwdr swihb jI',
-    'DMn gurU goibMd isMG swihb jI',
-    'DMn gurU gRMQ swihb jI',
+    {
+      english: 'Dhan Guru Nanak Dev Jee',
+      gurmukhi: 'DMn gurU nwnk dyv jI',
+    },
+    {
+      english: 'Dhan Guru Angad Dev Jee',
+      gurmukhi: 'DMn gurU AMgd dyv jI',
+    },
+    {
+      english: 'Dhan Guru Amardas Sahib Jee',
+      gurmukhi: 'DMn gurU Amrdwsu swihb jI',
+    },
+    {
+      english: 'Dhan Guru Ramdas Sahib Jee',
+      gurmukhi: 'DMn gurU rwmdws swihb jI',
+    },
+    {
+      english: 'Dhan Guru Arjun Dev Jee',
+      gurmukhi: 'DMn gurU Arjun dyv jI',
+    },
+    {
+      english: 'Dhan Guru Hargobind Sahib Jee',
+      gurmukhi: 'DMn gurU hirgoibMd swihb jI',
+    },
+    {
+      english: 'Dhan Guru Harrai Sahib Jee',
+      gurmukhi: 'DMn gurU hirrwie swihb jI',
+    },
+    {
+      english: 'Dhan Guru Harkrishan Sahib Jee',
+      gurmukhi: 'DMn gurU hirikRSn swihb jI',
+    },
+    {
+      english: 'Dhan Guru Teg Bahadur Sahib Jee',
+      gurmukhi: 'DMn gurU qyg bhwdr swihb jI',
+    },
+    {
+      english: 'Dhan Guru Gobind Singh Sahib Jee',
+      gurmukhi: 'DMn gurU goibMd isMG swihb jI',
+    },
+    {
+      english: 'Dhan Guru Granth Sahib Jee',
+      gurmukhi: 'DMn gurU gRMQ swihb jI',
+    },
   ],
 };
 const dropdownStrings = {

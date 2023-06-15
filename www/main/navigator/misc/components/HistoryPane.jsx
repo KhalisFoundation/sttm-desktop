@@ -15,7 +15,7 @@ export const HistoryPane = ({ className }) => {
     homeVerse,
     activeVerseId,
     singleDisplayActiveTab,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
     setInitialVerseId,
@@ -27,10 +27,9 @@ export const HistoryPane = ({ className }) => {
     setHomeVerse,
     setActiveVerseId,
     setSingleDisplayActiveTab,
-  } = useStoreActions(state => state.navigator);
-  const { isSingleDisplayMode, shortcutTray } = useStoreState(state => state.userSettings);
+  } = useStoreActions((state) => state.navigator);
 
-  const openShabadFromHistory = element => {
+  const openShabadFromHistory = (element) => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
@@ -84,7 +83,7 @@ export const HistoryPane = ({ className }) => {
 
   const versesMarkup = [];
 
-  verseHistory.forEach(element => {
+  verseHistory.forEach((element) => {
     versesMarkup.push(
       <p
         className="history-item gurmukhi"
@@ -98,15 +97,7 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  return (
-    <div
-      className={`history-results ${
-        shortcutTray && !isSingleDisplayMode ? 'history-results-shrinked' : ''
-      } ${className}`}
-    >
-      {versesMarkup}
-    </div>
-  );
+  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
 };
 
 HistoryPane.propTypes = {

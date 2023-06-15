@@ -4,9 +4,9 @@ import { useStoreState } from 'easy-peasy';
 import ReactHtmlParser from 'html-react-parser';
 
 const SlideAnnouncement = ({ getFontSize }) => {
-  const { announcementsFontSize } = useStoreState(state => state.userSettings);
+  const { announcementsFontSize } = useStoreState((state) => state.userSettings);
   const { isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
-    state => state.navigator,
+    (state) => state.navigator,
   );
   let gurmukhi = true;
 
