@@ -23,7 +23,7 @@ const release = async () => {
   if (platform !== 'win32') {
     // Get all tags, sort in desc order, and get latest from current track
     const gitTags = await git().tags();
-    const gitTag = gitTags.all.reverse().find(tag => tag.indexOf(track) > -1);
+    const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
     console.log(`Last Git tag: ${gitTag}`);
 
     // Get a new release version and update package.json
@@ -34,8 +34,8 @@ const release = async () => {
   console.log('TODO: stream output for the next command');
   console.log(`npm run dist:${platform}`);
   try {
-    const { stdout1 } = await exec(`npm run dist:${platform}`);
-    console.log(stdout1);
+    const { stdout } = await exec(`npm run dist:${platform}`);
+    console.log(stdout);
   } catch (e) {
     console.log(e);
   }
