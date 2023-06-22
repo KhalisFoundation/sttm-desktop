@@ -96,6 +96,10 @@
   max-width: 150px;
   z-index: 2;
 
+  .single-display-mode & {
+    height: calc(100% - 56px);
+  }
+
   &.hide-quicktools {
     left: -18%;
   }
