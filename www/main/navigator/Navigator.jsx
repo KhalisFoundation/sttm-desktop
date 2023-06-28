@@ -13,7 +13,7 @@ const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
   const { isSingleDisplayMode, akhandpatt } = useStoreState(state => state.userSettings);
-  const { setAkhandpatt } = useStoreState(state => state.userSettings);
+  const { setAkhandpatt } = useStoreActions(state => state.userSettings);
   const {
     minimizedBySingleDisplay,
     shortcuts,
