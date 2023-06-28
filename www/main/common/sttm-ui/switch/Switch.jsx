@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const Switch = ({ title, controlId, className, onToggle, value = false }) => {
+const Switch = ({ title, controlId, className, onToggle, value = false, disabled = false }) => {
   const [isSwitched, setSwitchedState] = useState(value);
 
   useEffect(() => {
@@ -23,6 +23,7 @@ const Switch = ({ title, controlId, className, onToggle, value = false }) => {
               onToggle(newState);
             }
           }}
+          disabled={disabled}
         />
         <label htmlFor={controlId} />
       </div>
@@ -35,6 +36,7 @@ Switch.propTypes = {
   controlId: PropTypes.string,
   className: PropTypes.string,
   value: PropTypes.bool,
+  disabled: PropTypes.bool,
   onToggle: PropTypes.func,
 };
 
