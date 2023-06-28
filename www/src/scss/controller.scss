@@ -220,7 +220,13 @@ ul {
       }
     }
   }
-
+  
+  .single-display {
+    &-minimize {
+      min-height: auto;
+      height: 5vh;
+    }
+  }
   .single-display-switches {
     background: rgba(221, 221, 221, 1);
 
