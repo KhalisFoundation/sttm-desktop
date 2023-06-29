@@ -1,5 +1,5 @@
 os: osx
-osx_image: xcode11.3
+osx_image: xcode14.2
 
 sudo: required
 branches:
@@ -17,8 +17,8 @@ cache:
 before_install:
   - if [ "$TRAVIS_BRANCH" = "release" ]; then openssl aes-256-cbc -K $encrypted_fec05b564c85_key -iv $encrypted_fec05b564c85_iv
     -in id_rsa.enc -out packaging/id_rsa -d; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then chmod +x ./packaging/add-osx-cert.sh; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then ./packaging/add-osx-cert.sh; fi
+  - chmod +x ./packaging/add-osx-cert.sh;
+  - ./packaging/add-osx-cert.sh;
 script:
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then npm test; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && travis_wait 30 ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN; fi'
