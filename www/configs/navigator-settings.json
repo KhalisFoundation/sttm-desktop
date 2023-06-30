@@ -40,5 +40,6 @@
     "copyToClipboard": false
   },
   "minimizedBySingleDisplay": false,
-  "isDontSaveHistory": false
+  "isDontSaveHistory": false,
+  "currentMiscPanel": "History"
 }

@@ -23,7 +23,7 @@ const release = async () => {
   if (platform !== 'win32') {
     // Get all tags, sort in desc order, and get latest from current track
     const gitTags = await git().tags();
-    const gitTag = gitTags.all.reverse().find(tag => tag.indexOf(track) > -1);
+    const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
     console.log(`Last Git tag: ${gitTag}`);
 
     // Get a new release version and update package.json
@@ -33,11 +33,16 @@ const release = async () => {
 
   console.log('TODO: stream output for the next command');
   console.log(`npm run dist:${platform}`);
+
   try {
-    const { stdout1 } = await exec(`npm run dist:${platform}`);
-    console.log(stdout1);
-  } catch (e) {
-    console.log(e);
+    setTimeout(() => {
+      console.log(`npm run dist:${platform} is taking a long time, please wait...`);
+    }, 590000);
+    const { stdout, stderr } = await exec(`npm run dist:${platform}`);
+    console.log('stdout:', stdout);
+    console.log('stderr:', stderr);
+  } catch (err) {
+    console.error(err);
   }
 
   // Only push git tag if on Travis

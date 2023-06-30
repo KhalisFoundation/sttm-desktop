@@ -213,18 +213,20 @@
     }
 
     &-container {
-      height: calc(100% - 50px);
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      height: 100%;
+      overflow: hidden;
     }
   }
   .search-results {
-    height: calc(100% - 120px);
+    flex-grow: 1;
+    overflow: auto;
 
     &.filter-applied {
-      height: calc(100% - 150px);
+      height: calc(100% - 62px);
     }
-  }
-  .gurmukhi-keyboard + .search-result-controls + .search-results {
-    height: calc(100% - 281px);
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);
