@@ -15,18 +15,14 @@ const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
-  const {
-    isSundarGutkaBani,
-    sundarGutkaBaniId,
-    isCeremonyBani,
-    singleDisplayActiveTab,
-  } = useStoreState(state => state.navigator);
+  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani, singleDisplayActiveTab } =
+    useStoreState((state) => state.navigator);
   const {
     setIsSundarGutkaBani,
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
@@ -38,7 +34,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const overlayClassName = `ui-${hyphenedTitle}`;
   const blockListId = `${hyphenedTitle}-banis`;
   const blockListItemClassName = `${hyphenedTitle}-bani`;
-  const taggedBanis = banis.map(bani => {
+  const taggedBanis = banis.map((bani) => {
     const b = bani;
     b.baniTag = '';
 
@@ -54,7 +50,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     return b;
   });
 
-  const loadBani = baniId => {
+  const loadBani = (baniId) => {
     if (isCeremonyBani) {
       setIsCeremonyBani(false);
     }
@@ -71,7 +67,11 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
       setSingleDisplayActiveTab('shabad');
     }
 
-    analytics.trackEvent('sunderGutkaBanis', baniId);
+    analytics.trackEvent({
+      category: 'sundar-gutka',
+      action: 'bani',
+      label: baniId,
+    });
     onScreenClose();
   };
 
@@ -96,7 +96,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
               <section className="blocklist">
                 <ul id={blockListId} className="gurmukhi">
-                  {taggedBanis.map(bani => (
+                  {taggedBanis.map((bani) => (
                     <li
                       key={bani.name}
                       className={blockListItemClassName}

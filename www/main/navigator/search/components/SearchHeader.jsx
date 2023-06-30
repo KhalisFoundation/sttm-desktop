@@ -4,6 +4,8 @@ import banidb from '../../../common/constants/banidb';
 
 const remote = require('@electron/remote');
 
+const analytics = remote.getGlobal('analytics');
+
 function SearchHeader() {
   // For responsiveness
   const [width, setWidth] = useState(window.innerWidth);
@@ -25,10 +27,10 @@ function SearchHeader() {
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;
   const englishSearchTypes = Object.keys(englishSearchText);
 
-  const { currentLanguage, currentSearchType } = useStoreState(state => state.navigator);
-  const { setCurrentSearchType, setCurrentLanguage } = useStoreActions(state => state.navigator);
+  const { currentLanguage, currentSearchType } = useStoreState((state) => state.navigator);
+  const { setCurrentSearchType, setCurrentLanguage } = useStoreActions((state) => state.navigator);
 
-  const handleLanguageChange = event => {
+  const handleLanguageChange = (event) => {
     if (event.target.value === 'en' && currentSearchType !== 3) {
       setCurrentSearchType(3);
     }
@@ -38,17 +40,32 @@ function SearchHeader() {
     if (currentLanguage !== event.target.value) {
       setCurrentLanguage(event.target.value);
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'language',
+      label: event.target.value,
+    });
   };
-  const handleSearchType = event => {
+  const handleSearchType = (event) => {
     if (currentSearchType !== parseInt(event.target.value, 10)) {
       setCurrentSearchType(parseInt(event.target.value, 10));
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'search-type',
+      label: event.target.value,
+    });
   };
 
-  const handleSearchOption = event => {
+  const handleSearchOption = (event) => {
     if (event.target.checked && currentSearchType !== parseInt(event.target.value, 10)) {
       setCurrentSearchType(parseInt(event.target.value, 10));
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'search-option',
+      label: event.target.value,
+    });
   };
 
   return (
@@ -87,7 +104,7 @@ function SearchHeader() {
             {width < breakpoint ? (
               <div className="search-select">
                 <select onChangeCapture={handleSearchType}>
-                  {gurmukhiSearchTypes.map(value => (
+                  {gurmukhiSearchTypes.map((value) => (
                     <option key={value} value={value}>
                       {i18n.t(`SEARCH.${gurmukhiSearchText[value]}`)}
                     </option>
@@ -96,7 +113,7 @@ function SearchHeader() {
               </div>
             ) : (
               <div className="search-type">
-                {gurmukhiSearchTypes.map(value => (
+                {gurmukhiSearchTypes.map((value) => (
                   <React.Fragment key={value}>
                     <input
                       className="search-type-checkbox"
@@ -121,7 +138,7 @@ function SearchHeader() {
             {width < breakpoint ? (
               <div className="search-select">
                 <select onChangeCapture={handleSearchType}>
-                  {englishSearchTypes.map(value => (
+                  {englishSearchTypes.map((value) => (
                     <option key={value} value={value}>
                       {i18n.t(`SEARCH.${englishSearchText[value]}`)}
                     </option>
@@ -130,7 +147,7 @@ function SearchHeader() {
               </div>
             ) : (
               <div className="search-type">
-                {englishSearchTypes.map(value => (
+                {englishSearchTypes.map((value) => (
                   <React.Fragment key={value}>
                     <input
                       id={value}

@@ -129,7 +129,11 @@ module.exports = {
     const isPresenterView = document.body.classList.contains('presenter-view');
     const settingsViewType = isPresenterView ? 'from_presenter_view' : 'not_from_presenter_view';
     const settingsClickSource = fromMainMenu ? 'menu_settings' : 'hamburger_settings';
-    analytics.trackEvent(settingsClickSource, 'click', settingsViewType);
+    analytics.trackEvent({
+      category: settingsClickSource,
+      action: 'open_settings',
+      label: settingsViewType,
+    });
 
     const sessionPage = document.querySelector('#session-page');
     sessionPage.classList.add('bounce-animate');

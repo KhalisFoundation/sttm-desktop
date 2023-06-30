@@ -30,7 +30,7 @@ class Analytics {
    * @param label
    * @param value
    */
-  trackEvent(category, action, label, value) {
+  trackEvent({ category, action, label, value }) {
     const useragent = this.store.get('user-agent');
     const params = {
       ec: category,

@@ -48,8 +48,13 @@ export const OtherPane = ({ className }) => {
   const openRandomShabad = () => {
     randomShabad().then((randomId) => {
       setShabadId(randomId);
+      analytics.trackEvent({
+        category: 'display',
+        action: 'random-shabad',
+        label: 'shabadId',
+        value: randomId,
+      });
     });
-    analytics.trackEvent('display', 'random-shabad');
   };
 
   const openDailyHukamnana = () => {
@@ -57,7 +62,12 @@ export const OtherPane = ({ className }) => {
       dailyHukamnama(setIsHukamnamaLoading).then((hukamId) => {
         setIsHukamnamaLoading(false);
         setShabadId(hukamId);
-        analytics.trackEvent('display', 'hukamnama', hukamId);
+        analytics.trackEvent({
+          category: 'display',
+          action: 'hukamnama',
+          label: 'shabadId',
+          value: hukamId,
+        });
       });
     }
     setIsHukamnamaLoading(true);
