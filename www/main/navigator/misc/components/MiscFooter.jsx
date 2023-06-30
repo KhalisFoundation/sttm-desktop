@@ -75,20 +75,18 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
         <button className="tray-item-icon" onClick={blankSlide}>
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
-          <label htmlFor="themebg-upload">
-            {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
-            <input
-              className="file-input"
-              onChange={async (e) => {
-                await uploadImage(e);
-              }}
-              id="themebg-upload"
-              type="file"
-              accept="image/png, image/jpeg"
-            />
-          </label>
-        </button>
+        <label className="tray-item-icon" htmlFor="themebg-upload">
+          {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
+          <input
+            className="file-input"
+            onChange={async (e) => {
+              await uploadImage(e);
+            }}
+            id="themebg-upload"
+            type="file"
+            accept="image/png, image/jpeg"
+          />
+        </label>
         <button className="tray-item-icon" onClick={() => setTab('Announcement')}>
           {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
