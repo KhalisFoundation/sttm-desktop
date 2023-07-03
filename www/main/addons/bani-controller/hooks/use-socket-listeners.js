@@ -38,7 +38,12 @@ const useSocketListeners = (
     const listenerActions = {
       shabad: (payload) => {
         changeActiveShabad(payload.shabadId, payload.verseId);
-        analytics.trackEvent('controller', 'shabad', `${payload.shabadId}`);
+        analytics.trackEvent({
+          category: 'controller',
+          action: 'shabad',
+          label: 'shabadId',
+          value: payload.shabadId,
+        });
       },
       text: (payload) => {
         if (!isMiscSlide) {
@@ -50,6 +55,12 @@ const useSocketListeners = (
         if (isMiscSlideGurmukhi !== payload.isGurmukhi) {
           setIsMiscSlideGurmukhi(payload.isGurmukhi);
         }
+        analytics.trackEvent({
+          category: 'controller',
+          action: 'send text',
+          label: 'text',
+          value: payload.text,
+        });
       },
       bani: (payload) => {
         if (isCeremonyBani) {
@@ -69,6 +80,12 @@ const useSocketListeners = (
             setSavedCrossPlatformId(payload.verseId);
           }
         }
+        analytics.trackEvent({
+          category: 'controller',
+          action: 'bani',
+          label: 'baniId',
+          value: payload.baniId,
+        });
       },
       ceremony: (payload) => {
         if (!isCeremonyBani) {
@@ -82,6 +99,12 @@ const useSocketListeners = (
         if (ceremonyId !== payload.ceremonyId) {
           setCeremonyId(payload.ceremonyId);
         }
+        analytics.trackEvent({
+          category: 'controller',
+          action: 'ceremony',
+          label: 'ceremonyId',
+          value: payload.ceremonyId,
+        });
       },
       'request-control': () =>
         handleRequestControl(
@@ -101,6 +124,12 @@ const useSocketListeners = (
         if (settings.action === 'changeFontSize') {
           changeFontSize(settings.target, settings.value === 'plus');
         }
+        analytics.trackEvent({
+          category: 'controller',
+          action: 'settings',
+          label: settings.action,
+          value: settings.value,
+        });
       },
     };
     // if its an event from web and not from desktop itself

@@ -64,7 +64,11 @@ const SearchContent = () => {
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
-    analytics.trackEvent('search', 'gurmukhi-keyboard-open', keyboardOpenStatus);
+    analytics.trackEvent({
+      category: 'search',
+      action: 'gurmukhi-keyboard-open',
+      value: keyboardOpenStatus ? 'open' : 'close',
+    });
   };
 
   const loadMoreSearchResults = useCallback(() => {
@@ -73,6 +77,11 @@ const SearchContent = () => {
       searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) =>
         query ? setSearchData(rows) : setSearchData([]),
       );
+      analytics.trackEvent({
+        category: 'search',
+        action: 'load-more-search-results',
+        value: searchResultsCount,
+      });
     }, 200);
   });
 
@@ -98,6 +107,11 @@ const SearchContent = () => {
       const { shabadId, verseId } = filteredShabads[0];
       changeActiveShabad(shabadId, verseId);
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'open-first-result',
+      value: searchQuery,
+    });
   };
 
   const getPlaceholder = () => {
@@ -205,21 +219,45 @@ const SearchContent = () => {
           <div className="filter-tag--container">
             {currentWriter !== 'all' && (
               <FilterTag
-                close={() => setCurrentWriter('all')}
+                close={() => {
+                  setCurrentWriter('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'writer',
+                    value: currentWriter,
+                  });
+                }}
                 title={currentWriter}
                 filterType={i18n.t('SEARCH.WRITER')}
               />
             )}
             {currentRaag !== 'all' && (
               <FilterTag
-                close={() => setCurrentRaag('all')}
+                close={() => {
+                  setCurrentRaag('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'raag',
+                    value: currentRaag,
+                  });
+                }}
                 title={currentRaag}
                 filterType={i18n.t('SEARCH.RAAG')}
               />
             )}
             {currentSource !== 'all' && (
               <FilterTag
-                close={() => setCurrentSource('all')}
+                close={() => {
+                  setCurrentSource('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'source',
+                    value: currentSource,
+                  });
+                }}
                 title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
@@ -232,7 +270,12 @@ const SearchContent = () => {
             title="Writer"
             onChange={(event) => {
               setCurrentWriter(event.target.value);
-              analytics.trackEvent('search', 'searchWriter', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'writer',
+                value: event.target.value,
+              });
             }}
             optionsArray={writerArray}
             currentValue={currentWriter}
@@ -241,7 +284,12 @@ const SearchContent = () => {
             title="Raag"
             onChange={(event) => {
               setCurrentRaag(event.target.value);
-              analytics.trackEvent('search', 'searchRaag', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'raag',
+                value: event.target.value,
+              });
             }}
             optionsArray={raagArray}
             currentValue={currentRaag}
@@ -250,7 +298,12 @@ const SearchContent = () => {
             title="Source"
             onChange={(event) => {
               setCurrentSource(event.target.value);
-              analytics.trackEvent('search', 'searchSource', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'source',
+                value: event.target.value,
+              });
             }}
             optionsArray={sourceArray}
             currentValue={currentSource}

@@ -10,16 +10,16 @@ const analytics = remote.getGlobal('analytics');
 const { store } = remote.require('./app');
 
 const WorkspaceBar = () => {
-  const { isSingleDisplayMode } = useStoreState(state => state.userSettings);
-  const { setIsSingleDisplayMode } = useStoreActions(state => state.userSettings);
-  const { minimizedBySingleDisplay } = useStoreState(state => state.navigator);
+  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
+  const { setIsSingleDisplayMode } = useStoreActions((state) => state.userSettings);
+  const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
 
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
   const workspaces = [presenterIdentifier, i18n.t('WORKSPACES.SINGLE_DISPLAY')];
   const defaultWsState = !isSingleDisplayMode ? workspaces[0] : workspaces[1];
   const [currentWorkspace, setWorkspace] = useState(defaultWsState);
 
-  const handleWorkspaceChange = workspace => {
+  const handleWorkspaceChange = (workspace) => {
     const moveToPresenter = workspace === presenterIdentifier;
     if (moveToPresenter) {
       if (isSingleDisplayMode) {
@@ -33,6 +33,11 @@ const WorkspaceBar = () => {
     }
     setWorkspace(workspace);
     analytics.trackEvent('changed workspace', workspace);
+    analytics.trackEvent({
+      category: 'workspace',
+      action: 'changed',
+      label: workspace,
+    });
     setTimeout(() => {
       updateViewerScale();
     }, 2500);

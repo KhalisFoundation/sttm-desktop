@@ -24,15 +24,21 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
     if (tabName !== currentMiscPanel) {
       setCurrentMiscPanel(tabName);
     }
+    analytics.trackEvent({
+      category: 'Misc',
+      action: 'set-tab',
+      label: tabName,
+      value: 'openedFromShortcutTray',
+    });
   };
 
   const toggleTray = (toggleValue) => {
     setShortcutTray(toggleValue);
-    if (toggleValue) {
-      analytics.trackEvent('shortcutTray', 'toggleTray', 'openTray', toggleValue);
-    } else {
-      analytics.trackEvent('shortcutTray', 'toggleTray', 'closeTray', toggleValue);
-    }
+    analytics.trackEvent({
+      category: 'shortcutTray',
+      action: 'toggleTray',
+      label: toggleValue ? 'openTray' : 'closeTray',
+    });
   };
 
   return (
@@ -63,16 +69,28 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
           shortcutTray ? 'shortcut-drawer-active' : 'shortcut-drawer-inactive'
         }`}
       >
-        <button className="tray-item-icon" onClick={anandSahibBhog}>
+        <button
+          className="tray-item-icon"
+          onClick={() => anandSahibBhog({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
-        <button className="tray-item-icon" onClick={moolMantraSlide}>
+        <button
+          className="tray-item-icon"
+          onClick={() => moolMantraSlide({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
-        <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
+        <button
+          className="gurmukhi tray-item-icon"
+          onClick={() => waheguruSlide({ openedFrom: 'shortcut-tray' })}
+        >
           vwihgurU
         </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
+        <button
+          className="tray-item-icon"
+          onClick={() => blankSlide({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
         <button className="tray-item-icon" onClick={blankSlide}>
