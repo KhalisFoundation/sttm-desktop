@@ -2,6 +2,10 @@ import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { classNames } from '../../../common/utils';
 
+const remote = require('@electron/remote');
+
+const analytics = remote.getGlobal('analytics');
+
 export const MiscHeader = () => {
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
   const { setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
@@ -15,6 +19,11 @@ export const MiscHeader = () => {
     if (tabName !== currentMiscPanel) {
       setCurrentMiscPanel(tabName);
     }
+    analytics.trackEvent({
+      category: 'Misc',
+      action: 'set-tab',
+      label: tabName,
+    });
   };
 
   const getTurbanIcon = () =>

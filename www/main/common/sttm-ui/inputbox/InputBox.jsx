@@ -31,7 +31,11 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
   };
 
   const sendAnalytics = () => {
-    analytics.trackEvent('search', currentSearchType, searchQuery);
+    analytics.trackEvent({
+      category: 'search',
+      action: 'physical keyboard search',
+      value: searchQuery,
+    });
   };
 
   useEffect(() => {

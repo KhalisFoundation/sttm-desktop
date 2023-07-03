@@ -50,6 +50,11 @@ const getBaniControllerItems = ({
               });
               setMiscSlideText(syncString);
               analytics.trackEvent('controller', 'codePresented', true);
+              analytics.trackEvent({
+                category: 'controller',
+                action: 'codePresented',
+                value: true,
+              });
             }
           }}
         >

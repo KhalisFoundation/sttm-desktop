@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { getKeyboardKeyValue, getMatraAkhar } from './utils';
 import { Arrow, Spacebar } from './icons';
 import { defaultMatraValue, matras, withMatra, withoutMatra } from './constants';
+const remote = require('@electron/remote');
+
+const analytics = remote.getGlobal('analytics');
 
 export const GurmukhiKeyboard = ({ query, searchType, setQuery }) => {
   const defaultMatraKeys = Object.keys(defaultMatraValue);
@@ -11,7 +14,7 @@ export const GurmukhiKeyboard = ({ query, searchType, setQuery }) => {
   const keys = isWithMatras ? withMatra : withoutMatra;
   const keyboardGrid = [keys];
 
-  const handleClick = keyValue => {
+  const handleClick = (keyValue) => {
     const lastChar = query.slice(-1);
 
     switch (keyValue) {
@@ -34,6 +37,12 @@ export const GurmukhiKeyboard = ({ query, searchType, setQuery }) => {
         }
         break;
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'gurmukhi keyboard search',
+      label: searchType,
+      value: query,
+    });
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -14,7 +14,9 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
   const { setVerseHistory, setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
   const drawerRef = useRef(null);
-  const [shortcutTray, setShortcutTray] = useState(false);
+  const { shortcutTray } = useStoreState((state) => state.userSettings);
+  const { setShortcutTray } = useStoreActions((state) => state.userSettings);
+
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
@@ -24,15 +26,21 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
     if (tabName !== currentMiscPanel) {
       setCurrentMiscPanel(tabName);
     }
+    analytics.trackEvent({
+      category: 'Misc',
+      action: 'set-tab',
+      label: tabName,
+      value: 'openedFromShortcutTray',
+    });
   };
 
   const toggleTray = (toggleValue) => {
     setShortcutTray(toggleValue);
-    if (toggleValue) {
-      analytics.trackEvent('shortcutTray', 'toggleTray', 'openTray', toggleValue);
-    } else {
-      analytics.trackEvent('shortcutTray', 'toggleTray', 'closeTray', toggleValue);
-    }
+    analytics.trackEvent({
+      category: 'shortcutTray',
+      action: 'toggleTray',
+      label: toggleValue ? 'openTray' : 'closeTray',
+    });
   };
 
   return (
@@ -63,33 +71,43 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
           shortcutTray ? 'shortcut-drawer-active' : 'shortcut-drawer-inactive'
         }`}
       >
-        <button className="tray-item-icon" onClick={anandSahibBhog}>
+        <button
+          className="tray-item-icon"
+          onClick={() => anandSahibBhog({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
-        <button className="tray-item-icon" onClick={moolMantraSlide}>
+        <button
+          className="tray-item-icon"
+          onClick={() => moolMantraSlide({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
-        <button className="gurmukhi tray-item-icon" onClick={waheguruSlide}>
+        <button
+          className="gurmukhi tray-item-icon"
+          onClick={() => waheguruSlide({ openedFrom: 'shortcut-tray' })}
+        >
           vwihgurU
         </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
+        <button
+          className="tray-item-icon"
+          onClick={() => blankSlide({ openedFrom: 'shortcut-tray' })}
+        >
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
-        <button className="tray-item-icon" onClick={blankSlide}>
-          <label htmlFor="themebg-upload">
-            {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
-            <input
-              className="file-input"
-              onChange={async (e) => {
-                await uploadImage(e);
-              }}
-              id="themebg-upload"
-              type="file"
-              accept="image/png, image/jpeg"
-            />
-          </label>
-        </button>
-        <button className="tray-item-icon" onClick={() => setTab('Insert')}>
+        <label className="tray-item-icon" htmlFor="themebg-upload">
+          {i18n.t('SHORTCUT_TRAY.CUSTOM_IMAGE')}
+          <input
+            className="file-input"
+            onChange={async (e) => {
+              await uploadImage(e);
+            }}
+            id="themebg-upload"
+            type="file"
+            accept="image/png, image/jpeg"
+          />
+        </label>
+        <button className="tray-item-icon" onClick={() => setTab('Announcement')}>
           {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
       </div>

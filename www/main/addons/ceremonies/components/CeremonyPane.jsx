@@ -15,12 +15,14 @@ const analytics = remote.getGlobal('analytics');
 const { getTheme } = require('../../../theme_editor');
 
 const CeremonyPane = ({ token, name, id, onScreenClose }) => {
-  const { setTheme, setThemeBg } = useStoreActions(state => state.userSettings);
-  const { theme: currentTheme } = useStoreState(state => state.userSettings);
+  const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
+  const { theme: currentTheme } = useStoreState((state) => state.userSettings);
 
-  const { ceremonyId, isCeremonyBani, isSundarGutkaBani } = useStoreState(state => state.navigator);
+  const { ceremonyId, isCeremonyBani, isSundarGutkaBani } = useStoreState(
+    (state) => state.navigator,
+  );
   const { setCeremonyId, setIsCeremonyBani, setIsSundarGutkaBani } = useStoreActions(
-    state => state.navigator,
+    (state) => state.navigator,
   );
 
   const paneId = token;
@@ -33,7 +35,7 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     }
   }, []);
 
-  const onThemeClick = theme => {
+  const onThemeClick = (theme) => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
@@ -48,7 +50,12 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     if (currentTheme !== theme.key) {
       applyTheme(theme, null, setTheme, setThemeBg);
     }
-    analytics.trackEvent('ceremony', token);
+    analytics.trackEvent({
+      category: 'ceremony',
+      action: 'theme',
+      label: theme.key,
+      value: currentCeremony,
+    });
   };
 
   const toggleOptions = (toggleType, toggleVar) => {
@@ -61,11 +68,11 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     setCurrentCeremony(ceremonyToLoad);
   };
 
-  const toggleEnglishExplanations = isEnglishExplanations => {
+  const toggleEnglishExplanations = (isEnglishExplanations) => {
     toggleOptions('english', isEnglishExplanations);
   };
 
-  const toggleRm = isRm => {
+  const toggleRm = (isRm) => {
     toggleOptions('rm', isRm);
   };
 
