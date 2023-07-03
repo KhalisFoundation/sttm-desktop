@@ -38,6 +38,7 @@ Switch.propTypes = {
   value: PropTypes.bool,
   disabled: PropTypes.bool,
   onToggle: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 export default Switch;

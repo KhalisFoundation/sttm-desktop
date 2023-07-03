@@ -39,7 +39,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     case 'range':
       settingDOM = (
         <>
-          <p className='range-value'>{userSettings[stateVar]}</p>
+          <p className="range-value">{userSettings[stateVar]}</p>
           <input
             type="range"
             data-value={userSettings[stateVar]}
@@ -70,7 +70,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           className={`control-item-switch-${title}`}
           value={userSettings[stateVar]}
           onToggle={handleInputChange}
-          disabled={userSettings[settingObj.disableWhen]}
+          disabled={userSettings[convertToCamelCase(settingObj.disableWhen)]}
         />
       );
       break;

@@ -118,7 +118,7 @@
       "title": "AKHAND_PATH_VIEW",
       "notes": "CHROMECAST_UNAVAILABLE",
       "initialValue": false,
-      "disableSetting": "disable-next-line"
+      "disableSetting": "display-next-line"
     },
     "display-next-line": {
       "title": "NEXT_LINE",
