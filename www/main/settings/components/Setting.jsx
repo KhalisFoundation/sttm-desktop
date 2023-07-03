@@ -17,13 +17,21 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
     userSettingsActions[stateFunction](value);
-    analytics.trackEvent('setting', stateVar, value);
+    analytics.trackEvent({
+      category: 'setting',
+      action: userSettingsActions[stateFunction],
+      label: value,
+    });
   };
 
   const handleCheckboxChange = (event) => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
-    analytics.trackEvent('setting', stateVar, value);
+    analytics.trackEvent({
+      category: 'setting',
+      action: userSettingsActions[stateFunction],
+      label: value,
+    });
   };
 
   let settingDOM;
@@ -32,7 +40,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     case 'range':
       settingDOM = (
         <>
-          <p className='range-value'>{userSettings[stateVar]}</p>
+          <p className="range-value">{userSettings[stateVar]}</p>
           <input
             type="range"
             data-value={userSettings[stateVar]}

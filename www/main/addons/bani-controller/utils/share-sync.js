@@ -35,7 +35,11 @@ async function getNewCode(host) {
 
     newCode = namespaceString;
   } catch (error) {
-    analytics.trackEvent('sync', 'error', error);
+    analytics.trackEvent({
+      category: 'sync',
+      action: 'error',
+      value: error,
+    });
     new Noty({
       type: 'error',
       text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),

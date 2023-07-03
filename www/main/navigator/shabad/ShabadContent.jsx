@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-unsafe-finally */
 import Noty from 'noty';
 import React, { useState, useEffect, useRef } from 'react';
@@ -75,12 +76,16 @@ const ShabadContent = () => {
   };
 
   const skipIkOnkar = (shabadVerses, index) => {
-    const { verse: gurmukhi } = shabadVerses[index].verse;
-    const { verseId } = shabadVerses[index];
-    if (verseId !== 1 && /^(<>)/gm.test(gurmukhi)) {
-      return index + 1;
+    if (shabadVerses[index]) {
+      // eslint-disable-next-line no-unsafe-optional-chaining
+      const { verse: gurmukhi } = shabadVerses[index]?.verse;
+      const { verseId } = shabadVerses[index];
+      if (verseId !== 1 && /^(<>)/gm.test(gurmukhi)) {
+        return index + 1;
+      }
+      return index;
     }
-    return index;
+    return 0;
   };
 
   const filterRequiredVerseItems = (verses) => {
@@ -168,6 +173,7 @@ const ShabadContent = () => {
         setVersesRead([...versesRead, newTraversedVerse]);
       }
     } else {
+      // eslint-disable-next-line no-lonely-if
       if (!versesRead.some((traversedVerse) => traversedVerse === newTraversedVerse)) {
         setVersesRead([...versesRead, newTraversedVerse]);
       }
