@@ -12,7 +12,6 @@ global.platform = require('../../desktop_scripts');
 
 const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
   const {
-    akhandpatt,
     translationVisibility,
     transliterationVisibility,
     teekaVisibility,
@@ -141,7 +140,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
                 order={transliterationOrder}
               />
             )}
-            {!akhandpatt && displayNextLine && nextLineObj && (
+            {displayNextLine && nextLineObj && (
               <div
                 className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
               >
