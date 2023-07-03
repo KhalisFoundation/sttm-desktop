@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -14,7 +14,9 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
   const { currentMiscPanel } = useStoreState((state) => state.navigator);
   const { setVerseHistory, setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
   const drawerRef = useRef(null);
-  const [shortcutTray, setShortcutTray] = useState(false);
+  const { shortcutTray } = useStoreState((state) => state.userSettings);
+  const { setShortcutTray } = useStoreActions((state) => state.userSettings);
+
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
