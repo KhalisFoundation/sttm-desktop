@@ -286,6 +286,7 @@
     "DISPLAY_OPTIONS": "Display Options",
     "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
     "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
+    "AKHAND_PATH_UNAVAILABLE": "Unavailable in Akhand Paatth View",
     "LARIVAAR": "Larivaar",
     "LARIVAAR_ASSIST": "Larivaar Assist",
     "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",

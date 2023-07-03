@@ -117,11 +117,14 @@
     "akhandpatt": {
       "title": "AKHAND_PATH_VIEW",
       "notes": "CHROMECAST_UNAVAILABLE",
-      "initialValue": false
+      "initialValue": false,
+      "disableSetting": "display-next-line"
     },
     "display-next-line": {
       "title": "NEXT_LINE",
-      "initialValue": false
+      "notes": "AKHAND_PATH_UNAVAILABLE",
+      "initialValue": false,
+      "disableWhen": "akhandpatt"
     },
     "left-align": {
       "title": "LEFT_ALIGN",

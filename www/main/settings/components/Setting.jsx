@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
+import { convertToCamelCase } from '../../common/utils';
 
 const remote = require('@electron/remote');
 
@@ -16,7 +17,13 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
 
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
+    const { disableSetting } = settingObj;
     userSettingsActions[stateFunction](value);
+    if (value && disableSetting) {
+      if (userSettings[convertToCamelCase(disableSetting)] !== false) {
+        userSettingsActions[`set${convertToCamelCase(disableSetting, true)}`](false);
+      }
+    }
     analytics.trackEvent('setting', stateVar, value);
   };
 
@@ -32,7 +39,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     case 'range':
       settingDOM = (
         <>
-          <p className='range-value'>{userSettings[stateVar]}</p>
+          <p className="range-value">{userSettings[stateVar]}</p>
           <input
             type="range"
             data-value={userSettings[stateVar]}
@@ -63,6 +70,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           className={`control-item-switch-${title}`}
           value={userSettings[stateVar]}
           onToggle={handleInputChange}
+          disabled={userSettings[convertToCamelCase(settingObj.disableWhen)]}
         />
       );
       break;
