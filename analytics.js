@@ -40,7 +40,7 @@ class Analytics {
       cd1: appVersion,
       useragent,
     };
-    const url = `https://www.google-analytics.com/mp/collect?measurement_id=${process.env.MEASUREMENT_ID}&api_secret=${process.env.API_SECRET}`;
+    const url = `https://www.google-analytics.com/mp/collect?measurement_id=${process.env.GA_MEASUREMENT_ID}&api_secret=${process.env.GA_API_SECRET}`;
     const requestData = {
       method: 'POST',
       headers: {
