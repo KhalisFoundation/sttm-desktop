@@ -42,5 +42,6 @@
   "minimizedBySingleDisplay": false,
   "isDontSaveHistory": false,
   "favShabad": [],
-  "searchVerse": ""
+  "searchVerse": "",
+  "currentMiscPanel": "History"
 }

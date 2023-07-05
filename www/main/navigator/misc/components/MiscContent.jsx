@@ -1,19 +1,22 @@
 import React from 'react';
-import { useDataLayerValue } from '../state-manager/DataLayer';
+import { useStoreState } from 'easy-peasy';
 import { FavoritePane } from './favoritePane';
 import { HistoryPane } from './HistoryPane';
-import { InsertPane } from './InsertPane';
+import { AnnouncementPane } from './AnnouncementPane';
 import { OtherPane } from './OtherPane';
+import { DhanGuruPane } from './DhanGuruPane';
+import { classNames } from '../../../common/utils';
 
 export const MiscContent = () => {
-  const [{ miscPanel }] = useDataLayerValue();
+  const { currentMiscPanel } = useStoreState((state) => state.navigator);
 
   return (
     <>
-      <HistoryPane className={miscPanel === 'History' ? '' : 'd-none'} />
-      <InsertPane className={miscPanel === 'Insert' ? '' : 'd-none'} />
-      <FavoritePane className={miscPanel === 'Favorite' ? '' : 'd-none'} />
-      <OtherPane className={miscPanel === 'Others' ? '' : 'd-none'} />
+      <HistoryPane className={classNames(currentMiscPanel !== 'History' && 'd-none')} />
+      <AnnouncementPane className={classNames(currentMiscPanel !== 'Announcement' && 'd-none')} />
+      <OtherPane className={classNames(currentMiscPanel !== 'Others' && 'd-none')} />
+      <FavoritePane className={currentMiscPanel === 'Favorite' ? '' : 'd-none'} />
+      <DhanGuruPane className={classNames(currentMiscPanel !== 'DhanGuru' && 'd-none')} />
     </>
   );
 };

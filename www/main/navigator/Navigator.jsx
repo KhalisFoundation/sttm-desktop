@@ -50,22 +50,34 @@ const Navigator = () => {
     }
   };
 
-  const openWaheguruSlide = () => {
+  const openWaheguruSlide = ({ openedFrom }) => {
     addMiscSlide(insertSlide.slideStrings.waheguru);
-    analytics.trackEvent('display', 'waheguru-slide');
+    analytics.trackEvent({
+      category: 'display',
+      action: 'waheguru-slide',
+      label: `Opened from: ${openedFrom}`,
+    });
   };
 
-  const openMoolMantraSlide = () => {
+  const openMoolMantraSlide = ({ openedFrom }) => {
     addMiscSlide(insertSlide.slideStrings.moolMantra);
-    analytics.trackEvent('display', 'mool-mantra-slide');
+    analytics.trackEvent({
+      category: 'display',
+      action: 'moool-mantra-slide',
+      label: `Opened from: ${openedFrom}`,
+    });
   };
 
-  const openBlankViewer = () => {
+  const openBlankViewer = ({ openedFrom }) => {
     addMiscSlide('');
-    analytics.trackEvent('display', 'empty-slide');
+    analytics.trackEvent({
+      category: 'display',
+      action: 'empty-slide',
+      label: `Opened from: ${openedFrom}`,
+    });
   };
 
-  const openAnandSahibBhog = () => {
+  const openAnandSahibBhog = ({ openedFrom }) => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
@@ -75,25 +87,30 @@ const Navigator = () => {
     if (!isCeremonyBani) {
       setIsCeremonyBani(true);
     }
+    analytics.trackEvent({
+      category: 'ceremony',
+      action: 'anand-sahib-bhog',
+      label: `Opened from: ${openedFrom}`,
+    });
   };
 
   useEffect(() => {
     if (shortcuts.openWaheguruSlide) {
-      openWaheguruSlide();
+      openWaheguruSlide({ openedFrom: 'shortcuts' });
       setShortcuts({
         ...shortcuts,
         openWaheguruSlide: false,
       });
     }
     if (shortcuts.openMoolMantraSlide) {
-      openMoolMantraSlide();
+      openMoolMantraSlide({ openedFrom: 'shortcuts' });
       setShortcuts({
         ...shortcuts,
         openMoolMantraSlide: false,
       });
     }
     if (shortcuts.openBlankViewer) {
-      openBlankViewer();
+      openBlankViewer({ openedFrom: 'shortcuts' });
       setShortcuts({
         ...shortcuts,
         openBlankViewer: false,
@@ -104,7 +121,7 @@ const Navigator = () => {
         ...shortcuts,
         openAnandSahibBhog: false,
       });
-      openAnandSahibBhog();
+      openAnandSahibBhog({ openedFrom: 'shortcuts' });
     }
   }, [shortcuts]);
 

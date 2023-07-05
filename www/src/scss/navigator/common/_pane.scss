@@ -1,5 +1,7 @@
 @import '../utils/variables';
 .pane {
+  display: flex;
+  flex-direction: column;
   min-width: 500px;
   position: relative;
   overflow: hidden;
@@ -20,14 +22,13 @@
 }
 .pane-content {
   @include flex($fd-value: column, $ai-value: initial);
-  height: 100%;
-  z-index: 5;
+  flex-grow: 1;
   flex-wrap: nowrap;
+  height: 100%;
+  overflow: auto;
+  z-index: 5;
 }
 .pane-footer {
   @include flex($ai-value: center, $jc-value: space-around);
-  bottom: 0;
-  position: absolute;
-  top: auto;
   z-index: 10;
 }

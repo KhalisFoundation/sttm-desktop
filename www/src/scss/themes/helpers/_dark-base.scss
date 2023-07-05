@@ -13,6 +13,8 @@
   $highlight-bg: $dull-blue;
   $highlight-text: $transparent-blue;
   color: $text-base;
+  $button-bg: $princeton-orange;
+  $tray-bg: $philippine-gray;
 
   a {
     color: $white;
@@ -161,22 +163,26 @@
   .pane-footer {
     .clear-pane {
       background-color: $black;
+
+      .quick-tray > i {
+        color: $white;
+      }
       .footer-toggler-inactive {
-        background: darken($bg-main, 10);
+        background: $tray-bg;
       }
       .footer-toggler {
-        background-color: $bg-alt;
+        background-color: $tray-bg;
       }
     }
-    .shortcut-drawer {
-      background: darken($bg-main, 10);
-    }
+  }
+  .shortcut-drawer {
+    background: $tray-bg;
   }
   .tray-item-icon {
-    background: $text-bright;
+    background: $button-bg;
   }
   .tray-item-icon {
-    color: $bg-main;
+    color: $white;
   }
   &.shortcut-tray-true .shortcut-toggle {
     background: darken($bg-main, 10);

@@ -111,9 +111,17 @@ const BaniController = ({ onScreenClose, className }) => {
 
         setConnection(true);
         setListeners(true);
+        analytics.trackEvent({
+          category: 'sync',
+          action: 'syncStarted',
+        });
       } else {
         showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
-        analytics.trackEvent('sync', 'error');
+        analytics.trackEvent({
+          category: 'sync',
+          action: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
+          label: 'error',
+        });
       }
     } else {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
@@ -131,7 +139,10 @@ const BaniController = ({ onScreenClose, className }) => {
       onEnd(code);
       setCode(null);
       setAdminPin(null);
-      analytics.trackEvent('syncStopped', true);
+      analytics.trackEvent({
+        category: 'sync',
+        action: 'syncStopped',
+      });
     } else {
       await remoteSyncInit();
     }
@@ -141,6 +152,11 @@ const BaniController = ({ onScreenClose, className }) => {
     if (overlayScreen !== 'lock-screen') {
       setOverlayScreen('lock-screen');
     }
+    analytics.trackEvent({
+      category: 'sync',
+      action: 'lockScreen',
+      label: 'lockScreen button clicked',
+    });
   };
 
   useEffect(() => {

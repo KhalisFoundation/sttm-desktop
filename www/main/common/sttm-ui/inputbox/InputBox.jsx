@@ -31,12 +31,17 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
   };
 
   const sendAnalytics = () => {
-    analytics.trackEvent('search', currentSearchType, searchQuery);
+    analytics.trackEvent({
+      category: 'search',
+      action: 'physical keyboard search',
+      value: searchQuery,
+    });
   };
 
   useEffect(() => {
     if (shortcuts.focusInput) {
       focusInputbox();
+      setQuery('');
       setShortcuts({
         ...shortcuts,
         focusInput: false,

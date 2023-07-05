@@ -67,11 +67,12 @@ const handleRequestControl = (
       });
     }
   }
-  analytics.trackEvent(
-    'controller',
-    'connection',
-    isPinCorrect ? 'Connection Succesfull' : 'Connection Failed',
-  );
+  analytics.trackEvent({
+    category: 'controller',
+    action: 'connection',
+    label: 'controller_connection_attempt',
+    value: isPinCorrect ? 'Connection Succesfull' : 'Connection Failed',
+  });
 };
 
 export default handleRequestControl;

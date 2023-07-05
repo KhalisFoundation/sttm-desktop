@@ -101,11 +101,11 @@ const secondaryWindows = {
       endChangelogOpenTimer = new Date().getTime();
       store.set('changelog-seen', appVersion);
       store.set('changelog-seen-count', count + 1);
-      global.analytics.trackEvent(
-        'changelog',
-        'closed',
-        (endChangelogOpenTimer - startChangelogOpenTimer) / 1000.0,
-      );
+      global.analytics.trackEvent({
+        category: 'changelog',
+        action: 'closed',
+        value: (endChangelogOpenTimer - startChangelogOpenTimer) / 1000.0,
+      });
     },
     show: () => {
       startChangelogOpenTimer = new Date().getTime();

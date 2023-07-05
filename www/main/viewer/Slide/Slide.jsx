@@ -22,9 +22,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     vishraamSource,
     vishraamType,
     displayNextLine,
-  } = useStoreState(state => state.userSettings);
-  const { activeVerseId } = useStoreState(state => state.navigator);
-  const { slideOrder } = useStoreState(state => state.viewerSettings);
+  } = useStoreState((state) => state.userSettings);
+  const { activeVerseId } = useStoreState((state) => state.navigator);
+  const { slideOrder } = useStoreState((state) => state.viewerSettings);
   const activeVerseRef = useRef(null);
 
   const [translationOrder, setTranslationOrder] = useState();
@@ -32,17 +32,17 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
   const [transliterationOrder, setTransliterationOrder] = useState();
 
   const orderFunctions = {
-    translation: item => {
+    translation: (item) => {
       if (translationOrder !== item) {
         setTranslationOrder(item);
       }
     },
-    transliteration: item => {
+    transliteration: (item) => {
       if (transliterationOrder !== item) {
         setTransliterationOrder(item);
       }
     },
-    teeka: item => {
+    teeka: (item) => {
       if (teekaOrder !== item) {
         setTeekaOrder(item);
       }
@@ -58,13 +58,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     return '';
   };
 
-  const getVishraamType = () => {
-    return vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
-  };
+  const getVishraamType = () =>
+    vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
 
-  const getFontSize = verseType => {
-    return { fontSize: `${verseType}vh` };
-  };
+  const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');

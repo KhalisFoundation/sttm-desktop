@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import classNames from '../../common/utils/classnames';
+import { classNames } from '../../common/utils';
 
 export const singleDisplayFooter = () => {
   const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
@@ -10,15 +10,19 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('search');
     }
   };
+  const getTurbanIcon = () =>
+    singleDisplayActiveTab === 'dhan-guru'
+      ? 'assets/img/icons/turban-filled-blue.png'
+      : 'assets/img/icons/turban-filled.png';
 
   const openShabadPane = () => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
   };
-  const openInsertPane = () => {
-    if (singleDisplayActiveTab !== 'insert') {
-      setSingleDisplayActiveTab('insert');
+  const openAnnouncementPane = () => {
+    if (singleDisplayActiveTab !== 'announcement') {
+      setSingleDisplayActiveTab('announcement');
     }
   };
   const openOtherPane = () => {
@@ -34,6 +38,12 @@ export const singleDisplayFooter = () => {
   const openFavoritePane = () => {
     if (singleDisplayActiveTab !== 'favorite') {
       setSingleDisplayActiveTab('favorite');
+    }
+  };
+
+  const openDhanGuruPane = () => {
+    if (singleDisplayActiveTab !== 'dhan-guru') {
+      setSingleDisplayActiveTab('dhan-guru');
     }
   };
 
@@ -58,10 +68,16 @@ export const singleDisplayFooter = () => {
         <i className="fa fa-dot-circle-o" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'insert' && 'active')}
-        onClick={openInsertPane}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'announcement' && 'active')}
+        onClick={openAnnouncementPane}
       >
         <i className="fa fa-desktop" />
+      </button>
+      <button
+        className={classNames('tab-switch', singleDisplayActiveTab === 'dhan-guru' && 'active')}
+        onClick={openDhanGuruPane}
+      >
+        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
       </button>
       <button
         className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
