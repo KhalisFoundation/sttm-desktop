@@ -461,8 +461,13 @@ const handleDeeplink = async (url) => {
     const loginData = new URLSearchParams(`?${urlObject[1]}`);
     const token = loginData.get('token');
     if (token) {
-      await keytar.setPassword('sttm-desktop', 'userToken', token);
-      mainWindow.webContents.send('userToken', token);
+      try {
+        await keytar.setPassword('sttm-desktop', 'userToken', token);
+        mainWindow.webContents.send('userToken', token);
+      } catch {
+        // eslint-disable-next-line no-console
+        console.error('Error saving token');
+      }
     }
   }
 };

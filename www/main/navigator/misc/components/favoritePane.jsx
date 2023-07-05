@@ -43,11 +43,16 @@ export const FavoritePane = ({ className }) => {
     const onlineValue = await isOnline();
     if (onlineValue) {
       if (userToken) {
-        setError('');
-        setFetching(true);
-        const data = await fetchFavShabad(userToken);
-        setFetching(false);
-        setFavShabad([...data]);
+        try {
+          setError('');
+          setFetching(true);
+          const data = await fetchFavShabad(userToken);
+          setFetching(false);
+          setFavShabad([...data]);
+        } catch (err) {
+          setFavShabad([]);
+          setError(i18n.t('FAV_SHABAD.API_ERR'));
+        }
       } else {
         setError(i18n.t('FAV_SHABAD.LOGGED_OUT'));
         setFavShabad([]);

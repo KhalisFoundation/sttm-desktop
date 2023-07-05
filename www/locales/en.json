@@ -52,7 +52,8 @@
   },
   "FAV_SHABAD": {
     "LOGGED_OUT": "You need to login to view the favorite shabads",
-    "INTERNET_ERR": "Sorry, You seem to be offline. Favorite shabads only work when you are connected to the internet."
+    "INTERNET_ERR": "Sorry, You seem to be offline. Favorite shabads only work when you are connected to the internet.",
+    "API_ERR": "Something went wrong while fetching your favorite shabads. Please try again later."
   },
   "AUTH": {
     "LOGIN_LABEL": "Login",
