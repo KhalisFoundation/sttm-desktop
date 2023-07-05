@@ -52,6 +52,22 @@ const ShabadHeader = () => {
     }
   };
 
+  const toggleFavShabad = () => {
+    if (favShabadIndex < 0) {
+      addToFav(activeShabadId, activeVerseId, userToken);
+    } else {
+      favShabad.splice(favShabadIndex, 1);
+      removeFromFav(activeShabadId, userToken);
+      setFavShabad([...favShabad]);
+    }
+    const fetchProgress = fetchFavShabad(userToken);
+    setLoading(true);
+    fetchProgress.then((data) => {
+      setFavShabad([...data]);
+      setLoading(false);
+    });
+  };
+
   useEffect(() => {
     ipcRenderer.send('toggle-viewer-window', showViewer);
   }, [showViewer]);
@@ -63,21 +79,7 @@ const ShabadHeader = () => {
           className={classNames('button fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
           ref={favBtnRef}
           title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
-          onClick={() => {
-            if (favShabadIndex < 0) {
-              addToFav(activeShabadId, activeVerseId, userToken);
-            } else {
-              favShabad.splice(favShabadIndex, 1);
-              removeFromFav(activeShabadId, userToken);
-              setFavShabad([...favShabad]);
-            }
-            const fetchProgress = fetchFavShabad(userToken);
-            setLoading(true);
-            fetchProgress.then((data) => {
-              setFavShabad([...data]);
-              setLoading(false);
-            });
-          }}
+          onClick={toggleFavShabad}
         >
           <i className={favShabadIndex < 0 ? 'fa-solid fa-star' : 'fa-regular fa-star'}></i>
           {favShabadIndex < 0 ? i18n.t('SHABAD_PANE.MARK_FAV') : i18n.t('SHABAD_PANE.UNMARK_FAV')}
