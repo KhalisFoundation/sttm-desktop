@@ -223,10 +223,6 @@
   .search-results {
     flex-grow: 1;
     overflow: auto;
-
-    &.filter-applied {
-      height: calc(100% - 62px);
-    }
   }
   .search-footer {
     @include flex($ai-value: start, $jc-value: initial, $width: 99%);

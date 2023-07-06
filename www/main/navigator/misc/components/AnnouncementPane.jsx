@@ -78,7 +78,7 @@ export const AnnouncementPane = ({ className }) => {
         </header>
         <div className="announcement-body">
           <textarea
-            className={classNames('announcement-text', 'gurmukhi' && isMiscSlideGurmukhi)}
+            className={classNames('announcement-text', isMiscSlideGurmukhi && 'gurmukhi')}
             placeholder={getPlaceholderText(isMiscSlideGurmukhi)}
             ref={inputRef}
           />
