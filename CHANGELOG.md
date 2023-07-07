@@ -1,17 +1,17 @@
 ## New Updates
 
-### 9.1.2 - _June 13, 2023_
+### 9.1.2 - _July 7, 2023_
 
 #### Enhancements
 
-- UI overhaul of Dhan Guru slides, Quick tray, and Announcements Tab
+- Dhan Guru slides, Quick Tray, and Announcements Tab have been improved
 
-#### Improvements
+#### Misc. bug fix and other improvements
 
-- Fix the warning of malicious software for MacOS
-- Fix issues with marking verses as read
-- Fix scroll issues with Announcement tab
-- Other minor issues
+- MacOS installation errors have been resolved
+- Fixed issues with marking verses as read
+- Fixed scroll issues with the Announcement tab
+- Other minor improvements
 
 </br>
 
