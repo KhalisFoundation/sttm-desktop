@@ -1,5 +1,24 @@
 ## New Updates
 
+### 9.1.2 - _July 7, 2023_
+
+#### Enhancements
+
+- Dhan Guru slides, Quick Tray, and Announcements Tab have been improved
+
+#### Misc. bug fix and other improvements
+
+- MacOS installation errors have been resolved
+- Fixed issues with marking verses as read
+- Fixed scroll issues with the Announcement tab
+- Other minor improvements
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.1.1 - _April 25, 2023_
 
 #### Improvements

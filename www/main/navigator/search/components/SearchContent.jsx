@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
+import { Virtuoso } from 'react-virtuoso';
 import banidb from '../../../common/constants/banidb';
-import { filters } from '../../utils';
+import { filters, searchShabads } from '../../utils';
 import { retrieveFilterOption } from '../utils';
 
 import { classNames } from '../../../common/utils';
@@ -17,6 +18,7 @@ import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -33,7 +35,7 @@ const SearchContent = () => {
     currentSearchType,
     shortcuts,
     searchShabadsCount,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     setCurrentWriter,
     setCurrentRaag,
@@ -41,7 +43,8 @@ const SearchContent = () => {
     setSearchQuery,
     setShortcuts,
     setSearchShabadsCount,
-  } = useStoreActions(state => state.navigator);
+    setSearchData,
+  } = useStoreActions((state) => state.navigator);
 
   // Local State
   const [databaseProgress, setDatabaseProgress] = useState(1);
@@ -49,6 +52,7 @@ const SearchContent = () => {
   const [writerArray, setWriterArray] = useState([]);
   const [raagArray, setRaagArray] = useState([]);
   const [sourceArray, setSourceArray] = useState([]);
+  const [searchResultsCount, setSearchResultsCount] = useState(40);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -60,25 +64,40 @@ const SearchContent = () => {
   const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
-    analytics.trackEvent('search', 'gurmukhi-keyboard-open', keyboardOpenStatus);
+    analytics.trackEvent({
+      category: 'search',
+      action: 'gurmukhi-keyboard-open',
+      value: keyboardOpenStatus ? 'open' : 'close',
+    });
   };
 
-  const mapVerseItems = searchedShabadsArray => {
-    return searchedShabadsArray
-      ? searchedShabadsArray.map(verse => {
-          return {
-            ang: verse.PageNo,
-            raag: verse.Raag ? verse.Raag.RaagEnglish : '',
-            shabadId: verse.Shabads[0].ShabadID,
-            source: verse.Source ? verse.Source.SourceEnglish : '',
-            sourceId: verse.Source ? verse.Source.SourceID : '',
-            verse: verse.Gurmukhi,
-            verseId: verse.ID,
-            writer: verse.Writer ? verse.Writer.WriterEnglish : '',
-          };
-        })
+  const loadMoreSearchResults = useCallback(() => {
+    setTimeout(() => {
+      setSearchResultsCount(searchResultsCount + 20);
+      searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) =>
+        query ? setSearchData(rows) : setSearchData([]),
+      );
+      analytics.trackEvent({
+        category: 'search',
+        action: 'load-more-search-results',
+        value: searchResultsCount,
+      });
+    }, 200);
+  });
+
+  const mapVerseItems = (searchedShabadsArray) =>
+    searchedShabadsArray
+      ? searchedShabadsArray.map((verse) => ({
+          ang: verse.PageNo,
+          raag: verse.Raag ? verse.Raag.RaagEnglish : '',
+          shabadId: verse.Shabads[0].ShabadID,
+          source: verse.Source ? verse.Source.SourceEnglish : '',
+          sourceId: verse.Source ? verse.Source.SourceID : '',
+          verse: verse.Gurmukhi,
+          verseId: verse.ID,
+          writer: verse.Writer ? verse.Writer.WriterEnglish : '',
+        }))
       : [];
-  };
 
   const [filteredShabads, setFilteredShabads] = useState([]);
 
@@ -88,6 +107,11 @@ const SearchContent = () => {
       const { shabadId, verseId } = filteredShabads[0];
       changeActiveShabad(shabadId, verseId);
     }
+    analytics.trackEvent({
+      category: 'search',
+      action: 'open-first-result',
+      value: searchQuery,
+    });
   };
 
   const getPlaceholder = () => {
@@ -129,7 +153,7 @@ const SearchContent = () => {
     }
   }, [filteredShabads]);
 
-  ipcRenderer.on('database-progress', data => {
+  ipcRenderer.on('database-progress', (data) => {
     const { percent } = JSON.parse(data);
     setDatabaseProgress(percent);
   });
@@ -138,6 +162,7 @@ const SearchContent = () => {
     const timeoutId = setTimeout(() => {
       if (query !== searchQuery) {
         setSearchQuery(query);
+        setSearchResultsCount(40);
       }
     }, 50);
     return () => {
@@ -147,15 +172,15 @@ const SearchContent = () => {
 
   useEffect(() => {
     const wData = retrieveFilterOption(writersObj, 'writer');
-    wData.then(d => {
+    wData.then((d) => {
       setWriterArray(d);
     });
     const rData = retrieveFilterOption(raagsObj, 'raag');
-    rData.then(d => {
+    rData.then((d) => {
       setRaagArray(d);
     });
     const sData = retrieveFilterOption(sourcesObj, 'source');
-    sData.then(d => {
+    sData.then((d) => {
       setSourceArray(d);
     });
   }, []);
@@ -194,21 +219,45 @@ const SearchContent = () => {
           <div className="filter-tag--container">
             {currentWriter !== 'all' && (
               <FilterTag
-                close={() => setCurrentWriter('all')}
+                close={() => {
+                  setCurrentWriter('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'writer',
+                    value: currentWriter,
+                  });
+                }}
                 title={currentWriter}
                 filterType={i18n.t('SEARCH.WRITER')}
               />
             )}
             {currentRaag !== 'all' && (
               <FilterTag
-                close={() => setCurrentRaag('all')}
+                close={() => {
+                  setCurrentRaag('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'raag',
+                    value: currentRaag,
+                  });
+                }}
                 title={currentRaag}
                 filterType={i18n.t('SEARCH.RAAG')}
               />
             )}
             {currentSource !== 'all' && (
               <FilterTag
-                close={() => setCurrentSource('all')}
+                close={() => {
+                  setCurrentSource('all');
+                  analytics.trackEvent({
+                    category: 'search',
+                    action: 'remove-filter',
+                    label: 'source',
+                    value: currentSource,
+                  });
+                }}
                 title={i18n.t(`SEARCH.SOURCES.${sourcesObj[currentSource]}.TEXT`)}
                 filterType={i18n.t('SEARCH.SOURCE')}
               />
@@ -219,27 +268,42 @@ const SearchContent = () => {
           <span>Filter by </span>
           <FilterDropdown
             title="Writer"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentWriter(event.target.value);
-              analytics.trackEvent('search', 'searchWriter', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'writer',
+                value: event.target.value,
+              });
             }}
             optionsArray={writerArray}
             currentValue={currentWriter}
           />
           <FilterDropdown
             title="Raag"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentRaag(event.target.value);
-              analytics.trackEvent('search', 'searchRaag', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'raag',
+                value: event.target.value,
+              });
             }}
             optionsArray={raagArray}
             currentValue={currentRaag}
           />
           <FilterDropdown
             title="Source"
-            onChange={event => {
+            onChange={(event) => {
               setCurrentSource(event.target.value);
-              analytics.trackEvent('search', 'searchSource', event.target.value);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'set-filter',
+                label: 'source',
+                value: event.target.value,
+              });
             }}
             optionsArray={sourceArray}
             currentValue={currentSource}
@@ -248,8 +312,11 @@ const SearchContent = () => {
       </div>
       <div className={classNames('search-results', isShowFiltersTag && 'filter-applied')}>
         <div className="verse-block">
-          {filteredShabads.map(
-            ({ ang, shabadId, sourceId, verse, verseId, writer, raag }, index) => (
+          <Virtuoso
+            data={filteredShabads}
+            overscan={200}
+            endReached={loadMoreSearchResults}
+            itemContent={(index, { ang, shabadId, sourceId, verse, verseId, writer, raag }) => (
               <SearchResults
                 key={index}
                 ang={ang}
@@ -263,8 +330,8 @@ const SearchContent = () => {
                 verseId={verseId}
                 writer={writer}
               />
-            ),
-          )}
+            )}
+          ></Virtuoso>
         </div>
       </div>
     </div>

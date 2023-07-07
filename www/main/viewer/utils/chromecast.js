@@ -164,7 +164,10 @@ const initializeCastApi = () => {
   const sessionRequest = new chrome.cast.SessionRequest(applicationID);
   const apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
   chrome.cast.initialize(apiConfig, onInitSuccess, onError);
-  analytics.trackEvent('chromecast', 'start');
+  analytics.trackEvent({
+    category: 'chromecast',
+    action: 'initialize',
+  });
 };
 
 /**
