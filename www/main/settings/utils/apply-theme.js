@@ -30,5 +30,10 @@ export const applyTheme = (themeInstance, isCustom, setTheme, setThemeBg, themeB
     }
   }
   global.core.platformMethod('updateSettings');
-  analytics.trackEvent('theme', themeInstance.key);
+  analytics.trackEvent({
+    category: 'theme',
+    action: 'apply-theme',
+    label: isCustom ? 'custom' : 'default',
+    value: isCustom ? '' : themeInstance.key,
+  });
 };

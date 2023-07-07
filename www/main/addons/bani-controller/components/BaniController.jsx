@@ -36,12 +36,12 @@ const BaniController = ({ onScreenClose, className }) => {
   const [socketData, setSocketData] = useState(null);
 
   // Store State
-  const { isListeners, overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen, setListeners } = useStoreActions(actions => actions.app);
+  const { isListeners, overlayScreen } = useStoreState((state) => state.app);
+  const { setOverlayScreen, setListeners } = useStoreActions((actions) => actions.app);
 
-  const { adminPin, code, isConnected } = useStoreState(state => state.baniController);
+  const { adminPin, code, isConnected } = useStoreState((state) => state.baniController);
   const { setAdminPin, setCode, setConnection } = useStoreActions(
-    actions => actions.baniController,
+    (actions) => actions.baniController,
   );
 
   const {
@@ -57,7 +57,7 @@ const BaniController = ({ onScreenClose, className }) => {
     miscSlideText,
     isMiscSlideGurmukhi,
     savedCrossPlatformId,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
 
   const {
     setIsSundarGutkaBani,
@@ -68,7 +68,7 @@ const BaniController = ({ onScreenClose, className }) => {
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
     setSavedCrossPlatformId,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   const {
     gurbaniFontSize,
@@ -77,7 +77,7 @@ const BaniController = ({ onScreenClose, className }) => {
     teekaFontSize,
     baniLength,
     // mangalPosition,
-  } = useStoreState(state => state.userSettings);
+  } = useStoreState((state) => state.userSettings);
 
   const fontSizes = {
     gurbani: parseInt(gurbaniFontSize, 10),
@@ -86,7 +86,7 @@ const BaniController = ({ onScreenClose, className }) => {
     transliteration: parseInt(transliterationFontSize, 10),
   };
 
-  const showSyncError = errorMessage => {
+  const showSyncError = (errorMessage) => {
     setCodeLabel(errorMessage);
     setCode(null);
     setAdminPin(null);
@@ -110,9 +110,17 @@ const BaniController = ({ onScreenClose, className }) => {
 
         setConnection(true);
         setListeners(true);
+        analytics.trackEvent({
+          category: 'sync',
+          action: 'syncStarted',
+        });
       } else {
         showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
-        analytics.trackEvent('sync', 'error');
+        analytics.trackEvent({
+          category: 'sync',
+          action: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
+          label: 'error',
+        });
       }
     } else {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
@@ -130,7 +138,10 @@ const BaniController = ({ onScreenClose, className }) => {
       onEnd(code);
       setCode(null);
       setAdminPin(null);
-      analytics.trackEvent('syncStopped', true);
+      analytics.trackEvent({
+        category: 'sync',
+        action: 'syncStopped',
+      });
     } else {
       await remoteSyncInit();
     }
@@ -140,6 +151,11 @@ const BaniController = ({ onScreenClose, className }) => {
     if (overlayScreen !== 'lock-screen') {
       setOverlayScreen('lock-screen');
     }
+    analytics.trackEvent({
+      category: 'sync',
+      action: 'lockScreen',
+      label: 'lockScreen button clicked',
+    });
   };
 
   useEffect(() => {
@@ -149,7 +165,7 @@ const BaniController = ({ onScreenClose, className }) => {
   useEffect(() => {
     if (isListeners && adminPin) {
       if (window.socket !== undefined) {
-        window.socket.on('data', data => {
+        window.socket.on('data', (data) => {
           setSocketData(data);
         });
       }
@@ -215,7 +231,7 @@ const BaniController = ({ onScreenClose, className }) => {
 
                   <div className="sync-code-num"> {code || '...'} </div>
 
-                  {baniControllerItems.map(item => (
+                  {baniControllerItems.map((item) => (
                     <BaniControllerItem key={item.title} {...item} />
                   ))}
 

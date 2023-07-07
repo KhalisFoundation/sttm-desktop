@@ -34,7 +34,10 @@ if (!isUnsupportedWindow) {
       label: i18n.t('MENU.UPDATE.CHECK'),
       accelerator: 'CmdOrCtrl+U',
       click: () => {
-        analytics.trackEvent('menu', 'check-update');
+        analytics.trackEvent({
+          category: 'menu',
+          action: 'check-update',
+        });
         main.checkForUpdates(true);
       },
       // Only show if not in a platform-specific app store
@@ -53,7 +56,10 @@ if (!isUnsupportedWindow) {
     {
       label: i18n.t('MENU.UPDATE.INSTALL_AND_RESTART'),
       click: () => {
-        analytics.trackEvent('menu', 'install-restart');
+        analytics.trackEvent({
+          category: 'menu',
+          action: 'install-restart',
+        });
         main.autoUpdater.quitAndInstall();
       },
       visible: false,
@@ -179,7 +185,10 @@ const winMenu = [
         label: i18n.t('MENU.APP.QUIT'),
         accelerator: 'Ctrl+Q',
         click: () => {
-          analytics.trackEvent('menu', 'quit');
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'quit',
+          });
           app.quit();
         },
       },
@@ -197,21 +206,30 @@ const winMenu = [
       {
         label: i18n.t('MENU.HELP.GUIDE'),
         click: () => {
-          analytics.trackEvent('menu', 'guide');
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'guide',
+          });
           main.openSecondaryWindow('helpWindow');
         },
       },
       {
         label: i18n.t('MENU.HELP.SHORTCUT_LEGEND'),
         click: () => {
-          analytics.trackEvent('menu', 'shortcut-legend');
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'shortcut-legend',
+          });
           main.openSecondaryWindow('shortcutLegend');
         },
       },
       {
         label: i18n.t('MENU.HELP.CHANGELOG'),
         click: () => {
-          analytics.trackEvent('menu', 'changelog');
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'changelog',
+          });
           main.openSecondaryWindow('changelogWindow');
         },
       },
@@ -221,7 +239,10 @@ const winMenu = [
   {
     label: i18n.t('MENU.HELP.DONATE'),
     click: () => {
-      analytics.trackEvent('menu', 'donate');
+      analytics.trackEvent({
+        category: 'menu',
+        action: 'donate',
+      });
       electron.shell.openExternal('https://khalisfoundation.org/donate/');
     },
   },
@@ -291,19 +312,30 @@ const macMenu = [
       {
         label: i18n.t('MENU.HELP.SHORTCUT_LEGEND'),
         click: () => {
-          analytics.trackEvent('menu', 'shortcut-legend');
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'shortcut-legend',
+          });
           main.openSecondaryWindow('shortcutLegend');
         },
       },
       {
         label: i18n.t('MENU.HELP.CHANGELOG'),
         click: () => {
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'changelog',
+          });
           main.openSecondaryWindow('changelogWindow');
         },
       },
       {
         label: i18n.t('MENU.HELP.DONATE'),
         click: () => {
+          analytics.trackEvent({
+            category: 'menu',
+            action: 'donate',
+          });
           electron.shell.openExternal('https://khalisfoundation.org/donate/');
         },
       },
@@ -430,12 +462,19 @@ global.platform.ipc.on('cast-session-active', () => {
 
   document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
-  analytics.trackEvent('chromecast', 'start');
+  analytics.trackEvent({
+    category: 'chromecast',
+    action: 'start',
+  });
 });
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
+  analytics.trackEvent({
+    category: 'chromecast',
+    action: 'stop',
+  });
 });
 
 global.platform.ipc.on('set-user-setting', (event, settingChanger) => {

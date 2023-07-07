@@ -24,13 +24,21 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         userSettingsActions[`set${convertToCamelCase(disableSetting, true)}`](false);
       }
     }
-    analytics.trackEvent('setting', stateVar, value);
+    analytics.trackEvent({
+      category: 'setting',
+      action: userSettingsActions[stateFunction],
+      label: value,
+    });
   };
 
   const handleCheckboxChange = (event) => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
-    analytics.trackEvent('setting', stateVar, value);
+    analytics.trackEvent({
+      category: 'setting',
+      action: userSettingsActions[stateFunction],
+      label: value,
+    });
   };
 
   let settingDOM;
