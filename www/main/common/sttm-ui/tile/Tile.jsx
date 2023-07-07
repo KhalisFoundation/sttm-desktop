@@ -3,22 +3,28 @@ import PropTypes from 'prop-types';
 
 import { joinClasses } from '../../utils';
 
-const Tile = ({ children, className, theme = null, type = 'extras', onClick, content }) => {
+const Tile = ({
+  children,
+  className,
+  theme = null,
+  type = 'extras',
+  onClick,
+  content,
+  isEngTransliterated = false,
+}) => {
   const tileClassname = joinClasses([
     `${type}-tile`,
     theme ? `${theme.key}-tile` : null,
     className || null,
   ]);
 
-  const getThemeSwatchStyles = themeInstance => {
-    return {
-      backgroundColor: themeInstance['background-color'],
-      backgroundImage: themeInstance['background-image']
-        ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})`
-        : 'none',
-      color: themeInstance['gurbani-color'],
-    };
-  };
+  const getThemeSwatchStyles = (themeInstance) => ({
+    backgroundColor: themeInstance['background-color'],
+    backgroundImage: themeInstance['background-image']
+      ? `url(assets/img/custom_backgrounds/${themeInstance['background-image']})`
+      : 'none',
+    color: themeInstance['gurbani-color'],
+  });
 
   return (
     <button
@@ -26,7 +32,7 @@ const Tile = ({ children, className, theme = null, type = 'extras', onClick, con
       className={`ui-tile ${tileClassname}`}
       style={theme ? getThemeSwatchStyles(theme) : null}
     >
-      <span>{children || content}</span>
+      <span className={isEngTransliterated && 'eng-tile'}>{children || content}</span>
     </button>
   );
 };
@@ -38,6 +44,7 @@ Tile.propTypes = {
   theme: PropTypes.object,
   children: PropTypes.node,
   type: PropTypes.oneOf(['extras']),
+  isEngTransliterated: PropTypes.bool,
 };
 
 export default Tile;

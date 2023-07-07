@@ -163,7 +163,9 @@ button {
     word-wrap: break-word;
 
     .sundar-gutka-bani {
+      align-items: center;
       cursor: pointer;
+      display: flex;
       padding: 0.3rem 1rem;
     }
 
@@ -182,7 +184,9 @@ button {
       display: none;
       text-transform: capitalize;
     }
-
+    .english-bani {
+      text-transform: capitalize;
+    }
     &.translit {
       .translit-bani {
         display: inline;
@@ -309,6 +313,12 @@ button {
       & > span {
         font-family: 'gurbaniakhar';
         font-size: 1.1rem;
+      }
+
+      & > span.eng-tile {
+        font-family: $body-font-family;
+        text-transform: capitalize;
+        font-size: 1rem;
       }
 
       &:hover {
@@ -1168,5 +1178,14 @@ body.show-overlay {
 
   .bani-extras {
     top: $presenter-pane-gap + $title-bar-offset;
+  }
+}
+
+.transliterate-eng {
+  display: flex;
+  align-items: center;
+
+  & > span {
+    margin-right: 4px;
   }
 }
