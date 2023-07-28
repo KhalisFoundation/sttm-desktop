@@ -131,6 +131,7 @@
   "build": {
     "appId": "org.khalisfoundation.sttm",
     "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "afterSign": "packaging/afterSignHook.js",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -164,7 +165,6 @@
       "category": "public.app-category.reference",
       "icon": "assets/STTM.icns",
       "hardenedRuntime": true,
-      "afterSign": "packaging/afterSignHook.js",
       "entitlements": "./entitlements.mac.inherit.plist",
       "target": [
         "dmg",
