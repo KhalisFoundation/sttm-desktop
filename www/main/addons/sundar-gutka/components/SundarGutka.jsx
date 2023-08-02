@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
-const remote = require('@electron/remote');
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
 import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
-
 import useLoadBani from '../hooks/use-load-bani';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');

@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ipcRenderer } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { on } from 'nodemon';
 import { classNames } from '../../../common/utils';
 import { IconButton } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from '../../search/components/GurmukhiKeyboard';
@@ -68,6 +67,9 @@ export const AnnouncementPane = ({ className }) => {
   };
 
   const toggleAnnouncementLanguage = (event) => {
+    if (gurmukhiSwitchOn) {
+      setKeyboardOpenStatus(false);
+    }
     setGurmukhiSwitchOn(!gurmukhiSwitchOn);
 
     if (isMiscSlideGurmukhi !== event.target.checked) {
