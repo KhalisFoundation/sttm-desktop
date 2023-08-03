@@ -5,7 +5,7 @@ branches:
     - master
     - dev
 cache:
-  # - '%USERPROFILE%\.electron'
+  - '%USERPROFILE%\.electron'
 environment:
   BONJOUR_SDK_HOME: 'C:\\Program Files\\Bonjour SDK'
   GH_TOKEN:
