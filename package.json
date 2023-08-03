@@ -185,6 +185,7 @@
       "target": [
         "nsis"
       ],
+      "verifyUpdateCodeSignature": false,
       "rfc3161TimeStampServer": "http://timestamp.digicert.com"
     },
     "linux": {
