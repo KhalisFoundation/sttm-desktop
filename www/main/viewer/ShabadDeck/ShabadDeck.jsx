@@ -168,6 +168,14 @@ function ShabadDeck() {
     }
   }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
+  useEffect(() => {
+    if (isMiscSlide) {
+      if (activeVerse !== []) {
+        setActiveVerse([]);
+      }
+    }
+  }, [isMiscSlide]);
+
   return (
     <>
       <div
@@ -176,7 +184,7 @@ function ShabadDeck() {
           isSingleDisplayMode && 'single-display-mode',
           miscSlideText === '' && 'empty-slide',
           minimizedBySingleDisplay && 'single-display-minimized',
-          akhandpatt && 'akhandpatt-view',
+          akhandpatt && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
         )}

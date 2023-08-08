@@ -1,18 +1,15 @@
-.akhandpatt-view {
-  &.shabad-deck {
-    background-attachment: fixed;
-    background-size: cover;
-    height: unset;
-    overflow-y: scroll;
-    padding-bottom: 10px;
-    width: 100%;
-  }
-}
-
 .shabad-deck {
   background-size: cover;
   background-position: center;
   height: 100%;
+
+  &.akhandpatt-view {
+    background-attachment: fixed;
+    background-size: cover;
+    overflow-y: scroll;
+    padding-bottom: 10px;
+    width: 100%;
+  }
 
   &.single-display-mode {
     padding: 30px 72px 24px 72px;

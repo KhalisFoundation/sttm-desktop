@@ -117,11 +117,13 @@ export const DhanGuruPane = ({ className }) => {
   const toggleDhanGuruLanguage = (event) => {
     if (isMiscSlideGurmukhi !== event.target.checked) {
       setIsMiscSlideGurmukhi(event.target.checked);
-      addDhanGuruSlide(
-        insertSlide.slideStrings.dhanguruStrings[currentDhanGuruIndex][
-          event.target.checked ? 'gurmukhi' : 'english'
-        ],
-      );
+      if (isMiscSlide) {
+        addDhanGuruSlide(
+          insertSlide.slideStrings.dhanguruStrings[currentDhanGuruIndex][
+            event.target.checked ? 'gurmukhi' : 'english'
+          ],
+        );
+      }
     }
   };
 
