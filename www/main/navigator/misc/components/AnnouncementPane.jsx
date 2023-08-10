@@ -28,14 +28,6 @@ export const AnnouncementPane = ({ className }) => {
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
 
-    if (keyboardOpenStatus && gurmukhiSwitchOn) {
-      setGurmukhiSwitchOn(false);
-      setIsMiscSlideGurmukhi(false);
-    } else if (!keyboardOpenStatus && !gurmukhiSwitchOn) {
-      setGurmukhiSwitchOn(true);
-      setIsMiscSlideGurmukhi(true);
-    }
-
     analytics.trackEvent(
       'display',
       'announcement-slide',
@@ -132,7 +124,9 @@ export const AnnouncementPane = ({ className }) => {
             />
           )}
           <div className="announcement-actions">
-            <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
+            {isMiscSlideGurmukhi && (
+              <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
+            )}
             <div className="announcement-switch">
               <span>{i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')}</span>
               <div className="switch">
