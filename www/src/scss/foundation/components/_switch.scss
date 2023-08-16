@@ -130,5 +130,8 @@ $switch-paddle-offset: 4px !default;
 
     &.small { @include switch-layout(rem-calc(40), rem-calc(26)); }
     &.large { @include switch-layout(rem-calc(60), rem-calc(38)); }
+    &.xs-small {
+      @include switch-layout(rem-calc(32), rem-calc(16))
+    }
   }
 }

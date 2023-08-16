@@ -20,7 +20,7 @@ setTimeout(() => {
     ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
     global.webview.send('is-webview');
   });
-}, 300);
+}, 200);
 
 const updateMenu = [];
 
