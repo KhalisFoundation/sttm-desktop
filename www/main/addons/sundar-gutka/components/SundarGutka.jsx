@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
-const remote = require('@electron/remote');
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';
@@ -10,6 +9,8 @@ import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 
 import useLoadBani from '../hooks/use-load-bani';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
@@ -96,9 +97,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                       onChange={() => {
                         const newState = !isEngTransliterated;
                         setEngTransliterate(newState);
-                        if (isEngTransliterated) {
-                          onToggle(newState);
-                        }
                       }}
                     />
                     <label htmlFor="translate-eng" />
@@ -143,14 +141,16 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                 banis={nitnemBanis}
                 loadBani={loadBani}
                 isEngTransliterated={isEngTransliterated}
-              />            )}
+              />
+            )}
             {popularBanis.length > 0 && (
               <ExtraBani
                 title="Popular Banis"
                 banis={popularBanis}
                 loadBani={loadBani}
                 isEngTransliterated={isEngTransliterated}
-              />            )}
+              />
+            )}
           </div>
         )}
       </div>
