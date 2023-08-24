@@ -10,20 +10,21 @@ const { i18n } = remote.require('./app');
 
 const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
-  const { activeShabadId, activeVerseId, isDontSaveHistory, homeVerse } = useStoreState(
+  const { activeShabadId, activeVerseId, initialVerseId, homeVerse } = useStoreState(
     (state) => state.navigator,
   );
-  const { setActiveShabadId, setActiveVerseId, setIsDontSaveHistory, setHomeVerse } =
-    useStoreActions((state) => state.navigator);
+  const { setActiveShabadId, setActiveVerseId, setInitialVerseId, setHomeVerse } = useStoreActions(
+    (state) => state.navigator,
+  );
 
   const navigateVerseLeft = () => {
     if (activeShabadId) {
-      if (!isDontSaveHistory) {
-        setIsDontSaveHistory(true);
-      }
       setActiveShabadId(activeShabadId - 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (initialVerseId !== null) {
+        setInitialVerseId(null);
       }
       if (homeVerse !== 0) {
         setHomeVerse(0);
@@ -32,12 +33,12 @@ const ShabadHeader = () => {
   };
   const navigateVerseRight = () => {
     if (activeShabadId) {
-      if (!isDontSaveHistory) {
-        setIsDontSaveHistory(true);
-      }
       setActiveShabadId(activeShabadId + 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (initialVerseId !== null) {
+        setInitialVerseId(null);
       }
       if (homeVerse !== 0) {
         setHomeVerse(0);
