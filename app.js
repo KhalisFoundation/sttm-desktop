@@ -190,8 +190,8 @@ autoUpdater.on('update-not-available', () => {
 autoUpdater.on('update-downloaded', () => {
   if (!isUnsupportedWindow) {
     mainWindow.webContents.send('update-downloaded');
-    dialog.showMessageBox(
-      {
+    dialog
+      .showMessageBox({
         type: 'info',
         buttons: [i18n.t('DISMISS'), i18n.t('INSTALL_N_RESTART')],
         defaultId: 1,
@@ -199,13 +199,18 @@ autoUpdater.on('update-downloaded', () => {
         message: i18n.t('UPDATE_AVAILABLE'),
         detail: i18n.t('UPDATE_DOWNLOADED'),
         cancelId: 0,
-      },
-      (response) => {
+      })
+      .then(({ response }) => {
         if (response === 1) {
           autoUpdater.quitAndInstall();
         }
-      },
-    );
+        global.analytics.trackEvent({
+          category: 'menu',
+          action: 'install-restart',
+          label: 'from-update-dialog',
+          value: response,
+        });
+      });
   }
 });
 autoUpdater.on('error', () => {
