@@ -1,8 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ipcRenderer } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { classNames } from '../../../common/utils';
+import { IconButton } from '../../../common/sttm-ui';
+import { GurmukhiKeyboard } from '../../search/components/GurmukhiKeyboard';
 
 const remote = require('@electron/remote');
 
@@ -16,7 +18,23 @@ export const AnnouncementPane = ({ className }) => {
   const { setIsMiscSlide, setIsMiscSlideGurmukhi, setMiscSlideText, setIsAnnoucement } =
     useStoreActions((state) => state.navigator);
 
+  const [announcementVal, setAnnouncementVal] = useState('');
+  const [gurmukhiSwitchOn, setGurmukhiSwitchOn] = useState(false);
   const inputRef = useRef(null);
+
+  // Gurmukhi Keyboard
+  const [keyboardOpenStatus, setKeyboardOpenStatus] = useState(false);
+
+  const HandleKeyboardToggle = () => {
+    setKeyboardOpenStatus(!keyboardOpenStatus);
+
+    analytics.trackEvent(
+      'display',
+      'announcement-slide',
+      'announcement-in-gurmukhi',
+      gurmukhiSwitchOn,
+    );
+  };
 
   const addMiscSlide = (givenText) => {
     if (!isMiscSlide) {
@@ -41,6 +59,11 @@ export const AnnouncementPane = ({ className }) => {
   };
 
   const toggleAnnouncementLanguage = (event) => {
+    if (gurmukhiSwitchOn) {
+      setKeyboardOpenStatus(false);
+    }
+    setGurmukhiSwitchOn(!gurmukhiSwitchOn);
+
     if (isMiscSlideGurmukhi !== event.target.checked) {
       setIsMiscSlideGurmukhi(event.target.checked);
     }
@@ -50,6 +73,10 @@ export const AnnouncementPane = ({ className }) => {
       'announcement-in-gurmukhi',
       event.target.checked,
     );
+  };
+
+  const handleChange = (event) => {
+    setAnnouncementVal(event.target.value);
   };
 
   const getPlaceholderText = (gurmukhiPlaceholder) => {
@@ -78,11 +105,28 @@ export const AnnouncementPane = ({ className }) => {
         </header>
         <div className="announcement-body">
           <textarea
-            className={classNames('announcement-text', isMiscSlideGurmukhi && 'gurmukhi')}
+            className={classNames(
+              keyboardOpenStatus ? 'announcement-gurmukhi-keyboard-text' : 'announcement-text',
+              keyboardOpenStatus && 'gurmukhi',
+              isMiscSlideGurmukhi && 'gurmukhi',
+            )}
             placeholder={getPlaceholderText(isMiscSlideGurmukhi)}
             ref={inputRef}
+            value={announcementVal}
+            onChange={handleChange}
           />
+          {keyboardOpenStatus && (
+            <GurmukhiKeyboard
+              title={i18n.t('INSERT.GURMUKHI_KEYBOARD')}
+              searchType={2}
+              query={announcementVal}
+              setQuery={setAnnouncementVal}
+            />
+          )}
           <div className="announcement-actions">
+            {isMiscSlideGurmukhi && (
+              <IconButton icon="fa fa-keyboard-o" onClick={HandleKeyboardToggle} />
+            )}
             <div className="announcement-switch">
               <span>{i18n.t('INSERT.ANNOUNCEMENT_IN_GURMUKHI')}</span>
               <div className="switch">
@@ -90,6 +134,7 @@ export const AnnouncementPane = ({ className }) => {
                   id="announcement-language"
                   name="announcement-language"
                   type="checkbox"
+                  checked={gurmukhiSwitchOn}
                   onChange={toggleAnnouncementLanguage}
                 />
                 <label htmlFor="announcement-language" />

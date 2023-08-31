@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import anvaad from 'anvaad-js';
 import { Tile } from '../../../common/sttm-ui';
 import { convertToHyphenCase } from '../../../common/utils';
 
-const ExtraBani = ({ title, banis = [], loadBani }) => {
+const ExtraBani = ({ title, banis = [], loadBani, isEngTransliterated = false }) => {
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const groupHeaderClassName = `${hyphenedTitle}-heading`;
   const groupClassName = hyphenedTitle;
@@ -13,14 +14,15 @@ const ExtraBani = ({ title, banis = [], loadBani }) => {
     <div className="bani-group-container">
       <header className={`bani-group-heading ${groupHeaderClassName}`}>{title}</header>
       <div className={`bani-group ${groupClassName}`}>
-        {banis.map(b => (
+      {banis.map(({ id, name }) => (
           <Tile
-            onClick={() => loadBani(b.id)}
-            key={b.name}
+            onClick={() => loadBani(id)}
+            key={name}
             type="extras"
             className={groupItemClassName}
+            isEngTransliterated={isEngTransliterated}
           >
-            {b.name}
+            {isEngTransliterated ? anvaad.translit(name) : name}
           </Tile>
         ))}
       </div>
@@ -32,6 +34,7 @@ ExtraBani.propTypes = {
   title: PropTypes.string,
   banis: PropTypes.array,
   loadBani: PropTypes.func,
+  isEngTransliterated: PropTypes.bool,
 };
 
 export default ExtraBani;

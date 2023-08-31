@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
-const remote = require('@electron/remote');
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Overlay } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
 import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
-
 import useLoadBani from '../hooks/use-load-bani';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
@@ -26,6 +26,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
+  const [isEngTransliterated, setEngTransliterate] = useState(false);
 
   const nitnemBanis = [];
   const popularBanis = [];
@@ -83,8 +84,24 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
             <div className="sttm-loader" />
           ) : (
             <>
-              <header className="navigator-header">{title}</header>
-
+              <header className="navigator-header">
+                {title}
+                <div className="transliterate-eng">
+                  <span>{i18n.t('SETTINGS.ENGLISH_LANGUAGE')} </span>
+                  <div className="switch xs-small">
+                    <input
+                      id="translate-eng"
+                      type="checkbox"
+                      checked={isEngTransliterated}
+                      onChange={() => {
+                        const newState = !isEngTransliterated;
+                        setEngTransliterate(newState);
+                      }}
+                    />
+                    <label htmlFor="translate-eng" />
+                  </div>
+                </div>
+              </header>
               {isShowTranslitSwitch && (
                 <Switch
                   controlId="translit-switch"
@@ -95,7 +112,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               )}
 
               <section className="blocklist">
-                <ul id={blockListId} className="gurmukhi">
+                <ul id={blockListId} className={!isEngTransliterated && 'gurmukhi'}>
                   {taggedBanis.map((bani) => (
                     <li
                       key={bani.name}
@@ -103,7 +120,9 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                       onClick={() => loadBani(bani.id)}
                     >
                       <span className={`tag tag-${bani.baniTag}`} />
-                      <span>{bani.name}</span>
+                      <span className={isEngTransliterated && 'english-bani'}>
+                        {isEngTransliterated ? anvaad.translit(bani.name) : bani.name}
+                      </span>
                       <span className="translit-bani">{anvaad.translit(bani.name)}</span>
                     </li>
                   ))}
@@ -116,10 +135,20 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
         {!isLoadingBanis && (
           <div className={`bani-extras overlay-ui ${overlayClassName}`}>
             {nitnemBanis.length > 0 && (
-              <ExtraBani title="Nitnem Banis" banis={nitnemBanis} loadBani={loadBani} />
+              <ExtraBani
+                title="Nitnem Banis"
+                banis={nitnemBanis}
+                loadBani={loadBani}
+                isEngTransliterated={isEngTransliterated}
+              />
             )}
             {popularBanis.length > 0 && (
-              <ExtraBani title="Popular Banis" banis={popularBanis} loadBani={loadBani} />
+              <ExtraBani
+                title="Popular Banis"
+                banis={popularBanis}
+                loadBani={loadBani}
+                isEngTransliterated={isEngTransliterated}
+              />
             )}
           </div>
         )}
