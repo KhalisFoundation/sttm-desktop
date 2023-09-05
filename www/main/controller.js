@@ -182,7 +182,7 @@ const winMenu = [
         type: 'separator',
       },
       {
-        label: i18n.t('MENU.APP.QUIT'),
+        label: i18n.t('MENU.APP.QUIT', { appName }),
         accelerator: 'Ctrl+Q',
         click: () => {
           analytics.trackEvent({
