@@ -63,6 +63,9 @@ export const AnnouncementPane = ({ className }) => {
       setKeyboardOpenStatus(false);
     }
     setGurmukhiSwitchOn(!gurmukhiSwitchOn);
+    if (miscSlideText !== inputRef.current.value) {
+      setMiscSlideText(inputRef.current.value);
+    }
 
     if (isMiscSlideGurmukhi !== event.target.checked) {
       setIsMiscSlideGurmukhi(event.target.checked);
@@ -95,6 +98,10 @@ export const AnnouncementPane = ({ className }) => {
       });
     }
   }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnoucement]);
+
+  useEffect(() => {
+    setGurmukhiSwitchOn(isMiscSlideGurmukhi);
+  }, [isMiscSlideGurmukhi]);
 
   return (
     <ul className={`list-of-items ${className}`}>
