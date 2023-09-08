@@ -116,6 +116,7 @@ export const AnnouncementPane = ({ className }) => {
               keyboardOpenStatus ? 'announcement-gurmukhi-keyboard-text' : 'announcement-text',
               keyboardOpenStatus && 'gurmukhi',
               isMiscSlideGurmukhi && 'gurmukhi',
+              'disable-kb-shortcuts',
             )}
             placeholder={getPlaceholderText(isMiscSlideGurmukhi)}
             ref={inputRef}

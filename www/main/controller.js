@@ -351,11 +351,6 @@ if (process.platform === 'darwin' || process.platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
 
-// Mousetrap.bindGlobal('mod+,', () => settings.openSettings());
-Mousetrap.bindGlobal('mod+q', () => {
-  app.quit();
-});
-
 const $menuButton = document.querySelector('.menu-button');
 $menuButton.addEventListener('contextmenu', (e) => {
   e.preventDefault();

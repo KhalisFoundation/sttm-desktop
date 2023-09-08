@@ -9,15 +9,22 @@ export const useKeys = (key, shortcutType, cb) => {
   });
 
   useEffect(() => {
-    function handle(event) {
-      if (shortcutType === 'single') {
-        if (event.code === key) {
-          callbackRef.current(event);
+    const handle = (event) => {
+      if (!event.target.classList.contains('disable-kb-shortcuts')) {
+        const defaultException = ['Space', 'ArrowUp', 'ArrowDown'];
+        if (defaultException.includes(event.code)) {
+          event.preventDefault();
         }
-      }
-      if (shortcutType === 'combination') {
-        if (event.code === key && event.ctrlKey) {
-          callbackRef.current(event);
+
+        if (shortcutType === 'single') {
+          if (event.code === key) {
+            callbackRef.current(event);
+          }
+        }
+        if (shortcutType === 'combination') {
+          if (event.code === key && event.ctrlKey) {
+            callbackRef.current(event);
+          }
         }
       }
     }

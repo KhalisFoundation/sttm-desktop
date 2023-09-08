@@ -709,10 +709,6 @@ ipcMain.on('presenter-view', (event, arg) => {
   }
 });
 
-ipcMain.on('shortcuts', (event, arg) => {
-  mainWindow.webContents.send('shortcuts', arg);
-});
-
 ipcMain.on('scroll-from-main', (event, arg) => {
   if (viewerWindow) {
     viewerWindow.webContents.send('send-scroll', arg);
