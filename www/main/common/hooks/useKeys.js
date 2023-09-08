@@ -27,7 +27,7 @@ export const useKeys = (key, shortcutType, cb) => {
           }
         }
       }
-    }
+    };
 
     document.addEventListener('keydown', handle);
     return () => document.removeEventListener('keydown', handle);

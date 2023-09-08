@@ -1,5 +1,3 @@
-/* global Mousetrap */
-
 const electron = require('electron');
 const remote = require('@electron/remote');
 const { updateViewerScale } = require('./viewer/utils');
