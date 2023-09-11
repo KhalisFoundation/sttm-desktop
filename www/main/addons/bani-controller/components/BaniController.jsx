@@ -1,7 +1,6 @@
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-const remote = require('@electron/remote');
 
 import isOnline from 'is-online';
 
@@ -17,6 +16,8 @@ import QrCode from './QrCode';
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
+
+const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { tryConnection, onEnd } = shareSync;
