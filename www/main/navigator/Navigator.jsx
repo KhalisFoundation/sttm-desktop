@@ -9,6 +9,7 @@ import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from '
 import insertSlide from '../common/constants/slidedb';
 
 const remote = require('@electron/remote');
+
 const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {

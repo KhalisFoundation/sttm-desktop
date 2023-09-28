@@ -190,7 +190,7 @@ function ShabadDeck() {
         )}
         style={applyTheme()}
       >
-        <QuickTools isMiscSlide={isMiscSlide} />
+        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
         {activeVerse.length ? (
           activeVerse.map((activeVerseObj, index) => (
             <Slide
