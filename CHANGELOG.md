@@ -1,5 +1,25 @@
 ## New Updates
 
+### 9.1.3 - _September 30, 2023_
+
+#### Enhancements
+
+- Adds a gurmukhi on-screen keyboard to write annoucements.
+- Sundar gutka now has an option to switch to english menu.
+
+#### Misc. bug fix and other improvements
+
+- Bani Overlay connectivity with annoucement is improved.
+- Fixed issues with the Akhand path view and the Dhan Guru slides.
+- Save the shabad navigated through next and previous icons in shabad history.
+- Other minor improvements
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.1.2 - _July 7, 2023_
 
 #### Enhancements

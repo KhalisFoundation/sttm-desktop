@@ -91,6 +91,10 @@
     .misc-header {
       a {
         color: $grey;
+
+        img {
+          filter: invert(1);
+        }
       }
       .misc-active {
         color: $white;

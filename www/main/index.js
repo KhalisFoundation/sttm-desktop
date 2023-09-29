@@ -1,9 +1,6 @@
 const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const settings = require('./settings');
-const { applyShortcuts } = require('./keyboard-shortcuts/shortcuts');
-
-applyShortcuts('non-viewer');
 
 /**
  * Check if the platform has a method and call if it is does

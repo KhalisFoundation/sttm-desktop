@@ -45,6 +45,7 @@ const ShabadContent = () => {
     setVerseHistory,
     setIsMiscSlide,
     setIsDontSaveHistory,
+    setInitialVerseId,
   } = useStoreActions((state) => state.navigator);
 
   // mangalPosition was removed from below settings
@@ -428,7 +429,7 @@ const ShabadContent = () => {
         }
       });
     } else {
-      loadShabad(activeShabadId, initialVerseId).then((verses) => {
+      loadShabad(activeShabadId).then((verses) => {
         if (verses) {
           setActiveShabad(verses);
           if (initialVerseId) {
@@ -438,6 +439,8 @@ const ShabadContent = () => {
             if (isDontSaveHistory) {
               setIsDontSaveHistory(false);
             }
+          } else {
+            setInitialVerseId(verses[0].ID);
           }
           if (isRandomShabad) {
             openFirstVerse(verses[0].ID);

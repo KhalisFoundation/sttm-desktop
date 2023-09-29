@@ -39,6 +39,10 @@
       const socket = io();
       const preview = document.location.href.indexOf('preview') > -1;
       let overlayPrefs;
+      let hasAnnoucement = false;
+      let lineBeforeAnnoucement = {};
+      let lastAnnoucement = {};
+
       const hexToRgb = hex => {
         if (hex === '#000') {
           return '0, 0, 0';
@@ -64,6 +68,7 @@
       };
 
       const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
+        lineBeforeAnnoucement = {Line, larivaar, larivaarAssist, languageSettings};
         document.querySelector('.o-gurbani').innerHTML = assist(
           Line.Gurmukhi,
           larivaar,
@@ -127,7 +132,7 @@
           'layout-vertical-left',
         );
 
-        const { gurbaniFont, textFont } = overlayPrefs;
+        const { gurbaniFont, textFont, toggleAnnoucement } = overlayPrefs;
         document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
         document.querySelector('.o-translation').style.fontFamily = textFont;
         document.querySelector('.o-transliteration').style.fontFamily = textFont;
@@ -135,6 +140,18 @@
         document.body.classList.add('layout-' + overlayPrefs.layout);
 
         document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
+
+        if (toggleAnnoucement) {
+          if (hasAnnoucement && Object.keys(lastAnnoucement).length) {
+            const { text, isGurmukhi, isAnnoucement } = lastAnnoucement;
+            writeText(text, isGurmukhi, isAnnoucement);
+          }
+        } else {
+          if(Object.keys(lineBeforeAnnoucement).length) {
+            const {Line, larivaar, larivaarAssist, languageSettings} = lineBeforeAnnoucement;
+            writeLine(Line, larivaar, larivaarAssist, languageSettings);
+          }
+        }
 
         document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
           // Clear styles added by other overrides
@@ -199,7 +216,15 @@
       socket.on('show-misc-text', request => {
         if (!preview) {
           if (overlayPrefs) {
-            writeText(request.text, request.isGurmukhi, request.isAnnoucement);
+            const {text, isGurmukhi, isAnnoucement} = request;
+            writeText(text, isGurmukhi, isAnnoucement);
+            if(isAnnoucement) {
+              hasAnnoucement = true;
+              lastAnnoucement = {text, isGurmukhi, isAnnoucement};
+            } else {
+              hasAnnoucement = false;
+            }
+            applyOverlayPrefs();
           }
         }
       });

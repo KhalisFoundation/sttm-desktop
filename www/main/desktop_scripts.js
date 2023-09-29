@@ -7,6 +7,7 @@ const path = require('path');
 const request = require('request');
 const progress = require('request-progress');
 const remote = require('@electron/remote');
+const moment = require('moment');
 const tingle = require('../assets/js/vendor/tingle');
 
 const { i18n, isUnsupportedWindow } = remote.require('./app');
@@ -67,7 +68,12 @@ function addBadgeToNotification(msg) {
 
 function checkForNotifcations() {
   let timeStamp = store.get('userPrefs.notification-timestamp');
-  global.core.menu.getNotifications(timeStamp, global.core.menu.showNotificationsModal);
+  if (timeStamp) {
+    global.core.menu.getNotifications(timeStamp, global.core.menu.showNotificationsModal);
+  } else {
+    const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    store.set('userPrefs.notification-timestamp', currentTime);
+  }
 
   setInterval(() => {
     timeStamp = store.get('userPrefs.notification-timestamp');

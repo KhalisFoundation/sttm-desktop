@@ -138,7 +138,7 @@ $misc-footer-active: 70px;
         }
       }
       &-switch {
-        @include flex($jc-value: start, $ai-value: center, $width: 100%);
+        @include flex($jc-value: start, $ai-value: center, $width: auto);
         gap: 8px;
 
         .switch {
@@ -167,6 +167,10 @@ $misc-footer-active: 70px;
         padding: 10px;
         width: inherit;
       }
+      &-gurmukhi-keyboard-text {
+        height: 35px;
+        border-radius: 8px;
+      }
       &-slide-btn {
         align-self: center;
         background: $lapis-lazuli;
@@ -180,17 +184,16 @@ $misc-footer-active: 70px;
         padding: 0.85em 1em;
         text-align: center;
         -webkit-font-smoothing: antialiased;
-        width: 300px;
         -webkit-appearance: none;
       }
       &-body {
         display: flex;
         flex-direction: column;
-        gap: 22px;
+        gap: 12px;
         width: 450px;
       }
       &-actions {
-        @include flex($ai-value: center, $jc-value: space-around, $width: 100%);
+        @include flex($ai-value: center, $jc-value: space-between, $width: 100%);
       }
     }
   }

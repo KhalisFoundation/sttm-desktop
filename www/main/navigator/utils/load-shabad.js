@@ -5,9 +5,9 @@ const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
-export const loadShabad = (shabadID, lineID) =>
+export const loadShabad = (shabadID) =>
   banidb
-    .loadShabad(shabadID, lineID)
+    .loadShabad(shabadID)
     .then((rows) => rows)
     .catch((err) => {
       const dbStatus = !!localStorage.getItem('isDbDownloaded');
