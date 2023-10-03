@@ -17,7 +17,7 @@ const QuickTools = ({ isMiscSlide }) => {
     setTeekaFontSize,
     setTransliterationFontSize,
     setAnnouncementsFontSize,
-  } = useStoreActions(state => state.userSettings);
+  } = useStoreActions((state) => state.userSettings);
   const {
     translationVisibility,
     teekaVisibility,
@@ -28,9 +28,9 @@ const QuickTools = ({ isMiscSlide }) => {
     transliterationFontSize,
     announcementsFontSize,
     quickTools,
-  } = useStoreState(state => state.userSettings);
-  const { quickToolsOpen } = useStoreState(state => state.viewerSettings);
-  const { setQuickToolsOpen } = useStoreActions(state => state.viewerSettings);
+  } = useStoreState((state) => state.userSettings);
+  const { quickToolsOpen } = useStoreState((state) => state.viewerSettings);
+  const { setQuickToolsOpen } = useStoreActions((state) => state.viewerSettings);
   const [quickToolsActions, setQuickToolsActions] = useState([
     'Gurbani',
     'Translation',
@@ -74,14 +74,13 @@ const QuickTools = ({ isMiscSlide }) => {
     return '';
   };
 
-  const hide = (name, toolName) => {
-    return name === 'visibility' && ['Gurbani', 'Announcements'].includes(toolName)
+  const hide = (name, toolName) =>
+    name === 'visibility' && ['Gurbani', 'Announcements'].includes(toolName)
       ? 'quicktool-icons-hidden'
       : '';
-  };
 
-  const bakeIcons = (toolName, icons) => {
-    return icons.map(({ name, actionName }) => (
+  const bakeIcons = (toolName, icons) =>
+    icons.map(({ name, actionName }) => (
       <div key={name} className={`quicktool-icons ${hide(name, toolName)}`}>
         <i
           className={getIconClassName(name, toolName, actionName)}
@@ -94,7 +93,6 @@ const QuickTools = ({ isMiscSlide }) => {
         />
       </div>
     ));
-  };
 
   useEffect(() => {
     if (isMiscSlide) {
@@ -112,7 +110,7 @@ const QuickTools = ({ isMiscSlide }) => {
       </div>
       {quickToolsOpen && (
         <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
-          {quickToolsActions.map(name => (
+          {quickToolsActions.map((name) => (
             <div key={name} className="quicktool-item">
               <div>{name}</div>
               <div className="quicktool-icons">{bakeIcons(name, quickToolsModifiers)}</div>

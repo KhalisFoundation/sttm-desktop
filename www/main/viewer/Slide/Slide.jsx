@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
@@ -24,30 +24,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     displayNextLine,
   } = useStoreState((state) => state.userSettings);
   const { activeVerseId } = useStoreState((state) => state.navigator);
-  const { slideOrder } = useStoreState((state) => state.viewerSettings);
   const activeVerseRef = useRef(null);
-
-  const [translationOrder, setTranslationOrder] = useState();
-  const [teekaOrder, setTeekaOrder] = useState();
-  const [transliterationOrder, setTransliterationOrder] = useState();
-
-  const orderFunctions = {
-    translation: (item) => {
-      if (translationOrder !== item) {
-        setTranslationOrder(item);
-      }
-    },
-    transliteration: (item) => {
-      if (transliterationOrder !== item) {
-        setTransliterationOrder(item);
-      }
-    },
-    teeka: (item) => {
-      if (teekaOrder !== item) {
-        setTeekaOrder(item);
-      }
-    },
-  };
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -77,12 +54,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
       }
     }, 100);
   }, [verseObj]);
-
-  useEffect(() => {
-    slideOrder.forEach((element, index) => {
-      orderFunctions[element](index + 2);
-    });
-  }, [slideOrder]);
 
   return (
     <>
@@ -114,31 +85,18 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
               <SlideTranslation
                 getFontSize={getFontSize}
                 translationObj={JSON.parse(verseObj.Translations)}
-                order={translationOrder}
               />
             )}
 
             {verseObj.English && (
-              <SlideTranslation
-                getFontSize={getFontSize}
-                translationHTML={verseObj.English}
-                order={translationOrder}
-              />
+              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
             )}
 
             {teekaVisibility && verseObj.Translations && (
-              <SlideTeeka
-                getFontSize={getFontSize}
-                teekaObj={JSON.parse(verseObj.Translations)}
-                order={teekaOrder}
-              />
+              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
             )}
             {transliterationVisibility && (
-              <SlideTransliteration
-                getFontSize={getFontSize}
-                gurmukhiString={verseObj.Gurmukhi}
-                order={transliterationOrder}
-              />
+              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
             )}
             {displayNextLine && nextLineObj && (
               <div

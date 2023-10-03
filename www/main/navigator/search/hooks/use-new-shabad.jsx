@@ -10,7 +10,7 @@ export const useNewShabad = () => {
     isCeremonyBani,
     isMiscSlide,
     singleDisplayActiveTab,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
 
   const {
     setActiveShabadId,
@@ -21,7 +21,7 @@ export const useNewShabad = () => {
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
-  } = useStoreActions(state => state.navigator);
+  } = useStoreActions((state) => state.navigator);
 
   return (newSelectedShabad, newSelectedVerse) => {
     // Push verseId of active Verse to versesRead Array when shabad is changed

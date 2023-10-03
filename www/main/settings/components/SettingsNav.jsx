@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const SettingsNav = ({ settingsNavObj }) => {
   const [activeTab, setActiveTab] = useState('slide-layout');
 
-  const isActiveClass = activeCategory => {
+  const isActiveClass = (activeCategory) => {
     switch (activeCategory) {
       case 'slide-layout':
         return activeTab === 'slide-layout' ? 'settings-nav-active' : '';

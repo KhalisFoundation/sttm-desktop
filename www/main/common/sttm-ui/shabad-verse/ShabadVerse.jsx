@@ -12,8 +12,8 @@ const ShabadVerse = ({
   englishVerse,
   verseId,
 }) => {
-  const loadActiveClass = (verseObj, currentVerseId, verseIndex) => {
-    return Object.keys(verseObj).map(verseKey => {
+  const loadActiveClass = (verseObj, currentVerseId, verseIndex) =>
+    Object.keys(verseObj).map((verseKey) => {
       if (Number(verseKey) === verseIndex && verseObj[verseKey] === currentVerseId) {
         return 1;
       }
@@ -21,7 +21,6 @@ const ShabadVerse = ({
     })[0]
       ? 'shabad-pane-active'
       : '';
-  };
 
   return (
     <li

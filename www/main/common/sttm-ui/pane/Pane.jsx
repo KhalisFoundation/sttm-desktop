@@ -4,15 +4,13 @@ import PaneContent from './PaneContent';
 import PaneFooter from './PaneFooter';
 import PaneHeader from './PaneHeader';
 
-const Pane = ({ content, header, footer, className }) => {
-  return (
-    <div className={`pane ${className}`.trim()}>
-      {header ? <PaneHeader Header={header} /> : ''}
-      {content ? <PaneContent Content={content} /> : ''}
-      {footer ? <PaneFooter Footer={footer} /> : ''}
-    </div>
-  );
-};
+const Pane = ({ content, header, footer, className }) => (
+  <div className={`pane ${className}`.trim()}>
+    {header ? <PaneHeader Header={header} /> : ''}
+    {content ? <PaneContent Content={content} /> : ''}
+    {footer ? <PaneFooter Footer={footer} /> : ''}
+  </div>
+);
 
 Pane.propTypes = {
   content: PropTypes.any,

@@ -6,19 +6,20 @@ import { getDefaultSettings } from '../../common/store/user-settings/get-saved-o
 import { convertToCamelCase } from '../../common/utils';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
-  const baniOverlayState = useStoreState(state => state.baniOverlay);
-  const baniOverlayActions = useStoreActions(state => state.baniOverlay);
+  const baniOverlayState = useStoreState((state) => state.baniOverlay);
+  const baniOverlayActions = useStoreActions((state) => state.baniOverlay);
 
-  const handleInputChange = event => {
+  const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
     baniOverlayActions[stateFunction](value);
   };
 
-  const handleSizeIcon = event => {
+  const handleSizeIcon = (event) => {
     const { max, min, step } = settingObj;
     const value = event.currentTarget ? event.currentTarget.dataset.value : event;
     const currentValue = baniOverlayState[stateVar];
@@ -36,7 +37,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const handleToggleChange = () => {
     if (stateVar === 'reset') {
       const defaultSettings = getDefaultSettings();
-      Object.keys(baniOverlayState).forEach(state => {
+      Object.keys(baniOverlayState).forEach((state) => {
         if (baniOverlayState[state] !== defaultSettings[state]) {
           baniOverlayActions[`set${convertToCamelCase(state, true)}`](defaultSettings[state]);
         }
@@ -47,7 +48,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     }
   };
 
-  const handleLayoutChange = event => {
+  const handleLayoutChange = (event) => {
     const currentLayout = baniOverlayState[stateVar];
     const newLayout = event.currentTarget.dataset.layout;
     if (newLayout !== currentLayout) {
