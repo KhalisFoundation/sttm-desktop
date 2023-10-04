@@ -4,8 +4,15 @@ import { useStoreState } from 'easy-peasy';
 import ToolbarItem from './ToolbarItem';
 
 const Toolbar = () => {
-  const { minimizedBySingleDisplay } = useStoreState(state => state.navigator);
-  const toolbarItems = ['sunder-gutka', 'ceremonies', 'sync-button', 'lock-screen', 'settings'];
+  const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
+  const toolbarItems = [
+    'sunder-gutka',
+    'ceremonies',
+    'sync-button',
+    'lock-screen',
+    'auth-dialog',
+    'settings',
+  ];
 
   return (
     <div
@@ -14,9 +21,9 @@ const Toolbar = () => {
         minimizedBySingleDisplay ? 'single-display-hide-left' : 'single-display-show-left'
       }`}
     >
-      {toolbarItems.map((itemName, index) => {
-        return <ToolbarItem key={index} itemName={itemName} />;
-      })}
+      {toolbarItems.map((itemName, index) => (
+        <ToolbarItem key={index} itemName={itemName} />
+      ))}
     </div>
   );
 };

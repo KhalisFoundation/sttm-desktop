@@ -6,7 +6,7 @@ import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
 import { useKeys } from '../common/hooks';
 
-import { Ceremonies, SundarGutka, BaniController, LockScreen } from '../addons';
+import { Ceremonies, SundarGutka, BaniController, LockScreen, AuthDialog } from '../addons';
 import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
@@ -185,6 +185,7 @@ const Launchpad = () => {
   const isCeremoniesOverlay = overlayScreen === 'ceremonies';
   const isLockScreen = overlayScreen === 'lock-screen';
   const isSettingsOverlay = overlayScreen === 'settings';
+  const isAuthDialog = overlayScreen === 'auth-dialog';
 
   return (
     <>
@@ -199,7 +200,7 @@ const Launchpad = () => {
         {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
         {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
-
+        <AuthDialog onScreenClose={onScreenClose} className={isAuthDialog ? '' : 'd-none'} />
         <InputContext.Provider value={ref}>
           <Navigator />
         </InputContext.Provider>

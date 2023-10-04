@@ -35,6 +35,12 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('history');
     }
   };
+  const openFavoritePane = () => {
+    if (singleDisplayActiveTab !== 'favorite') {
+      setSingleDisplayActiveTab('favorite');
+    }
+  };
+
   const openDhanGuruPane = () => {
     if (singleDisplayActiveTab !== 'dhan-guru') {
       setSingleDisplayActiveTab('dhan-guru');
@@ -78,6 +84,12 @@ export const singleDisplayFooter = () => {
         onClick={openOtherPane}
       >
         <i className="fa fa-ellipsis-h" />
+      </button>
+      <button
+        className={classNames('tab-switch', singleDisplayActiveTab === 'favorite' && 'active')}
+        onClick={openFavoritePane}
+      >
+        <i className="fa fa-heart" />
       </button>
     </div>
   );
