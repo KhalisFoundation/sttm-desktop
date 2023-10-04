@@ -112,6 +112,14 @@ button {
   border-radius: 50%;
   height: 60px;
   width: 60px;
+
+  .fav-results > & {
+    margin: auto;
+  }
+}
+
+.fav-results .error {
+  margin: 14px;
 }
 
 @keyframes spin {
@@ -139,7 +147,7 @@ button {
   flex-direction: column;
 }
 
-.sync-wrapper {
+.sync-wrapper, .auth-wrapper {
   bottom: 0;
   height: 100vh;
   left: 100px;
@@ -424,6 +432,13 @@ button {
     }
   }
 
+  #tool-auth-dialog {
+    background-color: $extra-light-grey;
+    background-image: url('../../assets/img/icons/user.png');
+    bottom: 80px;
+    position: fixed;
+  }
+
   #tool-sunder-gutka {
     background-image: url('../../assets/img/icons/sundar_gutka.png');
   }
@@ -436,7 +451,7 @@ button {
     background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 80px;
+    bottom: 160px;
     position: fixed;
   }
 
@@ -719,6 +734,16 @@ button {
 
   &.hidden {
     display: none;
+  }
+}
+
+.auth-wrapper {
+  .auth-content {
+    align-items: flex-start;
+
+    button i {
+      margin-right: 8px;
+    }
   }
 }
 

@@ -24,17 +24,36 @@
 
     .toggle-viewer-btn {
       height: 30px;
-      padding: 0 0.9em;
+      padding: 0px 0.9em;
       margin: unset;
       background: $dark-grey;
 
+      i {
+        padding-right: 8px;
+      }
+
       &.btn-danger {
-        background: $bright-red;
+        background: $red;
       }
     }
 
     i {
       font-size: 16px;
     }
+  }
+}
+
+.fav-btn {
+  background: $red;
+  height: 30px;
+  margin: 0px 10px;
+  padding: 0px 10px 0px 0px;
+
+  i {
+    padding-right: 8px;
+  }
+
+  &.unfav-btn {
+    background-color: $dark-grey;
   }
 }
