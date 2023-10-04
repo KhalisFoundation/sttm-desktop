@@ -17,37 +17,35 @@ const navigatorSettings = require('../../../configs/navigator-settings.json');
 
 global.platform = require('../../desktop_scripts');
 
-global.platform = require('../../desktop_scripts');
-
 const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
-    setOverlayScreen: action((state, payload) => ({
-      ...state,
-      overlayScreen: payload,
-    })),
-    setListeners: action((state, listenersState) => ({
-      ...state,
-      isListeners: listenersState,
-    })),
+    setOverlayScreen: action((state, payload) => {
+      state.overlayScreen = payload;
+      return state;
+    }),
+    setListeners: action((state, listenersState) => {
+      state.isListeners = listenersState;
+      return state;
+    }),
   },
   baniController: {
     adminPin: null,
     code: null,
     isConnected: false,
-    setAdminPin: action((state, adminPin) => ({
-      ...state,
-      adminPin,
-    })),
-    setCode: action((state, code) => ({
-      ...state,
-      code,
-    })),
-    setConnection: action((state, connectionState) => ({
-      ...state,
-      isConnected: connectionState,
-    })),
+    setAdminPin: action((state, adminPin) => {
+      state.adminPin = adminPin;
+      return state;
+    }),
+    setCode: action((state, code) => {
+      state.code = code;
+      return state;
+    }),
+    setConnection: action((state, connectionState) => {
+      state.isConnected = connectionState;
+      return state;
+    }),
   },
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
