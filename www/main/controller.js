@@ -1,5 +1,3 @@
-/* global Mousetrap */
-
 const electron = require('electron');
 const remote = require('@electron/remote');
 const { updateViewerScale } = require('./viewer/utils');
@@ -20,7 +18,7 @@ setTimeout(() => {
     ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
     global.webview.send('is-webview');
   });
-}, 300);
+}, 200);
 
 const updateMenu = [];
 
@@ -182,7 +180,7 @@ const winMenu = [
         type: 'separator',
       },
       {
-        label: i18n.t('MENU.APP.QUIT'),
+        label: i18n.t('MENU.APP.QUIT', { appName }),
         accelerator: 'Ctrl+Q',
         click: () => {
           analytics.trackEvent({
@@ -350,11 +348,6 @@ const menu = Menu.buildFromTemplate(
 if (process.platform === 'darwin' || process.platform === 'linux') {
   Menu.setApplicationMenu(menu);
 }
-
-// Mousetrap.bindGlobal('mod+,', () => settings.openSettings());
-Mousetrap.bindGlobal('mod+q', () => {
-  app.quit();
-});
 
 const $menuButton = document.querySelector('.menu-button');
 $menuButton.addEventListener('contextmenu', (e) => {

@@ -14,10 +14,10 @@ const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const favBtnRef = useRef(null);
-  const { activeShabadId, activeVerseId, isDontSaveHistory, favShabad, homeVerse } = useStoreState(
+  const { activeShabadId, activeVerseId, favShabad, initialVerseId, homeVerse } = useStoreState(
     (state) => state.navigator,
   );
-  const { setActiveShabadId, setActiveVerseId, setIsDontSaveHistory, setFavShabad, setHomeVerse } =
+  const { setActiveShabadId, setActiveVerseId, setInitialVerseId, setFavShabad, setHomeVerse } =
     useStoreActions((state) => state.navigator);
 
   const { userToken } = useStoreState((state) => state.app);
@@ -25,12 +25,12 @@ const ShabadHeader = () => {
 
   const navigateVerseLeft = () => {
     if (activeShabadId) {
-      if (!isDontSaveHistory) {
-        setIsDontSaveHistory(true);
-      }
       setActiveShabadId(activeShabadId - 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (initialVerseId !== null) {
+        setInitialVerseId(null);
       }
       if (homeVerse !== 0) {
         setHomeVerse(0);
@@ -39,12 +39,12 @@ const ShabadHeader = () => {
   };
   const navigateVerseRight = () => {
     if (activeShabadId) {
-      if (!isDontSaveHistory) {
-        setIsDontSaveHistory(true);
-      }
       setActiveShabadId(activeShabadId + 1);
       if (activeVerseId !== null) {
         setActiveVerseId(null);
+      }
+      if (initialVerseId !== null) {
+        setInitialVerseId(null);
       }
       if (homeVerse !== 0) {
         setHomeVerse(0);

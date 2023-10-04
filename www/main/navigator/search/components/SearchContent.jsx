@@ -84,7 +84,6 @@ const SearchContent = () => {
       });
     }, 200);
   });
-
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray
       ? searchedShabadsArray.map((verse) => ({
@@ -329,6 +328,7 @@ const SearchContent = () => {
                 verse={verse}
                 verseId={verseId}
                 writer={writer}
+                currentLanguage={currentLanguage}
               />
             )}
           ></Virtuoso>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const SearchResults = ({
@@ -16,8 +17,9 @@ const SearchResults = ({
   verse,
   verseId,
   writer,
+  currentLanguage,
 }) => {
-  const getClassForAng = baniSource => {
+  const getClassForAng = (baniSource) => {
     if (baniSource === 'G') {
       return 'sggs-color';
     }
@@ -30,7 +32,7 @@ const SearchResults = ({
     return 'other-color';
   };
 
-  const getBorderColorClass = baniSource => {
+  const getBorderColorClass = (baniSource) => {
     if (baniSource === 'G') {
       return 'sggs-border';
     }
@@ -48,7 +50,7 @@ const SearchResults = ({
     const mainLetters = anvaad.mainLetters(gurbaniVerse);
     const firstLetters = mainLetters
       .split(' ')
-      .map(d => d[0])
+      .map((d) => d[0])
       .join('');
     const queryStart = firstLetters.indexOf(searchCharacters);
     const queryEnd = queryStart + searchCharacters.length;
@@ -107,6 +109,7 @@ const SearchResults = ({
             )} ${ang} `}</span>
           )}
           <span className="gurmukhi">{highlightKeywords(verse, searchQuery)}</span>
+          {currentLanguage === 'en' && <div className="eng-verse">{anvaad.translit(verse)}</div>}
           <div className="search-list-footer">
             {`${writer}${writer && raag ? ', ' : ' '}${raag !== null ? raag : ''}`}
           </div>

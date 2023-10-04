@@ -1,17 +1,37 @@
 ## New Updates
 
-### 9.1.2 - _June 13, 2023_
+### 9.1.3 - _September 30, 2023_
 
 #### Enhancements
 
-- UI overhaul of Dhan Guru slides, Quick tray, and Announcements Tab
+- Adds a gurmukhi on-screen keyboard to write annoucements.
+- Sundar gutka now has an option to switch to english menu.
 
-#### Improvements
+#### Misc. bug fix and other improvements
 
-- Fix the warning of malicious software for MacOS
-- Fix issues with marking verses as read
-- Fix scroll issues with Announcement tab
-- Other minor issues
+- Bani Overlay connectivity with annoucement is improved.
+- Fixed issues with the Akhand path view and the Dhan Guru slides.
+- Save the shabad navigated through next and previous icons in shabad history.
+- Other minor improvements
+
+</br>
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
+### 9.1.2 - _July 7, 2023_
+
+#### Enhancements
+
+- Dhan Guru slides, Quick Tray, and Announcements Tab have been improved
+
+#### Misc. bug fix and other improvements
+
+- MacOS installation errors have been resolved
+- Fixed issues with marking verses as read
+- Fixed scroll issues with the Announcement tab
+- Other minor improvements
 
 </br>
 
