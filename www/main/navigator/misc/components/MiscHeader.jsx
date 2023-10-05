@@ -1,8 +1,11 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+
 import { classNames } from '../../../common/utils';
 
 const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 
@@ -14,6 +17,7 @@ export const MiscHeader = () => {
   const isAnnouncement = currentMiscPanel === 'Announcement';
   const isOther = currentMiscPanel === 'Others';
   const isDhanGuru = currentMiscPanel === 'DhanGuru';
+  const isFav = currentMiscPanel === 'Favorite';
 
   const setTab = (tabName) => {
     if (tabName !== currentMiscPanel) {
@@ -37,7 +41,7 @@ export const MiscHeader = () => {
       >
         <i className="fa fa-clock-o">
           <span className="Icon-label" key="History">
-            History
+            {i18n.t('TOOLBAR.HISTORY')}
           </span>
         </i>
       </a>
@@ -62,12 +66,22 @@ export const MiscHeader = () => {
         </span>
       </a>
       <a
+        className={classNames('misc-button', isFav && 'misc-active')}
+        onClick={() => setTab('Favorite')}
+      >
+        <i className="fa fa-heart">
+          <span className="Icon-label" key="Favorite">
+            {i18n.t('TOOLBAR.FAVORITE')}
+          </span>
+        </i>
+      </a>
+      <a
         className={classNames('misc-button', isOther && 'misc-active')}
         onClick={() => setTab('Others')}
       >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
-            Others
+            {i18n.t('TOOLBAR.OTHERS')}
           </span>
         </i>
       </a>

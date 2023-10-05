@@ -21,12 +21,17 @@ const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
+    userToken: '',
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
       return state;
     }),
     setListeners: action((state, listenersState) => {
       state.isListeners = listenersState;
+      return state;
+    }),
+    setUserToken: action((state, payload) => {
+      state.userToken = payload;
       return state;
     }),
   },
@@ -98,6 +103,13 @@ global.platform.ipc.on('update-global-setting', (event, setting) => {
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
   global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
+});
+
+global.platform.ipc.on('userToken', (event, data) => {
+  const currentToken = GlobalState.getState().app.userToken;
+  if (data !== currentToken) {
+    GlobalState.getActions().app.setUserToken(data);
+  }
 });
 
 export default GlobalState;
