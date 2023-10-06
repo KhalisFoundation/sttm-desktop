@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
-const SlideTeeka = ({ getFontSize, teekaObj, order }) => {
-  const { teekaFontSize } = useStoreState(state => state.userSettings);
+const SlideTeeka = ({ getFontSize, teekaObj }) => {
+  const { teekaFontSize } = useStoreState((state) => state.userSettings);
   const [teekaString, setTeekaString] = useState(null);
 
-  const getTeeka = inputTeeka => {
+  const getTeeka = (inputTeeka) => {
     if (inputTeeka && inputTeeka.pu) {
       if (inputTeeka.pu.bdb) {
         setTeekaString(inputTeeka.pu.bdb);
@@ -36,7 +36,6 @@ const SlideTeeka = ({ getFontSize, teekaObj, order }) => {
 SlideTeeka.propTypes = {
   getFontSize: PropTypes.func,
   teekaObj: PropTypes.object,
-  order: PropTypes.number,
 };
 
 export default SlideTeeka;

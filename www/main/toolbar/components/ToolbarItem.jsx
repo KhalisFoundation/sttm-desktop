@@ -5,8 +5,8 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../../common/constants';
 
 const ToolbarItem = ({ itemName }) => {
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
+  const { overlayScreen } = useStoreState((state) => state.app);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
   const isSelectedOverlay = overlayScreen === itemName;
 
   return (
@@ -19,7 +19,7 @@ const ToolbarItem = ({ itemName }) => {
           return setOverlayScreen(DEFAULT_OVERLAY);
         }
 
-        setOverlayScreen(itemName);
+        return setOverlayScreen(itemName);
       }}
     ></div>
   );

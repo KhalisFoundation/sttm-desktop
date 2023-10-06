@@ -5,13 +5,11 @@ import SearchContent from './SearchContent';
 import SearchFooter from './SearchFooter';
 import SearchHeader from './SearchHeader';
 
-const SearchPane = ({ className }) => {
-  return (
-    <div className={`search-pane ${className}`}>
-      <Pane header={SearchHeader} content={SearchContent} footer={SearchFooter} />
-    </div>
-  );
-};
+const SearchPane = ({ className }) => (
+  <div className={`search-pane ${className}`}>
+    <Pane header={SearchHeader} content={SearchContent} footer={SearchFooter} />
+  </div>
+);
 
 SearchPane.propTypes = {
   className: PropTypes.string,

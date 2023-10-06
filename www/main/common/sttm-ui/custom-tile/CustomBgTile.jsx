@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const CustomBgTile = ({ customBg, onApply, onRemove }) => {
-  const getCustomBgImageForTile = tile => {
-    return {
-      backgroundImage: `url('${tile['background-image']}')`,
-    };
-  };
+  const getCustomBgImageForTile = (tile) => ({
+    backgroundImage: `url('${tile['background-image']}')`,
+  });
 
   return (
     <>

@@ -130,6 +130,7 @@ SearchResults.propTypes = {
   verse: PropTypes.string,
   verseId: PropTypes.number,
   writer: PropTypes.string,
+  currentLanguage: PropTypes.string,
 };
 
 export default SearchResults;

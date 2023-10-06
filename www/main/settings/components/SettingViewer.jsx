@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 
-// import { buttonMarkup } from '../utils';
-
 const SettingViewer = () => {
-  const { themeBg } = useStoreState(state => state.userSettings);
-  const { slideOrder } = useStoreState(state => state.viewerSettings);
-  /* TODO: will reveal this feature in next release */
-  // const { setSlideOrder } = useStoreActions(state => state.viewerSettings);
+  const { themeBg } = useStoreState((state) => state.userSettings);
+  const { slideOrder } = useStoreState((state) => state.viewerSettings);
 
   const [translationOrder, setTranslationOrder] = useState();
   const [teekaOrder, setTeekaOrder] = useState();
   const [transliterationOrder, setTransliterationOrder] = useState();
 
   const orderFunctions = {
-    translation: item => {
+    translation: (item) => {
       if (translationOrder !== item) {
         setTranslationOrder(item);
       }
     },
-    transliteration: item => {
+    transliteration: (item) => {
       if (transliterationOrder !== item) {
         setTransliterationOrder(item);
       }
     },
-    teeka: item => {
+    teeka: (item) => {
       if (teekaOrder !== item) {
         setTeekaOrder(item);
       }
@@ -44,7 +40,7 @@ const SettingViewer = () => {
     larivaarAssistType,
     vishraamType,
     displayVishraams,
-  } = useStoreState(state => state.userSettings);
+  } = useStoreState((state) => state.userSettings);
 
   const commonStyles = {
     textAlign: leftAlign ? 'left' : 'center',
@@ -162,13 +158,11 @@ const SettingViewer = () => {
               हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
             </div>
           </div>
-          {/* {buttonMarkup('translation', slideOrder, setSlideOrder)} */}
         </h2>
         <h2 className="slide-teeka teeka" style={{ ...teekaStyles, order: teekaOrder }}>
           <div>
             hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
           </div>
-          {/* {buttonMarkup('teeka', slideOrder, setSlideOrder)} */}
         </h2>
         <h2
           className="slide-transliteration transliteration"
@@ -185,7 +179,6 @@ const SettingViewer = () => {
               जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
             </div>
           </div>
-          {/* {buttonMarkup('transliteration', slideOrder, setSlideOrder)} */}
         </h2>
         <h1
           className="slide-next-line slide-gurbani gurbani gurmukhi next-line"
