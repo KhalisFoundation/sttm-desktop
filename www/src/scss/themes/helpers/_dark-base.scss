@@ -216,6 +216,12 @@
   #toolbar,
   #toolbar-nav {
     background: $bg-alt;
+
+    #tool-sync-button,
+    #tool-auth-dialog,
+    #tool-settings {
+      filter: invert(1);
+    }
   }
 
   .pane,
@@ -349,6 +355,17 @@
 
   .history-results {
     .history-item:hover {
+      background-color: $bg-bright;
+    }
+  }
+
+  .fav-results {
+    .fav-shabad-container {
+      button {
+        color: $text-base;
+      }
+    }
+    .fav-shabad-container:hover {
       background-color: $bg-bright;
     }
   }

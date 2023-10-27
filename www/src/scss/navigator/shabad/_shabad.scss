@@ -44,16 +44,14 @@
 }
 
 .fav-btn {
-  background: $red;
+  background: transparent;
+  color: $princeton-orange;
   height: 30px;
-  margin: 0px 10px;
+  line-height: 1;
+  margin-right: auto;
   padding: 0px 10px 0px 0px;
 
   i {
     padding-right: 8px;
-  }
-
-  &.unfav-btn {
-    background-color: $dark-grey;
   }
 }

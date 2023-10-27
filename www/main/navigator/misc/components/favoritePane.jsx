@@ -162,7 +162,6 @@ export const FavoritePane = ({ className }) => {
               </p>
             </div>
             <div className="fav-shabad-options">
-              <i className="fa-regular fa-clock"></i>
               <p className="date">{date}</p>
               <p className="time">{time}</p>
               <button
@@ -170,7 +169,7 @@ export const FavoritePane = ({ className }) => {
                   deleteFromFav(element);
                 }}
               >
-                <i className="fa-solid fa-x"></i>
+                <i className="fa-solid fa-trash"></i>
               </button>
             </div>
           </div>

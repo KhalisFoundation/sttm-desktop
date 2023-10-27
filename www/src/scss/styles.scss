@@ -433,10 +433,15 @@ button {
   }
 
   #tool-auth-dialog {
-    background-color: $extra-light-grey;
     background-image: url('../../assets/img/icons/user.png');
+    background-size: 32px;
+    background-repeat: no-repeat;
     bottom: 80px;
     position: fixed;
+
+    &.auth-logged-in {
+      background-image: url('../../assets/img/icons/logout.png');  
+    }
   }
 
   #tool-sunder-gutka {
@@ -450,6 +455,7 @@ button {
   #tool-sync-button {
     background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
+    background-size: 24px;
     background-repeat: no-repeat;
     bottom: 160px;
     position: fixed;
@@ -467,6 +473,7 @@ button {
     background-image: url('../../assets/img/icons/settings.png');
     background-position: center center;
     background-repeat: no-repeat;
+    background-size: 36px;
     bottom: 10px;
     position: fixed;
   }

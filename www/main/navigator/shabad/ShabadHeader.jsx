@@ -76,13 +76,12 @@ const ShabadHeader = () => {
     <div className="shabad-pane-header">
       {activeShabadId && !isLoading && userToken && (
         <button
-          className={classNames('button fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
+          className={classNames('fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
           ref={favBtnRef}
           title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
           onClick={toggleFavShabad}
         >
-          <i className={favShabadIndex < 0 ? 'fa-solid fa-star' : 'fa-regular fa-star'}></i>
-          {favShabadIndex < 0 ? i18n.t('SHABAD_PANE.MARK_FAV') : i18n.t('SHABAD_PANE.UNMARK_FAV')}
+          <i className={favShabadIndex < 0 ? 'fa-regular fa-star' : 'fa-solid fa-star'}></i>
         </button>
       )}
       <button

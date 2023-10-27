@@ -286,6 +286,17 @@
     }
   }
 
+  .fav-results {
+    .fav-shabad-container {
+      button {
+        color: $base-text;
+      }
+    }
+    .fav-shabad-container:hover {
+      background-color: $statusbar-bg;
+    }
+  }
+
   #footer {
     background-color: $statusbar-bg;
 
