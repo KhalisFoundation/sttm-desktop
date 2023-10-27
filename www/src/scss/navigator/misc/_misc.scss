@@ -268,24 +268,37 @@ $misc-footer-active: 70px;
   flex-direction: row;
   justify-content: space-between;
   padding: 0px 8px;
+  transition: 0.3s all ease;
+
+  .fav-shabad-text  {
+    cursor: pointer;
+    width: 65%;
+  }
 
   .fav-shabad-options {
     align-items: center;
-    color: $sky-blue;
+    color: $grey;
     display: flex;
+    font-size: 12px;
+    font-style: italic;
     > p,
     > button {
       margin: 0px 4px;
     }
 
     > button {
-      background-color: $red;
+      background-color: transparent;
       border-radius: 50%;
-      color: $white;
       font-size: 14px;
       height: 24px;
+      margin-right: auto;
       padding: 4px;
       width: 24px;
+      transition:0.3s all;
+
+      &:hover {
+        color: $red;
+      }
     }
   }
 }
