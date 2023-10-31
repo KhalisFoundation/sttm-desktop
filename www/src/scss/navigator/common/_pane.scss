@@ -1,11 +1,15 @@
 @import '../utils/variables';
+.pane-container {
+  flex: 1;
+}
+
 .pane {
   display: flex;
   flex-direction: column;
   min-width: 500px;
   position: relative;
   overflow: hidden;
-  height: 45vh;
+  height: 100%;
   width: 100%;
   i {
     cursor: pointer;
@@ -19,6 +23,20 @@
   font-size: 14px;
   margin: 0;
   padding: 0 10px;
+
+  .shabad-pn {
+      display: inline-block;
+      font-size: 1.1rem;
+      width: 36px;
+      height: 36px;
+      text-align: center;
+      line-height: 36px;
+      margin-left:0px;
+      &:hover {
+        background: #eaeaea;
+      }
+    }
+    
 }
 .pane-content {
   @include flex($fd-value: column, $ai-value: initial);

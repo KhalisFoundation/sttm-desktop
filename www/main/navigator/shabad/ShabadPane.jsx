@@ -5,7 +5,7 @@ import ShabadContent from './ShabadContent';
 import ShabadHeader from './ShabadHeader';
 
 const ShabadPane = ({ className }) => (
-  <div className={`shabad-pane ${className}`}>
+  <div className={`pane-container shabad-pane ${className}`}>
     <Pane header={ShabadHeader} content={ShabadContent} />
   </div>
 );

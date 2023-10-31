@@ -2,7 +2,7 @@ $presenter-pane-gap: 25px;
 $title-bar-offset: 10px;
 $ws-offset: 40px;
 $keyboard-height: 128px;
-$toolbar-offset: 75px;
+$toolbar-offset: 48px;
 $toolbar-small-offset: 50px;
 $toolbar-width-offset: $toolbar-offset/2;
 $bani-list-width: 300px;
@@ -417,10 +417,10 @@ button {
     background-size: cover;
     border-radius: 5px;
     cursor: pointer;
-    height: 40px;
+    height: 36px;
     margin-bottom: 5px;
     transition: 0.5s all ease;
-    width: 40px;
+    width: 36px;
 
     &:hover {
       box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
@@ -766,8 +766,8 @@ button {
   width: $toolbar-offset;
 
   .toolbar-item {
-    height: 60px;
-    width: 60px;
+    height: 36px;
+    width: 36px;
   }
 
   .bani-list,
@@ -881,6 +881,7 @@ body.show-overlay {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    position: static;
     width: 100%;
   }
 

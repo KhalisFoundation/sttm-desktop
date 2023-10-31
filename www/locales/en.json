@@ -195,7 +195,7 @@
     "WRITER": "Writer",
     "SOURCES": {
       "ALL_SOURCES": {
-        "TEXT": "All Sources"
+        "TEXT": "Sources"
       },
       "AMRIT_KEERTAN": {
         "TEXT": "Amrit Keertan"
@@ -221,7 +221,7 @@
     },
     "RAAGS": {
       "ALL_RAAGS": {
-        "TEXT": "All Raags"
+        "TEXT": "Raags"
       },
       "ASA": {
         "TEXT": "Asa"
@@ -247,7 +247,7 @@
     },
     "WRITERS": {
       "ALL_WRITERS": {
-        "TEXT": "All Writers"
+        "TEXT": "Writers"
       },
       "GURU_NANAK_DEV": {
         "TEXT": "Guru Nanak Dev"
