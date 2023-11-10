@@ -1,6 +1,7 @@
 @import '../utils/variables';
 .pane-container {
   flex: 1;
+  max-height: 45vh;
 }
 
 .pane {

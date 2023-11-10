@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const FilterDropdown = ({ title, onChange, currentValue, optionsArray }) => (
   <div className="select-bani-dd-group">
+    <span className="filter-label">{title}</span>
     <select
       id={`dropdown-${title}`}
       className="select-bani"
@@ -16,7 +17,6 @@ const FilterDropdown = ({ title, onChange, currentValue, optionsArray }) => (
           </option>
         ))}
     </select>
-    <span>{title}</span>
   </div>
 );
 
