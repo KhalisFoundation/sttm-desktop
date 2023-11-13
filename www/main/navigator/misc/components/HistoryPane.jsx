@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
@@ -28,6 +28,7 @@ export const HistoryPane = ({ className }) => {
     setActiveVerseId,
     setSingleDisplayActiveTab,
   } = useStoreActions((state) => state.navigator);
+  const [order, setOrder] = useState('newest');
 
   const openShabadFromHistory = (element) => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -97,7 +98,22 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
+  return (
+    <div>
+      <div className="history-order">
+        <div className="history-order-select">
+          <label>Sort by: </label>
+          <select value={order} onChange={(e) => setOrder(e.target.value)}>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+      </div>
+      <div className={`history-results ${className}`}>
+        {order === 'newest' ? versesMarkup : versesMarkup.slice().reverse()}
+      </div>
+    </div>
+  );
 };
 
 HistoryPane.propTypes = {

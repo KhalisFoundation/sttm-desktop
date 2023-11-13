@@ -280,6 +280,12 @@
     }
   }
 
+  .history-order {
+    select {
+      color: $base-text;
+    }
+  }
+
   .history-results {
     .history-item:hover {
       background-color: $statusbar-bg;
