@@ -538,7 +538,13 @@ input[type='color'] {
           width: 100%;
         }
       }
-
+     
+      .control-item-switch {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2px;
+      }
       &.control-size-icon {
         text-align: center;
       }
@@ -547,7 +553,9 @@ input[type='color'] {
       &:last-child() {
         margin: 0;
       }
-
+      &.control-switch {
+        margin:0 10px;
+      }
       &#date-time-position {
         align-items: center;
         display: flex;
