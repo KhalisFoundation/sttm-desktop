@@ -14,9 +14,15 @@ const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const favBtnRef = useRef(null);
-  const { activeShabadId, activeVerseId, favShabad, initialVerseId, homeVerse } = useStoreState(
-    (state) => state.navigator,
-  );
+  const {
+    activeShabadId,
+    activeVerseId,
+    favShabad,
+    initialVerseId,
+    homeVerse,
+    isSundarGutkaBani,
+    isCeremonyBani,
+  } = useStoreState((state) => state.navigator);
   const { setActiveShabadId, setActiveVerseId, setInitialVerseId, setFavShabad, setHomeVerse } =
     useStoreActions((state) => state.navigator);
 
@@ -92,8 +98,12 @@ const ShabadHeader = () => {
         <i className="fa fa-display"></i>
         {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
       </button>
-      <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>
-      <i className="fa fa-arrow-circle-o-right" onClick={navigateVerseRight}></i>
+      {!isSundarGutkaBani && !isCeremonyBani && (
+        <>
+          <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>
+          <i className="fa fa-arrow-circle-o-right" onClick={navigateVerseRight}></i>
+        </>
+      )}
     </div>
   );
 };

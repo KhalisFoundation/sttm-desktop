@@ -339,8 +339,9 @@
     color: $text-base;
   }
 
-  .panktee.search-result span.gurmukhi span.highlight {
+  .panktee span.gurmukhi span.highlight {
     color: #fff;
+    background-color: $bg-main;
   }
 
   .result-list ul li {
