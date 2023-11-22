@@ -137,7 +137,7 @@ button {
   display: flex;
   height: 100vh;
   justify-content: flex-start;
-  left: 100px;
+  left: 60px;
   position: fixed;
   top: 0;
   width: calc(100% - 100px);
@@ -150,7 +150,7 @@ button {
 .sync-wrapper, .auth-wrapper {
   bottom: 0;
   height: 100vh;
-  left: 100px;
+  left: 60px;
   max-height: 750px;
   max-width: 850px;
   overflow: auto;
