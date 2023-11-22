@@ -357,6 +357,13 @@
     }
   }
 
+  .history-order {
+    select {
+      background-color: $bg-main;
+      color: $text-base;
+    }
+  }
+
   .history-results {
     .history-item:hover {
       background-color: $bg-bright;
