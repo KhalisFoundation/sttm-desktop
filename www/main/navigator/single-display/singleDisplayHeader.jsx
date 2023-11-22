@@ -36,6 +36,10 @@ export const singleDisplayHeader = () => {
         component = 'Dhan Guru';
         break;
 
+      case 'favorite':
+        component = 'Favorites';
+        break;
+
       default:
         break;
     }

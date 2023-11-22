@@ -146,6 +146,10 @@
       }
     }
 
+    .select-bani option {
+      color: $text-base;
+    }
+
     .search-type {
       &-label {
         &::before {

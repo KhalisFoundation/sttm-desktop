@@ -264,7 +264,7 @@ const SearchContent = () => {
           </div>
         )}
         <div className="filters">
-          <span>Filter by </span>
+          <span className="filters-label">Filter by </span>
           <FilterDropdown
             title="Writer"
             onChange={(event) => {

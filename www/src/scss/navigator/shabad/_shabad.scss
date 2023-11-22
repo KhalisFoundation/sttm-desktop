@@ -8,7 +8,7 @@
     outline: 0;
   }
   .shabad-list {
-    height: calc(100% - 40px);
+    height: 100%;
   }
 
   .fa-check {
@@ -18,15 +18,12 @@
   &-header {
     @include flex($ai-value: center, $jc-value: flex-end);
 
-    :nth-child(n) {
-      margin-left: 10px;
-    }
-
     .toggle-viewer-btn {
       height: 30px;
       padding: 0px 0.9em;
       margin: unset;
       background: $dark-grey;
+      margin-right: 12px;
 
       i {
         padding-right: 8px;

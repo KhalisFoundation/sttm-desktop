@@ -80,16 +80,16 @@ export const singleDisplayFooter = () => {
         <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
-        onClick={openOtherPane}
-      >
-        <i className="fa fa-ellipsis-h" />
-      </button>
-      <button
         className={classNames('tab-switch', singleDisplayActiveTab === 'favorite' && 'active')}
         onClick={openFavoritePane}
       >
         <i className="fa fa-heart" />
+      </button>
+      <button
+        className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
+        onClick={openOtherPane}
+      >
+        <i className="fa fa-ellipsis-h" />
       </button>
     </div>
   );

@@ -143,7 +143,7 @@ export const FavoritePane = ({ className }) => {
 
   return (
     <div className={`fav-results ${className}`}>
-      <p>{errorMessage}</p>
+      <p className="error">{errorMessage}</p>
       {isFetching && <div className="sttm-loader" />}
       {parsedFav.map((element, index) => {
         const { shabadId, verseId, date, time, verse, id } = element;

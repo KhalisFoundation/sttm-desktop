@@ -150,6 +150,9 @@
         background-color: $statusbar-bg;
       }
     }
+    .select-bani option {
+      color: $base-text;
+    }
   }
 
   .viewer-pane {

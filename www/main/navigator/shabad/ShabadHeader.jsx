@@ -92,8 +92,8 @@ const ShabadHeader = () => {
         <i className="fa fa-display"></i>
         {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
       </button>
-      <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>
-      <i className="fa fa-arrow-circle-o-right" onClick={navigateVerseRight}></i>
+      <i className="fa fa-arrow-circle-o-left shabad-pn" onClick={navigateVerseLeft}></i>
+      <i className="fa fa-arrow-circle-o-right shabad-pn" onClick={navigateVerseRight}></i>
     </div>
   );
 };
