@@ -71,6 +71,14 @@ function ShabadDeck() {
     return bakeThemeStyles(themeInstance, themeBg);
   };
 
+  const applyOverlay = () => {
+    const themeInstance = getCurrentThemeInstance();
+    if (themeBg.type === 'video') {
+      return themeInstance['background-color'];
+    }
+    return '';
+  };
+
   const bakeEmptyVerse = () => ({
     Gurmukhi: '',
     Visraam: '',
@@ -170,9 +178,11 @@ function ShabadDeck() {
       }
     }
   }, [isMiscSlide]);
-
   return (
     <>
+      {themeBg.type === 'video' && (
+        <video className="video_preview" src={themeBg.url} autoPlay muted loop />
+      )}
       <div
         className={classNames(
           'shabad-deck',
@@ -193,10 +203,11 @@ function ShabadDeck() {
               verseObj={activeVerseObj}
               nextLineObj={nextVerse}
               isMiscSlide={isMiscSlide}
+              bgColor={applyOverlay()}
             />
           ))
         ) : (
-          <Slide isMiscSlide={isMiscSlide} />
+          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
         )}
       </div>
       <ViewerIcon className="viewer-logo" />

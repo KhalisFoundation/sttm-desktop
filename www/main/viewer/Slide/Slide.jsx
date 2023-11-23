@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -38,7 +38,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     }
     return '';
   };
-
   const getVishraamType = () =>
     vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
 
@@ -66,7 +65,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
 
   return (
     <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
-      <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
+      <div
+        className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}
+        style={{
+          background: bgColor,
+        }}
+      >
         {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
         {verseObj && showVerse && !isMiscSlide && (
           <>
@@ -131,6 +135,7 @@ Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
+  bgColor: PropTypes.string,
 };
 
 export default Slide;
