@@ -11,7 +11,7 @@ environment:
   GH_TOKEN:
     secure: YnpSJBnaHBEg7du/NqieQRj7Dyp87cH+l8dxFpoaGtPFBhh9t/Lnq9pjMghP1Qf8
   matrix:
-    - nodejs_version: 16
+    - nodejs_version: 18
 install:
   - ps: $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
   - ps: $fileContent += $env:priv_key.Replace(' ', "`n")
