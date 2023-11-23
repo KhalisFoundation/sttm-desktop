@@ -544,6 +544,22 @@ input[type='color'] {
         justify-content: center;
         align-items: center;
         margin-top: 2px;
+
+        .switch {
+          height: 1.5em;
+          width: 2.6em;
+
+          label:after {
+            height: 1.5em;
+            width: 1.5em;
+          }
+
+          input:checked {
+            + label:after {
+              left: 1.1em;
+            }
+          }
+        }
       }
       &.control-size-icon {
         text-align: center;
