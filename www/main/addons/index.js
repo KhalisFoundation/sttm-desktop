@@ -3,3 +3,4 @@ export { default as BaniController } from './bani-controller';
 export { default as Ceremonies } from './ceremonies';
 export { default as LockScreen } from './lock-screen';
 export { default as AuthDialog } from './auth-dialog';
+export { default as Announcement } from './announcement';

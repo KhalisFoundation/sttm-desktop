@@ -10,4 +10,12 @@
   i {
     padding-bottom: 2px;
   }
+
+  &.keyboard-toggle {
+    position: absolute;
+    right: 8px;
+    bottom: 10px;
+    border-radius: 8px;
+    height: 32px;
+  }
 }
