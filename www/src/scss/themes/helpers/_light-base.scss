@@ -55,6 +55,7 @@
   .sync-content-wrapper,
   .zoom-content-wrapper,
   .settings-container,
+  .addon-overlay,
   .fav-results {
     background-color: $nav-bg;
     .sttm-loader {
@@ -149,6 +150,9 @@
       .search-footer {
         background-color: $statusbar-bg;
       }
+    }
+    .select-bani option {
+      color: $base-text;
     }
   }
 
@@ -277,6 +281,12 @@
         background-color: $statusbar-bg;
         cursor: pointer;
       }
+    }
+  }
+
+  .history-order {
+    select {
+      color: $base-text;
     }
   }
 

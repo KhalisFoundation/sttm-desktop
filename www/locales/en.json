@@ -340,7 +340,15 @@
       "SELF": "Fields to Display",
       "TRANSLATION": "Translation",
       "TRANSLITERATION": "Transliteration"
-    }
+    },
+    "TRANSLATION_SOURCE": "Translation Source",
+    "TEEKA_SOURCE": "Teeka Source",
+    "MANMOHAN_SINGH": "Manmohan Singh",
+    "BANI_DB": "BaniDB",
+    "SANT_SINGH": "Sant Singh",
+    "SAHIB_SINGH": "Sahib Singh",
+    "SANT_SINGH_KHALSA": "Sant Singh Khalsa",
+    "FAREEDKOT": "Fareedkot"
   },
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (6 Pauris)",

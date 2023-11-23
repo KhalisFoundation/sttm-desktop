@@ -143,7 +143,7 @@ export const FavoritePane = ({ className }) => {
 
   return (
     <div className={`fav-results ${className}`}>
-      <p>{errorMessage}</p>
+      <p className="error">{errorMessage}</p>
       {isFetching && <div className="sttm-loader" />}
       {parsedFav.map((element, index) => {
         const { shabadId, verseId, date, time, verse, id } = element;
@@ -169,7 +169,7 @@ export const FavoritePane = ({ className }) => {
                   deleteFromFav(element);
                 }}
               >
-                <i className="fa-solid fa-trash"></i>
+                <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
           </div>
