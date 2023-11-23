@@ -12,15 +12,15 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { gurus } = insertSlide.dropdownStrings;
 
-export const DhanGuruPane = ({ className }) => {
+export const DhanGuru = ({ isGurmukhi }) => {
   const { isMiscSlide, miscSlideText, isAnnoucement, isMiscSlideGurmukhi, shortcuts } =
     useStoreState((state) => state.navigator);
   const {
     setIsMiscSlide,
     setMiscSlideText,
     setIsAnnoucement,
-    setIsMiscSlideGurmukhi,
     setShortcuts,
+    setIsMiscSlideGurmukhi,
   } = useStoreActions((state) => state.navigator);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDhanGuruIndex, setCurrentDhanGuruIndex] = useState(null);
@@ -107,23 +107,13 @@ export const DhanGuruPane = ({ className }) => {
   const insertDhanGuru = (index) => {
     const { english, gurmukhi } = insertSlide.slideStrings.dhanguruStrings[index];
     setCurrentDhanGuruIndex(index);
-    if (isMiscSlideGurmukhi) {
+    if (isGurmukhi !== isMiscSlideGurmukhi) {
+      setIsMiscSlideGurmukhi(isGurmukhi);
+    }
+    if (isGurmukhi) {
       addDhanGuruSlide(gurmukhi);
     } else {
       addDhanGuruSlide(english);
-    }
-  };
-
-  const toggleDhanGuruLanguage = (event) => {
-    if (isMiscSlideGurmukhi !== event.target.checked) {
-      setIsMiscSlideGurmukhi(event.target.checked);
-      if (isMiscSlide) {
-        addDhanGuruSlide(
-          insertSlide.slideStrings.dhanguruStrings[currentDhanGuruIndex][
-            event.target.checked ? 'gurmukhi' : 'english'
-          ],
-        );
-      }
     }
   };
 
@@ -148,20 +138,10 @@ export const DhanGuruPane = ({ className }) => {
   }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnoucement]);
 
   return (
-    <div className={className}>
-      <div className="dhan-guru-language-switch">
-        <span>{i18n.t('INSERT.DHAN_GURU_IN_GURMUKHI')}</span>
-        <div className="switch">
-          <input
-            id="dhan-guru-language"
-            name="dhan-guru-language"
-            type="checkbox"
-            checked={isMiscSlideGurmukhi}
-            onChange={toggleDhanGuruLanguage}
-          />
-          <label htmlFor="dhan-guru-language" />
-        </div>
-      </div>
+    <>
+      <header className="sync-header">
+        <h3>{i18n.t('INSERT.ADD_DHAN_GURU')}</h3>
+      </header>
       <div className="dhan-guru-pane">
         {gurus.map((guru, index) => (
           <div
@@ -172,14 +152,20 @@ export const DhanGuruPane = ({ className }) => {
             }}
           >
             <span className="dhan-guru-button-prefix">{getGuruIndex(index)}</span>
-            <span className="dhan-guru-button-text">{i18n.t(`INSERT.DHAN_GURU.${guru}`)}</span>
+            {isGurmukhi ? (
+              <span className="dhan-guru-button-text gurmukhi">
+                {insertSlide.slideStrings.dhanguruStrings[index].gurmukhi}
+              </span>
+            ) : (
+              <span className="dhan-guru-button-text">{i18n.t(`INSERT.DHAN_GURU.${guru}`)}</span>
+            )}
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 
-DhanGuruPane.propTypes = {
-  className: PropTypes.string,
+DhanGuru.propTypes = {
+  isGurmukhi: PropTypes.bool,
 };

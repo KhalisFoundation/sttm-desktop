@@ -14,9 +14,7 @@ export const MiscHeader = () => {
   const { setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
 
   const isHistory = currentMiscPanel === 'History';
-  const isAnnouncement = currentMiscPanel === 'Announcement';
   const isOther = currentMiscPanel === 'Others';
-  const isDhanGuru = currentMiscPanel === 'DhanGuru';
   const isFav = currentMiscPanel === 'Favorite';
 
   const setTab = (tabName) => {
@@ -30,9 +28,6 @@ export const MiscHeader = () => {
     });
   };
 
-  const getTurbanIcon = () =>
-    isDhanGuru ? 'assets/img/icons/turban-filled.png' : 'assets/img/icons/turban-outline.png';
-
   return (
     <div className="misc-header">
       <a
@@ -44,26 +39,6 @@ export const MiscHeader = () => {
             {i18n.t('TOOLBAR.HISTORY')}
           </span>
         </i>
-      </a>
-
-      <a
-        className={classNames('misc-button', isAnnouncement && 'misc-active')}
-        onClick={() => setTab('Announcement')}
-      >
-        <i className="fa fa-desktop">
-          <span className="Icon-label" key="Announcement">
-            Announcement
-          </span>
-        </i>
-      </a>
-      <a
-        className={classNames('misc-button', isDhanGuru && 'misc-active')}
-        onClick={() => setTab('DhanGuru')}
-      >
-        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
-        <span className="Icon-label" key="DhanGuru">
-          Gurus
-        </span>
       </a>
       <a
         className={classNames('misc-button', isFav && 'misc-active')}

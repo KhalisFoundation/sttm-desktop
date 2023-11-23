@@ -43,7 +43,7 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
   'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
@@ -407,9 +407,9 @@ button {
   align-items: center;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   padding-top: 10px;
-  top: 0;
   z-index: 1300;
 
   .toolbar-item {
@@ -418,7 +418,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     height: 36px;
-    margin-bottom: 5px;
+    margin-bottom: 16px;
     transition: 0.5s all ease;
     width: 36px;
 
@@ -435,8 +435,6 @@ button {
   #tool-auth-dialog {
     background-image: url('../../assets/img/icons/user.png');
     background-repeat: no-repeat;
-    bottom: 80px;
-    position: fixed;
 
     &.auth-logged-in {
       background-image: url('../../assets/img/icons/logout.png');  
@@ -459,8 +457,6 @@ button {
     background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 160px;
-    position: fixed;
 
     &:hover {
       box-shadow: none;
@@ -479,12 +475,22 @@ button {
     background-image: url('../../assets/img/icons/settings.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 10px;
-    position: fixed;
 
     &:hover {
       box-shadow: none;
     }
+  }
+
+  #tool-announcement {
+    background-image: url('../../assets/img/icons/megaphone.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  #tool-sync-button,
+  #tool-auth-dialog,
+  #tool-settings {
+    background-size: auto 80%;
   }
 }
 

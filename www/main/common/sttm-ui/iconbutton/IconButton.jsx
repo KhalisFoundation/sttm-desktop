@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const IconButton = ({ icon, onClick }) => (
-  <button className="icon-button" onClick={onClick}>
+const IconButton = ({ icon, onClick, className }) => (
+  <button className={`icon-button ${className}`} onClick={onClick}>
     <i className={icon} />
   </button>
 );
@@ -10,6 +10,7 @@ const IconButton = ({ icon, onClick }) => (
 IconButton.propTypes = {
   icon: PropTypes.string,
   onClick: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default IconButton;
