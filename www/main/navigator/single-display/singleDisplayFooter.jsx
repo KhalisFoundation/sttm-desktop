@@ -20,11 +20,6 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('shabad');
     }
   };
-  const openAnnouncementPane = () => {
-    if (singleDisplayActiveTab !== 'announcement') {
-      setSingleDisplayActiveTab('announcement');
-    }
-  };
   const openOtherPane = () => {
     if (singleDisplayActiveTab !== 'other') {
       setSingleDisplayActiveTab('other');
@@ -38,12 +33,6 @@ export const singleDisplayFooter = () => {
   const openFavoritePane = () => {
     if (singleDisplayActiveTab !== 'favorite') {
       setSingleDisplayActiveTab('favorite');
-    }
-  };
-
-  const openDhanGuruPane = () => {
-    if (singleDisplayActiveTab !== 'dhan-guru') {
-      setSingleDisplayActiveTab('dhan-guru');
     }
   };
 
@@ -66,18 +55,6 @@ export const singleDisplayFooter = () => {
         onClick={openShabadPane}
       >
         <i className="fa fa-dot-circle-o" />
-      </button>
-      <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'announcement' && 'active')}
-        onClick={openAnnouncementPane}
-      >
-        <i className="fa fa-desktop" />
-      </button>
-      <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'dhan-guru' && 'active')}
-        onClick={openDhanGuruPane}
-      >
-        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
       </button>
       <button
         className={classNames('tab-switch', singleDisplayActiveTab === 'favorite' && 'active')}

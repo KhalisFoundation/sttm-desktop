@@ -31,6 +31,7 @@
   .sync-content-wrapper,
   .zoom-content-wrapper,
   .settings-container,
+  .addon-overlay,
   .fav-results {
     background-color: $bg-alt;
     .sttm-loader {
@@ -343,7 +344,7 @@
     color: $text-base;
   }
 
-  .panktee.search-result span.gurmukhi span.highlight {
+  .panktee span.gurmukhi span.highlight {
     color: #fff;
   }
 

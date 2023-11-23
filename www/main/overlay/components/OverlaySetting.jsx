@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import LayoutSelector from './LayoutSelector';
 import { getDefaultSettings } from '../../common/store/user-settings/get-saved-overlay-settings';
 import { convertToCamelCase } from '../../common/utils';
+import { Switch } from '../../common/sttm-ui';
 
 const remote = require('@electron/remote');
 
@@ -107,6 +108,16 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
             }}
           ></span>
         </div>,
+      );
+      break;
+    case 'switch':
+      settingDOM.push(          
+        <Switch
+          controlId={`${title}-switch`}
+          className={`control-item-switch`}
+          value={baniOverlayState[stateVar]}
+          onToggle={handleToggleChange}
+        />        
       );
       break;
     case 'custom':

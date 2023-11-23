@@ -55,6 +55,7 @@
   .sync-content-wrapper,
   .zoom-content-wrapper,
   .settings-container,
+  .addon-overlay,
   .fav-results {
     background-color: $nav-bg;
     .sttm-loader {
@@ -264,9 +265,9 @@
     }
   }
 
-  .panktee.search-result .gurmukhi {
+  .panktee span.gurmukhi {
     color: $base-text;
-    .highlight {
+    span.highlight {
       color: $black;
     }
   }

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
+import { CSSTransition } from 'react-transition-group';
 
 import SlideTeeka from './SlideTeeka';
 import SlideGurbani from './SlideGurbani';
@@ -23,7 +24,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     vishraamType,
     displayNextLine,
   } = useStoreState((state) => state.userSettings);
+
   const { activeVerseId } = useStoreState((state) => state.navigator);
+  const [showVerse, setShowVerse] = useState(true);
+
   const activeVerseRef = useRef(null);
 
   const getLarivaarAssistClass = () => {
@@ -41,6 +45,11 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
 
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
+    setShowVerse(false);
+
+    const timeoutId = setTimeout(() => setShowVerse(true), 200);
+
+    return () => clearTimeout(timeoutId);
   }, [verseObj, isMiscSlide]);
 
   useEffect(() => {
@@ -63,7 +72,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
         }}
       >
         {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
-        {verseObj && !isMiscSlide && (
+        {verseObj && showVerse && !isMiscSlide && (
           <>
             {verseObj.Gurmukhi && (
               <h1
@@ -118,7 +127,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
           </>
         )}
       </div>
-    </>
+    </CSSTransition>
   );
 };
 

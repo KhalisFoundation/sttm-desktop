@@ -5,14 +5,8 @@ import ToolbarItem from './ToolbarItem';
 
 const Toolbar = () => {
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
-  const toolbarItems = [
-    'sunder-gutka',
-    'ceremonies',
-    'sync-button',
-    'lock-screen',
-    'auth-dialog',
-    'settings',
-  ];
+  const toolbarTop = ['sunder-gutka', 'ceremonies', 'announcement'];
+  const toolbarBottom = ['sync-button', 'lock-screen', 'auth-dialog', 'settings'];
 
   return (
     <div
@@ -21,9 +15,17 @@ const Toolbar = () => {
         minimizedBySingleDisplay ? 'single-display-hide-left' : 'single-display-show-left'
       }`}
     >
-      {toolbarItems.map((itemName, index) => (
-        <ToolbarItem key={index} itemName={itemName} />
-      ))}
+      <div className="toolbar-top">
+        {toolbarTop.map((itemName, index) => (
+          <ToolbarItem key={index} itemName={itemName} />
+        ))}
+      </div>
+
+      <div className="toolbar-bottom">
+        {toolbarBottom.map((itemName, index) => (
+          <ToolbarItem key={index} itemName={itemName} />
+        ))}
+      </div>
     </div>
   );
 };
