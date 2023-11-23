@@ -99,7 +99,7 @@ export const HistoryPane = ({ className }) => {
   });
 
   return (
-    <div>
+    <div className={className}>
       <div className="history-order">
         <div className="history-order-select">
           <label>Sort by: </label>

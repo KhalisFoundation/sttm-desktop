@@ -169,7 +169,7 @@ export const FavoritePane = ({ className }) => {
                   deleteFromFav(element);
                 }}
               >
-                <i className="fa-solid fa-trash"></i>
+                <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
           </div>
