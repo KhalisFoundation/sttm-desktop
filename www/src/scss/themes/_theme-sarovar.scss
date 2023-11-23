@@ -1,0 +1,23 @@
+$themeSarovar: (
+  type: 'light',
+  background-color: #fff,
+  background-image: 'none',
+  gurbani: #222f3e,
+  translation: #222f3e,
+  teeka: #222f3e,
+  transliteration: #222f3e,
+  visraam: #b33939,
+  yamki: #ffc500,
+);
+
+.theme-sarovar {
+  @include generateTheme($themeSarovar...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+
+    &:hover {
+      background: $transparent-blue;
+    }
+  }
+}

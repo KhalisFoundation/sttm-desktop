@@ -30,7 +30,9 @@
   .ceremony-pane,
   .sync-content-wrapper,
   .zoom-content-wrapper,
-  .settings-container {
+  .settings-container,
+  .addon-overlay,
+  .fav-results {
     background-color: $bg-alt;
     .sttm-loader {
       border-color: $bg-bright;
@@ -145,6 +147,10 @@
       }
     }
 
+    .select-bani option {
+      color: $text-base;
+    }
+
     .search-type {
       &-label {
         &::before {
@@ -215,6 +221,12 @@
   #toolbar,
   #toolbar-nav {
     background: $bg-alt;
+
+    #tool-sync-button,
+    #tool-auth-dialog,
+    #tool-settings {
+      filter: invert(1);
+    }
   }
 
   .pane,
@@ -332,7 +344,7 @@
     color: $text-base;
   }
 
-  .panktee.search-result span.gurmukhi span.highlight {
+  .panktee span.gurmukhi span.highlight {
     color: #fff;
   }
 
@@ -346,8 +358,26 @@
     }
   }
 
+  .history-order {
+    select {
+      background-color: $bg-main;
+      color: $text-base;
+    }
+  }
+
   .history-results {
     .history-item:hover {
+      background-color: $bg-bright;
+    }
+  }
+
+  .fav-results {
+    .fav-shabad-container {
+      button {
+        color: $text-base;
+      }
+    }
+    .fav-shabad-container:hover {
       background-color: $bg-bright;
     }
   }

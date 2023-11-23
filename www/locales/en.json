@@ -27,6 +27,7 @@
     "BG": "BG",
     "COPY_URL": "Copy URL",
     "LARIVAAR": "Larivaar",
+    "LARIVAAR_ASSIST":"Larivaar Assist",
     "LAYOUT": "Layout",
     "LOGO": "Logo",
     "OPACITY": "Opacity",
@@ -49,6 +50,19 @@
     "12HR": "12Hr",
     "24HR": "24Hr",
     "THEME_HEADING": "Themes"
+  },
+  "FAV_SHABAD": {
+    "LOGGED_OUT": "You need to login to view the favorite shabads",
+    "INTERNET_ERR": "Sorry, You seem to be offline. Favorite shabads only work when you are connected to the internet.",
+    "API_ERR": "Something went wrong while fetching your favorite shabads. Please try again later."
+  },
+  "AUTH": {
+    "LOGIN_LABEL": "Login",
+    "LOGOUT_LABEL": "Logout",
+    "LOGIN_DESC": "Click the following button to login. It will take you to an external page in a web browser.",
+    "LOGGED_IN_GREETING": "Welcome {{firstName}}",
+    "LOGGED_IN_DESC": "Logged in as {{email}}",
+    "INTERNET_ERR": "Sorry, You seem to be offline. You can login once you are connected to the internet."
   },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
@@ -327,7 +341,15 @@
       "SELF": "Fields to Display",
       "TRANSLATION": "Translation",
       "TRANSLITERATION": "Transliteration"
-    }
+    },
+    "TRANSLATION_SOURCE": "Translation Source",
+    "TEEKA_SOURCE": "Teeka Source",
+    "MANMOHAN_SINGH": "Manmohan Singh",
+    "BANI_DB": "BaniDB",
+    "SANT_SINGH": "Sant Singh",
+    "SAHIB_SINGH": "Sahib Singh",
+    "SANT_SINGH_KHALSA": "Sant Singh Khalsa",
+    "FAREEDKOT": "Fareedkot"
   },
   "SHORTCUT_TRAY": {
     "ANAND_SAHIB": "Anand Sahib (6 Pauris)",
@@ -348,6 +370,8 @@
     "HIGH_CONTRAST": "High Contrast",
     "KHALSA_GOLD": "Khalsa Gold",
     "KHALSA_RUSH": "Khalsa Rush",
+    "OCEAN": "Ocean",
+    "SAROVAR": "Sarovar",
     "LIGHT": "Light",
     "LOW_LIGHT": "Low Light",
     "MOODY_BLUE": "Moody Blue",
@@ -357,6 +381,7 @@
     "NEW_IMAGE": "New Image",
     "BACKGROUNDS": "Backgrounds",
     "COLORS": "Colors",
+    "VIDEOS": "Videos",
     "CURRENT_THEME": "Current Theme",
     "CUSTOM_BACKGROUNDS": "Custom Backgrounds",
     "SPECIAL_CONDITIONS": "Special Conditions",
@@ -389,6 +414,7 @@
     "ZOOM_HEADING": "Overlay",
     "NITNEM_BANIS": "Nitnem Banis",
     "OTHERS": "Others",
+    "FAVORITE": "Favorites",
     "POPULAR_BANIS": "Popular Banis",
     "SEARCH": "Search",
     "SETTINGS": "Settings",
@@ -438,8 +464,11 @@
     "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
   },
   "SHABAD_PANE": {
-    "SHOW_DISPLAY": "SHOW DISPLAY",
-    "HIDE_SCREEN": "HIDE SCREEN",
+    "SHOW_DISPLAY": "Show Display",
+    "HIDE_SCREEN": "Hide Display",
+    "MARK_FAV": "Add to favorites",
+    "UNMARK_FAV": "Remove from favorites",
+    "FAV_BTN_TOOLTIP": "Add or remove the current displayed Shabad to your list of favorites. Your favorites are available under the tabs in the bottom right hand panel.",
     "HIDE_BUTTON_TOOLTIP": "Hides the secondary screen when not needed. This will show the default desktop background on your secondary screen. Once hidden, you can unhide the STTM screen again by clicking the \"Show Display\" button which will appear here."
   }
 }

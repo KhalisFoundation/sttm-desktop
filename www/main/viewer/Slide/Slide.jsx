@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
+import { CSSTransition } from 'react-transition-group';
 
 import SlideTeeka from './SlideTeeka';
 import SlideGurbani from './SlideGurbani';
@@ -10,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   const {
     translationVisibility,
     transliterationVisibility,
@@ -23,31 +24,11 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     vishraamType,
     displayNextLine,
   } = useStoreState((state) => state.userSettings);
+
   const { activeVerseId } = useStoreState((state) => state.navigator);
-  const { slideOrder } = useStoreState((state) => state.viewerSettings);
+  const [showVerse, setShowVerse] = useState(true);
+
   const activeVerseRef = useRef(null);
-
-  const [translationOrder, setTranslationOrder] = useState();
-  const [teekaOrder, setTeekaOrder] = useState();
-  const [transliterationOrder, setTransliterationOrder] = useState();
-
-  const orderFunctions = {
-    translation: (item) => {
-      if (translationOrder !== item) {
-        setTranslationOrder(item);
-      }
-    },
-    transliteration: (item) => {
-      if (transliterationOrder !== item) {
-        setTransliterationOrder(item);
-      }
-    },
-    teeka: (item) => {
-      if (teekaOrder !== item) {
-        setTeekaOrder(item);
-      }
-    },
-  };
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -57,7 +38,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     }
     return '';
   };
-
   const getVishraamType = () =>
     vishraamType === 'colored-words' ? 'vishraam-colored' : 'vishraam-gradient';
 
@@ -65,6 +45,11 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
 
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
+    setShowVerse(false);
+
+    const timeoutId = setTimeout(() => setShowVerse(true), 200);
+
+    return () => clearTimeout(timeoutId);
   }, [verseObj, isMiscSlide]);
 
   useEffect(() => {
@@ -78,17 +63,16 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
     }, 100);
   }, [verseObj]);
 
-  useEffect(() => {
-    slideOrder.forEach((element, index) => {
-      orderFunctions[element](index + 2);
-    });
-  }, [slideOrder]);
-
   return (
-    <>
-      <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
+    <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
+      <div
+        className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}
+        style={{
+          background: bgColor,
+        }}
+      >
         {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
-        {verseObj && !isMiscSlide && (
+        {verseObj && showVerse && !isMiscSlide && (
           <>
             {verseObj.Gurmukhi && (
               <h1
@@ -114,31 +98,18 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
               <SlideTranslation
                 getFontSize={getFontSize}
                 translationObj={JSON.parse(verseObj.Translations)}
-                order={translationOrder}
               />
             )}
 
             {verseObj.English && (
-              <SlideTranslation
-                getFontSize={getFontSize}
-                translationHTML={verseObj.English}
-                order={translationOrder}
-              />
+              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
             )}
 
             {teekaVisibility && verseObj.Translations && (
-              <SlideTeeka
-                getFontSize={getFontSize}
-                teekaObj={JSON.parse(verseObj.Translations)}
-                order={teekaOrder}
-              />
+              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
             )}
             {transliterationVisibility && (
-              <SlideTransliteration
-                getFontSize={getFontSize}
-                gurmukhiString={verseObj.Gurmukhi}
-                order={transliterationOrder}
-              />
+              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
             )}
             {displayNextLine && nextLineObj && (
               <div
@@ -156,7 +127,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide }) => {
           </>
         )}
       </div>
-    </>
+    </CSSTransition>
   );
 };
 
@@ -164,6 +135,7 @@ Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
+  bgColor: PropTypes.string,
 };
 
 export default Slide;

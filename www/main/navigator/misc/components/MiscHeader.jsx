@@ -1,8 +1,11 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+
 import { classNames } from '../../../common/utils';
 
 const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 
@@ -11,9 +14,8 @@ export const MiscHeader = () => {
   const { setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
 
   const isHistory = currentMiscPanel === 'History';
-  const isAnnouncement = currentMiscPanel === 'Announcement';
   const isOther = currentMiscPanel === 'Others';
-  const isDhanGuru = currentMiscPanel === 'DhanGuru';
+  const isFav = currentMiscPanel === 'Favorite';
 
   const setTab = (tabName) => {
     if (tabName !== currentMiscPanel) {
@@ -26,9 +28,6 @@ export const MiscHeader = () => {
     });
   };
 
-  const getTurbanIcon = () =>
-    isDhanGuru ? 'assets/img/icons/turban-filled.png' : 'assets/img/icons/turban-outline.png';
-
   return (
     <div className="misc-header">
       <a
@@ -37,29 +36,19 @@ export const MiscHeader = () => {
       >
         <i className="fa fa-clock-o">
           <span className="Icon-label" key="History">
-            History
-          </span>
-        </i>
-      </a>
-
-      <a
-        className={classNames('misc-button', isAnnouncement && 'misc-active')}
-        onClick={() => setTab('Announcement')}
-      >
-        <i className="fa fa-desktop">
-          <span className="Icon-label" key="Announcement">
-            Announcement
+            {i18n.t('TOOLBAR.HISTORY')}
           </span>
         </i>
       </a>
       <a
-        className={classNames('misc-button', isDhanGuru && 'misc-active')}
-        onClick={() => setTab('DhanGuru')}
+        className={classNames('misc-button', isFav && 'misc-active')}
+        onClick={() => setTab('Favorite')}
       >
-        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
-        <span className="Icon-label" key="DhanGuru">
-          Gurus
-        </span>
+        <i className="fa fa-heart">
+          <span className="Icon-label" key="Favorite">
+            {i18n.t('TOOLBAR.FAVORITE')}
+          </span>
+        </i>
       </a>
       <a
         className={classNames('misc-button', isOther && 'misc-active')}
@@ -67,7 +56,7 @@ export const MiscHeader = () => {
       >
         <i className="fa fa-ellipsis-h">
           <span className="Icon-label" key="Others">
-            Others
+            {i18n.t('TOOLBAR.OTHERS')}
           </span>
         </i>
       </a>

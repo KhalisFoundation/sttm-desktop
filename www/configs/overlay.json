@@ -28,6 +28,18 @@
         "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
       },
 
+      "larivaar-title": {
+        "title": "LARIVAAR",
+        "type": "title",
+        "subcategories": ["larivaar-options"]
+      },
+      "larivaar-options": {
+        "title": "",
+        "type": "switch",
+        "settings": ["overlayLarivaar", "larivaarAssist"]
+      },
+     
+     
       "date-time": {
         "title": "DATE_AND_TIME",
         "toggle": true,
@@ -59,6 +71,15 @@
           "Prabhki": "Prabhki"
         },
         "initialValue": "Gurbani Akhar Thick"
+      },
+      "overlayLarivaar": {
+        "title": "LARIVAAR",
+        "tooltip": "Toggle Larivaar",
+        "initialValue": false
+      },
+      "larivaarAssist": {
+        "title":"LARIVAAR_ASSIST",
+        "initialValue": false
       },
       "gurbani-size": {
         "title": "",
@@ -144,7 +165,7 @@
       "addons": {
         "title": "",
         "type": "icon-toggle",
-        "settings": ["toggle-logo", "toggle-annoucement", "overlayLarivaar", "green-screen-toggle"]
+        "settings": ["toggle-logo", "toggle-annoucement", "green-screen-toggle"]
       },
       "center-icons": {
         "title": "",
@@ -172,14 +193,6 @@
       "reset": {
         "icon": "reset.svg",
         "tooltip": "Reset Defaults",
-        "initialValue": false
-      },
-      "overlayLarivaar": {
-        "icon": "link.png",
-        "tooltip": "Toggle Larivaar",
-        "initialValue": false
-      },
-      "larivaarAssist": {
         "initialValue": false
       },
       "layout": {

@@ -3,13 +3,11 @@ import PropTypes from 'prop-types';
 
 import OverlaySettingsContainer from './OverlaySettingsContainer';
 
-const OverlaySettings = ({ settingsObj }) => {
-  return (
-    <div className="overlay-settings-wrapper">
-      <OverlaySettingsContainer settingsObj={settingsObj} />
-    </div>
-  );
-};
+const OverlaySettings = ({ settingsObj }) => (
+  <div className="overlay-settings-wrapper">
+    <OverlaySettingsContainer settingsObj={settingsObj} />
+  </div>
+);
 
 OverlaySettings.propTypes = {
   settingsObj: PropTypes.object,

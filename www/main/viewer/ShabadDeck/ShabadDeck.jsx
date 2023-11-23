@@ -14,7 +14,7 @@ import ViewerIcon from '../icons/ViewerIcon';
 const os = require('os');
 
 const platform = os.platform();
-const themes = require('../../../../www/configs/themes.json');
+const themes = require('../../../configs/themes.json');
 
 function ShabadDeck() {
   const {
@@ -27,7 +27,7 @@ function ShabadDeck() {
     ceremonyId,
     isCeremonyBani,
     minimizedBySingleDisplay,
-  } = useStoreState(state => state.navigator);
+  } = useStoreState((state) => state.navigator);
   const {
     theme: currentTheme,
     akhandpatt,
@@ -36,7 +36,7 @@ function ShabadDeck() {
     displayNextLine,
     isSingleDisplayMode,
     themeBg,
-  } = useStoreState(state => state.userSettings);
+  } = useStoreState((state) => state.userSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
 
@@ -47,17 +47,13 @@ function ShabadDeck() {
     extralong: 'existsBuddhaDal',
   };
 
-  const getCurrentThemeInstance = () => {
-    return themes.find(theme => theme.key === currentTheme);
-  };
+  const getCurrentThemeInstance = () => themes.find((theme) => theme.key === currentTheme);
 
   const bakeThemeStyles = (themeInstance, themeObj) => {
     const backgroundImageObj =
       themeObj.type === 'default'
         ? {
-            backgroundImage: `url('assets/img/custom_backgrounds/${
-              themeInstance['background-image-full']
-            }')`,
+            backgroundImage: `url('assets/img/custom_backgrounds/${themeInstance['background-image-full']}')`,
           }
         : {
             backgroundImage: `url('${themeObj.url}')`,
@@ -75,28 +71,34 @@ function ShabadDeck() {
     return bakeThemeStyles(themeInstance, themeBg);
   };
 
-  const bakeEmptyVerse = () => {
-    return {
-      Gurmukhi: '',
-      Visraam: '',
-    };
+  const applyOverlay = () => {
+    const themeInstance = getCurrentThemeInstance();
+    if (themeBg.type === 'video') {
+      return themeInstance['background-color'];
+    }
+    return '';
   };
+
+  const bakeEmptyVerse = () => ({
+    Gurmukhi: '',
+    Visraam: '',
+  });
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
   useEffect(() => {
     if (activeVerseId) {
       if (akhandpatt) {
-        loadShabad(activeShabadId, activeVerseId).then(verses => setActiveVerse(verses));
+        loadShabad(activeShabadId, activeVerseId).then((verses) => setActiveVerse(verses));
       } else {
-        loadShabadVerse(activeShabadId, activeVerseId).then(result =>
-          result.map(activeRes => setActiveVerse([activeRes])),
+        loadShabadVerse(activeShabadId, activeVerseId).then((result) =>
+          result.map((activeRes) => setActiveVerse([activeRes])),
         );
         // load next line of searched shabad verse from db
         if (displayNextLine) {
-          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then(result => {
+          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then((result) => {
             if (result.length) {
-              result.map(activeRes => setNextVerse(activeRes));
+              result.map((activeRes) => setNextVerse(activeRes));
             } else {
               setNextVerse(bakeEmptyVerse());
             }
@@ -107,7 +109,7 @@ function ShabadDeck() {
     if (sundarGutkaBaniId && isSundarGutkaBani) {
       if (akhandpatt) {
         // mangalPosition was removed from 3rd argument of loadBani
-        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then(baniRows => {
+        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((baniRows) => {
           setActiveVerse([...baniRows]);
         });
       } else {
@@ -117,7 +119,7 @@ function ShabadDeck() {
           activeVerseId,
           baniLengthCols[baniLength],
           // mangalPosition,
-        ).then(rows => {
+        ).then((rows) => {
           if (rows.length > 1) {
             setActiveVerse([rows[0]]);
           } else if (rows.length === 1) {
@@ -132,7 +134,7 @@ function ShabadDeck() {
             baniLengthCols[baniLength],
             displayNextLine,
             // mangalPosition,
-          ).then(rows => {
+          ).then((rows) => {
             if (rows.length === 1) {
               setNextVerse(...rows);
             } else {
@@ -143,9 +145,10 @@ function ShabadDeck() {
       }
     }
     if (ceremonyId && isCeremonyBani) {
-      loadCeremony(ceremonyId).then(ceremonyVerses => {
+      loadCeremony(ceremonyId).then((ceremonyVersesArray) => {
+        let ceremonyVerses;
         try {
-          ceremonyVerses = ceremonyVerses.flat(1);
+          ceremonyVerses = ceremonyVersesArray.flat(1);
         } finally {
           const activeCeremonyVerse = ceremonyVerses.filter((ceremonyVerse) => {
             if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
@@ -154,9 +157,9 @@ function ShabadDeck() {
             return false;
           });
           // filters next line of ceremony verse
-          const nextCeremonyVerse = ceremonyVerses.filter((ceremonyVerse) => {
-            return ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1;
-          });
+          const nextCeremonyVerse = ceremonyVerses.filter(
+            (ceremonyVerse) => ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1,
+          );
           setNextVerse(...nextCeremonyVerse);
           if (akhandpatt) {
             setActiveVerse([...ceremonyVerses]);
@@ -170,14 +173,16 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (isMiscSlide) {
-      if (activeVerse !== []) {
+      if (activeVerse.length !== 0) {
         setActiveVerse([]);
       }
     }
   }, [isMiscSlide]);
-
   return (
     <>
+      {themeBg.type === 'video' && (
+        <video className="video_preview" src={themeBg.url} autoPlay muted loop />
+      )}
       <div
         className={classNames(
           'shabad-deck',
@@ -198,10 +203,11 @@ function ShabadDeck() {
               verseObj={activeVerseObj}
               nextLineObj={nextVerse}
               isMiscSlide={isMiscSlide}
+              bgColor={applyOverlay()}
             />
           ))
         ) : (
-          <Slide isMiscSlide={isMiscSlide} />
+          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
         )}
       </div>
       <ViewerIcon className="viewer-logo" />

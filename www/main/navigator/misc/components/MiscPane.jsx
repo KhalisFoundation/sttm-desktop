@@ -21,7 +21,7 @@ export const MiscPane = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahi
   );
 
   return (
-    <div className="misc-pane" ref={paneRef}>
+    <div className="pane-container misc-pane" ref={paneRef}>
       <DataLayer initialState={initialState} reducer={reducer}>
         <Pane header={MiscHeader} content={MiscContent} footer={footerComponent} />
       </DataLayer>

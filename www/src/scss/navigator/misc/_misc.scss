@@ -16,6 +16,7 @@ $misc-footer-active: 70px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
           Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         font-size: 16px;
+        font-weight: normal;
       }
     }
 
@@ -38,62 +39,6 @@ $misc-footer-active: 70px;
       padding: 10px;
     }
   }
-  .dhan-guru {
-    &-pane {
-      padding: 0 32px;
-      display: grid;
-      column-gap: 20px;
-      grid-auto-flow: column;
-      grid-template-rows: repeat(6, 1fr);
-      overflow: scroll;
-    }
-
-    &-language-switch {
-      @include flex($width: fit-content);
-      padding: 6px;
-      margin: 4px auto;
-
-      span {
-        padding-right: 6px;
-      }
-    }
-    &-button {
-      color: $white;
-      display: grid;
-      grid-template-columns: 1fr 6fr;
-      height: 40px;
-      margin-bottom: 16px;
-      width: 250px;
-
-      &:hover {
-        cursor: pointer;
-
-        .dhan-guru-button {
-          &-prefix {
-            background: url('../../assets/img/icons/play-button-filled.svg') no-repeat center center;
-            background-color: $cadmium-orange;
-            background-size: 26px;
-            color: transparent;
-          }
-
-          &-text {
-            background: $rust;
-          }
-        }
-      }
-
-      &-prefix {
-        @include flex($jc-value: center, $width: auto);
-        background: $cadmium-orange;
-      }
-
-      &-text {
-        @include flex($jc-value: start, $width: auto);
-        background: $darker-grey;
-        padding-left: 8px;
-      }
-    }
-  }
   .list-of-items {
     @include flex($fd-value: column, $jc-value: start);
     margin: 0;
@@ -114,86 +59,6 @@ $misc-footer-active: 70px;
         select {
           margin-left: 12px;
         }
-      }
-    }
-    .announcement {
-      &-box {
-        @include flex($fd-value: column);
-        gap: 22px;
-        padding: 22px 12px;
-
-        header {
-          color: $sonic-silver;
-          font-size: 0.8em;
-          font-weight: bold;
-          letter-spacing: 0.15em;
-          text-align: center;
-          text-transform: uppercase;
-          word-spacing: 0.15em;
-          width: 80%;
-
-          i {
-            padding-right: 6px;
-          }
-        }
-      }
-      &-switch {
-        @include flex($jc-value: start, $ai-value: center, $width: auto);
-        gap: 8px;
-
-        .switch {
-          height: 1.2em;
-          width: 2em;
-
-          label:after {
-            height: 1.2em;
-            width: 1.2em;
-          }
-
-          input:checked {
-            + label:after {
-              left: 0.8em;
-            }
-          }
-        }
-      }
-      &-text {
-        border-radius: 10px;
-        display: inline-block;
-        height: 150px;
-        min-height: 100px;
-        min-width: 300px;
-        outline: none;
-        padding: 10px;
-        width: inherit;
-      }
-      &-gurmukhi-keyboard-text {
-        height: 35px;
-        border-radius: 8px;
-      }
-      &-slide-btn {
-        align-self: center;
-        background: $lapis-lazuli;
-        border: 0;
-        border-radius: 0;
-        font-size: 0.9rem;
-        color: $white;
-        cursor: pointer;
-        display: block;
-        line-height: 1;
-        padding: 0.85em 1em;
-        text-align: center;
-        -webkit-font-smoothing: antialiased;
-        -webkit-appearance: none;
-      }
-      &-body {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        width: 450px;
-      }
-      &-actions {
-        @include flex($ai-value: center, $jc-value: space-between, $width: 100%);
       }
     }
   }
@@ -257,6 +122,197 @@ $misc-footer-active: 70px;
       .tray-item-icon {
         display: none;
       }
+    }
+  }
+}
+
+.fav-shabad-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0px 8px;
+  transition: 0.3s all ease;
+
+  .fav-shabad-text  {
+    cursor: pointer;
+    width: 65%;
+  }
+
+  .fav-shabad-options {
+    align-items: center;
+    color: $grey;
+    display: flex;
+    font-size: 12px;
+    font-style: italic;
+    > p,
+    > button {
+      margin: 0px 4px;
+    }
+
+    > button {
+      background-color: transparent;
+      border-radius: 50%;
+      font-size: 14px;
+      height: 24px;
+      margin-right: auto;
+      padding: 4px;
+      width: 24px;
+      transition:0.3s all;
+
+      &:hover {
+        color: $red;
+      }
+    }
+  }
+}
+
+.announcement {
+  &-box {
+    @include flex($fd-value: column);
+    gap: 22px;
+    padding: 22px 12px;
+
+    header {
+      color: $sonic-silver;
+      font-size: 0.8em;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      text-align: center;
+      text-transform: uppercase;
+      word-spacing: 0.15em;
+      width: 80%;
+
+      i {
+        padding-right: 6px;
+      }
+    }
+  }
+  &-switch {
+    @include flex($jc-value: start, $ai-value: center, $width: auto);
+    gap: 8px;
+
+    .switch {
+      height: 1.2em;
+      width: 2em;
+
+      label:after {
+        height: 1.2em;
+        width: 1.2em;
+      }
+
+      input:checked {
+        + label:after {
+          left: 0.8em;
+        }
+      }
+    }
+  }
+  &-text {
+    border-radius: 10px;
+    display: inline-block;
+    height: 150px;
+    min-height: 100px;
+    min-width: 300px;
+    outline: none;
+    padding: 10px;
+    width: inherit;
+  }
+  &-gurmukhi-keyboard-text {
+    height: 35px;
+    border-radius: 8px;
+  }
+  &-slide-btn {
+    align-self: center;
+    background: $lapis-lazuli;
+    border: 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: $white;
+    cursor: pointer;
+    display: block;
+    line-height: 1;
+    padding: 0.85em 1em;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -webkit-appearance: none;
+  }
+  &-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    width: 100%;
+
+    .gurmukhi-keyboard {
+      margin-top: -12px;
+    }
+
+    .textarea-container {
+      position: relative;
+
+      textarea {
+        width: 100%;
+      }
+    }
+  }
+  &-actions {
+    @include flex($ai-value: center, $jc-value: space-between, $width: 100%);
+  }
+}
+
+.dhan-guru {
+  &-pane {
+    padding: 0 32px;
+    display: grid;
+    column-gap: 20px;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(6, 1fr);
+  }
+
+  &-language-switch {
+    @include flex($width: fit-content);
+    padding: 6px;
+    margin: 4px auto;
+
+    span {
+      padding-right: 6px;
+    }
+  }
+  &-button {
+    color: $white;
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+    height: 40px;
+    margin-bottom: 16px;
+    width: 250px;
+
+    &:hover {
+      cursor: pointer;
+
+      .dhan-guru-button {
+        &-prefix {
+          background: url('../../assets/img/icons/play-button-filled.svg') no-repeat center center;
+          background-color: $cadmium-orange;
+          background-size: 26px;
+          color: transparent;
+        }
+
+        &-text {
+          background: $rust;
+        }
+      }
+    }
+
+    &-prefix {
+      @include flex($jc-value: center, $width: auto);
+      background: $cadmium-orange;
+    }
+
+    &-text {
+      @include flex($jc-value: start, $width: auto);
+      background: $darker-grey;
+      padding-left: 8px;
     }
   }
 }

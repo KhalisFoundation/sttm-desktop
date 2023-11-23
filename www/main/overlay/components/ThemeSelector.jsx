@@ -10,12 +10,12 @@ const themeObjects = require('../../../configs/overlay_presets.json');
 
 export const ThemeSelector = () => {
   const { setOverlayTheme, setTextColor, setBgColor, setGurbaniTextColor } = useStoreActions(
-    state => state.baniOverlay,
+    (state) => state.baniOverlay,
   );
   const { overlayTheme, gurbaniTextColor, textColor, bgColor } = useStoreState(
-    state => state.baniOverlay,
+    (state) => state.baniOverlay,
   );
-  const handleThemeChange = e => {
+  const handleThemeChange = (e) => {
     const clickedTheme = e.currentTarget.dataset.themeName;
     const clickedThemeObj = themeObjects[clickedTheme];
     if (clickedTheme !== overlayTheme) {
