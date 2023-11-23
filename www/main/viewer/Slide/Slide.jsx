@@ -64,7 +64,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   }, [verseObj]);
 
   return (
-    <>
+    <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
       <div
         className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}
         style={{
