@@ -6,6 +6,10 @@ $misc-footer-active: 70px;
 
 .misc-pane {
   @include pane-containers;
+  .pane-header {
+    display: block;
+  }
+
   .misc-header {
     display: inline-flex;
     width: 100%;
