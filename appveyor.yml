@@ -25,7 +25,7 @@ install:
   - appveyor DownloadFile https://github.com/KhalisFoundation/sttm-desktop/blob/master/assets/bonjoursdksetup.exe?raw=true
   - bonjoursdksetup.exe /quiet
   - del bonjoursdksetup.exe
-  - npm install -g npm@6.11.3
+  - npm install -g npm@9.8.1
   - set PATH=%APPDATA%\npm;%PATH%
   - npm ci
 matrix:
