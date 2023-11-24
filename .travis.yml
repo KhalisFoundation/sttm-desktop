@@ -10,7 +10,7 @@ branches:
 git:
   submodules: false
 language: node_js
-node_js: '18'
+node_js: '18.18.0'
 cache:
   directories:
     - $HOME/.electron
