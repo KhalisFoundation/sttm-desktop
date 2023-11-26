@@ -116,7 +116,7 @@
 
   .control-item {
     .custom-checkbox {
-      input[type='checkbox']:checked+label::before {
+      input[type='checkbox']+label::before {
         filter: invert(0.7);
       }
     }
