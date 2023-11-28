@@ -10,7 +10,9 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const MiscHeader = () => {
-  const { currentMiscPanel, historyOrder } = useStoreState((state) => state.navigator);
+  const { currentMiscPanel, historyOrder, verseHistory } = useStoreState(
+    (state) => state.navigator,
+  );
   const { setCurrentMiscPanel, setHistoryOrder } = useStoreActions((state) => state.navigator);
 
   const isHistory = currentMiscPanel === 'History';
@@ -63,7 +65,7 @@ export const MiscHeader = () => {
         </a>
       </div>
       <div className="misc-header-sort">
-        {isHistory && (
+        {isHistory && verseHistory.length > 1 && (
           <div className="history-order">
             <div className="history-order-select">
               <label>Sort by: </label>

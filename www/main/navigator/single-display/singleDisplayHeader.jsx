@@ -3,9 +3,8 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import ShabadHeader from '../shabad/ShabadHeader';
 
 export const singleDisplayHeader = () => {
-  const { singleDisplayActiveTab, minimizedBySingleDisplay, historyOrder } = useStoreState(
-    (state) => state.navigator,
-  );
+  const { singleDisplayActiveTab, minimizedBySingleDisplay, historyOrder, verseHistory } =
+    useStoreState((state) => state.navigator);
   const { setMinimizedBySingleDisplay, setHistoryOrder } = useStoreActions(
     (state) => state.navigator,
   );
@@ -60,7 +59,7 @@ export const singleDisplayHeader = () => {
   return (
     <div className="header-controller">
       <span>{getActiveTab(singleDisplayActiveTab)}</span>
-      {singleDisplayActiveTab === 'history' && (
+      {singleDisplayActiveTab === 'history' && verseHistory.length > 1 && (
         <div className="history-order">
           <div className="history-order-select">
             <label>Sort by: </label>
