@@ -22,15 +22,15 @@
       height: 30px;
       padding: 0px 0.9em;
       margin: unset;
-      background: $dark-grey;
+      background-color: $dull-blue;
       margin-right: 12px;
 
       i {
         padding-right: 8px;
       }
 
-      &.btn-danger {
-        background: $red;
+      &:hover {
+        box-shadow: none;
       }
     }
 
