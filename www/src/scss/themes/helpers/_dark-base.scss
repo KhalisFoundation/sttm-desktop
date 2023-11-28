@@ -147,8 +147,14 @@
       }
     }
 
-    .select-bani option {
-      color: $text-base;
+    .select-bani {
+      &-dd-group:hover {
+        background-color: $transparent-light-white;
+      }
+      
+      option {
+        color: $text-base;
+      }
     }
 
     .search-type {
@@ -408,5 +414,22 @@
 
   ::-webkit-scrollbar-thumb {
     background-color: $scrollbar;
+  }
+  
+  .verse-block {
+    .search-li,
+    .shabad-li {
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
+  }
+
+  .shabad-pane-header {
+    >i {
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
   }
 }

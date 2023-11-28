@@ -35,8 +35,11 @@
     }
 
     > i {
+      border-radius: 50%;
       font-size: 18px;
-      margin: 12px;
+      padding: 6px;
+      margin: 6px;
+      transition: 0.3s all ease;
     }
   }
 }

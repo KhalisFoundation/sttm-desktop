@@ -138,6 +138,7 @@
         margin-top: 3px;
         padding: 0 10px 0 5px;
         position: relative;
+        transition: 0.3s all ease;
 
         .filter-label {
            position: absolute;
@@ -147,7 +148,7 @@
         }
 
         &:hover {
-          border-radius: 3px;
+          border-radius: 8px;
         }
       }
 
