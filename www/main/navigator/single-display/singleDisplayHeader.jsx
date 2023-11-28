@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import ShabadHeader from '../shabad/ShabadHeader';
 
 export const singleDisplayHeader = () => {
   const { singleDisplayActiveTab, minimizedBySingleDisplay, historyOrder } = useStoreState(
@@ -75,6 +76,7 @@ export const singleDisplayHeader = () => {
           </div>
         </div>
       )}
+      {singleDisplayActiveTab === 'shabad' && <ShabadHeader />}
       <span onClick={toggleDisplayUI}>
         <i className={`fa fa-window-${minimizedBySingleDisplay ? 'maximize' : 'minimize'}`}></i>
       </span>

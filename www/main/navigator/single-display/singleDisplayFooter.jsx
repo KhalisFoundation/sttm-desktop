@@ -10,10 +10,6 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('search');
     }
   };
-  const getTurbanIcon = () =>
-    singleDisplayActiveTab === 'dhan-guru'
-      ? 'assets/img/icons/turban-filled-blue.png'
-      : 'assets/img/icons/turban-filled.png';
 
   const openShabadPane = () => {
     if (singleDisplayActiveTab !== 'shabad') {

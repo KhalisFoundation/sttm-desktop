@@ -145,6 +145,10 @@ ul {
 
     &-pane {
       min-width: 550px;
+
+      .shabad-pane-header {
+        margin-right: 24px;
+      }
     }
 
     &-minimize {
