@@ -534,6 +534,15 @@ app.on('ready', () => {
       nodeIntegrationInWorker: true,
     },
   });
+  const splash = new BrowserWindow({
+    width: 500,
+    height: 300,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+  });
+  splash.loadFile('splash.html');
+  splash.center();
   remote.enable(mainWindow.webContents);
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
@@ -545,6 +554,7 @@ app.on('ready', () => {
         }),
       );
     }
+    splash.close();
     mainWindow.show();
     // Platform-specific app stores have their own update mechanism
     // so only check if we're not in one

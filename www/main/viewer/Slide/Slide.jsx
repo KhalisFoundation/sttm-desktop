@@ -64,70 +64,73 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   }, [verseObj]);
 
   return (
-    <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
-      <div
-        className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}
-        style={{
-          background: bgColor,
-        }}
-      >
-        {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
-        {verseObj && showVerse && !isMiscSlide && (
-          <>
-            {verseObj.Gurmukhi && (
-              <h1
-                className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()} ${
-                  activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
-                }`}
-                ref={activeVerseRef}
-                style={{
-                  'font-weight': 'normal', // adding style here to reach chromecast
-                }}
-              >
-                <SlideGurbani
+    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+      <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
+        <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
+          {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
+          {verseObj && showVerse && !isMiscSlide && (
+            <>
+              {verseObj.Gurmukhi && (
+                <h1
+                  className={`slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()} ${
+                    activeVerseId === verseObj.ID ? 'active-viewer-verse' : ''
+                  }`}
+                  ref={activeVerseRef}
+                  style={{
+                    'font-weight': 'normal', // adding style here to reach chromecast
+                  }}
+                >
+                  <SlideGurbani
+                    getFontSize={getFontSize}
+                    gurmukhiString={verseObj.Gurmukhi}
+                    larivaar={larivaar}
+                    vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
+                    vishraamSource={vishraamSource}
+                  />
+                </h1>
+              )}
+
+              {translationVisibility && verseObj.Translations && (
+                <SlideTranslation
+                  getFontSize={getFontSize}
+                  translationObj={JSON.parse(verseObj.Translations)}
+                />
+              )}
+
+              {verseObj.English && (
+                <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
+              )}
+
+              {teekaVisibility && verseObj.Translations && (
+                <SlideTeeka
+                  getFontSize={getFontSize}
+                  teekaObj={JSON.parse(verseObj.Translations)}
+                />
+              )}
+              {transliterationVisibility && (
+                <SlideTransliteration
                   getFontSize={getFontSize}
                   gurmukhiString={verseObj.Gurmukhi}
-                  larivaar={larivaar}
-                  vishraamPlacement={verseObj.Visraam ? JSON.parse(verseObj.Visraam) : {}}
-                  vishraamSource={vishraamSource}
                 />
-              </h1>
-            )}
-
-            {translationVisibility && verseObj.Translations && (
-              <SlideTranslation
-                getFontSize={getFontSize}
-                translationObj={JSON.parse(verseObj.Translations)}
-              />
-            )}
-
-            {verseObj.English && (
-              <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
-            )}
-
-            {teekaVisibility && verseObj.Translations && (
-              <SlideTeeka getFontSize={getFontSize} teekaObj={JSON.parse(verseObj.Translations)} />
-            )}
-            {transliterationVisibility && (
-              <SlideTransliteration getFontSize={getFontSize} gurmukhiString={verseObj.Gurmukhi} />
-            )}
-            {displayNextLine && nextLineObj && (
-              <div
-                className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
-              >
-                <SlideGurbani
-                  getFontSize={getFontSize}
-                  gurmukhiString={nextLineObj.Gurmukhi}
-                  larivaar={larivaar}
-                  vishraamPlacement={nextLineObj.Visraam ? JSON.parse(nextLineObj.Visraam) : {}}
-                  vishraamSource={vishraamSource}
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </CSSTransition>
+              )}
+              {displayNextLine && nextLineObj && (
+                <div
+                  className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
+                >
+                  <SlideGurbani
+                    getFontSize={getFontSize}
+                    gurmukhiString={nextLineObj.Gurmukhi}
+                    larivaar={larivaar}
+                    vishraamPlacement={nextLineObj.Visraam ? JSON.parse(nextLineObj.Visraam) : {}}
+                    vishraamSource={vishraamSource}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </CSSTransition>
+    </div>
   );
 };
 

@@ -22,21 +22,24 @@
       height: 30px;
       padding: 0px 0.9em;
       margin: unset;
-      background: $dark-grey;
+      background-color: $dull-blue;
       margin-right: 12px;
 
       i {
         padding-right: 8px;
       }
 
-      &.btn-danger {
-        background: $red;
+      &:hover {
+        box-shadow: none;
       }
     }
 
     > i {
+      border-radius: 50%;
       font-size: 18px;
-      margin: 12px;
+      padding: 6px;
+      margin: 6px;
+      transition: 0.3s all ease;
     }
   }
 }

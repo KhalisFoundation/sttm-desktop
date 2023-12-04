@@ -132,6 +132,12 @@ ul {
             display: flex;
             justify-content: space-between;
             width: 100%;
+
+            .history-order {
+              flex-grow: 1;
+              text-align: right;
+              margin-right: 24px;
+            }
           }
         }
 
@@ -145,6 +151,10 @@ ul {
 
     &-pane {
       min-width: 550px;
+
+      .shabad-pane-header {
+        margin-right: 24px;
+      }
     }
 
     &-minimize {

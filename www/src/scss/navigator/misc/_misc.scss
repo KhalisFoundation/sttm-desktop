@@ -6,13 +6,16 @@ $misc-footer-active: 70px;
 
 .misc-pane {
   @include pane-containers;
-  .pane-header {
-    display: block;
-  }
 
   .misc-header {
     display: inline-flex;
+    justify-content: space-between;
+    min-height: $misc-header;
     width: 100%;
+
+    .misc-header-nav {
+      display: inline-flex;
+    }
     a {
       padding: 0 10px;
       span {

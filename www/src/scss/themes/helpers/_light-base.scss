@@ -151,9 +151,15 @@
         background-color: $statusbar-bg;
       }
     }
-    .select-bani option {
-      color: $base-text;
-    }
+    .select-bani {
+      &-dd-group:hover {
+        background-color: $transparent-light-black;
+      }
+
+      option {
+        color: $base-text;
+      }
+    } 
   }
 
   .viewer-pane {
@@ -320,6 +326,22 @@
 
       &.active {
         color: $active-focus;
+      }
+    }
+  }
+  .verse-block {
+    .search-li,
+    .shabad-li {
+      &:hover {
+        background-color: $transparent-light-black;
+      }
+    }
+  }
+  
+  .shabad-pane-header {
+    >i {
+      &:hover {
+        background-color: $transparent-light-black;
       }
     }
   }

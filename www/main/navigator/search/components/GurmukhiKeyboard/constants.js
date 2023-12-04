@@ -10,7 +10,7 @@ export const withMatra = [
   ['a', 'A', 'e', 's', 'h', 'k', 'K', 'g', 'G', '`'],
   ['c', 'C', 'j', 'J', 't', 'T', 'f', 'F', 'x', 'H'],
   ['q', 'Q', 'd', 'D', 'n', 'p', 'P', 'b', 'B', 'm'],
-  ['X', 'r', 'l', 'v', 'V', 'R', '^', 'space', 'meta'],
+  ['X', 'r', 'l', 'v', 'V', 'R', '^', 'N', 'space', 'meta'],
 ];
 
 export const defaultMatraValue = {
@@ -28,6 +28,7 @@ export const defaultMatraValue = {
   R: ' R',
   H: ' H',
   ' ': ' ',
+  N: 'PN',
 };
 
 export const matras = Object.keys(defaultMatraValue);

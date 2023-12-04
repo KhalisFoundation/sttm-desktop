@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import isOnline from 'is-online';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+import { shell } from 'electron';
 import { fetchFavShabad, removeFromFav } from '../utils';
 import banidb from '../../../banidb';
+import { SP_API } from '../../../common/constants/api-urls';
 
 const remote = require('@electron/remote');
 
@@ -143,7 +145,19 @@ export const FavoritePane = ({ className }) => {
 
   return (
     <div className={`fav-results ${className}`}>
-      <p className="error">{errorMessage}</p>
+      <div className="nologin">
+        <p className="error">{errorMessage}</p>
+        {!userToken && (
+          <button
+            className="button"
+            onClick={() => {
+              shell.openExternal(`${SP_API}/login/sso`);
+            }}
+          >
+            Login
+          </button>
+        )}
+      </div>
       {isFetching && <div className="sttm-loader" />}
       {parsedFav.map((element, index) => {
         const { shabadId, verseId, date, time, verse, id } = element;
