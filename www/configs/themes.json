@@ -160,16 +160,5 @@
     "type": ["VIDEO"],
     "background-video": "assets/videos/ocean-view.mp4",
     "key": "ocean"
-  },
-  {
-    "name": "SAROVAR",
-    "background-color":  "linear-gradient(45deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4))",
-    "gurbani-color": "#222f3e",
-    "translation-color": "#222f3e",
-    "transliteration-color": "#222f3e",
-    "teeka-color": "#222f3e",
-    "type": ["VIDEO"],
-    "background-video": "assets/videos/sarovar.mp4",
-    "key": "sarovar"
   }
 ]
