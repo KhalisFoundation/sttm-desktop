@@ -149,5 +149,16 @@
     "teeka-color": "#b1b1b1",
     "type": "SPECIAL",
     "key": "low-light"
+  },
+  {
+    "name": "OCEAN",
+    "background-color": "linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4))",
+    "gurbani-color": "#000000",
+    "translation-color": "#353535",
+    "transliteration-color": "#353535",
+    "teeka-color": "#4b4b4b",
+    "type": ["VIDEO"],
+    "background-video": "assets/videos/ocean-view.mp4",
+    "key": "ocean"
   }
 ]

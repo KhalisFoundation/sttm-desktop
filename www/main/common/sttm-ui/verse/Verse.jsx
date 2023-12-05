@@ -1,7 +1,5 @@
 import React from 'react';
 
-const Verse = () => {
-  return <>verse</>;
-};
+const Verse = () => <>verse</>;
 
 export default Verse;

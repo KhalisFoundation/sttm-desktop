@@ -46,7 +46,13 @@
       }
     }
   }
-
+  .larivaar-assist-single-color {
+    .larivaar {
+      span:nth-of-type(odd) {
+        position: sticky;
+      }
+    }
+  }
   .larivaar-assist-multi-color {
     .larivaar {
       span:nth-of-type(even) {

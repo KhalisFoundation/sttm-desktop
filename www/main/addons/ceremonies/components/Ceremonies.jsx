@@ -11,8 +11,8 @@ const Ceremonies = ({ onScreenClose }) => {
 
   const visibleCeremonies =
     ceremonies.length > 0
-      ? ceremoniesFilter.visible.map(cId => {
-          const ceremony = ceremonies.find(c => c.id === cId);
+      ? ceremoniesFilter.visible.map((cId) => {
+          const ceremony = ceremonies.find((c) => c.id === cId);
           return ceremony;
         })
       : [];
@@ -24,7 +24,7 @@ const Ceremonies = ({ onScreenClose }) => {
         <div className="ceremonies-list ui-ceremonies">
           {isLoadingCeremonies && <div className="sttm-loader" />}
           {!isLoadingCeremonies &&
-            visibleCeremonies.map(c => (
+            visibleCeremonies.map((c) => (
               <CeremonyPane key={c.token} {...c} onScreenClose={onScreenClose} />
             ))}
         </div>

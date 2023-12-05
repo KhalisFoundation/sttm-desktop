@@ -11,11 +11,12 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
-  const { currentMiscPanel } = useStoreState((state) => state.navigator);
-  const { setVerseHistory, setCurrentMiscPanel } = useStoreActions((state) => state.navigator);
-  const drawerRef = useRef(null);
+  const { overlayScreen } = useStoreState((state) => state.app);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
+  const { setVerseHistory } = useStoreActions((actions) => actions.navigator);
   const { shortcutTray } = useStoreState((state) => state.userSettings);
   const { setShortcutTray } = useStoreActions((state) => state.userSettings);
+  const drawerRef = useRef(null);
 
   // Event Handlers
   const clearHistory = () => {
@@ -23,8 +24,8 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
   };
 
   const setTab = (tabName) => {
-    if (tabName !== currentMiscPanel) {
-      setCurrentMiscPanel(tabName);
+    if (tabName !== overlayScreen) {
+      setOverlayScreen(tabName);
     }
     analytics.trackEvent({
       category: 'Misc',
@@ -107,7 +108,7 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
             accept="image/png, image/jpeg"
           />
         </label>
-        <button className="tray-item-icon" onClick={() => setTab('Announcement')}>
+        <button className="tray-item-icon" onClick={() => setTab('announcement')}>
           {i18n.t(`SHORTCUT_TRAY.ANNOUNCEMENT`)}
         </button>
       </div>

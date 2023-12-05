@@ -8,7 +8,7 @@
     outline: 0;
   }
   .shabad-list {
-    height: calc(100% - 40px);
+    height: 100%;
   }
 
   .fa-check {
@@ -18,23 +18,41 @@
   &-header {
     @include flex($ai-value: center, $jc-value: flex-end);
 
-    :nth-child(n) {
-      margin-left: 10px;
-    }
-
     .toggle-viewer-btn {
       height: 30px;
-      padding: 0 0.9em;
+      padding: 0px 0.9em;
       margin: unset;
-      background: $dark-grey;
+      background-color: $dull-blue;
+      margin-right: 12px;
 
-      &.btn-danger {
-        background: $bright-red;
+      i {
+        padding-right: 8px;
+      }
+
+      &:hover {
+        box-shadow: none;
       }
     }
 
-    i {
-      font-size: 16px;
+    > i {
+      border-radius: 50%;
+      font-size: 18px;
+      padding: 6px;
+      margin: 6px;
+      transition: 0.3s all ease;
     }
+  }
+}
+
+.fav-btn {
+  background: transparent;
+  color: $princeton-orange;
+  height: 30px;
+  line-height: 1;
+  margin-right: auto;
+  padding: 0px 10px 0px 0px;
+
+  i {
+    padding-right: 8px;
   }
 }

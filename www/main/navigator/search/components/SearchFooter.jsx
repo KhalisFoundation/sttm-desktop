@@ -2,7 +2,7 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
 const SearchFooter = () => {
-  const { searchShabadsCount } = useStoreState(state => state.navigator);
+  const { searchShabadsCount } = useStoreState((state) => state.navigator);
 
   return (
     <div className="search-footer">

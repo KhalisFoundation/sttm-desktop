@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getKeyboardKeyValue, getMatraAkhar } from './utils';
 import { Arrow, Spacebar } from './icons';
 import { defaultMatraValue, matras, withMatra, withoutMatra } from './constants';
+
 const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
@@ -47,51 +48,49 @@ export const GurmukhiKeyboard = ({ query, searchType, setQuery }) => {
 
   return (
     <div className="gurmukhi-keyboard gurmukhi">
-      {keyboardGrid.map((rows, index) => {
-        return (
-          <div className="page" key={index} id={`gurmukhi-keyboard-page-${index + 1}`}>
-            {rows.map((chars, rowIndex) => (
-              <div key={`${index}-${rowIndex}`} className="keyboard-row">
-                <div className="keyboard-row-set">
-                  {chars.map((keyboardKey, i) => {
-                    if (keyboardKey === 'meta') {
-                      return (
-                        <button key={keyboardKey} onClick={() => handleClick('meta')}>
-                          <Arrow />
-                        </button>
-                      );
-                    }
-
-                    if (keyboardKey === 'space') {
-                      return (
-                        <button key={keyboardKey} onClick={() => handleClick('space')}>
-                          <Spacebar />‎
-                        </button>
-                      );
-                    }
-
-                    const isCurrentKeyDefaultMatraKey = defaultMatraKeys.includes(keyboardKey);
-
+      {keyboardGrid.map((rows, index) => (
+        <div className="page" key={index} id={`gurmukhi-keyboard-page-${index + 1}`}>
+          {rows.map((chars, rowIndex) => (
+            <div key={`${index}-${rowIndex}`} className="keyboard-row">
+              <div className="keyboard-row-set">
+                {chars.map((keyboardKey, i) => {
+                  if (keyboardKey === 'meta') {
                     return (
-                      <button
-                        type="button"
-                        key={i}
-                        data-value={getKeyboardKeyValue(keyboardKey, query)}
-                        className={isCurrentKeyDefaultMatraKey ? 'matra-button' : ''}
-                        onClick={() => handleClick(getKeyboardKeyValue(keyboardKey, query))}
-                      >
-                        {isCurrentKeyDefaultMatraKey
-                          ? getMatraAkhar(keyboardKey, query)
-                          : keyboardKey}
+                      <button key={keyboardKey} onClick={() => handleClick('meta')}>
+                        <Arrow />
                       </button>
                     );
-                  })}
-                </div>
+                  }
+
+                  if (keyboardKey === 'space') {
+                    return (
+                      <button key={keyboardKey} onClick={() => handleClick('space')}>
+                        <Spacebar />‎
+                      </button>
+                    );
+                  }
+
+                  const isCurrentKeyDefaultMatraKey = defaultMatraKeys.includes(keyboardKey);
+
+                  return (
+                    <button
+                      type="button"
+                      key={i}
+                      data-value={getKeyboardKeyValue(keyboardKey, query)}
+                      className={isCurrentKeyDefaultMatraKey ? 'matra-button' : ''}
+                      onClick={() => handleClick(getKeyboardKeyValue(keyboardKey, query))}
+                    >
+                      {isCurrentKeyDefaultMatraKey
+                        ? getMatraAkhar(keyboardKey, query)
+                        : keyboardKey}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-        );
-      })}
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 };

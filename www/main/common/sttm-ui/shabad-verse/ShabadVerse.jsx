@@ -12,8 +12,8 @@ const ShabadVerse = ({
   englishVerse,
   verseId,
 }) => {
-  const loadActiveClass = (verseObj, currentVerseId, verseIndex) => {
-    return Object.keys(verseObj).map(verseKey => {
+  const loadActiveClass = (verseObj, currentVerseId, verseIndex) =>
+    Object.keys(verseObj).map((verseKey) => {
       if (Number(verseKey) === verseIndex && verseObj[verseKey] === currentVerseId) {
         return 1;
       }
@@ -21,7 +21,6 @@ const ShabadVerse = ({
     })[0]
       ? 'shabad-pane-active'
       : '';
-  };
 
   return (
     <li
@@ -33,10 +32,6 @@ const ShabadVerse = ({
         {versesRead.map(
           (isRead, index) => isRead === verseId && <i key={index} className="fa fa-fw fa-check" />,
         )}
-        <i
-          onClick={() => changeHomeVerse(lineNumber)}
-          className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
-        />
       </span>
       {verse ? (
         <span
@@ -57,6 +52,10 @@ const ShabadVerse = ({
           {englishVerse && englishVerse.split('<h1>')[1].split('</h1>')[0]}
         </span>
       )}
+      <i
+        onClick={() => changeHomeVerse(lineNumber)}
+        className={`fa ${isHomeVerse !== lineNumber ? `fa-home hoverIcon` : `fa-fw fa-home`}`}
+      />
     </li>
   );
 };

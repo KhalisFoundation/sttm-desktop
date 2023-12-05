@@ -5,21 +5,22 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { DEFAULT_OVERLAY } from '../../common/constants';
 
 const ToolbarItem = ({ itemName }) => {
-  const { overlayScreen } = useStoreState(state => state.app);
-  const { setOverlayScreen } = useStoreActions(actions => actions.app);
+  const { overlayScreen, userToken } = useStoreState((state) => state.app);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
   const isSelectedOverlay = overlayScreen === itemName;
+  const isAuthItem = itemName === 'auth-dialog';
 
   return (
     <div
       id={`tool-${itemName}`}
-      className="toolbar-item"
+      className={`toolbar-item ${isAuthItem && userToken ? 'auth-logged-in' : ''}`}
       onClick={() => {
         document.body.classList.toggle(`overlay-${itemName}-active`, !isSelectedOverlay);
         if (isSelectedOverlay) {
           return setOverlayScreen(DEFAULT_OVERLAY);
         }
 
-        setOverlayScreen(itemName);
+        return setOverlayScreen(itemName);
       }}
     ></div>
   );

@@ -3,7 +3,7 @@
 .settings-wrapper {
   display: flex;
   height: 95vh;
-  left: 100px;
+  left: 60px;
   margin-top: 24px;
   overflow: auto;
   position: relative;
@@ -11,20 +11,60 @@
   width: 82vw;
 
   .other-settings {
-    margin-left: 48px;
+    margin-left: 18px;
   }
+  .video-thumbnail-settings {
+    position: relative;
 
+    video {
+      display: block; /* Remove extra space below video */
+      width: 100%; /* Responsive video size */
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none; 
+    } 
+  }
+  .video-theme-instance {
+    padding: 0; 
+    width: 200px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      margin-bottom: 14px;
+      margin-top: 6px;
+    }
+    video, .overlay {
+      border-radius: 5px;
+    }
+  }
   .settings-viewer {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    height: 300px;
+    height: 280px;
     justify-content: space-between;
     margin-bottom: 20px;
-    overflow: auto;
-    padding: 12px;
+    overflow: hidden;
     width: 500px;
-
+    position: relative;
+    .video_preview {
+      position: absolute;
+      width: 100%;
+      overflow:hidden;
+    }
     .slide-transliteration,
     .slide-translation,
     .slide-teeka {
@@ -375,4 +415,8 @@
       content: '\f06e';
     }
   }
+}
+.video_preview {
+  position: absolute;
+  width: 100%;
 }

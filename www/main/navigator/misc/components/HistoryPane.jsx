@@ -14,6 +14,7 @@ export const HistoryPane = ({ className }) => {
     sundarGutkaBaniId,
     homeVerse,
     activeVerseId,
+    historyOrder,
     singleDisplayActiveTab,
   } = useStoreState((state) => state.navigator);
   const {
@@ -97,7 +98,13 @@ export const HistoryPane = ({ className }) => {
     );
   });
 
-  return <div className={`history-results ${className}`}>{versesMarkup}</div>;
+  return (
+    <div className={className}>
+      <div className={`history-results ${className}`}>
+        {historyOrder === 'newest' ? versesMarkup : versesMarkup.slice().reverse()}
+      </div>
+    </div>
+  );
 };
 
 HistoryPane.propTypes = {

@@ -17,37 +17,40 @@ const navigatorSettings = require('../../../configs/navigator-settings.json');
 
 global.platform = require('../../desktop_scripts');
 
-global.platform = require('../../desktop_scripts');
-
 const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
-    setOverlayScreen: action((state, payload) => ({
-      ...state,
-      overlayScreen: payload,
-    })),
-    setListeners: action((state, listenersState) => ({
-      ...state,
-      isListeners: listenersState,
-    })),
+    userToken: '',
+    setOverlayScreen: action((state, payload) => {
+      state.overlayScreen = payload;
+      return state;
+    }),
+    setListeners: action((state, listenersState) => {
+      state.isListeners = listenersState;
+      return state;
+    }),
+    setUserToken: action((state, payload) => {
+      state.userToken = payload;
+      return state;
+    }),
   },
   baniController: {
     adminPin: null,
     code: null,
     isConnected: false,
-    setAdminPin: action((state, adminPin) => ({
-      ...state,
-      adminPin,
-    })),
-    setCode: action((state, code) => ({
-      ...state,
-      code,
-    })),
-    setConnection: action((state, connectionState) => ({
-      ...state,
-      isConnected: connectionState,
-    })),
+    setAdminPin: action((state, adminPin) => {
+      state.adminPin = adminPin;
+      return state;
+    }),
+    setCode: action((state, code) => {
+      state.code = code;
+      return state;
+    }),
+    setConnection: action((state, connectionState) => {
+      state.isConnected = connectionState;
+      return state;
+    }),
   },
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
@@ -100,6 +103,13 @@ global.platform.ipc.on('update-global-setting', (event, setting) => {
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
   global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
+});
+
+global.platform.ipc.on('userToken', (event, data) => {
+  const currentToken = GlobalState.getState().app.userToken;
+  if (data !== currentToken) {
+    GlobalState.getActions().app.setUserToken(data);
+  }
 });
 
 export default GlobalState;

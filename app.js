@@ -11,6 +11,7 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
+const keytar = require('keytar');
 
 remote.initialize();
 
@@ -80,6 +81,16 @@ let mainWindow;
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
+
+app.setAsDefaultProtocolClient('sttm-desktop');
+
+if (process.argv.length >= 2) {
+  app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
+}
+
+keytar.getPassword('sttm-desktop', 'userToken').then((data) => {
+  mainWindow.webContents.send('userToken', data);
+});
 
 const secondaryWindows = {
   changelogWindow: {
@@ -449,19 +460,43 @@ if (overlayCast) {
   searchPorts();
 }
 
+const handleDeeplink = async (url) => {
+  const urlObject = url.replace('sttm-desktop://', '').split('?');
+  if (urlObject[0].includes('login')) {
+    const loginData = new URLSearchParams(`?${urlObject[1]}`);
+    const token = loginData.get('token');
+    if (token) {
+      try {
+        await keytar.setPassword('sttm-desktop', 'userToken', token);
+        mainWindow.webContents.send('userToken', token);
+      } catch {
+        // eslint-disable-next-line no-console
+        console.error('Error saving token');
+      }
+    }
+  }
+};
+
 if (!singleInstanceLock) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
-    // Someone tried to run a second instance, we should focus our window.
+  app.on('second-instance', (event, commandLine) => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) {
         mainWindow.restore();
       }
       mainWindow.focus();
     }
+    const deepLinkUrl = commandLine.find((arg) => arg.startsWith('sttm-desktop://'));
+    if (deepLinkUrl) {
+      handleDeeplink(deepLinkUrl);
+    }
   });
 }
+
+app.on('open-url', (event, url) => {
+  handleDeeplink(url);
+});
 
 app.on('ready', () => {
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
@@ -499,6 +534,15 @@ app.on('ready', () => {
       nodeIntegrationInWorker: true,
     },
   });
+  const splash = new BrowserWindow({
+    width: 500,
+    height: 300,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+  });
+  splash.loadFile('splash.html');
+  splash.center();
   remote.enable(mainWindow.webContents);
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
@@ -510,6 +554,7 @@ app.on('ready', () => {
         }),
       );
     }
+    splash.close();
     mainWindow.show();
     // Platform-specific app stores have their own update mechanism
     // so only check if we're not in one

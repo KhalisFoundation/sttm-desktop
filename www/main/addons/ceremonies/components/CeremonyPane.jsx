@@ -10,6 +10,7 @@ import { applyTheme } from '../../../settings/utils';
 // import { loadCeremony } from '../../../navigator/utils';
 
 const remote = require('@electron/remote');
+
 const { store, i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { getTheme } = require('../../../theme_editor');

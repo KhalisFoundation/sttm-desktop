@@ -117,6 +117,10 @@
       color: $mild-dark;
     }
 
+    .filters-label {
+      margin-right: 5px;
+    }
+
     .filters {
       align-items: center;
       color: $mild-dark;
@@ -127,6 +131,25 @@
 
       @include breakpoint(xxlarge) {
         justify-content: flex-end;
+      }
+
+      .select-bani-dd-group {
+        cursor: pointer;
+        margin-top: 3px;
+        padding: 0 10px 0 5px;
+        position: relative;
+        transition: 0.3s all ease;
+
+        .filter-label {
+           position: absolute;
+           top: 10px;
+           right: 40px;
+           z-index: 1;
+        }
+
+        &:hover {
+          border-radius: 8px;
+        }
       }
 
       .select-bani {
@@ -140,7 +163,7 @@
         background-size: 15px 10px;
         border: none;
         border-radius: 0;
-        color: #0a0a0a;
+        color: transparent;
         cursor: pointer;
         font-family: inherit;
         font-size: 1rem;
@@ -148,7 +171,13 @@
         margin: 0;
         padding: 0.5rem;
         padding-right: 1.5rem;
-        width: 0;
+        position: relative;
+        width: 80px;
+        z-index: 2;
+
+        &#dropdown-Raag {
+          width: 64px;
+        }
 
         &:disabled {
           background-color: #eee;

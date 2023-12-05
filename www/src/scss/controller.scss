@@ -94,9 +94,7 @@ ul {
   flex-direction: row;
   height: 100%;
   overflow-x: auto;
-  padding: 30px;
-  padding-left: 75px;
-  padding-top: 10px;
+  padding: 10px 10px 40px 50px;
   width: 100%;
 
   &.single-display {
@@ -134,6 +132,12 @@ ul {
             display: flex;
             justify-content: space-between;
             width: 100%;
+
+            .history-order {
+              flex-grow: 1;
+              text-align: right;
+              margin-right: 24px;
+            }
           }
         }
 
@@ -147,6 +151,10 @@ ul {
 
     &-pane {
       min-width: 550px;
+
+      .shabad-pane-header {
+        margin-right: 24px;
+      }
     }
 
     &-minimize {
@@ -248,7 +256,7 @@ ul {
     align-items: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     position: relative;
     width: 50vw;
   }

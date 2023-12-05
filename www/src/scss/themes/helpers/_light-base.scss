@@ -54,7 +54,9 @@
   .ceremony-pane,
   .sync-content-wrapper,
   .zoom-content-wrapper,
-  .settings-container {
+  .settings-container,
+  .addon-overlay,
+  .fav-results {
     background-color: $nav-bg;
     .sttm-loader {
       border-color: $alt-bg;
@@ -149,6 +151,15 @@
         background-color: $statusbar-bg;
       }
     }
+    .select-bani {
+      &-dd-group:hover {
+        background-color: $transparent-light-black;
+      }
+
+      option {
+        color: $base-text;
+      }
+    } 
   }
 
   .viewer-pane {
@@ -260,9 +271,9 @@
     }
   }
 
-  .panktee.search-result .gurmukhi {
+  .panktee span.gurmukhi {
     color: $base-text;
-    .highlight {
+    span.highlight {
       color: $black;
     }
   }
@@ -279,8 +290,25 @@
     }
   }
 
+  .history-order {
+    select {
+      color: $base-text;
+    }
+  }
+
   .history-results {
     .history-item:hover {
+      background-color: $statusbar-bg;
+    }
+  }
+
+  .fav-results {
+    .fav-shabad-container {
+      button {
+        color: $base-text;
+      }
+    }
+    .fav-shabad-container:hover {
       background-color: $statusbar-bg;
     }
   }
@@ -298,6 +326,22 @@
 
       &.active {
         color: $active-focus;
+      }
+    }
+  }
+  .verse-block {
+    .search-li,
+    .shabad-li {
+      &:hover {
+        background-color: $transparent-light-black;
+      }
+    }
+  }
+  
+  .shabad-pane-header {
+    >i {
+      &:hover {
+        background-color: $transparent-light-black;
       }
     }
   }

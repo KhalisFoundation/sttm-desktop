@@ -2,7 +2,7 @@ $presenter-pane-gap: 25px;
 $title-bar-offset: 10px;
 $ws-offset: 40px;
 $keyboard-height: 128px;
-$toolbar-offset: 75px;
+$toolbar-offset: 48px;
 $toolbar-small-offset: 50px;
 $toolbar-width-offset: $toolbar-offset/2;
 $bani-list-width: 300px;
@@ -43,7 +43,7 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'akhandpaatt',
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
   'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
@@ -112,6 +112,18 @@ button {
   border-radius: 50%;
   height: 60px;
   width: 60px;
+
+  .fav-results > & {
+    margin: auto;
+  }
+}
+
+.fav-results .error {
+  margin: 14px;
+}
+
+.nologin {
+  text-align: center;
 }
 
 @keyframes spin {
@@ -129,7 +141,7 @@ button {
   display: flex;
   height: 100vh;
   justify-content: flex-start;
-  left: 100px;
+  left: 60px;
   position: fixed;
   top: 0;
   width: calc(100% - 100px);
@@ -139,10 +151,10 @@ button {
   flex-direction: column;
 }
 
-.sync-wrapper {
+.sync-wrapper, .auth-wrapper {
   bottom: 0;
   height: 100vh;
-  left: 100px;
+  left: 60px;
   max-height: 750px;
   max-width: 850px;
   overflow: auto;
@@ -399,20 +411,20 @@ button {
   align-items: center;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   padding-top: 10px;
-  top: 0;
   z-index: 1300;
 
   .toolbar-item {
     background-position: center center;
-    background-size: cover;
+    background-size: contain;
     border-radius: 5px;
     cursor: pointer;
-    height: 40px;
-    margin-bottom: 5px;
+    height: 36px;
+    margin-bottom: 12px;
     transition: 0.5s all ease;
-    width: 40px;
+    width: 36px;
 
     &:hover {
       box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
@@ -421,6 +433,19 @@ button {
 
     &:active {
       transform: translateY(1px);
+    }
+  }
+
+  #tool-auth-dialog {
+    background-image: url('../../assets/img/icons/user.png');
+    background-repeat: no-repeat;
+
+    &.auth-logged-in {
+      background-image: url('../../assets/img/icons/logout.png');  
+    }
+
+    &:hover {
+      box-shadow: none;
     }
   }
 
@@ -436,8 +461,10 @@ button {
     background-image: url('../../assets/img/icons/liveicon.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 80px;
-    position: fixed;
+
+    &:hover {
+      box-shadow: none;
+    }
   }
 
   #tool-ceremonies {
@@ -452,8 +479,22 @@ button {
     background-image: url('../../assets/img/icons/settings.png');
     background-position: center center;
     background-repeat: no-repeat;
-    bottom: 10px;
-    position: fixed;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
+
+  #tool-announcement {
+    background-image: url('../../assets/img/icons/megaphone.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  #tool-sync-button,
+  #tool-auth-dialog,
+  #tool-settings {
+    background-size: auto 80%;
   }
 }
 
@@ -722,6 +763,19 @@ button {
   }
 }
 
+.auth-wrapper {
+  bottom: 40px;
+  height: initial;
+
+  .auth-content {
+    align-items: flex-start;
+
+    button i {
+      margin-right: 8px;
+    }
+  }
+}
+
 .button-wrap {
   padding: 10px;
 }
@@ -734,8 +788,8 @@ button {
   width: $toolbar-offset;
 
   .toolbar-item {
-    height: 60px;
-    width: 60px;
+    height: 36px;
+    width: 36px;
   }
 
   .bani-list,
@@ -849,6 +903,7 @@ body.show-overlay {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    position: static;
     width: 100%;
   }
 

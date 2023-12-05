@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 import anvaad from 'anvaad-js';
 
-const SlideTransliteration = ({ getFontSize, gurmukhiString, order }) => {
+const SlideTransliteration = ({ getFontSize, gurmukhiString }) => {
   const { transliterationLanguage, transliterationFontSize } = useStoreState(
-    state => state.userSettings,
+    (state) => state.userSettings,
   );
   const [transliterationString, setTransliterationString] = useState(null);
 
-  const getTransliteration = gurmukhi => {
+  const getTransliteration = (gurmukhi) => {
     switch (transliterationLanguage) {
       case 'English':
         setTransliterationString(anvaad.translit(gurmukhi));
@@ -47,7 +47,6 @@ const SlideTransliteration = ({ getFontSize, gurmukhiString, order }) => {
 SlideTransliteration.propTypes = {
   getFontSize: PropTypes.func,
   gurmukhiString: PropTypes.string,
-  order: PropTypes.number,
 };
 
 export default SlideTransliteration;

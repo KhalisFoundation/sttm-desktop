@@ -12,8 +12,9 @@
   }
 
   &.single-display-mode {
-    padding: 30px 72px 24px 72px;
     border: none;
+    padding-left: 48px;
+    padding-top: 30px;
 
     &.win32 {
       padding-top: 56px;
@@ -25,6 +26,11 @@
   }
 
   &.single-display-minimized {
+    padding-left: 0px;
+
+    &.win32 {
+      padding-top: 32px;
+    }
 
     & + .viewer-logo {
       left: 12px;

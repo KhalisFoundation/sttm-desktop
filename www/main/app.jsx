@@ -8,12 +8,10 @@ import { globalInit } from './common/constants';
 // Initialize globals
 globalInit.socket();
 
-const App = () => {
-  return (
-    <StoreProvider store={GlobalState}>
-      <Launchpad />
-    </StoreProvider>
-  );
-};
+const App = () => (
+  <StoreProvider store={GlobalState}>
+    <Launchpad />
+  </StoreProvider>
+);
 
 export default App;

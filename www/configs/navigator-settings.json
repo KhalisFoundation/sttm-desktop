@@ -14,6 +14,7 @@
   "activeVerseId": "",
   "searchShabadsCount": 0,
   "savedCrossPlatformId": null,
+  "historyOrder": "newest",
 
   "isMiscSlide": false,
   "miscSlideText": "",
@@ -41,5 +42,7 @@
   },
   "minimizedBySingleDisplay": false,
   "isDontSaveHistory": false,
+  "favShabad": [],
+  "searchVerse": "",
   "currentMiscPanel": "History"
 }
