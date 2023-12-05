@@ -61,8 +61,8 @@ const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
-  viewerHtml.children[1].remove();
-  viewerHtml.children[0].children[0].remove();
+  viewerHtml.querySelector('.viewer-logo').remove();
+  viewerHtml.querySelector('.slide-quicktools').remove();
   viewerHtml.children[0].removeAttribute('style');
   return viewerHtml.innerHTML;
 };

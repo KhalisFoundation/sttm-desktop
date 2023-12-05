@@ -44,10 +44,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
-    global.platform.ipc.send('cast-to-receiver');
     setShowVerse(false);
 
-    const timeoutId = setTimeout(() => setShowVerse(true), 200);
+    const timeoutId = setTimeout(() => {
+      setShowVerse(true);
+      global.platform.ipc.send('cast-to-receiver');
+    }, 200);
 
     return () => clearTimeout(timeoutId);
   }, [verseObj, isMiscSlide]);
