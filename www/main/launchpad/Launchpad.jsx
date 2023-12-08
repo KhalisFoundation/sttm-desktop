@@ -207,7 +207,7 @@ const Launchpad = () => {
         />
         {isCeremoniesOverlay && <Ceremonies onScreenClose={onScreenClose} />}
         {isLockScreen && <LockScreen onScreenClose={onScreenClose} />}
-        {isAnnouncement && <Announcement onScreenClose={onScreenClose} />}
+        <Announcement onScreenClose={onScreenClose} className={isAnnouncement ? '' : 'd-none'} />
         {isSettingsOverlay && <Settings onScreenClose={onScreenClose} />}
         <AuthDialog onScreenClose={onScreenClose} className={isAuthDialog ? '' : 'd-none'} />
         <InputContext.Provider value={ref}>

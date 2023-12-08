@@ -17,7 +17,7 @@ export const singleDisplayHeader = () => {
         break;
 
       case 'shabad':
-        component = 'Shabad';
+        component = '';
 
         break;
 
