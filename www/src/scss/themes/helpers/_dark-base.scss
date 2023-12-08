@@ -26,6 +26,7 @@
 
   #toolbar,
   #toolbar-nav,
+  .tingle-modal-box,
   .bani-list,
   .ceremony-pane,
   .sync-content-wrapper,
@@ -40,7 +41,7 @@
     }
   }
 
-  .viewer-controls {
+  .viewer-controls, .tingle-modal-box__footer {
     background-color: $bg-main;
   }
 

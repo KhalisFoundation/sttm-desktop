@@ -203,8 +203,13 @@
   }
 
   #toolbar,
-  #toolbar-nav {
+  #toolbar-nav,
+  .tingle-modal-box__footer {
     background-color: $nav-bg;
+  }
+
+  .tingle-modal-box {
+    background-color: $alt-bg;
   }
 
   .pane {

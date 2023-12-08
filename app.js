@@ -88,10 +88,6 @@ if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
 }
 
-keytar.getPassword('sttm-desktop', 'userToken').then((data) => {
-  mainWindow.webContents.send('userToken', data);
-});
-
 const secondaryWindows = {
   changelogWindow: {
     obj: false,
@@ -541,9 +537,12 @@ app.on('ready', () => {
     frame: false,
     alwaysOnTop: true,
   });
-  splash.loadFile('splash.html');
+  splash.loadURL(`file://${__dirname}/www/splash.html`);
   splash.center();
   remote.enable(mainWindow.webContents);
+  keytar.getPassword('sttm-desktop', 'userToken').then((data) => {
+    mainWindow.webContents.send('userToken', data);
+  });
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send(
