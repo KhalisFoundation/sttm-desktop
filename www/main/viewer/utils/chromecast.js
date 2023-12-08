@@ -68,7 +68,6 @@ const getSanitizedViewer = () => {
   }
   viewerHtml.querySelector('.shabad-deck').removeAttribute('style');
   viewerHtml.querySelector('.verse-slide-wrapper').removeAttribute('style');
-  console.log(viewerHtml.innerHTML);
   return viewerHtml.innerHTML;
 };
 
