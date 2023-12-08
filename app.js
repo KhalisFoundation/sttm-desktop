@@ -537,7 +537,7 @@ app.on('ready', () => {
     frame: false,
     alwaysOnTop: true,
   });
-  splash.loadFile('splash.html');
+  splash.loadURL(`file://${__dirname}/www/splash.html`);
   splash.center();
   remote.enable(mainWindow.webContents);
   keytar.getPassword('sttm-desktop', 'userToken').then((data) => {
