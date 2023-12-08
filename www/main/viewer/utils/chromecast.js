@@ -63,7 +63,12 @@ const getSanitizedViewer = () => {
     : '';
   viewerHtml.querySelector('.viewer-logo').remove();
   viewerHtml.querySelector('.slide-quicktools').remove();
-  viewerHtml.children[0].removeAttribute('style');
+  if (viewerHtml.querySelector('video')) {
+    viewerHtml.querySelector('video').remove();
+  }
+  viewerHtml.querySelector('.shabad-deck').removeAttribute('style');
+  viewerHtml.querySelector('.verse-slide-wrapper').removeAttribute('style');
+  console.log(viewerHtml.innerHTML);
   return viewerHtml.innerHTML;
 };
 
