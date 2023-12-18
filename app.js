@@ -11,6 +11,9 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
+const aptabase = require('@aptabase/electron/main');
+
+require('dotenv').config();
 
 remote.initialize();
 
@@ -82,6 +85,7 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
+aptabase.initialize(process.env.APTABASE_KEY);
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
