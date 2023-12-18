@@ -11,6 +11,7 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
+// eslint-disable-next-line import/no-unresolved
 const aptabase = require('@aptabase/electron/main');
 
 require('dotenv').config();
@@ -278,6 +279,7 @@ function deleteToken() {
   const userDataPath = app.getPath('userData');
   const tokenPath = path.join(userDataPath, 'userToken.enc');
   fs.unlink(tokenPath, () => {
+    // eslint-disable-next-line no-console
     console.log('token deleted');
   });
 }
