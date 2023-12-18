@@ -3,7 +3,6 @@ import { ipcRenderer, shell } from 'electron';
 
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import keytar from 'keytar';
 import isOnline from 'is-online';
 
 import { Overlay } from '../../../common/sttm-ui';
@@ -64,8 +63,8 @@ const AuthDialog = ({ onScreenClose, className }) => {
                   <button
                     className="button auth-button logout-button"
                     onClick={async () => {
-                      await keytar.deletePassword('sttm-desktop', 'userToken');
                       ipcRenderer.emit('userToken', '');
+                      ipcRenderer.send('deleteToken');
                       setUserInfo('');
                       onScreenClose();
                     }}
