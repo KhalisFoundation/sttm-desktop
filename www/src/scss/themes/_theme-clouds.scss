@@ -1,0 +1,23 @@
+$themeClouds: (
+  type: 'light',
+  background-color: #07ccf3,
+  background-image: url('../../assets/img/custom_backgrounds/clouds.jpg'),
+  gurbani: #0e2654,
+  translation: #003a8c,
+  teeka: #033780,
+  transliteration: #80878a,
+  visraam: #d20b0b,
+  yamki: #c2951a,
+);
+
+.theme-clouds {
+  @include generateTheme($themeClouds...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $transparent-blue;
+
+    &:hover {
+      background: $transparent-blue;
+    }
+  }
+}
