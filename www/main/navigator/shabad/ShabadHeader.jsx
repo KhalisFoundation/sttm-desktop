@@ -95,8 +95,17 @@ const ShabadHeader = () => {
         onClick={() => setShowViewer(!showViewer)}
         title={showViewer ? i18n.t('SHABAD_PANE.HIDE_BUTTON_TOOLTIP') : ''}
       >
-        <i className="fa fa-display"></i>
-        {showViewer ? i18n.t('SHABAD_PANE.HIDE_SCREEN') : i18n.t('SHABAD_PANE.SHOW_DISPLAY')}
+        {showViewer ? (
+          <>
+            <img src="assets/img/icons/monitor-slash.png" />
+            <p>{i18n.t('SHABAD_PANE.HIDE_SCREEN')}</p>
+          </>
+        ) : (
+          <>
+            <img src="assets/img/icons/monitor.png" />
+            <p>{i18n.t('SHABAD_PANE.SHOW_DISPLAY')}</p>
+          </>
+        )}
       </button>
       {!isSundarGutkaBani && !isCeremonyBani && (
         <>

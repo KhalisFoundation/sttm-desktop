@@ -160,5 +160,28 @@
     "type": ["VIDEO"],
     "background-video": "assets/videos/ocean-view.mp4",
     "key": "ocean"
+  },
+  {
+    "name": "CLOUDS",
+    "background-color": "linear-gradient(45deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4))",
+    "gurbani-color": "#0e2654",
+    "gurbani-shadow": "2px 2px 2px rgba(255,255,255,0.7)",
+    "translation-color": "#003a8c",
+    "transliteration-color": "#80878a",
+    "teeka-color": "#033780",
+    "type": ["VIDEO"],
+    "background-video": "assets/videos/clouds.mp4",
+    "key": "clouds"
+  },
+  {
+    "name": "MELANCHOLY",
+    "background-color": "linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4))",
+    "gurbani-color": "#fcfefe",
+    "translation-color": "#fde5ab",
+    "transliteration-color": "#f1f5f4",
+    "teeka-color": "#d1dbe2",
+    "type": ["VIDEO"],
+    "background-video": "assets/videos/melancholy.mov",
+    "key": "melancholy"
   }
 ]

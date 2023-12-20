@@ -11,7 +11,10 @@ const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
 const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
-const keytar = require('keytar');
+// eslint-disable-next-line import/no-unresolved
+const aptabase = require('@aptabase/electron/main');
+
+require('dotenv').config();
 
 remote.initialize();
 
@@ -60,7 +63,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, webContents, BrowserWindow, dialog, ipcMain } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -83,6 +86,7 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
+aptabase.initialize(process.env.APTABASE_KEY);
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
@@ -244,6 +248,40 @@ function checkForUpdates(manual = false) {
       autoUpdater.checkForUpdatesAndNotify();
     }
   }
+}
+
+function saveToken(token) {
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error('Encryption is not available on this system');
+  }
+  const userDataPath = app.getPath('userData');
+  const encryptedToken = safeStorage.encryptString(token);
+  const tokenPath = path.join(userDataPath, 'userToken.enc');
+  fs.writeFileSync(tokenPath, encryptedToken);
+}
+
+function retrieveToken() {
+  const userDataPath = app.getPath('userData');
+  const tokenPath = path.join(userDataPath, 'userToken.enc');
+
+  if (fs.existsSync(tokenPath)) {
+    const encryptedToken = fs.readFileSync(tokenPath);
+    if (!safeStorage.isEncryptionAvailable()) {
+      throw new Error('Decryption is not available on this system');
+    }
+    return safeStorage.decryptString(encryptedToken);
+  }
+
+  return null;
+}
+
+function deleteToken() {
+  const userDataPath = app.getPath('userData');
+  const tokenPath = path.join(userDataPath, 'userToken.enc');
+  fs.unlink(tokenPath, () => {
+    // eslint-disable-next-line no-console
+    console.log('token deleted');
+  });
 }
 
 function checkForExternalDisplay() {
@@ -463,7 +501,7 @@ const handleDeeplink = async (url) => {
     const token = loginData.get('token');
     if (token) {
       try {
-        await keytar.setPassword('sttm-desktop', 'userToken', token);
+        saveToken(token);
         mainWindow.webContents.send('userToken', token);
       } catch {
         // eslint-disable-next-line no-console
@@ -540,9 +578,6 @@ app.on('ready', () => {
   splash.loadURL(`file://${__dirname}/www/splash.html`);
   splash.center();
   remote.enable(mainWindow.webContents);
-  keytar.getPassword('sttm-desktop', 'userToken').then((data) => {
-    mainWindow.webContents.send('userToken', data);
-  });
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send(
@@ -555,6 +590,10 @@ app.on('ready', () => {
     }
     splash.close();
     mainWindow.show();
+    const token = retrieveToken();
+    if (token) {
+      mainWindow.webContents.send('userToken', token);
+    }
     // Platform-specific app stores have their own update mechanism
     // so only check if we're not in one
     if (!appstore && !isUnsupportedWindow) {
@@ -642,6 +681,10 @@ let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
+});
+
+ipcMain.on('deleteToken', () => {
+  deleteToken();
 });
 
 io.on('connection', (socket) => {
