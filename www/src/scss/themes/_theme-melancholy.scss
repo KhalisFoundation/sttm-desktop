@@ -1,4 +1,4 @@
-$themeAbstract: (
+$themeMelancholy: (
   type: 'dark',
   background-color: #38987b,
   background-image: url('../../assets/img/custom_backgrounds/blue.jpg'),
@@ -10,8 +10,8 @@ $themeAbstract: (
   yamki: #ffde00,
 );
 
-.theme-abstract {
-  @include generateTheme($themeAbstract...);
+.theme-melancholy {
+  @include generateTheme($themeMelancholy...);
 
   .shabad-pane .shabad-pane-active {
     background: $light-blue-30;

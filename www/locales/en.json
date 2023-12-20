@@ -379,7 +379,7 @@
     "NIRBAAN": "Nirbaan",
     "IMMORTAL_ORANGE": "Immortal Orange",
     "CLOUDS": "Clouds",
-    "ABSTRACT": "Abstract",
+    "MELANCHOLY": "Melancholy",
     "NEW_IMAGE": "New Image",
     "BACKGROUNDS": "Backgrounds",
     "COLORS": "Colors",
@@ -404,6 +404,8 @@
   "TOOLBAR": {
     "BANI_CONTROLLER": "Bani Controller",
     "CEREMONIES": "Ceremonies",
+    "SETTINGS": "Settings",
+    "SUNDAR_GUTKA": "Sundar Gutka",
     "CHOOSE_THEME": "Choose a Theme to launch",
     "CURRENT_SHABAD": "Current Shabad",
     "DISABLE_CONNECTIONS_MSG": "Disable all the remote connections to {{appName}}",
@@ -419,8 +421,6 @@
     "FAVORITE": "Favorites",
     "POPULAR_BANIS": "Popular Banis",
     "SEARCH": "Search",
-    "SETTINGS": "Settings",
-    "SUNDAR_GUTKA": "Sundar Gutka",
     "THEMES": "Themes",
     "BANI_DESC": {
       "1": "Connect to SikhiToTheMax by visiting ",

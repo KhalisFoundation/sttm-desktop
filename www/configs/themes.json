@@ -174,14 +174,14 @@
     "key": "clouds"
   },
   {
-    "name": "ABSTRACT",
+    "name": "MELANCHOLY",
     "background-color": "linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4))",
     "gurbani-color": "#fcfefe",
     "translation-color": "#fde5ab",
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#d1dbe2",
     "type": ["VIDEO"],
-    "background-video": "assets/videos/abstract.mov",
-    "key": "abstract"
+    "background-video": "assets/videos/melancholy.mov",
+    "key": "melancholy"
   }
 ]
