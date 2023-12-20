@@ -15,7 +15,7 @@ const ToolbarItem = ({ itemName }) => {
   const isAuthItem = itemName === 'auth-dialog';
   const displayName = {
     'sync-button': i18n.t('TOOLBAR.BANI_CONTROLLER'),
-    'auth-dialog': i18n.t('AUTH.LOGIN_LABEL'),
+    'auth-dialog': userToken ? i18n.t('AUTH.LOGOUT_LABEL') : i18n.t('AUTH.LOGIN_LABEL'),
     settings: i18n.t('TOOLBAR.SETTINGS'),
     'sunder-gutka': i18n.t('TOOLBAR.SUNDAR_GUTKA'),
     ceremonies: i18n.t('TOOLBAR.CEREMONIES'),
