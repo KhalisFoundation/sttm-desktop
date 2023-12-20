@@ -19,14 +19,19 @@
     @include flex($ai-value: center, $jc-value: flex-end);
 
     .toggle-viewer-btn {
+      align-items: center;
+      display: flex;
       height: 30px;
+      justify-content: center;
       padding: 0px 0.9em;
       margin: unset;
       background-color: $dull-blue;
       margin-right: 12px;
 
-      i {
-        padding-right: 8px;
+      img {
+        width: 0.9rem;
+        height: auto;
+        margin-right: 8px;
       }
 
       &:hover {
