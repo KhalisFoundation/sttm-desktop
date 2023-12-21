@@ -30,6 +30,12 @@ export const ThemeSelector = () => {
         setBgColor(clickedThemeObj.bgColor);
       }
     }
+    global.analytics.trackEvent({
+      category: 'Theme',
+      action: 'change theme',
+      label: 'theme name',
+      value: e.currentTarget.dataset.themeName,
+    });
   };
 
   return (

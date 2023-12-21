@@ -104,6 +104,7 @@ const secondaryWindows = {
       global.analytics.trackEvent({
         category: 'changelog',
         action: 'closed',
+        label: 'changelog',
         value: (endChangelogOpenTimer - startChangelogOpenTimer) / 1000.0,
       });
     },
@@ -545,7 +546,7 @@ app.on('ready', () => {
     userId = uuidv4();
     store.set('userId', userId);
   }
-  const analytics = new Analytics(userId, store);
+  const analytics = new Analytics();
   global.analytics = analytics;
 
   const screens = electron.screen;

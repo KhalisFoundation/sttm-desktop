@@ -10,6 +10,12 @@ export const fetchFavShabad = async (userToken) => {
 };
 
 export const addToFav = async (shabadId, verseId, userToken) => {
+  global.analytics.trackEvent({
+    category: 'Favourite Shabad',
+    action: 'Add',
+    label: 'shabadId',
+    value: shabadId,
+  });
   await fetch(`${SP_API}/favourite-shabads`, {
     method: 'POST',
     body: JSON.stringify({
@@ -24,6 +30,12 @@ export const addToFav = async (shabadId, verseId, userToken) => {
 };
 
 export const removeFromFav = async (shabadId, userToken) => {
+  global.analytics.trackEvent({
+    category: 'Favourite Shabad',
+    action: 'Remove',
+    label: 'shabadId',
+    value: shabadId,
+  });
   await fetch(`${SP_API}/favourite-shabads/${shabadId}`, {
     method: 'DELETE',
     headers: {
