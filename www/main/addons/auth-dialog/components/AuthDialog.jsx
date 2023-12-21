@@ -63,6 +63,12 @@ const AuthDialog = ({ onScreenClose, className }) => {
                   <button
                     className="button auth-button logout-button"
                     onClick={async () => {
+                      global.analytics.trackEvent({
+                        category: 'User Authentication',
+                        action: 'Logout',
+                        label: 'Logout',
+                        value: 'logged out',
+                      });
                       ipcRenderer.emit('userToken', '');
                       ipcRenderer.send('deleteToken');
                       setUserInfo('');
@@ -76,6 +82,12 @@ const AuthDialog = ({ onScreenClose, className }) => {
                   <button
                     className="button auth-button login-button"
                     onClick={() => {
+                      global.analytics.trackEvent({
+                        category: 'User Authentication',
+                        action: 'Login',
+                        label: 'Login',
+                        value: 'logged in',
+                      });
                       shell.openExternal(`${SP_API}/login/sso`);
                     }}
                   >
