@@ -10,6 +10,7 @@ import { SP_API } from '../../../common/constants/api-urls';
 
 const remote = require('@electron/remote');
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const AuthDialog = ({ onScreenClose, className }) => {
@@ -63,7 +64,7 @@ const AuthDialog = ({ onScreenClose, className }) => {
                   <button
                     className="button auth-button logout-button"
                     onClick={async () => {
-                      global.analytics.trackEvent({
+                      analytics.trackEvent({
                         category: 'User Authentication',
                         action: 'Logout',
                         label: 'Logout',
@@ -82,7 +83,7 @@ const AuthDialog = ({ onScreenClose, className }) => {
                   <button
                     className="button auth-button login-button"
                     onClick={() => {
-                      global.analytics.trackEvent({
+                      analytics.trackEvent({
                         category: 'User Authentication',
                         action: 'Login',
                         label: 'Login',
