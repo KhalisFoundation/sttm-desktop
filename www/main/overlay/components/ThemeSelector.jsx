@@ -5,6 +5,7 @@ import getThemeMarkup from '../utils/get-theme-markup';
 
 const remote = require('@electron/remote');
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 const themeObjects = require('../../../configs/overlay_presets.json');
 
@@ -30,7 +31,7 @@ export const ThemeSelector = () => {
         setBgColor(clickedThemeObj.bgColor);
       }
     }
-    global.analytics.trackEvent({
+    analytics.trackEvent({
       category: 'Theme',
       action: 'change theme',
       label: 'theme name',

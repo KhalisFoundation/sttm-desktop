@@ -1,5 +1,9 @@
 import { SP_API } from '../../../common/constants/api-urls';
 
+const remote = require('@electron/remote');
+
+const analytics = remote.getGlobal('analytics');
+
 export const fetchFavShabad = async (userToken) => {
   const response = await fetch(`${SP_API}/favourite-shabads`, {
     headers: {
@@ -10,7 +14,7 @@ export const fetchFavShabad = async (userToken) => {
 };
 
 export const addToFav = async (shabadId, verseId, userToken) => {
-  global.analytics.trackEvent({
+  analytics.trackEvent({
     category: 'Favourite Shabad',
     action: 'Add',
     label: 'shabadId',
@@ -30,7 +34,7 @@ export const addToFav = async (shabadId, verseId, userToken) => {
 };
 
 export const removeFromFav = async (shabadId, userToken) => {
-  global.analytics.trackEvent({
+  analytics.trackEvent({
     category: 'Favourite Shabad',
     action: 'Remove',
     label: 'shabadId',

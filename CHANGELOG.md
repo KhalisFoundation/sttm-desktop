@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.0 - ਊਨਾ Release _December 24, 2023_
+### 9.2.0 - ਊਨਾ Release _December 25, 2023_
 
 #### New Features
 
