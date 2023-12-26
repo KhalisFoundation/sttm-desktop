@@ -1,5 +1,4 @@
 import axios from 'axios';
-import request from 'request-promise';
 
 import Noty from 'noty';
 
@@ -77,7 +76,7 @@ const shareSync = {
     }
   },
   async onEnd(namespaceString) {
-    await request(`${SYNC_API_URL}/sync/end/${namespaceString}`);
+    await axios.request(`${SYNC_API_URL}/sync/end/${namespaceString}`);
     window.socket.disconnect();
     window.socket = null;
     window.namespaceString = null;
