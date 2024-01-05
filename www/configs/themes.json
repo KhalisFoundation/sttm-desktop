@@ -181,7 +181,7 @@
     "transliteration-color": "#f1f5f4",
     "teeka-color": "#d1dbe2",
     "type": ["VIDEO"],
-    "background-video": "assets/videos/melancholy.mov",
+    "background-video": "assets/videos/melancholy.mp4",
     "key": "melancholy"
   }
 ]
