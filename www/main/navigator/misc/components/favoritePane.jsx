@@ -99,8 +99,8 @@ export const FavoritePane = ({ className }) => {
         setHomeVerse(verseId);
       }
 
-      if (versesRead !== []) {
-        setVersesRead([]);
+      if (!versesRead.includes(verseId)) {
+        setVersesRead([verseId]);
       }
 
       if (isSundarGutkaBani) {

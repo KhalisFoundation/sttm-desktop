@@ -24,7 +24,7 @@ const ViewerApp = () => {
         receivers.forEach((receiver) => {
           const fullName = receiver.service_fullname;
           const blacklist = ['Chromecast-Audio', 'Google-Home', 'Sound-Bar', 'Google-Cast-Group'];
-          if (!new RegExp(blacklist.join('|')).test(fullName)) {
+          if (receiver.friendlyName && !new RegExp(blacklist.join('|')).test(fullName)) {
             modal.addCastBtn(
               receiver.friendlyName,
               'tingle-btn tingle-btn--primary',
@@ -46,7 +46,7 @@ const ViewerApp = () => {
           receivers.length === 0
             ? i18n.t(`CHROMECAST.NO_DEVICES_FOUND`)
             : i18n.t('CHROMECAST.SELECT_DEVICE');
-        modal.setContent(`<h2>${message}</h2>`);
+        modal.setContent(`<h2 class='tingle-heading'>${message}</h2>`);
         // add cancel button
         const cancelTitle = receivers.length === 0 ? 'OK' : i18n.t('CHROMECAST.CANCEL');
         modal.addFooterBtn(
