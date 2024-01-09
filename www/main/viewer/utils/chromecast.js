@@ -30,7 +30,7 @@ const displayError = (errorMessage) => {
     closeMethods: ['overlay', 'button', 'escape'],
   });
 
-  modal.setContent(`<h2>${errorMessage}</h2>`);
+  modal.setContent(`<h2 class='tingle-heading'>${errorMessage}</h2>`);
   // add ok button
   modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
     modal.close();
