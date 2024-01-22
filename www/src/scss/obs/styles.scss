@@ -50,11 +50,11 @@ body {
 }
 
 .o-gurbani {
-  font-family: 'Gurbani Akhar Thick';
+  font-family: 'Noto Sans Bold';
 }
 
 .o-teeka {
-  font-family: 'Gurbani Akhar';
+  font-family: 'Noto Sans';
 }
 
 .o-transliteration,
@@ -87,6 +87,12 @@ body {
   .overlay-wrapper {
     bottom: 0;
     position: absolute;
+  }
+
+  .content-top {
+    .content-bar {
+      padding-top: 8px;
+    }
   }
 
   .content-bottom {

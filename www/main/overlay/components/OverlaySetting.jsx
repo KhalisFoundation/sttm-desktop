@@ -33,6 +33,16 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
       updatedValue = baniOverlayState[stateVar] - step;
       baniOverlayActions[stateFunction](updatedValue);
     }
+
+    if (settingObj?.disableOnChange?.length > 0) {
+      settingObj.disableOnChange.forEach((disableSetting) => {
+        const disabledSetting = convertToCamelCase(disableSetting);
+        const setDisabledSetting = `set${convertToCamelCase(disableSetting, true)}`;
+        if (baniOverlayState[disabledSetting] !== false) {
+          baniOverlayActions[setDisabledSetting](false);
+        }
+      });
+    }
   };
 
   const handleToggleChange = () => {
@@ -111,13 +121,13 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
       );
       break;
     case 'switch':
-      settingDOM.push(          
+      settingDOM.push(
         <Switch
           controlId={`${title}-switch`}
           className={`control-item-switch`}
           value={baniOverlayState[stateVar]}
           onToggle={handleToggleChange}
-        />        
+        />,
       );
       break;
     case 'custom':
