@@ -19,6 +19,21 @@ body {
 .overlay-wrapper {
   position: relative;
   width: 100%;
+
+  .layout-top-bottom,
+  .other-layouts {
+    display: none;
+  }
+
+  .layout-top-bottom {
+    display: flex;
+    justify-content: center;
+    min-height: 150px;
+
+    .o-gurbani, .o-translation {
+      padding: 0;
+    }
+  }
 }
 
 .gurmukhi {
@@ -50,11 +65,11 @@ body {
 }
 
 .o-gurbani {
-  font-family: 'Gurbani Akhar Thick';
+  font-family: 'Noto Sans Bold';
 }
 
 .o-teeka {
-  font-family: 'Gurbani Akhar';
+  font-family: 'Noto Sans';
 }
 
 .o-transliteration,
@@ -87,6 +102,12 @@ body {
   .overlay-wrapper {
     bottom: 0;
     position: absolute;
+  }
+
+  .content-top {
+    .content-bar {
+      padding-top: 8px;
+    }
   }
 
   .content-bottom {

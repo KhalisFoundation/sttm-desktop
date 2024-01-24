@@ -16,7 +16,6 @@
         "type": "dropdown",
         "settings": ["text-color", "text-font", "text-size"]
       },
-
       "background": {
         "title": "BACKGROUND",
         "type": "title",
@@ -50,6 +49,18 @@
         "title": "",
         "type": "dropdown",
         "settings": ["date-format", "time-format"]
+      },
+
+      "advanced-options": {
+        "title": "ADVANCED_OPTIONS",
+        "type": "title",
+        "subcategories": ["advanced-settings"]
+      },
+
+      "advanced-settings": {
+        "title": "",
+        "type": "switch",
+        "settings": ["fit-text-switch"]
       }
     },
     "settings": {
@@ -77,6 +88,11 @@
         "tooltip": "Toggle Larivaar",
         "initialValue": false
       },
+      "fit-text-switch": {
+        "title": "FIT_TEXT",
+        "tooltip": "Automatically set text size to fit screen",
+        "initialValue": false
+      },
       "larivaarAssist": {
         "title":"LARIVAAR_ASSIST",
         "initialValue": false
@@ -87,7 +103,8 @@
         "initialValue": 5,
         "max": 15,
         "min": 1,
-        "step": 0.25
+        "step": 0.25,
+        "disableOnChange": ["fit-text-switch"]
       },
       "text-color": {
         "type": "color-input",
@@ -109,7 +126,8 @@
         "initialValue": 3,
         "max": 14,
         "min": 1,
-        "step": 0.25
+        "step": 0.25,
+        "disableOnChange": ["fit-text-switch"]
       },
       "bg-color": {
         "title": "",
@@ -121,7 +139,8 @@
         "initialValue": 0.5,
         "max": 5,
         "min": 0.5,
-        "step": 0.1
+        "step": 0.1,
+        "disableOnChange": ["fit-text-switch"]
       },
       "bg-opacity": {
         "title": "OPACITY",
