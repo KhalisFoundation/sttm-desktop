@@ -19,6 +19,21 @@ body {
 .overlay-wrapper {
   position: relative;
   width: 100%;
+
+  .layout-top-bottom,
+  .other-layouts {
+    display: none;
+  }
+
+  .layout-top-bottom {
+    display: flex;
+    justify-content: center;
+    min-height: 150px;
+
+    .o-gurbani, .o-translation {
+      padding: 0;
+    }
+  }
 }
 
 .gurmukhi {
