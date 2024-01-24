@@ -10,6 +10,22 @@
   <script src="fitty.js"></script>
 
   <script>
+    const getElements = (selector) => {
+      const elements = document.querySelectorAll(selector);
+      return {
+        elements: elements,
+        setProperty: (property, value) => {
+          elements.forEach(element => {
+            if (property in element.style) {
+              element.style[property] = value;
+            } else {
+              element[property] = value;
+            }
+          });
+        },
+      };
+    };
+
     const previewData = {
       English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
       Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
@@ -72,11 +88,8 @@
 
     const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
       lineBeforeAnnoucement = { Line, larivaar, larivaarAssist, languageSettings };
-      document.querySelector('.o-gurbani').innerHTML = assist(
-        Line.Gurmukhi,
-        larivaar,
-        larivaarAssist,
-      );
+      getElements('.o-gurbani').setProperty('innerHTML',
+        assist(Line.Gurmukhi, larivaar, larivaarAssist));
 
       let translation = '';
       let transliteration = '';
@@ -88,9 +101,9 @@
         transliteration = Line.Transliteration['English'] || '';
       }
 
-      document.querySelector('.o-translation').innerHTML = translation;
-      document.querySelector('.o-teeka').innerHTML = Line.Punjabi || '';
-      document.querySelector('.o-transliteration').innerHTML = transliteration;
+      getElements('.o-translation').setProperty('innerHTML', translation);
+      getElements('.o-teeka').setProperty('innerHTML', Line.Punjabi || '');
+      getElements('.o-transliteration').setProperty('innerHTML', transliteration);
 
       document.querySelector('.overlay-wrapper').hidden =
         Line.Gurmukhi === '' && Line.English === '';
@@ -100,12 +113,12 @@
       let htmlCode;
       if (isAnnoucement && !isGurmukhi) {
         htmlCode = `<span>${text}</span>`;
-        document.querySelector('.o-translation').innerHTML = htmlCode;
-        document.querySelector('.o-gurbani').innerHTML = '';
+        getElements('.o-translation').setProperty('innerHTML', htmlCode);
+        getElements('.o-gurbani').setProperty('innerHTML', '');
       } else {
         htmlCode = `<span>${text}</span>`;
-        document.querySelector('.o-gurbani').innerHTML = htmlCode;
-        document.querySelector('.o-translation').innerHTML = '';
+        getElements('.o-gurbani').setProperty('innerHTML', htmlCode);
+        getElements('.o-translation').setProperty('innerHTML', '');
       }
       document.querySelector('.o-teeka').innerHTML = '';
       document.querySelector('.o-transliteration').innerHTML = '';
@@ -115,6 +128,12 @@
       const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
       const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
 
+      const layoutContainer = document.querySelector('.layout-top-bottom');
+      layoutContainer.style.color = overlayPrefs.textColor;
+      layoutContainer.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
+      layoutContainer.style.padding = `${overlayPrefs.fitTextSwitch ? 1 : overlayPrefs.padding}vh`;
+      layoutContainer.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+
       document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
         el.style.color = overlayPrefs.textColor;
         el.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
@@ -123,17 +142,17 @@
       });
 
       document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.bgOpacity;
-      document.querySelector('.o-gurbani').style.color = overlayPrefs.gurbaniTextColor;
-      document.querySelector('.o-gurbani').style.fontSize =
-        `${(preview && overlayPrefs.fitTextSwitch) ? 5 : overlayPrefs.gurbaniSize}vh`;
+      getElements('.o-gurbani').setProperty('color', overlayPrefs.gurbaniTextColor);
+      getElements('.o-gurbani').setProperty('fontSize',
+        `${(preview && overlayPrefs.fitTextSwitch) ? 5 : overlayPrefs.gurbaniSize}vh`);
 
       if (!preview && ['top', 'bottom'].includes(overlayPrefs.layout)) {
         if (overlayPrefs.fitTextSwitch) {
-          fitTextInstances = fitty('.o-gurbani', {
+          fitTextInstances = fitty('.layout-top-bottom .o-gurbani', {
             minSize: 14,
             maxSize: 36,
           });
-          fitTextInstances.push(...fitty('.o-translation', {
+          fitTextInstances.push(...fitty('.layout-top-bottom .o-translation', {
             minSize: 12,
             maxSize: 24,
             multiLine: true,
@@ -142,9 +161,9 @@
           if (fitTextInstances && fitTextInstances.length > 0) {
             fitTextInstances[0].unsubscribe();
             fitTextInstances = fitTextInstances[1].unsubscribe();
-            document.querySelector('.o-gurbani').style.whiteSpace = 'normal';
-            document.querySelector('.o-translation').style.whiteSpace = 'normal';
-            document.querySelector('.o-translation').style.fontSize = 'inherit';
+            document.querySelector('.layout-top-bottom .o-gurbani').style.whiteSpace = 'normal';
+            document.querySelector('.layout-top-bottom .o-translation').style.whiteSpace = 'normal';
+            document.querySelector('.layout-top-bottom .o-translation').style.fontSize = 'inherit';
           }
         }
       }
@@ -159,12 +178,19 @@
       );
 
       const { gurbaniFont, textFont, toggleAnnoucement } = overlayPrefs;
-      document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
-      document.querySelector('.o-translation').style.fontFamily = textFont;
-      document.querySelector('.o-transliteration').style.fontFamily = textFont;
+      getElements('.o-gurbani').setProperty('fontFamily', gurbaniFont);
+      getElements('.o-translation').setProperty('fontFamily', textFont);
+      getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
       document.body.classList.add('layout-' + overlayPrefs.layout);
 
+      if (['top', 'bottom'].includes(overlayPrefs.layout)) {
+        document.querySelector('.layout-top-bottom').style.display = 'flex';
+        document.querySelector('.other-layouts').style.display = 'none';
+      } else {
+        document.querySelector('.other-layouts').style.display = 'block';
+        document.querySelector('.layout-top-bottom').style.display = 'none';
+      }
       document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
 
       if (toggleAnnoucement) {
@@ -264,25 +290,34 @@
 
 <body class="layout-bottom bani-overlay-page">
   <section class="overlay-wrapper">
-    <div class="content-top">
+    <div class="layout-top-bottom">
       <div class="content-bar ">
         <div><span class="gurmukhi o-gurbani"> </span></div>
+        <div><span class="o-translation"> </span></div>
       </div>
-      <div class="content-bar"><span class=" o-teeka"> </span></div>
     </div>
-    <div class="content-bars-bottom">
-      <div class="content-bottom">
-        <div class="content-bar"><span class="o-transliteration"> </span></div>
-        <div class="content-bar">
-          <div><span class="o-translation"> </span></div>
+    <div class="other-layouts">
+      <div class="content-top">
+        <div class="content-bar ">
+          <div><span class="gurmukhi o-gurbani"> </span></div>
         </div>
+        <div class="content-bar"><span class=" o-teeka"> </span></div>
       </div>
-      <div class="logo-wrapper">
-        <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
-        <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
+      <div class="content-bars-bottom">
+        <div class="content-bottom">
+          <div class="content-bar"><span class="o-transliteration"> </span></div>
+          <div class="content-bar">
+            <div><span class="o-translation"> </span></div>
+          </div>
+        </div>
+        <div class="logo-wrapper">
+          <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
+          <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
+        </div>
       </div>
     </div>
   </section>
+  <!-- TODO: Refactor the above code to use gurbani and translation divs for each layout -->
   <script type="text/javascript">
     if (preview) {
       writeLine(previewData);

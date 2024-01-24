@@ -570,8 +570,8 @@ app.on('ready', () => {
     },
   });
   const splash = new BrowserWindow({
-    width: 500,
-    height: 300,
+    width: 600,
+    height: 400,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
