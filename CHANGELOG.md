@@ -1,15 +1,35 @@
 ## New Updates
 
+### 9.2.0 - ਊਨਾ Release _January 30, 2024_
+
+#### New Features
+
+- Ability to login and save your favorite shabads
+- Added new video themes for the viewer
+  ![](./assets/img/help_images/video-themes.gif)
+- Added a newly designed app loader 
+- Ability to fiter history results
+
+#### Misc. bug fix and other improvements
+- Completely redesigned announcement and dhan guru pane.
+  ![](./assets/img/help_images/announcement-overhaul.png)
+- Smoother user experience with subtle animations.
+- Other minor improvements
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.1.3 - _September 30, 2023_
 
 #### Enhancements
 
-- Adds a gurmukhi on-screen keyboard to write annoucements.
+- Adds a gurmukhi on-screen keyboard to write announcements.
 - Sundar gutka now has an option to switch to english menu.
 
 #### Misc. bug fix and other improvements
 
-- Bani Overlay connectivity with annoucement is improved.
+- Bani Overlay connectivity with announcement is improved.
 - Fixed issues with the Akhand path view and the Dhan Guru slides.
 - Save the shabad navigated through next and previous icons in shabad history.
 - Other minor improvements
@@ -381,7 +401,7 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 
 - Bani Overlay has been revamped! We have enhanced the UI to make things a little cleaner and less cluttered
 - The SikhiToTheMax logo has been added to Bani Overlay as default and can be turned off with the new "Logo" toggle
-- The "Show Annoucements in Overlay" toggle has been moved to the Bani Overlay toolbar
+- The "Show announcements in Overlay" toggle has been moved to the Bani Overlay toolbar
 - The Dhan Guru Nanak Gurpurab theme has been removed. Stay tuned for more special themes in the future!
   ![](./assets/img/help_images/desktop-new-overlay.png)
 
@@ -408,8 +428,8 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 
 ### Improved:
 
-- Added the ability to choose if annoucements should appear in Bani Overlay
-- Fixed a bug that would cause annoucements to be hard to read when using dark themes
+- Added the ability to choose if announcements should appear in Bani Overlay
+- Fixed a bug that would cause announcements to be hard to read when using dark themes
 - Fixed a bug that would cause the last line of Anand Sahib (Bhog) not to display properly
 - Fixed a bug that would cause a white screen to flash upon app launch
 - Fixed a bug that caused the spacebar not to function properly
@@ -430,7 +450,7 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 
 ### Added:
 
-- New shortcut for inserting an annoucement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G
+- New shortcut for inserting an announcement or displaying a "Dhan Guru" slide. Just press CTRL (or CMD for Mac) + G
   ![](./assets/img/help_images/desktop-dhan-modal.jpg)
 
 ### Improved:

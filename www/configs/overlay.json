@@ -16,7 +16,6 @@
         "type": "dropdown",
         "settings": ["text-color", "text-font", "text-size"]
       },
-
       "background": {
         "title": "BACKGROUND",
         "type": "title",
@@ -28,6 +27,18 @@
         "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
       },
 
+      "larivaar-title": {
+        "title": "LARIVAAR",
+        "type": "title",
+        "subcategories": ["larivaar-options"]
+      },
+      "larivaar-options": {
+        "title": "",
+        "type": "switch",
+        "settings": ["overlayLarivaar", "larivaarAssist"]
+      },
+     
+     
       "date-time": {
         "title": "DATE_AND_TIME",
         "toggle": true,
@@ -38,6 +49,18 @@
         "title": "",
         "type": "dropdown",
         "settings": ["date-format", "time-format"]
+      },
+
+      "advanced-options": {
+        "title": "ADVANCED_OPTIONS",
+        "type": "title",
+        "subcategories": ["advanced-settings"]
+      },
+
+      "advanced-settings": {
+        "title": "",
+        "type": "switch",
+        "settings": ["fit-text-switch"]
       }
     },
     "settings": {
@@ -60,13 +83,28 @@
         },
         "initialValue": "Gurbani Akhar Thick"
       },
+      "overlayLarivaar": {
+        "title": "LARIVAAR",
+        "tooltip": "Toggle Larivaar",
+        "initialValue": false
+      },
+      "fit-text-switch": {
+        "title": "FIT_TEXT",
+        "tooltip": "Automatically set text size to fit screen",
+        "initialValue": false
+      },
+      "larivaarAssist": {
+        "title":"LARIVAAR_ASSIST",
+        "initialValue": false
+      },
       "gurbani-size": {
         "title": "",
         "type": "size-icon",
         "initialValue": 5,
         "max": 15,
         "min": 1,
-        "step": 0.25
+        "step": 0.25,
+        "disableOnChange": ["fit-text-switch"]
       },
       "text-color": {
         "type": "color-input",
@@ -88,7 +126,8 @@
         "initialValue": 3,
         "max": 14,
         "min": 1,
-        "step": 0.25
+        "step": 0.25,
+        "disableOnChange": ["fit-text-switch"]
       },
       "bg-color": {
         "title": "",
@@ -100,7 +139,8 @@
         "initialValue": 0.5,
         "max": 5,
         "min": 0.5,
-        "step": 0.1
+        "step": 0.1,
+        "disableOnChange": ["fit-text-switch"]
       },
       "bg-opacity": {
         "title": "OPACITY",
@@ -144,7 +184,7 @@
       "addons": {
         "title": "",
         "type": "icon-toggle",
-        "settings": ["toggle-logo", "toggle-annoucement", "overlayLarivaar", "green-screen-toggle"]
+        "settings": ["toggle-logo", "toggle-annoucement", "green-screen-toggle"]
       },
       "center-icons": {
         "title": "",
@@ -172,14 +212,6 @@
       "reset": {
         "icon": "reset.svg",
         "tooltip": "Reset Defaults",
-        "initialValue": false
-      },
-      "overlayLarivaar": {
-        "icon": "link.png",
-        "tooltip": "Toggle Larivaar",
-        "initialValue": false
-      },
-      "larivaarAssist": {
         "initialValue": false
       },
       "layout": {

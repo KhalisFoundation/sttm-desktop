@@ -55,7 +55,7 @@
         "overlayLogo": true,
         "overlayLarivaar": false,
         "translationFont": "Muli",
-        "gurbaniFont": "Gurbani Akhar Thick",
+        "gurbaniFont": "Noto Sans Bold",
         "larivaarAssist": false,
         "theme": false,
         "greenScreen": false

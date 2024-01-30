@@ -11,7 +11,8 @@ const Tile = ({
   onClick,
   content,
   isEngTransliterated = false,
-}) => {  const tileClassname = joinClasses([
+}) => {
+  const tileClassname = joinClasses([
     `${type}-tile`,
     theme ? `${theme.key}-tile` : null,
     className || null,

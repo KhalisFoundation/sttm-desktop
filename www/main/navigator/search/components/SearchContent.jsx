@@ -103,8 +103,8 @@ const SearchContent = () => {
   const openFirstResult = () => {
     if (searchQuery.length > 0 && filteredShabads.length > 0) {
       // Takes { shabadId, verseId, verse } from the first shabad in search result
-      const { shabadId, verseId } = filteredShabads[0];
-      changeActiveShabad(shabadId, verseId);
+      const { shabadId, verseId, verse } = filteredShabads[0];
+      changeActiveShabad(shabadId, verseId, verse);
     }
     analytics.trackEvent({
       category: 'search',
@@ -264,7 +264,7 @@ const SearchContent = () => {
           </div>
         )}
         <div className="filters">
-          <span>Filter by </span>
+          <span className="filters-label">Filter by </span>
           <FilterDropdown
             title="Writer"
             onChange={(event) => {

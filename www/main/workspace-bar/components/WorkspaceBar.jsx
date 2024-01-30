@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
-import { ipcRenderer } from 'electron';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
@@ -48,19 +48,17 @@ const WorkspaceBar = () => {
       className={`workspace-bar 
       ${minimizedBySingleDisplay ? 'single-display-hide-top' : 'single-display-show-top'}`}
     >
-      {workspaces.map((workspace, index) => {
-        return (
-          <div
-            key={index}
-            className={currentWorkspace === workspace ? 'active' : 'inactive'}
-            onClick={() => {
-              handleWorkspaceChange(workspace);
-            }}
-          >
-            <span className="workspace-name"> {workspace} </span>
-          </div>
-        );
-      })}
+      {workspaces.map((workspace, index) => (
+        <div
+          key={index}
+          className={currentWorkspace === workspace ? 'active' : 'inactive'}
+          onClick={() => {
+            handleWorkspaceChange(workspace);
+          }}
+        >
+          <span className="workspace-name"> {workspace} </span>
+        </div>
+      ))}
     </div>
   );
 };

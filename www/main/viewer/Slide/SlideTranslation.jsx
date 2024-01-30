@@ -2,20 +2,25 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
-const SlideTranslation = ({ getFontSize, translationObj, translationHTML, order }) => {
-  const { translationLanguage, translationFontSize } = useStoreState(state => state.userSettings);
+const SlideTranslation = ({ getFontSize, translationObj, translationHTML }) => {
+  const {
+    translationLanguage,
+    translationFontSize,
+    translationEnglishSource,
+    translationHindiSource,
+  } = useStoreState((state) => state.userSettings);
   const [translationString, setTranslationString] = useState(null);
 
-  const getTranslation = translations => {
+  const getTranslation = (translations) => {
     switch (translationLanguage) {
       case 'English':
-        setTranslationString(translations.en.bdb);
+        setTranslationString(translations.en[translationEnglishSource]);
         break;
       case 'Spanish':
         setTranslationString(translations.es.sn);
         break;
       case 'Hindi':
-        setTranslationString((translations.hi && translations.hi.ss) || null);
+        setTranslationString((translations.hi && translations.hi[translationHindiSource]) || null);
         break;
       default:
         setTranslationString(null);
@@ -62,7 +67,6 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, order 
 SlideTranslation.propTypes = {
   getFontSize: PropTypes.func,
   translationObj: PropTypes.object,
-  order: PropTypes.number,
 };
 
 export default SlideTranslation;

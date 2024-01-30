@@ -11,6 +11,13 @@
   }
 }
 
+.verse-slide-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
 .verse-slide {
   background-size: cover;
   display: flex;
@@ -19,6 +26,8 @@
   justify-content: space-between;
   padding: 20px 10px;
   text-align: center;
+  z-index: 10;
+  position: relative;
 }
 
 .slide-gurbani {
@@ -94,7 +103,7 @@
   position: fixed;
   width: 18%;
   max-width: 150px;
-  z-index: 2;
+  z-index: 20;
 
   .single-display-mode & {
     height: calc(100% - 56px);
@@ -152,4 +161,27 @@
       display: none;
     }
   }
+}
+
+// CSSTransition classes
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.fade-enter-done {
+  opacity: 1;
+}
+
+/* Define exit and exit-active states */
+.fade-exit {
+  opacity: 0;
+}
+
+.fade-exit-active {
+  opacity: 0;
 }

@@ -5,6 +5,7 @@ import OverlaySetting from './OverlaySetting';
 import { convertToCamelCase } from '../../common/utils';
 
 const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {

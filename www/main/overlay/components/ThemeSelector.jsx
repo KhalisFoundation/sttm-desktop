@@ -5,17 +5,18 @@ import getThemeMarkup from '../utils/get-theme-markup';
 
 const remote = require('@electron/remote');
 
+const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 const themeObjects = require('../../../configs/overlay_presets.json');
 
 export const ThemeSelector = () => {
   const { setOverlayTheme, setTextColor, setBgColor, setGurbaniTextColor } = useStoreActions(
-    state => state.baniOverlay,
+    (state) => state.baniOverlay,
   );
   const { overlayTheme, gurbaniTextColor, textColor, bgColor } = useStoreState(
-    state => state.baniOverlay,
+    (state) => state.baniOverlay,
   );
-  const handleThemeChange = e => {
+  const handleThemeChange = (e) => {
     const clickedTheme = e.currentTarget.dataset.themeName;
     const clickedThemeObj = themeObjects[clickedTheme];
     if (clickedTheme !== overlayTheme) {
@@ -30,6 +31,12 @@ export const ThemeSelector = () => {
         setBgColor(clickedThemeObj.bgColor);
       }
     }
+    analytics.trackEvent({
+      category: 'Theme',
+      action: 'change theme',
+      label: 'theme name',
+      value: e.currentTarget.dataset.themeName,
+    });
   };
 
   return (

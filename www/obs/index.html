@@ -1,261 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bani Overlay</title>
-    <link rel="stylesheet" href="bundle.css" />
-    <script src="socket.io.js"></script>
 
-    <script>
-      const previewData = {
-        English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
-        Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
-        PageNo: 589,
-        Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
-        Raag: {
-          RaagEnglish: 'Raag Vadhans',
-          RaagGurmukhi: 'rwgu vfhMsu',
-          RaagWithPage: 'Vadhans (557-594)',
-        },
-        Source: {
-          SourceEnglish: 'Sri Guru Granth Sahib Ji',
-          SourceGurmukhi: 'sRI gurU gRMQ swihb jI',
-        },
-        Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
-        Translations:
-          '{"en":{"bdb":"If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||"},"pu":{"ss":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[","ft":"jy hrI ApnI ikRpw kry qW mYN iqs hir ky nwm ko aur myN Dwrn kr rKW]1]","bdb":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1["},"puu":{"ss":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।","ft":"ਜੇ ਹਰੀ ਅਪਨੀ ਕ੍ਰਿਪਾ ਕਰੇ ਤਾਂ ਮੈਂ ਤਿਸ ਹਰਿ ਕੇ ਨਾਮ ਕੋ ਉਰ ਮੇਂ ਧਾਰਨ ਕਰ ਰਖਾਂ॥੧॥","bdb":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।"},"es":{"sn":"Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)"}}',
-        Transliteration: {
-          Devanagari: 'कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥',
-          English: 'kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||',
-          Shahmukhi: 'کِ®پا کرے جے آپنی تا هر رکھا اُر دھار ۔۔۱۔۔',
-        },
-        Visraam: '{"sttm": [], "igurbani": [], "sttm2": [{"p": 3, "t": "v"}]}',
-        Writer: {
-          WriterEnglish: 'Guru Amar Daas Ji',
-          WriterGurmukhi: 'mÚ 3',
-        },
-      };
-      const socket = io();
-      const preview = document.location.href.indexOf('preview') > -1;
-      let overlayPrefs;
-      let hasAnnoucement = false;
-      let lineBeforeAnnoucement = {};
-      let lastAnnoucement = {};
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bani Overlay</title>
+  <link rel="stylesheet" href="bundle.css" />
+  <script src="socket.io.js"></script>
+  <script src="fitty.js"></script>
 
-      const hexToRgb = hex => {
-        if (hex === '#000') {
-          return '0, 0, 0';
-        }
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-        return result
-          ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-          : null;
-      };
-
-      const assist = (line, overlayLarivaar, larivaarAssist) => {
-        return line
-          .split(' ')
-          .map((word, index) => {
-            let className = 'normal';
-            if (overlayLarivaar && larivaarAssist) {
-              className = index % 2 == 0 ? 'normal' : 'light';
+  <script>
+    const getElements = (selector) => {
+      const elements = document.querySelectorAll(selector);
+      return {
+        elements: elements,
+        setProperty: (property, value) => {
+          elements.forEach(element => {
+            if (property in element.style) {
+              element.style[property] = value;
+            } else {
+              element[property] = value;
             }
-            return `<span class="${className}-word">${word}</span>`;
-          })
-          .join(overlayLarivaar ? '' : ' ');
+          });
+        },
       };
+    };
 
-      const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
-        lineBeforeAnnoucement = {Line, larivaar, larivaarAssist, languageSettings};
-        document.querySelector('.o-gurbani').innerHTML = assist(
-          Line.Gurmukhi,
-          larivaar,
-          larivaarAssist,
-        );
+    const previewData = {
+      English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
+      Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
+      PageNo: 589,
+      Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
+      Raag: {
+        RaagEnglish: 'Raag Vadhans',
+        RaagGurmukhi: 'rwgu vfhMsu',
+        RaagWithPage: 'Vadhans (557-594)',
+      },
+      Source: {
+        SourceEnglish: 'Sri Guru Granth Sahib Ji',
+        SourceGurmukhi: 'sRI gurU gRMQ swihb jI',
+      },
+      Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
+      Translations:
+        '{"en":{"bdb":"If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||"},"pu":{"ss":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[","ft":"jy hrI ApnI ikRpw kry qW mYN iqs hir ky nwm ko aur myN Dwrn kr rKW]1]","bdb":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1["},"puu":{"ss":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।","ft":"ਜੇ ਹਰੀ ਅਪਨੀ ਕ੍ਰਿਪਾ ਕਰੇ ਤਾਂ ਮੈਂ ਤਿਸ ਹਰਿ ਕੇ ਨਾਮ ਕੋ ਉਰ ਮੇਂ ਧਾਰਨ ਕਰ ਰਖਾਂ॥੧॥","bdb":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।"},"es":{"sn":"Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)"}}',
+      Transliteration: {
+        Devanagari: 'कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥',
+        English: 'kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||',
+        Shahmukhi: 'کِ®پا کرے جے آپنی تا هر رکھا اُر دھار ۔۔۱۔۔',
+      },
+      Visraam: '{"sttm": [], "igurbani": [], "sttm2": [{"p": 3, "t": "v"}]}',
+      Writer: {
+        WriterEnglish: 'Guru Amar Daas Ji',
+        WriterGurmukhi: 'mÚ 3',
+      },
+    };
+    const socket = io();
+    const preview = document.location.href.indexOf('preview') > -1;
+    let overlayPrefs;
+    let hasAnnoucement = false;
+    let lineBeforeAnnoucement = {};
+    let lastAnnoucement = {};
+    let fitTextInstances = [];
 
-        let translation = '';
-        let transliteration = '';
-        if (languageSettings) {
-          translation = Line[languageSettings.translation] || '';
-          transliteration = Line.Transliteration[languageSettings.transliteration] || '';
+    const hexToRgb = hex => {
+      if (hex === '#000') {
+        return '0, 0, 0';
+      }
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+      return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : null;
+    };
+
+    const assist = (line, overlayLarivaar, larivaarAssist) => {
+      return line
+        .split(' ')
+        .map((word, index) => {
+          let className = 'normal';
+          if (overlayLarivaar && larivaarAssist) {
+            className = index % 2 == 0 ? 'normal' : 'light';
+          }
+          return `<span class="${className}-word">${word}</span>`;
+        })
+        .join(overlayLarivaar ? '' : ' ');
+    };
+
+    const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
+      lineBeforeAnnoucement = { Line, larivaar, larivaarAssist, languageSettings };
+      getElements('.o-gurbani').setProperty('innerHTML',
+        assist(Line.Gurmukhi, larivaar, larivaarAssist));
+
+      let translation = '';
+      let transliteration = '';
+      if (languageSettings) {
+        translation = Line[languageSettings.translation] || '';
+        transliteration = Line.Transliteration[languageSettings.transliteration] || '';
+      } else {
+        translation = Line.English || '';
+        transliteration = Line.Transliteration['English'] || '';
+      }
+
+      getElements('.o-translation').setProperty('innerHTML', translation);
+      getElements('.o-teeka').setProperty('innerHTML', Line.Punjabi || '');
+      getElements('.o-transliteration').setProperty('innerHTML', transliteration);
+
+      document.querySelector('.overlay-wrapper').hidden =
+        Line.Gurmukhi === '' && Line.English === '';
+    };
+
+    const writeText = (text, isGurmukhi, isAnnoucement) => {
+      let htmlCode;
+      if (isAnnoucement && !isGurmukhi) {
+        htmlCode = `<span>${text}</span>`;
+        getElements('.o-translation').setProperty('innerHTML', htmlCode);
+        getElements('.o-gurbani').setProperty('innerHTML', '');
+      } else {
+        htmlCode = `<span>${text}</span>`;
+        getElements('.o-gurbani').setProperty('innerHTML', htmlCode);
+        getElements('.o-translation').setProperty('innerHTML', '');
+      }
+      document.querySelector('.o-teeka').innerHTML = '';
+      document.querySelector('.o-transliteration').innerHTML = '';
+    };
+
+    const applyOverlayPrefs = () => {
+      const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
+      const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
+
+      const layoutContainer = document.querySelector('.layout-top-bottom');
+      layoutContainer.style.color = overlayPrefs.textColor;
+      layoutContainer.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
+      layoutContainer.style.padding = `${overlayPrefs.fitTextSwitch ? 1 : overlayPrefs.padding}vh`;
+      layoutContainer.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+
+      document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
+        el.style.color = overlayPrefs.textColor;
+        el.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
+        el.style.padding = `${overlayPrefs.fitTextSwitch ? 1 : overlayPrefs.padding}vh`;
+        el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+      });
+
+      document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.bgOpacity;
+      getElements('.o-gurbani').setProperty('color', overlayPrefs.gurbaniTextColor);
+      getElements('.o-gurbani').setProperty('fontSize',
+        `${(preview && overlayPrefs.fitTextSwitch) ? 5 : overlayPrefs.gurbaniSize}vh`);
+
+      if (!preview && ['top', 'bottom'].includes(overlayPrefs.layout)) {
+        if (overlayPrefs.fitTextSwitch) {
+          fitTextInstances = fitty('.layout-top-bottom .o-gurbani', {
+            minSize: 14,
+            maxSize: 36,
+          });
+          fitTextInstances.push(...fitty('.layout-top-bottom .o-translation', {
+            minSize: 12,
+            maxSize: 24,
+            multiLine: true,
+          }));
         } else {
-          translation = Line.English || '';
-          transliteration = Line.Transliteration['English'] || '';
+          if (fitTextInstances && fitTextInstances.length > 0) {
+            fitTextInstances[0].unsubscribe();
+            fitTextInstances = fitTextInstances[1].unsubscribe();
+            document.querySelector('.layout-top-bottom .o-gurbani').style.whiteSpace = 'normal';
+            document.querySelector('.layout-top-bottom .o-translation').style.whiteSpace = 'normal';
+            document.querySelector('.layout-top-bottom .o-translation').style.fontSize = 'inherit';
+          }
         }
+      }
 
-        document.querySelector('.o-translation').innerHTML = translation;
-        document.querySelector('.o-teeka').innerHTML = Line.Punjabi || '';
-        document.querySelector('.o-transliteration').innerHTML = transliteration;
+      document.body.classList.remove(
+        'layout-top',
+        'layout-bottom',
+        'layout-split',
+        'layout-classic',
+        'layout-vertical',
+        'layout-vertical-left',
+      );
 
-        document.querySelector('.overlay-wrapper').hidden =
-          Line.Gurmukhi === '' && Line.English === '';
-      };
+      const { gurbaniFont, textFont, toggleAnnoucement } = overlayPrefs;
+      getElements('.o-gurbani').setProperty('fontFamily', gurbaniFont);
+      getElements('.o-translation').setProperty('fontFamily', textFont);
+      getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
-      const writeText = (text, isGurmukhi, isAnnoucement) => {
-        let htmlCode;
-        if (isAnnoucement && !isGurmukhi) {
-          htmlCode = `<span>${text}</span>`;
-          document.querySelector('.o-translation').innerHTML = htmlCode;
-          document.querySelector('.o-gurbani').innerHTML = '';
-        } else {
-          htmlCode = `<span>${text}</span>`;
-          document.querySelector('.o-gurbani').innerHTML = htmlCode;
-          document.querySelector('.o-translation').innerHTML = '';
+      document.body.classList.add('layout-' + overlayPrefs.layout);
+
+      if (['top', 'bottom'].includes(overlayPrefs.layout)) {
+        document.querySelector('.layout-top-bottom').style.display = 'flex';
+        document.querySelector('.other-layouts').style.display = 'none';
+      } else {
+        document.querySelector('.other-layouts').style.display = 'block';
+        document.querySelector('.layout-top-bottom').style.display = 'none';
+      }
+      document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
+
+      if (toggleAnnoucement) {
+        if (hasAnnoucement && Object.keys(lastAnnoucement).length) {
+          const { text, isGurmukhi, isAnnoucement } = lastAnnoucement;
+          writeText(text, isGurmukhi, isAnnoucement);
         }
-        document.querySelector('.o-teeka').innerHTML = '';
-        document.querySelector('.o-transliteration').innerHTML = '';
-      };
+      } else {
+        if (Object.keys(lineBeforeAnnoucement).length) {
+          const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnoucement;
+          writeLine(Line, larivaar, larivaarAssist, languageSettings);
+        }
+      }
 
-      const applyOverlayPrefs = () => {
-        const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
-        const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
+      document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
+        // Clear styles added by other overrides
+        document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
+          spanEl.style.backgroundColor = 'transparent';
+        });
+        document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
+        // Apply the background color from theme
+        el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+      });
 
-        document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
-          el.style.color = overlayPrefs.textColor;
-          el.style.fontSize = `${overlayPrefs.textSize}vh`;
-          el.style.padding = `${overlayPrefs.padding}vh`;
+      // Special style overrides for vertical layout
+      document
+        .querySelectorAll(
+          '.layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
+        )
+        .forEach(el => {
+          document.querySelectorAll('.content-top, .content-bottom').forEach(content => {
+            content.style.backgroundColor = 'transparent';
+            content.style.padding = '0';
+          });
+          el.style.width = `${overlayPrefs.padding} * 10%`;
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         });
 
-        document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.bgOpacity;
-        document.querySelector('.o-gurbani').style.fontSize = `${overlayPrefs.gurbaniSize}vh`;
-        document.querySelector('.o-gurbani').style.color = overlayPrefs.gurbaniTextColor;
+      // Special style overrides for classic layout
+      document
+        .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
+        .forEach(el => {
+          el.style.backgroundColor = 'transparent';
+          const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+          el.style.padding = '0';
 
-        document.body.classList.remove(
-          'layout-top',
-          'layout-bottom',
-          'layout-split',
-          'layout-classic',
-          'layout-vertical',
-          'layout-vertical-left',
-        );
-
-        const { gurbaniFont, textFont, toggleAnnoucement } = overlayPrefs;
-        document.querySelector('.o-gurbani').style.fontFamily = gurbaniFont;
-        document.querySelector('.o-translation').style.fontFamily = textFont;
-        document.querySelector('.o-transliteration').style.fontFamily = textFont;
-
-        document.body.classList.add('layout-' + overlayPrefs.layout);
-
-        document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
-
-        if (toggleAnnoucement) {
-          if (hasAnnoucement && Object.keys(lastAnnoucement).length) {
-            const { text, isGurmukhi, isAnnoucement } = lastAnnoucement;
-            writeText(text, isGurmukhi, isAnnoucement);
-          }
-        } else {
-          if(Object.keys(lineBeforeAnnoucement).length) {
-            const {Line, larivaar, larivaarAssist, languageSettings} = lineBeforeAnnoucement;
-            writeLine(Line, larivaar, larivaarAssist, languageSettings);
-          }
-        }
-
-        document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
-          // Clear styles added by other overrides
           document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
-            spanEl.style.backgroundColor = 'transparent';
+            spanEl.style.backgroundColor = overlayBgColor;
+            spanEl.style.padding = `${overlayPrefs.padding}vh`;
+            spanEl.style.lineHeight = '1.5em';
           });
           document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
-          // Apply the background color from theme
-          el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         });
 
-        // Special style overrides for vertical layout
-        document
-          .querySelectorAll(
-            '.layout-vertical .overlay-wrapper, .layout-vertical-left .overlay-wrapper',
-          )
-          .forEach(el => {
-            document.querySelectorAll('.content-top, .content-bottom').forEach(content => {
-              content.style.backgroundColor = 'transparent';
-              content.style.padding = '0';
-            });
-            el.style.width = `${overlayPrefs.padding} * 10%`;
-            el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
-          });
+      document.body.style.backgroundColor = overlayColor;
 
-        // Special style overrides for classic layout
-        document
-          .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
-          .forEach(el => {
-            el.style.backgroundColor = 'transparent';
-            const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
-            el.style.padding = '0';
+      const $gurbani = document.querySelector('.o-gurbani');
+      const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+      let line = '';
+      if ($gurbani.children.length) {
+        line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
+      }
+      $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+    };
 
-            document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
-              spanEl.style.backgroundColor = overlayBgColor;
-              spanEl.style.padding = `${overlayPrefs.padding}vh`;
-              spanEl.style.lineHeight = '1.5em';
-            });
-            document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
-          });
-
-        document.body.style.backgroundColor = overlayColor;
-
-        const $gurbani = document.querySelector('.o-gurbani');
-        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-        let line = '';
-        if ($gurbani.children.length) {
-          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
+    socket.on('show-line', request => {
+      if (!preview) {
+        if (overlayPrefs) {
+          const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
         }
-        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
-      };
+      }
+    });
 
-      socket.on('show-line', request => {
-        if (!preview) {
-          if (overlayPrefs) {
-            const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-            writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+    socket.on('show-misc-text', request => {
+      if (!preview) {
+        if (overlayPrefs) {
+          const { text, isGurmukhi, isAnnoucement } = request;
+          writeText(text, isGurmukhi, isAnnoucement);
+          if (isAnnoucement) {
+            hasAnnoucement = true;
+            lastAnnoucement = { text, isGurmukhi, isAnnoucement };
+          } else {
+            hasAnnoucement = false;
           }
+          applyOverlayPrefs();
         }
-      });
+      }
+    });
 
-      socket.on('show-misc-text', request => {
-        if (!preview) {
-          if (overlayPrefs) {
-            const {text, isGurmukhi, isAnnoucement} = request;
-            writeText(text, isGurmukhi, isAnnoucement);
-            if(isAnnoucement) {
-              hasAnnoucement = true;
-              lastAnnoucement = {text, isGurmukhi, isAnnoucement};
-            } else {
-              hasAnnoucement = false;
-            }
-            applyOverlayPrefs();
-          }
-        }
-      });
+    socket.on('update-prefs', data => {
+      overlayPrefs = data;
+      applyOverlayPrefs();
+    });
+  </script>
+</head>
 
-      socket.on('update-prefs', data => {
-        overlayPrefs = data;
-        applyOverlayPrefs();
-      });
-    </script>
-  </head>
-  <body class="layout-bottom bani-overlay-page">
-    <section class="overlay-wrapper">
+<body class="layout-bottom bani-overlay-page">
+  <section class="overlay-wrapper">
+    <div class="layout-top-bottom">
+      <div class="content-bar ">
+        <div><span class="gurmukhi o-gurbani"> </span></div>
+        <div><span class="o-translation"> </span></div>
+      </div>
+    </div>
+    <div class="other-layouts">
       <div class="content-top">
-        <div class="content-bar "><span class="gurmukhi o-gurbani"> </span></div>
+        <div class="content-bar ">
+          <div><span class="gurmukhi o-gurbani"> </span></div>
+        </div>
         <div class="content-bar"><span class=" o-teeka"> </span></div>
       </div>
       <div class="content-bars-bottom">
         <div class="content-bottom">
           <div class="content-bar"><span class="o-transliteration"> </span></div>
-          <div class="content-bar"><span class="o-translation"> </span></div>
+          <div class="content-bar">
+            <div><span class="o-translation"> </span></div>
+          </div>
         </div>
         <div class="logo-wrapper">
           <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
           <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
         </div>
       </div>
-    </section>
-    <script type="text/javascript">
-      if (preview) {
-        writeLine(previewData);
-      }
-    </script>
-  </body>
+    </div>
+  </section>
+  <!-- TODO: Refactor the above code to use gurbani and translation divs for each layout -->
+  <script type="text/javascript">
+    if (preview) {
+      writeLine(previewData);
+    }
+  </script>
+</body>
+
 </html>

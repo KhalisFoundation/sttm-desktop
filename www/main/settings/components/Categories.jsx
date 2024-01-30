@@ -1,16 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useStoreState } from 'easy-peasy';
 
 import Setting from './Setting';
 import { convertToCamelCase } from '../../common/utils';
 
 const remote = require('@electron/remote');
+
 const { store, i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];
+  const userSettings = useStoreState((state) => state.userSettings);
+
   Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
-    const { addonObj, addon } = subCategory.settingObjs[settingKey];
+    const { addonObj, addon, condition, conditionValue } = subCategory.settingObjs[settingKey];
+
+    if (condition) {
+      if (userSettings[convertToCamelCase(condition)] !== conditionValue) {
+        return;
+      }
+    }
+
     settingsDOM.push(
       /* 1. Push the Addon first */
       <div className="control-item" id={settingKey} key={settingIndex}>

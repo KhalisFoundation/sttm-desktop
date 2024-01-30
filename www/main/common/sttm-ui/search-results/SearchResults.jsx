@@ -100,7 +100,7 @@ const SearchResults = ({
   };
 
   return (
-    <li onClick={() => onClick(shabadId, verseId)} className="search-li">
+    <li onClick={() => onClick(shabadId, verseId, verse)} className="search-li">
       <div className={`search-list ${getBorderColorClass(sourceId)}`}>
         <a className="panktee">
           {!!ang && (
@@ -130,6 +130,7 @@ SearchResults.propTypes = {
   verse: PropTypes.string,
   verseId: PropTypes.number,
   writer: PropTypes.string,
+  currentLanguage: PropTypes.string,
 };
 
 export default SearchResults;

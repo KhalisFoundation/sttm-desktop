@@ -30,7 +30,7 @@ const displayError = (errorMessage) => {
     closeMethods: ['overlay', 'button', 'escape'],
   });
 
-  modal.setContent(`<h2>${errorMessage}</h2>`);
+  modal.setContent(`<h2 class='tingle-heading'>${errorMessage}</h2>`);
   // add ok button
   modal.addFooterBtn('OK', 'tingle-btn tingle-btn--pull-right tingle-btn--default', () => {
     modal.close();
@@ -61,9 +61,13 @@ const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
-  viewerHtml.children[1].remove();
-  viewerHtml.children[0].children[0].remove();
-  viewerHtml.children[0].removeAttribute('style');
+  viewerHtml.querySelector('.viewer-logo').remove();
+  viewerHtml.querySelector('.slide-quicktools').remove();
+  if (viewerHtml.querySelector('video')) {
+    viewerHtml.querySelector('video').remove();
+  }
+  viewerHtml.querySelector('.shabad-deck').removeAttribute('style');
+  viewerHtml.querySelector('.verse-slide-wrapper').removeAttribute('style');
   return viewerHtml.innerHTML;
 };
 

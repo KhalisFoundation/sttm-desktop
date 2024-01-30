@@ -14,7 +14,7 @@ const ExtraBani = ({ title, banis = [], loadBani, isEngTransliterated = false })
     <div className="bani-group-container">
       <header className={`bani-group-heading ${groupHeaderClassName}`}>{title}</header>
       <div className={`bani-group ${groupClassName}`}>
-      {banis.map(({ id, name }) => (
+        {banis.map(({ id, name }) => (
           <Tile
             onClick={() => loadBani(id)}
             key={name}

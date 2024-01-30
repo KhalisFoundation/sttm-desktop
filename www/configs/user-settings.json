@@ -57,7 +57,13 @@
     "language": {
       "title": "LANGUAGE_SETTINGS",
       "type": "dropdown",
-      "settings": ["translation-language", "transliteration-language"]
+      "settings": [
+        "teeka-source",
+        "translation-language",
+        "translation-english-source",
+        "translation-hindi-source",
+        "transliteration-language"
+      ]
     },
     "app-settings": {
       "title": "APP_SETTINGS",
@@ -212,6 +218,40 @@
         "Hindi": "HINDI_LANGUAGE"
       },
       "initialValue": "English"
+    },
+    "translation-english-source": {
+      "title": "TRANSLATION_SOURCE",
+      "type": "dropdown",
+      "options": {
+        "bdb": "BANI_DB",
+        "ms":"MANMOHAN_SINGH",
+        "ssk": "SANT_SINGH_KHALSA"
+      },
+      "condition": "translation-language",
+      "conditionValue": "English",
+      "initialValue": "bdb"
+    },
+    "translation-hindi-source": {
+      "title": "TRANSLATION_SOURCE",
+      "type": "dropdown",
+      "options": {
+        "ss":"SAHIB_SINGH",
+        "sts": "SANT_SINGH"
+      },
+      "condition": "translation-language",
+      "conditionValue": "Hindi",
+      "initialValue": "ss"
+    },
+    "teeka-source": {
+      "title": "TEEKA_SOURCE",
+      "type": "dropdown",
+      "options": {
+        "bdb": "BANI_DB",
+        "ft": "FAREEDKOT",
+        "ms":"MANMOHAN_SINGH",
+        "ss": "SANT_SINGH"
+      },
+      "initialValue": "bdb"
     },
     "transliteration-language": {
       "title": "TRANSLITERATION_LANGUAGE",

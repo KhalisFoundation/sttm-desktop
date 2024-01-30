@@ -33,6 +33,11 @@ body.win32:not(.webview) {
     height: 94vh;
   }
 
+  .auth-wrapper {
+    bottom: 40px;
+    height: initial;
+  }
+
   .close-screen {
     top: 35px;
   }

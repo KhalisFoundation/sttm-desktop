@@ -9,22 +9,20 @@ import ThemeContainer from './ThemeContainer';
 import SettingViewer from './SettingViewer';
 import { settingsNavObj, settingsObj } from '../utils';
 
-const Settings = ({ onScreenClose }) => {
-  return (
-    <Overlay onScreenClose={onScreenClose}>
-      <div className="addon-wrapper settings-wrapper">
-        <div className="main-settings-wrapper">
-          <SettingsNav settingsNavObj={settingsNavObj} />
-          <SettingsContainer settingsObj={settingsObj} />
-        </div>
-        <div className="other-settings">
-          <SettingViewer />
-          <ThemeContainer />
-        </div>
+const Settings = ({ onScreenClose }) => (
+  <Overlay onScreenClose={onScreenClose}>
+    <div className="addon-wrapper settings-wrapper">
+      <div className="main-settings-wrapper">
+        <SettingsNav settingsNavObj={settingsNavObj} />
+        <SettingsContainer settingsObj={settingsObj} />
       </div>
-    </Overlay>
-  );
-};
+      <div className="other-settings">
+        <SettingViewer />
+        <ThemeContainer />
+      </div>
+    </div>
+  </Overlay>
+);
 
 Settings.propTypes = {
   onScreenClose: PropTypes.func,

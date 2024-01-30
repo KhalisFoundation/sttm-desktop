@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const LayoutSelector = ({ changeLayout }) => {
   const layouts = ['top', 'bottom', 'split', 'vertical', 'classic'];
-  const layoutMarkup = layouts.map(layout => (
+  const layoutMarkup = layouts.map((layout) => (
     <div
       key={`layout-${layout}`}
       className={`layout-btn ${layout}`}

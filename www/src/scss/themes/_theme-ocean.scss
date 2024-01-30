@@ -1,0 +1,38 @@
+$themeDark: (
+  type: 'dark',
+  background-color: #000,
+  background-image: 'none',
+  gurbani: #fff,
+  translation: #e2e2e2,
+  teeka: #c6c6c6,
+  transliteration: #ababab,
+  visraam: #c0392b,
+  yamki: #ffc500,
+);
+
+.theme-ocean {
+  @include generateTheme($themeDark...);
+
+  .shabad-pane .shabad-pane-active {
+    background: $dull-blue;
+
+    &:hover {
+      background: $light-blue-30;
+    }
+  }
+
+  .launchpad .single-display-switches {
+    .tab-switch,
+    & {
+      background: $darker-grey;
+    }
+    .tab-switch.active {
+      background: $black !important;
+      color: $light-grey !important;
+    }
+  }
+
+  .quicktool-body {
+    background-color: $black;
+  }
+}

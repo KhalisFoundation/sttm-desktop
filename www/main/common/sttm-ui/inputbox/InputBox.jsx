@@ -41,7 +41,6 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
   useEffect(() => {
     if (shortcuts.focusInput) {
       focusInputbox();
-      setQuery('');
       setShortcuts({
         ...shortcuts,
         focusInput: false,

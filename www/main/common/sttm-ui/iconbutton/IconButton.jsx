@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const IconButton = ({ icon, onClick }) => {
-  return (
-    <button className="icon-button" onClick={onClick}>
-      <i className={icon} />
-    </button>
-  );
-};
+const IconButton = ({ icon, onClick, className }) => (
+  <button className={`icon-button ${className}`} onClick={onClick}>
+    <i className={icon} />
+  </button>
+);
 
 IconButton.propTypes = {
   icon: PropTypes.string,
   onClick: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default IconButton;

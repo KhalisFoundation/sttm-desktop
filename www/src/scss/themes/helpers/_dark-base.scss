@@ -26,11 +26,14 @@
 
   #toolbar,
   #toolbar-nav,
+  .tingle-modal-box,
   .bani-list,
   .ceremony-pane,
   .sync-content-wrapper,
   .zoom-content-wrapper,
-  .settings-container {
+  .settings-container,
+  .addon-overlay,
+  .fav-results {
     background-color: $bg-alt;
     .sttm-loader {
       border-color: $bg-bright;
@@ -38,7 +41,7 @@
     }
   }
 
-  .viewer-controls {
+  .viewer-controls, .tingle-modal-box__footer {
     background-color: $bg-main;
   }
 
@@ -114,7 +117,7 @@
 
   .control-item {
     .custom-checkbox {
-      input[type='checkbox']:checked+label::before {
+      input[type='checkbox']+label::before {
         filter: invert(0.7);
       }
     }
@@ -142,6 +145,16 @@
     .pane {
       .pane-footer {
         background-color: $not-so-black;
+      }
+    }
+
+    .select-bani {
+      &-dd-group:hover {
+        background-color: $transparent-light-white;
+      }
+      
+      option {
+        color: $text-base;
       }
     }
 
@@ -215,6 +228,12 @@
   #toolbar,
   #toolbar-nav {
     background: $bg-alt;
+
+    #tool-sync-button,
+    #tool-auth-dialog,
+    #tool-settings {
+      filter: invert(1);
+    }
   }
 
   .pane,
@@ -332,7 +351,7 @@
     color: $text-base;
   }
 
-  .panktee.search-result span.gurmukhi span.highlight {
+  .panktee span.gurmukhi span.highlight {
     color: #fff;
   }
 
@@ -346,8 +365,26 @@
     }
   }
 
+  .history-order {
+    select {
+      background-color: $bg-main;
+      color: $text-base;
+    }
+  }
+
   .history-results {
     .history-item:hover {
+      background-color: $bg-bright;
+    }
+  }
+
+  .fav-results {
+    .fav-shabad-container {
+      button {
+        color: $text-base;
+      }
+    }
+    .fav-shabad-container:hover {
       background-color: $bg-bright;
     }
   }
@@ -378,5 +415,22 @@
 
   ::-webkit-scrollbar-thumb {
     background-color: $scrollbar;
+  }
+  
+  .verse-block {
+    .search-li,
+    .shabad-li {
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
+  }
+
+  .shabad-pane-header {
+    >i {
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
   }
 }

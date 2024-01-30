@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-
-const remote = require('@electron/remote');
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { Tile, CustomBgTile } from '../../common/sttm-ui';
+import { Tile, CustomBgTile, VideoWithOverlay } from '../../common/sttm-ui';
 
 import { themes } from '../../theme_editor';
 import {
@@ -13,12 +11,15 @@ import {
   removeCustomBackgroundFile,
 } from '../utils';
 
+const remote = require('@electron/remote');
+
 const { i18n } = remote.require('./app');
 
 const themeTypes = [
   { type: 'COLOR', title: 'COLORS' },
   { type: 'BACKGROUND', title: 'BACKGROUNDS' },
   { type: 'SPECIAL', title: 'SPECIAL_CONDITIONS' },
+  { type: 'VIDEO', title: 'VIDEOS' },
 ];
 
 const ThemeContainer = () => {
@@ -36,7 +37,12 @@ const ThemeContainer = () => {
       <div id="custom-theme-options">
         {themeTypes.map(({ type, title }) => (
           <React.Fragment key={type}>
-            <header className="options-header">{i18n.t(`THEMES.${title}`)}</header>
+            <header className="options-header">
+              {i18n.t(`THEMES.${title}`)}
+              {type === 'VIDEO' && (
+                <span className="notes">{i18n.t('SETTINGS.CHROMECAST_UNAVAILABLE')}</span>
+              )}
+            </header>
             <span className="theme-tile-holder">
               {groupThemes(type).map((theme) => (
                 <Tile
@@ -46,15 +52,23 @@ const ThemeContainer = () => {
                       applyTheme(theme, false, setTheme, setThemeBg, themeBg);
                     }
                   }}
-                  className="theme-instance"
+                  className={theme['background-video'] ? 'video-theme-instance' : 'theme-instance'}
                   theme={theme}
                 >
-                  {i18n.t(`THEMES.${theme.name}`)}
+                  {theme['background-video'] ? (
+                    <VideoWithOverlay
+                      src={theme['background-video']}
+                      overlayContent={i18n.t(`THEMES.${theme.name}`)}
+                    />
+                  ) : (
+                    i18n.t(`THEMES.${theme.name}`)
+                  )}
                 </Tile>
               ))}
             </span>
           </React.Fragment>
         ))}
+
         <header className="options-header">{i18n.t(`THEMES.CUSTOM_BACKGROUNDS`)}</header>
         <label className="file-input-label">
           {i18n.t('THEMES.NEW_IMAGE')}

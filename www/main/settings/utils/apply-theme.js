@@ -4,12 +4,15 @@ const analytics = remote.getGlobal('analytics');
 
 export const setDefaultBg = (themeInstance, setThemeBg, themeBg) => {
   const hasBackgroundImage = !!themeInstance['background-image'];
+  const hasBackgroundVideo = !!themeInstance['background-video'];
   const imageUrl = hasBackgroundImage
     ? `assets/img/custom_backgrounds/${themeInstance['background-image-full']}`
     : false;
+  const videoUrl = hasBackgroundVideo ? themeInstance['background-video'] : false;
+
   const themeBgObj = {
-    type: 'default',
-    url: imageUrl,
+    type: hasBackgroundVideo ? 'video' : 'default',
+    url: hasBackgroundVideo ? videoUrl : imageUrl,
   };
   if (themeBg !== themeBgObj) {
     setThemeBg(themeBgObj);

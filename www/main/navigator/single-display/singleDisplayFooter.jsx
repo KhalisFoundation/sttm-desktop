@@ -10,19 +10,10 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('search');
     }
   };
-  const getTurbanIcon = () =>
-    singleDisplayActiveTab === 'dhan-guru'
-      ? 'assets/img/icons/turban-filled-blue.png'
-      : 'assets/img/icons/turban-filled.png';
 
   const openShabadPane = () => {
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
-    }
-  };
-  const openAnnouncementPane = () => {
-    if (singleDisplayActiveTab !== 'announcement') {
-      setSingleDisplayActiveTab('announcement');
     }
   };
   const openOtherPane = () => {
@@ -35,9 +26,9 @@ export const singleDisplayFooter = () => {
       setSingleDisplayActiveTab('history');
     }
   };
-  const openDhanGuruPane = () => {
-    if (singleDisplayActiveTab !== 'dhan-guru') {
-      setSingleDisplayActiveTab('dhan-guru');
+  const openFavoritePane = () => {
+    if (singleDisplayActiveTab !== 'favorite') {
+      setSingleDisplayActiveTab('favorite');
     }
   };
 
@@ -62,16 +53,10 @@ export const singleDisplayFooter = () => {
         <i className="fa fa-dot-circle-o" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'announcement' && 'active')}
-        onClick={openAnnouncementPane}
+        className={classNames('tab-switch', singleDisplayActiveTab === 'favorite' && 'active')}
+        onClick={openFavoritePane}
       >
-        <i className="fa fa-desktop" />
-      </button>
-      <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'dhan-guru' && 'active')}
-        onClick={openDhanGuruPane}
-      >
-        <img className="turban-icon" src={getTurbanIcon()} alt="Dhan Guru" />
+        <i className="fa fa-heart" />
       </button>
       <button
         className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
