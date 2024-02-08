@@ -350,4 +350,10 @@
       }
     }
   }
+  
+  .sundar-gutka-bani {
+    &:hover {
+      background-color: $disabled-light;
+    }
+  }
 }
