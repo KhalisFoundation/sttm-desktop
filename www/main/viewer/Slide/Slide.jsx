@@ -13,9 +13,6 @@ global.platform = require('../../desktop_scripts');
 
 const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   const {
-    translationVisibility,
-    transliterationVisibility,
-    teekaVisibility,
     larivaar,
     larivaarAssist,
     larivaarAssistType,
@@ -25,8 +22,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     displayNextLine,
   } = useStoreState((state) => state.userSettings);
 
-  const { activeVerseId } = useStoreState((state) => state.navigator);
+  const { activeVerseId, baniOrder } = useStoreState((state) => state.navigator);
   const [showVerse, setShowVerse] = useState(true);
+  const [orderMarkup, setOrderMarkup] = useState(null);
 
   const activeVerseRef = useRef(null);
 
@@ -65,6 +63,51 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     }, 100);
   }, [verseObj]);
 
+  useEffect(() => {
+    const markup = baniOrder.map((orderObj, index) => {
+      switch (orderObj.label) {
+        case 'teeka':
+          return (
+            verseObj &&
+            verseObj.Translations && (
+              <SlideTeeka
+                getFontSize={getFontSize}
+                teekaObj={JSON.parse(verseObj.Translations)}
+                key={`line-${index}`}
+              />
+            )
+          );
+        case 'translation':
+          return (
+            verseObj &&
+            verseObj.Translations && (
+              <SlideTranslation
+                getFontSize={getFontSize}
+                translationObj={JSON.parse(verseObj.Translations)}
+                key={`line-${index}`}
+                lang={orderObj.id}
+              />
+            )
+          );
+        case 'transliteration':
+          return (
+            verseObj &&
+            verseObj.Gurmukhi && (
+              <SlideTransliteration
+                getFontSize={getFontSize}
+                gurmukhiString={verseObj.Gurmukhi}
+                key={`line-${index}`}
+                lang={orderObj.id}
+              />
+            )
+          );
+        default:
+          return null;
+      }
+    });
+    setOrderMarkup(markup);
+  }, [baniOrder]);
+
   return (
     <div className="verse-slide-wrapper" style={{ background: bgColor }}>
       <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
@@ -92,29 +135,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                 </h1>
               )}
 
-              {translationVisibility && verseObj.Translations && (
-                <SlideTranslation
-                  getFontSize={getFontSize}
-                  translationObj={JSON.parse(verseObj.Translations)}
-                />
-              )}
+              {orderMarkup !== null && orderMarkup}
 
               {verseObj.English && (
                 <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
               )}
 
-              {teekaVisibility && verseObj.Translations && (
-                <SlideTeeka
-                  getFontSize={getFontSize}
-                  teekaObj={JSON.parse(verseObj.Translations)}
-                />
-              )}
-              {transliterationVisibility && (
-                <SlideTransliteration
-                  getFontSize={getFontSize}
-                  gurmukhiString={verseObj.Gurmukhi}
-                />
-              )}
               {displayNextLine && nextLineObj && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}

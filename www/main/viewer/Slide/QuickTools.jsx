@@ -29,14 +29,34 @@ const QuickTools = ({ isMiscSlide }) => {
     announcementsFontSize,
     quickTools,
   } = useStoreState((state) => state.userSettings);
+  const { baniOrder } = useStoreState((state) => state.navigator);
+  const { setBaniOrder } = useStoreActions((state) => state.navigator);
+
   const { quickToolsOpen } = useStoreState((state) => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions((state) => state.viewerSettings);
-  const [quickToolsActions, setQuickToolsActions] = useState([
-    'Gurbani',
-    'Translation',
-    'Teeka',
-    'Transliteration',
-  ]);
+  const [prevOrder, setPrevOrder] = useState([]);
+
+  const baniOptions = [
+    {
+      label: 'teeka',
+      options: [{ id: 'teeka-punjabi', text: 'Punjabi' }],
+    },
+    {
+      label: 'translation',
+      options: [
+        { id: 'translation-english', text: 'English' },
+        { id: 'translation-hindi', text: 'Hindi' },
+        { id: 'translation-spanish', text: 'Spanish' },
+      ],
+    },
+    {
+      label: 'transliteration',
+      options: [
+        { id: 'transliteration-english', text: 'English' },
+        { id: 'transliteration-hindi', text: 'Hindi' },
+      ],
+    },
+  ];
 
   const quickToolsModifiers = [
     {
@@ -67,7 +87,7 @@ const QuickTools = ({ isMiscSlide }) => {
   };
 
   const getIconClassName = (name, toolName, action) => {
-    if (name === 'visibility' && ['Translation', 'Teeka', 'Transliteration'].includes(toolName))
+    if (name === 'visibility' && ['translation', 'teeka', 'transliteration'].includes(toolName))
       return eval(convertToCamelCase(`${toolName}${action}`)) ? 'fa fa-eye' : 'fa fa-eye-slash';
     if (name === 'minus') return 'fa fa-minus-circle';
     if (name === 'plus') return 'fa fa-plus-circle';
@@ -96,11 +116,50 @@ const QuickTools = ({ isMiscSlide }) => {
 
   useEffect(() => {
     if (isMiscSlide) {
-      setQuickToolsActions(['Announcements']);
-    } else {
-      setQuickToolsActions(['Gurbani', 'Translation', 'Teeka', 'Transliteration']);
+      if (prevOrder !== baniOrder) {
+        setPrevOrder(baniOrder);
+      }
+      setBaniOrder([{ label: 'announcements', id: 'announcements' }]);
+    } else if (baniOrder !== prevOrder && prevOrder.length > 1) {
+      setBaniOrder(prevOrder);
     }
   }, [isMiscSlide]);
+
+  const handleQuickTools = (orderObj, index) => {
+    if (orderObj.label === 'gurbani' || orderObj.label === 'announcements') {
+      return <div style={{ 'text-transform': 'capitalize' }}>{orderObj.label}</div>;
+    }
+
+    const markup = baniOptions.map((optionObj, optionIndex) => (
+      <optgroup
+        key={`option-${optionIndex}`}
+        label={optionObj.label}
+        style={{ 'text-transform': 'capitalize' }}
+      >
+        {optionObj.options.map((optionName, nameIndex) => (
+          <option key={`option-name-${nameIndex}`} value={optionName.id}>
+            {optionName.text}
+          </option>
+        ))}
+      </optgroup>
+    ));
+    return (
+      <>
+        <div style={{ 'text-transform': 'capitalize' }}>{orderObj.label}</div>
+        <select
+          value={orderObj.id}
+          onChange={(event) => {
+            const newOrder = [...baniOrder];
+            const selectedText = event.target.options[event.target.selectedIndex].parentNode.label;
+            newOrder[index] = { label: selectedText, id: event.target.value };
+            setBaniOrder(newOrder);
+          }}
+        >
+          {markup}
+        </select>
+      </>
+    );
+  };
 
   return (
     <div className={`slide-quicktools ${!quickTools ? 'hide-quicktools' : ''}`.trim()}>
@@ -110,10 +169,12 @@ const QuickTools = ({ isMiscSlide }) => {
       </div>
       {quickToolsOpen && (
         <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
-          {quickToolsActions.map((name) => (
-            <div key={name} className="quicktool-item">
-              <div>{name}</div>
-              <div className="quicktool-icons">{bakeIcons(name, quickToolsModifiers)}</div>
+          {baniOrder.map((orderObj, index) => (
+            <div key={`item-${index}`} className="quicktool-item">
+              {handleQuickTools(orderObj, index)}
+              <div className="quicktool-icons">
+                {bakeIcons(orderObj.label, quickToolsModifiers)}
+              </div>
             </div>
           ))}
         </div>

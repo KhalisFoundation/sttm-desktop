@@ -2,24 +2,21 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
-const SlideTranslation = ({ getFontSize, translationObj, translationHTML }) => {
-  const {
-    translationLanguage,
-    translationFontSize,
-    translationEnglishSource,
-    translationHindiSource,
-  } = useStoreState((state) => state.userSettings);
+const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang }) => {
+  const { translationFontSize, translationEnglishSource, translationHindiSource } = useStoreState(
+    (state) => state.userSettings,
+  );
   const [translationString, setTranslationString] = useState(null);
 
   const getTranslation = (translations) => {
-    switch (translationLanguage) {
-      case 'English':
+    switch (lang) {
+      case 'translation-english':
         setTranslationString(translations.en[translationEnglishSource]);
         break;
-      case 'Spanish':
+      case 'translation-spanish':
         setTranslationString(translations.es.sn);
         break;
-      case 'Hindi':
+      case 'translation-hindi':
         setTranslationString((translations.hi && translations.hi[translationHindiSource]) || null);
         break;
       default:
@@ -32,7 +29,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML }) => {
     if (translationObj) {
       getTranslation(translationObj);
     }
-  }, [translationObj]);
+  }, [translationObj, lang]);
 
   let translationMarkup;
 
@@ -41,24 +38,19 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML }) => {
   if (translationHTML) {
     translationMarkup = (
       <div
-        className={`slide-translation custom-english language-${translationLanguage}`}
+        className={`slide-translation custom-english`}
         style={customStyle}
         dangerouslySetInnerHTML={{ __html: translationHTML }}
       />
     );
   } else if (translationString) {
     translationMarkup = (
-      <div className={`slide-translation language-${translationLanguage}`} style={customStyle}>
+      <div className={`slide-translation`} style={customStyle}>
         {translationString}
       </div>
     );
   } else {
-    translationMarkup = (
-      <div
-        className={`slide-translation language-${translationLanguage}`}
-        style={customStyle}
-      ></div>
-    );
+    translationMarkup = <div className={`slide-translation`} style={customStyle}></div>;
   }
 
   return translationMarkup;
@@ -67,6 +59,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML }) => {
 SlideTranslation.propTypes = {
   getFontSize: PropTypes.func,
   translationObj: PropTypes.object,
+  lang: PropTypes.string,
 };
 
 export default SlideTranslation;

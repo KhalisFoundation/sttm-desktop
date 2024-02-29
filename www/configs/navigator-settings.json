@@ -15,6 +15,12 @@
   "searchShabadsCount": 0,
   "savedCrossPlatformId": null,
   "historyOrder": "newest",
+  "baniOrder": [
+    { "label": "gurbani", "id": "gurbani" },
+    { "label": "translation", "id": "translation-english" },
+    { "label": "teeka", "id": "teeka" },
+    { "label": "transliteration", "id": "transliteration-english" }
+  ],
 
   "isMiscSlide": false,
   "miscSlideText": "",
