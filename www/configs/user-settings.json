@@ -28,16 +28,16 @@
       "step": 1,
       "settings": [
         "gurbani-font-size",
-        "translation-font-size",
-        "transliteration-font-size",
-        "teeka-font-size",
+        "content1-font-size",
+        "content2-font-size",
+        "content3-font-size",
         "announcements-font-size"
       ]
     },
     "visibility": {
       "title": "VISIBILITY",
       "type": "checkbox",
-      "settings": ["translation-visibility", "transliteration-visibility", "teeka-visibility"]
+      "settings": ["content1-visibility", "content2-visibility", "content3-visibility"]
     },
     "autoplay-options": {
       "title": "AUTOPLAY_OPTIONS",
@@ -57,13 +57,7 @@
     "language": {
       "title": "LANGUAGE_SETTINGS",
       "type": "dropdown",
-      "settings": [
-        "teeka-source",
-        "translation-language",
-        "translation-english-source",
-        "translation-hindi-source",
-        "transliteration-language"
-      ]
+      "settings": ["teeka-source"]
     },
     "app-settings": {
       "title": "APP_SETTINGS",
@@ -86,39 +80,120 @@
       "title": "BANI",
       "initialValue": 9
     },
-    "translation-font-size": {
-      "title": "TRANSLATION",
+    "content1-font-size": {
+      "title": "",
       "initialValue": 5,
-      "addon": "translation-visibility"
+      "addon": ["content1-visibility", "content1"]
     },
-    "teeka-font-size": {
-      "title": "PUNJABI_TEEKA",
+    "content2-font-size": {
+      "title": "",
       "initialValue": 4,
-      "addon": "teeka-visibility"
+      "addon": ["content2-visibility", "content2"]
     },
-    "transliteration-font-size": {
-      "title": "TRANSLITERATION",
+    "content3-font-size": {
+      "title": "",
       "initialValue": 4,
-      "addon": "transliteration-visibility"
+      "addon": ["content3-visibility", "content3"]
     },
     "announcements-font-size": {
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
-    "translation-visibility": {
+    "content1-visibility": {
       "title": "TRANSLATION_VISIBILITY",
       "type": "checkbox",
       "initialValue": true
     },
-    "teeka-visibility": {
+    "content2-visibility": {
       "title": "TEEKA_VISIBILITY",
       "type": "checkbox",
       "initialValue": true
     },
-    "transliteration-visibility": {
+    "content3-visibility": {
       "title": "TRANSLITERATION_VISIBILITY",
       "type": "checkbox",
       "initialValue": true
+    },
+    "content1": {
+      "title": "",
+      "initialValue": "translation-english",
+      "type": "multilevel-dropdown",
+      "disableWhen": "content1-visibility",
+      "options": [
+        {
+          "label": "teeka",
+          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
+        },
+        {
+          "label": "translation",
+          "options": [
+            { "id": "translation-english", "text": "English" },
+            { "id": "translation-hindi", "text": "Hindi" },
+            { "id": "translation-spanish", "text": "Spanish" }
+          ]
+        },
+        {
+          "label": "transliteration",
+          "options": [
+            { "id": "transliteration-english", "text": "English" },
+            { "id": "transliteration-hindi", "text": "Hindi" }
+          ]
+        }
+      ]
+    },
+    "content2": {
+      "title": "",
+      "initialValue": "teeka-punjabi",
+      "type": "multilevel-dropdown",
+      "disableWhen": "content2-visibility",
+      "options": [
+        {
+          "label": "teeka",
+          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
+        },
+        {
+          "label": "translation",
+          "options": [
+            { "id": "translation-english", "text": "English" },
+            { "id": "translation-hindi", "text": "Hindi" },
+            { "id": "translation-spanish", "text": "Spanish" }
+          ]
+        },
+        {
+          "label": "transliteration",
+          "options": [
+            { "id": "transliteration-english", "text": "English" },
+            { "id": "transliteration-hindi", "text": "Hindi" }
+          ]
+        }
+      ]
+    },
+    "content3": {
+      "title": "",
+      "initialValue": "transliteration-english",
+      "type": "multilevel-dropdown",
+      "disableWhen": "content3-visibility",
+      "options": [
+        {
+          "label": "teeka",
+          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
+        },
+        {
+          "label": "translation",
+          "options": [
+            { "id": "translation-english", "text": "English" },
+            { "id": "translation-hindi", "text": "Hindi" },
+            { "id": "translation-spanish", "text": "Spanish" }
+          ]
+        },
+        {
+          "label": "transliteration",
+          "options": [
+            { "id": "transliteration-english", "text": "English" },
+            { "id": "transliteration-hindi", "text": "Hindi" }
+          ]
+        }
+      ]
     },
     "akhandpatt": {
       "title": "AKHAND_PATH_VIEW",
@@ -224,7 +299,7 @@
       "type": "dropdown",
       "options": {
         "bdb": "BANI_DB",
-        "ms":"MANMOHAN_SINGH",
+        "ms": "MANMOHAN_SINGH",
         "ssk": "SANT_SINGH_KHALSA"
       },
       "condition": "translation-language",
@@ -235,7 +310,7 @@
       "title": "TRANSLATION_SOURCE",
       "type": "dropdown",
       "options": {
-        "ss":"SAHIB_SINGH",
+        "ss": "SAHIB_SINGH",
         "sts": "SANT_SINGH"
       },
       "condition": "translation-language",
@@ -248,7 +323,7 @@
       "options": {
         "bdb": "BANI_DB",
         "ft": "FAREEDKOT",
-        "ms":"MANMOHAN_SINGH",
+        "ms": "MANMOHAN_SINGH",
         "ss": "SANT_SINGH"
       },
       "initialValue": "bdb"

@@ -31,9 +31,9 @@ const SettingViewer = () => {
 
   const {
     gurbaniFontSize,
-    translationFontSize,
-    teekaFontSize,
-    transliterationFontSize,
+    content1FontSize,
+    content2FontSize,
+    content3FontSize,
     displayNextLine,
     leftAlign,
     theme,
@@ -63,15 +63,15 @@ const SettingViewer = () => {
   };
 
   const translationStyles = {
-    fontSize: `${translationFontSize * 3}px`,
+    fontSize: `${content1FontSize * 3}px`,
   };
 
   const transliterationStyles = {
-    fontSize: `${transliterationFontSize * 3}px`,
+    fontSize: `${content2FontSize * 3}px`,
   };
 
   const teekaStyles = {
-    fontSize: `${teekaFontSize * 3}px`,
+    fontSize: `${content3FontSize * 3}px`,
   };
 
   const nextLineStyles = {
@@ -157,10 +157,7 @@ const SettingViewer = () => {
               )}
             </div>
           </h1>
-          <h2
-            className="slide-translation translation"
-            style={{ ...translationStyles, order: translationOrder }}
-          >
+          <h2 className="slide-translation translation" style={{ ...translationStyles }}>
             <div>
               <div className="english-translation transtext">
                 Whatever I ask for from my Lord and Master, he gives that to me.
@@ -173,14 +170,14 @@ const SettingViewer = () => {
               </div>
             </div>
           </h2>
-          <h2 className="slide-teeka teeka" style={{ ...teekaStyles, order: teekaOrder }}>
+          <h2 className="slide-teeka teeka" style={{ ...teekaStyles }}>
             <div>
               hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
             </div>
           </h2>
           <h2
             className="slide-transliteration transliteration"
-            style={{ ...transliterationStyles, order: transliterationOrder }}
+            style={{ ...transliterationStyles }}
           >
             <div>
               <div className="english-transliteration translittext">

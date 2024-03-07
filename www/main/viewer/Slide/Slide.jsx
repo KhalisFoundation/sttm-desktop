@@ -20,13 +20,21 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     vishraamSource,
     vishraamType,
     displayNextLine,
+    content1,
+    content2,
+    content3,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
   } = useStoreState((state) => state.userSettings);
 
-  const { activeVerseId, baniOrder } = useStoreState((state) => state.navigator);
+  const { activeVerseId } = useStoreState((state) => state.navigator);
   const [showVerse, setShowVerse] = useState(true);
   const [orderMarkup, setOrderMarkup] = useState(null);
 
   const activeVerseRef = useRef(null);
+
+  const visibilityStates = [content1Visibility, content2Visibility, content3Visibility];
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -64,9 +72,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
   }, [verseObj]);
 
   useEffect(() => {
-    const markup = baniOrder.map((orderObj, index) => {
-      switch (orderObj.label) {
-        case 'teeka':
+    const markup = [content1, content2, content3].map((content, index) => {
+      if (visibilityStates[index]) {
+        if (content.includes('teeka')) {
           return (
             verseObj &&
             verseObj.Translations && (
@@ -74,10 +82,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                 getFontSize={getFontSize}
                 teekaObj={JSON.parse(verseObj.Translations)}
                 key={`line-${index}`}
+                position={index}
               />
             )
           );
-        case 'translation':
+        }
+        if (content.includes('translation')) {
           return (
             verseObj &&
             verseObj.Translations && (
@@ -85,11 +95,13 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                 getFontSize={getFontSize}
                 translationObj={JSON.parse(verseObj.Translations)}
                 key={`line-${index}`}
-                lang={orderObj.id}
+                lang={content}
+                position={index}
               />
             )
           );
-        case 'transliteration':
+        }
+        if (content.includes('transliteration')) {
           return (
             verseObj &&
             verseObj.Gurmukhi && (
@@ -97,16 +109,25 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                 getFontSize={getFontSize}
                 gurmukhiString={verseObj.Gurmukhi}
                 key={`line-${index}`}
-                lang={orderObj.id}
+                lang={content}
+                position={index}
               />
             )
           );
-        default:
-          return null;
+        }
       }
+      return null;
     });
     setOrderMarkup(markup);
-  }, [baniOrder]);
+  }, [
+    content1,
+    content2,
+    content3,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
+    verseObj,
+  ]);
 
   return (
     <div className="verse-slide-wrapper" style={{ background: bgColor }}>

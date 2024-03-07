@@ -1,40 +1,43 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-eval */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import convertToCamelCase from '../../common/utils/convert-to-camel-case';
+
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 global.platform = require('../../desktop_scripts');
 
 const QuickTools = ({ isMiscSlide }) => {
-  const {
-    setTranslationVisibility,
-    setTeekaVisibility,
-    setTransliterationVisibility,
-    setGurbaniFontSize,
-    setTranslationFontSize,
-    setTeekaFontSize,
-    setTransliterationFontSize,
-    setAnnouncementsFontSize,
-  } = useStoreActions((state) => state.userSettings);
-  const {
-    translationVisibility,
-    teekaVisibility,
-    transliterationVisibility,
-    gurbaniFontSize,
-    translationFontSize,
-    teekaFontSize,
-    transliterationFontSize,
-    announcementsFontSize,
-    quickTools,
-  } = useStoreState((state) => state.userSettings);
-  const { baniOrder } = useStoreState((state) => state.navigator);
-  const { setBaniOrder } = useStoreActions((state) => state.navigator);
+  const userSettings = useStoreState((state) => state.userSettings);
 
   const { quickToolsOpen } = useStoreState((state) => state.viewerSettings);
   const { setQuickToolsOpen } = useStoreActions((state) => state.viewerSettings);
+
   const [prevOrder, setPrevOrder] = useState([]);
+
+  const [baniOrder, setBaniOrder] = useState([
+    'gurbani',
+    userSettings.content1,
+    userSettings.content2,
+    userSettings.content3,
+  ]);
+
+  const dropdownLabel = (option) => {
+    if (option.includes('gurbani')) {
+      return i18n.t(`QUICK_TOOLS.BANI`);
+    }
+    if (option.includes('teeka')) {
+      return i18n.t(`QUICK_TOOLS.TEEKA`);
+    }
+    if (option.includes('translation')) {
+      return i18n.t(`QUICK_TOOLS.TRANSLATION`);
+    }
+    if (option.includes('transliteration')) {
+      return i18n.t(`QUICK_TOOLS.TRANSLITERATION`);
+    }
+    return '';
+  };
 
   const baniOptions = [
     {
@@ -73,41 +76,55 @@ const QuickTools = ({ isMiscSlide }) => {
     },
   ];
 
-  const createGlobalPlatformObj = (name, toolName, action) => {
-    let payload = eval(convertToCamelCase(`${toolName}${action}`));
-    const actionName = `set${toolName}${action}`;
-    if (name === 'visibility') payload = eval(`${actionName}(${!payload})`);
-    if (name === 'minus') payload = eval(`${actionName}(${payload} - 1)`);
-    if (name === 'plus') payload = eval(`${actionName}(${payload} + 1)`);
+  const createGlobalPlatformObj = (name, index, action) => {
+    let payload;
+    let actionName;
+    let stateName;
+
+    if (index > 0) {
+      stateName = `content${index}${action}`;
+      actionName = `setContent${index}${action}`;
+    } else {
+      stateName = `gurbani${action}`;
+      actionName = `setGurbani${action}`;
+    }
+
+    if (name === 'visibility') {
+      payload = !userSettings[stateName];
+    } else if (name === 'minus') {
+      payload = userSettings[stateName] - 1;
+    } else if (name === 'plus') {
+      payload = userSettings[stateName] + 1;
+    }
     return {
       actionName,
-      payload: payload.payload,
+      payload,
       settingType: 'userSettings',
     };
   };
 
-  const getIconClassName = (name, toolName, action) => {
-    if (name === 'visibility' && ['translation', 'teeka', 'transliteration'].includes(toolName))
-      return eval(convertToCamelCase(`${toolName}${action}`)) ? 'fa fa-eye' : 'fa fa-eye-slash';
+  const getIconClassName = (name, index, action) => {
+    if (index > 0 && name === 'visibility')
+      return userSettings[`content${index}${action}`] ? 'fa fa-eye' : 'fa fa-eye-slash';
     if (name === 'minus') return 'fa fa-minus-circle';
     if (name === 'plus') return 'fa fa-plus-circle';
     return '';
   };
 
   const hide = (name, toolName) =>
-    name === 'visibility' && ['Gurbani', 'Announcements'].includes(toolName)
+    name === 'visibility' && ['gurbani', 'announcements'].includes(toolName)
       ? 'quicktool-icons-hidden'
       : '';
 
-  const bakeIcons = (toolName, icons) =>
+  const bakeIcons = (toolName, index, icons) =>
     icons.map(({ name, actionName }) => (
       <div key={name} className={`quicktool-icons ${hide(name, toolName)}`}>
         <i
-          className={getIconClassName(name, toolName, actionName)}
+          className={getIconClassName(name, index, actionName)}
           onClick={() => {
             global.platform.ipc.send(
               'update-global-setting',
-              JSON.stringify(createGlobalPlatformObj(name, toolName, actionName)),
+              JSON.stringify(createGlobalPlatformObj(name, index, actionName)),
             );
           }}
         />
@@ -119,15 +136,19 @@ const QuickTools = ({ isMiscSlide }) => {
       if (prevOrder !== baniOrder) {
         setPrevOrder(baniOrder);
       }
-      setBaniOrder([{ label: 'announcements', id: 'announcements' }]);
+      setBaniOrder(['announcements']);
     } else if (baniOrder !== prevOrder && prevOrder.length > 1) {
       setBaniOrder(prevOrder);
     }
   }, [isMiscSlide]);
 
-  const handleQuickTools = (orderObj, index) => {
-    if (orderObj.label === 'gurbani' || orderObj.label === 'announcements') {
-      return <div style={{ 'text-transform': 'capitalize' }}>{orderObj.label}</div>;
+  useEffect(() => {
+    setBaniOrder(['gurbani', userSettings.content1, userSettings.content2, userSettings.content3]);
+  }, [userSettings.content1, userSettings.content2, userSettings.content3]);
+
+  const handleQuickTools = (order, index) => {
+    if (order === 'gurbani' || order === 'announcements') {
+      return <div>{dropdownLabel(order)}</div>;
     }
 
     const markup = baniOptions.map((optionObj, optionIndex) => (
@@ -145,14 +166,21 @@ const QuickTools = ({ isMiscSlide }) => {
     ));
     return (
       <>
-        <div style={{ 'text-transform': 'capitalize' }}>{orderObj.label}</div>
+        <div>{dropdownLabel(order)}</div>
         <select
-          value={orderObj.id}
+          value={order}
           onChange={(event) => {
             const newOrder = [...baniOrder];
-            const selectedText = event.target.options[event.target.selectedIndex].parentNode.label;
-            newOrder[index] = { label: selectedText, id: event.target.value };
+            newOrder[index] = event.target.value;
             setBaniOrder(newOrder);
+            global.platform.ipc.send(
+              'update-global-setting',
+              JSON.stringify({
+                actionName: `setContent${index}`,
+                payload: event.target.value,
+                settingType: 'userSettings',
+              }),
+            );
           }}
         >
           {markup}
@@ -162,19 +190,17 @@ const QuickTools = ({ isMiscSlide }) => {
   };
 
   return (
-    <div className={`slide-quicktools ${!quickTools ? 'hide-quicktools' : ''}`.trim()}>
+    <div className={`slide-quicktools ${!userSettings.quickTools ? 'hide-quicktools' : ''}`.trim()}>
       <div className="quicktool-header" onClick={() => setQuickToolsOpen(!quickToolsOpen)}>
         Quick Tools
         <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>
       </div>
       {quickToolsOpen && (
         <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
-          {baniOrder.map((orderObj, index) => (
+          {baniOrder.map((order, index) => (
             <div key={`item-${index}`} className="quicktool-item">
-              {handleQuickTools(orderObj, index)}
-              <div className="quicktool-icons">
-                {bakeIcons(orderObj.label, quickToolsModifiers)}
-              </div>
+              {handleQuickTools(order, index)}
+              <div className="quicktool-icons">{bakeIcons(order, index, quickToolsModifiers)}</div>
             </div>
           ))}
         </div>
