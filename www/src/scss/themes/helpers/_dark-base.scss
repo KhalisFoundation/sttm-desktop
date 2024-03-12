@@ -433,4 +433,9 @@
       }
     }
   }
+  .sundar-gutka-bani {
+    &:hover {
+      background-color: $disabled-dark;
+    }
+  }
 }
