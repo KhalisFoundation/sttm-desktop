@@ -16,6 +16,45 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       userSettingsState[stateVarName] = savedSettings[settingKey];
     }
 
+    // Defines an action to reset all font size settings to their initial values.
+    userSettingsState.resetFontSizes = action((state) => {
+      Object.keys(settingsSchema).forEach((settingKey) => {
+        if (settingsSchema[settingKey].type === 'range' && settingKey.includes('font-size')) {
+          const stateVarName = convertToCamelCase(settingKey);
+          const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
+          const oldValue = state[stateVarName]; // Capture the old value before updating
+          const initialValue = settingsSchema[settingKey].initialValue;
+          console.log('OldSavedsettings:', oldValue)
+          // Update state and savedSettings
+          state[stateVarName] = initialValue;
+          savedSettings[settingKey] = initialValue;
+
+          // Prepare payload
+          const payload = {
+            stateName: stateVarName,
+            payload: initialValue,
+            oldValue,
+            actionName: stateFuncName,
+            settingType: 'userSettings',
+          };
+          console.log('Payload:', payload)
+          // Broadcast the update to the webview if available
+          if (global.webview) {
+            global.webview.send('update-viewer-setting', JSON.stringify(payload));
+          }
+
+          // Broadcast the update to the platform IPC if available
+          if (global.platform) {
+            global.platform.ipc.send('update-viewer-setting', JSON.stringify(payload));
+          }
+        }
+      });
+
+      //Save the updated settings to a file
+      fs.writeFileSync(userConfigPath, JSON.stringify(savedSettings));
+      console.log('Savedsettings:', savedSettings)
+    });
+
     userSettingsState[stateFuncName] = action((state, payload) => {
       const oldValue = state[stateVarName];
       // eslint-disable-next-line no-param-reassign
