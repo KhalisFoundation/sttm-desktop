@@ -43,6 +43,19 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
 
   let settingDOM;
 
+  const dropdownLabel = (option) => {
+    if (option.includes('teeka')) {
+      return i18n.t(`QUICK_TOOLS.TEEKA`);
+    }
+    if (option.includes('translation')) {
+      return i18n.t(`QUICK_TOOLS.TRANSLATION`);
+    }
+    if (option.includes('transliteration')) {
+      return i18n.t(`QUICK_TOOLS.TRANSLITERATION`);
+    }
+    return '';
+  };
+
   switch (type) {
     case 'range':
       settingDOM = (
@@ -90,6 +103,32 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           handler={handleCheckboxChange}
           checked={userSettings[stateVar]}
         />
+      );
+      break;
+    case 'multilevel-dropdown':
+      settingDOM = (
+        <>
+          <select
+            value={userSettings[stateVar]}
+            onChange={handleInputChange}
+            style={{ marginRight: '8px' }}
+          >
+            {options.map((optionObj, optionIndex) => (
+              <optgroup
+                key={`option-${optionIndex}`}
+                label={optionObj.label}
+                style={{ 'text-transform': 'capitalize' }}
+              >
+                {optionObj.options.map((optionName, nameIndex) => (
+                  <option key={`option-name-${nameIndex}`} value={optionName.id}>
+                    {optionName.text}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <span>{dropdownLabel(userSettings[stateVar])}</span>
+        </>
       );
       break;
     default:
