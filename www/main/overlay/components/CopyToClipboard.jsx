@@ -11,8 +11,7 @@ export const CopyToClipboard = ({ url }) => {
 
   const handleCopy = () => {
     copy(url);
-    setCopied(!copied);
-    setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds.
+    setCopied(true);
   };
 
   return (
@@ -24,12 +23,14 @@ export const CopyToClipboard = ({ url }) => {
           className="url-text"
           onClick={handleCopy}
           onFocus={(event) => event.target.select()} // Select all text on focus
+          onMouseLeave={() => setCopied(false)}
           readOnly={true}
           value={url}
         />
         <span
           className="export-btn"
           onClick={handleCopy}
+          onMouseLeave={() => setCopied(false)}
         >
           <i className="fa fa-files-o cp-icon"></i>
         </span>
