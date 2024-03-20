@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { useStoreState } from 'easy-peasy';
 
 import Setting from './Setting';
 import { convertToCamelCase } from '../../common/utils';
@@ -70,19 +70,12 @@ const SettingsFactory = ({ subCategory }) => {
 };
 
 const Categories = ({ category }) => {
-  const resetFontSizes = useStoreActions((actions) => actions.userSettings.resetFontSizes);
   const categoriesDOM = [];
   Object.keys(category.subCatObjs).forEach((subCat, scIndex) => {
     categoriesDOM.push(
       <div key={`control-${scIndex}`} className={`controls-container`} id={`settings-${subCat}`}>
         <h4>{i18n.t(`SETTINGS.${category.subCatObjs[subCat].title}`)}</h4>
         <SettingsFactory subCategory={category.subCatObjs[subCat]} />
-        {/* Renders 'Reset Font Sizes' button for 'font-sizes' subcategory. Clicking it calls resetFontSizes to revert font sizes to defaults. */}
-        {subCat === 'font-sizes' && (
-          <button onClick={resetFontSizes} key="reset-font-sizes">
-            {i18n.t('Reset Font Sizes')}
-          </button>
-        )}
       </div>,
     );
   });
