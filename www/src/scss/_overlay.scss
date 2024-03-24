@@ -98,15 +98,30 @@ $toolbar-width: 40px;
 }
 
 .url-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
   input[type='text'] {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 32px;
     color: #333;
     font-size: 12px;
+    line-height: 2;
     margin: 0;
     padding: 10px;
     text-align: center;
+  }
+
+  .tooltip {
+    background-color: black;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0;
+    padding: 0.5em 0.7em;
+    width: max-content;
   }
 }
 
@@ -329,6 +344,10 @@ input[type='color'] {
   background: #ddd;
   display: inline-block;
   margin: 2px;
+
+  &:hover + .tooltip {
+    opacity: 1;
+  }
 }
 
 .resize-btn {
