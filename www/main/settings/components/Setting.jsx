@@ -146,13 +146,13 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       break;
     case 'reset-button':
       settingDOM = (
-        <button
+        <div
           onClick={handleResetFontSizes}
           className="icon-reset"
-          title={settingObj.tooltip}
-          style={{ backgroundImage: `url('assets/img/icons/${settingObj.icon}')` }}
         >
-        </button>
+          <img src="assets/img/icons/reset.svg" alt="Reset Font Sizes to Default" />
+        </div>
+
       );
       break;
     default:

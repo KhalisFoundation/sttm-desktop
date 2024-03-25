@@ -221,12 +221,15 @@
         }
 
         .icon-reset {
-          background-size: cover;
           border-radius: 4px;
           border: 2px solid white;
           box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
-          height: 30px;
-          width: 30px;
+          cursor: pointer;
+          
+          img{
+            height: 30px;
+            width: 30px;
+          }
         }
       }
     }

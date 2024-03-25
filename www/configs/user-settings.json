@@ -103,8 +103,6 @@
     "reset-font-sizes": {
       "title": "RESET FONT SIZES",
       "type": "reset-button",
-      "icon": "reset.svg",
-      "tooltip": "Reset Fonts Sizes",
       "resetSettings": [
         "gurbani-font-size",
         "content1-font-size",
