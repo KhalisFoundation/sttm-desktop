@@ -219,6 +219,18 @@
             }
           }
         }
+
+        .icon-reset {
+          border-radius: 4px;
+          border: 2px solid white;
+          box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          
+          img{
+            height: 30px;
+            width: 30px;
+          }
+        }
       }
     }
   }
