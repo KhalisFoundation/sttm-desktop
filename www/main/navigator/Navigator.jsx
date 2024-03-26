@@ -153,8 +153,6 @@ const Navigator = () => {
       <>
         <div className="navigator-row">
           <SearchPane />
-        </div>
-        <div className="navigator-row">
           <ViewerPane />
         </div>
       </>
@@ -162,11 +160,11 @@ const Navigator = () => {
   }
   return (
     <>
-      <div className="navigator-row">
+      <div className="navigator-column">
         <SearchPane />
         <ShabadPane />
       </div>
-      <div className="navigator-row">
+      <div className="navigator-column">
         <ViewerPane />
         <MiscPane
           waheguruSlide={openWaheguruSlide}

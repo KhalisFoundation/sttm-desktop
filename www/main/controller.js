@@ -2,7 +2,6 @@ const electron = require('electron');
 const remote = require('@electron/remote');
 const { updateViewerScale } = require('./viewer/utils');
 
-const { ipcRenderer } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
@@ -10,15 +9,6 @@ const analytics = remote.getGlobal('analytics');
 const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
-
-setTimeout(() => {
-  global.webview = document.querySelector('webview');
-
-  global.webview.addEventListener('dom-ready', () => {
-    ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
-    global.webview.send('is-webview');
-  });
-}, 200);
 
 const updateMenu = [];
 

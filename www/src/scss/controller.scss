@@ -252,13 +252,19 @@ ul {
     }
   }
 
-  .navigator-row {
+  .navigator-column {
     align-items: center;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     position: relative;
     width: 50vw;
+  }
+
+  .navigator-row {
+    width: 100vw;
+    display: flex;
+    justify-content: space-evenly;
   }
 }
 
