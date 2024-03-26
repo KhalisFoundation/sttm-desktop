@@ -69,7 +69,8 @@
   },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
-    "SINGLE_DISPLAY": "Single Display"
+    "SINGLE_DISPLAY": "Single-Display",
+    "MULTI_PANE": "Multi-Pane"
   },
   "CHROMECAST": {
     "CANCEL": "Cancel",

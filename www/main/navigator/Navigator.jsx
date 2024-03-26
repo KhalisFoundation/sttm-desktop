@@ -10,11 +10,13 @@ import insertSlide from '../common/constants/slidedb';
 
 const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
+
 const analytics = remote.getGlobal('analytics');
 
 const Navigator = () => {
-  const { isSingleDisplayMode, akhandpatt } = useStoreState((state) => state.userSettings);
-  const { setAkhandpatt } = useStoreState((state) => state.userSettings);
+  const { akhandpatt } = useStoreState((state) => state.userSettings);
+  const { setAkhandpatt, currentWorkspace } = useStoreState((state) => state.userSettings);
   const {
     minimizedBySingleDisplay,
     shortcuts,
@@ -125,43 +127,54 @@ const Navigator = () => {
     }
   }, [shortcuts]);
 
+  if (currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY')) {
+    return (
+      <>
+        <div
+          className={`single-display-controller ${
+            minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
+          }`}
+        >
+          <Pane
+            header={singleDisplayHeader}
+            content={singleDisplayContent}
+            footer={singleDisplayFooter}
+            className="single-display-pane"
+          />
+        </div>
+        <div className="single-display-viewer">
+          <ViewerPane />
+        </div>
+      </>
+    );
+  }
+  if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+    return (
+      <>
+        <div className="navigator-row">
+          <SearchPane />
+        </div>
+        <div className="navigator-row">
+          <ViewerPane />
+        </div>
+      </>
+    );
+  }
   return (
     <>
-      {isSingleDisplayMode ? (
-        <>
-          <div
-            className={`single-display-controller ${
-              minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
-            }`}
-          >
-            <Pane
-              header={singleDisplayHeader}
-              content={singleDisplayContent}
-              footer={singleDisplayFooter}
-              className="single-display-pane"
-            />
-          </div>
-          <div className="single-display-viewer">
-            <ViewerPane />
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="navigator-row">
-            <SearchPane />
-            <ShabadPane />
-          </div>
-          <div className="navigator-row">
-            <ViewerPane />
-            <MiscPane
-              waheguruSlide={openWaheguruSlide}
-              moolMantraSlide={openMoolMantraSlide}
-              blankSlide={openBlankViewer}
-              anandSahibBhog={openAnandSahibBhog}
-            />
-          </div>
-        </>
-      )}
+      <div className="navigator-row">
+        <SearchPane />
+        <ShabadPane />
+      </div>
+      <div className="navigator-row">
+        <ViewerPane />
+        <MiscPane
+          waheguruSlide={openWaheguruSlide}
+          moolMantraSlide={openMoolMantraSlide}
+          blankSlide={openBlankViewer}
+          anandSahibBhog={openAnandSahibBhog}
+        />
+      </div>
     </>
   );
 };

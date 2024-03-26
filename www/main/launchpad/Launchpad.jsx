@@ -20,6 +20,7 @@ import { DEFAULT_OVERLAY } from '../common/constants';
 
 const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
 export const InputContext = createContext();
@@ -29,7 +30,7 @@ const Launchpad = () => {
   const { shortcuts } = useStoreState((state) => state.navigator);
   const { setShortcuts } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const ref = useRef();
 
@@ -194,6 +195,7 @@ const Launchpad = () => {
   const isSettingsOverlay = overlayScreen === 'settings';
   const isAuthDialog = overlayScreen === 'auth-dialog';
   const isAnnouncement = overlayScreen === 'announcement';
+  const isSingleDisplayMode = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
 
   return (
     <>
