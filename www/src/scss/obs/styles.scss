@@ -84,10 +84,6 @@ body {
 }
 
 .layout-top {
-  .content-top {
-    padding-top: 3vh;
-  }
-
   .o-gurbani,
   .o-translation {
     padding: 0.5% 3vw;
@@ -102,16 +98,6 @@ body {
   .overlay-wrapper {
     bottom: 0;
     position: absolute;
-  }
-
-  .content-top {
-    .content-bar {
-      padding-top: 8px;
-    }
-  }
-
-  .content-bottom {
-    padding-bottom: 3vh;
   }
 
   .o-gurbani,
