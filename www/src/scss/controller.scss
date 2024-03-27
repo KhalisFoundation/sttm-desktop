@@ -11,6 +11,7 @@ $totalSessionOffset: $footerOffset + $shortcutTrayHeight;
 $sessionPageHeight: calc(100% - #{$totalSessionOffset});
 
 .presenter-view.shortcut-tray-true {
+
   #main-ui,
   .nav-page:nth-child(2) {
     height: $sessionPageHeight;
@@ -92,6 +93,7 @@ ul {
 .launchpad {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   height: 100%;
   overflow-x: auto;
   padding: 10px 10px 40px 50px;
@@ -121,6 +123,7 @@ ul {
         .pane {
           height: inherit;
         }
+
         .shabad-list {
           height: inherit;
         }
@@ -142,7 +145,7 @@ ul {
         }
 
         .pane-content {
-          > div {
+          >div {
             padding: 0;
           }
         }
@@ -175,6 +178,7 @@ ul {
         .pane {
           height: inherit;
         }
+
         .search-footer {
           margin: 0;
           width: 100%;
@@ -204,7 +208,7 @@ ul {
       top: 0;
       width: 100%;
 
-      & > .viewer-pane {
+      &>.viewer-pane {
         padding: 0;
 
         & .pane {
@@ -228,13 +232,14 @@ ul {
       }
     }
   }
-  
+
   .single-display {
     &-minimize {
       min-height: auto;
       height: 5vh;
     }
   }
+
   .single-display-switches {
     background: rgba(221, 221, 221, 1);
 
@@ -256,9 +261,10 @@ ul {
     align-items: center;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     justify-content: space-evenly;
     position: relative;
-    width: 50vw;
+    width: 50%;
   }
 
   .navigator-row {
@@ -266,6 +272,41 @@ ul {
     display: flex;
     justify-content: space-evenly;
   }
+
+  .multipane-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 100%;
+    height: 100%;
+  }
+
+  .searchpane-container {
+    grid-column: 1/4;
+    grid-row: 1;
+  }
+
+  .viewerpane-container {
+    grid-column: 4/7;
+    grid-row: 1;
+  }
+
+  .shabad1-container, .shabad2-container, .shabad3-container {
+    grid-row: 2;
+  }
+
+  .shabad1-container {
+    grid-column: 1/3;
+  }
+
+  .shabad2-container {
+    grid-column: 3/5;
+  }
+
+  .shabad3-container {
+    grid-column: 5/7;
+  }
+
 }
 
 .minimized {
@@ -348,7 +389,7 @@ ul {
   }
 
   &#session-page {
-    ul > li {
+    ul>li {
       align-items: center;
       display: flex;
 
@@ -395,7 +436,7 @@ ul {
       border-bottom: none;
     }
 
-    li > a {
+    li>a {
       cursor: default;
       display: block;
       line-height: normal;
@@ -523,4 +564,4 @@ ul {
 }
 
 @import 'foundation/foundation', 'animations', 'footer', 'forms', 'header', 'helpers', 'search',
-  'share-sync', 'settings', 'notifications';
+'share-sync', 'settings', 'notifications';

@@ -150,12 +150,23 @@ const Navigator = () => {
   }
   if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
     return (
-      <>
-        <div className="navigator-row">
+      <div className="multipane-grid">
+        <div className="searchpane-container">
           <SearchPane />
+        </div>
+        <div className="viewerpane-container">
           <ViewerPane />
         </div>
-      </>
+        <div className="shabad1-container">
+          <ShabadPane />
+        </div>
+        <div className="shabad2-container">
+          <ShabadPane />
+        </div>
+        <div className="shabad3-container">
+          <ShabadPane />
+        </div>
+      </div>
     );
   }
   return (

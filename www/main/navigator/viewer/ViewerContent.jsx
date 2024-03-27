@@ -31,9 +31,9 @@ const ViewerContent = () => {
         id="webview-viewer"
         ref={webviewRef}
         /* eslint-disable react/no-unknown-property */
-        nodeIntegration="true"
-        nodeIntegrationInSubFrames="true"
-        webPreferences="contextIsolation=no"
+        nodeintegration="true"
+        nodeintegrationinsubframes="true"
+        webpreferences="contextIsolation=no"
       />
     </div>
   );
