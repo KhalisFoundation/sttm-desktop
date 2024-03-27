@@ -138,7 +138,6 @@ body {
     width: auto;
   }
   .logo-wrapper {
-    border-radius: 2px;
     top: 2vh;
   }
 
@@ -184,6 +183,7 @@ body {
     display: block;
     height: 100px;
     position: relative;
+    right: 0;
     width: 100%;
     .sttm-logo {
       display: none;
@@ -351,7 +351,7 @@ body {
 .logo-wrapper {
   align-items: center;
   background: #fff;
-  border-radius: 5px;
+  border-radius: 2px;
   display: inline-flex;
   justify-content: center;
   padding: 2vh 2vw;
