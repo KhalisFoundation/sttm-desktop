@@ -158,13 +158,13 @@ const Navigator = () => {
           <ViewerPane />
         </div>
         <div className="shabad1-container">
-          <ShabadPane />
+          <ShabadPane multiPaneId={1} />
         </div>
         <div className="shabad2-container">
-          <ShabadPane />
+          <ShabadPane multiPaneId={2} />
         </div>
         <div className="shabad3-container">
-          <ShabadPane />
+          <ShabadPane multiPaneId={3} />
         </div>
       </div>
     );
