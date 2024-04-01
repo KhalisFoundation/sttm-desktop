@@ -45,5 +45,23 @@
   "isDontSaveHistory": false,
   "favShabad": [],
   "searchVerse": "",
-  "currentMiscPanel": "History"
+  "currentMiscPanel": "History",
+
+  "activePaneId": null,
+  "defaultPaneId": null,
+  "pane1": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": ""
+  },
+  "pane2": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": ""
+  },
+  "pane3": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": ""
+  }
 }

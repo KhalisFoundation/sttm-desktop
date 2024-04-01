@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
+import { useStoreState } from 'easy-peasy';
 
 const remote = require('@electron/remote');
 
@@ -19,6 +20,8 @@ const SearchResults = ({
   writer,
   currentLanguage,
 }) => {
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+
   const getClassForAng = (baniSource) => {
     if (baniSource === 'G') {
       return 'sggs-color';
@@ -43,6 +46,19 @@ const SearchResults = ({
       return 'ak-border';
     }
     return 'other-border';
+  };
+
+  const shabadPaneButtons = () => {
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      return (
+        <div className="button-container">
+          <button onClick={() => onClick(shabadId, verseId, verse, 1)}>1</button>
+          <button onClick={() => onClick(shabadId, verseId, verse, 2)}>2</button>
+          <button onClick={() => onClick(shabadId, verseId, verse, 3)}>3</button>
+        </div>
+      );
+    }
+    return null;
   };
 
   const isHighlightRequired = (gurbaniVerse, word, wordIndex, searchCharacters) => {
@@ -100,8 +116,11 @@ const SearchResults = ({
   };
 
   return (
-    <li onClick={() => onClick(shabadId, verseId, verse)} className="search-li">
-      <div className={`search-list ${getBorderColorClass(sourceId)}`}>
+    <li className="search-li">
+      <div
+        onClick={() => onClick(shabadId, verseId, verse)}
+        className={`search-list ${getBorderColorClass(sourceId)}`}
+      >
         <a className="panktee">
           {!!ang && (
             <span className={`${getClassForAng(sourceId)}`}>{`${i18n.t(
@@ -115,6 +134,7 @@ const SearchResults = ({
           </div>
         </a>
       </div>
+      {shabadPaneButtons()}
     </li>
   );
 };

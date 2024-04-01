@@ -11,6 +11,7 @@ export const useNewShabad = () => {
     isMiscSlide,
     singleDisplayActiveTab,
     searchVerse,
+    activePaneId,
   } = useStoreState((state) => state.navigator);
 
   const {
@@ -23,10 +24,15 @@ export const useNewShabad = () => {
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
     setSearchVerse,
-  } = useStoreActions((state) => state.navigator);
+    setActivePaneId,
+  } = useStoreActions((actions) => actions.navigator);
 
-  return (newSelectedShabad, newSelectedVerse, newSearchVerse) => {
+  return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
     // Push verseId of active Verse to versesRead Array when shabad is changed
+    if (multiPaneId && activePaneId !== multiPaneId) {
+      setActivePaneId(multiPaneId);
+    }
+
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }

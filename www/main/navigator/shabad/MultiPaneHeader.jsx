@@ -1,10 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const MultiPaneHeader = ({ data }) => {
-  console.log('MultiPaneHeader', data);
-  const heading = `Shabad Header ${data.multiPaneId}`;
-  return <div className="shabad-pane-header">{heading}</div>;
+  const paneId = data.multiPaneId;
+  const navigatorState = useStoreState((state) => state.navigator);
+  const navigatorActions = useStoreActions((state) => state.navigator);
+  const paneAttributes = navigatorState[`pane${paneId}`];
+  const setPaneAttributes = navigatorActions[`setPane${paneId}`];
+
+  return (
+    <div className="shabad-pane-header">
+      <button
+        onClick={() => {
+          const updatedAttributes = { ...paneAttributes };
+          updatedAttributes.locked = !paneAttributes.locked;
+          if (paneAttributes !== updatedAttributes) {
+            setPaneAttributes(updatedAttributes);
+          }
+        }}
+      >
+        {paneAttributes.locked ? (
+          <i className="fa-solid fa-lock"></i>
+        ) : (
+          <i className="fa-solid fa-lock-open"></i>
+        )}
+      </button>
+    </div>
+  );
 };
 
 MultiPaneHeader.propTypes = {
