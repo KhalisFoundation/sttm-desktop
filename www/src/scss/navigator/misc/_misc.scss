@@ -268,6 +268,31 @@ $misc-footer-active: 70px;
   }
 }
 
+.slides-pane-container {
+  padding: 0 32px;
+
+  .slides-pane {
+    @include flex($jc-value: space-evenly);
+    background: $philippine-gray;
+    height: 70px;
+
+    .tray-item-icon {
+      cursor: pointer;
+      font-size: 14px;
+      height: 54px;
+      line-height: 1.15em;
+      padding: 10px;
+      transition: 0.3s all ease;
+      @include flex($jc-value: center, $width: fit-content);
+
+      &:hover {
+        height: 60px;
+        padding: 14px;
+      }
+    }
+  }
+}
+
 .dhan-guru {
   &-pane {
     padding: 0 32px;
@@ -300,7 +325,7 @@ $misc-footer-active: 70px;
       .dhan-guru-button {
         &-prefix {
           background: url('../../assets/img/icons/play-button-filled.svg') no-repeat center center;
-          background-color: $cadmium-orange;
+          background-color: $princeton-orange;
           background-size: 26px;
           color: transparent;
         }
@@ -313,12 +338,12 @@ $misc-footer-active: 70px;
 
     &-prefix {
       @include flex($jc-value: center, $width: auto);
-      background: $cadmium-orange;
+      background: $princeton-orange;
     }
 
     &-text {
       @include flex($jc-value: start, $width: auto);
-      background: $darker-grey;
+      background: $philippine-gray;
       padding-left: 8px;
     }
   }
