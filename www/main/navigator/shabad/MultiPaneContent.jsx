@@ -19,7 +19,14 @@ const MultiPaneContent = ({ data }) => {
     }
   }, [activePaneId]);
 
-  return <ShabadText shabadId={paneAttributes.activeShabad} baniType="shabad" baniLength="short" />;
+  return (
+    <ShabadText
+      shabadId={paneAttributes.activeShabad}
+      baniType="shabad"
+      baniLength="short"
+      paneId={paneId}
+    />
+  );
 };
 
 MultiPaneContent.propTypes = {

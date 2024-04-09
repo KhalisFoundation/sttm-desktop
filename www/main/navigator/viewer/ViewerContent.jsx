@@ -7,7 +7,6 @@ const ViewerContent = () => {
   useEffect(() => {
     const handleDomReady = () => {
       ipcRenderer.send('enable-wc-webview', webviewRef.current.getWebContentsId());
-      webviewRef.current.send('is-webview');
       global.webview = webviewRef.current;
     };
 
@@ -19,6 +18,7 @@ const ViewerContent = () => {
     return () => {
       if (webviewElement) {
         webviewElement.removeEventListener('dom-ready', handleDomReady);
+        global.webview = null;
       }
     };
   }, []);

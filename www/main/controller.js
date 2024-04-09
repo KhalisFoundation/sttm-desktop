@@ -423,7 +423,7 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[5].visible = true;
 });
 global.platform.ipc.on('send-scroll', (event, arg) => {
-  global.webview.send('send-scroll', JSON.stringify(arg));
+  if (global.webview) global.webview.send('send-scroll', JSON.stringify(arg));
 });
 global.platform.ipc.on('next-ang', (event, arg) => {
   const { PageNo, SourceID } = JSON.parse(arg);
@@ -440,7 +440,7 @@ global.platform.ipc.on('cast-session-active', () => {
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
-  global.webview.send('clear-apv');
+  if (global.webview) global.webview.send('clear-apv');
   global.platform.ipc.send('clear-apv');
 
   document.body.classList.remove('akhandpaatt');

@@ -1,9 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
-
 import { Virtuoso } from 'react-virtuoso';
+import { useStoreActions, useStoreState } from 'easy-peasy';
+
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+import {
+  changeHomeVerse,
+  changeVerse,
+  sendToBaniController,
+  filterRequiredVerseItems,
+} from './utils';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -14,37 +21,21 @@ const baniLengthCols = {
 
 export const ShabadText = ({ shabadId, baniType, baniLength }) => {
   const [filteredItems, setFilteredItems] = useState([]);
+  const {
+    homeVerse,
+    activeVerseId,
+    isMiscSlide,
+    isSundarGutkaBani,
+    sundarGutkaBaniId,
+    isCeremonyBani,
+    ceremonyId,
+    activeShabadId,
+  } = useStoreState((state) => state.navigator);
 
-  const filterRequiredVerseItems = (verses) => {
-    let versesNew;
-    let currentLine = 0;
-    try {
-      versesNew = verses.flat(1);
-    } catch (error) {
-      versesNew = verses;
-    }
-    const checkPauri = versesNew.filter((verse) => /]\d*]/.test(verse.Gurmukhi));
-    const regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
-    return versesNew
-      ? versesNew.map((verse, index) => {
-          if (verse) {
-            const verseObj = {
-              ID: index,
-              verseId: verse.ID,
-              verse: verse.Gurmukhi,
-              english: verse.English ? verse.English : '',
-              lineNo: currentLine,
-              crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
-            };
-            if (regex.test(verse.Gurmukhi)) {
-              currentLine++;
-            }
-            return verseObj;
-          }
-          return {};
-        })
-      : [];
-  };
+  const { setHomeVerse, setActiveVerseId, setIsMiscSlide } = useStoreActions(
+    (actions) => actions.navigator,
+  );
+  const [activeVerse, setActiveVerse] = useState({});
 
   useEffect(() => {
     if (baniType === 'shabad') {
@@ -68,12 +59,27 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
     }
   }, [shabadId, baniType, baniLength]);
 
-  const changeHomeVerse = () => {
-    console.log('changeHomeVerse');
+  const updateHomeVerse = (verseIndex) => {
+    changeHomeVerse(verseIndex, { homeVerse, setHomeVerse });
   };
 
-  const updateTraversedVerse = () => {
-    console.log('updateTraversedVerse');
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
+    changeVerse(newTraversedVerse, verseIndex, {
+      activeVerseId,
+      setActiveVerseId,
+      setActiveVerse,
+    });
+    sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
+      isSundarGutkaBani,
+      sundarGutkaBaniId,
+      isCeremonyBani,
+      ceremonyId,
+      activeShabadId,
+      homeVerse,
+    });
   };
 
   return (
@@ -87,14 +93,14 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
             return (
               <ShabadVerse
                 key={index}
-                activeVerse={filteredItems[0]}
-                isHomeVerse={false}
+                activeVerse={activeVerse}
+                isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={[]}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
-                changeHomeVerse={changeHomeVerse}
+                changeHomeVerse={updateHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />
             );
