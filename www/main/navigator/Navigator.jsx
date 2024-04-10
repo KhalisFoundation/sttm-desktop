@@ -148,42 +148,35 @@ const Navigator = () => {
       </>
     );
   }
-  if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-    return (
-      <div className="multipane-grid">
-        <div className="searchpane-container">
-          <SearchPane />
-        </div>
-        <div className="viewerpane-container">
-          <ViewerPane />
-        </div>
-        <div className="shabad1-container">
-          <ShabadPane multiPaneId={1} />
-        </div>
-        <div className="shabad2-container">
-          <ShabadPane multiPaneId={2} />
-        </div>
-        <div className="shabad3-container">
-          <ShabadPane multiPaneId={3} />
-        </div>
-      </div>
-    );
-  }
   return (
     <>
-      <div className="navigator-column">
+      <div className="navigator-row">
         <SearchPane />
-        <ShabadPane />
-      </div>
-      <div className="navigator-column">
         <ViewerPane />
-        <MiscPane
-          waheguruSlide={openWaheguruSlide}
-          moolMantraSlide={openMoolMantraSlide}
-          blankSlide={openBlankViewer}
-          anandSahibBhog={openAnandSahibBhog}
-        />
       </div>
+      {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') ? (
+        <div className="multipane-grid">
+          <div className="shabad1-container">
+            <ShabadPane multiPaneId={1} />
+          </div>
+          <div className="shabad2-container">
+            <ShabadPane multiPaneId={2} />
+          </div>
+          <div className="shabad3-container">
+            <ShabadPane multiPaneId={3} />
+          </div>
+        </div>
+      ) : (
+        <div className="navigator-row">
+          <ShabadPane />
+          <MiscPane
+            waheguruSlide={openWaheguruSlide}
+            moolMantraSlide={openMoolMantraSlide}
+            blankSlide={openBlankViewer}
+            anandSahibBhog={openAnandSahibBhog}
+          />
+        </div>
+      )}
     </>
   );
 };

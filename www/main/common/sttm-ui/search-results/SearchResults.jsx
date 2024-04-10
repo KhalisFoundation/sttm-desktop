@@ -20,7 +20,7 @@ const SearchResults = ({
   writer,
   currentLanguage,
 }) => {
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const getClassForAng = (baniSource) => {
     if (baniSource === 'G') {
@@ -118,7 +118,7 @@ const SearchResults = ({
   return (
     <li className="search-li">
       <div
-        onClick={() => onClick(shabadId, verseId, verse)}
+        onClick={() => onClick(shabadId, verseId, verse, defaultPaneId)}
         className={`search-list ${getBorderColorClass(sourceId)}`}
       >
         <a className="panktee">

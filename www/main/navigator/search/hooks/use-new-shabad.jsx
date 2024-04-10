@@ -1,5 +1,9 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
+
 export const useNewShabad = () => {
   const {
     versesRead,
@@ -11,8 +15,12 @@ export const useNewShabad = () => {
     isMiscSlide,
     singleDisplayActiveTab,
     searchVerse,
-    activePaneId,
+    pane1,
+    pane2,
+    pane3,
   } = useStoreState((state) => state.navigator);
+
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const {
     setActiveShabadId,
@@ -24,13 +32,26 @@ export const useNewShabad = () => {
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
     setSearchVerse,
-    setActivePaneId,
+    setPane1,
+    setPane2,
+    setPane3,
   } = useStoreActions((actions) => actions.navigator);
 
   return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
-    // Push verseId of active Verse to versesRead Array when shabad is changed
-    if (multiPaneId && activePaneId !== multiPaneId) {
-      setActivePaneId(multiPaneId);
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      switch (multiPaneId) {
+        case 1:
+          setPane1({ ...pane1, activeShabad: newSelectedShabad });
+          break;
+        case 2:
+          setPane2({ ...pane2, activeShabad: newSelectedShabad });
+          break;
+        case 3:
+          setPane3({ ...pane3, activeShabad: newSelectedShabad });
+          break;
+        default:
+          break;
+      }
     }
 
     if (singleDisplayActiveTab !== 'shabad') {
@@ -50,8 +71,13 @@ export const useNewShabad = () => {
       setIsCeremonyBani(false);
     }
 
-    if (activeShabadId !== newSelectedShabad) {
-      setActiveShabadId(newSelectedShabad);
+    if (
+      currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE') &&
+      activeShabadId !== newSelectedShabad
+    ) {
+      if (activeShabadId !== newSelectedShabad) {
+        setActiveShabadId(newSelectedShabad);
+      }
 
       // initialVerseId is the verse which is stored in history
       // It is the verse we searched for.

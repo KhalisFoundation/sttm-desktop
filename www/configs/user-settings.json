@@ -372,6 +372,10 @@
     "currentWorkspace": {
       "title": "CURRENT_WORKSPACE",
       "initialValue": "Presentation"
+    },
+    "defaultPaneId": {
+      "title": "DEFAULT_PANE",
+      "initialValue": 1
     }
   }
 }

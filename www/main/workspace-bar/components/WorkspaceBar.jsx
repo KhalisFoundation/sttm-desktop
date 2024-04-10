@@ -17,7 +17,7 @@ const WorkspaceBar = () => {
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
   const singleDisplayIdentifier = i18n.t('WORKSPACES.SINGLE_DISPLAY');
   const multiPaneIdentifier = i18n.t('WORKSPACES.MULTI_PANE');
-  const workspaces = [presenterIdentifier, singleDisplayIdentifier, multiPaneIdentifier];
+  const workspaces = [singleDisplayIdentifier, presenterIdentifier, multiPaneIdentifier];
 
   const handleWorkspaceChange = (workspace) => {
     const moveToPresenter = workspace === presenterIdentifier;

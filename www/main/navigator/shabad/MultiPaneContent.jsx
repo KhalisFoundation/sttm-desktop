@@ -9,11 +9,11 @@ const MultiPaneContent = ({ data }) => {
   const navigatorActions = useStoreActions((state) => state.navigator);
   const paneAttributes = navigatorState[`pane${paneId}`];
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
-  const { activePaneId, activeShabadId } = navigatorState;
+  const { activePaneId } = navigatorState;
 
   useEffect(() => {
     if (activePaneId === paneId) {
-      setPaneAttributes({ ...paneAttributes, locked: true, activeShabad: activeShabadId });
+      setPaneAttributes({ ...paneAttributes, locked: true });
     } else {
       setPaneAttributes({ ...paneAttributes, locked: false });
     }

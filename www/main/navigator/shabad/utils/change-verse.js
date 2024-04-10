@@ -1,8 +1,12 @@
 export const changeVerse = (
   newTraversedVerse,
   verseIndex,
-  { activeVerseId, setActiveVerseId, setActiveVerse },
+  clickedShabad,
+  { activeVerseId, setActiveVerseId, setActiveVerse, setActiveShabadId, activeShabadId },
 ) => {
+  if (clickedShabad !== activeShabadId) {
+    setActiveShabadId(clickedShabad);
+  }
   setActiveVerse({ [verseIndex]: newTraversedVerse });
   if (activeVerseId !== newTraversedVerse) {
     setActiveVerseId(newTraversedVerse);

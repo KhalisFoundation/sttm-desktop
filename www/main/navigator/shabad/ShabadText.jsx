@@ -32,7 +32,7 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
     activeShabadId,
   } = useStoreState((state) => state.navigator);
 
-  const { setHomeVerse, setActiveVerseId, setIsMiscSlide } = useStoreActions(
+  const { setHomeVerse, setActiveVerseId, setIsMiscSlide, setActiveShabadId } = useStoreActions(
     (actions) => actions.navigator,
   );
   const [activeVerse, setActiveVerse] = useState({});
@@ -67,10 +67,12 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
-    changeVerse(newTraversedVerse, verseIndex, {
+    changeVerse(newTraversedVerse, verseIndex, shabadId, {
       activeVerseId,
       setActiveVerseId,
       setActiveVerse,
+      activeShabadId,
+      setActiveShabadId,
     });
     sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
       isSundarGutkaBani,
