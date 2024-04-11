@@ -63,11 +63,11 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       resetSettings.forEach((settingKey) => {
         const value = settings[settingKey].initialValue;
         if (userSettings[convertToCamelCase(settingKey)] !== value) {
-          userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value)
+          userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value);
         }
       });
     }
-  }
+  };
 
   switch (type) {
     case 'range':
@@ -146,13 +146,10 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       break;
     case 'reset-button':
       settingDOM = (
-        <div
-          onClick={handleResetFontSizes}
-          className="icon-reset"
-        >
-          <img src="assets/img/icons/reset.svg" alt="Reset Font Sizes to Default" />
-        </div>
-
+        <button onClick={handleResetFontSizes} className="icon-reset">
+          <img src="assets/img/icons/reset-transparent.svg" alt="Reset Font Sizes to Default" />
+          <span>{i18n.t(`SETTINGS.RESET TO DEFAULT`)}</span>
+        </button>
       );
       break;
     default:
