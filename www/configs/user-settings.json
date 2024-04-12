@@ -101,7 +101,7 @@
       "initialValue": 7
     },
     "reset-font-sizes": {
-      "title": "RESET FONT SIZES",
+      "title": "RESET_FONT_SIZES",
       "type": "reset-button",
       "resetSettings": [
         "gurbani-font-size",

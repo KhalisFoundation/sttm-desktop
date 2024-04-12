@@ -148,7 +148,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       settingDOM = (
         <button onClick={handleResetFontSizes} className="icon-reset">
           <img src="assets/img/icons/reset-transparent.svg" alt="Reset Font Sizes to Default" />
-          <span>{i18n.t(`SETTINGS.RESET TO DEFAULT`)}</span>
+          <span>{i18n.t(`SETTINGS.RESET_TO_DEFAULT`)}</span>
         </button>
       );
       break;
