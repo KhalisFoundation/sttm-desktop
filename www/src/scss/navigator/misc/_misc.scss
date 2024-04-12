@@ -42,8 +42,8 @@ $misc-footer-active: 70px;
 
     .history-item {
       cursor: pointer;
-      margin: 8px 0;
-      padding: 10px;
+      margin: 0;
+      padding: 16px 10px;
     }
   }
   .list-of-items {
@@ -138,12 +138,17 @@ $misc-footer-active: 70px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0px 8px;
+  padding: 0px 10px;
   transition: 0.3s all ease;
 
   .fav-shabad-text  {
     cursor: pointer;
     width: 65%;
+  }
+
+  .fav-item {
+    margin: 0;
+    padding: 16px 0;
   }
 
   .fav-shabad-options {
