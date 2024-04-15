@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import ShabadHeader from '../shabad/ShabadHeader';
+import { TAB_NAMES } from '../../common/constants/misc-tabs';
 
 export const singleDisplayHeader = () => {
   const { singleDisplayActiveTab, minimizedBySingleDisplay, historyOrder, verseHistory } =
@@ -21,12 +22,12 @@ export const singleDisplayHeader = () => {
 
         break;
 
-      case 'history':
-        component = 'History';
+      case TAB_NAMES.HISTORY:
+        component = TAB_NAMES.HISTORY;
         break;
 
-      case 'other':
-        component = 'Other';
+      case TAB_NAMES.OTHERS:
+        component = TAB_NAMES.OTHERS;
 
         break;
 
@@ -38,8 +39,8 @@ export const singleDisplayHeader = () => {
         component = 'Dhan Guru';
         break;
 
-      case 'favorite':
-        component = 'Favorites';
+      case TAB_NAMES.FAVORITES:
+        component = TAB_NAMES.FAVORITES;
         break;
 
       default:
@@ -59,7 +60,7 @@ export const singleDisplayHeader = () => {
   return (
     <div className="header-controller">
       <span>{getActiveTab(singleDisplayActiveTab)}</span>
-      {singleDisplayActiveTab === 'history' && verseHistory.length > 1 && (
+      {singleDisplayActiveTab === TAB_NAMES.HISTORY && verseHistory.length > 1 && (
         <div className="history-order">
           <div className="history-order-select">
             <label>Sort by: </label>

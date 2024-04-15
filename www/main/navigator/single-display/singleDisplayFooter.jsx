@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { classNames } from '../../common/utils';
+import { TAB_NAMES } from '../../common/constants/misc-tabs';
 
 export const singleDisplayFooter = () => {
   const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
@@ -17,18 +18,18 @@ export const singleDisplayFooter = () => {
     }
   };
   const openOtherPane = () => {
-    if (singleDisplayActiveTab !== 'other') {
-      setSingleDisplayActiveTab('other');
+    if (singleDisplayActiveTab !== TAB_NAMES.OTHERS) {
+      setSingleDisplayActiveTab(TAB_NAMES.OTHERS);
     }
   };
   const openHistoryPane = () => {
-    if (singleDisplayActiveTab !== 'history') {
-      setSingleDisplayActiveTab('history');
+    if (singleDisplayActiveTab !== TAB_NAMES.HISTORY) {
+      setSingleDisplayActiveTab(TAB_NAMES.HISTORY);
     }
   };
   const openFavoritePane = () => {
-    if (singleDisplayActiveTab !== 'favorite') {
-      setSingleDisplayActiveTab('favorite');
+    if (singleDisplayActiveTab !== TAB_NAMES.FAVORITES) {
+      setSingleDisplayActiveTab(TAB_NAMES.FAVORITES);
     }
   };
 
@@ -41,7 +42,10 @@ export const singleDisplayFooter = () => {
         <i className="fa fa-search" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'history' && 'active')}
+        className={classNames(
+          'tab-switch',
+          singleDisplayActiveTab === TAB_NAMES.HISTORY && 'active',
+        )}
         onClick={openHistoryPane}
       >
         <i className="fa fa-history" />
@@ -53,13 +57,19 @@ export const singleDisplayFooter = () => {
         <i className="fa fa-dot-circle-o" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'favorite' && 'active')}
+        className={classNames(
+          'tab-switch',
+          singleDisplayActiveTab === TAB_NAMES.FAVORITES && 'active'
+        )}
         onClick={openFavoritePane}
       >
         <i className="fa fa-heart" />
       </button>
       <button
-        className={classNames('tab-switch', singleDisplayActiveTab === 'other' && 'active')}
+        className={classNames(
+          'tab-switch',
+          singleDisplayActiveTab === TAB_NAMES.OTHERS && 'active'
+        )}
         onClick={openOtherPane}
       >
         <i className="fa fa-ellipsis-h" />

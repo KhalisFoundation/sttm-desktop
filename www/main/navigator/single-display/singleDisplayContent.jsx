@@ -3,6 +3,7 @@ import { useStoreState } from 'easy-peasy';
 import { HistoryPane, OtherPane, FavoritePane } from '../misc/components';
 import SearchPane from '../search/components/SearchPane';
 import ShabadContent from '../shabad/ShabadContent';
+import { TAB_NAMES } from '../../common/constants/misc-tabs';
 
 export const singleDisplayContent = () => {
   const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
@@ -17,9 +18,9 @@ export const singleDisplayContent = () => {
             </div>
           </div>
         </div>
-        <HistoryPane className={tabName === 'history' ? '' : 'd-none'} />
-        <OtherPane className={tabName === 'other' ? '' : 'd-none'} />
-        <FavoritePane className={tabName === 'favorite' ? '' : 'd-none'} />
+        <HistoryPane className={tabName === TAB_NAMES.HISTORY ? '' : 'd-none'} />
+        <OtherPane className={tabName === TAB_NAMES.OTHERS ? '' : 'd-none'} />
+        <FavoritePane className={tabName === TAB_NAMES.FAVORITES ? '' : 'd-none'} />
       </>
     );
 
