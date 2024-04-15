@@ -89,8 +89,12 @@ const BaniController = ({ onScreenClose, className }) => {
 
   const showSyncError = (errorMessage) => {
     setCodeLabel(errorMessage);
-    setCode(null);
-    setAdminPin(null);
+    if (code !== null) {
+      setCode(null);
+    }
+    if (adminPin !== null) {
+      setAdminPin(null);
+    }
   };
 
   const remoteSyncInit = async () => {
