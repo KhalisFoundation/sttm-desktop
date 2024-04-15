@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
+import { settings } from '../../../configs/user-settings.json';
 
 const remote = require('@electron/remote');
 
@@ -54,6 +55,18 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       return i18n.t(`QUICK_TOOLS.TRANSLITERATION`);
     }
     return '';
+  };
+
+  const handleResetFontSizes = () => {
+    const { resetSettings } = settingObj;
+    if (resetSettings) {
+      resetSettings.forEach((settingKey) => {
+        const value = settings[settingKey].initialValue;
+        if (userSettings[convertToCamelCase(settingKey)] !== value) {
+          userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value);
+        }
+      });
+    }
   };
 
   switch (type) {
@@ -129,6 +142,14 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           </select>
           <span>{dropdownLabel(userSettings[stateVar])}</span>
         </>
+      );
+      break;
+    case 'reset-button':
+      settingDOM = (
+        <button onClick={handleResetFontSizes} className="icon-reset">
+          <img src="assets/img/icons/reset-transparent.svg" alt="Reset Font Sizes to Default" />
+          <span>{i18n.t(`SETTINGS.RESET_TO_DEFAULT`)}</span>
+        </button>
       );
       break;
     default:
