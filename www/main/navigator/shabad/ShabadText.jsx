@@ -10,7 +10,9 @@ import {
   changeVerse,
   sendToBaniController,
   filterRequiredVerseItems,
+  udpateHistory,
 } from './utils';
+import { saveToHistory } from './utils/save-to-history';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -19,7 +21,13 @@ const baniLengthCols = {
   extralong: 'existsBuddhaDal',
 };
 
-export const ShabadText = ({ shabadId, baniType, baniLength }) => {
+export const ShabadText = ({
+  shabadId,
+  baniType,
+  baniLength,
+  paneAttributes,
+  setPaneAttributes,
+}) => {
   const [filteredItems, setFilteredItems] = useState([]);
   const {
     homeVerse,
@@ -30,11 +38,12 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
     isCeremonyBani,
     ceremonyId,
     activeShabadId,
+    verseHistory,
+    initialVerseId,
   } = useStoreState((state) => state.navigator);
 
-  const { setHomeVerse, setActiveVerseId, setIsMiscSlide, setActiveShabadId } = useStoreActions(
-    (actions) => actions.navigator,
-  );
+  const { setHomeVerse, setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory } =
+    useStoreActions((actions) => actions.navigator);
   const [activeVerse, setActiveVerse] = useState({});
 
   useEffect(() => {
@@ -59,6 +68,18 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
     }
   }, [shabadId, baniType, baniLength]);
 
+  useEffect(() => {
+    if (filteredItems.length) {
+      saveToHistory(
+        shabadId,
+        filteredItems,
+        baniType,
+        { verseHistory, setVerseHistory, baniLength },
+        initialVerseId,
+      );
+    }
+  }, [filteredItems]);
+
   const updateHomeVerse = (verseIndex) => {
     changeHomeVerse(verseIndex, { homeVerse, setHomeVerse });
   };
@@ -73,6 +94,12 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
       setActiveVerse,
       activeShabadId,
       setActiveShabadId,
+    });
+    udpateHistory(shabadId, newTraversedVerse, {
+      verseHistory,
+      setVerseHistory,
+      setPaneAttributes,
+      paneAttributes,
     });
     sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
       isSundarGutkaBani,
@@ -98,7 +125,7 @@ export const ShabadText = ({ shabadId, baniType, baniLength }) => {
                 activeVerse={activeVerse}
                 isHomeVerse={homeVerse}
                 lineNumber={index}
-                versesRead={[]}
+                versesRead={paneAttributes.versesRead}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
@@ -118,4 +145,6 @@ ShabadText.propTypes = {
   initialVerseId: PropTypes.number,
   baniType: PropTypes.string,
   baniLength: PropTypes.string,
+  paneAttributes: PropTypes.object,
+  setPaneAttributes: PropTypes.func,
 };

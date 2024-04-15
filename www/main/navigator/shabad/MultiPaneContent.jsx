@@ -24,7 +24,8 @@ const MultiPaneContent = ({ data }) => {
       shabadId={paneAttributes.activeShabad}
       baniType="shabad"
       baniLength="short"
-      paneId={paneId}
+      paneAttributes={paneAttributes}
+      setPaneAttributes={setPaneAttributes}
     />
   );
 };

@@ -1,3 +1,21 @@
+export const udpateHistory = (
+  currentShabadId,
+  newTraversedVerse,
+  { verseHistory, setPaneAttributes, paneAttributes },
+) => {
+  const existingShabadIndex = verseHistory.findIndex(
+    (historyShabad) => historyShabad.shabadId === currentShabadId,
+  );
+  const currentHistoryObj = verseHistory[existingShabadIndex];
+  if (currentHistoryObj) {
+    currentHistoryObj.continueFrom = newTraversedVerse;
+    if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
+      currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
+      setPaneAttributes({ ...paneAttributes, versesRead: currentHistoryObj.versesRead });
+    }
+  }
+};
+
 export const changeVerse = (
   newTraversedVerse,
   verseIndex,

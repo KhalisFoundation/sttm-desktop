@@ -52,16 +52,19 @@
   "pane1": {
     "locked": false,
     "activeShabad": null,
-    "activeVerse": ""
+    "activeVerse": "",
+    "versesRead": []
   },
   "pane2": {
     "locked": false,
     "activeShabad": null,
-    "activeVerse": ""
+    "activeVerse": "",
+    "versesRead": []
   },
   "pane3": {
     "locked": false,
     "activeShabad": null,
-    "activeVerse": ""
+    "activeVerse": "",
+    "versesRead": []
   }
 }

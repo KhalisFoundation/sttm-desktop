@@ -71,11 +71,8 @@ export const useNewShabad = () => {
       setIsCeremonyBani(false);
     }
 
-    if (
-      currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE') &&
-      activeShabadId !== newSelectedShabad
-    ) {
-      if (activeShabadId !== newSelectedShabad) {
+    if (activeShabadId !== newSelectedShabad) {
+      if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
         setActiveShabadId(newSelectedShabad);
       }
 
