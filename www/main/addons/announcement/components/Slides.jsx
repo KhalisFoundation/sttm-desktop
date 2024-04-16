@@ -13,33 +13,32 @@ const Slides = () => {
       <header className="sync-header">
         <h3>{i18n.t('INSERT.ADD_SLIDES')}</h3>
       </header>
-      <div className="slides-pane-container">
-        <div className="slides-pane">
-          <button
-            className="tray-item-icon"
-            onClick={() => openAnandSahibBhog({ openedFrom: 'shortcut-tray' })}
-          >
-            {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
-          </button>
-          <button
-            className="tray-item-icon"
-            onClick={() => openMoolMantraSlide({ openedFrom: 'shortcut-tray' })}
-          >
-            {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
-          </button>
-          <button
-            className="gurmukhi tray-item-icon"
-            onClick={() => openWaheguruSlide({ openedFrom: 'shortcut-tray' })}
-          >
-            vwihgurU
-          </button>
-          <button
-            className="tray-item-icon"
-            onClick={() => openBlankViewer({ openedFrom: 'shortcut-tray' })}
-          >
-            {i18n.t(`SHORTCUT_TRAY.BLANK`)}
-          </button>
-        </div>
+
+      <div className="misc-slides-pane">
+        <button
+          className="misc-slide-button"
+          onClick={() => openAnandSahibBhog({ openedFrom: 'shortcut-tray' })}
+        >
+          {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
+        </button>
+        <button
+          className="misc-slide-button"
+          onClick={() => openMoolMantraSlide({ openedFrom: 'shortcut-tray' })}
+        >
+          {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
+        </button>
+        <button
+          className="gurmukhi misc-slide-button"
+          onClick={() => openWaheguruSlide({ openedFrom: 'shortcut-tray' })}
+        >
+          vwihgurU
+        </button>
+        <button
+          className="misc-slide-button"
+          onClick={() => openBlankViewer({ openedFrom: 'shortcut-tray' })}
+        >
+          {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+        </button>
       </div>
     </>
   )
