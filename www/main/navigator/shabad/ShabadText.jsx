@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -11,8 +11,9 @@ import {
   sendToBaniController,
   filterRequiredVerseItems,
   udpateHistory,
+  scrollToVerse,
+  saveToHistory,
 } from './utils';
-import { saveToHistory } from './utils/save-to-history';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -27,10 +28,10 @@ export const ShabadText = ({
   baniLength,
   paneAttributes,
   setPaneAttributes,
+  currentPane,
 }) => {
   const [filteredItems, setFilteredItems] = useState([]);
   const {
-    homeVerse,
     activeVerseId,
     isMiscSlide,
     isSundarGutkaBani,
@@ -42,9 +43,43 @@ export const ShabadText = ({
     initialVerseId,
   } = useStoreState((state) => state.navigator);
 
-  const { setHomeVerse, setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory } =
-    useStoreActions((actions) => actions.navigator);
+  const { setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory } = useStoreActions(
+    (actions) => actions.navigator,
+  );
   const [activeVerse, setActiveVerse] = useState({});
+
+  const virtuosoRef = useRef(null);
+
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
+    changeVerse(newTraversedVerse, verseIndex, shabadId, {
+      activeVerseId,
+      setActiveVerseId,
+      setActiveVerse,
+      activeShabadId,
+      setActiveShabadId,
+    });
+    udpateHistory(shabadId, newTraversedVerse, {
+      verseHistory,
+      setVerseHistory,
+      setPaneAttributes,
+      paneAttributes,
+    });
+    sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
+      isSundarGutkaBani,
+      sundarGutkaBaniId,
+      isCeremonyBani,
+      ceremonyId,
+      activeShabadId,
+      paneAttributes,
+    });
+  };
+
+  const updateHomeVerse = (verseIndex) => {
+    changeHomeVerse(verseIndex, { paneAttributes, setPaneAttributes });
+  };
 
   useEffect(() => {
     if (baniType === 'shabad') {
@@ -77,45 +112,26 @@ export const ShabadText = ({
         { verseHistory, setVerseHistory, baniLength },
         initialVerseId,
       );
+      setTimeout(() => {
+        scrollToVerse(initialVerseId, filteredItems, virtuosoRef);
+      }, 100);
+      const initialVerseIndex = filteredItems.findIndex(
+        (verse) => verse.verseId === initialVerseId,
+      );
+      if (initialVerseIndex >= 0) updateHomeVerse(initialVerseIndex);
+      if (activeShabadId === null) {
+        updateTraversedVerse(initialVerseId, initialVerseIndex);
+      }
     }
   }, [filteredItems]);
-
-  const updateHomeVerse = (verseIndex) => {
-    changeHomeVerse(verseIndex, { homeVerse, setHomeVerse });
-  };
-
-  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
-    if (isMiscSlide) {
-      setIsMiscSlide(false);
-    }
-    changeVerse(newTraversedVerse, verseIndex, shabadId, {
-      activeVerseId,
-      setActiveVerseId,
-      setActiveVerse,
-      activeShabadId,
-      setActiveShabadId,
-    });
-    udpateHistory(shabadId, newTraversedVerse, {
-      verseHistory,
-      setVerseHistory,
-      setPaneAttributes,
-      paneAttributes,
-    });
-    sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
-      isSundarGutkaBani,
-      sundarGutkaBaniId,
-      isCeremonyBani,
-      ceremonyId,
-      activeShabadId,
-      homeVerse,
-    });
-  };
 
   return (
     <div className="shabad-list">
       <div className="verse-block">
         <Virtuoso
+          id={`shabad-text-${currentPane}`}
           data={filteredItems}
+          ref={virtuosoRef}
           totalCount={filteredItems.length}
           itemContent={(index, verseObj) => {
             const { verseId, verse, english } = verseObj;
@@ -123,7 +139,7 @@ export const ShabadText = ({
               <ShabadVerse
                 key={index}
                 activeVerse={activeVerse}
-                isHomeVerse={homeVerse}
+                isHomeVerse={paneAttributes.homeVerse}
                 lineNumber={index}
                 versesRead={paneAttributes.versesRead}
                 verse={verse}
@@ -147,4 +163,5 @@ ShabadText.propTypes = {
   baniLength: PropTypes.string,
   paneAttributes: PropTypes.object,
   setPaneAttributes: PropTypes.func,
+  currentPane: PropTypes.number,
 };

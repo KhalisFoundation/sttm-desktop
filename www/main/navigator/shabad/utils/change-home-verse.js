@@ -1,5 +1,5 @@
-export const changeHomeVerse = (verseIndex, { homeVerse, setHomeVerse }) => {
-  if (verseIndex !== homeVerse) {
-    setHomeVerse(verseIndex);
+export const changeHomeVerse = (verseIndex, { paneAttributes, setPaneAttributes }) => {
+  if (paneAttributes.homeVerse !== verseIndex) {
+    setPaneAttributes({ ...paneAttributes, homeVerse: verseIndex });
   }
 };

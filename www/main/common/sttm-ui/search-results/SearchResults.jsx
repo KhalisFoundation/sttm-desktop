@@ -21,6 +21,7 @@ const SearchResults = ({
   currentLanguage,
 }) => {
   const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
 
   const getClassForAng = (baniSource) => {
     if (baniSource === 'G') {
@@ -52,9 +53,33 @@ const SearchResults = ({
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       return (
         <div className="button-container">
-          <button onClick={() => onClick(shabadId, verseId, verse, 1)}>1</button>
-          <button onClick={() => onClick(shabadId, verseId, verse, 2)}>2</button>
-          <button onClick={() => onClick(shabadId, verseId, verse, 3)}>3</button>
+          <button
+            className="button-pane-1"
+            disabled={pane1.locked}
+            onClick={() => {
+              if (!pane1.locked) onClick(shabadId, verseId, verse, 1);
+            }}
+          >
+            {pane1.locked ? <i className="fa-solid fa-lock"></i> : '1'}
+          </button>
+          <button
+            className="button-pane-2"
+            disabled={pane2.locked}
+            onClick={() => {
+              if (!pane2.locked) onClick(shabadId, verseId, verse, 2);
+            }}
+          >
+            {pane2.locked ? <i className="fa-solid fa-lock"></i> : '2'}
+          </button>
+          <button
+            className="button-pane-3"
+            disabled={pane3.locked}
+            onClick={() => {
+              if (!pane3.locked) onClick(shabadId, verseId, verse, 3);
+            }}
+          >
+            {pane3.locked ? <i className="fa-solid fa-lock"></i> : '3'}
+          </button>
         </div>
       );
     }

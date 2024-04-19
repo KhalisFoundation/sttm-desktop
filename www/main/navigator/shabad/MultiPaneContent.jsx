@@ -9,11 +9,14 @@ const MultiPaneContent = ({ data }) => {
   const navigatorActions = useStoreActions((state) => state.navigator);
   const paneAttributes = navigatorState[`pane${paneId}`];
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
-  const { activePaneId } = navigatorState;
+  const { activePaneId, homeVerse, versesRead } = navigatorState;
+  const { setHomeVerse, setVersesRead } = navigatorActions;
 
   useEffect(() => {
     if (activePaneId === paneId) {
       setPaneAttributes({ ...paneAttributes, locked: true });
+      if (homeVerse !== paneAttributes.homeVerse) setHomeVerse(paneAttributes.homeVerse);
+      if (versesRead !== paneAttributes.versesRead) setVersesRead(paneAttributes.versesRead);
     } else {
       setPaneAttributes({ ...paneAttributes, locked: false });
     }
@@ -26,6 +29,7 @@ const MultiPaneContent = ({ data }) => {
       baniLength="short"
       paneAttributes={paneAttributes}
       setPaneAttributes={setPaneAttributes}
+      currentPane={paneId}
     />
   );
 };

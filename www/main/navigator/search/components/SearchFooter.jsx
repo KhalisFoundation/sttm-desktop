@@ -22,7 +22,7 @@ const SearchFooter = () => {
       {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') && (
         <div className="default-pane-switcher">
           <button
-            className={addActiveClass(1)}
+            className={`pane-1-btn ${addActiveClass(1)}`}
             onClick={() => {
               if (defaultPaneId !== 1) {
                 setDefaultPaneId(1);
@@ -32,7 +32,7 @@ const SearchFooter = () => {
             1
           </button>
           <button
-            className={addActiveClass(2)}
+            className={`pane-2-btn ${addActiveClass(2)}`}
             onClick={() => {
               if (defaultPaneId !== 2) {
                 setDefaultPaneId(2);
@@ -42,7 +42,7 @@ const SearchFooter = () => {
             2
           </button>
           <button
-            className={addActiveClass(3)}
+            className={`pane-3-btn ${addActiveClass(3)}`}
             onClick={() => {
               if (defaultPaneId !== 3) {
                 setDefaultPaneId(3);

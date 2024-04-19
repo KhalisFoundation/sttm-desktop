@@ -36,7 +36,14 @@ export const sendToBaniController = (
   activeShabad,
   newTraversedVerse,
   baniLength,
-  { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani, ceremonyId, activeShabadId, homeVerse },
+  {
+    isSundarGutkaBani,
+    sundarGutkaBaniId,
+    isCeremonyBani,
+    ceremonyId,
+    activeShabadId,
+    paneAttributes,
+  },
 ) => {
   if (window.socket !== undefined && window.socket !== null) {
     let baniVerse;
@@ -70,7 +77,7 @@ export const sendToBaniController = (
         id: activeShabadId,
         shabadid: activeShabadId, // @deprecated
         highlight: newTraversedVerse,
-        homeId: homeVerse,
+        homeId: paneAttributes.homeVerse,
         verseChange: false,
       });
     }

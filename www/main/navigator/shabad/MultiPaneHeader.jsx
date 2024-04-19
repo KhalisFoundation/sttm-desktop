@@ -10,7 +10,8 @@ const MultiPaneHeader = ({ data }) => {
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
 
   return (
-    <div className="shabad-pane-header">
+    <div className={`shabad-pane-header pane-${paneId}`}>
+      <span className="pane-symbol">{paneId}</span>
       <button
         onClick={() => {
           const updatedAttributes = { ...paneAttributes };

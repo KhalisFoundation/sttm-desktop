@@ -1,0 +1,63 @@
+$colors: (
+  "pane-1": $picton-blue,
+  "pane-2": $princeton-orange,
+  "pane-3": $grape
+);
+
+@each $pane, $color in $colors {
+  .#{$pane} {
+    border-bottom: 2px solid $color;
+    display: flex;
+    justify-content: space-between;
+
+    .pane-symbol {
+      background-color: $color;
+      color: white;
+      height: 100%;
+      font-size: 18px;
+      text-align: center;
+      width: 40px;
+    }
+
+    &-btn.active {
+      background-color: $color;
+      color: white;
+    }
+  }
+
+  .button-#{$pane} {
+    cursor: pointer;
+    margin: 0 2px;
+    padding: 12px;
+    transition: 0.3s all ease;
+
+    .theme-light-theme & {
+      background-color: rgba($color, 0.3);
+    }
+
+    .theme-dark-theme & {
+      background-color: rgba($color, 0.6);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    &:hover {
+      background-color: $color;
+      color: white;
+    }
+
+    &:disabled {
+      background-color: rgba($color, 0.8);
+      color: initial;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.default-pane-switcher {
+  flex-grow: 1;
+  text-align: right;
+  button {
+    cursor: pointer;
+    padding: 8px 12px;
+  }
+}
