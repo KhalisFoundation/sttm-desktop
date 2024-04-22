@@ -92,9 +92,9 @@ const QuickTools = ({ isMiscSlide }) => {
     if (name === 'visibility') {
       payload = !userSettings[stateName];
     } else if (name === 'minus') {
-      payload = userSettings[stateName] - 1;
+      payload = parseInt(userSettings[stateName], 10) - 1;
     } else if (name === 'plus') {
-      payload = userSettings[stateName] + 1;
+      payload = parseInt(userSettings[stateName], 10) + 1;
     }
     return {
       actionName,
