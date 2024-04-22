@@ -127,56 +127,64 @@ const Navigator = () => {
     }
   }, [shortcuts]);
 
+  let controllerMarkup = null;
+
   if (currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY')) {
-    return (
-      <>
-        <div
-          className={`single-display-controller ${
-            minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
-          }`}
-        >
-          <Pane
-            header={singleDisplayHeader}
-            content={singleDisplayContent}
-            footer={singleDisplayFooter}
-            className="single-display-pane"
-          />
+    controllerMarkup = (
+      <div
+        className={`single-display-controller ${
+          minimizedBySingleDisplay ? 'single-display-minimize' : 'single-display-maximize'
+        }`}
+      >
+        <Pane
+          header={singleDisplayHeader}
+          content={singleDisplayContent}
+          footer={singleDisplayFooter}
+          className="single-display-pane"
+        />
+      </div>
+    );
+  } else if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+    controllerMarkup = (
+      <div className="multipane-grid">
+        <div className="shabad1-container">
+          <ShabadPane multiPaneId={1} />
         </div>
-        <div className="single-display-viewer">
-          <ViewerPane />
+        <div className="shabad2-container">
+          <ShabadPane multiPaneId={2} />
         </div>
-      </>
+        <div className="shabad3-container">
+          <ShabadPane multiPaneId={3} />
+        </div>
+      </div>
+    );
+  } else {
+    controllerMarkup = (
+      <div className="navigator-row">
+        <ShabadPane />
+        <MiscPane
+          waheguruSlide={openWaheguruSlide}
+          moolMantraSlide={openMoolMantraSlide}
+          blankSlide={openBlankViewer}
+          anandSahibBhog={openAnandSahibBhog}
+        />
+      </div>
     );
   }
+
   return (
     <>
-      <div className="navigator-row">
-        <SearchPane />
+      <div
+        className={
+          currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY')
+            ? 'single-display-viewer'
+            : 'navigator-row'
+        }
+      >
+        {currentWorkspace !== i18n.t('WORKSPACES.SINGLE_DISPLAY') && <SearchPane />}
         <ViewerPane />
       </div>
-      {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') ? (
-        <div className="multipane-grid">
-          <div className="shabad1-container">
-            <ShabadPane multiPaneId={1} />
-          </div>
-          <div className="shabad2-container">
-            <ShabadPane multiPaneId={2} />
-          </div>
-          <div className="shabad3-container">
-            <ShabadPane multiPaneId={3} />
-          </div>
-        </div>
-      ) : (
-        <div className="navigator-row">
-          <ShabadPane />
-          <MiscPane
-            waheguruSlide={openWaheguruSlide}
-            moolMantraSlide={openMoolMantraSlide}
-            blankSlide={openBlankViewer}
-            anandSahibBhog={openAnandSahibBhog}
-          />
-        </div>
-      )}
+      {controllerMarkup}
     </>
   );
 };

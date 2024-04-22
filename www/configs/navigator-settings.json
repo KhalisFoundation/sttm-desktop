@@ -54,20 +54,23 @@
     "activeShabad": null,
     "activeVerse": "",
     "versesRead": [],
-    "homeVerse": false
+    "homeVerse": false,
+    "content": null
   },
   "pane2": {
     "locked": false,
     "activeShabad": null,
     "activeVerse": "",
     "versesRead": [],
-    "homeVerse": false
+    "homeVerse": false,
+    "content": null
   },
   "pane3": {
     "locked": false,
     "activeShabad": null,
     "activeVerse": "",
     "versesRead": [],
-    "homeVerse": false
+    "homeVerse": false,
+    "content": null
   }
 }

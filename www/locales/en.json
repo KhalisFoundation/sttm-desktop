@@ -121,6 +121,10 @@
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
     }
   },
+  "MULTI_PANE": {
+    "CLEAR_PANE": "Clear Pane",
+    "MISC_SLIDES": "Misc Slides"
+  },
   "MENU": {
     "APP": {
       "ABOUT": "About {{appName}}",

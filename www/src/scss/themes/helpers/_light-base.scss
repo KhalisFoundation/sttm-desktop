@@ -356,4 +356,15 @@
       background-color: $disabled-light;
     }
   }
+
+  .pane-options {
+    background-color: $nav-bg;
+    ul {
+      li {
+        &:hover {
+          background-color: $current-focus;
+        }
+      }
+    }
+  }
 }

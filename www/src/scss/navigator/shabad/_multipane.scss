@@ -9,6 +9,7 @@ $colors: (
     border-bottom: 2px solid $color;
     display: flex;
     justify-content: space-between;
+    position: relative;
 
     .pane-symbol {
       background-color: $color;
@@ -19,9 +20,40 @@ $colors: (
       width: 40px;
     }
 
+    .pane-tools {
+      display: flex;
+      justify-content: space-between;
+      width: 100px;
+
+      button {
+        padding: 8px;
+      }
+    }
+
     &-btn.active {
       background-color: $color;
       color: white;
+    }
+
+    .pane-options {
+      position: absolute;
+      top: 35px;
+      right: 0px;
+      width: 120px;
+      list-style-type: none;
+      z-index: 100;
+
+      ul {
+        list-style-type: none;
+        li {
+          padding-left: 24px;
+          cursor: pointer;
+        }
+      }
+
+      &.hidden {
+        display: none;
+      }
     }
   }
 
@@ -56,6 +88,7 @@ $colors: (
 .default-pane-switcher {
   flex-grow: 1;
   text-align: right;
+
   button {
     cursor: pointer;
     padding: 8px 12px;

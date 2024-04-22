@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ShabadText } from './ShabadText';
+import { HistoryPane } from '../misc/components';
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
@@ -22,16 +23,47 @@ const MultiPaneContent = ({ data }) => {
     }
   }, [activePaneId]);
 
-  return (
-    <ShabadText
-      shabadId={paneAttributes.activeShabad}
-      baniType="shabad"
-      baniLength="short"
-      paneAttributes={paneAttributes}
-      setPaneAttributes={setPaneAttributes}
-      currentPane={paneId}
-    />
-  );
+  switch (paneAttributes.content) {
+    case 'shabad':
+      return (
+        <ShabadText
+          shabadId={paneAttributes.activeShabad}
+          baniType="shabad"
+          baniLength="short"
+          paneAttributes={paneAttributes}
+          setPaneAttributes={setPaneAttributes}
+          currentPane={paneId}
+        />
+      );
+    case 'history':
+      return (
+        <>
+          <button
+            onClick={() => {
+              setPaneAttributes({ ...paneAttributes, content: 'shabad' });
+            }}
+          >
+            Go back to shabad
+          </button>
+          <HistoryPane />;
+        </>
+      );
+    case 'misc':
+      return (
+        <>
+          <button
+            onClick={() => {
+              setPaneAttributes({ ...paneAttributes, content: 'shabad' });
+            }}
+          >
+            Go back to shabad
+          </button>
+          <p>Misc slides will come here</p>;
+        </>
+      );
+    default:
+      return null;
+  }
 };
 
 MultiPaneContent.propTypes = {

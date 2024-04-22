@@ -41,13 +41,13 @@ export const useNewShabad = () => {
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       switch (multiPaneId) {
         case 1:
-          setPane1({ ...pane1, activeShabad: newSelectedShabad });
+          setPane1({ ...pane1, content: 'shabad', activeShabad: newSelectedShabad });
           break;
         case 2:
-          setPane2({ ...pane2, activeShabad: newSelectedShabad });
+          setPane2({ ...pane2, content: 'shabad', activeShabad: newSelectedShabad });
           break;
         case 3:
-          setPane3({ ...pane3, activeShabad: newSelectedShabad });
+          setPane3({ ...pane3, content: 'shabad', activeShabad: newSelectedShabad });
           break;
         default:
           break;
