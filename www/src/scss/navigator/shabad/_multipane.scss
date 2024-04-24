@@ -21,12 +21,30 @@ $colors: (
     }
 
     .pane-tools {
+      align-items: center;
       display: flex;
       justify-content: space-between;
       width: 100px;
 
       button {
-        padding: 8px;
+        background-color: transparent;
+        padding: 0 8px;
+      }
+
+      .pane-options-dropdown {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: url('../../assets/img/icons/ellipsis-vertical-solid.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: auto 18px;
+        border: none;
+        color: transparent;
+        cursor: pointer;
+        height: 40px;
+        outline: none;
+        width: 40px;
       }
     }
 
@@ -45,6 +63,7 @@ $colors: (
 
       ul {
         list-style-type: none;
+
         li {
           padding-left: 24px;
           cursor: pointer;

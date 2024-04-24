@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -19,10 +19,8 @@ const MultiPaneHeader = ({ data }) => {
     activeVerse: '',
     versesRead: [],
     homeVerse: false,
-    content: null,
+    content: i18n.t('MULTI_PANE.CLEAR_PANE'),
   };
-
-  const paneOptionRef = useRef(null);
 
   const lockPane = () => {
     const updatedAttributes = { ...paneAttributes };
@@ -33,16 +31,11 @@ const MultiPaneHeader = ({ data }) => {
   };
 
   const selectPaneOption = (event) => {
-    const clickedOption = event.target;
-    const optionText = clickedOption.textContent;
-    if (optionText === i18n.t('MULTI_PANE.CLEAR_PANE')) {
+    if (event.target.value === i18n.t('MULTI_PANE.CLEAR_PANE')) {
       if (paneAttributes !== defaultPaneAttributes) setPaneAttributes(defaultPaneAttributes);
-    } else if (optionText === i18n.t('TOOLBAR.HISTORY')) {
-      setPaneAttributes({ ...paneAttributes, content: 'history' });
-    } else if (optionText === i18n.t('MULTI_PANE.MISC_SLIDES')) {
-      setPaneAttributes({ ...paneAttributes, content: 'misc' });
+    } else {
+      setPaneAttributes({ ...paneAttributes, content: event.target.value });
     }
-    paneOptionRef.current.classList.add('hidden');
   };
 
   return (
@@ -59,22 +52,16 @@ const MultiPaneHeader = ({ data }) => {
         <button>
           <i className="fa-regular fa-star"></i>
         </button>
-        <button
-          onClick={(event) => {
-            const clickedButton = event.currentTarget;
-            const paneOptions = clickedButton.nextElementSibling;
-            paneOptions.classList.toggle('hidden');
-          }}
+        <select
+          onChange={selectPaneOption}
+          value={paneAttributes.content}
+          className="pane-options-dropdown"
         >
-          <i className="fa-solid fa-ellipsis-vertical"></i>
-        </button>
-        <div className="pane-options hidden" ref={paneOptionRef}>
-          <ul>
-            <li onClick={selectPaneOption}>{i18n.t('MULTI_PANE.CLEAR_PANE')}</li>
-            <li onClick={selectPaneOption}>{i18n.t('TOOLBAR.HISTORY')}</li>
-            <li onClick={selectPaneOption}>{i18n.t('MULTI_PANE.MISC_SLIDES')}</li>
-          </ul>
-        </div>
+          <option>{i18n.t('MULTI_PANE.CLEAR_PANE')}</option>
+          <option style={{ display: 'none' }}>{i18n.t('MULTI_PANE.SHABAD')}</option>
+          <option>{i18n.t('TOOLBAR.HISTORY')}</option>
+          <option>{i18n.t('MULTI_PANE.MISC_SLIDES')}</option>
+        </select>
       </div>
     </div>
   );

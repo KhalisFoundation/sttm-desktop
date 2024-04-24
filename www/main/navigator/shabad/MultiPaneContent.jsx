@@ -1,8 +1,14 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
+
 import { ShabadText } from './ShabadText';
 import { HistoryPane } from '../misc/components';
+import Slides from '../../addons/announcement/components/Slides';
+
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
@@ -24,7 +30,9 @@ const MultiPaneContent = ({ data }) => {
   }, [activePaneId]);
 
   switch (paneAttributes.content) {
-    case 'shabad':
+    case i18n.t('MULTI_PANE.CLEAR_PANE'):
+      return null;
+    case i18n.t('MULTI_PANE.SHABAD'):
       return (
         <ShabadText
           shabadId={paneAttributes.activeShabad}
@@ -35,12 +43,12 @@ const MultiPaneContent = ({ data }) => {
           currentPane={paneId}
         />
       );
-    case 'history':
+    case i18n.t('TOOLBAR.HISTORY'):
       return (
         <>
           <button
             onClick={() => {
-              setPaneAttributes({ ...paneAttributes, content: 'shabad' });
+              setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
             }}
           >
             Go back to shabad
@@ -48,17 +56,17 @@ const MultiPaneContent = ({ data }) => {
           <HistoryPane />;
         </>
       );
-    case 'misc':
+    case i18n.t('MULTI_PANE.MISC_SLIDES'):
       return (
         <>
           <button
             onClick={() => {
-              setPaneAttributes({ ...paneAttributes, content: 'shabad' });
+              setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
             }}
           >
             Go back to shabad
           </button>
-          <p>Misc slides will come here</p>;
+          <Slides />
         </>
       );
     default:

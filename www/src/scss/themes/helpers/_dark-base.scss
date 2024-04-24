@@ -389,6 +389,26 @@
     }
   }
 
+  .shabad-pane {
+    .pane-options-dropdown {
+      filter: invert(1);
+      option {
+        background-color: $bg-main;
+        color: $white;
+      }
+    }
+  }
+
+  .pane-tools {
+    button, select {
+      color: $text-base;
+
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
+  }
+
   #footer {
     background-color: $bg-main;
 

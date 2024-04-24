@@ -350,6 +350,25 @@
       }
     }
   }
+
+  .shabad-pane {
+    .pane-options-dropdown {
+      option {
+        color: $base-text;
+      }
+    }
+  }
+
+
+  .pane-tools {
+    button, select {
+      color: $base-text;
+
+      &:hover {
+        background-color: $transparent-light-black;
+      }
+    }
+  }
   
   .sundar-gutka-bani {
     &:hover {
