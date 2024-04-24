@@ -44,7 +44,7 @@
     
 }
 .pane-content {
-  @include flex($fd-value: column, $ai-value: initial);
+  @include flex($fd-value: column, $ai-value: initial, $jc-value: flex-start);
   flex-grow: 1;
   flex-wrap: nowrap;
   height: 100%;

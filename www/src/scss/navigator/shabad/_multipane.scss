@@ -44,6 +44,7 @@ $colors: (
         cursor: pointer;
         height: 40px;
         outline: none;
+        padding: 16px;
         width: 40px;
       }
     }
@@ -111,5 +112,19 @@ $colors: (
   button {
     cursor: pointer;
     padding: 8px 12px;
+  }
+}
+
+.multipane-content-btn {
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 12px;
+  padding: 8px;
+  width: 160px;
+
+  span {
+    margin-left: 12px;
   }
 }

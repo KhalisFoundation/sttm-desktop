@@ -29,6 +29,25 @@ const MultiPaneContent = ({ data }) => {
     }
   }, [activePaneId]);
 
+  const goToShabadBtn = (
+    <button
+      className="multipane-content-btn"
+      style={paneAttributes.activeShabad ? {} : { display: 'none' }}
+      onClick={() => {
+        setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.children[0].classList.add('fa-beat');
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.children[0].classList.remove('fa-beat');
+      }}
+    >
+      <i className="fa-solid fa-arrow-left"></i>
+      <span>{i18n.t('MULTI_PANE.SHABAD_BTN')}</span>
+    </button>
+  );
+
   switch (paneAttributes.content) {
     case i18n.t('MULTI_PANE.CLEAR_PANE'):
       return null;
@@ -46,26 +65,14 @@ const MultiPaneContent = ({ data }) => {
     case i18n.t('TOOLBAR.HISTORY'):
       return (
         <>
-          <button
-            onClick={() => {
-              setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
-            }}
-          >
-            Go back to shabad
-          </button>
-          <HistoryPane />;
+          {goToShabadBtn}
+          <HistoryPane />
         </>
       );
     case i18n.t('MULTI_PANE.MISC_SLIDES'):
       return (
         <>
-          <button
-            onClick={() => {
-              setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
-            }}
-          >
-            Go back to shabad
-          </button>
+          {goToShabadBtn}
           <Slides />
         </>
       );

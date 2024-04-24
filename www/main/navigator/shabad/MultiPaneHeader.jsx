@@ -38,9 +38,15 @@ const MultiPaneHeader = ({ data }) => {
     }
   };
 
+  const getTitle = (content) => {
+    if (content === i18n.t('MULTI_PANE.CLEAR_PANE')) return '';
+    return content;
+  };
+
   return (
     <div className={`shabad-pane-header pane-${paneId}`}>
       <span className="pane-symbol">{paneId}</span>
+      <span className="pane-title">{getTitle(paneAttributes.content)}</span>
       <div className="pane-tools">
         <button onClick={lockPane}>
           {paneAttributes.locked ? (
