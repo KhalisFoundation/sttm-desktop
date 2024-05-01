@@ -55,7 +55,8 @@
     "activeVerse": "",
     "versesRead": [],
     "homeVerse": false,
-    "content": null
+    "content":"",
+    "baniType": ""
   },
   "pane2": {
     "locked": false,
@@ -63,7 +64,8 @@
     "activeVerse": "",
     "versesRead": [],
     "homeVerse": false,
-    "content": null
+    "content":"",
+    "baniType": ""
   },
   "pane3": {
     "locked": false,
@@ -71,6 +73,7 @@
     "activeVerse": "",
     "versesRead": [],
     "homeVerse": false,
-    "content": null
+    "content":"",
+    "baniType": ""
   }
 }

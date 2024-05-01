@@ -172,7 +172,7 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   useEffect(() => {
     if (isMiscSlide) {

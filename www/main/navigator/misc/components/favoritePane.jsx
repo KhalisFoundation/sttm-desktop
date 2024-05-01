@@ -12,7 +12,7 @@ const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
-export const FavoritePane = ({ className }) => {
+export const FavoritePane = ({ className, paneId }) => {
   const {
     activeShabadId,
     initialVerseId,
@@ -35,6 +35,7 @@ export const FavoritePane = ({ className }) => {
     setSingleDisplayActiveTab,
     setFavShabad,
   } = useStoreActions((state) => state.navigator);
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const { userToken } = useStoreState((state) => state.app);
   const [parsedFav, setParsedFav] = useState([]);
@@ -176,8 +177,22 @@ export const FavoritePane = ({ className }) => {
               </p>
             </div>
             <div className="fav-shabad-options">
-              <p className="date">{date}</p>
-              <p className="time">{time}</p>
+              <p
+                className="date"
+                style={
+                  currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') ? { display: 'none' } : {}
+                }
+              >
+                {date}
+              </p>
+              <p
+                className="time"
+                style={
+                  currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') ? { display: 'none' } : {}
+                }
+              >
+                {time}
+              </p>
               <button
                 onClick={() => {
                   deleteFromFav(element);
@@ -195,4 +210,5 @@ export const FavoritePane = ({ className }) => {
 
 FavoritePane.propTypes = {
   className: PropTypes.string,
+  paneId: PropTypes.number,
 };

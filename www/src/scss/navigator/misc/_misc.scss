@@ -37,15 +37,6 @@ $misc-footer-active: 70px;
       }
     }
   }
-  .history-results {
-    overflow-y: auto;
-
-    .history-item {
-      cursor: pointer;
-      margin: 0;
-      padding: 16px 10px;
-    }
-  }
   .list-of-items {
     @include flex($fd-value: column, $jc-value: start);
     margin: 0;
@@ -69,6 +60,7 @@ $misc-footer-active: 70px;
       }
     }
   }
+  
   .misc-footer {
     @include flex($fd-value: column);
     height: fit-content;
@@ -130,6 +122,16 @@ $misc-footer-active: 70px;
         display: none;
       }
     }
+  }
+}
+
+.history-results {
+  overflow-y: auto;
+
+  .history-item {
+    cursor: pointer;
+    margin: 0;
+    padding: 16px 10px;
   }
 }
 

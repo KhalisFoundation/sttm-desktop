@@ -25,7 +25,6 @@ const baniLengthCols = {
 export const ShabadText = ({
   shabadId,
   baniType,
-  baniLength,
   paneAttributes,
   setPaneAttributes,
   currentPane,
@@ -41,11 +40,13 @@ export const ShabadText = ({
     activeShabadId,
     verseHistory,
     initialVerseId,
+    activePaneId,
   } = useStoreState((state) => state.navigator);
 
-  const { setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory } = useStoreActions(
-    (actions) => actions.navigator,
-  );
+  const { baniLength } = useStoreState((state) => state.userSettings);
+
+  const { setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory, setActivePaneId } =
+    useStoreActions((actions) => actions.navigator);
   const [activeVerse, setActiveVerse] = useState({});
 
   const virtuosoRef = useRef(null);
@@ -53,6 +54,9 @@ export const ShabadText = ({
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
+    }
+    if (activePaneId !== currentPane) {
+      setActivePaneId(currentPane);
     }
     changeVerse(newTraversedVerse, verseIndex, shabadId, {
       activeVerseId,
@@ -119,6 +123,7 @@ export const ShabadText = ({
         (verse) => verse.verseId === initialVerseId,
       );
       if (initialVerseIndex >= 0) updateHomeVerse(initialVerseIndex);
+      console.log('if condition value activeShabadId', activeShabadId);
       if (activeShabadId === null) {
         updateTraversedVerse(initialVerseId, initialVerseIndex);
       }
@@ -160,7 +165,6 @@ ShabadText.propTypes = {
   shabadId: PropTypes.number,
   initialVerseId: PropTypes.number,
   baniType: PropTypes.string,
-  baniLength: PropTypes.string,
   paneAttributes: PropTypes.object,
   setPaneAttributes: PropTypes.func,
   currentPane: PropTypes.number,

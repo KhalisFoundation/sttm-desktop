@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { ShabadText } from './ShabadText';
-import { HistoryPane } from '../misc/components';
-import Slides from '../../addons/announcement/components/Slides';
+import { FavoritePane, HistoryPane } from '../misc/components';
+import { useSlides } from '../../common/hooks';
 
 const remote = require('@electron/remote');
 
@@ -18,6 +18,9 @@ const MultiPaneContent = ({ data }) => {
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
   const { activePaneId, homeVerse, versesRead } = navigatorState;
   const { setHomeVerse, setVersesRead } = navigatorActions;
+
+  const { openWaheguruSlide, openMoolMantraSlide, openBlankViewer, openAnandSahibBhog } =
+    useSlides();
 
   useEffect(() => {
     if (activePaneId === paneId) {
@@ -55,8 +58,7 @@ const MultiPaneContent = ({ data }) => {
       return (
         <ShabadText
           shabadId={paneAttributes.activeShabad}
-          baniType="shabad"
-          baniLength="short"
+          baniType={paneAttributes.baniType}
           paneAttributes={paneAttributes}
           setPaneAttributes={setPaneAttributes}
           currentPane={paneId}
@@ -66,14 +68,46 @@ const MultiPaneContent = ({ data }) => {
       return (
         <>
           {goToShabadBtn}
-          <HistoryPane />
+          <HistoryPane paneId={paneId} />
         </>
       );
     case i18n.t('MULTI_PANE.MISC_SLIDES'):
       return (
         <>
           {goToShabadBtn}
-          <Slides />
+          <ul className="history-results">
+            <li
+              className="history-item"
+              onClick={() => openAnandSahibBhog({ openedFrom: 'multipane-content' })}
+            >
+              {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
+            </li>
+            <li
+              className="history-item"
+              onClick={() => openMoolMantraSlide({ openedFrom: 'multipane-content' })}
+            >
+              {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
+            </li>
+            <li
+              className="gurmukhi history-item"
+              onClick={() => openWaheguruSlide({ openedFrom: 'multipane-content' })}
+            >
+              vwihgurU
+            </li>
+            <li
+              className="history-item"
+              onClick={() => openBlankViewer({ openedFrom: 'multiplane-content' })}
+            >
+              {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+            </li>
+          </ul>
+        </>
+      );
+    case i18n.t('MULTI_PANE.FAVORITES'):
+      return (
+        <>
+          {goToShabadBtn}
+          <FavoritePane paneId={paneId} />
         </>
       );
     default:

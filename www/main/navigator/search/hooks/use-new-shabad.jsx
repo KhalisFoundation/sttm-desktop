@@ -15,6 +15,7 @@ export const useNewShabad = () => {
     isMiscSlide,
     singleDisplayActiveTab,
     searchVerse,
+    activePaneId,
     pane1,
     pane2,
     pane3,
@@ -32,6 +33,7 @@ export const useNewShabad = () => {
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
     setSearchVerse,
+    setActivePaneId,
     setPane1,
     setPane2,
     setPane3,
@@ -39,12 +41,14 @@ export const useNewShabad = () => {
 
   return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      if (multiPaneId !== activePaneId) setActivePaneId(multiPaneId);
       switch (multiPaneId) {
         case 1:
           setPane1({
             ...pane1,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
+            baniType: 'shabad',
           });
           break;
         case 2:
@@ -52,6 +56,7 @@ export const useNewShabad = () => {
             ...pane2,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
+            baniType: 'shabad',
           });
           break;
         case 3:
@@ -59,6 +64,7 @@ export const useNewShabad = () => {
             ...pane3,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
+            baniType: 'shabad',
           });
           break;
         default:

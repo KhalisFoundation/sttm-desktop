@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+import FavShabadIcon from './FavShabadIcon';
+import ArrowIcon from './ArrowIcon';
+
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
@@ -45,9 +48,8 @@ const MultiPaneHeader = ({ data }) => {
 
   return (
     <div className={`shabad-pane-header pane-${paneId}`}>
-      <span className="pane-symbol">{paneId}</span>
-      <span className="pane-title">{getTitle(paneAttributes.content)}</span>
-      <div className="pane-tools">
+      <div className="pane-info">
+        <span className="pane-symbol">{paneId}</span>
         <button onClick={lockPane}>
           {paneAttributes.locked ? (
             <i className="fa-solid fa-lock"></i>
@@ -55,9 +57,11 @@ const MultiPaneHeader = ({ data }) => {
             <i className="fa-solid fa-lock-open"></i>
           )}
         </button>
-        <button>
-          <i className="fa-regular fa-star"></i>
-        </button>
+      </div>
+      <span className="pane-title">{getTitle(paneAttributes.content)}</span>
+      <div className="pane-tools">
+        <FavShabadIcon paneId={paneId} />
+        <ArrowIcon paneId={paneId} />
         <select
           onChange={selectPaneOption}
           value={paneAttributes.content}
@@ -66,6 +70,7 @@ const MultiPaneHeader = ({ data }) => {
           <option>{i18n.t('MULTI_PANE.CLEAR_PANE')}</option>
           <option style={{ display: 'none' }}>{i18n.t('MULTI_PANE.SHABAD')}</option>
           <option>{i18n.t('TOOLBAR.HISTORY')}</option>
+          <option>{i18n.t('MULTI_PANE.FAVORITES')}</option>
           <option>{i18n.t('MULTI_PANE.MISC_SLIDES')}</option>
         </select>
       </div>
