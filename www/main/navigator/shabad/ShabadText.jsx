@@ -1,7 +1,8 @@
-import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import { useStoreActions, useStoreState } from 'easy-peasy';
+import { Virtuoso } from 'react-virtuoso';
+import { ipcRenderer } from 'electron';
+import PropTypes from 'prop-types';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
@@ -14,6 +15,7 @@ import {
   scrollToVerse,
   saveToHistory,
 } from './utils';
+import { filterOverlayVerseItems } from './utils/filter-verse-items';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -30,6 +32,7 @@ export const ShabadText = ({
   currentPane,
 }) => {
   const [filteredItems, setFilteredItems] = useState([]);
+  const [rawVerses, setRawVerses] = useState([]);
   const {
     activeVerseId,
     isMiscSlide,
@@ -43,7 +46,7 @@ export const ShabadText = ({
     activePaneId,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength } = useStoreState((state) => state.userSettings);
+  const { baniLength, liveFeed } = useStoreState((state) => state.userSettings);
 
   const { setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory, setActivePaneId } =
     useStoreActions((actions) => actions.navigator);
@@ -89,6 +92,7 @@ export const ShabadText = ({
     if (baniType === 'shabad') {
       loadShabad(shabadId).then((verseList) => {
         if (verseList.length) {
+          setRawVerses(verseList);
           saveToHistory(
             shabadId,
             verseList,
@@ -102,6 +106,7 @@ export const ShabadText = ({
     } else if (baniType === 'bani') {
       loadBani(shabadId, baniLengthCols[baniLength]).then((verseList) => {
         if (verseList.length) {
+          setRawVerses(verseList);
           saveToHistory(
             shabadId,
             verseList,
@@ -115,6 +120,7 @@ export const ShabadText = ({
     } else if (baniType === 'ceremony') {
       loadCeremony(shabadId).then((verseList) => {
         if (verseList.length) {
+          setRawVerses(verseList);
           saveToHistory(
             shabadId,
             verseList,
@@ -146,6 +152,17 @@ export const ShabadText = ({
       }
     }
   }, [filteredItems]);
+
+  useEffect(() => {
+    const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
+    ipcRenderer.send(
+      'show-line',
+      JSON.stringify({
+        Line: overlayVerse,
+        live: liveFeed,
+      }),
+    );
+  }, [activeShabadId, activeVerseId]);
 
   return (
     <div className="shabad-list">
