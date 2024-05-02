@@ -33,6 +33,12 @@ const ArrowIcon = ({ paneId }) => {
     setPane3,
   } = useStoreActions((state) => state.navigator);
 
+  const paneBani = {
+    1: pane1.baniType,
+    2: pane2.baniType,
+    3: pane3.baniType,
+  };
+
   const updatePaneShabad = (direction) => {
     if (paneId !== activePaneId) setActivePaneId(paneId);
     let currentShabad;
@@ -91,6 +97,7 @@ const ArrowIcon = ({ paneId }) => {
       }
     }
   };
+
   const navigateVerseRight = () => {
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       updatePaneShabad('right');
@@ -108,7 +115,16 @@ const ArrowIcon = ({ paneId }) => {
     }
   };
 
-  if (activeShabadId && !isSundarGutkaBani && !isCeremonyBani) {
+  if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+    if (paneBani[paneId] === 'shabad') {
+      return (
+        <>
+          <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>
+          <i className="fa fa-arrow-circle-o-right" onClick={navigateVerseRight}></i>
+        </>
+      );
+    }
+  } else if (activeShabadId && !isSundarGutkaBani && !isCeremonyBani) {
     return (
       <>
         <i className="fa fa-arrow-circle-o-left" onClick={navigateVerseLeft}></i>

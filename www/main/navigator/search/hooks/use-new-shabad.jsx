@@ -49,6 +49,7 @@ export const useNewShabad = () => {
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
+            versesRead: [newSelectedVerse],
           });
           break;
         case 2:
@@ -57,6 +58,7 @@ export const useNewShabad = () => {
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
+            versesRead: [newSelectedVerse],
           });
           break;
         case 3:
@@ -65,6 +67,7 @@ export const useNewShabad = () => {
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
+            versesRead: [newSelectedVerse],
           });
           break;
         default:

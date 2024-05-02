@@ -23,6 +23,10 @@ export const FavoritePane = ({ className, paneId }) => {
     activeVerseId,
     singleDisplayActiveTab,
     favShabad,
+    pane1,
+    pane2,
+    pane3,
+    activePaneId,
   } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
@@ -34,6 +38,10 @@ export const FavoritePane = ({ className, paneId }) => {
     setActiveVerseId,
     setSingleDisplayActiveTab,
     setFavShabad,
+    setPane1,
+    setPane2,
+    setPane3,
+    setActivePaneId,
   } = useStoreActions((state) => state.navigator);
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
@@ -110,6 +118,35 @@ export const FavoritePane = ({ className, paneId }) => {
 
       if (isCeremonyBani) {
         setIsCeremonyBani(false);
+      }
+
+      if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+        if (paneId !== activePaneId) setActivePaneId(paneId);
+        switch (paneId) {
+          case 1:
+            setPane1({
+              ...pane1,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              activeShabad: shabadId,
+            });
+            break;
+          case 2:
+            setPane2({
+              ...pane2,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              activeShabad: shabadId,
+            });
+            break;
+          case 3:
+            setPane3({
+              ...pane3,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              activeShabad: shabadId,
+            });
+            break;
+          default:
+            break;
+        }
       }
     }
   };

@@ -29,15 +29,15 @@ const FavShabadIcon = ({ paneId }) => {
       switch (paneId) {
         case 1:
           setCurrentShabad(pane1.activeShabad);
-          setCurrentVerse(pane1.activeVerse);
+          setCurrentVerse(pane1.versesRead[0]);
           break;
         case 2:
           setCurrentShabad(pane2.activeShabad);
-          setCurrentVerse(pane2.activeVerse);
+          setCurrentVerse(pane2.versesRead[0]);
           break;
         case 3:
           setCurrentShabad(pane3.activeShabad);
-          setCurrentVerse(pane3.activeVerse);
+          setCurrentVerse(pane3.versesRead[0]);
           break;
         default:
           break;

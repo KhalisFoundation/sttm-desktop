@@ -78,7 +78,7 @@ const MultiPaneContent = ({ data }) => {
           <ul className="history-results">
             <li
               className="history-item"
-              onClick={() => openAnandSahibBhog({ openedFrom: 'multipane-content' })}
+              onClick={() => openAnandSahibBhog({ openedFrom: 'multipane-content', paneId })}
             >
               {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
             </li>

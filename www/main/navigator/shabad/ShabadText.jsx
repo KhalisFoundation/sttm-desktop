@@ -89,18 +89,39 @@ export const ShabadText = ({
     if (baniType === 'shabad') {
       loadShabad(shabadId).then((verseList) => {
         if (verseList.length) {
+          saveToHistory(
+            shabadId,
+            verseList,
+            baniType,
+            { verseHistory, setVerseHistory, baniLength },
+            initialVerseId,
+          );
           setFilteredItems(filterRequiredVerseItems(verseList));
         }
       });
     } else if (baniType === 'bani') {
       loadBani(shabadId, baniLengthCols[baniLength]).then((verseList) => {
         if (verseList.length) {
+          saveToHistory(
+            shabadId,
+            verseList,
+            baniType,
+            { verseHistory, setVerseHistory, baniLength },
+            initialVerseId,
+          );
           setFilteredItems(filterRequiredVerseItems(verseList));
         }
       });
     } else if (baniType === 'ceremony') {
       loadCeremony(shabadId).then((verseList) => {
         if (verseList.length) {
+          saveToHistory(
+            shabadId,
+            verseList,
+            baniType,
+            { verseHistory, setVerseHistory, baniLength },
+            initialVerseId,
+          );
           setFilteredItems(filterRequiredVerseItems(verseList));
         }
       });
@@ -109,13 +130,6 @@ export const ShabadText = ({
 
   useEffect(() => {
     if (filteredItems.length) {
-      saveToHistory(
-        shabadId,
-        filteredItems,
-        baniType,
-        { verseHistory, setVerseHistory, baniLength },
-        initialVerseId,
-      );
       setTimeout(() => {
         scrollToVerse(initialVerseId, filteredItems, virtuosoRef);
       }, 100);
@@ -123,7 +137,6 @@ export const ShabadText = ({
         (verse) => verse.verseId === initialVerseId,
       );
       if (initialVerseIndex >= 0) updateHomeVerse(initialVerseIndex);
-      console.log('if condition value activeShabadId', activeShabadId);
       if (activeShabadId === null) {
         updateTraversedVerse(initialVerseId, initialVerseIndex);
       }

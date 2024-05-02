@@ -12,8 +12,8 @@ export const saveToHistory = (
   let verse;
   if (verseType === 'shabad') {
     if (initialVerse) {
-      const clickedVerse = verses.filter((verseObj) => verseObj.verseId === initialVerse);
-      verse = clickedVerse.length && clickedVerse[0].verse;
+      const clickedVerse = verses.filter((verseObj) => verseObj.ID === initialVerse);
+      verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
     } else {
       verse = firstVerse.verse;
     }
