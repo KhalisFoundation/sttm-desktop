@@ -16,7 +16,7 @@ const ShabadPane = ({ className, multiPaneId = false }) => {
         header={multiPaneId ? MultiPaneHeader : ShabadHeader}
         content={multiPaneId ? MultiPaneContent : ShabadContent}
         data={{ multiPaneId }}
-        className={multiPaneId === activePaneId ? 'live-pane' : ''}
+        className={multiPaneId === activePaneId ? 'live-pane' : 'inactive-pane'}
       />
     </div>
   );

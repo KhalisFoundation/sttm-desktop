@@ -47,6 +47,14 @@
     .theme-dark-theme & {
       background-color: $dull-blue;
     }
+    .inactive-pane & {
+      .theme-light-theme & {
+        background-color: $transparent-light-black;
+      }
+      .theme-dark-theme & {
+        background-color: $transparent-light-white;
+      }
+    }
   }
   .search-list {
     display: inline-flex;

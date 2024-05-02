@@ -136,7 +136,11 @@ export const ShabadText = ({
       const initialVerseIndex = filteredItems.findIndex(
         (verse) => verse.verseId === initialVerseId,
       );
-      if (initialVerseIndex >= 0) updateHomeVerse(initialVerseIndex);
+      const activeVerseIndex = filteredItems.findIndex((verse) => verse.verseId === activeVerseId);
+      if (initialVerseIndex >= 0) {
+        updateHomeVerse(initialVerseIndex);
+        setActiveVerse({ [activeVerseIndex]: activeVerseId });
+      }
       if (activeShabadId === null) {
         updateTraversedVerse(initialVerseId, initialVerseIndex);
       }
