@@ -381,9 +381,13 @@
       "initialValue": false,
       "dontApplyClass": true
     },
-    "isSingleDisplayMode": {
-      "title": "SINGLE_DISPLAY",
-      "initialValue": false
+    "currentWorkspace": {
+      "title": "CURRENT_WORKSPACE",
+      "initialValue": "Presentation"
+    },
+    "defaultPaneId": {
+      "title": "DEFAULT_PANE",
+      "initialValue": 1
     }
   }
 }

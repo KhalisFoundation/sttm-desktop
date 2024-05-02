@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 import { useStoreState, useStoreActions } from 'easy-peasy';
@@ -15,18 +15,34 @@ const analytics = remote.getGlobal('analytics');
 const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
-  const { isSundarGutkaBani, sundarGutkaBaniId, isCeremonyBani, singleDisplayActiveTab } =
-    useStoreState((state) => state.navigator);
+  const {
+    isSundarGutkaBani,
+    sundarGutkaBaniId,
+    isCeremonyBani,
+    singleDisplayActiveTab,
+    pane1,
+    pane2,
+    pane3,
+  } = useStoreState((state) => state.navigator);
+
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+
   const {
     setIsSundarGutkaBani,
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
+    setPane1,
+    setPane2,
+    setPane3,
   } = useStoreActions((state) => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
   const [isTranslit, setTranslitState] = useState(false);
   const [isEngTransliterated, setEngTransliterate] = useState(false);
+  const [paneSelectorActive, setPaneSelectorActive] = useState(false);
+
+  const paneSelector = useRef(null);
 
   const nitnemBanis = [];
   const popularBanis = [];
@@ -51,7 +67,18 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     return b;
   });
 
-  const loadBani = (baniId) => {
+  const openPaneMenu = (e, baniId) => {
+    paneSelector.current.style.left = `${e.clientX - 100}px`;
+    if (window.innerHeight - e.clientY > 200) {
+      paneSelector.current.style.top = `${e.clientY - 10}px`;
+    } else {
+      paneSelector.current.style.top = `${e.clientY - 195}px`;
+    }
+    paneSelector.current.dataset.baniId = baniId;
+    setPaneSelectorActive(true);
+  };
+
+  const loadBani = (baniId, paneId = null) => {
     if (isCeremonyBani) {
       setIsCeremonyBani(false);
     }
@@ -68,12 +95,51 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
       setSingleDisplayActiveTab('shabad');
     }
 
+    if (paneId !== null) {
+      switch (paneId) {
+        case 1:
+          setPane1({
+            ...pane1,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'bani',
+            activeShabad: baniId,
+          });
+          break;
+        case 2:
+          setPane2({
+            ...pane2,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'bani',
+            activeShabad: baniId,
+          });
+          break;
+        case 3:
+          setPane3({
+            ...pane3,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'bani',
+            activeShabad: baniId,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
     analytics.trackEvent({
       category: 'sundar-gutka',
       action: 'bani',
       label: baniId,
     });
     onScreenClose();
+  };
+
+  const getBani = (e, baniId) => {
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      openPaneMenu(e, baniId);
+    } else {
+      loadBani(baniId);
+    }
   };
 
   return (
@@ -112,12 +178,51 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               )}
 
               <section className="blocklist">
+                <div
+                  ref={paneSelector}
+                  className={`history-results multipane-dropdown ${
+                    paneSelectorActive ? 'enabled' : 'disabled'
+                  }`}
+                  onMouseLeave={() => setPaneSelectorActive(false)}
+                >
+                  <p
+                    onClick={() => {
+                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 1);
+                      setPaneSelectorActive(false);
+                    }}
+                    className="history-item"
+                  >
+                    Open in Pane 1
+                  </p>
+                  <p
+                    onClick={() => {
+                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 2);
+                      setPaneSelectorActive(false);
+                    }}
+                    className="history-item"
+                  >
+                    Open in Pane 2
+                  </p>
+                  <p
+                    onClick={() => {
+                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 3);
+                      setPaneSelectorActive(false);
+                    }}
+                    className="history-item"
+                  >
+                    Open in Pane 3
+                  </p>
+                </div>
                 <ul id={blockListId} className={!isEngTransliterated && 'gurmukhi'}>
                   {taggedBanis.map((bani) => (
                     <li
                       key={bani.name}
                       className={blockListItemClassName}
-                      onClick={() => loadBani(bani.id)}
+                      onClick={(e) =>
+                        currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')
+                          ? openPaneMenu(e, bani.id)
+                          : loadBani(bani.id)
+                      }
                     >
                       <span className={`tag tag-${bani.baniTag}`} />
                       <span className={isEngTransliterated && 'english-bani'}>
@@ -138,7 +243,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               <ExtraBani
                 title="Nitnem Banis"
                 banis={nitnemBanis}
-                loadBani={loadBani}
+                getBani={getBani}
                 isEngTransliterated={isEngTransliterated}
               />
             )}
@@ -146,7 +251,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               <ExtraBani
                 title="Popular Banis"
                 banis={popularBanis}
-                loadBani={loadBani}
+                getBani={getBani}
                 isEngTransliterated={isEngTransliterated}
               />
             )}

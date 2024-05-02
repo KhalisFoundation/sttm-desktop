@@ -47,10 +47,19 @@
     .theme-dark-theme & {
       background-color: $dull-blue;
     }
+    .inactive-pane & {
+      .theme-light-theme & {
+        background-color: $transparent-light-black;
+      }
+      .theme-dark-theme & {
+        background-color: $transparent-light-white;
+      }
+    }
   }
   .search-list {
     display: inline-flex;
     padding: 0 5px;
+    width: 100%;
     .sggs-color {
       color: $cadmium-orange;
     }
@@ -83,8 +92,10 @@
     transition: 0.3s all ease;
 
     &.search-li {
-      padding: 2px 10px;
+      display: flex;
+      justify-content: space-between;
       list-style: none;
+      padding: 2px 10px;
     }
 
     &.shabad-li {

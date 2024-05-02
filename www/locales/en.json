@@ -69,7 +69,8 @@
   },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
-    "SINGLE_DISPLAY": "Single Display"
+    "SINGLE_DISPLAY": "Single-Display",
+    "MULTI_PANE": "Multi-Pane"
   },
   "CHROMECAST": {
     "CANCEL": "Cancel",
@@ -120,6 +121,13 @@
       "RAMDAS_SAHIB_JI": "Guru Ramdas Ji",
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
     }
+  },
+  "MULTI_PANE": {
+    "CLEAR_PANE": "Clear Pane",
+    "MISC_SLIDES": "Misc Slides",
+    "SHABAD": "Shabad",
+    "SHABAD_BTN": "Back to shabad",
+    "FAVORITES": "Favorite Shabads"
   },
   "MENU": {
     "APP": {

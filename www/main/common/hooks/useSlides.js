@@ -4,13 +4,37 @@ import insertSlide from '../constants/slidedb';
 
 const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
+
 const analytics = remote.getGlobal('analytics');
 
 export const useSlides = () => {
-  const { akhandpatt } = useStoreState((state) => state.userSettings);
+  const { akhandpatt, currentWorkspace } = useStoreState((state) => state.userSettings);
   const { setAkhandpatt } = useStoreActions((state) => state.userSettings);
-  const { shortcuts, isMiscSlide, miscSlideText, isAnnoucement, isSundarGutkaBani, isCeremonyBani, ceremonyId } = useStoreState((state) => state.navigator);
-  const { setShortcuts, setIsMiscSlide, setMiscSlideText, setIsAnnoucement, setIsSundarGutkaBani, setIsCeremonyBani, setCeremonyId } = useStoreActions((state) => state.navigator);
+  const {
+    shortcuts,
+    isMiscSlide,
+    miscSlideText,
+    isAnnoucement,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    ceremonyId,
+    pane1,
+    pane2,
+    pane3,
+  } = useStoreState((state) => state.navigator);
+  const {
+    setShortcuts,
+    setIsMiscSlide,
+    setMiscSlideText,
+    setIsAnnoucement,
+    setIsSundarGutkaBani,
+    setIsCeremonyBani,
+    setCeremonyId,
+    setPane1,
+    setPane2,
+    setPane3,
+  } = useStoreActions((state) => state.navigator);
 
   const addMiscSlide = (givenText) => {
     if (isAnnoucement) {
@@ -54,7 +78,7 @@ export const useSlides = () => {
     });
   };
 
-  const openAnandSahibBhog = ({ openedFrom }) => {
+  const openAnandSahibBhog = ({ openedFrom, paneId = null }) => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
@@ -63,6 +87,38 @@ export const useSlides = () => {
     }
     if (!isCeremonyBani) {
       setIsCeremonyBani(true);
+    }
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      if (paneId) {
+        switch (paneId) {
+          case 1:
+            setPane1({
+              ...pane1,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              baniType: 'ceremony',
+              activeShabad: 3,
+            });
+            break;
+          case 2:
+            setPane2({
+              ...pane2,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              baniType: 'ceremony',
+              activeShabad: 3,
+            });
+            break;
+          case 3:
+            setPane3({
+              ...pane3,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              baniType: 'ceremony',
+              activeShabad: 3,
+            });
+            break;
+          default:
+            break;
+        }
+      }
     }
     analytics.trackEvent({
       category: 'ceremony',
@@ -106,6 +162,6 @@ export const useSlides = () => {
     openWaheguruSlide,
     openMoolMantraSlide,
     openBlankViewer,
-    openAnandSahibBhog
+    openAnandSahibBhog,
   };
 };

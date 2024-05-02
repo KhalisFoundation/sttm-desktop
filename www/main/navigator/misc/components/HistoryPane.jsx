@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-export const HistoryPane = ({ className }) => {
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
+
+export const HistoryPane = ({ className, paneId }) => {
   const {
     verseHistory,
     activeShabadId,
@@ -16,6 +20,10 @@ export const HistoryPane = ({ className }) => {
     activeVerseId,
     historyOrder,
     singleDisplayActiveTab,
+    pane1,
+    pane2,
+    pane3,
+    activePaneId,
   } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
@@ -28,7 +36,13 @@ export const HistoryPane = ({ className }) => {
     setHomeVerse,
     setActiveVerseId,
     setSingleDisplayActiveTab,
+    setPane1,
+    setPane2,
+    setPane3,
+    setActivePaneId,
   } = useStoreActions((state) => state.navigator);
+
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const openShabadFromHistory = (element) => {
     if (singleDisplayActiveTab !== 'shabad') {
@@ -80,6 +94,34 @@ export const HistoryPane = ({ className }) => {
     if (element.continueFrom !== activeVerseId) {
       setActiveVerseId(element.continueFrom);
     }
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      if (paneId !== activePaneId) setActivePaneId(paneId);
+      switch (paneId) {
+        case 1:
+          setPane1({
+            ...pane1,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            activeShabad: element.shabadId,
+          });
+          break;
+        case 2:
+          setPane2({
+            ...pane2,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            activeShabad: element.shabadId,
+          });
+          break;
+        case 3:
+          setPane3({
+            ...pane3,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            activeShabad: element.shabadId,
+          });
+          break;
+        default:
+          break;
+      }
+    }
   };
 
   const versesMarkup = [];
@@ -109,4 +151,5 @@ export const HistoryPane = ({ className }) => {
 
 HistoryPane.propTypes = {
   className: PropTypes.string,
+  paneId: PropTypes.number,
 };

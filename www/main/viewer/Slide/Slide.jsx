@@ -143,7 +143,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                   }`}
                   ref={activeVerseRef}
                   style={{
-                    'font-weight': 'normal', // adding style here to reach chromecast
+                    fontWeight: 'normal', // adding style here to reach chromecast
                   }}
                 >
                   <SlideGurbani
