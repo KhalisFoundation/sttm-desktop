@@ -424,15 +424,20 @@
   }
 
   .pane-tools {
-
     button,
-    select {
+    select,
+    div > i {
       color: $text-base;
 
       &:hover {
         background-color: $transparent-light-white;
       }
     }
+  }
+
+  .pane-info button {
+    color: $text-base;
+    background-color: transparent;
   }
 
   #footer {

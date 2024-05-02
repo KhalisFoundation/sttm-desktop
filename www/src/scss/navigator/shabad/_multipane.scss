@@ -34,12 +34,30 @@ $colors: (
     .pane-tools {
       align-items: center;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       width: 100px;
 
       button {
         background-color: transparent;
         padding: 0 8px;
+      }
+
+      .fav-btn {
+        border-radius: 50%;
+        margin: 0;
+        i {
+          padding-right: 0;
+        }
+      }
+
+      .arrow-icons {
+        display: flex;
+
+        i {
+          border-radius: 50%;
+          font-size: 16px;
+          padding: 5px;
+        }
       }
 
       .pane-options-dropdown {

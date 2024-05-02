@@ -11,7 +11,11 @@ export const udpateHistory = (
     currentHistoryObj.continueFrom = newTraversedVerse;
     if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
       currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
-      setPaneAttributes({ ...paneAttributes, versesRead: currentHistoryObj.versesRead });
+      setPaneAttributes({
+        ...paneAttributes,
+        activeVerse: newTraversedVerse,
+        versesRead: currentHistoryObj.versesRead,
+      });
     }
   }
 };

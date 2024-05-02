@@ -50,6 +50,7 @@ export const useNewShabad = () => {
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
             versesRead: [newSelectedVerse],
+            activeVerse: newSelectedVerse,
           });
           break;
         case 2:
@@ -59,6 +60,7 @@ export const useNewShabad = () => {
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
             versesRead: [newSelectedVerse],
+            activeVerse: newSelectedVerse,
           });
           break;
         case 3:
@@ -68,6 +70,7 @@ export const useNewShabad = () => {
             activeShabad: newSelectedShabad,
             baniType: 'shabad',
             versesRead: [newSelectedVerse],
+            activeVerse: newSelectedVerse,
           });
           break;
         default:
