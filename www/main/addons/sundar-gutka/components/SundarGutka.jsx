@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
-import { Switch, Overlay } from '../../../common/sttm-ui';
+import { Switch, Overlay, MultipaneDropdown } from '../../../common/sttm-ui';
 import ExtraBani from './ExtraBani';
 import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
@@ -142,6 +142,11 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     }
   };
 
+  const openBaniFromDropdown = (paneId) => {
+    loadBani(parseInt(paneSelector.current.dataset.baniId, 10), paneId);
+    setPaneSelectorActive(false);
+  };
+
   return (
     <Overlay onScreenClose={onScreenClose}>
       <div className={`addon-wrapper ${hyphenedTitle}-wrapper`}>
@@ -178,41 +183,14 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
               )}
 
               <section className="blocklist">
-                <div
-                  ref={paneSelector}
-                  className={`history-results multipane-dropdown ${
-                    paneSelectorActive ? 'enabled' : 'disabled'
-                  }`}
-                  onMouseLeave={() => setPaneSelectorActive(false)}
-                >
-                  <p
-                    onClick={() => {
-                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 1);
-                      setPaneSelectorActive(false);
-                    }}
-                    className="history-item"
-                  >
-                    Open in Pane 1
-                  </p>
-                  <p
-                    onClick={() => {
-                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 2);
-                      setPaneSelectorActive(false);
-                    }}
-                    className="history-item"
-                  >
-                    Open in Pane 2
-                  </p>
-                  <p
-                    onClick={() => {
-                      loadBani(parseInt(paneSelector.current.dataset.baniId, 10), 3);
-                      setPaneSelectorActive(false);
-                    }}
-                    className="history-item"
-                  >
-                    Open in Pane 3
-                  </p>
-                </div>
+                {
+                  <MultipaneDropdown
+                    paneSelectorActive={paneSelectorActive}
+                    setPaneSelectorActive={setPaneSelectorActive}
+                    paneSelector={paneSelector}
+                    clickHandler={openBaniFromDropdown}
+                  />
+                }
                 <ul id={blockListId} className={!isEngTransliterated && 'gurmukhi'}>
                   {taggedBanis.map((bani) => (
                     <li
