@@ -1,10 +1,4 @@
-$colors: (
-  "pane-1": $picton-blue,
-  "pane-2": $princeton-orange,
-  "pane-3": $grape
-);
-
-@each $pane, $color in $colors {
+@each $pane, $color in $multipane-colors {
   .#{$pane} {
     border-bottom: 2px solid $color;
     box-sizing: content-box;
@@ -129,15 +123,6 @@ $colors: (
     i {
       color: $snow-white;
       font-size: 14px;
-    }
-
-    .theme-light-theme & {
-      background-color: rgba($color, 0.3);
-    }
-
-    .theme-dark-theme & {
-      background-color: rgba($color, 0.6);
-      color: rgba($white, 0.7);
     }
 
     &:hover {

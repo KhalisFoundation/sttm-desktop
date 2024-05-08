@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
+
 const MultipaneDropdown = ({
   paneSelectorActive,
   setPaneSelectorActive,
@@ -17,10 +21,15 @@ const MultipaneDropdown = ({
           clickHandler(index + 1);
         }
       }}
+      title={item.locked ? i18n.t('MULTI_PANE.LOCKED_PANE_MSG') : ''}
       className={`history-item option-pane-${index + 1} ${item.locked ? 'locked-option' : ''}`}
     >
-      {item.locked ? <i style={{ fontSize: '12px' }} className="fa-solid fa-lock"></i> : '-'} Pane{' '}
-      {index + 1}
+      {`Pane ${index + 1}`}
+      {item.locked ? (
+        <i style={{ fontSize: '12px', marginLeft: '8px' }} className="fa-solid fa-lock"></i>
+      ) : (
+        ''
+      )}
     </p>
   ));
   return (

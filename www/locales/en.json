@@ -127,7 +127,8 @@
     "MISC_SLIDES": "Misc Slides",
     "SHABAD": "Shabad",
     "SHABAD_BTN": "Back to shabad",
-    "FAVORITES": "Favorite Shabads"
+    "FAVORITES": "Favorite Shabads",
+    "LOCKED_PANE_MSG": "This pane is locked"
   },
   "MENU": {
     "APP": {
