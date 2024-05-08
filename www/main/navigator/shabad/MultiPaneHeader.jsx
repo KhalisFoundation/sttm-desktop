@@ -16,34 +16,53 @@ const MultiPaneHeader = ({ data }) => {
   const paneAttributes = navigatorState[`pane${paneId}`];
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
 
+  const { defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { setDefaultPaneId } = useStoreActions((actions) => actions.userSettings);
+
   const defaultPaneAttributes = {
     locked: false,
     activeShabad: null,
     activeVerse: '',
     versesRead: [],
     homeVerse: false,
-    content: i18n.t('MULTI_PANE.CLEAR_PANE'),
+    content: '',
+  };
+
+  const nextAvailablePane = (givenPaneId) => {
+    let nextPane = givenPaneId;
+    do {
+      if (nextPane === 3) {
+        nextPane = 1;
+      } else {
+        nextPane++;
+      }
+      if (!navigatorState[`pane${nextPane}`].locked) {
+        return nextPane;
+      }
+    } while (nextPane !== givenPaneId);
+    return null;
   };
 
   const lockPane = () => {
     const updatedAttributes = { ...paneAttributes };
-    updatedAttributes.locked = !paneAttributes.locked;
+    if (paneAttributes.locked) {
+      updatedAttributes.locked = false;
+    } else {
+      updatedAttributes.locked = true;
+      if (defaultPaneId === paneId) {
+        const newDefault = nextAvailablePane(paneId);
+        if (defaultPaneId !== newDefault) {
+          setDefaultPaneId(newDefault);
+        }
+      }
+    }
     if (paneAttributes !== updatedAttributes) {
       setPaneAttributes(updatedAttributes);
     }
   };
 
   const selectPaneOption = (event) => {
-    if (event.target.value === i18n.t('MULTI_PANE.CLEAR_PANE')) {
-      if (paneAttributes !== defaultPaneAttributes) setPaneAttributes(defaultPaneAttributes);
-    } else {
-      setPaneAttributes({ ...paneAttributes, content: event.target.value });
-    }
-  };
-
-  const getTitle = (content) => {
-    if (content === i18n.t('MULTI_PANE.CLEAR_PANE')) return '';
-    return content;
+    setPaneAttributes({ ...paneAttributes, content: event.target.value });
   };
 
   return (
@@ -58,17 +77,17 @@ const MultiPaneHeader = ({ data }) => {
           )}
         </button>
       </div>
-      <span className="pane-title">{getTitle(paneAttributes.content)}</span>
+      <span className="pane-title">{paneAttributes.content}</span>
       <div className="pane-tools">
         <FavShabadIcon paneId={paneId} />
         <ArrowIcon paneId={paneId} />
+        <button onClick={() => setPaneAttributes(defaultPaneAttributes)}>Clear</button>
         <select
           onChange={selectPaneOption}
           value={paneAttributes.content}
           className="pane-options-dropdown"
         >
-          <option>{i18n.t('MULTI_PANE.CLEAR_PANE')}</option>
-          <option style={{ display: 'none' }}>{i18n.t('MULTI_PANE.SHABAD')}</option>
+          <option>{i18n.t('MULTI_PANE.SHABAD')}</option>
           <option>{i18n.t('TOOLBAR.HISTORY')}</option>
           <option>{i18n.t('MULTI_PANE.FAVORITES')}</option>
           <option>{i18n.t('MULTI_PANE.MISC_SLIDES')}</option>

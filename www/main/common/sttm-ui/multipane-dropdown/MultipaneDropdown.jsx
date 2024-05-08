@@ -11,13 +11,16 @@ const MultipaneDropdown = ({
   const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
   const dropdownOptions = [pane1, pane2, pane3].map((item, index) => (
     <p
-      key={`pane-option-${index}`}
+      key={`pane-option-${index + 1}`}
       onClick={() => {
-        clickHandler(index + 1);
+        if (!item.locked) {
+          clickHandler(index + 1);
+        }
       }}
-      className={`history-item pane-option-${index + 1}`}
+      className={`history-item option-pane-${index + 1} ${item.locked ? 'locked-option' : ''}`}
     >
-      Pane {index + 1}
+      {item.locked ? <i style={{ fontSize: '12px' }} className="fa-solid fa-lock"></i> : '-'} Pane{' '}
+      {index + 1}
     </p>
   ));
   return (
