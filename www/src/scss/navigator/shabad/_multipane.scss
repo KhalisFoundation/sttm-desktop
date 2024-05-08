@@ -17,6 +17,13 @@ $colors: (
 
       button {
         height: 100%;
+
+        &.disabled {
+          opacity: 0.5;
+          i {
+            cursor: not-allowed;
+          }
+        }
       }
     }
 
@@ -193,7 +200,7 @@ $colors: (
   p {
     &.locked-option {
       cursor: not-allowed;
-      opacity: 0.7;
+      opacity: 0.5;
     }
   }
 }

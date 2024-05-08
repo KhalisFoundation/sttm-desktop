@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -18,6 +18,10 @@ const MultiPaneHeader = ({ data }) => {
 
   const { defaultPaneId } = useStoreState((state) => state.userSettings);
   const { setDefaultPaneId } = useStoreActions((actions) => actions.userSettings);
+
+  const [disableLock, setDisableLock] = useState(false);
+
+  const lockIcon = useRef(null);
 
   const defaultPaneAttributes = {
     locked: false,
@@ -47,7 +51,7 @@ const MultiPaneHeader = ({ data }) => {
     const updatedAttributes = { ...paneAttributes };
     if (paneAttributes.locked) {
       updatedAttributes.locked = false;
-    } else {
+    } else if (!disableLock) {
       updatedAttributes.locked = true;
       if (defaultPaneId === paneId) {
         const newDefault = nextAvailablePane(paneId);
@@ -61,6 +65,17 @@ const MultiPaneHeader = ({ data }) => {
     }
   };
 
+  useEffect(() => {
+    const remainingPanes = [1, 2, 3].filter((pane) => pane !== paneId);
+    if (remainingPanes.every((pane) => navigatorState[`pane${pane}`].locked)) {
+      lockIcon.current.classList.add('disabled');
+      setDisableLock(true);
+    } else {
+      lockIcon.current.classList.remove('disabled');
+      setDisableLock(false);
+    }
+  }, [navigatorState.pane1, navigatorState.pane2, navigatorState.pane3]);
+
   const selectPaneOption = (event) => {
     setPaneAttributes({ ...paneAttributes, content: event.target.value });
   };
@@ -69,7 +84,7 @@ const MultiPaneHeader = ({ data }) => {
     <div className={`shabad-pane-header pane-${paneId}`}>
       <div className="pane-info">
         <span className="pane-symbol">{paneId}</span>
-        <button onClick={lockPane}>
+        <button onClick={lockPane} ref={lockIcon}>
           {paneAttributes.locked ? (
             <i className="fa-solid fa-lock"></i>
           ) : (
