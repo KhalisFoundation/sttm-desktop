@@ -6,7 +6,7 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const SearchFooter = () => {
-  const { searchShabadsCount } = useStoreState((state) => state.navigator);
+  const { searchShabadsCount, pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
   const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
   const { setDefaultPaneId } = useStoreActions((actions) => actions.userSettings);
 
@@ -28,6 +28,7 @@ const SearchFooter = () => {
                 setDefaultPaneId(1);
               }
             }}
+            disabled={pane1.locked}
           >
             1
           </button>
@@ -38,6 +39,7 @@ const SearchFooter = () => {
                 setDefaultPaneId(2);
               }
             }}
+            disabled={pane2.locked}
           >
             2
           </button>
@@ -48,6 +50,7 @@ const SearchFooter = () => {
                 setDefaultPaneId(3);
               }
             }}
+            disabled={pane3.locked}
           >
             3
           </button>

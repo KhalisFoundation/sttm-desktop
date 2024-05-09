@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 
 import { useSlides } from '../../../common/hooks';
+import { MultipaneDropdown } from '../../../common/sttm-ui';
 
 const remote = require('@electron/remote');
 
@@ -16,6 +17,11 @@ const MiscSlides = () => {
   const [paneSelectorActive, setPaneSelectorActive] = useState(false);
   const paneSelector = useRef(null);
 
+  const openSlideFromDropdown = (paneId) => {
+    openAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId });
+    setPaneSelectorActive(false);
+  };
+
   return (
     <>
       <header className="sync-header">
@@ -23,41 +29,14 @@ const MiscSlides = () => {
       </header>
 
       <div className="misc-slides-pane">
-        <div
-          className={`history-results multipane-dropdown ${
-            paneSelectorActive ? 'enabled' : 'disabled'
-          }`}
-          ref={paneSelector}
-          onMouseLeave={() => setPaneSelectorActive(false)}
-        >
-          <p
-            onClick={() => {
-              openAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId: 1 });
-              setPaneSelectorActive(false);
-            }}
-            className="history-item"
-          >
-            Open in Pane 1
-          </p>
-          <p
-            onClick={() => {
-              openAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId: 2 });
-              setPaneSelectorActive(false);
-            }}
-            className="history-item"
-          >
-            Open in Pane 2
-          </p>
-          <p
-            onClick={() => {
-              openAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId: 3 });
-              setPaneSelectorActive(false);
-            }}
-            className="history-item"
-          >
-            Open in Pane 3
-          </p>
-        </div>
+        {
+          <MultipaneDropdown
+            paneSelectorActive={paneSelectorActive}
+            setPaneSelectorActive={setPaneSelectorActive}
+            paneSelector={paneSelector}
+            clickHandler={openSlideFromDropdown}
+          />
+        }
         <button
           className="misc-slide-button"
           onClick={(e) => {

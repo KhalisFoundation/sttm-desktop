@@ -1,10 +1,4 @@
-$colors: (
-  "pane-1": $picton-blue,
-  "pane-2": $princeton-orange,
-  "pane-3": $grape
-);
-
-@each $pane, $color in $colors {
+@each $pane, $color in $multipane-colors {
   .#{$pane} {
     border-bottom: 2px solid $color;
     box-sizing: content-box;
@@ -17,6 +11,13 @@ $colors: (
 
       button {
         height: 100%;
+
+        &.disabled {
+          opacity: 0.5;
+          i {
+            cursor: not-allowed;
+          }
+        }
       }
     }
 
@@ -39,6 +40,7 @@ $colors: (
 
       button {
         background-color: transparent;
+        cursor: pointer;
         padding: 0 8px;
       }
 
@@ -78,9 +80,15 @@ $colors: (
       }
     }
 
-    &-btn.active {
+    &-btn {
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &.active {
       background-color: $color;
       color: white;
+    }
     }
 
     .pane-options {
@@ -115,15 +123,6 @@ $colors: (
     i {
       color: $snow-white;
       font-size: 14px;
-    }
-
-    .theme-light-theme & {
-      background-color: rgba($color, 0.3);
-    }
-
-    .theme-dark-theme & {
-      background-color: rgba($color, 0.6);
-      color: rgba($white, 0.7);
     }
 
     &:hover {
@@ -181,5 +180,12 @@ $colors: (
     height: 154px;
     transition: 0.3s height ease;
     opacity: 1;
+  }
+
+  p {
+    &.locked-option {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
   }
 }

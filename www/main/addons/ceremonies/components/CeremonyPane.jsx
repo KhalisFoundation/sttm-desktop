@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-import { Switch, Tile } from '../../../common/sttm-ui';
+import { MultipaneDropdown, Switch, Tile } from '../../../common/sttm-ui';
 import { ceremoniesFilter } from '../../../common/constants';
 
 import { getUserPreferenceFor } from '../utils';
@@ -136,43 +136,21 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     current: getTheme(currentTheme),
   };
 
+  const openCeremonyFromDropdown = (givenPane) => {
+    onThemeClick(paneSelector.current.dataset.theme, givenPane);
+    setPaneSelectorActive(false);
+  };
+
   return (
     <div className="ceremony-pane" id={paneId}>
-      <div
-        ref={paneSelector}
-        className={`history-results multipane-dropdown ${
-          paneSelectorActive ? 'enabled' : 'disabled'
-        }`}
-        onMouseLeave={() => setPaneSelectorActive(false)}
-      >
-        <p
-          onClick={() => {
-            onThemeClick(paneSelector.current.dataset.theme, 1);
-            setPaneSelectorActive(false);
-          }}
-          className="history-item"
-        >
-          Open in Pane 1
-        </p>
-        <p
-          onClick={() => {
-            onThemeClick(paneSelector.current.dataset.theme, 2);
-            setPaneSelectorActive(false);
-          }}
-          className="history-item"
-        >
-          Open in Pane 2
-        </p>
-        <p
-          onClick={() => {
-            onThemeClick(paneSelector.current.dataset.theme, 3);
-            setPaneSelectorActive(false);
-          }}
-          className="history-item"
-        >
-          Open in Pane 3
-        </p>
-      </div>
+      {
+        <MultipaneDropdown
+          paneSelectorActive={paneSelectorActive}
+          setPaneSelectorActive={setPaneSelectorActive}
+          paneSelector={paneSelector}
+          clickHandler={openCeremonyFromDropdown}
+        />
+      }
       <header className="toolbar-nh navigator-header">
         <span className="gurmukhi">{name}</span>
       </header>

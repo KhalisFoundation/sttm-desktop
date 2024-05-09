@@ -425,4 +425,10 @@
   .multipane-dropdown {
     background-color: $alt-bg;
   }
+
+  @each $pane, $color in $multipane-colors {
+    .button-#{$pane} {
+      background-color: rgba($color, 0.3);
+    }
+  }
 }

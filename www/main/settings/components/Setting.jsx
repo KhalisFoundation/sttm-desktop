@@ -127,11 +127,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
             style={{ marginRight: '8px' }}
           >
             {options.map((optionObj, optionIndex) => (
-              <optgroup
-                key={`option-${optionIndex}`}
-                label={optionObj.label}
-                style={{ 'text-transform': 'capitalize' }}
-              >
+              <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
                 {optionObj.options.map((optionName, nameIndex) => (
                   <option key={`option-name-${nameIndex}`} value={optionName.id}>
                     {optionName.text}

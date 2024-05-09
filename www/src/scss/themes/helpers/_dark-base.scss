@@ -497,4 +497,19 @@
   .multipane-dropdown {
     background-color: $bg-main;
   }
+
+  @each $pane, $color in $multipane-colors {
+    .button-#{$pane} {
+      background-color: rgba($color, 0.6);
+      color: rgba($white, 0.7);
+    }
+    .#{$pane}-btn {
+      background-color: $bg-alt;
+      color: $text-base;
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+  }
 }

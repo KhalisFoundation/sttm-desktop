@@ -24,11 +24,8 @@ const MultiPaneContent = ({ data }) => {
 
   useEffect(() => {
     if (activePaneId === paneId) {
-      setPaneAttributes({ ...paneAttributes, locked: true });
       if (homeVerse !== paneAttributes.homeVerse) setHomeVerse(paneAttributes.homeVerse);
       if (versesRead !== paneAttributes.versesRead) setVersesRead(paneAttributes.versesRead);
-    } else {
-      setPaneAttributes({ ...paneAttributes, locked: false });
     }
   }, [activePaneId]);
 
