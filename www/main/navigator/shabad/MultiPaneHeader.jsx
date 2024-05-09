@@ -96,7 +96,9 @@ const MultiPaneHeader = ({ data }) => {
       <div className="pane-tools">
         <FavShabadIcon paneId={paneId} />
         <ArrowIcon paneId={paneId} />
-        <button onClick={() => setPaneAttributes(defaultPaneAttributes)}>Clear</button>
+        {paneAttributes.activeShabad && (
+          <button onClick={() => setPaneAttributes(defaultPaneAttributes)}>Clear</button>
+        )}
         <select
           onChange={selectPaneOption}
           value={paneAttributes.content}
