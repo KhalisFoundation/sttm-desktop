@@ -134,6 +134,9 @@
       background-color: rgba($color, 0.8);
       color: initial;
       cursor: not-allowed;
+      i {
+        cursor: not-allowed;
+      }
     }
   }
 }
