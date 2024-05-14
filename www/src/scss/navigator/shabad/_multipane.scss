@@ -1,7 +1,6 @@
 @each $pane, $color in $multipane-colors {
   .#{$pane} {
     border-bottom: 2px solid $color;
-    box-sizing: content-box;
     display: flex;
     justify-content: space-between;
     position: relative;
