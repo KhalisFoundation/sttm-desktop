@@ -82,6 +82,7 @@ export const ShabadText = ({
       setActiveVerse,
       activeShabadId,
       setActiveShabadId,
+      setPreviousIndex,
     });
     udpateHistory(shabadId, newTraversedVerse, {
       verseHistory,
@@ -203,52 +204,54 @@ export const ShabadText = ({
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
-    if (shortcuts.nextVerse) {
-      const nextVerse = getVerse('next');
-      if (nextVerse) {
-        updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
-        scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+    if (activePaneId === currentPane) {
+      if (shortcuts.nextVerse) {
+        const nextVerse = getVerse('next');
+        if (nextVerse) {
+          updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
+          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          nextVerse: false,
+        });
       }
-      setShortcuts({
-        ...shortcuts,
-        nextVerse: false,
-      });
-    }
-    if (shortcuts.prevVerse) {
-      const prevVerse = getVerse('prev');
-      if (prevVerse) {
-        updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
-        scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef);
+      if (shortcuts.prevVerse) {
+        const prevVerse = getVerse('prev');
+        if (prevVerse) {
+          updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
+          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          prevVerse: false,
+        });
       }
-      setShortcuts({
-        ...shortcuts,
-        prevVerse: false,
-      });
-    }
-    if (shortcuts.homeVerse) {
-      const verse = intelligentNextVerse(filteredItems, {
-        activeVerseId,
-        previousVerseIndex,
-        setPreviousIndex,
-        atHome,
-        setHome,
-        homeVerse: paneAttributes.homeVerse,
-      });
-      if (verse) {
-        updateTraversedVerse(verse.verseId, verse.verseIndex);
-        scrollToVerse(verse.verseId, filteredItems, virtuosoRef);
+      if (shortcuts.homeVerse) {
+        const verse = intelligentNextVerse(filteredItems, {
+          activeVerseId: paneAttributes.activeVerse,
+          previousVerseIndex,
+          setPreviousIndex,
+          atHome,
+          setHome,
+          homeVerse: paneAttributes.homeVerse,
+        });
+        if (verse) {
+          updateTraversedVerse(verse.verseId, verse.verseIndex);
+          scrollToVerse(verse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          homeVerse: false,
+        });
       }
-      setShortcuts({
-        ...shortcuts,
-        homeVerse: false,
-      });
-    }
-    if (shortcuts.copyToClipboard) {
-      copyToClipboard(activeVerseRef);
-      setShortcuts({
-        ...shortcuts,
-        copyToClipboard: false,
-      });
+      if (shortcuts.copyToClipboard) {
+        copyToClipboard(activeVerseRef);
+        setShortcuts({
+          ...shortcuts,
+          copyToClipboard: false,
+        });
+      }
     }
   }, [shortcuts]);
 

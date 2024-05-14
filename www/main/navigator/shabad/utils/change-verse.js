@@ -24,10 +24,18 @@ export const changeVerse = (
   newTraversedVerse,
   verseIndex,
   clickedShabad,
-  { activeVerseId, setActiveVerseId, setActiveVerse, setActiveShabadId, activeShabadId },
+  {
+    activeVerseId,
+    setActiveVerseId,
+    setActiveVerse,
+    setActiveShabadId,
+    activeShabadId,
+    setPreviousIndex,
+  },
 ) => {
   if (clickedShabad !== activeShabadId) {
     setActiveShabadId(clickedShabad);
+    setPreviousIndex(null);
   }
   setActiveVerse({ [verseIndex]: newTraversedVerse });
   if (activeVerseId !== newTraversedVerse) {
