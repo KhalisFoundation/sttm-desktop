@@ -68,7 +68,7 @@ ShabadVerse.propTypes = {
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
   versesRead: PropTypes.array,
-  activeVerseRef: PropTypes.ref,
+  activeVerseRef: PropTypes.object,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
   englishVerse: PropTypes.string,

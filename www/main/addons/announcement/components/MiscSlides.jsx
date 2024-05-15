@@ -9,8 +9,12 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const MiscSlides = () => {
-  const { openWaheguruSlide, openMoolMantraSlide, openBlankViewer, openAnandSahibBhog } =
-    useSlides();
+  const {
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
+  } = useSlides();
 
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
@@ -18,7 +22,7 @@ const MiscSlides = () => {
   const paneSelector = useRef(null);
 
   const openSlideFromDropdown = (paneId) => {
-    openAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId });
+    displayAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId });
     setPaneSelectorActive(false);
   };
 
@@ -49,7 +53,7 @@ const MiscSlides = () => {
               }
               setPaneSelectorActive(true);
             } else {
-              openAnandSahibBhog({ openedFrom: 'shortcut-tray' });
+              displayAnandSahibBhog({ openedFrom: 'shortcut-tray' });
             }
           }}
         >
@@ -59,7 +63,7 @@ const MiscSlides = () => {
           className="misc-slide-button"
           onClick={() => {
             setPaneSelectorActive(false);
-            openMoolMantraSlide({ openedFrom: 'shortcut-tray' });
+            displayMoolMantraSlide({ openedFrom: 'shortcut-tray' });
           }}
         >
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
@@ -68,7 +72,7 @@ const MiscSlides = () => {
           className="gurmukhi misc-slide-button"
           onClick={() => {
             setPaneSelectorActive(false);
-            openWaheguruSlide({ openedFrom: 'shortcut-tray' });
+            displayWaheguruSlide({ openedFrom: 'shortcut-tray' });
           }}
         >
           vwihgurU
@@ -77,7 +81,7 @@ const MiscSlides = () => {
           className="misc-slide-button"
           onClick={() => {
             setPaneSelectorActive(false);
-            openBlankViewer({ openedFrom: 'shortcut-tray' });
+            displayBlankViewer({ openedFrom: 'shortcut-tray' });
           }}
         >
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
