@@ -6,7 +6,12 @@ export const saveToHistory = (
   initialVerse = null,
 ) => {
   const firstVerse = verses[0];
-  const verseId = initialVerse || firstVerse.verseId;
+  let verseId;
+  if (initialVerse === null) {
+    verseId = firstVerse.verseId;
+  } else {
+    verseId = initialVerse;
+  }
   const firstVerseIndex = verses.findIndex((v) => v.verseId === verseId);
   let baniId = shabadId;
   let verse;
