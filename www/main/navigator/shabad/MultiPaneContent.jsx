@@ -19,8 +19,12 @@ const MultiPaneContent = ({ data }) => {
   const { activePaneId, homeVerse, versesRead } = navigatorState;
   const { setHomeVerse, setVersesRead } = navigatorActions;
 
-  const { openWaheguruSlide, openMoolMantraSlide, openBlankViewer, openAnandSahibBhog } =
-    useSlides();
+  const {
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
+  } = useSlides();
 
   useEffect(() => {
     if (activePaneId === paneId) {
@@ -75,25 +79,25 @@ const MultiPaneContent = ({ data }) => {
           <ul className="history-results">
             <li
               className="history-item"
-              onClick={() => openAnandSahibBhog({ openedFrom: 'multipane-content', paneId })}
+              onClick={() => displayAnandSahibBhog({ openedFrom: 'multipane-content', paneId })}
             >
               {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
             </li>
             <li
               className="history-item"
-              onClick={() => openMoolMantraSlide({ openedFrom: 'multipane-content' })}
+              onClick={() => displayMoolMantraSlide({ openedFrom: 'multipane-content' })}
             >
               {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
             </li>
             <li
               className="gurmukhi history-item"
-              onClick={() => openWaheguruSlide({ openedFrom: 'multipane-content' })}
+              onClick={() => displayWaheguruSlide({ openedFrom: 'multipane-content' })}
             >
               vwihgurU
             </li>
             <li
               className="history-item"
-              onClick={() => openBlankViewer({ openedFrom: 'multiplane-content' })}
+              onClick={() => displayBlankViewer({ openedFrom: 'multiplane-content' })}
             >
               {i18n.t(`SHORTCUT_TRAY.BLANK`)}
             </li>

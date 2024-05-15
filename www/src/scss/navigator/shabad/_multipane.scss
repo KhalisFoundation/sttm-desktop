@@ -1,7 +1,6 @@
 @each $pane, $color in $multipane-colors {
   .#{$pane} {
     border-bottom: 2px solid $color;
-    box-sizing: content-box;
     display: flex;
     justify-content: space-between;
     position: relative;
@@ -134,6 +133,9 @@
       background-color: rgba($color, 0.8);
       color: initial;
       cursor: not-allowed;
+      i {
+        cursor: not-allowed;
+      }
     }
   }
 }

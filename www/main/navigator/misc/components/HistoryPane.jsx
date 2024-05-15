@@ -23,7 +23,6 @@ export const HistoryPane = ({ className, paneId }) => {
     pane1,
     pane2,
     pane3,
-    activePaneId,
   } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
@@ -39,69 +38,22 @@ export const HistoryPane = ({ className, paneId }) => {
     setPane1,
     setPane2,
     setPane3,
-    setActivePaneId,
   } = useStoreActions((state) => state.navigator);
 
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const openShabadFromHistory = (element) => {
-    if (singleDisplayActiveTab !== 'shabad') {
-      setSingleDisplayActiveTab('shabad');
-    }
-    if (element.verseId !== initialVerseId) {
-      setInitialVerseId(element.verseId);
-    }
-    if (element.homeVerse !== homeVerse) {
-      setHomeVerse(element.homeVerse);
-    }
-    if (element.versesRead !== versesRead) {
-      setVersesRead(element.versesRead);
-    }
-    if (element.type === 'shabad') {
-      if (isSundarGutkaBani) {
-        setIsSundarGutkaBani(false);
-      }
-      if (isCeremonyBani) {
-        setIsCeremonyBani(false);
-      }
-      if (element.shabadId !== activeShabadId) {
-        setActiveShabadId(element.shabadId);
-      }
-    }
-    if (element.type === 'ceremony') {
-      if (isSundarGutkaBani) {
-        setIsSundarGutkaBani(false);
-      }
-      if (!isCeremonyBani) {
-        setIsCeremonyBani(true);
-      }
-      if (ceremonyId !== element.shabadId) {
-        setCeremonyId(element.shabadId);
-      }
-    }
-    if (element.type === 'bani') {
-      if (isCeremonyBani) {
-        setIsCeremonyBani(false);
-      }
-      if (!isSundarGutkaBani) {
-        setIsSundarGutkaBani(true);
-      }
-
-      if (sundarGutkaBaniId !== element.shabadId) {
-        setSundarGutkaBaniId(element.shabadId);
-      }
-    }
-    if (element.continueFrom !== activeVerseId) {
-      setActiveVerseId(element.continueFrom);
-    }
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      if (paneId !== activePaneId) setActivePaneId(paneId);
       switch (paneId) {
         case 1:
           setPane1({
             ...pane1,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: element.shabadId,
+            activeVerse: element.continueFrom,
+            baniType: element.type,
+            versesRead: element.versesRead,
+            homeVerse: element.homeVerse,
           });
           break;
         case 2:
@@ -109,6 +61,10 @@ export const HistoryPane = ({ className, paneId }) => {
             ...pane2,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: element.shabadId,
+            activeVerse: element.continueFrom,
+            baniType: element.type,
+            versesRead: element.versesRead,
+            homeVerse: element.homeVerse,
           });
           break;
         case 3:
@@ -116,10 +72,64 @@ export const HistoryPane = ({ className, paneId }) => {
             ...pane3,
             content: i18n.t('MULTI_PANE.SHABAD'),
             activeShabad: element.shabadId,
+            activeVerse: element.continueFrom,
+            baniType: element.type,
+            versesRead: element.versesRead,
+            homeVerse: element.homeVerse,
           });
           break;
         default:
           break;
+      }
+    } else {
+      if (singleDisplayActiveTab !== 'shabad') {
+        setSingleDisplayActiveTab('shabad');
+      }
+      if (element.verseId !== initialVerseId) {
+        setInitialVerseId(element.verseId);
+      }
+      if (element.homeVerse !== homeVerse) {
+        setHomeVerse(element.homeVerse);
+      }
+      if (element.versesRead !== versesRead) {
+        setVersesRead(element.versesRead);
+      }
+      if (element.type === 'shabad') {
+        if (isSundarGutkaBani) {
+          setIsSundarGutkaBani(false);
+        }
+        if (isCeremonyBani) {
+          setIsCeremonyBani(false);
+        }
+        if (element.shabadId !== activeShabadId) {
+          setActiveShabadId(element.shabadId);
+        }
+      }
+      if (element.type === 'ceremony') {
+        if (isSundarGutkaBani) {
+          setIsSundarGutkaBani(false);
+        }
+        if (!isCeremonyBani) {
+          setIsCeremonyBani(true);
+        }
+        if (ceremonyId !== element.shabadId) {
+          setCeremonyId(element.shabadId);
+        }
+      }
+      if (element.type === 'bani') {
+        if (isCeremonyBani) {
+          setIsCeremonyBani(false);
+        }
+        if (!isSundarGutkaBani) {
+          setIsSundarGutkaBani(true);
+        }
+
+        if (sundarGutkaBaniId !== element.shabadId) {
+          setSundarGutkaBaniId(element.shabadId);
+        }
+      }
+      if (element.continueFrom !== activeVerseId) {
+        setActiveVerseId(element.continueFrom);
       }
     }
   };

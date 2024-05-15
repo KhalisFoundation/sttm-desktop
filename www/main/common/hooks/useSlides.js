@@ -1,5 +1,4 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
-import { useEffect } from 'react';
 import insertSlide from '../constants/slidedb';
 
 const remote = require('@electron/remote');
@@ -12,7 +11,6 @@ export const useSlides = () => {
   const { akhandpatt, currentWorkspace } = useStoreState((state) => state.userSettings);
   const { setAkhandpatt } = useStoreActions((state) => state.userSettings);
   const {
-    shortcuts,
     isMiscSlide,
     miscSlideText,
     isAnnoucement,
@@ -24,7 +22,6 @@ export const useSlides = () => {
     pane3,
   } = useStoreState((state) => state.navigator);
   const {
-    setShortcuts,
     setIsMiscSlide,
     setMiscSlideText,
     setIsAnnoucement,
@@ -51,7 +48,7 @@ export const useSlides = () => {
     }
   };
 
-  const openWaheguruSlide = ({ openedFrom }) => {
+  const displayWaheguruSlide = ({ openedFrom }) => {
     addMiscSlide(insertSlide.slideStrings.waheguru);
     analytics.trackEvent({
       category: 'display',
@@ -60,7 +57,7 @@ export const useSlides = () => {
     });
   };
 
-  const openMoolMantraSlide = ({ openedFrom }) => {
+  const displayMoolMantraSlide = ({ openedFrom }) => {
     addMiscSlide(insertSlide.slideStrings.moolMantra);
     analytics.trackEvent({
       category: 'display',
@@ -69,7 +66,7 @@ export const useSlides = () => {
     });
   };
 
-  const openBlankViewer = ({ openedFrom }) => {
+  const displayBlankViewer = ({ openedFrom }) => {
     addMiscSlide('');
     analytics.trackEvent({
       category: 'display',
@@ -78,7 +75,7 @@ export const useSlides = () => {
     });
   };
 
-  const openAnandSahibBhog = ({ openedFrom, paneId = null }) => {
+  const displayAnandSahibBhog = ({ openedFrom, paneId = null }) => {
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
@@ -127,41 +124,10 @@ export const useSlides = () => {
     });
   };
 
-  useEffect(() => {
-    if (shortcuts.openWaheguruSlide) {
-      openWaheguruSlide({ openedFrom: 'shortcuts' });
-      setShortcuts({
-        ...shortcuts,
-        openWaheguruSlide: false,
-      });
-    }
-    if (shortcuts.openMoolMantraSlide) {
-      openMoolMantraSlide({ openedFrom: 'shortcuts' });
-      setShortcuts({
-        ...shortcuts,
-        openMoolMantraSlide: false,
-      });
-    }
-    if (shortcuts.openBlankViewer) {
-      openBlankViewer({ openedFrom: 'shortcuts' });
-      setShortcuts({
-        ...shortcuts,
-        openBlankViewer: false,
-      });
-    }
-    if (shortcuts.openAnandSahibBhog) {
-      setShortcuts({
-        ...shortcuts,
-        openAnandSahibBhog: false,
-      });
-      openAnandSahibBhog({ openedFrom: 'shortcuts' });
-    }
-  }, [shortcuts]);
-
   return {
-    openWaheguruSlide,
-    openMoolMantraSlide,
-    openBlankViewer,
-    openAnandSahibBhog,
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
   };
 };

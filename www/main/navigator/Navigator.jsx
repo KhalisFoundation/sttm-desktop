@@ -17,8 +17,12 @@ const Navigator = () => {
     (state) => state.userSettings,
   );
 
-  const { openWaheguruSlide, openMoolMantraSlide, openBlankViewer, openAnandSahibBhog } =
-    useSlides();
+  const {
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
+  } = useSlides();
 
   let controllerMarkup = null;
 
@@ -56,10 +60,10 @@ const Navigator = () => {
       <div className="navigator-row">
         <ShabadPane />
         <MiscPane
-          waheguruSlide={openWaheguruSlide}
-          moolMantraSlide={openMoolMantraSlide}
-          blankSlide={openBlankViewer}
-          anandSahibBhog={openAnandSahibBhog}
+          waheguruSlide={displayWaheguruSlide}
+          moolMantraSlide={displayMoolMantraSlide}
+          blankSlide={displayBlankViewer}
+          anandSahibBhog={displayAnandSahibBhog}
         />
       </div>
     );

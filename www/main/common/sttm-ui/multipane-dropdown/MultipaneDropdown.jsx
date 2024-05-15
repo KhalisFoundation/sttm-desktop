@@ -48,7 +48,7 @@ const MultipaneDropdown = ({
 MultipaneDropdown.propTypes = {
   paneSelectorActive: PropTypes.bool,
   setPaneSelectorActive: PropTypes.func,
-  paneSelector: PropTypes.node,
+  paneSelector: PropTypes.object,
   clickHandler: PropTypes.func,
 };
 

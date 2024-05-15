@@ -14,6 +14,8 @@ import {
   udpateHistory,
   scrollToVerse,
   saveToHistory,
+  copyToClipboard,
+  intelligentNextVerse,
 } from './utils';
 import { filterOverlayVerseItems } from './utils/filter-verse-items';
 
@@ -33,6 +35,9 @@ export const ShabadText = ({
 }) => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [rawVerses, setRawVerses] = useState([]);
+  const [previousVerseIndex, setPreviousIndex] = useState();
+  const [atHome, setHome] = useState(true);
+
   const {
     activeVerseId,
     isMiscSlide,
@@ -44,15 +49,25 @@ export const ShabadText = ({
     verseHistory,
     initialVerseId,
     activePaneId,
+    shortcuts,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed } = useStoreState((state) => state.userSettings);
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle } = useStoreState(
+    (state) => state.userSettings,
+  );
 
-  const { setActiveVerseId, setIsMiscSlide, setActiveShabadId, setVerseHistory, setActivePaneId } =
-    useStoreActions((actions) => actions.navigator);
+  const {
+    setActiveVerseId,
+    setIsMiscSlide,
+    setActiveShabadId,
+    setVerseHistory,
+    setActivePaneId,
+    setShortcuts,
+  } = useStoreActions((actions) => actions.navigator);
   const [activeVerse, setActiveVerse] = useState({});
 
   const virtuosoRef = useRef(null);
+  const activeVerseRef = useRef(null);
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
     if (isMiscSlide) {
@@ -67,6 +82,7 @@ export const ShabadText = ({
       setActiveVerse,
       activeShabadId,
       setActiveShabadId,
+      setPreviousIndex,
     });
     udpateHistory(shabadId, newTraversedVerse, {
       verseHistory,
@@ -164,6 +180,96 @@ export const ShabadText = ({
     );
   }, [activeShabadId, activeVerseId]);
 
+  const getVerse = (direction) => {
+    let verseIndex = null;
+    if (direction === 'next') {
+      Object.keys(activeVerse).forEach((activeVerseIndex) => {
+        if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
+          verseIndex = parseInt(activeVerseIndex, 10) + 1;
+        }
+      });
+    } else if (direction === 'prev') {
+      Object.keys(activeVerse).forEach((activeVerseIndex) => {
+        if (parseInt(activeVerseIndex, 10) > 0) {
+          verseIndex = parseInt(activeVerseIndex, 10) - 1;
+        }
+      });
+    }
+    if (verseIndex !== null) {
+      const { verseId } = filteredItems[verseIndex];
+      return { verseIndex, verseId };
+    }
+    return null;
+  };
+
+  // checks if keyboard shortcut is fired then it invokes the function
+  useEffect(() => {
+    if (activePaneId === currentPane) {
+      if (shortcuts.nextVerse) {
+        const nextVerse = getVerse('next');
+        if (nextVerse) {
+          updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
+          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          nextVerse: false,
+        });
+      }
+      if (shortcuts.prevVerse) {
+        const prevVerse = getVerse('prev');
+        if (prevVerse) {
+          updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
+          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          prevVerse: false,
+        });
+      }
+      if (shortcuts.homeVerse) {
+        const verse = intelligentNextVerse(filteredItems, {
+          activeVerseId: paneAttributes.activeVerse,
+          previousVerseIndex,
+          setPreviousIndex,
+          atHome,
+          setHome,
+          homeVerse: paneAttributes.homeVerse,
+        });
+        if (verse) {
+          updateTraversedVerse(verse.verseId, verse.verseIndex);
+          scrollToVerse(verse.verseId, filteredItems, virtuosoRef);
+        }
+        setShortcuts({
+          ...shortcuts,
+          homeVerse: false,
+        });
+      }
+      if (shortcuts.copyToClipboard) {
+        copyToClipboard(activeVerseRef);
+        setShortcuts({
+          ...shortcuts,
+          copyToClipboard: false,
+        });
+      }
+    }
+  }, [shortcuts]);
+
+  useEffect(() => {
+    const milisecondsDelay = parseInt(autoplayDelay, 10) * 1000;
+    const interval = setInterval(() => {
+      if (autoplayToggle) {
+        setShortcuts({
+          ...shortcuts,
+          nextVerse: true,
+        });
+      }
+    }, milisecondsDelay);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [autoplayToggle, autoplayDelay]);
+
   return (
     <div className="shabad-list">
       <div className="verse-block">
@@ -181,6 +287,7 @@ export const ShabadText = ({
                 isHomeVerse={paneAttributes.homeVerse}
                 lineNumber={index}
                 versesRead={paneAttributes.versesRead}
+                activeVerseRef={activeVerseRef}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
