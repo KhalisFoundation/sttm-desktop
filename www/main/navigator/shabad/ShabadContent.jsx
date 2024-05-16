@@ -564,6 +564,7 @@ const ShabadContent = () => {
                 isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={versesRead}
+                activeVerseRef={activeVerseRef}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}

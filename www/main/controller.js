@@ -2,7 +2,6 @@ const electron = require('electron');
 const remote = require('@electron/remote');
 const { updateViewerScale } = require('./viewer/utils');
 
-const { ipcRenderer } = electron;
 const { app, dialog, Menu } = remote;
 const main = remote.require('./app');
 const { store, appstore, i18n, isUnsupportedWindow } = main;
@@ -10,15 +9,6 @@ const analytics = remote.getGlobal('analytics');
 const { changeFontSize, changeVisibility } = require('./quick-tools-utils');
 
 const appName = i18n.t('APPNAME');
-
-setTimeout(() => {
-  global.webview = document.querySelector('webview');
-
-  global.webview.addEventListener('dom-ready', () => {
-    ipcRenderer.send('enable-wc-webview', global.webview.getWebContentsId());
-    global.webview.send('is-webview');
-  });
-}, 200);
 
 const updateMenu = [];
 
@@ -433,7 +423,7 @@ global.platform.ipc.on('update-downloaded', () => {
   menuUpdate.items[5].visible = true;
 });
 global.platform.ipc.on('send-scroll', (event, arg) => {
-  global.webview.send('send-scroll', JSON.stringify(arg));
+  if (global.webview) global.webview.send('send-scroll', JSON.stringify(arg));
 });
 global.platform.ipc.on('next-ang', (event, arg) => {
   const { PageNo, SourceID } = JSON.parse(arg);
@@ -450,7 +440,7 @@ global.platform.ipc.on('cast-session-active', () => {
 
   store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
   store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
-  global.webview.send('clear-apv');
+  if (global.webview) global.webview.send('clear-apv');
   global.platform.ipc.send('clear-apv');
 
   document.body.classList.remove('akhandpaatt');

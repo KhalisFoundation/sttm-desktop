@@ -73,24 +73,28 @@ const BaniController = ({ onScreenClose, className }) => {
 
   const {
     gurbaniFontSize,
-    translationFontSize,
-    transliterationFontSize,
-    teekaFontSize,
+    content1FontSize,
+    content2FontSize,
+    content3FontSize,
     baniLength,
     // mangalPosition,
   } = useStoreState((state) => state.userSettings);
 
   const fontSizes = {
     gurbani: parseInt(gurbaniFontSize, 10),
-    translation: parseInt(translationFontSize, 10),
-    teeka: parseInt(teekaFontSize, 10),
-    transliteration: parseInt(transliterationFontSize, 10),
+    translation: parseInt(content1FontSize, 10),
+    teeka: parseInt(content2FontSize, 10),
+    transliteration: parseInt(content3FontSize, 10),
   };
 
   const showSyncError = (errorMessage) => {
     setCodeLabel(errorMessage);
-    setCode(null);
-    setAdminPin(null);
+    if (code !== null) {
+      setCode(null);
+    }
+    if (adminPin !== null) {
+      setAdminPin(null);
+    }
   };
 
   const remoteSyncInit = async () => {

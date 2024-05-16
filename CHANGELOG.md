@@ -1,5 +1,25 @@
 ## New Updates
 
+### 9.2.1 - ਊਨਾ Release _May 20, 2024_
+
+#### New Features
+- Add a dropdown to change the content order of viewer
+  ![](./assets/img/help_images/content-order.gif)
+- Add a new Multi-Pane workspace to open multiiple shabads at once
+  ![](./assets/img/help_images/multipane-preview.gif)
+- Add the ability to reset the font sizes.
+
+#### Misc. bug fix and other improvements
+- Change the support link.
+- Update the colors of Floral theme in Bani Overlay.
+- Preserve formatting (line breaks) in announcement.
+- Update Bani Overlay styles as per standard broadcast standards.
+- Code refactors and Style improvements.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+
+</br>
+
 ### 9.2.0 - ਊਨਾ Release _January 30, 2024_
 
 #### New Features

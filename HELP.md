@@ -154,7 +154,7 @@ Bani Overlay allows you to display Gurbani from SikhiToTheMax on a Live Stream. 
 
 ### <a name="report-mistake">How do I report a mistake?</a>
 
-Visit [SikhiToTheMax.org](https://sikhitothemax.org) and click "[Feedback](https://goo.gl/plk23h)" at the bottom of the page.
+Visit [Khalis Support](https://support.khalisfoundation.org/support/solutions/folders/63000040721) and click on New Support Ticket.
 
 ### <a name="video-tutorial">Video Tutorial</a>
 

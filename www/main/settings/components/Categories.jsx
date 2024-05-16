@@ -22,18 +22,30 @@ const SettingsFactory = ({ subCategory }) => {
       }
     }
 
-    settingsDOM.push(
-      /* 1. Push the Addon first */
-      <div className="control-item" id={settingKey} key={settingIndex}>
-        {addon && (
+    const addonMarkup = [];
+
+    if (addon) {
+      addonObj.forEach((add, index) => {
+        addonMarkup.push(
           <Setting
-            settingObj={addonObj}
-            stateVar={convertToCamelCase(addon)}
-            stateFunction={`set${convertToCamelCase(addon, true)}`}
-          />
-        )}
+            settingObj={add}
+            stateVar={convertToCamelCase(addon[index])}
+            stateFunction={`set${convertToCamelCase(addon[index], true)}`}
+          />,
+        );
+      });
+    }
+
+    settingsDOM.push(
+      <div className="control-item" id={settingKey} key={settingIndex}>
+        {/* 1. Push the Addon first */}
+        {addon && addonMarkup}
+
         {/* 2. Then add title */}
-        <span>{i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}</span>
+        <span>
+          {subCategory.settingObjs[settingKey].title &&
+            i18n.t(`SETTINGS.${subCategory.settingObjs[settingKey].title}`)}
+        </span>
 
         {/* 3. Push notes and default value text */}
         <span className="notes">

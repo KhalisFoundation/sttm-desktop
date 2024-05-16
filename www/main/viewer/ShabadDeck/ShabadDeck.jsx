@@ -12,8 +12,11 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 
 const os = require('os');
+const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
 const platform = os.platform();
+
 const themes = require('../../../configs/themes.json');
 
 function ShabadDeck() {
@@ -34,8 +37,8 @@ function ShabadDeck() {
     baniLength,
     // mangalPosition,
     displayNextLine,
-    isSingleDisplayMode,
     themeBg,
+    currentWorkspace,
   } = useStoreState((state) => state.userSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
@@ -169,7 +172,7 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   useEffect(() => {
     if (isMiscSlide) {
@@ -186,7 +189,7 @@ function ShabadDeck() {
       <div
         className={classNames(
           'shabad-deck',
-          isSingleDisplayMode && 'single-display-mode',
+          currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY') && 'single-display-mode',
           miscSlideText === '' && 'empty-slide',
           minimizedBySingleDisplay && 'single-display-minimized',
           akhandpatt && !isMiscSlide && 'akhandpatt-view',

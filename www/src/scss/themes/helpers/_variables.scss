@@ -41,3 +41,10 @@ $light-green: #27ae60;
 $apple-green: #65a757;
 
 $picton-blue: #348ce7;
+$grape: #7209B7;
+
+$multipane-colors: (
+  "pane-1": $picton-blue,
+  "pane-2": $princeton-orange,
+  "pane-3": $grape
+);
