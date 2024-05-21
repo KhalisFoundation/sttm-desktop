@@ -8,7 +8,7 @@ export const saveToHistory = (
   const firstVerse = verses[0];
   let verseId;
   if (initialVerse === null) {
-    verseId = firstVerse.verseId;
+    verseId = firstVerse.ID;
   } else {
     verseId = initialVerse;
   }
@@ -20,7 +20,7 @@ export const saveToHistory = (
       const clickedVerse = verses.filter((verseObj) => verseObj.ID === initialVerse);
       verse = clickedVerse.length && clickedVerse[0].Gurmukhi;
     } else {
-      verse = firstVerse.verse;
+      verse = firstVerse.Gurmukhi;
     }
   } else if (verseType === 'bani') {
     verse = firstVerse.baniName;

@@ -52,6 +52,9 @@ const ArrowIcon = ({ paneId }) => {
           ...pane1,
           content: i18n.t('MULTI_PANE.SHABAD'),
           activeShabad: currentShabad,
+          baniType: 'shabad',
+          versesRead: [],
+          activeVerse: null,
         });
         break;
       case 2:
@@ -63,6 +66,9 @@ const ArrowIcon = ({ paneId }) => {
           ...pane2,
           content: i18n.t('MULTI_PANE.SHABAD'),
           activeShabad: currentShabad,
+          baniType: 'shabad',
+          versesRead: [],
+          activeVerse: null,
         });
         break;
       case 3:
@@ -74,6 +80,9 @@ const ArrowIcon = ({ paneId }) => {
           ...pane3,
           content: i18n.t('MULTI_PANE.SHABAD'),
           activeShabad: currentShabad,
+          baniType: 'shabad',
+          versesRead: [],
+          activeVerse: null,
         });
         break;
       default:
@@ -89,12 +98,13 @@ const ArrowIcon = ({ paneId }) => {
       if (activeVerseId !== null) {
         setActiveVerseId(null);
       }
-      if (initialVerseId !== null) {
-        setInitialVerseId(null);
-      }
       if (homeVerse !== 0) {
         setHomeVerse(0);
       }
+    }
+
+    if (initialVerseId !== null) {
+      setInitialVerseId(null);
     }
   };
 
@@ -106,12 +116,13 @@ const ArrowIcon = ({ paneId }) => {
       if (activeVerseId !== null) {
         setActiveVerseId(null);
       }
-      if (initialVerseId !== null) {
-        setInitialVerseId(null);
-      }
       if (homeVerse !== 0) {
         setHomeVerse(0);
       }
+    }
+
+    if (initialVerseId !== null) {
+      setInitialVerseId(null);
     }
   };
 
