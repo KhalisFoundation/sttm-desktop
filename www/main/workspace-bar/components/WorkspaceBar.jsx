@@ -27,7 +27,6 @@ const WorkspaceBar = () => {
     if (currentWorkspace !== workspace) {
       setCurrentWorkspace(workspace);
     }
-    analytics.trackEvent('changed workspace', workspace);
     analytics.trackEvent({
       category: 'workspace',
       action: 'changed',

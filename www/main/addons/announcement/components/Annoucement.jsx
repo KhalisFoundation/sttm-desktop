@@ -27,7 +27,12 @@ const Announcement = ({ isGurmukhi }) => {
   const HandleKeyboardToggle = () => {
     setKeyboardOpenStatus(!keyboardOpenStatus);
 
-    analytics.trackEvent('display', 'announcement-slide', 'announcement-in-gurmukhi', isGurmukhi);
+    analytics.trackEvent({
+      category: 'display',
+      action: 'announcement-slide',
+      label: 'announcement-in-gurmukhi',
+      value: isGurmukhi,
+    });
   };
 
   const addMiscSlide = (givenText) => {
