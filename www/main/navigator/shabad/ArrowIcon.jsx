@@ -66,6 +66,9 @@ const ArrowIcon = ({ paneId }) => {
           ...pane2,
           content: i18n.t('MULTI_PANE.SHABAD'),
           activeShabad: currentShabad,
+          baniType: 'shabad',
+          versesRead: [],
+          activeVerse: null,
         });
         break;
       case 3:
@@ -77,6 +80,9 @@ const ArrowIcon = ({ paneId }) => {
           ...pane3,
           content: i18n.t('MULTI_PANE.SHABAD'),
           activeShabad: currentShabad,
+          baniType: 'shabad',
+          versesRead: [],
+          activeVerse: null,
         });
         break;
       default:
