@@ -177,9 +177,7 @@
         "dmg",
         "zip"
       ],
-    "notarize": {
-      "teamId": ""
-    }
+    "notarize": true
     },
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
