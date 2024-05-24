@@ -5,6 +5,7 @@
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
+    "prebuild": "cross-env node packaging/update-packagejson.js",
     "precommit": "npm test",
     "test": "run-p test:*",
     "test:lint": "run-p test:lint:*",
@@ -43,11 +44,11 @@
     "@babel/plugin-transform-runtime": "^7.22.15",
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
-    "@electron/notarize": "^2.1.0",
+    "@electron/notarize": "^2.3.0",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
     "electron": "^26.2.4",
-    "electron-builder": "^24.6.4",
+    "electron-builder": "^24.13.3",
     "electron-publisher-s3": "^20.17.2",
     "electron-react-devtools": "^0.5.3",
     "electron-rebuild": "^3.2.8",
@@ -139,7 +140,6 @@
       ]
     },
     "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
-    "afterSign": "packaging/afterSignHook.js",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -177,7 +177,10 @@
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "notarize": {
+        "teamId": ""
+      }
     },
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
