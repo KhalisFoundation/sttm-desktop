@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.1 - ਊਨਾ Release _May 22, 2024_
+### 9.2.1 - ਊਨਾ Release _May 24, 2024_
 
 #### New Features
 - Choose the order of the lines that sangat see on screen using quickview dropdowns. 
