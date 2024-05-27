@@ -5,23 +5,18 @@ require('dotenv').config();
 
 class Analytics {
   trackEvent({ category, action, label, value }) {
-    if (process.env.NODE_ENV !== 'development') {
-      // TODO: need to add variable that stops statistics collection
-      isOnline().then((online) => {
-        // TODO: for offline users, come up with a way of storing and send when online.
-        if (online) {
-          trackEvent(action, {
-            category,
-            label,
-            value,
-          });
-        }
-      });
-    } else {
-      console.log(
-        `Tracking Event suppressed for development ec: ${category}, ea: ${action}, el: ${label}, ev: ${value}`,
-      );
-    }
+    // TODO: need to add variable that stops statistics collection
+    isOnline().then((online) => {
+      // TODO: for offline users, come up with a way of storing and send when online.
+      if (online) {
+        console.log('action', action, 'options', { category, label, value });
+        trackEvent(action, {
+          category,
+          label,
+          value,
+        });
+      }
+    });
   }
 }
 

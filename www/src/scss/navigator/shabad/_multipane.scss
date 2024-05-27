@@ -1,0 +1,193 @@
+@each $pane, $color in $multipane-colors {
+  .#{$pane} {
+    border-bottom: 2px solid $color;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+
+    .pane-info {
+      height: 100%;
+
+      button {
+        height: 100%;
+
+        &.disabled {
+          opacity: 0.5;
+          i {
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    .pane-symbol {
+      background-color: $color;
+      color: white;
+      display: inline-block;
+      height: 100%;
+      font-size: 18px;
+      margin-right: 4px;
+      text-align: center;
+      width: 40px;
+    }
+
+    .pane-tools {
+      align-items: center;
+      display: flex;
+      justify-content: flex-end;
+      width: 100px;
+
+      button {
+        background-color: transparent;
+        cursor: pointer;
+        padding: 0 8px;
+      }
+
+      .fav-btn {
+        border-radius: 50%;
+        margin: 0;
+        i {
+          padding-right: 0;
+        }
+      }
+
+      .arrow-icons {
+        display: flex;
+
+        i {
+          border-radius: 50%;
+          font-size: 16px;
+          padding: 5px;
+        }
+      }
+
+      .pane-options-dropdown {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: url('../../assets/img/icons/ellipsis-vertical-solid.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: auto 18px;
+        border: none;
+        color: transparent;
+        cursor: pointer;
+        height: 40px;
+        outline: none;
+        padding: 16px;
+        width: 40px;
+      }
+    }
+
+    &-btn {
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background-color: $color;
+      color: white;
+    }
+    }
+
+    .pane-options {
+      position: absolute;
+      top: 35px;
+      right: 0px;
+      width: 120px;
+      list-style-type: none;
+      z-index: 100;
+
+      ul {
+        list-style-type: none;
+
+        li {
+          padding-left: 24px;
+          cursor: pointer;
+        }
+      }
+
+      &.hidden {
+        display: none;
+      }
+    }
+  }
+
+  .button-#{$pane} {
+    cursor: pointer;
+    margin: 0 2px;
+    padding: 12px;
+    transition: 0.3s all ease;
+
+    i {
+      color: $snow-white;
+      font-size: 14px;
+    }
+
+    &:hover {
+      background-color: $color;
+      color: white;
+    }
+
+    &:disabled {
+      background-color: rgba($color, 0.8);
+      color: initial;
+      cursor: not-allowed;
+      i {
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.default-pane-switcher {
+  flex-grow: 1;
+  text-align: right;
+
+  button {
+    cursor: pointer;
+    padding: 8px 12px;
+  }
+}
+
+.multipane-content-btn {
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 12px;
+  padding: 8px;
+  width: 160px;
+
+  span {
+    margin-left: 12px;
+  }
+}
+
+.multipane-dropdown {
+  list-style-type: none;
+  overflow: hidden;
+  position: absolute;
+  padding: 4px;
+  z-index: 10;
+
+  &.disabled {
+    height: 0px;
+    transition: 0.3s height ease;
+    opacity: 0;
+  }
+
+  &.enabled {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    height: 154px;
+    transition: 0.3s height ease;
+    opacity: 1;
+  }
+
+  p {
+    &.locked-option {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+}

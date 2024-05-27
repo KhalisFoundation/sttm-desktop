@@ -28,6 +28,7 @@
     "FIT_TEXT": "Fit text",
     "BG": "BG",
     "COPY_URL": "Copy URL",
+    "COPIED_URL": "Copied!",
     "LARIVAAR": "Larivaar",
     "LARIVAAR_ASSIST":"Larivaar Assist",
     "LAYOUT": "Layout",
@@ -68,7 +69,8 @@
   },
   "WORKSPACES": {
     "PRESENTER": "Presentation",
-    "SINGLE_DISPLAY": "Single Display"
+    "SINGLE_DISPLAY": "Single-Display",
+    "MULTI_PANE": "Multi-Pane"
   },
   "CHROMECAST": {
     "CANCEL": "Cancel",
@@ -89,11 +91,12 @@
     "DOWNLOADING": "Downloading database..."
   },
   "INSERT": {
-    "ADD_ANNOUNCEMENT": "Display Announcement",
+    "ADD_ANNOUNCEMENT": "Publish",
     "ADD_ANNOUNCEMENT_SLIDE": "Add Announcement Slide",
     "ADD_ANNOUNCEMENT_TEXT": "Announcement goes here...",
     "ADD_ANNOUNCEMENT_TEXT_GURMUKHI": "GoSxw ie`Qy ilKo...",
-    "ADD_DHAN_GURU": "Add Dhan Guru",
+    "ADD_SLIDES": "Popular Slides",
+    "ADD_DHAN_GURU": "Ten Guru Slides",
     "ADD_EMPTY_SLIDE": "Add Empty Slide",
     "ADD_WAHEGURU_SLIDE": "Add Waheguru Slide",
     "ANNOUNCEMENT": "Announcement",
@@ -118,6 +121,14 @@
       "RAMDAS_SAHIB_JI": "Guru Ramdas Ji",
       "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
     }
+  },
+  "MULTI_PANE": {
+    "CLEAR_PANE": "Clear Pane",
+    "MISC_SLIDES": "Misc Slides",
+    "SHABAD": "Shabad",
+    "SHABAD_BTN": "Back to shabad",
+    "FAVORITES": "Favorite Shabads",
+    "LOCKED_PANE_MSG": "This pane is locked"
   },
   "MENU": {
     "APP": {
@@ -300,6 +311,8 @@
     "PUNJABI_TEEKA": "Punjabi Teeka",
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration",
+    "RESET_FONT_SIZES": "Reset Font Sizes",
+    "RESET_TO_DEFAULT": "Reset to Default",
     "DISPLAY_OPTIONS": "Display Options",
     "AKHAND_PATH_VIEW": "Akhand Paatth View (Beta)",
     "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",

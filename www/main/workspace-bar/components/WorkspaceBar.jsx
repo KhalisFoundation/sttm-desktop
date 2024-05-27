@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
 
@@ -7,32 +7,26 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-const { store } = remote.require('./app');
+// const { store } = remote.require('./app');
 
 const WorkspaceBar = () => {
-  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
-  const { setIsSingleDisplayMode } = useStoreActions((state) => state.userSettings);
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
+  const { setCurrentWorkspace } = useStoreActions((state) => state.userSettings);
 
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
-  const workspaces = [presenterIdentifier, i18n.t('WORKSPACES.SINGLE_DISPLAY')];
-  const defaultWsState = !isSingleDisplayMode ? workspaces[0] : workspaces[1];
-  const [currentWorkspace, setWorkspace] = useState(defaultWsState);
+  const singleDisplayIdentifier = i18n.t('WORKSPACES.SINGLE_DISPLAY');
+  const multiPaneIdentifier = i18n.t('WORKSPACES.MULTI_PANE');
+  const workspaces = [singleDisplayIdentifier, presenterIdentifier, multiPaneIdentifier];
 
   const handleWorkspaceChange = (workspace) => {
     const moveToPresenter = workspace === presenterIdentifier;
     if (moveToPresenter) {
-      if (isSingleDisplayMode) {
-        setIsSingleDisplayMode(false);
-      }
-      store.setUserPref('app.layout.presenter-view', moveToPresenter);
-      global.platform.updateSettings();
       global.controller['presenter-view']();
-    } else if (!isSingleDisplayMode) {
-      setIsSingleDisplayMode(true);
     }
-    setWorkspace(workspace);
-    analytics.trackEvent('changed workspace', workspace);
+    if (currentWorkspace !== workspace) {
+      setCurrentWorkspace(workspace);
+    }
     analytics.trackEvent({
       category: 'workspace',
       action: 'changed',

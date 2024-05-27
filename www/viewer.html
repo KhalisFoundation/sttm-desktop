@@ -14,7 +14,7 @@
     <script>
         const { ipcRenderer } = require('electron');
 
-        ipcRenderer.on('wc-webview-enabled', () => { 
+        ipcRenderer.on('wc-webview-enabled', () => {
           const app = require('./js/viewer/viewerApp.js').default;
           const { createRoot } = require('react-dom/client');
           const root = createRoot(document.getElementById('viewer-container'));

@@ -19,9 +19,11 @@ export const settingsObjGenerator = (obj) => {
         settingsNewObj[category].subCatObjs[subCategory].settings.forEach((setting) => {
           settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting] = settings[setting];
           const { addon } = settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting];
-          if (addon) {
-            settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addonObj =
-              settings[addon];
+          if (addon && addon.length) {
+            addon.forEach((add) => {
+              settingsNewObj[category].subCatObjs[subCategory].settingObjs[setting].addonObj =
+                settings[add];
+            });
           }
           const subCat = settingsNewObj[category].subCatObjs[subCategory];
           const { type } = subCat;

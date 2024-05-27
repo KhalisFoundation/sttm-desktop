@@ -37,15 +37,6 @@ $misc-footer-active: 70px;
       }
     }
   }
-  .history-results {
-    overflow-y: auto;
-
-    .history-item {
-      cursor: pointer;
-      margin: 8px 0;
-      padding: 10px;
-    }
-  }
   .list-of-items {
     @include flex($fd-value: column, $jc-value: start);
     margin: 0;
@@ -69,6 +60,7 @@ $misc-footer-active: 70px;
       }
     }
   }
+  
   .misc-footer {
     @include flex($fd-value: column);
     height: fit-content;
@@ -133,17 +125,32 @@ $misc-footer-active: 70px;
   }
 }
 
+.history-results {
+  overflow-y: auto;
+
+  .history-item {
+    cursor: pointer;
+    margin: 0;
+    padding: 16px 10px;
+  }
+}
+
 .fav-shabad-container {
   align-items: center;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0px 8px;
+  padding: 0px 10px;
   transition: 0.3s all ease;
 
   .fav-shabad-text  {
     cursor: pointer;
     width: 65%;
+  }
+
+  .fav-item {
+    margin: 0;
+    padding: 16px 0;
   }
 
   .fav-shabad-options {
@@ -265,6 +272,21 @@ $misc-footer-active: 70px;
   }
   &-actions {
     @include flex($ai-value: center, $jc-value: space-between, $width: 100%);
+  }
+}
+
+.misc-slides-pane {
+  @include flex($jc-value: flex-start);
+  gap: 20px;
+  padding: 0 32px;
+
+  .misc-slide-button {
+    background: $cadmium-orange;
+    border-radius: 4px;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    color: $white;
+    cursor: pointer;
+    padding: 8px;
   }
 }
 
