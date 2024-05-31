@@ -176,7 +176,7 @@ export const ShabadText = ({
         updateHomeVerse(initialVerseIndex);
         setActiveVerse({ [activeVerseIndex]: activeVerseId });
       }
-      if (activeShabadId === null || sundarGutkaBaniId === null || ceremonyId === null) {
+      if (activeShabadId === null && sundarGutkaBaniId === null && ceremonyId === null) {
         if (initialVerseIndex >= 0) {
           updateTraversedVerse(initialVerseId, initialVerseIndex);
         }
