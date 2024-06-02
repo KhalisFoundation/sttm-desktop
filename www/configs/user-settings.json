@@ -73,7 +73,7 @@
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["limit-change-log", "statistics"]
+      "settings": ["limit-change-log", "statistics", "intelligent-spacebar"]
     }
   },
   "settings": {
@@ -267,6 +267,10 @@
     "autoplay-toggle": {
       "title": "AUTO_PLAY",
       "initialValue": false
+    },
+    "intelligent-spacebar":{
+      "title": "INTELLIGENT_SPACEBAR",
+      "initialValue": true
     },
     "autoplay-delay": {
       "title": "DELAY",
