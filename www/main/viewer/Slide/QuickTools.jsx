@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+import { convertToCamelCase } from '../../common/utils';
+
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
@@ -76,7 +78,7 @@ const QuickTools = ({ isMiscSlide }) => {
     },
   ];
 
-  const createGlobalPlatformObj = (name, index, action) => {
+  const createGlobalPlatformObj = (name, toolname, index, action) => {
     let payload;
     let actionName;
     let stateName;
@@ -85,8 +87,8 @@ const QuickTools = ({ isMiscSlide }) => {
       stateName = `content${index}${action}`;
       actionName = `setContent${index}${action}`;
     } else {
-      stateName = `gurbani${action}`;
-      actionName = `setGurbani${action}`;
+      stateName = `${toolname}${action}`;
+      actionName = `set${convertToCamelCase(`${toolname}-${action}`, true)}`;
     }
 
     if (name === 'visibility') {
@@ -124,7 +126,7 @@ const QuickTools = ({ isMiscSlide }) => {
           onClick={() => {
             global.platform.ipc.send(
               'update-global-setting',
-              JSON.stringify(createGlobalPlatformObj(name, index, actionName)),
+              JSON.stringify(createGlobalPlatformObj(name, toolName, index, actionName)),
             );
           }}
         />
