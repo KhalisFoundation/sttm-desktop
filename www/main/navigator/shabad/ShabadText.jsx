@@ -63,6 +63,10 @@ export const ShabadText = ({
     setVerseHistory,
     setActivePaneId,
     setShortcuts,
+    setSundarGutkaBaniId,
+    setCeremonyId,
+    setIsCeremonyBani,
+    setIsSundarGutkaBani,
   } = useStoreActions((actions) => actions.navigator);
   const [activeVerse, setActiveVerse] = useState({});
 
@@ -83,6 +87,15 @@ export const ShabadText = ({
       activeShabadId,
       setActiveShabadId,
       setPreviousIndex,
+      baniType,
+      sundarGutkaBaniId,
+      setSundarGutkaBaniId,
+      ceremonyId,
+      setCeremonyId,
+      isSundarGutkaBani,
+      setIsSundarGutkaBani,
+      isCeremonyBani,
+      setIsCeremonyBani,
     });
     udpateHistory(shabadId, newTraversedVerse, {
       verseHistory,
@@ -163,8 +176,10 @@ export const ShabadText = ({
         updateHomeVerse(initialVerseIndex);
         setActiveVerse({ [activeVerseIndex]: activeVerseId });
       }
-      if (activeShabadId === null) {
-        updateTraversedVerse(initialVerseId, initialVerseIndex);
+      if (activeShabadId === null && sundarGutkaBaniId === null && ceremonyId === null) {
+        if (initialVerseIndex >= 0) {
+          updateTraversedVerse(initialVerseId, initialVerseIndex);
+        }
       }
     }
   }, [filteredItems]);

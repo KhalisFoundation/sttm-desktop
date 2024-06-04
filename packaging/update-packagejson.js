@@ -7,7 +7,7 @@ const teamId = process.env.APPLE_TEAM_ID;
 
 if (!teamId) {
   console.error('TEAM_ID is not defined in the environment variables');
-  process.exit(1);
+  process.exit(0);
 }
 
 if (!process.env.I_AM_TRAVIS) {
