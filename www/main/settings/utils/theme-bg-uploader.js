@@ -42,7 +42,7 @@ const imageCheck = (filePath) => {
 export const removeCustomBackgroundFile = (imagePath) => {
   fs.unlink(imagePath, (deleteError) => {
     if (deleteError) {
-      errorAlert(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
+      errorAlert(i18n.t('THEMES.DELETE_ERR', { error: deleteError }));
       throw deleteError;
     }
   });
