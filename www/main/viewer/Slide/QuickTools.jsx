@@ -25,6 +25,8 @@ const QuickTools = ({ isMiscSlide }) => {
     userSettings.content3,
   ]);
 
+  const { disabledContent } = useStoreState((state) => state.navigator);
+
   const dropdownLabel = (option) => {
     if (option.includes('gurbani')) {
       return i18n.t(`QUICK_TOOLS.BANI`);
@@ -156,7 +158,11 @@ const QuickTools = ({ isMiscSlide }) => {
     const markup = baniOptions.map((optionObj, optionIndex) => (
       <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
         {optionObj.options.map((optionName, nameIndex) => (
-          <option key={`option-name-${nameIndex}`} value={optionName.id}>
+          <option
+            key={`option-name-${nameIndex}`}
+            value={optionName.id}
+            disabled={disabledContent.includes(optionName.id)}
+          >
             {optionName.text}
           </option>
         ))}
