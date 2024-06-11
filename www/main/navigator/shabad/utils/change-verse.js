@@ -59,11 +59,11 @@ export const changeVerse = (
       setPreviousIndex(null);
     }
 
-    if (!isSundarGutkaBani) {
-      setIsSundarGutkaBani(true);
+    if (isSundarGutkaBani) {
+      setIsSundarGutkaBani(false);
     }
-    if (isCeremonyBani) {
-      setIsCeremonyBani(false);
+    if (!isCeremonyBani) {
+      setIsCeremonyBani(true);
     }
   } else if (baniType === 'shabad') {
     if (clickedShabad !== activeShabadId) {
