@@ -9,7 +9,6 @@ import { ShabadVerse } from '../../common/sttm-ui';
 import {
   changeHomeVerse,
   changeVerse,
-  sendToBaniController,
   filterRequiredVerseItems,
   udpateHistory,
   scrollToVerse,
@@ -73,7 +72,7 @@ export const ShabadText = ({
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
 
-  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
+  const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
@@ -101,14 +100,6 @@ export const ShabadText = ({
       verseHistory,
       setVerseHistory,
       setPaneAttributes,
-      paneAttributes,
-    });
-    sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
-      isSundarGutkaBani,
-      sundarGutkaBaniId,
-      isCeremonyBani,
-      ceremonyId,
-      activeShabadId,
       paneAttributes,
     });
   };

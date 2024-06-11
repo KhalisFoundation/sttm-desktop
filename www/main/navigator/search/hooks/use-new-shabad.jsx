@@ -111,7 +111,11 @@ export const useNewShabad = () => {
     if (newSelectedVerse && activeVerseId !== newSelectedVerse) {
       setActiveVerseId(newSelectedVerse);
     }
-    if (window.socket !== undefined && window.socket !== null) {
+    if (
+      window.socket !== undefined &&
+      window.socket !== null &&
+      currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')
+    ) {
       window.socket.emit('data', {
         type: 'shabad',
         host: 'sttm-desktop',
