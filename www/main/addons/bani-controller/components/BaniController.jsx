@@ -77,7 +77,6 @@ const BaniController = ({ onScreenClose, className }) => {
     content2FontSize,
     content3FontSize,
     baniLength,
-    currentWorkspace,
     // mangalPosition,
   } = useStoreState((state) => state.userSettings);
 
@@ -231,12 +230,6 @@ const BaniController = ({ onScreenClose, className }) => {
                 <div className="sttm-loader" />
               ) : (
                 <>
-                  {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') && (
-                    <p className="error-msg">
-                      <i className="fa-solid fa-triangle-exclamation"></i>
-                      <span>Bani controller is not supported in Multi-Pane workspace.</span>
-                    </p>
-                  )}
                   <div className="sync-code-label">
                     {codeLabel || i18n.t('TOOLBAR.SYNC_CONTROLLER.UNIQUE_CODE_LABEL')}
                   </div>

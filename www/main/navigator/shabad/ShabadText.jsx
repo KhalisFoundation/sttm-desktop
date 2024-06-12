@@ -10,13 +10,14 @@ import {
   changeHomeVerse,
   changeVerse,
   filterRequiredVerseItems,
+  filterOverlayVerseItems,
   udpateHistory,
   scrollToVerse,
   saveToHistory,
   copyToClipboard,
   intelligentNextVerse,
+  sendToBaniController,
 } from './utils';
-import { filterOverlayVerseItems } from './utils/filter-verse-items';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -32,10 +33,14 @@ export const ShabadText = ({
   setPaneAttributes,
   currentPane,
 }) => {
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [rawVerses, setRawVerses] = useState([]);
   const [previousVerseIndex, setPreviousIndex] = useState();
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [activeVerse, setActiveVerse] = useState({});
+  const [rawVerses, setRawVerses] = useState([]);
   const [atHome, setHome] = useState(true);
+
+  const virtuosoRef = useRef(null);
+  const activeVerseRef = useRef(null);
 
   const {
     activeVerseId,
@@ -66,13 +71,10 @@ export const ShabadText = ({
     setCeremonyId,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
+    savedCrossPlatformId,
   } = useStoreActions((actions) => actions.navigator);
-  const [activeVerse, setActiveVerse] = useState({});
 
-  const virtuosoRef = useRef(null);
-  const activeVerseRef = useRef(null);
-
-  const updateTraversedVerse = (newTraversedVerse, verseIndex) => {
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
@@ -100,6 +102,14 @@ export const ShabadText = ({
       verseHistory,
       setVerseHistory,
       setPaneAttributes,
+      paneAttributes,
+    });
+    sendToBaniController(crossPlatformId, filteredItems, newTraversedVerse, baniLength, {
+      isSundarGutkaBani,
+      sundarGutkaBaniId,
+      isCeremonyBani,
+      ceremonyId,
+      activeShabadId,
       paneAttributes,
     });
   };
@@ -176,6 +186,15 @@ export const ShabadText = ({
   }, [filteredItems]);
 
   useEffect(() => {
+    const baniVerseIndex = filteredItems.findIndex(
+      (obj) => obj.crossPlatformId === savedCrossPlatformId,
+    );
+    if (baniVerseIndex >= 0) {
+      updateTraversedVerse(filteredItems[baniVerseIndex].ID, baniVerseIndex);
+    }
+  }, [savedCrossPlatformId]);
+
+  useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
     ipcRenderer.send(
       'show-line',
@@ -184,7 +203,16 @@ export const ShabadText = ({
         live: liveFeed,
       }),
     );
-  }, [activeShabadId, activeVerseId]);
+    if ([activeShabadId, sundarGutkaBaniId, ceremonyId].includes(paneAttributes.activeShabad)) {
+      setPaneAttributes({
+        ...paneAttributes,
+        activeVerse: activeVerseId,
+      });
+      const verseIndex = filteredItems.findIndex((verse) => verse.verseId === activeVerseId);
+      if (verseIndex >= 0) setActiveVerse({ [verseIndex]: activeVerseId });
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+    }
+  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
 
   const getVerse = (direction) => {
     let verseIndex = null;

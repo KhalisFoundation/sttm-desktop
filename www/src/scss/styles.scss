@@ -160,17 +160,6 @@ button {
   overflow: auto;
   position: fixed;
   width: calc(100% - 100px);
-
-  .error-msg{
-    i {
-      padding-right: 6px;
-    }
-    background: $rust-red;
-    border-radius: 6px;
-    color: white;
-    margin-top: 0;
-    padding: 6px;
-  }
 }
 
 .sundar-gutka-wrapper,
