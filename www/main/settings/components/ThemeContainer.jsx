@@ -51,6 +51,7 @@ const ThemeContainer = () => {
                     if (currentTheme !== theme.key) {
                       applyTheme(theme, false, setTheme, setThemeBg, themeBg);
                     }
+                    setDefaultBg(theme, setThemeBg, themeBg);
                   }}
                   className={theme['background-video'] ? 'video-theme-instance' : 'theme-instance'}
                   theme={theme}
@@ -93,7 +94,7 @@ const ThemeContainer = () => {
                   applyTheme(tile, 'custom', setTheme, setThemeBg);
                 }}
                 onRemove={() => {
-                  removeCustomBackgroundFile(tile['background-image-path'].replace(/\\(\s)/g, ' '));
+                  removeCustomBackgroundFile(tile['background-image-path']);
                   upsertCustomBackgrounds(setCustomThemes);
                   if (tile['background-image'] === themeBg.url.href) {
                     const currentThemeInstance = themes.filter(

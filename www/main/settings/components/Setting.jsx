@@ -16,6 +16,8 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const userSettings = useStoreState((state) => state.userSettings);
   const userSettingsActions = useStoreActions((state) => state.userSettings);
 
+  const { disabledContent } = useStoreState((state) => state.navigator);
+
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
     const { disableSetting } = settingObj;
@@ -129,7 +131,11 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
             {options.map((optionObj, optionIndex) => (
               <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
                 {optionObj.options.map((optionName, nameIndex) => (
-                  <option key={`option-name-${nameIndex}`} value={optionName.id}>
+                  <option
+                    key={`option-name-${nameIndex}`}
+                    value={optionName.id}
+                    disabled={disabledContent.includes(optionName.id)}
+                  >
                     {optionName.text}
                   </option>
                 ))}

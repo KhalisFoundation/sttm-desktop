@@ -373,7 +373,11 @@ const ShabadContent = () => {
     setTimeout(() => {
       const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
       // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-      if (activeVerseId !== 61 && activeShabad[currentIndex].Gurmukhi !== ',') {
+      if (
+        currentIndex >= 0 &&
+        activeVerseId !== 61 &&
+        activeShabad[currentIndex].Gurmukhi !== ','
+      ) {
         virtuosoRef.current.scrollToIndex({
           index: currentIndex,
           behavior: 'smooth',
