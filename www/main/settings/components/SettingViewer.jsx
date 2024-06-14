@@ -45,21 +45,17 @@ const SettingViewer = () => {
     fontSize: `${gurbaniFontSize * 3}px`,
   };
 
-  const content1Styles = {
-    display: content1Visibility ? 'block' : 'none',
-    fontSize: `${content1FontSize * 3}px`,
+  const contentAttributes = {
+    1: { visibility: content1Visibility, fontSize: content1FontSize },
+    2: { visibility: content2Visibility, fontSize: content2FontSize },
+    3: { visibility: content3Visibility, fontSize: content3FontSize },
+  };
+
+  const getContentStyles = (contentId) => ({
+    display: contentAttributes[contentId].visibility ? 'block' : 'none',
+    fontSize: `${contentAttributes[contentId].fontSize * 3}px`,
     fontWeight: 'normal',
-  };
-
-  const content2Styles = {
-    display: content2Visibility ? 'block' : 'none',
-    fontSize: `${content2FontSize * 3}px`,
-  };
-
-  const content3Styles = {
-    display: content3Visibility ? 'block' : 'none',
-    fontSize: `${content3FontSize * 3}px`,
-  };
+  });
 
   const nextLineStyles = {
     fontSize: `${gurbaniFontSize * 3}px`,
@@ -183,9 +179,9 @@ const SettingViewer = () => {
               )}
             </div>
           </h1>
-          <h2 style={{ ...content1Styles }}>{multilingual[content1]}</h2>
-          <h2 style={{ ...content2Styles }}>{multilingual[content2]}</h2>
-          <h2 style={{ ...content3Styles }}>{multilingual[content3]}</h2>
+          <h2 style={{ ...getContentStyles(1) }}>{multilingual[content1]}</h2>
+          <h2 style={{ ...getContentStyles(2) }}>{multilingual[content2]}</h2>
+          <h2 style={{ ...getContentStyles(3) }}>{multilingual[content3]}</h2>
           <h1
             className="slide-next-line slide-gurbani gurbani gurmukhi next-line"
             style={nextLineStyles}

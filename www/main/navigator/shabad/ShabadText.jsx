@@ -203,7 +203,11 @@ export const ShabadText = ({
         live: liveFeed,
       }),
     );
-    if ([activeShabadId, sundarGutkaBaniId, ceremonyId].includes(paneAttributes.activeShabad)) {
+    if (
+      (isCeremonyBani && ceremonyId === paneAttributes.activeShabad) ||
+      (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
+      (!isSundarGutkaBani && !isCeremonyBani && activeShabadId === paneAttributes.activeShabad)
+    ) {
       setPaneAttributes({
         ...paneAttributes,
         activeVerse: activeVerseId,

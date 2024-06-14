@@ -42,40 +42,46 @@ export const changeVerse = (
     setIsCeremonyBani,
   },
 ) => {
-  if (baniType === 'bani') {
-    if (clickedShabad !== sundarGutkaBaniId) {
-      setSundarGutkaBaniId(clickedShabad);
-      setPreviousIndex(null);
-    }
-    if (!isSundarGutkaBani) {
-      setIsSundarGutkaBani(true);
-    }
-    if (isCeremonyBani) {
-      setIsCeremonyBani(false);
-    }
-  } else if (baniType === 'ceremony') {
-    if (clickedShabad !== ceremonyId) {
-      setCeremonyId(clickedShabad);
-      setPreviousIndex(null);
-    }
+  switch (baniType) {
+    case 'bani':
+      if (clickedShabad !== sundarGutkaBaniId) {
+        setSundarGutkaBaniId(clickedShabad);
+        setPreviousIndex(null);
+      }
+      if (!isSundarGutkaBani) {
+        setIsSundarGutkaBani(true);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      break;
+    case 'ceremony':
+      if (clickedShabad !== ceremonyId) {
+        setCeremonyId(clickedShabad);
+        setPreviousIndex(null);
+      }
 
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
-    if (!isCeremonyBani) {
-      setIsCeremonyBani(true);
-    }
-  } else if (baniType === 'shabad') {
-    if (clickedShabad !== activeShabadId) {
-      setActiveShabadId(clickedShabad);
-      setPreviousIndex(null);
-    }
-    if (isSundarGutkaBani) {
-      setIsSundarGutkaBani(false);
-    }
-    if (isCeremonyBani) {
-      setIsCeremonyBani(false);
-    }
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (!isCeremonyBani) {
+        setIsCeremonyBani(true);
+      }
+      break;
+    case 'shabad':
+      if (clickedShabad !== activeShabadId) {
+        setActiveShabadId(clickedShabad);
+        setPreviousIndex(null);
+      }
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      break;
+    default:
+      break;
   }
   setActiveVerse({ [verseIndex]: newTraversedVerse });
   if (activeVerseId !== newTraversedVerse) {
