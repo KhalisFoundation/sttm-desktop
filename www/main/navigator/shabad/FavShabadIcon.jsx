@@ -12,9 +12,17 @@ const { i18n } = remote.require('./app');
 const FavShabadIcon = ({ paneId }) => {
   const [isLoading, setLoading] = useState(false);
   const favBtnRef = useRef(null);
-  const { activeShabadId, activeVerseId, favShabad, pane1, pane2, pane3 } = useStoreState(
-    (state) => state.navigator,
-  );
+  const {
+    activeShabadId,
+    activeVerseId,
+    favShabad,
+    pane1,
+    pane2,
+    pane3,
+    isSundarGutkaBani,
+    isCeremonyBani,
+  } = useStoreState((state) => state.navigator);
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const { setFavShabad } = useStoreActions((state) => state.navigator);
 
@@ -23,21 +31,25 @@ const FavShabadIcon = ({ paneId }) => {
   const [currentShabad, setCurrentShabad] = useState(activeShabadId);
   const [currentVerse, setCurrentVerse] = useState(activeVerseId);
   const [favShabadIndex, setFavShabadIndex] = useState(-1);
+  const [baniType, setBaniType] = useState('');
 
   useEffect(() => {
     if (paneId) {
       switch (paneId) {
         case 1:
           setCurrentShabad(pane1.activeShabad);
-          setCurrentVerse(pane1.versesRead[0]);
+          setCurrentVerse(pane1.activeVerse);
+          setBaniType(pane1.baniType);
           break;
         case 2:
           setCurrentShabad(pane2.activeShabad);
-          setCurrentVerse(pane2.versesRead[0]);
+          setCurrentVerse(pane2.activeVerse);
+          setBaniType(pane2.baniType);
           break;
         case 3:
           setCurrentShabad(pane3.activeShabad);
-          setCurrentVerse(pane3.versesRead[0]);
+          setCurrentVerse(pane3.activeVerse);
+          setBaniType(pane3.baniType);
           break;
         default:
           break;
@@ -69,17 +81,22 @@ const FavShabadIcon = ({ paneId }) => {
     });
   };
 
-  if (currentShabad && !isLoading && userToken) {
-    return (
-      <button
-        className={classNames('fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
-        ref={favBtnRef}
-        title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
-        onClick={toggleFavShabad}
-      >
-        <i className={favShabadIndex < 0 ? 'fa-regular fa-star' : 'fa-solid fa-star'}></i>
-      </button>
-    );
+  if (
+    baniType === 'shabad' ||
+    (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE') && !isSundarGutkaBani && !isCeremonyBani)
+  ) {
+    if (currentShabad && !isLoading && userToken) {
+      return (
+        <button
+          className={classNames('fav-btn', favShabadIndex >= 0 && 'unfav-btn')}
+          ref={favBtnRef}
+          title={i18n.t('SHABAD_PANE.FAV_BTN_TOOLTIP')}
+          onClick={toggleFavShabad}
+        >
+          <i className={favShabadIndex < 0 ? 'fa-regular fa-star' : 'fa-solid fa-star'}></i>
+        </button>
+      );
+    }
   }
   return null;
 };
