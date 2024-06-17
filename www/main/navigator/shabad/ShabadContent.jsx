@@ -373,7 +373,11 @@ const ShabadContent = () => {
     setTimeout(() => {
       const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
       // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-      if (activeVerseId !== 61 && activeShabad[currentIndex].Gurmukhi !== ',') {
+      if (
+        currentIndex >= 0 &&
+        activeVerseId !== 61 &&
+        activeShabad[currentIndex].Gurmukhi !== ','
+      ) {
         virtuosoRef.current.scrollToIndex({
           index: currentIndex,
           behavior: 'smooth',
@@ -422,10 +426,8 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then((ceremonyVerses) => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
-          if (newEntry) {
-            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
-          }
+          saveToHistory(ceremonyVerses, 'ceremony');
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {

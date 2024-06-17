@@ -128,6 +128,7 @@ export const FavoritePane = ({ className, paneId }) => {
               ...pane1,
               content: i18n.t('MULTI_PANE.SHABAD'),
               activeShabad: shabadId,
+              baniType: 'shabad',
             });
             break;
           case 2:
@@ -135,6 +136,7 @@ export const FavoritePane = ({ className, paneId }) => {
               ...pane2,
               content: i18n.t('MULTI_PANE.SHABAD'),
               activeShabad: shabadId,
+              baniType: 'shabad',
             });
             break;
           case 3:
@@ -142,6 +144,7 @@ export const FavoritePane = ({ className, paneId }) => {
               ...pane3,
               content: i18n.t('MULTI_PANE.SHABAD'),
               activeShabad: shabadId,
+              baniType: 'shabad',
             });
             break;
           default:

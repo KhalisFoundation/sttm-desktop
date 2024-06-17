@@ -1,5 +1,16 @@
 ## New Updates
 
+### 9.2.2 - ਊਨਾ Release _June 18, 2024_
+
+#### Misc. bug fix and other improvements
+- Enhanced Bani Controller: Improved functionality when using the Bani Controller in a multipane workspace.
+- Improved Theme Handling: Enhanced support for custom images during theme changes.
+- Restored Font Size Adjustments: Restored the ability to change the font size for miscellaneous slides such as "Waheguru" and "Mool Mantra."
+- Code and Style Improvements: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.1 - ਊਨਾ Release _May 24, 2024_
 
 #### New Features

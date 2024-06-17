@@ -20,7 +20,7 @@ export const useNewShabad = () => {
     pane3,
   } = useStoreState((state) => state.navigator);
 
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const {
     setActiveShabadId,
@@ -38,8 +38,21 @@ export const useNewShabad = () => {
   } = useStoreActions((actions) => actions.navigator);
 
   return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
+    let shabadPane;
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      switch (multiPaneId) {
+      if (!multiPaneId) {
+        const existingPane = [pane1, pane2, pane3].filter(
+          (pane) => pane.activeShabad === newSelectedShabad,
+        );
+        if (existingPane.length > 0) {
+          [shabadPane] = existingPane;
+        } else {
+          shabadPane = defaultPaneId;
+        }
+      } else {
+        shabadPane = multiPaneId;
+      }
+      switch (shabadPane) {
         case 1:
           setPane1({
             ...pane1,
@@ -95,6 +108,17 @@ export const useNewShabad = () => {
     if (activeShabadId !== newSelectedShabad) {
       if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
         setActiveShabadId(newSelectedShabad);
+        if (window.socket !== undefined && window.socket !== null) {
+          window.socket.emit('data', {
+            type: 'shabad',
+            host: 'sttm-desktop',
+            id: newSelectedShabad,
+            shabadid: newSelectedShabad, // @deprecated
+            highlight: newSelectedVerse,
+            homeId: newSelectedVerse,
+            verseChange: false,
+          });
+        }
       }
 
       // initialVerseId is the verse which is stored in history
@@ -110,17 +134,6 @@ export const useNewShabad = () => {
 
     if (newSelectedVerse && activeVerseId !== newSelectedVerse) {
       setActiveVerseId(newSelectedVerse);
-    }
-    if (window.socket !== undefined && window.socket !== null) {
-      window.socket.emit('data', {
-        type: 'shabad',
-        host: 'sttm-desktop',
-        id: newSelectedShabad,
-        shabadid: newSelectedShabad, // @deprecated
-        highlight: newSelectedVerse,
-        homeId: newSelectedVerse,
-        verseChange: false,
-      });
     }
   };
 };

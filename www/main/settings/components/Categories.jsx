@@ -28,6 +28,7 @@ const SettingsFactory = ({ subCategory }) => {
       addonObj.forEach((add, index) => {
         addonMarkup.push(
           <Setting
+            key={`setting-addon-${index}`}
             settingObj={add}
             stateVar={convertToCamelCase(addon[index])}
             stateFunction={`set${convertToCamelCase(addon[index], true)}`}

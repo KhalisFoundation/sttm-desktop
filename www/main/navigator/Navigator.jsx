@@ -13,9 +13,9 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const Navigator = () => {
-  const { minimizedBySingleDisplay, currentWorkspace } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+
+  const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
 
   const {
     displayWaheguruSlide,

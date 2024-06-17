@@ -31,11 +31,57 @@ export const changeVerse = (
     setActiveShabadId,
     activeShabadId,
     setPreviousIndex,
+    baniType,
+    sundarGutkaBaniId,
+    setSundarGutkaBaniId,
+    ceremonyId,
+    setCeremonyId,
+    isSundarGutkaBani,
+    setIsSundarGutkaBani,
+    isCeremonyBani,
+    setIsCeremonyBani,
   },
 ) => {
-  if (clickedShabad !== activeShabadId) {
-    setActiveShabadId(clickedShabad);
-    setPreviousIndex(null);
+  switch (baniType) {
+    case 'bani':
+      if (clickedShabad !== sundarGutkaBaniId) {
+        setSundarGutkaBaniId(clickedShabad);
+        setPreviousIndex(null);
+      }
+      if (!isSundarGutkaBani) {
+        setIsSundarGutkaBani(true);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      break;
+    case 'ceremony':
+      if (clickedShabad !== ceremonyId) {
+        setCeremonyId(clickedShabad);
+        setPreviousIndex(null);
+      }
+
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (!isCeremonyBani) {
+        setIsCeremonyBani(true);
+      }
+      break;
+    case 'shabad':
+      if (clickedShabad !== activeShabadId) {
+        setActiveShabadId(clickedShabad);
+        setPreviousIndex(null);
+      }
+      if (isSundarGutkaBani) {
+        setIsSundarGutkaBani(false);
+      }
+      if (isCeremonyBani) {
+        setIsCeremonyBani(false);
+      }
+      break;
+    default:
+      break;
   }
   setActiveVerse({ [verseIndex]: newTraversedVerse });
   if (activeVerseId !== newTraversedVerse) {
@@ -60,34 +106,34 @@ export const sendToBaniController = (
   if (window.socket !== undefined && window.socket !== null) {
     let baniVerse;
     if (!crossPlatformId) {
-      baniVerse = activeShabad.find((obj) => obj.ID === newTraversedVerse);
+      baniVerse = activeShabad.find((obj) => obj.verseId === newTraversedVerse);
     }
-    if (isSundarGutkaBani) {
+    if (isSundarGutkaBani && sundarGutkaBaniId) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
         type: 'bani',
-        id: sundarGutkaBaniId,
-        shabadid: sundarGutkaBaniId, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformID,
+        id: paneAttributes.activeShabad,
+        shabadid: paneAttributes.activeShabad, // @deprecated
+        highlight: crossPlatformId || baniVerse.crossPlatformId,
         baniLength,
         // mangalPosition,
         verseChange: false,
       });
-    } else if (isCeremonyBani) {
+    } else if (isCeremonyBani && ceremonyId) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
         type: 'ceremony',
-        id: ceremonyId,
-        shabadid: ceremonyId, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformID,
+        id: paneAttributes.activeShabad,
+        shabadid: paneAttributes.activeShabad, // @deprecated
+        highlight: crossPlatformId || baniVerse.crossPlatformId,
         verseChange: false,
       });
-    } else {
+    } else if (activeShabadId) {
       window.socket.emit('data', {
         type: 'shabad',
         host: 'sttm-desktop',
-        id: activeShabadId,
-        shabadid: activeShabadId, // @deprecated
+        id: paneAttributes.activeShabad,
+        shabadid: paneAttributes.activeShabad, // @deprecated
         highlight: newTraversedVerse,
         homeId: paneAttributes.homeVerse,
         verseChange: false,
