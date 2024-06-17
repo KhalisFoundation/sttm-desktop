@@ -247,13 +247,16 @@
 
       document.body.style.backgroundColor = overlayColor;
 
-      const $gurbani = document.querySelector('.o-gurbani');
-      const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-      let line = '';
-      if ($gurbani.children.length) {
-        line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
-      }
-      $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      const $gurbaniWrapper = document.querySelectorAll('.o-gurbani');
+
+      $gurbaniWrapper.forEach($gurbani => {
+        let line = '';
+        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+        if ($gurbani.children.length) {
+          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
+        }
+        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      });
     };
 
     socket.on('show-line', request => {
