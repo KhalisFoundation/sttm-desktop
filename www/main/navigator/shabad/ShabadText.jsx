@@ -159,6 +159,7 @@ export const ShabadText = ({
             initialVerseId,
           );
           setFilteredItems(filterRequiredVerseItems(verseList));
+          updateTraversedVerse(verseList[0].ID, 0);
         }
       });
     }
@@ -213,8 +214,10 @@ export const ShabadText = ({
         activeVerse: activeVerseId,
       });
       const verseIndex = filteredItems.findIndex((verse) => verse.verseId === activeVerseId);
-      if (verseIndex >= 0) setActiveVerse({ [verseIndex]: activeVerseId });
-      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+      if (verseIndex >= 0 && activeVerseId !== 61 && filteredItems[verseIndex].verse !== ',') {
+        setActiveVerse({ [verseIndex]: activeVerseId });
+        scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+      }
     }
   }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
 

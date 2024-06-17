@@ -426,10 +426,8 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then((ceremonyVerses) => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
-          if (newEntry) {
-            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
-          }
+          saveToHistory(ceremonyVerses, 'ceremony');
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {

@@ -136,8 +136,8 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     current: getTheme(currentTheme),
   };
 
-  const openCeremonyFromDropdown = (givenPane) => {
-    onThemeClick(paneSelector.current.dataset.theme, givenPane);
+  const openCeremonyFromDropdown = (e, givenPane) => {
+    onThemeClick(e, paneSelector.current.dataset.theme, givenPane);
     setPaneSelectorActive(false);
   };
 

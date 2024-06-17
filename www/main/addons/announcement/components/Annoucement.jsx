@@ -87,7 +87,7 @@ const Announcement = ({ isGurmukhi }) => {
         <textarea
           className={classNames(
             'announcement-text',
-            keyboardOpenStatus && 'gurmukhi',
+            keyboardOpenStatus && isGurmukhi && 'gurmukhi',
             isGurmukhi && 'gurmukhi',
             'disable-kb-shortcuts',
           )}
