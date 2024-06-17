@@ -159,6 +159,7 @@ export const ShabadText = ({
             initialVerseId,
           );
           setFilteredItems(filterRequiredVerseItems(verseList));
+          updateTraversedVerse(verseList[0].ID, 0);
         }
       });
     }
