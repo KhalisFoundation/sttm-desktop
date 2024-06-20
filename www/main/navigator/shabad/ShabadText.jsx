@@ -54,6 +54,7 @@ export const ShabadText = ({
     initialVerseId,
     activePaneId,
     shortcuts,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const { baniLength, liveFeed, autoplayDelay, autoplayToggle } = useStoreState(
@@ -145,6 +146,7 @@ export const ShabadText = ({
             initialVerseId,
           );
           setFilteredItems(filterRequiredVerseItems(verseList));
+          updateTraversedVerse(verseList[0].ID, 0);
         }
       });
     } else if (baniType === 'ceremony') {
@@ -209,13 +211,8 @@ export const ShabadText = ({
       (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
       (!isSundarGutkaBani && !isCeremonyBani && activeShabadId === paneAttributes.activeShabad)
     ) {
-      setPaneAttributes({
-        ...paneAttributes,
-        activeVerse: activeVerseId,
-      });
-      const verseIndex = filteredItems.findIndex((verse) => verse.verseId === activeVerseId);
-      if (verseIndex >= 0 && activeVerseId !== 61 && filteredItems[verseIndex].verse !== ',') {
-        setActiveVerse({ [verseIndex]: activeVerseId });
+      if (lineNumber !== null && filteredItems[lineNumber - 1].verseId === activeVerseId) {
+        setActiveVerse({ [lineNumber - 1]: activeVerseId });
         scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
       }
     }

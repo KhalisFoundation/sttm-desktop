@@ -32,12 +32,14 @@ const useSocketListeners = (
   setMiscSlideText,
   setIsMiscSlideGurmukhi,
   setSavedCrossPlatformId,
+  setLineNumber,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
     const listenerActions = {
       shabad: (payload) => {
         changeActiveShabad(payload.shabadId, payload.verseId);
+        setLineNumber(payload.lineCount);
         analytics.trackEvent({
           category: 'controller',
           action: 'shabad',

@@ -41,11 +41,10 @@ export const useNewShabad = () => {
     let shabadPane;
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       if (!multiPaneId) {
-        const existingPane = [pane1, pane2, pane3].filter(
-          (pane) => pane.activeShabad === newSelectedShabad,
-        );
-        if (existingPane.length > 0) {
-          [shabadPane] = existingPane;
+        const existingPane =
+          [pane1, pane2, pane3].findIndex((pane) => pane.activeShabad === newSelectedShabad) + 1;
+        if (existingPane > 0) {
+          shabadPane = existingPane;
         } else {
           shabadPane = defaultPaneId;
         }
