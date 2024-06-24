@@ -69,6 +69,7 @@ const BaniController = ({ onScreenClose, className }) => {
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
     setSavedCrossPlatformId,
+    setLineNumber,
   } = useStoreActions((state) => state.navigator);
 
   const {
@@ -205,6 +206,7 @@ const BaniController = ({ onScreenClose, className }) => {
       setMiscSlideText,
       setIsMiscSlideGurmukhi,
       setSavedCrossPlatformId,
+      setLineNumber,
     );
   }, [socketData]);
 
