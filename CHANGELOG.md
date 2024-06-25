@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.2 - ਊਨਾ Release _June 18, 2024_
+### 9.2.2 - ਊਨਾ Release _June 24, 2024_
 
 #### Misc. bug fix and other improvements
 - Enhanced Bani Controller: Improved functionality when using the Bani Controller in a multipane workspace.

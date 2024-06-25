@@ -34,6 +34,7 @@ const ShabadContent = () => {
     minimizedBySingleDisplay,
     isDontSaveHistory,
     savedCrossPlatformId,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const {
@@ -500,6 +501,10 @@ const ShabadContent = () => {
         live: liveFeed,
       }),
     );
+    if (lineNumber !== null && filteredItems[lineNumber - 1].verseId === activeVerseId) {
+      setActiveVerse({ [lineNumber - 1]: activeVerseId });
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+    }
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
