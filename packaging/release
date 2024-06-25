@@ -19,8 +19,8 @@ const release = async () => {
     console.log(`Prerelease Track: ${track}`);
   }
 
-  // win-ia32 is run on the same machine right after win-x64, so don't update the version
-  if (platform !== 'win32') {
+  // win-ia32 and macArm is run on the same machine right after win-x64, so don't update the version
+  if (platform !== 'win32' || platform !== 'macArm') {
     // Get all tags, sort in desc order, and get latest from current track
     const gitTags = await git().tags();
     const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
