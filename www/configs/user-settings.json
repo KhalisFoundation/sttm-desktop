@@ -68,12 +68,12 @@
     "app-layout": {
       "title": "APP_SETTINGS",
       "type": "switch",
-      "settings": ["quick-tools", "shortcut-tray", "live-feed"]
+      "settings": ["quick-tools", "shortcut-tray", "live-feed", "intelligent-spacebar"]
     },
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["limit-change-log", "statistics", "intelligent-spacebar"]
+      "settings": ["limit-change-log", "statistics"]
     }
   },
   "settings": {

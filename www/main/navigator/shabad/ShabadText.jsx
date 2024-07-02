@@ -52,7 +52,7 @@ export const ShabadText = ({
     shortcuts,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle } = useStoreState(
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar } = useStoreState(
     (state) => state.userSettings,
   );
 
@@ -235,6 +235,7 @@ export const ShabadText = ({
           atHome,
           setHome,
           homeVerse: paneAttributes.homeVerse,
+          intelligentSpacebar,
         });
         if (verse) {
           updateTraversedVerse(verse.verseId, verse.verseIndex);
