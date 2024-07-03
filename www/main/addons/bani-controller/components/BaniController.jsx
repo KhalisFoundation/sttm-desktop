@@ -16,6 +16,7 @@ import QrCode from './QrCode';
 import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
+import updateMultipane from '../../../navigator/search/utils/update-multipane';
 
 const remote = require('@electron/remote');
 
@@ -29,6 +30,7 @@ const BaniController = ({ onScreenClose, className }) => {
   const canvasRef = useRef(null);
 
   const changeActiveShabad = useNewShabad();
+  const updatePane = updateMultipane();
 
   // Local State
   const [codeLabel, setCodeLabel] = useState('');
@@ -58,6 +60,7 @@ const BaniController = ({ onScreenClose, className }) => {
     miscSlideText,
     isMiscSlideGurmukhi,
     savedCrossPlatformId,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const {
@@ -206,7 +209,9 @@ const BaniController = ({ onScreenClose, className }) => {
       setMiscSlideText,
       setIsMiscSlideGurmukhi,
       setSavedCrossPlatformId,
+      lineNumber,
       setLineNumber,
+      updatePane,
     );
   }, [socketData]);
 
