@@ -32,14 +32,16 @@ const useSocketListeners = (
   setMiscSlideText,
   setIsMiscSlideGurmukhi,
   setSavedCrossPlatformId,
+  lineNumber,
   setLineNumber,
+  updatePane,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
     const listenerActions = {
       shabad: (payload) => {
         changeActiveShabad(payload.shabadId, payload.verseId);
-        setLineNumber(payload.lineCount);
+        if (lineNumber !== payload.lineCount) setLineNumber(payload.lineCount);
         analytics.trackEvent({
           category: 'controller',
           action: 'shabad',
@@ -82,6 +84,7 @@ const useSocketListeners = (
             setSavedCrossPlatformId(payload.verseId);
           }
         }
+        updatePane('bani', payload.baniId);
         analytics.trackEvent({
           category: 'controller',
           action: 'bani',
@@ -101,6 +104,7 @@ const useSocketListeners = (
         if (ceremonyId !== payload.ceremonyId) {
           setCeremonyId(payload.ceremonyId);
         }
+        updatePane('ceremony', payload.ceremonyId);
         analytics.trackEvent({
           category: 'controller',
           action: 'ceremony',
