@@ -501,7 +501,7 @@ const ShabadContent = () => {
         live: liveFeed,
       }),
     );
-    if (lineNumber !== null && filteredItems[lineNumber - 1].verseId === activeVerseId) {
+    if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
       setActiveVerse({ [lineNumber - 1]: activeVerseId });
       scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
     }
