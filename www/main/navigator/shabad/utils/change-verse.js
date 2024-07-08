@@ -129,7 +129,7 @@ export const intelligentNextVerse = (
     intelligentSpacebar,
   },
 ) => {
-  function handleIntelligentSpacebar(nextIndex, currentVerseIndex) {
+  const handleIntelligentSpacebar = (nextIndex, currentVerseIndex) => {
     let nextVerseIndex = nextIndex;
 
     if (atHome) {
