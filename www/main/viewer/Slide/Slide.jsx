@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { useStoreState } from 'easy-peasy';
 import { CSSTransition } from 'react-transition-group';
 
 import SlideTeeka from './SlideTeeka';
@@ -28,8 +28,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     content3Visibility,
   } = useStoreState((state) => state.userSettings);
 
-  const { activeVerseId, disabledContent } = useStoreState((state) => state.navigator);
-  const { setDisabledContent } = useStoreActions((state) => state.navigator);
+  const { activeVerseId } = useStoreState((state) => state.navigator);
   const [showVerse, setShowVerse] = useState(true);
   const [orderMarkup, setOrderMarkup] = useState(null);
 
@@ -63,34 +62,13 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
+      if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
         });
       }
     }, 100);
-    if (verseObj && verseObj.Translations) {
-      const translations = JSON.parse(verseObj.Translations);
-
-      const translationMapping = {
-        'en.bdb': 'translation-english',
-        'es.sn': 'translation-spanish',
-        'hi.ss': 'translation-hindi',
-      };
-
-      const missingTranslations = Object.entries(translationMapping)
-        .filter(([key]) => {
-          const value = key.split('.').reduce((obj, k) => obj && obj[k], translations);
-          return !value || !value.trim();
-        })
-        // eslint-disable-next-line no-unused-vars
-        .map(([_, identifier]) => identifier);
-
-      if (JSON.stringify(disabledContent) !== JSON.stringify(missingTranslations)) {
-        setDisabledContent(missingTranslations);
-      }
-    }
   }, [verseObj]);
 
   useEffect(() => {
