@@ -62,7 +62,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
+      if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'center',

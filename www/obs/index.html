@@ -247,13 +247,23 @@
 
       document.body.style.backgroundColor = overlayColor;
 
-      const $gurbani = document.querySelector('.o-gurbani');
-      const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-      let line = '';
-      if ($gurbani.children.length) {
-        line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
-      }
-      $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      const $gurbaniWrapper = document.querySelectorAll('.o-gurbani');
+
+      $gurbaniWrapper.forEach($gurbani => {
+        let line = '';
+        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+        if ($gurbani.children.length) {
+          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
+        }
+        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      });
+
+      // Apply the font weight and italic to translation and transliteration
+      document.querySelectorAll('span.o-translation, span.o-transliteration').forEach(el => {
+        el.style.fontWeight = overlayPrefs.textFormat.bold ? 900 : 400;
+        el.style.fontStyle = overlayPrefs.textFormat.italic ? 'italic' : 'normal';
+      });
+
     };
 
     socket.on('show-line', request => {

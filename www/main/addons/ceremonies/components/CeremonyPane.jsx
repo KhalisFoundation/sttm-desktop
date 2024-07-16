@@ -53,7 +53,7 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     setPaneSelectorActive(true);
   };
 
-  const onThemeClick = (theme, multipaneId = null) => {
+  const onThemeClick = (event, theme, multipaneId = null) => {
     let parsedTheme = theme;
     if (typeof theme === 'string') {
       parsedTheme = JSON.parse(theme);
@@ -136,8 +136,8 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     current: getTheme(currentTheme),
   };
 
-  const openCeremonyFromDropdown = (givenPane) => {
-    onThemeClick(paneSelector.current.dataset.theme, givenPane);
+  const openCeremonyFromDropdown = (e, givenPane) => {
+    onThemeClick(e, paneSelector.current.dataset.theme, givenPane);
     setPaneSelectorActive(false);
   };
 
@@ -183,7 +183,7 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
                 if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
                   openPaneMenu(e, themes.light);
                 } else {
-                  onThemeClick(themes.light);
+                  onThemeClick(e, themes.light);
                 }
               }}
               className="theme-instance"

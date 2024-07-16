@@ -1,4 +1,5 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
+import updateMultipane from '../utils/update-multipane';
 
 const remote = require('@electron/remote');
 
@@ -15,9 +16,6 @@ export const useNewShabad = () => {
     isMiscSlide,
     singleDisplayActiveTab,
     searchVerse,
-    pane1,
-    pane2,
-    pane3,
   } = useStoreState((state) => state.navigator);
 
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
@@ -32,48 +30,12 @@ export const useNewShabad = () => {
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
     setSearchVerse,
-    setPane1,
-    setPane2,
-    setPane3,
   } = useStoreActions((actions) => actions.navigator);
 
+  const updatePane = updateMultipane();
+
   return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
-    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      switch (multiPaneId) {
-        case 1:
-          setPane1({
-            ...pane1,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: newSelectedShabad,
-            baniType: 'shabad',
-            versesRead: [newSelectedVerse],
-            activeVerse: newSelectedVerse,
-          });
-          break;
-        case 2:
-          setPane2({
-            ...pane2,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: newSelectedShabad,
-            baniType: 'shabad',
-            versesRead: [newSelectedVerse],
-            activeVerse: newSelectedVerse,
-          });
-          break;
-        case 3:
-          setPane3({
-            ...pane3,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: newSelectedShabad,
-            baniType: 'shabad',
-            versesRead: [newSelectedVerse],
-            activeVerse: newSelectedVerse,
-          });
-          break;
-        default:
-          break;
-      }
-    }
+    updatePane('shabad', newSelectedShabad, newSelectedVerse, multiPaneId);
 
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
@@ -95,6 +57,17 @@ export const useNewShabad = () => {
     if (activeShabadId !== newSelectedShabad) {
       if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
         setActiveShabadId(newSelectedShabad);
+        if (window.socket !== undefined && window.socket !== null) {
+          window.socket.emit('data', {
+            type: 'shabad',
+            host: 'sttm-desktop',
+            id: newSelectedShabad,
+            shabadid: newSelectedShabad, // @deprecated
+            highlight: newSelectedVerse,
+            homeId: newSelectedVerse,
+            verseChange: false,
+          });
+        }
       }
 
       // initialVerseId is the verse which is stored in history
@@ -110,17 +83,6 @@ export const useNewShabad = () => {
 
     if (newSelectedVerse && activeVerseId !== newSelectedVerse) {
       setActiveVerseId(newSelectedVerse);
-    }
-    if (window.socket !== undefined && window.socket !== null) {
-      window.socket.emit('data', {
-        type: 'shabad',
-        host: 'sttm-desktop',
-        id: newSelectedShabad,
-        shabadid: newSelectedShabad, // @deprecated
-        highlight: newSelectedVerse,
-        homeId: newSelectedVerse,
-        verseChange: false,
-      });
     }
   };
 };

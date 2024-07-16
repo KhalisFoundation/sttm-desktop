@@ -9,15 +9,15 @@ import { ShabadVerse } from '../../common/sttm-ui';
 import {
   changeHomeVerse,
   changeVerse,
-  sendToBaniController,
   filterRequiredVerseItems,
+  filterOverlayVerseItems,
   udpateHistory,
   scrollToVerse,
   saveToHistory,
   copyToClipboard,
   intelligentNextVerse,
+  sendToBaniController,
 } from './utils';
-import { filterOverlayVerseItems } from './utils/filter-verse-items';
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -33,10 +33,14 @@ export const ShabadText = ({
   setPaneAttributes,
   currentPane,
 }) => {
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [rawVerses, setRawVerses] = useState([]);
   const [previousVerseIndex, setPreviousIndex] = useState();
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [activeVerse, setActiveVerse] = useState({});
+  const [rawVerses, setRawVerses] = useState([]);
   const [atHome, setHome] = useState(true);
+
+  const virtuosoRef = useRef(null);
+  const activeVerseRef = useRef(null);
 
   const {
     activeVerseId,
@@ -50,6 +54,7 @@ export const ShabadText = ({
     initialVerseId,
     activePaneId,
     shortcuts,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const { baniLength, liveFeed, autoplayDelay, autoplayToggle } = useStoreState(
@@ -63,13 +68,14 @@ export const ShabadText = ({
     setVerseHistory,
     setActivePaneId,
     setShortcuts,
+    setSundarGutkaBaniId,
+    setCeremonyId,
+    setIsCeremonyBani,
+    setIsSundarGutkaBani,
+    savedCrossPlatformId,
   } = useStoreActions((actions) => actions.navigator);
-  const [activeVerse, setActiveVerse] = useState({});
 
-  const virtuosoRef = useRef(null);
-  const activeVerseRef = useRef(null);
-
-  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformID = null) => {
+  const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
@@ -83,6 +89,15 @@ export const ShabadText = ({
       activeShabadId,
       setActiveShabadId,
       setPreviousIndex,
+      baniType,
+      sundarGutkaBaniId,
+      setSundarGutkaBaniId,
+      ceremonyId,
+      setCeremonyId,
+      isSundarGutkaBani,
+      setIsSundarGutkaBani,
+      isCeremonyBani,
+      setIsCeremonyBani,
     });
     udpateHistory(shabadId, newTraversedVerse, {
       verseHistory,
@@ -90,7 +105,7 @@ export const ShabadText = ({
       setPaneAttributes,
       paneAttributes,
     });
-    sendToBaniController(crossPlatformID, filteredItems, newTraversedVerse, baniLength, {
+    sendToBaniController(crossPlatformId, filteredItems, newTraversedVerse, baniLength, {
       isSundarGutkaBani,
       sundarGutkaBaniId,
       isCeremonyBani,
@@ -131,6 +146,7 @@ export const ShabadText = ({
             initialVerseId,
           );
           setFilteredItems(filterRequiredVerseItems(verseList));
+          updateTraversedVerse(verseList[0].ID, 0);
         }
       });
     } else if (baniType === 'ceremony') {
@@ -145,6 +161,7 @@ export const ShabadText = ({
             initialVerseId,
           );
           setFilteredItems(filterRequiredVerseItems(verseList));
+          updateTraversedVerse(verseList[0].ID, 0);
         }
       });
     }
@@ -163,11 +180,22 @@ export const ShabadText = ({
         updateHomeVerse(initialVerseIndex);
         setActiveVerse({ [activeVerseIndex]: activeVerseId });
       }
-      if (activeShabadId === null) {
-        updateTraversedVerse(initialVerseId, initialVerseIndex);
+      if (activeShabadId === null && sundarGutkaBaniId === null && ceremonyId === null) {
+        if (initialVerseIndex >= 0) {
+          updateTraversedVerse(initialVerseId, initialVerseIndex);
+        }
       }
     }
   }, [filteredItems]);
+
+  useEffect(() => {
+    const baniVerseIndex = filteredItems.findIndex(
+      (obj) => obj.crossPlatformId === savedCrossPlatformId,
+    );
+    if (baniVerseIndex >= 0) {
+      updateTraversedVerse(filteredItems[baniVerseIndex].ID, baniVerseIndex);
+    }
+  }, [savedCrossPlatformId]);
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
@@ -178,7 +206,17 @@ export const ShabadText = ({
         live: liveFeed,
       }),
     );
-  }, [activeShabadId, activeVerseId]);
+    if (
+      (isCeremonyBani && ceremonyId === paneAttributes.activeShabad) ||
+      (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
+      (!isSundarGutkaBani && !isCeremonyBani && activeShabadId === paneAttributes.activeShabad)
+    ) {
+      if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
+        setActiveVerse({ [lineNumber - 1]: activeVerseId });
+        scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+      }
+    }
+  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
 
   const getVerse = (direction) => {
     let verseIndex = null;

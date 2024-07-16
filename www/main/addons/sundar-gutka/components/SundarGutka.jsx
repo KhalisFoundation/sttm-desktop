@@ -142,7 +142,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     }
   };
 
-  const openBaniFromDropdown = (paneId) => {
+  const openBaniFromDropdown = (e, paneId) => {
     loadBani(parseInt(paneSelector.current.dataset.baniId, 10), paneId);
     setPaneSelectorActive(false);
   };

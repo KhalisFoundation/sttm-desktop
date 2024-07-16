@@ -21,7 +21,7 @@ const MiscSlides = () => {
   const [paneSelectorActive, setPaneSelectorActive] = useState(false);
   const paneSelector = useRef(null);
 
-  const openSlideFromDropdown = (paneId) => {
+  const openSlideFromDropdown = (e, paneId) => {
     displayAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId });
     setPaneSelectorActive(false);
   };

@@ -42,7 +42,7 @@ const imageCheck = (filePath) => {
 export const removeCustomBackgroundFile = (imagePath) => {
   fs.unlink(imagePath, (deleteError) => {
     if (deleteError) {
-      errorAlert(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
+      errorAlert(i18n.t('THEMES.DELETE_ERR', { error: deleteError }));
       throw deleteError;
     }
   });
@@ -57,7 +57,10 @@ export const uploadImage = async (evt) => {
   return new Promise((resolve, reject) => {
     try {
       const filePath = evt.target.files[0].path;
-      const newPath = path.resolve(userBackgroundsPath, evt.target.files[0].name);
+      const newPath = path.resolve(
+        userBackgroundsPath,
+        evt.target.files[0].name.replaceAll(' ', '_'),
+      );
       // eslint-disable-next-line no-param-reassign
       evt.target.value = '';
 

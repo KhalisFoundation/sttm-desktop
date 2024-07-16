@@ -16,9 +16,9 @@ const MultipaneDropdown = ({
   const dropdownOptions = [pane1, pane2, pane3].map((item, index) => (
     <p
       key={`pane-option-${index + 1}`}
-      onClick={() => {
+      onClick={(e) => {
         if (!item.locked) {
-          clickHandler(index + 1);
+          clickHandler(e, index + 1);
         }
       }}
       title={item.locked ? i18n.t('MULTI_PANE.LOCKED_PANE_MSG') : ''}
