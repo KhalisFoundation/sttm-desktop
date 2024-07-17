@@ -34,6 +34,7 @@ const ShabadContent = () => {
     minimizedBySingleDisplay,
     isDontSaveHistory,
     savedCrossPlatformId,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const {
@@ -373,7 +374,11 @@ const ShabadContent = () => {
     setTimeout(() => {
       const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
       // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-      if (activeVerseId !== 61 && activeShabad[currentIndex].Gurmukhi !== ',') {
+      if (
+        currentIndex >= 0 &&
+        activeVerseId !== 61 &&
+        activeShabad[currentIndex].Gurmukhi !== ','
+      ) {
         virtuosoRef.current.scrollToIndex({
           index: currentIndex,
           behavior: 'smooth',
@@ -422,10 +427,8 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then((ceremonyVerses) => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
-          if (newEntry) {
-            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
-          }
+          saveToHistory(ceremonyVerses, 'ceremony');
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {
@@ -498,6 +501,10 @@ const ShabadContent = () => {
         live: liveFeed,
       }),
     );
+    if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
+      setActiveVerse({ [lineNumber - 1]: activeVerseId });
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+    }
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
@@ -564,6 +571,7 @@ const ShabadContent = () => {
                 isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={versesRead}
+                activeVerseRef={activeVerseRef}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}

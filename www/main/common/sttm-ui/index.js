@@ -10,3 +10,4 @@ export { default as SearchResults } from './search-results';
 export { default as ShabadVerse } from './shabad-verse';
 export { default as FilterDropdown } from './filter-dropdown';
 export { default as FilterTag } from './filter-tag';
+export { default as MultipaneDropdown } from './multipane-dropdown';

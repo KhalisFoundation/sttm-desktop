@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
+import { convertToCamelCase } from '../../common/utils';
+
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
@@ -22,6 +24,8 @@ const QuickTools = ({ isMiscSlide }) => {
     userSettings.content2,
     userSettings.content3,
   ]);
+
+  const { disabledContent } = useStoreState((state) => state.navigator);
 
   const dropdownLabel = (option) => {
     if (option.includes('gurbani')) {
@@ -76,7 +80,7 @@ const QuickTools = ({ isMiscSlide }) => {
     },
   ];
 
-  const createGlobalPlatformObj = (name, index, action) => {
+  const createGlobalPlatformObj = (name, toolname, index, action) => {
     let payload;
     let actionName;
     let stateName;
@@ -85,16 +89,16 @@ const QuickTools = ({ isMiscSlide }) => {
       stateName = `content${index}${action}`;
       actionName = `setContent${index}${action}`;
     } else {
-      stateName = `gurbani${action}`;
-      actionName = `setGurbani${action}`;
+      stateName = `${toolname}${action}`;
+      actionName = `set${convertToCamelCase(`${toolname}-${action}`, true)}`;
     }
 
     if (name === 'visibility') {
       payload = !userSettings[stateName];
     } else if (name === 'minus') {
-      payload = userSettings[stateName] - 1;
+      payload = parseInt(userSettings[stateName], 10) - 1;
     } else if (name === 'plus') {
-      payload = userSettings[stateName] + 1;
+      payload = parseInt(userSettings[stateName], 10) + 1;
     }
     return {
       actionName,
@@ -124,7 +128,7 @@ const QuickTools = ({ isMiscSlide }) => {
           onClick={() => {
             global.platform.ipc.send(
               'update-global-setting',
-              JSON.stringify(createGlobalPlatformObj(name, index, actionName)),
+              JSON.stringify(createGlobalPlatformObj(name, toolName, index, actionName)),
             );
           }}
         />
@@ -152,13 +156,13 @@ const QuickTools = ({ isMiscSlide }) => {
     }
 
     const markup = baniOptions.map((optionObj, optionIndex) => (
-      <optgroup
-        key={`option-${optionIndex}`}
-        label={optionObj.label}
-        style={{ 'text-transform': 'capitalize' }}
-      >
+      <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
         {optionObj.options.map((optionName, nameIndex) => (
-          <option key={`option-name-${nameIndex}`} value={optionName.id}>
+          <option
+            key={`option-name-${nameIndex}`}
+            value={optionName.id}
+            disabled={disabledContent.includes(optionName.id)}
+          >
             {optionName.text}
           </option>
         ))}

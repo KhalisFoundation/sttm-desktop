@@ -1,5 +1,35 @@
 ## New Updates
 
+### 9.2.2 - ਊਨਾ Release _July 15, 2024_
+
+#### Misc. bug fix and other improvements
+- Enhanced Bani Controller: Improved functionality when using the Bani Controller in a multipane workspace.
+- Improved Theme Handling: Enhanced support for custom images during theme changes.
+- Restored Font Size Adjustments: Restored the ability to change the font size for miscellaneous slides such as "Waheguru" and "Mool Mantra."
+- Code and Style Improvements: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
+### 9.2.1 - ਊਨਾ Release _May 24, 2024_
+
+#### New Features
+- Choose the order of the lines that sangat see on screen using quickview dropdowns. 
+  ![](./assets/img/help_images/content-order.gif)
+- New Multi-Pane workspace allows you to open multiple Shabads on one screen to display from.
+  ![](./assets/img/help_images/multipane-preview.gif)
+- You now have the ability to reset the font sizes.
+
+#### Misc. bug fix and other improvements
+- Update of the support link.
+- Improve the colors of Floral theme in Bani Overlay.
+- Preserve formatting (line breaks) in announcement.
+- Improvements to Bani Overlay margins to adhere to standard broadcast standards.
+- Code refactors and style improvements.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.0 - ਊਨਾ Release _January 30, 2024_
 
 #### New Features

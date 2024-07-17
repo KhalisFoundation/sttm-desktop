@@ -1,39 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
 const themes = require('../../../configs/themes.json');
 
 const SettingViewer = () => {
   const { themeBg } = useStoreState((state) => state.userSettings);
-  const { slideOrder } = useStoreState((state) => state.viewerSettings);
-
-  const [translationOrder, setTranslationOrder] = useState();
-  const [teekaOrder, setTeekaOrder] = useState();
-  const [transliterationOrder, setTransliterationOrder] = useState();
-
-  const orderFunctions = {
-    translation: (item) => {
-      if (translationOrder !== item) {
-        setTranslationOrder(item);
-      }
-    },
-    transliteration: (item) => {
-      if (transliterationOrder !== item) {
-        setTransliterationOrder(item);
-      }
-    },
-    teeka: (item) => {
-      if (teekaOrder !== item) {
-        setTeekaOrder(item);
-      }
-    },
-  };
 
   const {
     gurbaniFontSize,
     content1FontSize,
     content2FontSize,
     content3FontSize,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
+    content1,
+    content2,
+    content3,
     displayNextLine,
     leftAlign,
     theme,
@@ -62,29 +45,23 @@ const SettingViewer = () => {
     fontSize: `${gurbaniFontSize * 3}px`,
   };
 
-  const translationStyles = {
-    fontSize: `${content1FontSize * 3}px`,
+  const contentAttributes = {
+    1: { visibility: content1Visibility, fontSize: content1FontSize },
+    2: { visibility: content2Visibility, fontSize: content2FontSize },
+    3: { visibility: content3Visibility, fontSize: content3FontSize },
   };
 
-  const transliterationStyles = {
-    fontSize: `${content2FontSize * 3}px`,
-  };
-
-  const teekaStyles = {
-    fontSize: `${content3FontSize * 3}px`,
-  };
+  const getContentStyles = (contentId) => ({
+    display: contentAttributes[contentId].visibility ? 'block' : 'none',
+    fontSize: `${contentAttributes[contentId].fontSize * 3}px`,
+    fontWeight: 'normal',
+  });
 
   const nextLineStyles = {
     fontSize: `${gurbaniFontSize * 3}px`,
     opacity: 0.5,
     display: displayNextLine ? 'block' : 'none',
   };
-
-  useEffect(() => {
-    slideOrder.forEach((element, index) => {
-      orderFunctions[element](index + 2);
-    });
-  }, [slideOrder]);
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -102,6 +79,51 @@ const SettingViewer = () => {
       }
     }
     return '';
+  };
+
+  const multilingual = {
+    'translation-english': (
+      <div className="slide-translation translation">
+        <span className="english-translation transtext">
+          Whatever I ask for from my Lord and Master, he gives that to me.
+        </span>
+      </div>
+    ),
+    'translation-hindi': (
+      <div className="slide-translation translation">
+        <span className="hindi-translation transtext">
+          हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
+        </span>
+      </div>
+    ),
+    'translation-spanish': (
+      <div className="slide-translation translation">
+        <span className="spanish-translation transtext">
+          Lo que sea que el Esclavo del Señor, Nanak recita con sus labios
+        </span>
+      </div>
+    ),
+    'teeka-punjabi': (
+      <div className="slide-teeka teeka">
+        hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
+      </div>
+    ),
+    'transliteration-english': (
+      <div className="slide-transliteration transliteration">
+        jo maageh Thaakur apune te soiee soiee dhevai ||
+      </div>
+    ),
+    'transliteration-hindi': (
+      <div className="slide-transliteration transliteration">
+        जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
+      </div>
+    ),
+    'transliteration-shahmukhi': (
+      <div className="slide-transliteration transliteration">
+        {' '}
+        جو ماگه ٹھاکر اپنے تے سوای سوای دےوَے ۔۔
+      </div>
+    ),
   };
 
   return (
@@ -157,40 +179,9 @@ const SettingViewer = () => {
               )}
             </div>
           </h1>
-          <h2 className="slide-translation translation" style={{ ...translationStyles }}>
-            <div>
-              <div className="english-translation transtext">
-                Whatever I ask for from my Lord and Master, he gives that to me.
-              </div>
-              <div className="spanish-translation transtext">
-                Lo que sea que el Esclavo del Señor, Nanak recita con sus labios,{' '}
-              </div>
-              <div className="hindi-translation transtext">
-                हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
-              </div>
-            </div>
-          </h2>
-          <h2 className="slide-teeka teeka" style={{ ...teekaStyles }}>
-            <div>
-              hy BweI! pRBU dy dws Awpxy pRBU pwsoN jo kuJ mMgdy hn auh auhI kuJ auhnW ƒ dyNdw hY [
-            </div>
-          </h2>
-          <h2
-            className="slide-transliteration transliteration"
-            style={{ ...transliterationStyles }}
-          >
-            <div>
-              <div className="english-transliteration translittext">
-                jo maageh Thaakur apune te soiee soiee dhevai ||
-              </div>
-              <div className="shahmukhi-transliteration translittext">
-                جو ماگه ٹھاکر اپنے تے سوای سوای دےوَے ۔۔
-              </div>
-              <div className="devanagari-transliteration translittext">
-                जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
-              </div>
-            </div>
-          </h2>
+          <h2 style={{ ...getContentStyles(1) }}>{multilingual[content1]}</h2>
+          <h2 style={{ ...getContentStyles(2) }}>{multilingual[content2]}</h2>
+          <h2 style={{ ...getContentStyles(3) }}>{multilingual[content3]}</h2>
           <h1
             className="slide-next-line slide-gurbani gurbani gurmukhi next-line"
             style={nextLineStyles}

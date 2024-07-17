@@ -40,10 +40,20 @@ export const DhanGuru = ({ isGurmukhi }) => {
     }
     if (typeof e === 'object') {
       addMiscSlide(e.target.value);
-      analytics.trackEvent('display', 'dhanguru-slide', e.target.value);
+      analytics.trackEvent({
+        category: 'display',
+        action: 'dhanguru-slide',
+        label: 'Dhan guru slide',
+        value: e.target.value,
+      });
     } else {
       addMiscSlide(e);
-      analytics.trackEvent('display', 'dhanguru-slide', e);
+      analytics.trackEvent({
+        category: 'display',
+        action: 'dhanguru-slide',
+        label: 'Dhan guru slide',
+        value: e,
+      });
     }
   };
 

@@ -35,13 +35,15 @@
   .addon-overlay,
   .fav-results {
     background-color: $bg-alt;
+
     .sttm-loader {
       border-color: $bg-bright;
       border-top-color: $accent;
     }
   }
 
-  .viewer-controls, .tingle-modal-box__footer {
+  .viewer-controls,
+  .tingle-modal-box__footer {
     background-color: $bg-main;
   }
 
@@ -68,6 +70,7 @@
 
   .settings-wrapper {
     .settings-viewer {
+
       .slide-transliteration,
       .slide-translation,
       .slide-teeka {
@@ -99,11 +102,13 @@
           filter: invert(1);
         }
       }
+
       .misc-active {
         color: $white;
       }
     }
   }
+
   .pane-content {
     background-color: $bg-alt;
   }
@@ -126,6 +131,7 @@
       color: $white;
     }
   }
+
   .control-item:hover {
     background-color: $bg-main;
   }
@@ -138,9 +144,11 @@
   .slide#announcement-slide .announcements {
     color: $white;
   }
+
   .search-footer {
     background: $bg-main;
   }
+
   .search-pane {
     .pane {
       .pane-footer {
@@ -152,7 +160,7 @@
       &-dd-group:hover {
         background-color: $transparent-light-white;
       }
-      
+
       option {
         color: $text-base;
       }
@@ -164,6 +172,7 @@
           border: 1px solid $light-grey;
         }
       }
+
       &-checkbox {
         &:checked {
           + {
@@ -180,26 +189,32 @@
     .clear-pane {
       background-color: $black;
 
-      .quick-tray > i {
+      .quick-tray>i {
         color: $white;
       }
+
       .footer-toggler-inactive {
         background: $tray-bg;
       }
+
       .footer-toggler {
         background-color: $tray-bg;
       }
     }
   }
+
   .shortcut-drawer {
     background: $tray-bg;
   }
+
   .tray-item-icon {
     background: $button-bg;
   }
+
   .tray-item-icon {
     color: $white;
   }
+
   &.shortcut-tray-true .shortcut-toggle {
     background: darken($bg-main, 10);
   }
@@ -255,27 +270,27 @@
       background-color: $highlight-bg !important;
       color: $text-base !important;
 
-      & + i {
+      &+i {
         background-color: $highlight-bg !important;
         color: $text-base !important;
       }
     }
   }
 
-  .switch > label {
+  .switch>label {
     background: $text-dim;
   }
 
-  .switch > label::after {
+  .switch>label::after {
     background: $text-bright;
     border-color: $text-dim;
   }
 
-  .switch input:checked + label {
+  .switch input:checked+label {
     background: $accent;
   }
 
-  .switch input:checked + label::after {
+  .switch input:checked+label::after {
     background: $white;
     border-color: $accent;
   }
@@ -323,11 +338,11 @@
       }
     }
 
-    input:focus + div {
+    input:focus+div {
       background: rgba(255, 255, 255, 0.12);
     }
 
-    > button {
+    >button {
       color: $text-bright;
     }
   }
@@ -335,6 +350,7 @@
   .search-container:focus {
     background: white;
   }
+
   .filters {
     select {
       border: $bg-main;
@@ -359,6 +375,7 @@
     a {
       color: $text-base;
     }
+
     &:hover {
       background-color: $bg-bright;
       cursor: pointer;
@@ -384,9 +401,43 @@
         color: $text-base;
       }
     }
+
     .fav-shabad-container:hover {
       background-color: $bg-bright;
     }
+  }
+
+  .shabad-pane {
+    .pane-options-dropdown {
+      filter: invert(1);
+
+      option {
+        background-color: $bg-main;
+        color: $white;
+      }
+    }
+
+    .live-pane {
+      box-shadow: rgba($transparent-light-white, 0.25) 0px 13px 27px -5px,
+      rgba($transparent-light-white, 0.3) 0px 8px 16px -8px;
+    }
+  }
+
+  .pane-tools {
+    button,
+    select,
+    div > i {
+      color: $text-base;
+
+      &:hover {
+        background-color: $transparent-light-white;
+      }
+    }
+  }
+
+  .pane-info button {
+    color: $text-base;
+    background-color: transparent;
   }
 
   #footer {
@@ -405,8 +456,10 @@
       }
     }
   }
+
   .workspace-bar {
     background-color: $bg-main;
+
     div:hover {
       color: $text-base;
       background-color: $bg-bright;
@@ -416,8 +469,9 @@
   ::-webkit-scrollbar-thumb {
     background-color: $scrollbar;
   }
-  
+
   .verse-block {
+
     .search-li,
     .shabad-li {
       &:hover {
@@ -433,9 +487,29 @@
       }
     }
   }
+
   .sundar-gutka-bani {
     &:hover {
       background-color: $disabled-dark;
+    }
+  }
+
+  .multipane-dropdown {
+    background-color: $bg-main;
+  }
+
+  @each $pane, $color in $multipane-colors {
+    .button-#{$pane} {
+      background-color: rgba($color, 0.6);
+      color: rgba($white, 0.7);
+    }
+    .#{$pane}-btn {
+      background-color: $bg-alt;
+      color: $text-base;
+
+      &:disabled {
+        opacity: 0.5;
+      }
     }
   }
 }

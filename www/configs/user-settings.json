@@ -31,7 +31,8 @@
         "content1-font-size",
         "content2-font-size",
         "content3-font-size",
-        "announcements-font-size"
+        "announcements-font-size",
+        "reset-font-sizes"
       ]
     },
     "visibility": {
@@ -98,6 +99,17 @@
     "announcements-font-size": {
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
+    },
+    "reset-font-sizes": {
+      "title": "RESET_FONT_SIZES",
+      "type": "reset-button",
+      "resetSettings": [
+        "gurbani-font-size",
+        "content1-font-size",
+        "content2-font-size",
+        "content3-font-size",
+        "announcements-font-size"
+      ]
     },
     "content1-visibility": {
       "title": "TRANSLATION_VISIBILITY",
@@ -369,9 +381,13 @@
       "initialValue": false,
       "dontApplyClass": true
     },
-    "isSingleDisplayMode": {
-      "title": "SINGLE_DISPLAY",
-      "initialValue": false
+    "currentWorkspace": {
+      "title": "CURRENT_WORKSPACE",
+      "initialValue": "Presentation"
+    },
+    "defaultPaneId": {
+      "title": "DEFAULT_PANE",
+      "initialValue": 1
     }
   }
 }

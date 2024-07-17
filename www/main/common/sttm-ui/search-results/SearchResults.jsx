@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import anvaad from 'anvaad-js';
+import { useStoreState } from 'easy-peasy';
 
 const remote = require('@electron/remote');
 
@@ -19,6 +20,9 @@ const SearchResults = ({
   writer,
   currentLanguage,
 }) => {
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
+
   const getClassForAng = (baniSource) => {
     if (baniSource === 'G') {
       return 'sggs-color';
@@ -43,6 +47,43 @@ const SearchResults = ({
       return 'ak-border';
     }
     return 'other-border';
+  };
+
+  const shabadPaneButtons = () => {
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      return (
+        <div className="button-container">
+          <button
+            className="button-pane-1"
+            disabled={pane1.locked}
+            onClick={() => {
+              if (!pane1.locked) onClick(shabadId, verseId, verse, 1);
+            }}
+          >
+            {pane1.locked ? <i className="fa-solid fa-lock"></i> : '1'}
+          </button>
+          <button
+            className="button-pane-2"
+            disabled={pane2.locked}
+            onClick={() => {
+              if (!pane2.locked) onClick(shabadId, verseId, verse, 2);
+            }}
+          >
+            {pane2.locked ? <i className="fa-solid fa-lock"></i> : '2'}
+          </button>
+          <button
+            className="button-pane-3"
+            disabled={pane3.locked}
+            onClick={() => {
+              if (!pane3.locked) onClick(shabadId, verseId, verse, 3);
+            }}
+          >
+            {pane3.locked ? <i className="fa-solid fa-lock"></i> : '3'}
+          </button>
+        </div>
+      );
+    }
+    return null;
   };
 
   const isHighlightRequired = (gurbaniVerse, word, wordIndex, searchCharacters) => {
@@ -100,8 +141,11 @@ const SearchResults = ({
   };
 
   return (
-    <li onClick={() => onClick(shabadId, verseId, verse)} className="search-li">
-      <div className={`search-list ${getBorderColorClass(sourceId)}`}>
+    <li className="search-li">
+      <div
+        onClick={() => onClick(shabadId, verseId, verse, defaultPaneId)}
+        className={`search-list ${getBorderColorClass(sourceId)}`}
+      >
         <a className="panktee">
           {!!ang && (
             <span className={`${getClassForAng(sourceId)}`}>{`${i18n.t(
@@ -115,6 +159,7 @@ const SearchResults = ({
           </div>
         </a>
       </div>
+      {shabadPaneButtons()}
     </li>
   );
 };

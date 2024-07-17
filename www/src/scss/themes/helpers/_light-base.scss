@@ -58,6 +58,7 @@
   .addon-overlay,
   .fav-results {
     background-color: $nav-bg;
+
     .sttm-loader {
       border-color: $alt-bg;
       border-top-color: $active-focus;
@@ -66,6 +67,7 @@
 
   .workspace-bar {
     background-color: $dialog-bg;
+
     div:hover {
       background-color: $nav-bg;
     }
@@ -102,35 +104,42 @@
     background-color: $statusbar-bg;
     color: $base-text;
   }
+
   .control-item {
     input[type='range']::before {
       color: $base-text;
     }
   }
+
   .control-item:hover {
     background-color: $statusbar-bg;
   }
+
   .misc-pane {
     .misc-header {
       a {
         color: $grey;
       }
+
       .misc-active {
         color: $dark-grey;
       }
     }
+
     .pane-footer {
       background-color: $alt-bg;
 
       .clear-pane {
         background-color: $not-so-white;
 
-        .quick-tray > i { 
+        .quick-tray>i {
           color: $white;
         }
+
         .footer-toggler-inactive {
           background-color: $tray-bg;
         }
+
         .footer-toggler {
           background-color: $tray-bg;
         }
@@ -147,10 +156,12 @@
       .pane-footer {
         background-color: transparent;
       }
+
       .search-footer {
         background-color: $statusbar-bg;
       }
     }
+
     .select-bani {
       &-dd-group:hover {
         background-color: $transparent-light-black;
@@ -159,7 +170,7 @@
       option {
         color: $base-text;
       }
-    } 
+    }
   }
 
   .viewer-pane {
@@ -171,12 +182,15 @@
   .pane-footer {
     background: $statusbar-bg;
   }
+
   .tray-item-icon {
     background: $button-bg;
   }
+
   .tray-item-icon {
     color: $white;
   }
+
   &.shortcut-tray-true .shortcut-toggle {
     background: $alt-bg;
   }
@@ -215,11 +229,12 @@
   .pane {
     background-color: $nav-bg;
     color: $base-text !important;
+
     a.panktee.current {
       background-color: $current-focus !important;
       color: $base-text !important;
 
-      & + i {
+      &+i {
         background-color: $current-focus !important;
         color: $base-text !important;
       }
@@ -249,9 +264,11 @@
     background-color: $statusbar-bg;
     border-top: 1px solid $lighter-grey;
     color: $base-text;
+
     .input-box {
       color: $black;
     }
+
     input {
       color: $base-text;
 
@@ -267,17 +284,18 @@
       }
     }
 
-    input:focus + div {
+    input:focus+div {
       background: $dialog-bg;
     }
 
-    > button {
+    >button {
       color: $base-text;
     }
   }
 
   .panktee span.gurmukhi {
     color: $base-text;
+
     span.highlight {
       color: $black;
     }
@@ -313,6 +331,7 @@
         color: $base-text;
       }
     }
+
     .fav-shabad-container:hover {
       background-color: $statusbar-bg;
     }
@@ -334,7 +353,9 @@
       }
     }
   }
+
   .verse-block {
+
     .search-li,
     .shabad-li {
       &:hover {
@@ -342,7 +363,7 @@
       }
     }
   }
-  
+
   .shabad-pane-header {
     >i {
       &:hover {
@@ -350,10 +371,64 @@
       }
     }
   }
-  
+
+  .shabad-pane {
+    .pane-options-dropdown {
+      option {
+        color: $base-text;
+      }
+    }
+    
+    .live-pane {
+      box-shadow: rgba($transparent-light-black, 0.25) 0px 13px 27px -5px,
+      rgba($transparent-light-black, 0.3) 0px 8px 16px -8px;
+    }
+  }
+
+
+  .pane-tools {
+
+    button,
+    select,
+    div > i {
+      color: $base-text;
+
+      &:hover {
+        background-color: $transparent-light-black;
+      }
+    }
+  }
+
+  .pane-info button {
+    color: $base-text;
+    background-color: transparent;
+  }
+
   .sundar-gutka-bani {
     &:hover {
       background-color: $disabled-light;
+    }
+  }
+
+  .pane-options {
+    background-color: $nav-bg;
+
+    ul {
+      li {
+        &:hover {
+          background-color: $current-focus;
+        }
+      }
+    }
+  }
+
+  .multipane-dropdown {
+    background-color: $alt-bg;
+  }
+
+  @each $pane, $color in $multipane-colors {
+    .button-#{$pane} {
+      background-color: rgba($color, 0.3);
     }
   }
 }

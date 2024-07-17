@@ -1,4 +1,5 @@
 @import '../utils/variables';
+
 .shabad-pane {
   @include flex($ai-value: start);
   width: 100%;
@@ -7,6 +8,7 @@
   &:hover {
     outline: 0;
   }
+
   .shabad-list {
     height: 100%;
   }
@@ -17,6 +19,8 @@
 
   &-header {
     @include flex($ai-value: center, $jc-value: flex-end);
+    height: 100%;
+    width: 100%;
 
     .toggle-viewer-btn {
       align-items: center;

@@ -4,7 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
-import { useKeys } from '../common/hooks';
+import { useKeys, useSlides } from '../common/hooks';
 
 import {
   Ceremonies,
@@ -20,6 +20,7 @@ import { DEFAULT_OVERLAY } from '../common/constants';
 
 const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
 export const InputContext = createContext();
@@ -29,7 +30,14 @@ const Launchpad = () => {
   const { shortcuts } = useStoreState((state) => state.navigator);
   const { setShortcuts } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { isSingleDisplayMode } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+
+  const {
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
+  } = useSlides();
 
   const ref = useRef();
 
@@ -59,41 +67,25 @@ const Launchpad = () => {
 
   // open waheguru slide shortcut
   const handleCtrlPlus1 = () => {
-    if (!shortcuts.openWaheguruSlide) {
-      setShortcuts({
-        ...shortcuts,
-        openWaheguruSlide: true,
-      });
-    }
+    displayWaheguruSlide({ openedFrom: 'shortcuts' });
   };
 
   // open mool mantra slide shortcut
   const handleCtrlPlus2 = () => {
-    if (!shortcuts.openMoolMantraSlide) {
-      setShortcuts({
-        ...shortcuts,
-        openMoolMantraSlide: true,
-      });
-    }
+    displayMoolMantraSlide({ openedFrom: 'shortcuts' });
   };
 
   // open blank slide shortcut
   const handleCtrlPlus3 = () => {
-    if (!shortcuts.openBlankViewer) {
-      setShortcuts({
-        ...shortcuts,
-        openBlankViewer: true,
-      });
-    }
+    displayBlankViewer({ openedFrom: 'shortcuts' });
   };
 
   // open anand sahib bhog slide shortcut
   const handleCtrlPlus4 = () => {
-    if (!shortcuts.openAnandSahibBhog) {
-      setShortcuts({
-        ...shortcuts,
-        openAnandSahibBhog: true,
-      });
+    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+      displayAnandSahibBhog({ openedFrom: 'shortcuts', paneId: defaultPaneId });
+    } else {
+      displayAnandSahibBhog({ openedFrom: 'shortcuts' });
     }
   };
 
@@ -194,6 +186,7 @@ const Launchpad = () => {
   const isSettingsOverlay = overlayScreen === 'settings';
   const isAuthDialog = overlayScreen === 'auth-dialog';
   const isAnnouncement = overlayScreen === 'announcement';
+  const isSingleDisplayMode = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
 
   return (
     <>

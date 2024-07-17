@@ -16,6 +16,8 @@
   "savedCrossPlatformId": null,
   "historyOrder": "newest",
 
+  "lineNumber": null,
+
 
   "isMiscSlide": false,
   "miscSlideText": "",
@@ -45,5 +47,37 @@
   "isDontSaveHistory": false,
   "favShabad": [],
   "searchVerse": "",
-  "currentMiscPanel": "History"
+  "currentMiscPanel": "History",
+
+  "activePaneId": null,
+
+  "pane1": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": "",
+    "versesRead": [],
+    "homeVerse": false,
+    "content":"",
+    "baniType": ""
+  },
+  "pane2": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": "",
+    "versesRead": [],
+    "homeVerse": false,
+    "content":"",
+    "baniType": ""
+  },
+  "pane3": {
+    "locked": false,
+    "activeShabad": null,
+    "activeVerse": "",
+    "versesRead": [],
+    "homeVerse": false,
+    "content":"",
+    "baniType": ""
+  },
+
+  "disabledContent": []
 }

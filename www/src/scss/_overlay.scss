@@ -615,6 +615,25 @@ input[type='color'] {
         width: 30px;
       }
 
+      .text-icon-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+
+        .text-icon {
+          background-color: #e3e3e3;
+          color: #222;
+          padding: 8px;
+          border: 1px solid #222;
+          width: 30px;
+
+          &.active {
+            background-color: #222;
+            color: #e3e3e3;
+          }
+        }
+      }
+
       .size-icon-container {
         display: flex;
         flex-wrap: wrap;

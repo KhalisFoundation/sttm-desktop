@@ -45,7 +45,7 @@ $tag-popular-color: #ce744e;
 
 @import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
-  'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad',
+  'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad', 'navigator/shabad/multipane',
   'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
   'navigator/search/gurmukhi-keyboard';
 
@@ -155,7 +155,7 @@ button {
   bottom: 0;
   height: 100vh;
   left: 60px;
-  max-height: 750px;
+  max-height: 780px;
   max-width: 850px;
   overflow: auto;
   position: fixed;
@@ -606,7 +606,7 @@ button {
 
         &.instructions-btn {
           align-items: center;
-          background-color: #973737;
+          background-color: $rust-red;
           color: white;
           display: flex;
           margin: auto;

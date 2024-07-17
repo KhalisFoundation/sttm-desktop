@@ -1,4 +1,9 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
+import updateMultipane from '../utils/update-multipane';
+
+const remote = require('@electron/remote');
+
+const { i18n } = remote.require('./app');
 
 export const useNewShabad = () => {
   const {
@@ -13,6 +18,8 @@ export const useNewShabad = () => {
     searchVerse,
   } = useStoreState((state) => state.navigator);
 
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+
   const {
     setActiveShabadId,
     setInitialVerseId,
@@ -23,10 +30,13 @@ export const useNewShabad = () => {
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
     setSearchVerse,
-  } = useStoreActions((state) => state.navigator);
+  } = useStoreActions((actions) => actions.navigator);
 
-  return (newSelectedShabad, newSelectedVerse, newSearchVerse) => {
-    // Push verseId of active Verse to versesRead Array when shabad is changed
+  const updatePane = updateMultipane();
+
+  return (newSelectedShabad, newSelectedVerse, newSearchVerse, multiPaneId = false) => {
+    updatePane('shabad', newSelectedShabad, newSelectedVerse, multiPaneId);
+
     if (singleDisplayActiveTab !== 'shabad') {
       setSingleDisplayActiveTab('shabad');
     }
@@ -45,7 +55,20 @@ export const useNewShabad = () => {
     }
 
     if (activeShabadId !== newSelectedShabad) {
-      setActiveShabadId(newSelectedShabad);
+      if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
+        setActiveShabadId(newSelectedShabad);
+        if (window.socket !== undefined && window.socket !== null) {
+          window.socket.emit('data', {
+            type: 'shabad',
+            host: 'sttm-desktop',
+            id: newSelectedShabad,
+            shabadid: newSelectedShabad, // @deprecated
+            highlight: newSelectedVerse,
+            homeId: newSelectedVerse,
+            verseChange: false,
+          });
+        }
+      }
 
       // initialVerseId is the verse which is stored in history
       // It is the verse we searched for.
@@ -60,17 +83,6 @@ export const useNewShabad = () => {
 
     if (newSelectedVerse && activeVerseId !== newSelectedVerse) {
       setActiveVerseId(newSelectedVerse);
-    }
-    if (window.socket !== undefined && window.socket !== null) {
-      window.socket.emit('data', {
-        type: 'shabad',
-        host: 'sttm-desktop',
-        id: newSelectedShabad,
-        shabadid: newSelectedShabad, // @deprecated
-        highlight: newSelectedVerse,
-        homeId: newSelectedVerse,
-        verseChange: false,
-      });
     }
   };
 };

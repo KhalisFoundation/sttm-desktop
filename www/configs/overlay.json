@@ -4,7 +4,7 @@
       "subtitles": {
         "title": "SUBTITLES",
         "type": "title",
-        "subcategories": ["gurbani-options", "text-options"]
+        "subcategories": ["gurbani-options", "text-options", "text-format-options"]
       },
       "gurbani-options": {
         "title": "GURBANI",
@@ -15,6 +15,11 @@
         "title": "TEXT",
         "type": "dropdown",
         "settings": ["text-color", "text-font", "text-size"]
+      },
+      "text-format-options": {
+        "title": "TEXT_FORMAT",
+        "type": "icon-toggle",
+        "settings": ["text-format"]
       },
       "background": {
         "title": "BACKGROUND",
@@ -128,6 +133,11 @@
         "min": 1,
         "step": 0.25,
         "disableOnChange": ["fit-text-switch"]
+      },
+      "text-format": {
+        "title": "",
+        "type": "text-format-icon",
+        "initialValue": { "bold": false, "italic": false }
       },
       "bg-color": {
         "title": "",

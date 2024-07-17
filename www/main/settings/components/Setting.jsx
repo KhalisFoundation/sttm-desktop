@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
+import { settings } from '../../../configs/user-settings.json';
 
 const remote = require('@electron/remote');
 
@@ -14,6 +15,8 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
   const userSettings = useStoreState((state) => state.userSettings);
   const userSettingsActions = useStoreActions((state) => state.userSettings);
+
+  const { disabledContent } = useStoreState((state) => state.navigator);
 
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
@@ -54,6 +57,18 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       return i18n.t(`QUICK_TOOLS.TRANSLITERATION`);
     }
     return '';
+  };
+
+  const handleResetFontSizes = () => {
+    const { resetSettings } = settingObj;
+    if (resetSettings) {
+      resetSettings.forEach((settingKey) => {
+        const value = settings[settingKey].initialValue;
+        if (userSettings[convertToCamelCase(settingKey)] !== value) {
+          userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value);
+        }
+      });
+    }
   };
 
   switch (type) {
@@ -114,13 +129,13 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
             style={{ marginRight: '8px' }}
           >
             {options.map((optionObj, optionIndex) => (
-              <optgroup
-                key={`option-${optionIndex}`}
-                label={optionObj.label}
-                style={{ 'text-transform': 'capitalize' }}
-              >
+              <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
                 {optionObj.options.map((optionName, nameIndex) => (
-                  <option key={`option-name-${nameIndex}`} value={optionName.id}>
+                  <option
+                    key={`option-name-${nameIndex}`}
+                    value={optionName.id}
+                    disabled={disabledContent.includes(optionName.id)}
+                  >
                     {optionName.text}
                   </option>
                 ))}
@@ -129,6 +144,14 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
           </select>
           <span>{dropdownLabel(userSettings[stateVar])}</span>
         </>
+      );
+      break;
+    case 'reset-button':
+      settingDOM = (
+        <button onClick={handleResetFontSizes} className="icon-reset">
+          <img src="assets/img/icons/reset-transparent.svg" alt="Reset Font Sizes to Default" />
+          <span>{i18n.t(`SETTINGS.RESET_TO_DEFAULT`)}</span>
+        </button>
       );
       break;
     default:

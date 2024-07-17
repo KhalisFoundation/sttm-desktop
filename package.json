@@ -1,10 +1,11 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.2.0",
+  "version": "9.2.2",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
+    "prebuild": "cross-env node packaging/update-packagejson.js",
     "precommit": "npm test",
     "test": "run-p test:*",
     "test:lint": "run-p test:lint:*",
@@ -13,12 +14,14 @@
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
-    "pack:mac": "npm run build && electron-builder --mac",
+    "pack:mac": "npm run build && electron-builder --mac --x64",
+    "pack:macArm": "npm run build && electron-builder --mac --arm64",
     "pack:win": "npm run build && electron-builder --win --x64",
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
-    "dist:mac": "npm run build && electron-builder --mac --publish always",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --publish always",
+    "dist:macArm": "npm run build && electron-builder --mac --arm64 --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
     "build-css": "run-p build-css:*",
@@ -43,11 +46,11 @@
     "@babel/plugin-transform-runtime": "^7.22.15",
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
-    "@electron/notarize": "^2.1.0",
+    "@electron/notarize": "^2.3.0",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
     "electron": "^26.2.4",
-    "electron-builder": "^24.6.4",
+    "electron-builder": "^24.13.3",
     "electron-publisher-s3": "^20.17.2",
     "electron-react-devtools": "^0.5.3",
     "electron-rebuild": "^3.2.8",
@@ -139,7 +142,6 @@
       ]
     },
     "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
-    "afterSign": "packaging/afterSignHook.js",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -177,7 +179,10 @@
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "notarize": {
+        "teamId": ""
+      }
     },
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",

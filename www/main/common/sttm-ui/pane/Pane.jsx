@@ -4,11 +4,11 @@ import PaneContent from './PaneContent';
 import PaneFooter from './PaneFooter';
 import PaneHeader from './PaneHeader';
 
-const Pane = ({ content, header, footer, className }) => (
+const Pane = ({ content, header, footer, className, data }) => (
   <div className={`pane ${className}`.trim()}>
-    {header ? <PaneHeader Header={header} /> : ''}
-    {content ? <PaneContent Content={content} /> : ''}
-    {footer ? <PaneFooter Footer={footer} /> : ''}
+    {header ? <PaneHeader Header={header} data={data} /> : ''}
+    {content ? <PaneContent Content={content} data={data} /> : ''}
+    {footer ? <PaneFooter Footer={footer} data={data} /> : ''}
   </div>
 );
 
@@ -17,6 +17,7 @@ Pane.propTypes = {
   header: PropTypes.any,
   footer: PropTypes.any,
   className: PropTypes.string,
+  data: PropTypes.any,
 };
 
 Pane.defaultProps = {
@@ -24,6 +25,7 @@ Pane.defaultProps = {
   header: null,
   footer: null,
   className: '',
+  data: {},
 };
 
 export default Pane;
