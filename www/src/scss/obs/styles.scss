@@ -165,16 +165,12 @@ body {
   }
 
   .logo-wrapper {
-    background: transparent;
     display: block;
-    filter: none;
     height: 100px;
     position: relative;
     right: 0;
     width: 100%;
-    .sttm-logo {
-      display: none;
-    }
+
     .sttm-logo-white {
       display: block;
       margin: auto;
@@ -226,17 +222,10 @@ body {
   }
 
   .logo-wrapper {
-    background: transparent;
-    border-radius: 0;
     bottom: 0;
-    filter: none;
     height: 100%;
     position: absolute;
     right: 0;
-
-    .sttm-logo {
-      display: none;
-    }
 
     .sttm-logo-white {
       display: block;
@@ -347,23 +336,15 @@ body {
 }
 
 .logo-wrapper {
-  align-items: center;
-  background: #fff;
-  border-radius: 2px;
   display: inline-flex;
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2));
-  justify-content: center;
+  filter: drop-shadow(1px 1px rgba(0, 0, 0, 1));
   padding: 2vh 2vw;
   position: fixed;
   right: 2vh;
 
-  .sttm-logo,
   .sttm-logo-white {
+    display: block;
     width: 12vw;
-  }
-
-  .sttm-logo-white {
-    display: none;
   }
 }
 
