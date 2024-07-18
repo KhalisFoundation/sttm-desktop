@@ -63,7 +63,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -300,7 +300,7 @@ function checkForExternalDisplay() {
     viewerWindowPos.y = externalDisplay.bounds.y + 50;
     viewerWindowPos.w = externalDisplay.size.width;
     viewerWindowPos.h = externalDisplay.size.height;
-    return true;
+    return false;
   }
   return false;
 }
@@ -635,6 +635,12 @@ app.on('ready', () => {
   screens.on('display-added', () => {
     if (!viewerWindow) {
       createViewer();
+    }
+  });
+
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    if (mainWindow) {
+      mainWindow.webContents.openDevTools();
     }
   });
 });
