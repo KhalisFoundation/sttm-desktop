@@ -300,7 +300,7 @@ function checkForExternalDisplay() {
     viewerWindowPos.y = externalDisplay.bounds.y + 50;
     viewerWindowPos.w = externalDisplay.size.width;
     viewerWindowPos.h = externalDisplay.size.height;
-    return false;
+    return true;
   }
   return false;
 }
