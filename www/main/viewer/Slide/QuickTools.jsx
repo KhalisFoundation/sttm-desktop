@@ -84,6 +84,8 @@ const QuickTools = ({ isMiscSlide }) => {
     let payload;
     let actionName;
     let stateName;
+    const maxFontSize = 30;
+    const minFontSize = 1;
 
     if (index > 0) {
       stateName = `content${index}${action}`;
@@ -93,13 +95,21 @@ const QuickTools = ({ isMiscSlide }) => {
       actionName = `set${convertToCamelCase(`${toolname}-${action}`, true)}`;
     }
 
+    const currentFontSize = parseInt(userSettings[stateName], 10);
+
     if (name === 'visibility') {
       payload = !userSettings[stateName];
     } else if (name === 'minus') {
-      payload = parseInt(userSettings[stateName], 10) - 1;
+      payload = currentFontSize > minFontSize ? currentFontSize - 1 : minFontSize;
     } else if (name === 'plus') {
-      payload = parseInt(userSettings[stateName], 10) + 1;
+      payload = currentFontSize < maxFontSize ? currentFontSize + 1 : maxFontSize;
     }
+
+    // If payload does not change, return null to prevent unnecessary state updates
+    if (payload === userSettings[stateName]) {
+      return null;
+    }
+
     return {
       actionName,
       payload,
@@ -126,10 +136,10 @@ const QuickTools = ({ isMiscSlide }) => {
         <i
           className={getIconClassName(name, index, actionName)}
           onClick={() => {
-            global.platform.ipc.send(
-              'update-global-setting',
-              JSON.stringify(createGlobalPlatformObj(name, toolName, index, actionName)),
-            );
+            const globalObj = createGlobalPlatformObj(name, toolName, index, actionName);
+            if (globalObj) {
+              global.platform.ipc.send('update-global-setting', JSON.stringify(globalObj));
+            }
           }}
         />
       </div>
