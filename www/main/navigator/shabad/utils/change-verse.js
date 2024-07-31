@@ -165,11 +165,18 @@ const skipMangla = (shabadVerses, index) => {
 
 export const intelligentNextVerse = (
   filteredItems,
-  { activeVerseId, previousVerseIndex, setPreviousIndex, atHome, setHome, homeVerse },
+  {
+    activeVerseId,
+    previousVerseIndex,
+    setPreviousIndex,
+    atHome,
+    setHome,
+    homeVerse,
+    intelligentSpacebar,
+  },
 ) => {
-  if (homeVerse) {
-    const currentVerseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
-    let nextVerseIndex;
+  const handleIntelligentSpacebar = (nextIndex, currentVerseIndex) => {
+    let nextVerseIndex = nextIndex;
 
     if (atHome) {
       if (previousVerseIndex !== null) {
@@ -202,6 +209,17 @@ export const intelligentNextVerse = (
         setPreviousIndex(nextVerseIndex);
       }
     }
+    return nextVerseIndex;
+  }
+
+  if (homeVerse) {
+    const currentVerseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
+    let nextVerseIndex = homeVerse;
+
+    if (intelligentSpacebar) {
+      nextVerseIndex = handleIntelligentSpacebar(nextVerseIndex, currentVerseIndex);
+    }
+
     const nextVerseId = filteredItems[nextVerseIndex].verseId;
     return { verseId: nextVerseId, verseIndex: nextVerseIndex };
   }
