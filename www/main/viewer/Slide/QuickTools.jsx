@@ -84,7 +84,7 @@ const QuickTools = ({ isMiscSlide }) => {
     let payload;
     let actionName;
     let stateName;
-    const maxFontSize = 30;
+    const maxFontSize = 20;
     const minFontSize = 1;
 
     if (index > 0) {
