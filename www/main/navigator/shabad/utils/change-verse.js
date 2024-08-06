@@ -210,7 +210,7 @@ export const intelligentNextVerse = (
       }
     }
     return nextVerseIndex;
-  }
+  };
 
   if (homeVerse) {
     const currentVerseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
