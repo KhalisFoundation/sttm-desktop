@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+const { v4: uuidv4 } = require('uuid');
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
@@ -69,6 +70,38 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         }
       });
     }
+
+    const firebase_app_id = `1:693307351279:web:1837dbcd07b3ce7da63b1a`;
+    const api_secret = `GIupBo9tQwW5z02u8zFXDg`;
+    let app_instance_id = uuidv4();
+
+    fetch(`https://www.google-analytics.com/mp/collect?firebase_app_id=${firebase_app_id}&api_secret=${api_secret}`, {
+      method: "POST",
+      body: JSON.stringify({
+        app_instance_id: app_instance_id,
+        events: [{
+          name: 'tutorial_begin',
+          params: {
+            "campaign": "Analytics_test",
+            "source": "sttm",
+
+          },
+        }]
+      })
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        console.log('Event sent successfully');
+      })
+      .catch(error => {
+        console.error('Error sending event:', error, error.response || error.message);
+      });
+      
+    console.log('Button click event logged to Firebase');
+
+
   };
 
   switch (type) {

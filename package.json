@@ -90,6 +90,7 @@
     "electron-updater": "^6.1.4",
     "express": "^4.18.2",
     "extract-zip": "^2.0.1",
+    "firebase": "^10.13.1",
     "get-json": "^1.0.1",
     "html-react-parser": "^4.2.2",
     "http-shutdown": "^1.2.2",
