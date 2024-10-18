@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
+/* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-const { v4: uuidv4 } = require('uuid');
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
@@ -10,7 +11,10 @@ import { settings } from '../../../configs/user-settings.json';
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
-const analytics = remote.getGlobal('analytics');
+// const analytics = remote.getGlobal('analytics');
+
+const { getInstallations, getId } = require('firebase/installations');
+const analytics = require('../../../../firebase');
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
@@ -28,21 +32,21 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         userSettingsActions[`set${convertToCamelCase(disableSetting, true)}`](false);
       }
     }
-    analytics.trackEvent({
-      category: 'setting',
-      action: userSettingsActions[stateFunction],
-      label: value,
-    });
+    // analytics.trackEvent({
+    //   category: 'setting',
+    //   action: userSettingsActions[stateFunction],
+    //   label: value,
+    // });
   };
 
   const handleCheckboxChange = (event) => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
-    analytics.trackEvent({
-      category: 'setting',
-      action: userSettingsActions[stateFunction],
-      label: value,
-    });
+    // analytics.trackEvent({
+    //   category: 'setting',
+    //   action: userSettingsActions[stateFunction],
+    //   label: value,
+    // });
   };
 
   let settingDOM;
@@ -60,48 +64,50 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     return '';
   };
 
-  const handleResetFontSizes = () => {
-    const { resetSettings } = settingObj;
-    if (resetSettings) {
-      resetSettings.forEach((settingKey) => {
-        const value = settings[settingKey].initialValue;
-        if (userSettings[convertToCamelCase(settingKey)] !== value) {
-          userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value);
-        }
-      });
-    }
+  const handleResetFontSizes = async () => {
+    try {
+      const { resetSettings } = settingObj;
+      if (resetSettings) {
+        resetSettings.forEach((settingKey) => {
+          const value = settings[settingKey].initialValue;
+          if (userSettings[convertToCamelCase(settingKey)] !== value) {
+            userSettingsActions[`set${convertToCamelCase(settingKey, true)}`](value);
+          }
+        });
+      }
 
-    const firebase_app_id = `1:693307351279:web:1837dbcd07b3ce7da63b1a`;
-    const api_secret = `GIupBo9tQwW5z02u8zFXDg`;
-    let app_instance_id = uuidv4();
+      const firebase_app_id = `1:693307351279:web:1837dbcd07b3ce7da63b1a`;
+      const api_secret = `GIupBo9tQwW5z02u8zFXDg`;
+      const installations = getInstallations();
+      const app_instance_id = await getId(installations);
+      console.log(app_instance_id);
 
-    fetch(`https://www.google-analytics.com/mp/collect?firebase_app_id=${firebase_app_id}&api_secret=${api_secret}`, {
-      method: "POST",
-      body: JSON.stringify({
-        app_instance_id: app_instance_id,
-        events: [{
-          name: 'tutorial_begin',
-          params: {
-            "campaign": "Analytics_test",
-            "source": "sttm",
-
-          },
-        }]
-      })
-    })
-      .then(response => {
+      await fetch(
+        `https://www.google-analytics.com/mp/collect?firebase_app_id=${firebase_app_id}&api_secret=${api_secret}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            app_instance_id: app_instance_id,
+            events: [
+              {
+                name: 'tutorial_begin',
+                params: {
+                  campaign: 'Analytics_test',
+                  source: 'sttm',
+                },
+              },
+            ],
+          }),
+        },
+      ).then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         console.log('Event sent successfully');
-      })
-      .catch(error => {
-        console.error('Error sending event:', error, error.response || error.message);
       });
-      
-    console.log('Button click event logged to Firebase');
-
-
+    } catch (error) {
+      console.error('Error in handleResetFontSizes:', error);
+    }
   };
 
   switch (type) {
