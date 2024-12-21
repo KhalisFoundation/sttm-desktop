@@ -30,6 +30,7 @@ const ViewerState = createStore({
   },
   viewerSettings: {
     quickToolsOpen: false,
+    paddingToolsOpen: false,
     slideOrder: ['translation', 'teeka', 'transliteration'],
     setSlideOrder: action((state, slideOrder) => ({
       ...state,
@@ -37,7 +38,14 @@ const ViewerState = createStore({
     })),
     setQuickToolsOpen: action((state, payload) => {
       const newState = state;
+      newState.paddingToolsOpen = false; // explictely making sure we are closing the paddingTools when setting the quick tools.
       newState.quickToolsOpen = payload;
+      return newState;
+    }),
+    setPaddingToolsOpen: action((state, payload) => {
+      const newState = state;
+      newState.quickToolsOpen = false; // explictely making sure we are closing the quickTools when setting the padding tools.
+      newState.paddingToolsOpen = payload;
       return newState;
     }),
   },
