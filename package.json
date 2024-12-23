@@ -20,7 +20,7 @@
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
-    "dist:mac": "npm run build && electron-builder --mac --x64 --publish always",
+    "dist:mac": "npm run build && electron-builder --mac --arm64 --x64 --publish always",
     "dist:macArm": "npm run build && electron-builder --mac --arm64 --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
