@@ -18,4 +18,4 @@ before_install:
   - ./packaging/add-osx-cert.sh;
 script:
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then npm test; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && travis_wait 30 ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm test && travis_wait 30 ./packaging/release --branch=$TRAVIS_BRANCH --dist=mac --platform=mac --token=$GH_TOKEN'
