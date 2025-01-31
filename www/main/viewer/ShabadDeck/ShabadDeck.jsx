@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -10,6 +11,7 @@ import {
   loadShabad,
 } from '../../navigator/utils';
 import ViewerIcon from '../icons/ViewerIcon';
+import PaddingTools from '../Slide/PaddingTools';
 
 const os = require('os');
 const remote = require('@electron/remote');
@@ -181,11 +183,28 @@ function ShabadDeck() {
       }
     }
   }, [isMiscSlide]);
+
+  const data = {
+    activeShabadId,
+    activeVerseId,
+    isMiscSlide,
+    miscSlideText,
+    sundarGutkaBaniId,
+    isSundarGutkaBani,
+    ceremonyId,
+    isCeremonyBani,
+    minimizedBySingleDisplay,
+  }
+  useEffect(() => {
+    ipcRenderer.send('some-random-test', data);
+  });
+   
   return (
     <>
       {themeBg.type === 'video' && (
         <video className="video_preview" src={themeBg.url} autoPlay muted loop />
       )}
+      <h1>SHABAD DECK</h1>
       <div
         className={classNames(
           'shabad-deck',
@@ -198,7 +217,8 @@ function ShabadDeck() {
         )}
         style={applyTheme()}
       >
-        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
+        {/* {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />} */}
+        {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
         {activeVerse.length ? (
           activeVerse.map((activeVerseObj, index) => (
             <Slide
