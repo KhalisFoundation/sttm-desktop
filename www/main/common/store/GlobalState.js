@@ -55,6 +55,7 @@ const GlobalState = createStore({
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
     quickTools: false,
+    paddingTools: false,
     slideOrder: ['translation', 'teeka', 'transliteration'],
     setSlideOrder: action((state, payload) => {
       const oldValue = state.slideOrder;
@@ -97,6 +98,7 @@ const GlobalState = createStore({
 
 global.platform.ipc.on('update-global-setting', (event, setting) => {
   const { settingType, actionName, payload } = JSON.parse(setting);
+  console.log(settingType, action, payload, event, 'GLOBAL.PLATFORM.ipc')
   GlobalState.getActions()[settingType][actionName](payload);
 });
 

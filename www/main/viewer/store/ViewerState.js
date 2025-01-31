@@ -29,6 +29,12 @@ const ViewerState = createStore({
     ...createSettingsActions('navigator'),
   },
   viewerSettings: {
+    containerPadding: {
+      left: 48,
+      top: 20,
+      right: 0,
+      bottom: 0
+    },
     quickToolsOpen: false,
     paddingToolsOpen: false,
     slideOrder: ['translation', 'teeka', 'transliteration'],
@@ -48,11 +54,16 @@ const ViewerState = createStore({
       newState.paddingToolsOpen = payload;
       return newState;
     }),
+    setPadding: action((state, payload) => {
+      const newState = state;
+      newState.containerPadding[payload.type] = payload.value;
+      return newState;
+    })
   },
 });
 
 // Whenever a setting is changed in GlobalState, call the respective action here as well.
-global.platform.ipc.on('update-viewer-setting', (event, setting) => {
+global.platform.ipc.on('update-viewer-setting', (_event, setting) => {
   const { actionName, payload, settingType } = JSON.parse(setting);
   ViewerState.getActions()[settingType][actionName](payload);
 });
