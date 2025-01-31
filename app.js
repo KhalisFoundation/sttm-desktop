@@ -5,7 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const op = require('portfinder');
+const portfinder = require('portfinder');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
@@ -464,7 +464,7 @@ const emptyOverlay = () => {
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
-  op.getPort(
+  portfinder.getPort(
     {
       // Re: http://www.sikhiwiki.org/index.php/Gurgadi
       ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
@@ -663,6 +663,10 @@ ipcMain.on('enable-wc-webview', (event, data) => {
   }
 });
 
+ipcMain.on('some-random-test', (event, data) => {
+  console.log(data,'SOME RANDOM TEST FROM THE SHABAD DECK');
+})
+
 ipcMain.on('cast-session-active', () => {
   mainWindow.webContents.send('cast-session-active');
 });
@@ -840,6 +844,7 @@ ipcMain.on('update-viewer-setting', (event, setting) => {
 });
 
 ipcMain.on('update-global-setting', (event, setting) => {
+  console.log('EVENT <<<<<',event, setting, "SETTING>>>>>")
   mainWindow.webContents.send('update-global-setting', setting);
 });
 
