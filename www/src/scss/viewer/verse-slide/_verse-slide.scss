@@ -92,25 +92,36 @@
 
 // Quick Tools Styles
 
-.slide-quicktools {
-  font-size: 12px;
-  font-weight: bold;
-  height: 99%;
+.slide-tools {
   position: fixed;
   width: 18%;
-  max-width: 150px;
   z-index: 20;
+}
+
+.slide-quicktools, .slide-paddingtools {
+  font-size: 12px;
+  font-weight: bold;
+  position: relative;
+  height: 99%;
+  max-width: 150px;
 
   .single-display-mode & {
     height: calc(100% - 56px);
   }
 
   &.hide-quicktools {
-    left: -18%;
+    left: -100%;
   }
 }
 
-.quicktool {
+.slide-paddingtools {
+  
+  &.hide-tool {
+    left: -100%;
+  }
+}
+
+.quicktool, .paddingtool {
   &-header {
     background-color: #0000001a;
     display: flex;
@@ -156,6 +167,20 @@
     &-hidden {
       display: none;
     }
+  }
+}
+
+.paddingtool {
+  &-icons {
+    align-items: center;
+  }
+
+  &-icon-value {
+    margin: 0;
+  }
+
+  &-icon-title {
+    margin-bottom: 8px;
   }
 }
 

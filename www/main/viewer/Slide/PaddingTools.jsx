@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useStoreState } from 'easy-peasy';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 import { convertToCamelCase } from '../../common/utils';
 
  const icons = [{
@@ -15,7 +15,20 @@ const PADDING_VARIANTS = ['top', 'right', 'bottom', 'right'];
 
 const PaddingTools = (props) => {
     const viewerSettingsStore = useStoreState((state) => state.viewerSettings);
+    const { setPaddingToolsOpen } = useStoreActions(state => state.viewerSettings);
     console.log(viewerSettingsStore,'VIEWER SETTINGS STORE>')
+
+    const createPaddingIcon = ({name, variant}) => {
+      return (
+        <i 
+          className={name === 'minus' ? 'fa fa-minus-circle' : 'fa fa-plus-circle'}
+          onClick={() => {
+            const viewerSettingObj = createViewerSettingObject({name, variant}); 
+            global.platform.ipc.send('update-global-setting', JSON.stringify(viewerSettingObj));
+          }}
+        />
+      )
+    }
     
     const createViewerSettingObject = ({name, variant}) => {
       const payload = {type: variant};
@@ -35,37 +48,28 @@ const PaddingTools = (props) => {
     }
 
     const createPaddingChanger = (variant) => {
-      const title = `Padding ${convertToCamelCase(variant)} - ${viewerSettingsStore['containerPadding'][variant]}`;
-      const iconsMarkup = icons.map(icon => {
-        <div key={name} className="quicktool-icons">
-          <i 
-            className={icon.name === 'minus' ? 'fa fa-minus-circle' : 'fa fa-plus-circle'}
-            onClick={() => {
-              const viewerSettingObj = createViewerSettingObject({name, actionName, variant}); 
-              global.platform.ipc.send('update-global-setting', JSON.stringify(viewerSettingObj));
-            }}
-          />
-        </div>
-      })
+      const iconValue = viewerSettingsStore['containerPadding'][variant];
 
       return (
-        <div className='quicktool'>
-          <p>{title}</p>
-          {iconsMarkup}
+        <div className='paddingtool'>
+          <h3 className="paddingtool-title">{`padding${convertToCamelCase(variant)}`}</h3>
+          <div className="paddingtool-icons">
+            {createPaddingIcon({name: icons[0].name, variant})}
+            <p className='paddingtool-icon-value'>{iconValue}</p>
+            {createPaddingIcon({name: icons[1].name, variant})}
+          </div>
         </div>
       )
     }
 
-    const [paddingToolsOpen, setPaddingToolsOpen] = useState(false);
-
     return (
-        <div className={`slide-quicktools ${!userSettings.quickTools ? 'hide-quicktools' : ''}`.trim()}>
-            <div className="quicktool-header" onClick={() => setPaddingToolsOpen(!paddingToolsOpen)}>
+        <div className={`slide-paddingtools`}>
+            <div className="quicktool-header" onClick={() => setPaddingToolsOpen(!viewerSettingsStore.paddingToolsOpen)}>
                 Padding Tools
-                <i className={`fa fa-caret-${quickToolsOpen ? 'up' : 'down'}`}></i>
+                <i className={`fa fa-caret-${viewerSettingsStore.paddingToolsOpen ? 'up' : 'down'}`}></i>
             </div>
-            {paddingToolsOpen && (
-                <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
+            {viewerSettingsStore.paddingToolsOpen && (
+                <div className={`paddingtool-body paddingtool-${props.isMiscSlide ? 'announcement' : 'gurbani'}`}>
                 {PADDING_VARIANTS.map(variant => createPaddingChanger(variant))}
                 </div>
             )}

@@ -337,7 +337,7 @@ function createViewer(ipcData) {
     remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
-        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
+        '.slide-tools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
