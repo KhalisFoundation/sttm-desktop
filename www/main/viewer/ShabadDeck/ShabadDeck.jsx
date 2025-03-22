@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreState } from 'easy-peasy';
-import { ipcRenderer } from 'electron';
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -185,21 +184,6 @@ function ShabadDeck() {
     }
   }, [isMiscSlide]);
 
-  const data = {
-    activeShabadId,
-    activeVerseId,
-    isMiscSlide,
-    miscSlideText,
-    sundarGutkaBaniId,
-    isSundarGutkaBani,
-    ceremonyId,
-    isCeremonyBani,
-    minimizedBySingleDisplay,
-  };
-  useEffect(() => {
-    ipcRenderer.send('some-random-test', data);
-  });
-  console.log('style:', containerPadding, '>>>>>>');
   return (
     <>
       {themeBg.type === 'video' && (
@@ -215,7 +199,7 @@ function ShabadDeck() {
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
         )}
-        style={{ ...applyTheme() }}
+        style={applyTheme()}
       >
         <div className="slide-tools">
           {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}

@@ -129,9 +129,8 @@ const GlobalState = createStore({
   ),
 });
 
-global.platform.ipc.on('update-global-setting', (event, setting) => {
+global.platform.ipc.on('update-global-setting', (_event, setting) => {
   const { settingType, actionName, payload } = JSON.parse(setting);
-  console.log(GlobalState.getActions(), settingType, actionName, payload, 'GLOBAL.PLATFORM.ipc');
   GlobalState.getActions()[settingType][actionName](payload);
 });
 

@@ -65,7 +65,6 @@ const ViewerState = createStore({
 // Whenever a setting is changed in GlobalState, call the respective action here as well.
 global.platform.ipc.on('update-viewer-setting', (_event, setting) => {
   const { actionName, payload, settingType } = JSON.parse(setting);
-  console.log(payload, 'PAYLOAD....');
   ViewerState.getActions()[settingType][actionName](payload);
 });
 
