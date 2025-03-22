@@ -33,7 +33,7 @@ const ViewerState = createStore({
       left: 48,
       top: 20,
       right: 0,
-      bottom: 0
+      bottom: 0,
     },
     quickToolsOpen: false,
     paddingToolsOpen: false,
@@ -58,13 +58,14 @@ const ViewerState = createStore({
       const newState = state;
       newState.containerPadding[payload.type] = payload.value;
       return newState;
-    })
+    }),
   },
 });
 
 // Whenever a setting is changed in GlobalState, call the respective action here as well.
 global.platform.ipc.on('update-viewer-setting', (_event, setting) => {
   const { actionName, payload, settingType } = JSON.parse(setting);
+  console.log(payload, 'PAYLOAD....');
   ViewerState.getActions()[settingType][actionName](payload);
 });
 

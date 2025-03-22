@@ -663,10 +663,6 @@ ipcMain.on('enable-wc-webview', (event, data) => {
   }
 });
 
-ipcMain.on('some-random-test', (event, data) => {
-  console.log(data,'SOME RANDOM TEST FROM THE SHABAD DECK');
-})
-
 ipcMain.on('cast-session-active', () => {
   mainWindow.webContents.send('cast-session-active');
 });
@@ -844,7 +840,6 @@ ipcMain.on('update-viewer-setting', (event, setting) => {
 });
 
 ipcMain.on('update-global-setting', (event, setting) => {
-  console.log('EVENT <<<<<',event, setting, "SETTING>>>>>")
   mainWindow.webContents.send('update-global-setting', setting);
 });
 

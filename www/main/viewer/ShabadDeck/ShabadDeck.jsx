@@ -42,6 +42,7 @@ function ShabadDeck() {
     themeBg,
     currentWorkspace,
   } = useStoreState((state) => state.userSettings);
+  const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
 
@@ -194,17 +195,16 @@ function ShabadDeck() {
     ceremonyId,
     isCeremonyBani,
     minimizedBySingleDisplay,
-  }
+  };
   useEffect(() => {
     ipcRenderer.send('some-random-test', data);
   });
-   
+  console.log('style:', containerPadding, '>>>>>>');
   return (
     <>
       {themeBg.type === 'video' && (
         <video className="video_preview" src={themeBg.url} autoPlay muted loop />
       )}
-      <h1>SHABAD DECK</h1>
       <div
         className={classNames(
           'shabad-deck',
@@ -215,25 +215,33 @@ function ShabadDeck() {
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
         )}
-        style={applyTheme()}
+        style={{ ...applyTheme() }}
       >
-      <div className='slide-tools'>
-        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
-      </div>
-        {activeVerse.length ? (
-          activeVerse.map((activeVerseObj, index) => (
-            <Slide
-              key={index}
-              verseObj={activeVerseObj}
-              nextLineObj={nextVerse}
-              isMiscSlide={isMiscSlide}
-              bgColor={applyOverlay()}
-            />
-          ))
-        ) : (
-          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
-        )}
+        <div className="slide-tools">
+          {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
+          {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
+        </div>
+
+        <div
+          id="viewer-container-slide-wrapper"
+          style={{
+            padding: `${containerPadding.top}px ${containerPadding.right}px ${containerPadding.bottom}px ${containerPadding.left}px`,
+          }}
+        >
+          {activeVerse.length ? (
+            activeVerse.map((activeVerseObj, index) => (
+              <Slide
+                key={index}
+                verseObj={activeVerseObj}
+                nextLineObj={nextVerse}
+                isMiscSlide={isMiscSlide}
+                bgColor={applyOverlay()}
+              />
+            ))
+          ) : (
+            <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+          )}
+        </div>
       </div>
       <ViewerIcon className="viewer-logo" />
     </>

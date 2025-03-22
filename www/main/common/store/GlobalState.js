@@ -54,6 +54,12 @@ const GlobalState = createStore({
   },
   navigator: createNavigatorSettingsState(navigatorSettings),
   viewerSettings: {
+    containerPadding: {
+      left: 48,
+      top: 20,
+      right: 0,
+      bottom: 0,
+    },
     quickTools: false,
     paddingTools: false,
     slideOrder: ['translation', 'teeka', 'transliteration'],
@@ -87,6 +93,33 @@ const GlobalState = createStore({
       state.slideOrder = payload;
       return state;
     }),
+    setPadding: action((state, payload) => {
+      if (global.webview) {
+        global.webview.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            payload,
+            actionName: 'setPadding',
+            settingType: 'viewerSettings',
+          }),
+        );
+      }
+
+      if (global.platform) {
+        global.platform.ipc.send(
+          'update-viewer-setting',
+          JSON.stringify({
+            payload,
+            actionName: 'setPadding',
+            settingType: 'viewerSettings',
+          }),
+        );
+      }
+      const newState = state;
+      newState.containerPadding[payload.type] = payload.value;
+
+      return newState;
+    }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
   baniOverlay: createOverlaySettingsState(
@@ -98,7 +131,7 @@ const GlobalState = createStore({
 
 global.platform.ipc.on('update-global-setting', (event, setting) => {
   const { settingType, actionName, payload } = JSON.parse(setting);
-  console.log(settingType, action, payload, event, 'GLOBAL.PLATFORM.ipc')
+  console.log(GlobalState.getActions(), settingType, actionName, payload, 'GLOBAL.PLATFORM.ipc');
   GlobalState.getActions()[settingType][actionName](payload);
 });
 
