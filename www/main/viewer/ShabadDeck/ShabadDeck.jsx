@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState } from 'easy-peasy';
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
@@ -48,6 +48,12 @@ function ShabadDeck() {
     medium: 'existsMedium',
     long: 'existsTaksal',
     extralong: 'existsBuddhaDal',
+  };
+
+  const verseRefs = useRef({});
+
+  const updateVerseRef = (verseId, ref) => {
+    verseRefs.current[verseId] = ref;
   };
 
   const getCurrentThemeInstance = () => themes.find((theme) => theme.key === currentTheme);
@@ -175,6 +181,19 @@ function ShabadDeck() {
   }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   useEffect(() => {
+    if (activeVerseId && akhandpatt) {
+      const verseDOM = verseRefs.current[activeVerseId];
+
+      if (verseDOM) {
+        verseDOM.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }
+  }, [activeVerseId, akhandpatt, Object.keys(verseRefs.current)]);
+
+  useEffect(() => {
     if (isMiscSlide) {
       if (activeVerse.length !== 0) {
         setActiveVerse([]);
@@ -207,6 +226,7 @@ function ShabadDeck() {
               nextLineObj={nextVerse}
               isMiscSlide={isMiscSlide}
               bgColor={applyOverlay()}
+              updateVerseRef={updateVerseRef}
             />
           ))
         ) : (
