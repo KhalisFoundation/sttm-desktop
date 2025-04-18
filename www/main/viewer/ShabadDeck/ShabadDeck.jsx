@@ -10,6 +10,7 @@ import {
   loadShabad,
 } from '../../navigator/utils';
 import ViewerIcon from '../icons/ViewerIcon';
+import PaddingTools from '../Slide/PaddingTools';
 
 const os = require('os');
 const remote = require('@electron/remote');
@@ -40,6 +41,7 @@ function ShabadDeck() {
     themeBg,
     currentWorkspace,
   } = useStoreState((state) => state.userSettings);
+  const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
 
@@ -181,6 +183,7 @@ function ShabadDeck() {
       }
     }
   }, [isMiscSlide]);
+
   return (
     <>
       {themeBg.type === 'video' && (
@@ -198,20 +201,31 @@ function ShabadDeck() {
         )}
         style={applyTheme()}
       >
-        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {activeVerse.length ? (
-          activeVerse.map((activeVerseObj, index) => (
-            <Slide
-              key={index}
-              verseObj={activeVerseObj}
-              nextLineObj={nextVerse}
-              isMiscSlide={isMiscSlide}
-              bgColor={applyOverlay()}
-            />
-          ))
-        ) : (
-          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
-        )}
+        <div className="slide-tools">
+          {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
+          {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
+        </div>
+
+        <div
+          id="viewer-container-slide-wrapper"
+          style={{
+            padding: `${containerPadding.top}px ${containerPadding.right}px ${containerPadding.bottom}px ${containerPadding.left}px`,
+          }}
+        >
+          {activeVerse.length ? (
+            activeVerse.map((activeVerseObj, index) => (
+              <Slide
+                key={index}
+                verseObj={activeVerseObj}
+                nextLineObj={nextVerse}
+                isMiscSlide={isMiscSlide}
+                bgColor={applyOverlay()}
+              />
+            ))
+          ) : (
+            <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+          )}
+        </div>
       </div>
       <ViewerIcon className="viewer-logo" />
     </>

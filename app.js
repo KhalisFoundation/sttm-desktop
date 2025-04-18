@@ -5,7 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const op = require('portfinder');
+const portfinder = require('portfinder');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
@@ -337,7 +337,7 @@ function createViewer(ipcData) {
     remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
-        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
+        '.slide-tools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -464,7 +464,7 @@ const emptyOverlay = () => {
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
-  op.getPort(
+  portfinder.getPort(
     {
       // Re: http://www.sikhiwiki.org/index.php/Gurgadi
       ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
