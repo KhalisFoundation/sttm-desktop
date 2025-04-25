@@ -139,6 +139,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       ref={(el) => {
         updateVerseRef(verseObj.ID, el);
       }}
+      data-verseid={verseObj.ID}
     >
       <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>

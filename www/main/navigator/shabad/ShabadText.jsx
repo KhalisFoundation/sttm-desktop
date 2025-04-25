@@ -57,9 +57,8 @@ export const ShabadText = ({
     lineNumber,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar } =
+    useStoreState((state) => state.userSettings);
 
   const {
     setActiveVerseId,

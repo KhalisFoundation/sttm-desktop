@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
+
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -40,8 +42,27 @@ function ShabadDeck() {
     themeBg,
     currentWorkspace,
   } = useStoreState((state) => state.userSettings);
+
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
+  const verseRefKeys = useRef([]);
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 1.0,
+  };
+
+  const updateVerse = (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const visibleVerse = entry.target.dataset.verseid;
+        ipcRenderer.send('sync-scroll', visibleVerse);
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(updateVerse, observerOptions);
 
   const baniLengthCols = {
     short: 'existsSGPC',
@@ -53,7 +74,13 @@ function ShabadDeck() {
   const verseRefs = useRef({});
 
   const updateVerseRef = (verseId, ref) => {
-    verseRefs.current[verseId] = ref;
+    if (ref) {
+      verseRefs.current[verseId] = ref;
+      if (!verseRefKeys.current.includes(verseId)) {
+        verseRefKeys.current = [...verseRefKeys.current, verseId];
+      }
+      observer.observe(ref);
+    }
   };
 
   const getCurrentThemeInstance = () => themes.find((theme) => theme.key === currentTheme);
@@ -191,7 +218,7 @@ function ShabadDeck() {
         });
       }
     }
-  }, [activeVerseId, akhandpatt, Object.keys(verseRefs.current)]);
+  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
 
   useEffect(() => {
     if (isMiscSlide) {
