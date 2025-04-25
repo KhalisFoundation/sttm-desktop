@@ -1,0 +1,81 @@
+name: Build & Publish Electron App
+
+on:
+  push:
+    branches:
+      - dev
+      - release
+      - master
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.18.0
+
+      - name: Decrypt SSH key for release branch
+        if: github.ref == 'refs/heads/release'
+        run: |
+          openssl aes-256-cbc -K ${{ secrets.ENCRYPTED_FEC05B564C85_KEY }} -iv ${{ secrets.ENCRYPTED_FEC05B564C85_IV }} \
+          -in id_rsa.enc -out packaging/id_rsa -d
+          chmod 600 packaging/id_rsa
+
+      - name: Add OSX certificate
+        run: |
+          chmod +x ./packaging/add-osx-cert.sh
+          ./packaging/add-osx-cert.sh
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        if: github.event.pull_request != null
+        run: npm test
+
+      - name: Build and Publish (only on non-PRs)
+        if: github.event.pull_request == null
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          npm test
+          ./packaging/release --branch=${{ github.ref_name }} --dist=mac --platform=mac --token=$GH_TOKEN
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.18.0
+
+      - name: Install Windows build tools
+        run: npm install --global --production windows-build-tools@4.0.0
+
+      - name: Set node config
+        run: |
+          npm config set python python2.7
+          npm config set msvs_version 2015
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        if: github.event.pull_request != null
+        run: npm test
+
+      - name: Build and Publish (only on non-PRs)
+        if: github.event.pull_request == null
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          npm test
+          ./packaging/release --branch=${{ github.ref_name }} --dist=win --platform=win --token=$GH_TOKEN
