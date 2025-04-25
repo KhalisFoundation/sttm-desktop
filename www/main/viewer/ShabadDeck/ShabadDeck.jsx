@@ -50,7 +50,7 @@ function ShabadDeck() {
   const observerOptions = {
     root: null,
     rootMargin: '0px',
-    threshold: 1.0,
+    threshold: 0.8,
   };
 
   const updateVerse = (entries) => {
