@@ -10,6 +10,10 @@ executors:
 jobs:
   build-mac:
     executor: macos-exec
+    environment:
+      AZURE_STORAGE_ACCOUNT: ${AZURE_STORAGE_ACCOUNT}
+      AZURE_STORAGE_CONTAINER: ${AZURE_STORAGE_CONTAINER}
+      SAS_TOKEN: ${SAS_TOKEN}
     steps:
       - checkout
 
@@ -17,15 +21,18 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
 
       - run:
+          name: Install Azure CLI
+          command: |
+            brew install azure-cli
+
+      - run:
           name: Ensure Python distutils support
           command: |
-            # install setuptools (which brings back distutils)
-            brew install python-setuptools    # Homebrew formula for setuptools
+            brew install python-setuptools
             python3 -m pip install --upgrade setuptools
 
       - run:
           name: Verify nvm Installation, Install Node.js v18, Build & Package macOS App
-          # run in a login shell so ~/.bash_profile / ~/.bashrc are loaded
           command: |
             if ! command -v nvm &> /dev/null; then
               echo "nvm could not be found, installing..."
@@ -33,7 +40,6 @@ jobs:
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             fi
-            # if NVM was installed in $HOME:
             [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
 
             nvm install v18.18.0
@@ -58,11 +64,11 @@ jobs:
             npm run prebuild
 
             # download the certificate
-            curl -sSL "${CSC_LINK}" -o "${CERTIFICATE_P12}"
-            openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -legacy -passin pass:"${CSC_KEY_PASSWORD}"
+            curl -sSL "${P12_CERT_LINK}" -o "${CERTIFICATE_P12}"
+            openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -legacy -passin pass:"${P12_CERT_PASSWORD}"
 
             #create a keychain
-            security create-keychain -p "${CSC_KEY_PASSWORD}" "${KEY_CHAIN}"
+            security create-keychain -p "${P12_CERT_PASSWORD}" "${KEY_CHAIN}"
             security set-keychain-settings -t 3600 -l "${KEY_CHAIN}"
             security list-keychains -d user -s "${KEY_CHAIN}"
 
@@ -70,11 +76,11 @@ jobs:
             security default-keychain -d user -s "${KEY_CHAIN}"
             
             # Unlock the keychain
-            security unlock-keychain -p "${CSC_KEY_PASSWORD}" "${KEY_CHAIN}"
+            security unlock-keychain -p "${P12_CERT_PASSWORD}" "${KEY_CHAIN}"
 
-            security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${CSC_KEY_PASSWORD}" -T /usr/bin/codesign;
+            security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${P12_CERT_PASSWORD}" -T /usr/bin/codesign;
 
-            security set-key-partition-list -S apple-tool:,apple: -s -k "${CSC_KEY_PASSWORD}" "${KEY_CHAIN}"
+            security set-key-partition-list -S apple-tool:,apple: -s -k "${P12_CERT_PASSWORD}" "${KEY_CHAIN}"
 
             npm run pack:macArm
             rm -fr *.p12
@@ -119,7 +125,22 @@ jobs:
             else
               echo "✅ DMG is already properly signed. No action needed."
             fi
-      
+
+      - run:
+          name: Upload to Azure Storage
+          command: |
+            # Upload the DMG file
+            az storage blob upload \
+              --account-name "${AZURE_STORAGE_ACCOUNT}" \
+              --container-name "${AZURE_STORAGE_CONTAINER}" \
+              --name "sttm-desktop-builds/SikhiToTheMax-arm64-latest.dmg" \
+              --file "SikhiToTheMax-arm64-latest.dmg" \
+              --sas-token "${SAS_TOKEN}" \
+              --overwrite true || {
+                echo "Failed to upload to Azure Storage"
+                exit 1
+              }
+
       - run:
           name: Cleanup all build files
           command: |
