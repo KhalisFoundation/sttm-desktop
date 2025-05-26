@@ -1,5 +1,16 @@
 ## New Updates
 
+### 9.2.2 - ਊਨਾ Release _June 01, 2025_
+
+#### Misc. bug fix and other improvements
+- Style fix in Bani Overlay: Consistent branding across all layouts.
+- Added a setting to turn off the intelligent spacebar.
+- Akhand Path mode: Scroll to verse when clicked from Navigator and also syncs the scroll from preview window with the viewer.
+- Code and Style Improvements: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.2 - ਊਨਾ Release _July 15, 2024_
 
 #### Misc. bug fix and other improvements
