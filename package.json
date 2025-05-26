@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.2.3",
+  "version": "9.2.2",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -162,6 +162,12 @@
       "buildResources": "assets",
       "output": "builds"
     },
+    "publish": {
+      "provider": "s3",
+      "bucket": "sttm-releases",
+      "path": "${os}-${arch}",
+      "region": "us-west-2"
+    },
     "dmg": {
       "icon": "STTM-DMG.icns"
     },
@@ -199,10 +205,6 @@
       "category": "Network",
       "target": "deb",
       "icon": "assets"
-    },
-    "publish": {
-      "provider": "generic",
-      "url": "https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/${AZURE_STORAGE_CONTAINER}/sttm-desktop-builds"
     }
   },
   "husky": {
