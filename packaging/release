@@ -35,6 +35,12 @@ const release = async () => {
   console.log(`npm run dist:${platform}`);
 
   try {
+    if (platform === 'macArm') {
+      console.log(`Running rebuild for arm64:`);
+      const { stdout, stderr } = await exec('npx electron-rebuild --arch=arm64');
+      console.log('stdout:', stdout);
+      console.log('stderr:', stderr);
+    }
     setTimeout(() => {
       console.log(`npm run dist:${platform} is taking a long time, please wait...`);
     }, 590000);

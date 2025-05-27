@@ -63,7 +63,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -637,6 +637,12 @@ app.on('ready', () => {
       createViewer();
     }
   });
+
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    if (mainWindow) {
+      mainWindow.webContents.openDevTools();
+    }
+  });
 });
 
 // Quit when all windows are closed.
@@ -646,6 +652,17 @@ app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
+});
+
+ipcMain.on('sync-scroll', (event, data) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.executeJavaScript(`
+      document.querySelector('#verse-${data}').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    `);
+  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
