@@ -86,7 +86,9 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
-aptabase.initialize(process.env.APTABASE_KEY);
+if (process.env.APTABASE_KEY) {
+  aptabase.initialize(process.env.APTABASE_KEY);
+}
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
@@ -655,12 +657,14 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('sync-scroll', (event, data) => {
-  viewerWindow.webContents.executeJavaScript(`
-    document.querySelector('#verse-${data}').scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
-  `);
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
+    viewerWindow.webContents.executeJavaScript(`
+      document.querySelector('#verse-${data}').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    `);
+  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {

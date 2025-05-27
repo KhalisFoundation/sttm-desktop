@@ -26,6 +26,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     content1Visibility,
     content2Visibility,
     content3Visibility,
+    akhandpatt,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -133,7 +134,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
 
   return (
     <div
-      className="verse-slide-wrapper"
+      className={!akhandpatt ? 'verse-slide-wrapper' : ''}
       id={`verse-${verseObj.ID}`}
       style={{ background: bgColor }}
       ref={(el) => {
