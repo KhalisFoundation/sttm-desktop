@@ -655,12 +655,14 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('sync-scroll', (event, data) => {
-  viewerWindow.webContents.executeJavaScript(`
-    document.querySelector('#verse-${data}').scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
-  `);
+  if (viewerWindow) {
+    viewerWindow.webContents.executeJavaScript(`
+      document.querySelector('#verse-${data}').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    `);
+  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
