@@ -657,7 +657,7 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('sync-scroll', (event, data) => {
-  if (viewerWindow && !viewerWindow.isDestroyed()) {
+  if (viewerWindow) {
     viewerWindow.webContents.executeJavaScript(`
       document.querySelector('#verse-${data}').scrollIntoView({
         behavior: 'smooth',
