@@ -209,16 +209,22 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
-      const verseDOM = verseRefs.current[activeVerseId];
+      // Add a delay to ensure all verses are rendered and refs are populated
+      const scrollTimeout = setTimeout(() => {
+        const verseDOM = verseRefs.current[activeVerseId];
 
-      if (verseDOM) {
-        verseDOM.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
+        if (verseDOM) {
+          verseDOM.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      }, 500); // Increased delay to allow all verses to render
+
+      return () => clearTimeout(scrollTimeout);
     }
-  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
+    return undefined; // Explicit return for when condition is not met
+  }, [activeVerseId, akhandpatt, verseRefKeys.current, activeVerse.length]); // Changed dependency to activeVerse.length
 
   useEffect(() => {
     if (isMiscSlide) {

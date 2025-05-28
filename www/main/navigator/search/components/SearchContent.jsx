@@ -36,6 +36,7 @@ const SearchContent = () => {
     shortcuts,
     searchShabadsCount,
   } = useStoreState((state) => state.navigator);
+  const { akhandpatt } = useStoreState((state) => state.userSettings);
   const {
     setCurrentWriter,
     setCurrentRaag,
@@ -72,6 +73,7 @@ const SearchContent = () => {
   };
 
   const loadMoreSearchResults = useCallback(() => {
+    if (akhandpatt) return;
     setTimeout(() => {
       setSearchResultsCount(searchResultsCount + 20);
       searchShabads(query, currentSearchType, currentSource, searchResultsCount).then(
@@ -83,7 +85,7 @@ const SearchContent = () => {
         value: searchResultsCount,
       });
     }, 200);
-  });
+  }, [query, currentSearchType, currentSource, searchResultsCount, setSearchData, akhandpatt]);
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray
       ? searchedShabadsArray.map((verse) => ({
@@ -314,7 +316,7 @@ const SearchContent = () => {
           <Virtuoso
             data={filteredShabads}
             overscan={200}
-            endReached={loadMoreSearchResults}
+            endReached={akhandpatt ? undefined : loadMoreSearchResults}
             itemContent={(index, { ang, shabadId, sourceId, verse, verseId, writer, raag }) => (
               <SearchResults
                 key={index}
