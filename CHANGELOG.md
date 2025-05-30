@@ -22,6 +22,10 @@
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
 
+
+<details>
+<summary>Previous Updates</summary>
+
 ### 9.2.1 - ਊਨਾ Release _May 24, 2024_
 
 #### New Features
@@ -398,8 +402,7 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 - Fixed an issue with live feed text files not working
 - Fixed an issue with the changelog getting stuck behind the app
 
-<br/>  
-<details><summary>See previous updates...</summary>
+<br/>
   
 ### 6.3.2 - _January 7, 2020_
 
@@ -740,4 +743,4 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 3.  Navigate with up and down arrows and press space bar to return back to the main line
 4.  Use the icons at the bottom of the footer to navigate between Search, Recent Shabads, and Current Shabad
 5.  Please submit feedback to techsupport@khalisfoundation.org
-    </details>
+</details>
