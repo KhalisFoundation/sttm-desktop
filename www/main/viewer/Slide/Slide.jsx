@@ -129,9 +129,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     verseObj,
   ]);
 
-  if (!verseObj) return null;
-
-  return (
+  return verseObj ? (
     <div
       className="verse-slide-wrapper"
       id={`verse-${verseObj.ID}`}
@@ -143,7 +141,6 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     >
       <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-          {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
           {verseObj && showVerse && !isMiscSlide && (
             <>
               {verseObj.Gurmukhi && (
@@ -189,6 +186,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
           )}
         </div>
       </CSSTransition>
+    </div>
+  ) : (
+    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+      {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
     </div>
   );
 };
