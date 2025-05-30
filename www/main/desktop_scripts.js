@@ -121,7 +121,7 @@ module.exports = {
     isOnline().then((online) => {
       if (online) {
         request(
-          `https://banidb.com/databases/${database[dbPlatform].md5}`,
+          `https://banidb.blob.core.windows.net/database/${database[dbPlatform].md5}`,
           (error, response, newestDBHash) => {
             if (!error && response.statusCode === 200) {
               const curDBHash = store.get('curDBHash');
@@ -131,7 +131,9 @@ module.exports = {
                   database[dbPlatform].dbCompressedName,
                 );
                 progress(
-                  request(`https://banidb.com/databases/${database[dbPlatform].dbCompressedName}`),
+                  request(
+                    `https://banidb.blob.core.windows.net/database/${database[dbPlatform].dbCompressedName}`,
+                  ),
                 )
                   .on('progress', (state) => {
                     const win = remote.getCurrentWindow();

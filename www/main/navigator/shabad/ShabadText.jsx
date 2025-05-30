@@ -57,9 +57,8 @@ export const ShabadText = ({
     lineNumber,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar } =
+    useStoreState((state) => state.userSettings);
 
   const {
     setActiveVerseId,
@@ -273,6 +272,7 @@ export const ShabadText = ({
           atHome,
           setHome,
           homeVerse: paneAttributes.homeVerse,
+          intelligentSpacebar,
         });
         if (verse) {
           updateTraversedVerse(verse.verseId, verse.verseIndex);

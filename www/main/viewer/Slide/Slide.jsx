@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -129,11 +129,18 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     verseObj,
   ]);
 
-  return (
-    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+  return verseObj ? (
+    <div
+      className="verse-slide-wrapper"
+      id={`verse-${verseObj.ID}`}
+      style={{ background: bgColor }}
+      ref={(el) => {
+        updateVerseRef(verseObj.ID, el);
+      }}
+      data-verseid={verseObj.ID}
+    >
       <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-          {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
           {verseObj && showVerse && !isMiscSlide && (
             <>
               {verseObj.Gurmukhi && (
@@ -180,6 +187,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
         </div>
       </CSSTransition>
     </div>
+  ) : (
+    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+      {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
+    </div>
   );
 };
 
@@ -188,6 +199,7 @@ Slide.propTypes = {
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
   bgColor: PropTypes.string,
+  updateVerseRef: PropTypes.func,
 };
 
 export default Slide;

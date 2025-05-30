@@ -89,10 +89,6 @@ body {
 }
 
 .layout-top {
-  .content-top {
-    padding-top: 3vh;
-  }
-
   .o-gurbani,
   .o-translation {
     padding: 0.5% 3vw;
@@ -107,16 +103,6 @@ body {
   .overlay-wrapper {
     bottom: 0;
     position: absolute;
-  }
-
-  .content-top {
-    .content-bar {
-      padding-top: 8px;
-    }
-  }
-
-  .content-bottom {
-    padding-bottom: 3vh;
   }
 
   .o-gurbani,
@@ -143,7 +129,6 @@ body {
     width: auto;
   }
   .logo-wrapper {
-    border-radius: 2px;
     top: 2vh;
   }
 
@@ -185,14 +170,12 @@ body {
   }
 
   .logo-wrapper {
-    background: transparent;
     display: block;
     height: 100px;
     position: relative;
+    right: 0;
     width: 100%;
-    .sttm-logo {
-      display: none;
-    }
+
     .sttm-logo-white {
       display: block;
       margin: auto;
@@ -244,11 +227,15 @@ body {
   }
 
   .logo-wrapper {
-    border-radius: 0;
     bottom: 0;
     height: 100%;
     position: absolute;
     right: 0;
+
+    .sttm-logo-white {
+      display: block;
+      margin: auto;
+    }
   }
 }
 
@@ -354,22 +341,15 @@ body {
 }
 
 .logo-wrapper {
-  align-items: center;
-  background: #fff;
-  border-radius: 5px;
   display: inline-flex;
-  justify-content: center;
+  filter: drop-shadow(1px 1px rgba(0, 0, 0, 1));
   padding: 2vh 2vw;
   position: fixed;
   right: 2vh;
 
-  .sttm-logo,
   .sttm-logo-white {
+    display: block;
     width: 12vw;
-  }
-
-  .sttm-logo-white {
-    display: none;
   }
 }
 

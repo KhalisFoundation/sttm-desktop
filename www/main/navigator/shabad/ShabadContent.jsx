@@ -50,9 +50,8 @@ const ShabadContent = () => {
   } = useStoreActions((state) => state.navigator);
 
   // mangalPosition was removed from below settings
-  const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { autoplayToggle, autoplayDelay, baniLength, liveFeed, intelligentSpacebar } =
+    useStoreState((state) => state.userSettings);
 
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -259,15 +258,7 @@ const ShabadContent = () => {
   };
 
   const toggleHomeVerse = () => {
-    if (isSundarGutkaBani || isCeremonyBani) {
-      openNextVerse();
-    } else if (homeVerse) {
-      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const currentVerseIndex = mappedShabadArray.findIndex(
-        ({ verseId }) => verseId === activeVerseId,
-      );
-      let nextVerseIndex;
-
+    const handleIntelligentSpacebar = (nextVerseIndex, mappedShabadArray, currentVerseIndex) => {
       if (atHome) {
         if (previousVerseIndex !== null) {
           nextVerseIndex = previousVerseIndex + 1;
@@ -299,6 +290,27 @@ const ShabadContent = () => {
           setPreviousIndex(nextVerseIndex);
         }
       }
+      return nextVerseIndex;
+    };
+
+    if (isSundarGutkaBani || isCeremonyBani) {
+      openNextVerse();
+    } else if (homeVerse) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      const currentVerseIndex = mappedShabadArray.findIndex(
+        ({ verseId }) => verseId === activeVerseId,
+      );
+
+      let nextVerseIndex = homeVerse;
+
+      if (intelligentSpacebar) {
+        nextVerseIndex = handleIntelligentSpacebar(
+          nextVerseIndex,
+          mappedShabadArray,
+          currentVerseIndex,
+        );
+      }
+
       const nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
       scrollToVerse(nextVerseId);
       updateTraversedVerse(nextVerseId, nextVerseIndex);
