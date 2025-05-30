@@ -22,7 +22,7 @@ export const useKeys = (key, shortcutType, cb) => {
           }
         }
         if (shortcutType === 'combination') {
-          if (event.code === key && event.ctrlKey) {
+          if (event.code === key && (event.ctrlKey || event.metaKey)) {
             callbackRef.current(event);
           }
         }
