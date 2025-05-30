@@ -7,7 +7,10 @@
   .verse-slide-wrapper {
     align-items: center;
     display: flex;
-    justify-content: center;
+
+    .verse-slide {
+      width: 100%;
+    }
   }
 }
 
