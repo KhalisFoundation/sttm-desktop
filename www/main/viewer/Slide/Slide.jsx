@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
+const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -51,6 +51,14 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
+    // In akhand path mode, don't trigger any transition effects to prevent flickering
+    if (akhandpatt) {
+      setShowVerse(true);
+      global.platform.ipc.send('cast-to-receiver');
+      return undefined;
+    }
+
+    // Only in non-akhand path mode, use the transition effect
     setShowVerse(false);
 
     const timeoutId = setTimeout(() => {
@@ -59,9 +67,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [verseObj, isMiscSlide]);
+  }, [verseObj, isMiscSlide, akhandpatt]);
 
   useEffect(() => {
+    // Skip internal scrolling in akhand path mode since ShabadDeck handles it
+    if (akhandpatt) return;
+
     setTimeout(() => {
       if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
@@ -70,7 +81,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
         });
       }
     }, 100);
-  }, [verseObj]);
+  }, [verseObj, akhandpatt]);
 
   useEffect(() => {
     const markup = [content1, content2, content3].map((content, index) => {
@@ -142,7 +153,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       }}
       data-verseid={verseObj.ID}
     >
-      <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
+      <CSSTransition
+        in={showVerse}
+        timeout={akhandpatt ? 0 : 300}
+        classNames={akhandpatt ? '' : 'fade'}
+        unmountOnExit={!akhandpatt}
+      >
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
           {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
           {verseObj && showVerse && !isMiscSlide && (
@@ -192,7 +208,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       </CSSTransition>
     </div>
   );
-};
+});
+
+Slide.displayName = 'Slide';
 
 Slide.propTypes = {
   verseObj: PropTypes.object,
