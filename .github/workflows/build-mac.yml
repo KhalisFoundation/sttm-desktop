@@ -1,0 +1,252 @@
+name: Build macOS App
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+      - release
+
+jobs:
+  build-mac:
+    runs-on: macos-14
+    env:
+      KEY_CHAIN: build.keychain
+      CERTIFICATE_P12: certificate.p12
+      IDENTITY: "Developer ID Application: Khalis, Inc."
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      DMG_NAME: "" # Global variable for DMG filename
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create and activate Python virtual environment
+        run: |
+          python3 -m venv venv-gyp
+          source venv-gyp/bin/activate
+          python3 -m pip install --upgrade pip
+          pip install setuptools wheel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+
+      - name: Install dependencies
+        run: |
+          source venv-gyp/bin/activate
+          npm install
+
+      - name: Ensure Python distutils support
+        run: |
+          source venv-gyp/bin/activate
+          brew install python-setuptools
+          python3 -m pip install --upgrade setuptools
+
+      - name: Set DMG filename
+        id: dmg-name
+        run: |
+          source venv-gyp/bin/activate
+          VERSION=$(node -p "require('./package.json').version")
+          BRANCH=${GITHUB_REF_NAME}
+          
+          if [ "$BRANCH" = "dev" ]; then
+            DMG_NAME="SikhiToTheMax-${VERSION}-alpha.dmg"
+          elif [ "$BRANCH" = "master" ]; then
+            DMG_NAME="SikhiToTheMax-${VERSION}-beta.dmg"
+          elif [ "$BRANCH" = "release" ]; then
+            DMG_NAME="SikhiToTheMax-${VERSION}.dmg"
+          else
+            DMG_NAME="SikhiToTheMax-${VERSION}-${BRANCH}.dmg"
+          fi
+          
+          echo "Building for branch: $BRANCH"
+          echo "Version: $VERSION"
+          echo "DMG will be named: $DMG_NAME"
+          
+          # Set output for other steps
+          echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
+          # Set global variable
+          echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
+
+      - name: Import Code Signing Certificate
+        run: |
+          source venv-gyp/bin/activate
+          # Debug CSC_LINK
+          if [ -z "${{ secrets.CSC_LINK }}" ]; then
+            echo "CSC_LINK is empty!"
+            echo "Checking if secret exists..."
+            if [ -n "${{ secrets.CSC_LINK }}" ]; then
+              echo "CSC_LINK is set but empty"
+            else
+              echo "CSC_LINK is not set at all"
+            fi
+            exit 1
+          else
+            echo "CSC_LINK is set and not empty"
+            # Print first few characters to verify it's not just whitespace
+            echo "CSC_LINK starts with: ${{ secrets.CSC_LINK }}..."
+          fi
+
+          # add team id to package.json
+          npm run prebuild
+
+          # download the certificate - handle URL encoding
+          echo "Downloading certificate..."
+          
+          # Decode the URL if it's base64 encoded
+          if [[ "${{ secrets.CSC_LINK }}" == *"base64"* ]]; then
+            DECODED_URL=$(echo "${{ secrets.CSC_LINK }}" | base64 --decode)
+            echo "Decoded URL: ${DECODED_URL}"
+            curl -sSL "${DECODED_URL}" -o "${CERTIFICATE_P12}"
+          else
+            curl -sSL "${{ secrets.CSC_LINK }}" -o "${CERTIFICATE_P12}"
+          fi
+
+          # Verify the certificate was downloaded
+          if [ ! -f "${CERTIFICATE_P12}" ]; then
+            echo "Failed to download certificate"
+            exit 1
+          fi
+
+          openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -passin pass:"${{ secrets.CSC_KEY_PASSWORD }}"
+
+          #create a keychain
+          security create-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+          security set-keychain-settings -t 3600 -l "${KEY_CHAIN}"
+          security list-keychains -d user -s "${KEY_CHAIN}"
+
+          # Make the keychain the default so identities are found
+          security default-keychain -d user -s "${KEY_CHAIN}"
+          
+          # Unlock the keychain
+          security unlock-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+
+          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign
+
+          security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+
+          npm run pack:macArm
+          rm -fr *.p12
+
+      - name: Rename DMG file
+        run: |
+          source venv-gyp/bin/activate
+          # Find the original DMG and rename it
+          ls builds
+          DMG=$(find builds -name "SikhiToTheMax-*-arm64.dmg" | head -n 1)
+          if [ -z "$DMG" ]; then
+            echo "DMG not found!"
+            exit 1
+          fi
+          echo "Found: $DMG"
+          cp "$DMG" "$DMG_NAME"
+
+      - name: Verify and Code sign .dmg Signature
+        run: |
+          source venv-gyp/bin/activate
+          echo "🔑 Listing all identities in the keychain..."
+          security find-identity -p codesigning -v
+          echo "🔑 Listing all keychains..."
+          security list-keychains -d user
+
+          echo "🔍 Verifying DMG signature..."
+          if ! codesign --verify --deep --strict "$DMG_NAME"; then
+            echo "❌ DMG is not properly signed. Attempting to sign it now... $IDENTITY"
+
+            codesign --sign "$IDENTITY" --timestamp --options runtime "$DMG_NAME"
+
+            echo "✅ Signing completed. Re-verifying..."
+            if codesign --verify --deep --strict "$DMG_NAME"; then
+              echo "🎉 DMG has been successfully signed!"
+            else
+              echo "🚨 Failed to sign DMG properly. Please check codesigning identity and try again."
+              exit 1
+            fi
+          else
+            echo "✅ DMG is already properly signed. No action needed."
+          fi
+
+      - name: Notarize DMG
+        run: |
+          source venv-gyp/bin/activate
+          echo "📦 Starting notarization process for $DMG_NAME..."
+
+          # Submit for notarization
+          echo "Submitting to Apple notary service..."
+          xcrun notarytool submit "$DMG_NAME" \
+            --apple-id "${{ secrets.APPLE_ID }}" \
+            --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+
+          # Staple the notarization ticket
+          echo "Stapling notarization ticket..."
+          xcrun stapler staple "$DMG_NAME"
+
+          # Verify the notarization
+          echo "Verifying notarization..."
+          xcrun stapler validate "$DMG_NAME"
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Notarization completed successfully!"
+          else
+            echo "❌ Notarization verification failed!"
+            exit 1
+          fi
+
+      - name: Upload to Azure Storage
+        run: |
+          source venv-gyp/bin/activate
+          # Install Azure CLI
+          brew install azure-cli
+
+          # Function to get next available filename
+          get_next_filename() {
+            local base_name="$1"
+            local counter=1
+            local new_name="${base_name%.dmg}.${counter}.dmg"
+            
+            # Check if file exists and increment counter until we find an available name
+            while az storage blob exists \
+              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
+              --container-name "${{ secrets.AZURE_STORAGE_CONTAINER }}" \
+              --name "macos/$new_name" \
+              --sas-token "${{ secrets.SAS_TOKEN }}" | grep -q "true"; do
+              counter=$((counter + 1))
+              new_name="${base_name%.dmg}.${counter}.dmg"
+            done
+            echo "$new_name"
+          }
+
+          # Get next available filename
+          new_name=$(get_next_filename "$DMG_NAME")
+          
+          echo "Original file: $DMG_NAME"
+          echo "Uploading as: $new_name"
+          
+          # Upload the DMG to Azure Storage using SAS token
+          az storage blob upload \
+            --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
+            --container-name "${{ secrets.AZURE_STORAGE_CONTAINER }}" \
+            --name "macos/$new_name" \
+            --file "$DMG_NAME" \
+            --sas-token "${{ secrets.SAS_TOKEN }}"
+
+      - name: Cleanup build files
+        run: |
+          source venv-gyp/bin/activate
+          ls builds
+          echo "Cleaning up build leftovers..."
+          rm -rf builds
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: SikhiToTheMax-*.dmg 
