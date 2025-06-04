@@ -18,21 +18,11 @@ jobs:
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set branch tag
-        run: |
-          if [ "$GITHUB_REF_NAME" = "dev" ]; then
-            echo "BRANCH_TAG=alpha" >> $GITHUB_ENV
-          elif [ "$GITHUB_REF_NAME" = "master" ]; then
-            echo "BRANCH_TAG=beta" >> $GITHUB_ENV
-          elif [ "$GITHUB_REF_NAME" = "release" ]; then
-            echo "BRANCH_TAG=" >> $GITHUB_ENV
-          else
-            echo "BRANCH_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
-          fi
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -62,6 +52,18 @@ jobs:
           brew install python-setuptools
           python3 -m pip install --upgrade setuptools
 
+      - name: Set branch tag
+        run: |
+          if [ "$GITHUB_REF_NAME" = "dev" ]; then
+            echo "BRANCH_TAG=alpha" >> $GITHUB_ENV
+          elif [ "$GITHUB_REF_NAME" = "master" ]; then
+            echo "BRANCH_TAG=beta" >> $GITHUB_ENV
+          elif [ "$GITHUB_REF_NAME" = "release" ]; then
+            echo "BRANCH_TAG=" >> $GITHUB_ENV
+          else
+            echo "BRANCH_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
+          fi
+
       - name: Import Code Signing Certificate
         run: |
           source venv-gyp/bin/activate
@@ -77,8 +79,6 @@ jobs:
             exit 1
           else
             echo "CSC_LINK is set and not empty"
-            # Print first few characters to verify it's not just whitespace
-            echo "CSC_LINK starts with: ${{ secrets.CSC_LINK }}..."
           fi
 
           # add team id to package.json
@@ -90,7 +90,6 @@ jobs:
           # Decode the URL if it's base64 encoded
           if [[ "${{ secrets.CSC_LINK }}" == *"base64"* ]]; then
             DECODED_URL=$(echo "${{ secrets.CSC_LINK }}" | base64 --decode)
-            echo "Decoded URL: ${DECODED_URL}"
             curl -sSL "${DECODED_URL}" -o "${CERTIFICATE_P12}"
           else
             curl -sSL "${{ secrets.CSC_LINK }}" -o "${CERTIFICATE_P12}"
@@ -102,7 +101,11 @@ jobs:
             exit 1
           fi
 
-          openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -passin pass:"${{ secrets.CSC_KEY_PASSWORD }}"
+          # Verify certificate without displaying contents
+          if ! openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -passin pass:"${{ secrets.CSC_KEY_PASSWORD }}" > /dev/null 2>&1; then
+            echo "Failed to verify certificate"
+            exit 1
+          fi
 
           #create a keychain
           security create-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
@@ -115,16 +118,10 @@ jobs:
           # Unlock the keychain
           security unlock-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
 
-          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign
+          # Import certificate without displaying contents
+          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
 
           security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
-
-          # Set environment variables for electron-builder
-          echo "CSC_LINK=${{ secrets.CSC_LINK }}" >> $GITHUB_ENV
-          echo "CSC_KEY_PASSWORD=${{ secrets.CSC_KEY_PASSWORD }}" >> $GITHUB_ENV
-          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
-          echo "APPLE_APP_SPECIFIC_PASSWORD=${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
-          echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> $GITHUB_ENV
 
           # Build with electron-builder
           npm run dist:macArm
