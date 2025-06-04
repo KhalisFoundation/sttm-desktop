@@ -6,7 +6,7 @@ on:
       - dev
       - master
       - release
-      - github-actions
+      - github-action
 
 jobs:
   build-mac:
