@@ -169,7 +169,8 @@
       "region": "us-west-2"
     },
     "dmg": {
-      "icon": "STTM-DMG.icns"
+      "icon": "STTM-DMG.icns",
+      "artifactName": "SikhiToTheMax-${version}-${env.BRANCH_TAG}.dmg"
     },
     "mac": {
       "category": "public.app-category.reference",
@@ -181,7 +182,9 @@
         "zip"
       ],
       "notarize": {
-        "teamId": ""
+        "teamId": "${APPLE_TEAM_ID}",
+        "appleId": "${APPLE_ID}",
+        "appleIdPassword": "${APPLE_APP_SPECIFIC_PASSWORD}"
       }
     },
     "nsis": {
