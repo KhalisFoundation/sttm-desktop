@@ -180,9 +180,9 @@
       "target": [
         "dmg",
         "zip"
-      ],
-      "afterSign": "./notarize.js"
+      ]
     },
+    "afterSign": "./notarize.js",
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
       "deleteAppDataOnUninstall": true,

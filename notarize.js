@@ -9,11 +9,23 @@ exports.default = async function notarizing(context) {
 
   const appName = context.packager.appInfo.productFilename;
 
+  // Get environment variables
+  const appleId = process.env.APPLE_ID;
+  const appleIdPassword = process.env.APPLE_APP_SPECIFIC_PASSWORD;
+  const teamId = process.env.APPLE_TEAM_ID;
+
+  if (!appleId || !appleIdPassword || !teamId) {
+    console.warn('Notarization credentials not found in environment variables');
+    return;
+  }
+
+  console.log('Notarizing app...');
   await notarize({
     appBundleId: 'org.khalisfoundation.sttm',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: process.env.APPLE_ID,
-    appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
-    teamId: process.env.APPLE_TEAM_ID,
+    appleId,
+    appleIdPassword,
+    teamId,
   });
+  console.log('Notarization complete!');
 };

@@ -10,11 +10,6 @@ if (!teamId) {
   process.exit(0);
 }
 
-if (!process.env.I_AM_TRAVIS) {
-  console.log('Not running on Travis CI. Skipping update.');
-  process.exit(0);
-}
-
 packageJson.build.mac.notarize.teamId = teamId;
 
 fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2), 'utf-8');
