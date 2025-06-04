@@ -180,7 +180,10 @@
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "notarize": {
+        "teamId": ""
+      }
     },
     "afterSign": "./notarize.js",
     "nsis": {
