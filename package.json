@@ -181,11 +181,7 @@
         "dmg",
         "zip"
       ],
-      "notarize": {
-        "teamId": "${APPLE_TEAM_ID}",
-        "appleId": "${APPLE_ID}",
-        "appleIdPassword": "${APPLE_APP_SPECIFIC_PASSWORD}"
-      }
+      "afterSign": "./notarize.js"
     },
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
