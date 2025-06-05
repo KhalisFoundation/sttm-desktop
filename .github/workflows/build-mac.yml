@@ -11,6 +11,9 @@ on:
 jobs:
   build-mac:
     runs-on: macos-14
+    strategy:
+      matrix:
+        arch: [x64, arm64]
     env:
       KEY_CHAIN: build.keychain
       CERTIFICATE_P12: certificate.p12
@@ -23,6 +26,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -52,34 +57,9 @@ jobs:
           brew install python-setuptools
           python3 -m pip install --upgrade setuptools
 
-      - name: Set branch tag
-        run: |
-          if [ "$GITHUB_REF_NAME" = "dev" ]; then
-            echo "BRANCH_TAG=alpha" >> $GITHUB_ENV
-          elif [ "$GITHUB_REF_NAME" = "master" ]; then
-            echo "BRANCH_TAG=beta" >> $GITHUB_ENV
-          elif [ "$GITHUB_REF_NAME" = "release" ]; then
-            echo "BRANCH_TAG=" >> $GITHUB_ENV
-          else
-            echo "BRANCH_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
-          fi
-
       - name: Import Code Signing Certificate
         run: |
           source venv-gyp/bin/activate
-          # Debug CSC_LINK
-          if [ -z "${{ secrets.CSC_LINK }}" ]; then
-            echo "CSC_LINK is empty!"
-            echo "Checking if secret exists..."
-            if [ -n "${{ secrets.CSC_LINK }}" ]; then
-              echo "CSC_LINK is set but empty"
-            else
-              echo "CSC_LINK is not set at all"
-            fi
-            exit 1
-          else
-            echo "CSC_LINK is set and not empty"
-          fi
 
           # add team id to package.json
           npm run prebuild
@@ -119,16 +99,24 @@ jobs:
           security unlock-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
 
           # Import certificate without displaying contents
-          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
+          security import "${CERTIFICATE_P12}" -o "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
 
           security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
 
-          # Build with electron-builder
-          npm run dist:macArm
+      - name: Build for ${{ matrix.arch }}
+        run: |
+          source venv-gyp/bin/activate
+          # Configure git for GitHub Actions
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          # Run release script with appropriate platform
+          node packaging/release --branch=${{ github.ref_name }} --platform=mac --token=${{ secrets.GITHUB_TOKEN }}
+          
           rm -fr *.p12
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build
+          name: macos-build-${{ matrix.arch }}
           path: builds/*.dmg 
