@@ -169,8 +169,8 @@
       "region": "us-west-2"
     },
     "dmg": {
-      "icon": "STTM-DMG.icns",
-      "artifactName": "SikhiToTheMax-${version}-${env.BRANCH_TAG}-${env.BUILD_NUM}.dmg"
+      "icon": "assets/STTM-DMG.icns",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.dmg"
     },
     "mac": {
       "category": "public.app-category.reference",
