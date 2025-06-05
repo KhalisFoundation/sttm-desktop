@@ -1,0 +1,129 @@
+name: Build macOS App
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+      - release
+      - github-action
+
+jobs:
+  build-mac:
+    runs-on: macos-14
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    env:
+      KEY_CHAIN: build.keychain
+      CERTIFICATE_P12: certificate.p12
+      IDENTITY: "Developer ID Application: Khalis, Inc."
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create and activate Python virtual environment
+        run: |
+          python3 -m venv venv-gyp
+          source venv-gyp/bin/activate
+          python3 -m pip install --upgrade pip
+          pip install setuptools wheel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+
+      - name: Install dependencies
+        run: |
+          source venv-gyp/bin/activate
+          npm install
+
+      - name: Ensure Python distutils support
+        run: |
+          source venv-gyp/bin/activate
+          brew install python-setuptools
+          python3 -m pip install --upgrade setuptools
+
+      - name: Import Code Signing Certificate
+        run: |
+          source venv-gyp/bin/activate
+          # Debug CSC_LINK
+          if [ -z "${{ secrets.CSC_LINK }}" ]; then
+            echo "CSC_LINK is empty!"
+            echo "Checking if secret exists..."
+            if [ -n "${{ secrets.CSC_LINK }}" ]; then
+              echo "CSC_LINK is set but empty"
+            else
+              echo "CSC_LINK is not set at all"
+            fi
+            exit 1
+          else
+            echo "CSC_LINK is set and not empty"
+          fi
+          # add team id to package.json
+          npm run prebuild
+          # download the certificate - handle URL encoding
+          echo "Downloading certificate..."
+          
+          # Decode the URL if it's base64 encoded
+          if [[ "${{ secrets.CSC_LINK }}" == *"base64"* ]]; then
+            DECODED_URL=$(echo "${{ secrets.CSC_LINK }}" | base64 --decode)
+            curl -sSL "${DECODED_URL}" -o "${CERTIFICATE_P12}"
+          else
+            curl -sSL "${{ secrets.CSC_LINK }}" -o "${CERTIFICATE_P12}"
+          fi
+          # Verify the certificate was downloaded
+          if [ ! -f "${CERTIFICATE_P12}" ]; then
+            echo "Failed to download certificate"
+            exit 1
+          fi
+
+          # Verify certificate without displaying contents
+          if ! openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -passin pass:"${{ secrets.CSC_KEY_PASSWORD }}" > /dev/null 2>&1; then
+            echo "Failed to verify certificate"
+            exit 1
+          fi
+
+          #create a keychain
+          security create-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+          security set-keychain-settings -t 3600 -l "${KEY_CHAIN}"
+          security list-keychains -d user -s "${KEY_CHAIN}"
+          # Make the keychain the default so identities are found
+          security default-keychain -d user -s "${KEY_CHAIN}"
+          
+          # Unlock the keychain
+          security unlock-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+          # Import certificate without displaying contents
+          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
+          security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
+
+      - name: Build for ${{ matrix.arch }}
+        run: |
+          source venv-gyp/bin/activate
+          # Configure git for GitHub Actions
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          # Run release script with appropriate platform
+          node packaging/release --branch=${{ github.ref_name }} --platform=mac --token=${{ secrets.GITHUB_TOKEN }}
+          
+          rm -fr *.p12
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-${{ matrix.arch }}
+          path: builds/*.dmg 
