@@ -60,42 +60,36 @@ jobs:
       - name: Import Code Signing Certificate
         run: |
           source venv-gyp/bin/activate
-
+          # Debug CSC_LINK
+          if [ -z "${{ secrets.CSC_LINK }}" ]; then
+            echo "CSC_LINK is empty!"
+            echo "Checking if secret exists..."
+            if [ -n "${{ secrets.CSC_LINK }}" ]; then
+              echo "CSC_LINK is set but empty"
+            else
+              echo "CSC_LINK is not set at all"
+            fi
+            exit 1
+          else
+            echo "CSC_LINK is set and not empty"
+          fi
           # add team id to package.json
           npm run prebuild
-
           # download the certificate - handle URL encoding
           echo "Downloading certificate..."
           
-          # Debug: Print certificate URL length (without exposing the actual URL)
-          echo "Certificate URL length: ${#CSC_LINK}"
-          
           # Decode the URL if it's base64 encoded
           if [[ "${{ secrets.CSC_LINK }}" == *"base64"* ]]; then
-            echo "Detected base64 encoded certificate URL"
             DECODED_URL=$(echo "${{ secrets.CSC_LINK }}" | base64 --decode)
-            echo "Attempting to download from decoded URL..."
-            curl -v -sSL "${DECODED_URL}" -o "${CERTIFICATE_P12}"
-            CURL_EXIT_CODE=$?
+            curl -sSL "${DECODED_URL}" -o "${CERTIFICATE_P12}"
           else
-            echo "Using direct certificate URL"
-            curl -v -sSL "${{ secrets.CSC_LINK }}" -o "${CERTIFICATE_P12}"
-            CURL_EXIT_CODE=$?
+            curl -sSL "${{ secrets.CSC_LINK }}" -o "${CERTIFICATE_P12}"
           fi
-
-          # Check curl exit code
-          if [ $CURL_EXIT_CODE -ne 0 ]; then
-            echo "Failed to download certificate. Curl exit code: $CURL_EXIT_CODE"
-            exit 1
-          fi
-
           # Verify the certificate was downloaded
           if [ ! -f "${CERTIFICATE_P12}" ]; then
-            echo "Certificate file not found after download attempt"
+            echo "Failed to download certificate"
             exit 1
           fi
-
-          echo "Certificate downloaded successfully. File size: $(stat -f%z "${CERTIFICATE_P12}") bytes"
 
           # Verify certificate without displaying contents
           if ! openssl pkcs12 -in ${CERTIFICATE_P12} -nodes -passin pass:"${{ secrets.CSC_KEY_PASSWORD }}" > /dev/null 2>&1; then
@@ -107,16 +101,13 @@ jobs:
           security create-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
           security set-keychain-settings -t 3600 -l "${KEY_CHAIN}"
           security list-keychains -d user -s "${KEY_CHAIN}"
-
           # Make the keychain the default so identities are found
           security default-keychain -d user -s "${KEY_CHAIN}"
           
           # Unlock the keychain
           security unlock-keychain -p "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
-
           # Import certificate without displaying contents
-          security import "${CERTIFICATE_P12}" -o "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
-
+          security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
           security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
 
       - name: Build for ${{ matrix.arch }}
