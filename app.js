@@ -400,10 +400,10 @@ function createBroadcastFiles(arg) {
   const englishFile = `${userDataPath}/sttm-English.txt`;
 
   try {
-    if (arg) {
-      fs.writeFile(gurbaniFile, arg?.Line?.Gurmukhi?.trim(), writeFileCallback);
+    if (arg.Line.Gurmukhi) {
+      fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim(), writeFileCallback);
       fs.appendFile(gurbaniFile, '\n', writeFileCallback);
-      fs.writeFile(englishFile, arg?.Line?.English?.trim(), writeFileCallback);
+      fs.writeFile(englishFile, arg.Line.English.trim(), writeFileCallback);
       fs.appendFile(englishFile, '\n', writeFileCallback);
     }
   } catch (err) {

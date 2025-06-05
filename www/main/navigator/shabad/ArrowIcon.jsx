@@ -40,7 +40,7 @@ const ArrowIcon = ({ paneId }) => {
     3: pane3.baniType,
   };
 
-  const loadShabadAndSetVerses = (shabadId) =>
+  const loadShabadAndSetVerses = (shabadId, setPane, currentPane, targetPaneId) =>
     banidb
       .loadShabad(shabadId)
       .then((verses) => {
@@ -48,6 +48,19 @@ const ArrowIcon = ({ paneId }) => {
           const firstVerseId = verses[0].ID;
           if (initialVerseId !== firstVerseId) setInitialVerseId(firstVerseId);
           if (activeVerseId !== firstVerseId) setActiveVerseId(firstVerseId);
+
+          if (setPane && currentPane) {
+            setPane({
+              ...currentPane,
+              content: i18n.t('MULTI_PANE.SHABAD'),
+              activeShabad: shabadId,
+              baniType: 'shabad',
+              versesRead: [firstVerseId],
+              activeVerse: firstVerseId,
+            });
+            if (targetPaneId !== activePaneId) setActivePaneId(targetPaneId);
+          }
+
           return firstVerseId;
         }
         return null;
@@ -65,56 +78,21 @@ const ArrowIcon = ({ paneId }) => {
           direction === 'left'
             ? parseInt(pane1.activeShabad, 10) - 1
             : parseInt(pane1.activeShabad, 10) + 1;
-        loadShabadAndSetVerses(currentShabad).then((firstVerseId) => {
-          if (firstVerseId) {
-            setPane1({
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: currentShabad,
-              baniType: 'shabad',
-              versesRead: [firstVerseId],
-              activeVerse: firstVerseId,
-            });
-            if (paneId !== activePaneId) setActivePaneId(paneId);
-          }
-        });
+        loadShabadAndSetVerses(currentShabad, setPane1, pane1, paneId);
         break;
       case 2:
         currentShabad =
           direction === 'left'
             ? parseInt(pane2.activeShabad, 10) - 1
             : parseInt(pane2.activeShabad, 10) + 1;
-        loadShabadAndSetVerses(currentShabad).then((firstVerseId) => {
-          if (firstVerseId) {
-            setPane2({
-              ...pane2,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: currentShabad,
-              baniType: 'shabad',
-              versesRead: [firstVerseId],
-              activeVerse: firstVerseId,
-            });
-            if (paneId !== activePaneId) setActivePaneId(paneId);
-          }
-        });
+        loadShabadAndSetVerses(currentShabad, setPane2, pane2, paneId);
         break;
       case 3:
         currentShabad =
           direction === 'left'
             ? parseInt(pane3.activeShabad, 10) - 1
             : parseInt(pane3.activeShabad, 10) + 1;
-        loadShabadAndSetVerses(currentShabad).then((firstVerseId) => {
-          if (firstVerseId) {
-            setPane3({
-              ...pane3,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: currentShabad,
-              baniType: 'shabad',
-              versesRead: [firstVerseId],
-              activeVerse: firstVerseId,
-            });
-            if (paneId !== activePaneId) setActivePaneId(paneId);
-          }
-        });
+        loadShabadAndSetVerses(currentShabad, setPane3, pane3, paneId);
         break;
       default:
         break;
