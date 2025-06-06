@@ -1,0 +1,66 @@
+name: Build Windows App
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+      - release
+      - github-action
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, ia32]
+    env:
+      BONJOUR_SDK_HOME: 'C:\\Program Files\\Bonjour SDK'
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+
+      - name: Install Bonjour SDK
+        run: |
+          # Download and install Bonjour SDK
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/Bonjour64.msi" -OutFile "Bonjour64.msi"
+          Start-Process msiexec.exe -ArgumentList "/i Bonjour64.msi /qn" -Wait
+          Remove-Item Bonjour64.msi
+          
+          # Download and install Bonjour SDK Setup
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/bonjoursdksetup.exe" -OutFile "bonjoursdksetup.exe"
+          Start-Process bonjoursdksetup.exe -ArgumentList "/quiet" -Wait
+          Remove-Item bonjoursdksetup.exe
+
+      - name: Install dependencies
+        run: |
+          npm install -g npm@9.8.1
+          npm ci
+
+      - name: Build for ${{ matrix.arch }}
+        run: |
+          # Configure git for GitHub Actions
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          # Run release script with appropriate platform
+          if ("${{ matrix.arch }}" -eq "x64") {
+            node packaging/release --branch=${{ github.ref_name }} --platform=win --token=${{ secrets.GITHUB_TOKEN }}
+          } else {
+            node packaging/release --branch=${{ github.ref_name }} --platform=win32 --token=${{ secrets.GITHUB_TOKEN }}
+          }
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-${{ matrix.arch }}
+          path: builds/*.exe 
