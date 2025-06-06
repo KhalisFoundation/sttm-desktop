@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.3 - ਊਨਾ Release _June 01, 2025_
+### 9.2.3 - ਊਨਾ Release _June 09, 2025_
 
 #### Misc. bug fix and other improvements
 - Style fix in Bani Overlay: Consistent branding across all layouts.

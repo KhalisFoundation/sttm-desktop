@@ -20,7 +20,7 @@
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
-    "dist:mac": "npm run build && electron-builder --mac --arm64 --x64 --publish always",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --publish always",
     "dist:macArm": "npm run build && electron-builder --mac --arm64 --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
@@ -169,7 +169,8 @@
       "region": "us-west-2"
     },
     "dmg": {
-      "icon": "STTM-DMG.icns"
+      "icon": "assets/STTM-DMG.icns",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.dmg"
     },
     "mac": {
       "category": "public.app-category.reference",
@@ -177,13 +178,16 @@
       "hardenedRuntime": true,
       "entitlements": "./entitlements.mac.inherit.plist",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
       ],
       "notarize": {
         "teamId": ""
       }
     },
+    "afterSign": "./notarize.js",
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
       "deleteAppDataOnUninstall": true,
@@ -199,7 +203,8 @@
         "nsis"
       ],
       "verifyUpdateCodeSignature": false,
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
       "category": "Network",
