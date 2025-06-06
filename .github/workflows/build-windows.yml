@@ -58,9 +58,3 @@ jobs:
           } else {
             node packaging/release --branch=${{ github.ref_name }} --platform=win32 --token=${{ secrets.GITHUB_TOKEN }}
           }
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build-${{ matrix.arch }}
-          path: builds/*.exe 
