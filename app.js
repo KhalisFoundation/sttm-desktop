@@ -86,7 +86,9 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
-aptabase.initialize(process.env.APTABASE_KEY);
+if (process.env.APTABASE_KEY) {
+  aptabase.initialize(process.env.APTABASE_KEY);
+}
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
