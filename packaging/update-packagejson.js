@@ -3,15 +3,16 @@ require('dotenv').config();
 const fs = require('fs');
 const packageJson = require('../package.json');
 
+// Exit gracefully if not on macOS
+if (process.platform !== 'darwin') {
+  console.log('Skipping package.json update - not on macOS platform');
+  process.exit(0);
+}
+
 const teamId = process.env.APPLE_TEAM_ID;
 
 if (!teamId) {
   console.error('TEAM_ID is not defined in the environment variables');
-  process.exit(0);
-}
-
-if (!process.env.I_AM_TRAVIS) {
-  console.log('Not running on Travis CI. Skipping update.');
   process.exit(0);
 }
 

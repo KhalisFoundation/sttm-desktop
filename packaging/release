@@ -4,65 +4,67 @@
 const git = require('simple-git');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
+const fs = require('fs');
+const path = require('path');
+
 const {
   argv: { branch, platform, token },
 } = require('yargs');
+
 const checkVersion = require('./check-version');
-const updateRemoteVersion = require('./update-remote');
 
 const release = async () => {
-  let releaseVersion;
-  const track = branch === 'dev' ? 'alpha' : 'beta';
+  let track = '';
+  if (branch === 'dev') track = 'alpha';
+  else if (branch === 'master') track = 'beta';
+  else if (branch === 'release') track = '';
+  else track = branch;
+
   console.log(`Platform: ${platform}`);
   console.log(`Branch: ${branch}`);
   if (track) {
     console.log(`Prerelease Track: ${track}`);
   }
 
-  // win-ia32 and macArm is run on the same machine right after win-x64, so don't update the version
-  if (platform !== 'win32' && platform !== 'macArm') {
-    // Get all tags, sort in desc order, and get latest from current track
-    const gitTags = await git().tags();
-    const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
-    console.log(`Last Git tag: ${gitTag}`);
+  // Get all tags, sort in desc order, and get latest from current track
+  const gitTags = await git().tags();
+  const gitTag = gitTags.all.reverse().find((tag) => tag.indexOf(track) > -1);
+  console.log(`Last Git tag: ${gitTag}`);
 
-    // Get a new release version and update package.json
-    releaseVersion = checkVersion(branch, gitTag);
-    console.log(`New release version: ${releaseVersion}`);
+  // Get a new release version and update package.json
+  const releaseVersion = checkVersion(branch, gitTag);
+  console.log(`New release version: ${releaseVersion}`);
+
+  // Update package.json with new version and track-specific settings
+  const pkgPath = path.join(__dirname, '..', 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  pkg.version = releaseVersion;
+  if (track) {
+    pkg.productName = `${pkg.productName} ${track.charAt(0).toUpperCase()}${track.slice(1)}`;
+    pkg.build.mac.icon = `assets/STTM-${track}.icns`;
+    pkg.build.win.icon = `assets/STTM-${track}.ico`;
+  } else {
+    pkg.build.mac.icon = 'assets/STTM.icns';
+    pkg.build.win.icon = 'assets/STTM.ico';
   }
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
 
-  console.log('TODO: stream output for the next command');
-  console.log(`npm run dist:${platform}`);
-
+  console.log('Building application...');
   try {
-    setTimeout(() => {
-      console.log(`npm run dist:${platform} is taking a long time, please wait...`);
-    }, 590000);
     const { stdout, stderr } = await exec(`npm run dist:${platform}`);
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 
-  // Only push git tag if on Travis
-  if (platform === 'mac') {
-    console.log('Configure Git for Travis CI user');
-    await git().raw(['config', '--global', 'user.email', 'travis@travis-ci.org']);
-    await git().raw(['config', '--global', 'user.name', 'Travis CI']);
-    await git().raw(['config', '--global', 'push.default', 'current']);
-    await git().checkout(branch);
-
-    console.log('git tag new version and push');
-    await git().addTag(releaseVersion);
-    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
-  }
-
-  if (branch === 'release') {
-    updateRemoteVersion(platform);
-  }
+  // Create and push git tag
+  console.log('Creating git tag...');
+  await git().addTag(releaseVersion);
+  await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
 };
 
-if (branch === 'release' || branch === 'master' || branch === 'dev') {
+if (branch === 'release' || branch === 'master' || branch === 'dev' || branch === 'github-action') {
   release();
 }

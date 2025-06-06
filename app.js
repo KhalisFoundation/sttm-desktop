@@ -63,7 +63,7 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage } = electron;
+const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -400,10 +400,12 @@ function createBroadcastFiles(arg) {
   const englishFile = `${userDataPath}/sttm-English.txt`;
 
   try {
-    fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim(), writeFileCallback);
-    fs.appendFile(gurbaniFile, '\n', writeFileCallback);
-    fs.writeFile(englishFile, arg.Line.English.trim(), writeFileCallback);
-    fs.appendFile(englishFile, '\n', writeFileCallback);
+    if (arg.Line.Gurmukhi) {
+      fs.writeFile(gurbaniFile, arg.Line.Gurmukhi.trim(), writeFileCallback);
+      fs.appendFile(gurbaniFile, '\n', writeFileCallback);
+      fs.writeFile(englishFile, arg.Line.English.trim(), writeFileCallback);
+      fs.appendFile(englishFile, '\n', writeFileCallback);
+    }
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err);
@@ -637,6 +639,12 @@ app.on('ready', () => {
       createViewer();
     }
   });
+
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    if (mainWindow) {
+      mainWindow.webContents.openDevTools();
+    }
+  });
 });
 
 // Quit when all windows are closed.
@@ -646,6 +654,17 @@ app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
+});
+
+ipcMain.on('sync-scroll', (event, data) => {
+  if (viewerWindow) {
+    viewerWindow.webContents.executeJavaScript(`
+      document.querySelector('#verse-${data}').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    `);
+  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
