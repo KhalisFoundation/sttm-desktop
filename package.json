@@ -5,7 +5,7 @@
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
-    "prebuild": "cross-env node packaging/update-packagejson.js",
+    "prebuild": "node -e \"if (process.platform === 'darwin') require('./packaging/update-packagejson.js')\"",
     "precommit": "npm test",
     "test": "run-p test:*",
     "test:lint": "run-p test:lint:*",
