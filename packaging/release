@@ -43,6 +43,9 @@ const release = async () => {
     pkg.productName = `${pkg.productName} ${track.charAt(0).toUpperCase()}${track.slice(1)}`;
     pkg.build.mac.icon = `assets/STTM-${track}.icns`;
     pkg.build.win.icon = `assets/STTM-${track}.ico`;
+  } else {
+    pkg.build.mac.icon = 'assets/STTM.icns';
+    pkg.build.win.icon = 'assets/STTM.ico';
   }
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
 
