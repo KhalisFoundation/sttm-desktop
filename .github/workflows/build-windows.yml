@@ -6,7 +6,6 @@ on:
       - dev
       - master
       - release
-      - github-action
 
 jobs:
   build-windows:
