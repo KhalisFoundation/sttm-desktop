@@ -203,7 +203,8 @@
         "nsis"
       ],
       "verifyUpdateCodeSignature": false,
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
       "category": "Network",

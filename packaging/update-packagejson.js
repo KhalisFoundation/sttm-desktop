@@ -3,6 +3,12 @@ require('dotenv').config();
 const fs = require('fs');
 const packageJson = require('../package.json');
 
+// Exit gracefully if not on macOS
+if (process.platform !== 'darwin') {
+  console.log('Skipping package.json update - not on macOS platform');
+  process.exit(0);
+}
+
 const teamId = process.env.APPLE_TEAM_ID;
 
 if (!teamId) {
