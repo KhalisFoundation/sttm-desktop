@@ -667,6 +667,53 @@ ipcMain.on('sync-scroll', (event, data) => {
   }
 });
 
+ipcMain.on('sync-scroll-akhandpatt', (event, verseIds) => {
+  if (viewerWindow) {
+    // Create a script that will scroll to the first visible verse and highlight all visible verses
+    const script = `
+      (() => {
+        const visibleVerses = ${JSON.stringify(verseIds)};
+        if (visibleVerses.length > 0) {
+          // Only scroll if the first verse is not already in view
+          const firstVerse = document.querySelector('#verse-' + visibleVerses[0]);
+          if (firstVerse) {
+            const rect = firstVerse.getBoundingClientRect();
+            const isInView = (
+              rect.top >= 0 &&
+              rect.left >= 0 &&
+              rect.bottom <= window.innerHeight &&
+              rect.right <= window.innerWidth
+            );
+            
+            if (!isInView) {
+              firstVerse.scrollIntoView({
+                behavior: 'smooth', // Changed from 'smooth' to 'auto' to prevent bouncing
+                block: 'center'
+              });
+            }
+          }
+          
+          // Highlight all visible verses
+          visibleVerses.forEach(id => {
+            const verse = document.querySelector('#verse-' + id);
+            if (verse) {
+              verse.classList.add('active-viewer-verse');
+            }
+          });
+          
+          // Remove highlight from verses that are no longer visible
+          document.querySelectorAll('.active-viewer-verse').forEach(verse => {
+            if (!visibleVerses.includes(verse.dataset.verseid)) {
+              verse.classList.remove('active-viewer-verse');
+            }
+          });
+        }
+      })();
+    `;
+    viewerWindow.webContents.executeJavaScript(script);
+  }
+});
+
 ipcMain.on('enable-wc-webview', (event, data) => {
   const webViewWC = webContents.fromId(parseInt(data, 10));
   remote.enable(webViewWC);
