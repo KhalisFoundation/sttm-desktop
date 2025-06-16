@@ -49,17 +49,26 @@ function ShabadDeck() {
 
   const observerOptions = {
     root: null,
-    rootMargin: '0px',
-    threshold: 0.8,
+    rootMargin: '-45% 0px -45% 0px',
+    threshold: 1.0,
   };
 
   const updateVerse = (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const visibleVerse = entry.target.dataset.verseid;
-        ipcRenderer.send('sync-scroll', visibleVerse);
+    const centeredVerses = entries.filter((entry) => entry.isIntersecting);
+    if (centeredVerses.length === 0) return;
+
+    if (akhandpatt) {
+      const visibleVerses = centeredVerses.map((entry) => entry.target.dataset.verseid);
+
+      if (visibleVerses.length > 0) {
+        ipcRenderer.send('sync-scroll-akhandpatt', visibleVerses);
       }
-    });
+    } else {
+      const centeredVerse = centeredVerses[0];
+      if (centeredVerse) {
+        ipcRenderer.send('sync-scroll', centeredVerse.target.dataset.verseid);
+      }
+    }
   };
 
   const observer = new IntersectionObserver(updateVerse, observerOptions);
@@ -209,16 +218,22 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
-      const verseDOM = verseRefs.current[activeVerseId];
+      // Add a delay to ensure all verses are rendered and refs are populated
+      const scrollTimeout = setTimeout(() => {
+        const verseDOM = verseRefs.current[activeVerseId];
 
-      if (verseDOM) {
-        verseDOM.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
+        if (verseDOM) {
+          verseDOM.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      }, 500); // Increased delay to allow all verses to render
+
+      return () => clearTimeout(scrollTimeout);
     }
-  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
+    return undefined; // Explicit return for when condition is not met
+  }, [activeVerseId, akhandpatt, verseRefKeys.current, activeVerse.length]); // Changed dependency to activeVerse.length
 
   useEffect(() => {
     if (isMiscSlide) {
