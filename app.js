@@ -25,6 +25,7 @@ const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
 
+const prodConfig = require('./config.prod.json');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -86,7 +87,22 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
-aptabase.initialize(process.env.APTABASE_KEY);
+
+// Initialize Aptabase with key from appropriate source
+let aptabaseKey;
+if (process.env.NODE_ENV === 'development') {
+  aptabaseKey = process.env.APTABASE_KEY;
+} else {
+  try {
+    aptabaseKey = prodConfig.APTABASE_KEY;
+  } catch (error) {
+    console.error('Failed to load production config:', error);
+  }
+}
+
+if (aptabaseKey) {
+  aptabase.initialize(aptabaseKey);
+}
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
