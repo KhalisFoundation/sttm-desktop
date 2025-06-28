@@ -97,7 +97,7 @@
     "i18next": "^23.5.1",
     "i18next-node-fs-backend": "^2.1.3",
     "image-type": "^4.1.0",
-    "ip": "^1.1.8",
+    "ip": "^1.1.9",
     "is-electron": "^2.2.2",
     "is-online": "^9.0.1",
     "lodash.camelcase": "^4.3.0",
