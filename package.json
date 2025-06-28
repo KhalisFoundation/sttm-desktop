@@ -124,7 +124,7 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.12.1",
     "scroll": "^3.0.1",
     "sharp": "^0.32.6",
     "socket.io": "^4.7.2",
