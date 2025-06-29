@@ -126,7 +126,7 @@ Additionally, you have the option to choose between Vishraam sources:
 
 ### <a name="additional-info">Additional Database/Search Information</a>
 
-- SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
+- SikhiToTheMax's database includes shabads from Sri Guru Granth Sahib Jee, Sri Dasam Granth Sahib, Bhai Gurdas Jee, Bhai Gurdas Singh Jee, Bhai Nand Lal Jee, and various rehatnamas and thankhanamas. If your shabad is not from one of those sources, it will not appear.
 - If you verified your shabad should be in the database and it is still not coming up, make sure you are typing in the correct letters for search. If you aren’t sure about a letter, or are still having difficulties, try using one of the different search types to locate the shabad.
 - If you don't know one of the letters, consider using an asterisk in its place. Here's some information on how it works:
   - _First letter start_ -
