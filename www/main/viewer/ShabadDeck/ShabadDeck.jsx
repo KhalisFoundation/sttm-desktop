@@ -49,17 +49,26 @@ function ShabadDeck() {
 
   const observerOptions = {
     root: null,
-    rootMargin: '0px',
-    threshold: 0.8,
+    rootMargin: '-45% 0px -45% 0px',
+    threshold: 1.0,
   };
 
   const updateVerse = (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const visibleVerse = entry.target.dataset.verseid;
-        ipcRenderer.send('sync-scroll', visibleVerse);
+    const centeredVerses = entries.filter((entry) => entry.isIntersecting);
+    if (centeredVerses.length === 0) return;
+
+    if (akhandpatt) {
+      const visibleVerses = centeredVerses.map((entry) => entry.target.dataset.verseid);
+
+      if (visibleVerses.length > 0) {
+        ipcRenderer.send('sync-scroll-akhandpatt', visibleVerses);
       }
-    });
+    } else {
+      const centeredVerse = centeredVerses[0];
+      if (centeredVerse) {
+        ipcRenderer.send('sync-scroll', centeredVerse.target.dataset.verseid);
+      }
+    }
   };
 
   const observer = new IntersectionObserver(updateVerse, observerOptions);
@@ -209,6 +218,7 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
+      // Add a delay to ensure all verses are rendered and refs are populated
       const verseDOM = verseRefs.current[activeVerseId];
 
       if (verseDOM) {
@@ -218,7 +228,7 @@ function ShabadDeck() {
         });
       }
     }
-  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
+  }, [activeVerseId, akhandpatt, verseRefKeys.current, activeVerse.length]); // Changed dependency to activeVerse.length
 
   useEffect(() => {
     if (isMiscSlide) {

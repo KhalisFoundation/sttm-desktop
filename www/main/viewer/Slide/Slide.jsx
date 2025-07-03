@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
+const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -26,6 +26,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     content1Visibility,
     content2Visibility,
     content3Visibility,
+    akhandpatt,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -50,6 +51,14 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
+    // In akhand path mode, don't trigger any transition effects to prevent flickering
+    if (akhandpatt) {
+      setShowVerse(true);
+      global.platform.ipc.send('cast-to-receiver');
+      return undefined;
+    }
+
+    // Only in non-akhand path mode, use the transition effect
     setShowVerse(false);
 
     const timeoutId = setTimeout(() => {
@@ -58,7 +67,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [verseObj, isMiscSlide]);
+  }, [verseObj, isMiscSlide, akhandpatt]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -69,7 +78,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
         });
       }
     }, 100);
-  }, [verseObj]);
+  }, [verseObj, akhandpatt]);
 
   useEffect(() => {
     const markup = [content1, content2, content3].map((content, index) => {
@@ -131,7 +140,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
 
   return verseObj ? (
     <div
-      className="verse-slide-wrapper"
+      className={!akhandpatt ? 'verse-slide-wrapper' : ''}
       id={`verse-${verseObj.ID}`}
       style={{ background: bgColor }}
       ref={(el) => {
@@ -139,7 +148,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       }}
       data-verseid={verseObj.ID}
     >
-      <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
+      <CSSTransition
+        in={showVerse}
+        timeout={akhandpatt ? 0 : 300}
+        classNames={akhandpatt ? '' : 'fade'}
+        unmountOnExit={!akhandpatt}
+      >
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
           {verseObj && showVerse && !isMiscSlide && (
             <>
@@ -192,8 +206,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
     </div>
   );
-};
+});
 
+Slide.displayName = 'Slide';
 Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,

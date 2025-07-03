@@ -83,7 +83,7 @@ const SearchContent = () => {
         value: searchResultsCount,
       });
     }, 200);
-  });
+  }, [query, currentSearchType, currentSource, searchResultsCount, setSearchData]);
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray
       ? searchedShabadsArray.map((verse) => ({
