@@ -70,9 +70,6 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
   }, [verseObj, isMiscSlide, akhandpatt]);
 
   useEffect(() => {
-    // Skip internal scrolling in akhand path mode since ShabadDeck handles it
-    if (akhandpatt) return;
-
     setTimeout(() => {
       if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
@@ -211,7 +208,6 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
 });
 
 Slide.displayName = 'Slide';
-
 Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,

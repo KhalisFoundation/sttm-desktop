@@ -219,20 +219,15 @@ function ShabadDeck() {
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
       // Add a delay to ensure all verses are rendered and refs are populated
-      const scrollTimeout = setTimeout(() => {
-        const verseDOM = verseRefs.current[activeVerseId];
+      const verseDOM = verseRefs.current[activeVerseId];
 
-        if (verseDOM) {
-          verseDOM.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-        }
-      }, 500); // Increased delay to allow all verses to render
-
-      return () => clearTimeout(scrollTimeout);
+      if (verseDOM) {
+        verseDOM.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
     }
-    return undefined; // Explicit return for when condition is not met
   }, [activeVerseId, akhandpatt, verseRefKeys.current, activeVerse.length]); // Changed dependency to activeVerse.length
 
   useEffect(() => {
