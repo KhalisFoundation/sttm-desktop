@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
 // eslint-disable-next-line import/no-unresolved
 const aptabase = require('@aptabase/electron/main');
+const Sentry = require('@sentry/electron/main');
 
 require('dotenv').config();
 
@@ -41,6 +42,10 @@ const {
 /* eslint-enable */
 
 const savedSettings = savedSettingsCamelCase();
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+});
 
 const platform = os.platform();
 let isUnsupportedWindow = false;
