@@ -58,12 +58,6 @@ function ShabadDeck() {
     if (centeredVerses.length === 0) return;
 
     if (akhandpatt) {
-      const visibleVerses = centeredVerses.map((entry) => entry.target.dataset.verseid);
-
-      if (visibleVerses.length > 0) {
-        ipcRenderer.send('sync-scroll-akhandpatt', visibleVerses);
-      }
-    } else {
       const centeredVerse = centeredVerses[0];
       if (centeredVerse) {
         ipcRenderer.send('sync-scroll', centeredVerse.target.dataset.verseid);
