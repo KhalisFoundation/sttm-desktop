@@ -44,10 +44,6 @@ const {
 
 const savedSettings = savedSettingsCamelCase();
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-});
-
 const platform = os.platform();
 let isUnsupportedWindow = false;
 if (platform === 'win32') {
@@ -95,11 +91,14 @@ app.setAsDefaultProtocolClient('sttm-desktop');
 
 // Initialize Aptabase with key from appropriate source
 let aptabaseKey;
+let sentryDsn;
 if (process.env.NODE_ENV === 'development') {
   aptabaseKey = process.env.APTABASE_KEY;
+  sentryDsn = process.env.SENTRY_DSN;
 } else {
   try {
     aptabaseKey = prodConfig.APTABASE_KEY;
+    sentryDsn = prodConfig.SENTRY_DSN;
   } catch (error) {
     console.error('Failed to load production config:', error);
   }
@@ -107,6 +106,12 @@ if (process.env.NODE_ENV === 'development') {
 
 if (aptabaseKey) {
   aptabase.initialize(aptabaseKey);
+}
+
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
 }
 
 if (process.argv.length >= 2) {
