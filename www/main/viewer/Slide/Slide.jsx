@@ -138,9 +138,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
     verseObj,
   ]);
 
-  if (!verseObj) return null;
-
-  return (
+  return verseObj ? (
     <div
       className={!akhandpatt ? 'verse-slide-wrapper' : ''}
       id={`verse-${verseObj.ID}`}
@@ -157,7 +155,6 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
         unmountOnExit={!akhandpatt}
       >
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-          {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
           {verseObj && showVerse && !isMiscSlide && (
             <>
               {verseObj.Gurmukhi && (
@@ -203,6 +200,10 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
           )}
         </div>
       </CSSTransition>
+    </div>
+  ) : (
+    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+      {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
     </div>
   );
 });
