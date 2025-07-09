@@ -212,7 +212,6 @@ function ShabadDeck() {
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
-      // Add a delay to ensure all verses are rendered and refs are populated
       const verseDOM = verseRefs.current[activeVerseId];
 
       if (verseDOM) {
