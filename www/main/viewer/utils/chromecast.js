@@ -61,20 +61,15 @@ const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
-  const viewerLogo = viewerHtml.querySelector('.viewer-logo');
-  if (viewerLogo) viewerLogo.remove();
+  viewerHtml.querySelector('.viewer-logo')?.remove();
 
-  const slideQuicktools = viewerHtml.querySelector('.slide-quicktools');
-  if (slideQuicktools) slideQuicktools.remove();
+  viewerHtml.querySelector('.slide-quicktools')?.remove();
 
-  const video = viewerHtml.querySelector('video');
-  if (video) video.remove();
+  viewerHtml.querySelector('video')?.remove();
 
-  const shabadDeck = viewerHtml.querySelector('.shabad-deck');
-  if (shabadDeck) shabadDeck.removeAttribute('style');
+  viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
 
-  const verseSlideWrapper = viewerHtml.querySelector('.verse-slide-wrapper');
-  if (verseSlideWrapper) verseSlideWrapper.removeAttribute('style');
+ viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
 
   return viewerHtml.innerHTML;
 };
