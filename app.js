@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
 // eslint-disable-next-line import/no-unresolved
 const aptabase = require('@aptabase/electron/main');
+const Sentry = require('@sentry/electron/main');
 
 require('dotenv').config();
 
@@ -25,6 +26,7 @@ const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
 
+const prodConfig = require('./config.prod.json');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -86,7 +88,31 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
-aptabase.initialize(process.env.APTABASE_KEY);
+
+// Initialize Aptabase with key from appropriate source
+let aptabaseKey;
+let sentryDsn;
+if (process.env.NODE_ENV === 'development') {
+  aptabaseKey = process.env.APTABASE_KEY;
+  sentryDsn = process.env.SENTRY_DSN;
+} else {
+  try {
+    aptabaseKey = prodConfig.APTABASE_KEY;
+    sentryDsn = prodConfig.SENTRY_DSN;
+  } catch (error) {
+    console.error('Failed to load production config:', error);
+  }
+}
+
+if (aptabaseKey) {
+  aptabase.initialize(aptabaseKey);
+}
+
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
