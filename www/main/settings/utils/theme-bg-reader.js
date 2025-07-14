@@ -29,8 +29,8 @@ export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
           .map((file) => ({
             name: file,
             path: `${userBackgroundsPath}/${file}`,
-            'background-image': `${userBackgroundsURL}/${file.replace(/(\s)/g, '\\ ')}`,
-            'background-image-path': `${userBackgroundsPath}/${file.replace(/(\s)/g, '\\ ')}`,
+            'background-image': `${userBackgroundsURL}/${file}`,
+            'background-image-path': `${userBackgroundsPath}/${file}`,
             time: fs.statSync(path.resolve(userBackgroundsPath, file)).mtime.getTime(),
           }))
           .sort((a, b) => b.time - a.time),

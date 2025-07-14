@@ -34,6 +34,7 @@ const ShabadContent = () => {
     minimizedBySingleDisplay,
     isDontSaveHistory,
     savedCrossPlatformId,
+    lineNumber,
   } = useStoreState((state) => state.navigator);
 
   const {
@@ -49,9 +50,8 @@ const ShabadContent = () => {
   } = useStoreActions((state) => state.navigator);
 
   // mangalPosition was removed from below settings
-  const { autoplayToggle, autoplayDelay, baniLength, liveFeed } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { autoplayToggle, autoplayDelay, baniLength, liveFeed, intelligentSpacebar } =
+    useStoreState((state) => state.userSettings);
 
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -258,15 +258,7 @@ const ShabadContent = () => {
   };
 
   const toggleHomeVerse = () => {
-    if (isSundarGutkaBani || isCeremonyBani) {
-      openNextVerse();
-    } else if (homeVerse) {
-      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
-      const currentVerseIndex = mappedShabadArray.findIndex(
-        ({ verseId }) => verseId === activeVerseId,
-      );
-      let nextVerseIndex;
-
+    const handleIntelligentSpacebar = (nextVerseIndex, mappedShabadArray, currentVerseIndex) => {
       if (atHome) {
         if (previousVerseIndex !== null) {
           nextVerseIndex = previousVerseIndex + 1;
@@ -298,6 +290,27 @@ const ShabadContent = () => {
           setPreviousIndex(nextVerseIndex);
         }
       }
+      return nextVerseIndex;
+    };
+
+    if (isSundarGutkaBani || isCeremonyBani) {
+      openNextVerse();
+    } else if (homeVerse) {
+      const mappedShabadArray = filterRequiredVerseItems(activeShabad);
+      const currentVerseIndex = mappedShabadArray.findIndex(
+        ({ verseId }) => verseId === activeVerseId,
+      );
+
+      let nextVerseIndex = homeVerse;
+
+      if (intelligentSpacebar) {
+        nextVerseIndex = handleIntelligentSpacebar(
+          nextVerseIndex,
+          mappedShabadArray,
+          currentVerseIndex,
+        );
+      }
+
       const nextVerseId = mappedShabadArray[nextVerseIndex].verseId;
       scrollToVerse(nextVerseId);
       updateTraversedVerse(nextVerseId, nextVerseIndex);
@@ -373,7 +386,11 @@ const ShabadContent = () => {
     setTimeout(() => {
       const currentIndex = activeShabad.findIndex((obj) => obj.ID === activeVerseId);
       // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-      if (activeVerseId !== 61 && activeShabad[currentIndex].Gurmukhi !== ',') {
+      if (
+        currentIndex >= 0 &&
+        activeVerseId !== 61 &&
+        activeShabad[currentIndex].Gurmukhi !== ','
+      ) {
         virtuosoRef.current.scrollToIndex({
           index: currentIndex,
           behavior: 'smooth',
@@ -422,10 +439,8 @@ const ShabadContent = () => {
       loadCeremony(ceremonyId).then((ceremonyVerses) => {
         if (ceremonyVerses) {
           setActiveShabad(ceremonyVerses);
-          const newEntry = saveToHistory(ceremonyVerses, 'ceremony');
-          if (newEntry) {
-            openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
-          }
+          saveToHistory(ceremonyVerses, 'ceremony');
+          openFirstVerse(ceremonyVerses[0].ID, ceremonyVerses[0].crossPlatformID);
         }
       });
     } else {
@@ -498,6 +513,10 @@ const ShabadContent = () => {
         live: liveFeed,
       }),
     );
+    if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
+      setActiveVerse({ [lineNumber - 1]: activeVerseId });
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+    }
   }, [activeShabad, activeVerseId]);
 
   // checks if keyboard shortcut is fired then it invokes the function
@@ -564,6 +583,7 @@ const ShabadContent = () => {
                 isHomeVerse={homeVerse}
                 lineNumber={index}
                 versesRead={versesRead}
+                activeVerseRef={activeVerseRef}
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}

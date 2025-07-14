@@ -6,6 +6,7 @@ const { version } = require('../package.json');
 
 const files = {
   mac: 'sttm-mac-x64',
+  macArm: 'sttm-mac-arm64',
   win: 'sttm-win-x64',
   win32: 'sttm-win-ia32',
 };

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
-import { Switch, Tile } from '../../../common/sttm-ui';
+import { MultipaneDropdown, Switch, Tile } from '../../../common/sttm-ui';
 import { ceremoniesFilter } from '../../../common/constants';
 
 import { getUserPreferenceFor } from '../utils';
@@ -17,7 +17,13 @@ const { getTheme } = require('../../../theme_editor');
 
 const CeremonyPane = ({ token, name, id, onScreenClose }) => {
   const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
-  const { theme: currentTheme } = useStoreState((state) => state.userSettings);
+  const { setPane1, setPane2, setPane3 } = useStoreActions((state) => state.navigator);
+  const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
+  const { theme: currentTheme, currentWorkspace } = useStoreState((state) => state.userSettings);
+
+  const [paneSelectorActive, setPaneSelectorActive] = useState(false);
+
+  const paneSelector = useRef(null);
 
   const { ceremonyId, isCeremonyBani, isSundarGutkaBani } = useStoreState(
     (state) => state.navigator,
@@ -36,7 +42,22 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     }
   }, []);
 
-  const onThemeClick = (theme) => {
+  const openPaneMenu = (e, theme) => {
+    paneSelector.current.style.left = `${e.clientX - 100}px`;
+    if (window.innerHeight - e.clientY > 200) {
+      paneSelector.current.style.top = `${e.clientY - 10}px`;
+    } else {
+      paneSelector.current.style.top = `${e.clientY - 195}px`;
+    }
+    paneSelector.current.dataset.theme = JSON.stringify(theme);
+    setPaneSelectorActive(true);
+  };
+
+  const onThemeClick = (event, theme, multipaneId = null) => {
+    let parsedTheme = theme;
+    if (typeof theme === 'string') {
+      parsedTheme = JSON.parse(theme);
+    }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }
@@ -48,13 +69,43 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
       setIsCeremonyBani(true);
     }
     onScreenClose();
-    if (currentTheme !== theme.key) {
-      applyTheme(theme, null, setTheme, setThemeBg);
+    if (currentTheme !== parsedTheme.key) {
+      applyTheme(parsedTheme, null, setTheme, setThemeBg);
+    }
+    if (multipaneId !== null) {
+      switch (multipaneId) {
+        case 1:
+          setPane1({
+            ...pane1,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'ceremony',
+            activeShabad: currentCeremony,
+          });
+          break;
+        case 2:
+          setPane2({
+            ...pane2,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'ceremony',
+            activeShabad: currentCeremony,
+          });
+          break;
+        case 3:
+          setPane3({
+            ...pane3,
+            content: i18n.t('MULTI_PANE.SHABAD'),
+            baniType: 'ceremony',
+            activeShabad: currentCeremony,
+          });
+          break;
+        default:
+          break;
+      }
     }
     analytics.trackEvent({
       category: 'ceremony',
       action: 'theme',
-      label: theme.key,
+      label: parsedTheme.key,
       value: currentCeremony,
     });
   };
@@ -85,8 +136,21 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     current: getTheme(currentTheme),
   };
 
+  const openCeremonyFromDropdown = (e, givenPane) => {
+    onThemeClick(e, paneSelector.current.dataset.theme, givenPane);
+    setPaneSelectorActive(false);
+  };
+
   return (
     <div className="ceremony-pane" id={paneId}>
+      {
+        <MultipaneDropdown
+          paneSelectorActive={paneSelectorActive}
+          setPaneSelectorActive={setPaneSelectorActive}
+          paneSelector={paneSelector}
+          clickHandler={openCeremonyFromDropdown}
+        />
+      }
       <header className="toolbar-nh navigator-header">
         <span className="gurmukhi">{name}</span>
       </header>
@@ -115,8 +179,12 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
             <div className="ceremony-theme-header"> {i18n.t('TOOLBAR.CHOOSE_THEME')} </div>
 
             <Tile
-              onClick={() => {
-                onThemeClick(themes.light);
+              onClick={(e) => {
+                if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+                  openPaneMenu(e, themes.light);
+                } else {
+                  onThemeClick(e, themes.light);
+                }
               }}
               className="theme-instance"
               theme={themes.light}
@@ -125,8 +193,12 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
             </Tile>
 
             <Tile
-              onClick={() => {
-                onThemeClick(themes[token]);
+              onClick={(e) => {
+                if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+                  openPaneMenu(e, themes[token]);
+                } else {
+                  onThemeClick(e, themes[token]);
+                }
               }}
               className="theme-instance"
               theme={themes[token]}
@@ -135,8 +207,12 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
             </Tile>
 
             <Tile
-              onClick={() => {
-                onThemeClick(themes.current);
+              onClick={(e) => {
+                if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
+                  openPaneMenu(e, themes.current);
+                } else {
+                  onThemeClick(e, themes.current);
+                }
               }}
               className="theme-instance"
               theme={themes.current}

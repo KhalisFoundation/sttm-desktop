@@ -1,5 +1,50 @@
 ## New Updates
 
+### 9.2.4 - ਊਨਾ Release _June 06, 2025_
+
+#### Misc. bug fix and other improvements
+- Style fix in Bani Overlay: Consistent branding across all layouts.
+- Added a setting to turn off the intelligent spacebar.
+- Akhand Path mode: Scroll to verse when clicked from Navigator and also syncs the scroll from preview window with the viewer.
+- Code and Style Improvements: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
+### 9.2.2 - ਊਨਾ Release _July 15, 2024_
+
+#### Misc. bug fix and other improvements
+- Enhanced Bani Controller: Improved functionality when using the Bani Controller in a multipane workspace.
+- Improved Theme Handling: Enhanced support for custom images during theme changes.
+- Restored Font Size Adjustments: Restored the ability to change the font size for miscellaneous slides such as "Waheguru" and "Mool Mantra."
+- Code and Style Improvements: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
+
+<details>
+<summary>Previous Updates</summary>
+
+### 9.2.1 - ਊਨਾ Release _May 24, 2024_
+
+#### New Features
+- Choose the order of the lines that sangat see on screen using quickview dropdowns. 
+  ![](./assets/img/help_images/content-order.gif)
+- New Multi-Pane workspace allows you to open multiple Shabads on one screen to display from.
+  ![](./assets/img/help_images/multipane-preview.gif)
+- You now have the ability to reset the font sizes.
+
+#### Misc. bug fix and other improvements
+- Update of the support link.
+- Improve the colors of Floral theme in Bani Overlay.
+- Preserve formatting (line breaks) in announcement.
+- Improvements to Bani Overlay margins to adhere to standard broadcast standards.
+- Code refactors and style improvements.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.0 - ਊਨਾ Release _January 30, 2024_
 
 #### New Features
@@ -357,8 +402,7 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 - Fixed an issue with live feed text files not working
 - Fixed an issue with the changelog getting stuck behind the app
 
-<br/>  
-<details><summary>See previous updates...</summary>
+<br/>
   
 ### 6.3.2 - _January 7, 2020_
 
@@ -699,4 +743,4 @@ We are excited to launch the latest version of SikhiToTheMax 9.0, which features
 3.  Navigate with up and down arrows and press space bar to return back to the main line
 4.  Use the icons at the bottom of the footer to navigate between Search, Recent Shabads, and Current Shabad
 5.  Please submit feedback to techsupport@khalisfoundation.org
-    </details>
+</details>

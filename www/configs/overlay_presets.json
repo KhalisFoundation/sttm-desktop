@@ -31,9 +31,9 @@
   },
   "floral": {
     "label": "FLORAL",
-    "bgColor": "#f5b7d1",
-    "textColor": "#a3eafd",
-    "gurbaniTextColor": "#440a1d"
+    "bgColor": "#ff7ab2",
+    "textColor": "#570532",
+    "gurbaniTextColor": "#ffffff"
   },
   "khalsaGold": {
     "label": "KHALSA_GOLD",

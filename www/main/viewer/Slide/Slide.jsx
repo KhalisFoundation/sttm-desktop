@@ -11,11 +11,8 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
+const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
   const {
-    translationVisibility,
-    transliterationVisibility,
-    teekaVisibility,
     larivaar,
     larivaarAssist,
     larivaarAssistType,
@@ -23,12 +20,21 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     vishraamSource,
     vishraamType,
     displayNextLine,
+    content1,
+    content2,
+    content3,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
   const [showVerse, setShowVerse] = useState(true);
+  const [orderMarkup, setOrderMarkup] = useState(null);
 
   const activeVerseRef = useRef(null);
+
+  const visibilityStates = [content1Visibility, content2Visibility, content3Visibility];
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -56,7 +62,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (activeVerseRef && activeVerseRef.current.className.includes('active-viewer-verse')) {
+      if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
@@ -65,11 +71,76 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
     }, 100);
   }, [verseObj]);
 
-  return (
-    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+  useEffect(() => {
+    const markup = [content1, content2, content3].map((content, index) => {
+      if (visibilityStates[index]) {
+        if (content.includes('teeka')) {
+          return (
+            verseObj &&
+            verseObj.Translations && (
+              <SlideTeeka
+                getFontSize={getFontSize}
+                teekaObj={JSON.parse(verseObj.Translations)}
+                key={`line-${index}`}
+                position={index}
+              />
+            )
+          );
+        }
+        if (content.includes('translation')) {
+          return (
+            verseObj &&
+            verseObj.Translations && (
+              <SlideTranslation
+                getFontSize={getFontSize}
+                translationObj={JSON.parse(verseObj.Translations)}
+                key={`line-${index}`}
+                lang={content}
+                position={index}
+              />
+            )
+          );
+        }
+        if (content.includes('transliteration')) {
+          return (
+            verseObj &&
+            verseObj.Gurmukhi && (
+              <SlideTransliteration
+                getFontSize={getFontSize}
+                gurmukhiString={verseObj.Gurmukhi}
+                key={`line-${index}`}
+                lang={content}
+                position={index}
+              />
+            )
+          );
+        }
+      }
+      return null;
+    });
+    setOrderMarkup(markup);
+  }, [
+    content1,
+    content2,
+    content3,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
+    verseObj,
+  ]);
+
+  return verseObj ? (
+    <div
+      className="verse-slide-wrapper"
+      id={`verse-${verseObj.ID}`}
+      style={{ background: bgColor }}
+      ref={(el) => {
+        updateVerseRef(verseObj.ID, el);
+      }}
+      data-verseid={verseObj.ID}
+    >
       <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
-          {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
           {verseObj && showVerse && !isMiscSlide && (
             <>
               {verseObj.Gurmukhi && (
@@ -79,7 +150,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                   }`}
                   ref={activeVerseRef}
                   style={{
-                    'font-weight': 'normal', // adding style here to reach chromecast
+                    fontWeight: 'normal', // adding style here to reach chromecast
                   }}
                 >
                   <SlideGurbani
@@ -92,29 +163,12 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
                 </h1>
               )}
 
-              {translationVisibility && verseObj.Translations && (
-                <SlideTranslation
-                  getFontSize={getFontSize}
-                  translationObj={JSON.parse(verseObj.Translations)}
-                />
-              )}
+              {orderMarkup !== null && orderMarkup}
 
               {verseObj.English && (
                 <SlideTranslation getFontSize={getFontSize} translationHTML={verseObj.English} />
               )}
 
-              {teekaVisibility && verseObj.Translations && (
-                <SlideTeeka
-                  getFontSize={getFontSize}
-                  teekaObj={JSON.parse(verseObj.Translations)}
-                />
-              )}
-              {transliterationVisibility && (
-                <SlideTransliteration
-                  getFontSize={getFontSize}
-                  gurmukhiString={verseObj.Gurmukhi}
-                />
-              )}
               {displayNextLine && nextLineObj && (
                 <div
                   className={`slide-next-line slide-gurbani ${getLarivaarAssistClass()} ${getVishraamType()}`}
@@ -133,6 +187,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor }) => {
         </div>
       </CSSTransition>
     </div>
+  ) : (
+    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+      {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
+    </div>
   );
 };
 
@@ -141,6 +199,7 @@ Slide.propTypes = {
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
   bgColor: PropTypes.string,
+  updateVerseRef: PropTypes.func,
 };
 
 export default Slide;

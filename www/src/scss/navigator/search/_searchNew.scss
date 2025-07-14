@@ -254,10 +254,9 @@
     overflow: auto;
   }
   .search-footer {
-    @include flex($ai-value: start, $jc-value: initial, $width: 99%);
+    @include flex($ai-value: center, $jc-value: initial, $width: 100%);
     font-size: 14px;
     padding: 10px;
-    margin-bottom: 5px;
     span {
       &:not(:last-child) {
         @include inline-flex($width: initial);

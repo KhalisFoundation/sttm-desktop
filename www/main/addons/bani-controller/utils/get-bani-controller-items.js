@@ -49,7 +49,12 @@ const getBaniControllerItems = ({
                 code,
               });
               setMiscSlideText(syncString);
-              analytics.trackEvent('controller', 'codePresented', true);
+              analytics.trackEvent({
+                category: 'controller',
+                action: 'codePresented',
+                label: 'present code',
+                value: true,
+              });
               analytics.trackEvent({
                 category: 'controller',
                 action: 'codePresented',

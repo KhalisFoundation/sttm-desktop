@@ -3,6 +3,15 @@
     height: auto !important;
     padding: 10px !important;
   }
+
+  .verse-slide-wrapper {
+    align-items: center;
+    display: flex;
+
+    .verse-slide {
+      width: 100%;
+    }
+  }
 }
 
 .single-display-mode {
@@ -35,7 +44,6 @@
   font-size: 45px;
   font-weight: normal;
   line-height: 1.15;
-  order: 1;
 }
 
 .slide-announcement {
@@ -43,6 +51,7 @@
   display: flex;
   height: 100%;
   justify-content: center;
+  white-space: pre-wrap;
 
   .gurmukhi-announcement-slide {
     @extend .gurmukhi-vaak-thick;
@@ -59,7 +68,6 @@
 .slide-translation {
   font-weight: 600;
   margin: 10px 0;
-  order: 2;
 
   &.custom-english {
     display: flex;
@@ -75,19 +83,16 @@
   @extend .gurmukhi-vaak;
   font-weight: 600;
   margin: 10px 0;
-  order: 3;
 }
 
 .slide-transliteration {
   font-weight: 600;
   margin: 10px 0;
-  order: 4;
 }
 
 .slide-next-line {
   opacity: 0.5;
   margin: 10px 0;
-  order: 5;
 }
 
 .slide-left-align {

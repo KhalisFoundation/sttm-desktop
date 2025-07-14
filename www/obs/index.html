@@ -131,13 +131,13 @@
       const layoutContainer = document.querySelector('.layout-top-bottom');
       layoutContainer.style.color = overlayPrefs.textColor;
       layoutContainer.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
-      layoutContainer.style.padding = `${overlayPrefs.fitTextSwitch ? 1 : overlayPrefs.padding}vh`;
+      layoutContainer.style.padding = `${overlayPrefs.fitTextSwitch ? '1vh 5%' : `${overlayPrefs.padding}vh 5%`}`;
       layoutContainer.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
 
       document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
         el.style.color = overlayPrefs.textColor;
         el.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
-        el.style.padding = `${overlayPrefs.fitTextSwitch ? 1 : overlayPrefs.padding}vh`;
+        el.style.padding = `${overlayPrefs.fitTextSwitch ? '1vh 5%' : `${overlayPrefs.padding}vh 5%`}`;
         el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
       });
 
@@ -149,11 +149,11 @@
       if (!preview && ['top', 'bottom'].includes(overlayPrefs.layout)) {
         if (overlayPrefs.fitTextSwitch) {
           fitTextInstances = fitty('.layout-top-bottom .o-gurbani', {
-            minSize: 14,
+            minSize: 18,
             maxSize: 36,
           });
           fitTextInstances.push(...fitty('.layout-top-bottom .o-translation', {
-            minSize: 12,
+            minSize: 14,
             maxSize: 24,
             multiLine: true,
           }));
@@ -205,14 +205,12 @@
         }
       }
 
-      document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
+      document.querySelectorAll('.content-top, .content-bars-bottom').forEach(el => {
         // Clear styles added by other overrides
         document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
           spanEl.style.backgroundColor = 'transparent';
         });
         document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
-        // Apply the background color from theme
-        el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
       });
 
       // Special style overrides for vertical layout
@@ -247,13 +245,23 @@
 
       document.body.style.backgroundColor = overlayColor;
 
-      const $gurbani = document.querySelector('.o-gurbani');
-      const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-      let line = '';
-      if ($gurbani.children.length) {
-        line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
-      }
-      $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      const $gurbaniWrapper = document.querySelectorAll('.o-gurbani');
+
+      $gurbaniWrapper.forEach($gurbani => {
+        let line = '';
+        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+        if ($gurbani.children.length) {
+          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
+        }
+        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
+      });
+
+      // Apply the font weight and italic to translation and transliteration
+      document.querySelectorAll('span.o-translation, span.o-transliteration').forEach(el => {
+        el.style.fontWeight = overlayPrefs.textFormat.bold ? 900 : 400;
+        el.style.fontStyle = overlayPrefs.textFormat.italic ? 'italic' : 'normal';
+      });
+
     };
 
     socket.on('show-line', request => {
@@ -295,6 +303,9 @@
         <div><span class="gurmukhi o-gurbani"> </span></div>
         <div><span class="o-translation"> </span></div>
       </div>
+      <div class="logo-wrapper" >
+        <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
+      </div>
     </div>
     <div class="other-layouts">
       <div class="content-top">
@@ -311,7 +322,6 @@
           </div>
         </div>
         <div class="logo-wrapper">
-          <img alt="SikhiToTheMax" src="./sikhi-max-logo.png" class="sttm-logo" />
           <img alt="SikhiToTheMax" src="./sikhi-max-logo-white.png" class="sttm-logo-white" />
         </div>
       </div>

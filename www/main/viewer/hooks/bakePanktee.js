@@ -53,7 +53,7 @@ const bakePanktee = () => {
           ...getFontSize(gurbaniFontSize),
           display: 'inline-block',
           margin: '0 0.15em',
-          'white-space': 'nowrap',
+          whiteSpace: 'nowrap',
         };
       }
       return breakIntoWords(gurmukhiString).map((word, i) => (

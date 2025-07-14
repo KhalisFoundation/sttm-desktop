@@ -5,6 +5,7 @@ import { useStoreState } from 'easy-peasy';
 import { Overlay, Switch } from '../../../common/sttm-ui';
 import Announcement from './Annoucement';
 import { DhanGuru } from './DhanGuru';
+import MiscSlides from './MiscSlides';
 
 const AnnouncementPane = ({ onScreenClose, className }) => {
   const { isMiscSlideGurmukhi } = useStoreState((state) => state.navigator);
@@ -32,6 +33,7 @@ const AnnouncementPane = ({ onScreenClose, className }) => {
           />
         </header>
         <Announcement isGurmukhi={isGurmukhi} />
+        <MiscSlides />
         <DhanGuru isGurmukhi={isGurmukhi} />
       </div>
     </Overlay>

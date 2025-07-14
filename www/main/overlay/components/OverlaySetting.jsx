@@ -67,6 +67,13 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     }
   };
 
+  const handleFormatIcon = (event) => {
+    const clickedEvent = event.currentTarget ? event.currentTarget.dataset.value : event;
+    const currentFormat = { ...baniOverlayState[stateVar] };
+    currentFormat[clickedEvent] = !currentFormat[clickedEvent];
+    baniOverlayActions[stateFunction](currentFormat);
+  };
+
   const settingDOM = [];
 
   if (title) {
@@ -103,6 +110,26 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
           </div>
           <div className="size-icon icon-right" data-value="minus" onClick={handleSizeIcon}>
             <i className="fa fa-minus"></i>
+          </div>
+        </span>,
+      );
+      break;
+    case 'text-format-icon':
+      settingDOM.push(
+        <span className={`text-icon-container`}>
+          <div
+            className={`text-icon icon-bold ${baniOverlayState[stateVar].bold && 'active'}`}
+            data-value="bold"
+            onClick={handleFormatIcon}
+          >
+            <i className="fa fa-bold"></i>
+          </div>
+          <div
+            className={`text-icon icon-italic ${baniOverlayState[stateVar].italic && 'active'}`}
+            data-value="italic"
+            onClick={handleFormatIcon}
+          >
+            <i className="fa fa-italic"></i>
           </div>
         </span>,
       );

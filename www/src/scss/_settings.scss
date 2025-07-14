@@ -219,6 +219,21 @@
             }
           }
         }
+
+        .icon-reset {
+          border-radius: 4px;
+          box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          padding: 8px;
+          display: flex;
+          gap: 8px;
+
+          img{
+            height: 16px;
+            width: 16px;
+            filter: invert(0.4);
+          }
+        }
       }
     }
   }
@@ -356,11 +371,6 @@
   line-height: 1.5;
 }
 
-.transtext,
-.translittext {
-  display: none;
-}
-
 .translation-language-English .english-translation,
 .translation-language-Spanish .spanish-translation,
 .transliteration-language-Shahmukhi .shahmukhi-transliteration,
@@ -377,14 +387,6 @@
   font-family: 'gurbaniakhar';
   line-height: 1.5;
   margin-top: 0.25em;
-}
-
-.translation,
-.transliteration,
-.teeka {
-  display: none;
-  height: 0;
-  opacity: 0;
 }
 
 .translation-visibility-true .translation,

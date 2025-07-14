@@ -7,6 +7,7 @@ const ShabadVerse = ({
   isHomeVerse,
   lineNumber,
   versesRead,
+  activeVerseRef,
   updateTraversedVerse,
   verse,
   englishVerse,
@@ -15,18 +16,19 @@ const ShabadVerse = ({
   const loadActiveClass = (verseObj, currentVerseId, verseIndex) =>
     Object.keys(verseObj).map((verseKey) => {
       if (Number(verseKey) === verseIndex && verseObj[verseKey] === currentVerseId) {
-        return 1;
+        return true;
       }
-      return 0;
-    })[0]
-      ? 'shabad-pane-active'
-      : '';
+      return false;
+    })[0];
 
   return (
     <li
       id={`line-${lineNumber}`}
       value={lineNumber}
-      className={`shabad-pane-list shabad-li ${loadActiveClass(activeVerse, verseId, lineNumber)}`}
+      ref={loadActiveClass(activeVerse, verseId, lineNumber) ? activeVerseRef : null}
+      className={`shabad-pane-list shabad-li ${
+        loadActiveClass(activeVerse, verseId, lineNumber) ? 'shabad-pane-active' : ''
+      }`}
     >
       <span className="shabad-pane-controls">
         {versesRead.map(
@@ -66,6 +68,7 @@ ShabadVerse.propTypes = {
   isHomeVerse: PropTypes.number,
   lineNumber: PropTypes.number,
   versesRead: PropTypes.array,
+  activeVerseRef: PropTypes.object,
   updateTraversedVerse: PropTypes.func,
   verse: PropTypes.string,
   englishVerse: PropTypes.string,

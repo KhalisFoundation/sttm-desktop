@@ -4,7 +4,7 @@ import anvaad from 'anvaad-js';
 import { Tile } from '../../../common/sttm-ui';
 import { convertToHyphenCase } from '../../../common/utils';
 
-const ExtraBani = ({ title, banis = [], loadBani, isEngTransliterated = false }) => {
+const ExtraBani = ({ title, banis = [], getBani, isEngTransliterated = false }) => {
   const hyphenedTitle = convertToHyphenCase(title.toLowerCase());
   const groupHeaderClassName = `${hyphenedTitle}-heading`;
   const groupClassName = hyphenedTitle;
@@ -16,7 +16,9 @@ const ExtraBani = ({ title, banis = [], loadBani, isEngTransliterated = false })
       <div className={`bani-group ${groupClassName}`}>
         {banis.map(({ id, name }) => (
           <Tile
-            onClick={() => loadBani(id)}
+            onClick={(e) => {
+              getBani(e, id);
+            }}
             key={name}
             type="extras"
             className={groupItemClassName}
@@ -33,7 +35,7 @@ const ExtraBani = ({ title, banis = [], loadBani, isEngTransliterated = false })
 ExtraBani.propTypes = {
   title: PropTypes.string,
   banis: PropTypes.array,
-  loadBani: PropTypes.func,
+  getBani: PropTypes.func,
   isEngTransliterated: PropTypes.bool,
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { joinClasses } from '../../utils';
+import { classNames, joinClasses } from '../../utils';
 
 const Tile = ({
   children,
@@ -32,7 +32,7 @@ const Tile = ({
       className={`ui-tile ${tileClassname}`}
       style={theme ? getThemeSwatchStyles(theme) : null}
     >
-      <span className={isEngTransliterated && 'eng-tile'}>{children || content}</span>
+      <span className={classNames(isEngTransliterated && 'eng-tile')}>{children || content}</span>
     </button>
   );
 };

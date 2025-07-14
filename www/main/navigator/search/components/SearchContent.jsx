@@ -74,8 +74,8 @@ const SearchContent = () => {
   const loadMoreSearchResults = useCallback(() => {
     setTimeout(() => {
       setSearchResultsCount(searchResultsCount + 20);
-      searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) =>
-        query ? setSearchData(rows) : setSearchData([]),
+      searchShabads(query, currentSearchType, currentSource, searchResultsCount).then(
+        (rows) => query && rows.length && setSearchData(rows),
       );
       analytics.trackEvent({
         category: 'search',

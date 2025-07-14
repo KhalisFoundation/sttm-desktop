@@ -2,12 +2,16 @@
 .pane-container {
   flex: 1;
   max-height: 45vh;
+  height: 100%;
 }
 
 .pane {
   display: flex;
   flex-direction: column;
   min-width: 500px;
+  .multipane-grid & {
+    min-width: 300px;
+  }
   position: relative;
   overflow: hidden;
   height: 100%;
@@ -25,11 +29,15 @@
   margin: 0;
   padding: 0 10px;
 
+  .shabad-pane-header {
+    height: 40px;
+  }
+
   .shabad-pn {
       display: inline-block;
       font-size: 1.1rem;
       width: 36px;
-      height: 36px;
+      height: 40px;
       text-align: center;
       line-height: 36px;
       margin-left:0px;
@@ -40,7 +48,7 @@
     
 }
 .pane-content {
-  @include flex($fd-value: column, $ai-value: initial);
+  @include flex($fd-value: column, $ai-value: initial, $jc-value: flex-start);
   flex-grow: 1;
   flex-wrap: nowrap;
   height: 100%;

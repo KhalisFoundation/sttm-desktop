@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
+
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -12,8 +14,11 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 
 const os = require('os');
+const remote = require('@electron/remote');
 
+const { i18n } = remote.require('./app');
 const platform = os.platform();
+
 const themes = require('../../../configs/themes.json');
 
 function ShabadDeck() {
@@ -34,17 +39,48 @@ function ShabadDeck() {
     baniLength,
     // mangalPosition,
     displayNextLine,
-    isSingleDisplayMode,
     themeBg,
+    currentWorkspace,
   } = useStoreState((state) => state.userSettings);
+
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
+  const verseRefKeys = useRef([]);
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.8,
+  };
+
+  const updateVerse = (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const visibleVerse = entry.target.dataset.verseid;
+        ipcRenderer.send('sync-scroll', visibleVerse);
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(updateVerse, observerOptions);
 
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
     long: 'existsTaksal',
     extralong: 'existsBuddhaDal',
+  };
+
+  const verseRefs = useRef({});
+
+  const updateVerseRef = (verseId, ref) => {
+    if (ref) {
+      verseRefs.current[verseId] = ref;
+      if (!verseRefKeys.current.includes(verseId)) {
+        verseRefKeys.current = [...verseRefKeys.current, verseId];
+      }
+      observer.observe(ref);
+    }
   };
 
   const getCurrentThemeInstance = () => themes.find((theme) => theme.key === currentTheme);
@@ -169,7 +205,20 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+
+  useEffect(() => {
+    if (activeVerseId && akhandpatt) {
+      const verseDOM = verseRefs.current[activeVerseId];
+
+      if (verseDOM) {
+        verseDOM.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }
+  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
 
   useEffect(() => {
     if (isMiscSlide) {
@@ -186,7 +235,7 @@ function ShabadDeck() {
       <div
         className={classNames(
           'shabad-deck',
-          isSingleDisplayMode && 'single-display-mode',
+          currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY') && 'single-display-mode',
           miscSlideText === '' && 'empty-slide',
           minimizedBySingleDisplay && 'single-display-minimized',
           akhandpatt && !isMiscSlide && 'akhandpatt-view',
@@ -204,6 +253,7 @@ function ShabadDeck() {
               nextLineObj={nextVerse}
               isMiscSlide={isMiscSlide}
               bgColor={applyOverlay()}
+              updateVerseRef={updateVerseRef}
             />
           ))
         ) : (
