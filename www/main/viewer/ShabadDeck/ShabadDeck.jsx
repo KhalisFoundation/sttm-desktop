@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
+import { Virtuoso } from 'react-virtuoso';
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -45,6 +46,9 @@ function ShabadDeck() {
 
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
+  const [hasMore, setHasMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const PAGE_SIZE = 100;
   const verseRefKeys = useRef([]);
 
   const observerOptions = {
@@ -125,90 +129,119 @@ function ShabadDeck() {
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
-  useEffect(() => {
-    if (activeVerseId) {
-      if (akhandpatt) {
-        loadShabad(activeShabadId, activeVerseId).then((verses) => setActiveVerse(verses));
-      } else {
-        loadShabadVerse(activeShabadId, activeVerseId).then((result) =>
-          result.map((activeRes) => setActiveVerse([activeRes])),
-        );
-        // load next line of searched shabad verse from db
-        if (displayNextLine) {
-          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then((result) => {
-            if (result.length) {
-              result.map((activeRes) => setNextVerse(activeRes));
-            } else {
-              setNextVerse(bakeEmptyVerse());
-            }
-          });
-        }
-      }
-    }
-    if (sundarGutkaBaniId && isSundarGutkaBani) {
-      if (akhandpatt) {
-        // mangalPosition was removed from 3rd argument of loadBani
-        loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((baniRows) => {
-          setActiveVerse([...baniRows]);
-        });
-      } else {
-        // load current bani verse from db and set in the state
-        loadBaniVerse(
-          sundarGutkaBaniId,
-          activeVerseId,
-          baniLengthCols[baniLength],
-          // mangalPosition,
-        ).then((rows) => {
-          if (rows.length > 1) {
-            setActiveVerse([rows[0]]);
-          } else if (rows.length === 1) {
-            setActiveVerse([...rows]);
-          }
-        });
-        // load next line of bani
-        if (displayNextLine) {
-          loadBaniVerse(
-            sundarGutkaBaniId,
-            activeVerseId,
-            baniLengthCols[baniLength],
-            displayNextLine,
-            // mangalPosition,
-          ).then((rows) => {
-            if (rows.length === 1) {
-              setNextVerse(...rows);
-            } else {
-              setNextVerse(bakeEmptyVerse());
-            }
-          });
-        }
-      }
-    }
-    if (ceremonyId && isCeremonyBani) {
-      loadCeremony(ceremonyId).then((ceremonyVersesArray) => {
-        let ceremonyVerses;
-        try {
-          ceremonyVerses = ceremonyVersesArray.flat(1);
-        } finally {
-          const activeCeremonyVerse = ceremonyVerses.filter((ceremonyVerse) => {
-            if (ceremonyVerse && ceremonyVerse.ID === activeVerseId) {
-              return true;
-            }
-            return false;
-          });
-          // filters next line of ceremony verse
-          const nextCeremonyVerse = ceremonyVerses.filter(
-            (ceremonyVerse) => ceremonyVerse && ceremonyVerse.ID === activeVerseId + 1,
-          );
-          setNextVerse(...nextCeremonyVerse);
-          if (akhandpatt) {
-            setActiveVerse([...ceremonyVerses]);
+  // Unified verse loading function
+  const loadVerses = useCallback(
+    async (isAkhandPatt = false) => {
+      let verses = [];
+      let nextVerseData = {};
+
+      try {
+        if (activeVerseId) {
+          if (isAkhandPatt) {
+            verses = await loadShabad(activeShabadId, activeVerseId);
           } else {
-            setActiveVerse([...activeCeremonyVerse]);
+            const result = await loadShabadVerse(activeShabadId, activeVerseId);
+            verses = result.length ? [result[0]] : [];
+
+            // Load next line if needed
+            if (displayNextLine) {
+              const nextResult = await loadShabadVerse(
+                activeShabadId,
+                activeVerseId,
+                displayNextLine,
+              );
+              nextVerseData = nextResult.length ? nextResult[0] : bakeEmptyVerse();
+            }
           }
         }
-      });
-    }
-  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+
+        if (sundarGutkaBaniId && isSundarGutkaBani) {
+          if (isAkhandPatt) {
+            verses = await loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]);
+          } else {
+            const rows = await loadBaniVerse(
+              sundarGutkaBaniId,
+              activeVerseId,
+              baniLengthCols[baniLength],
+            );
+            verses = rows.length > 1 ? [rows[0]] : rows;
+
+            // Load next line if needed
+            if (displayNextLine) {
+              const nextRows = await loadBaniVerse(
+                sundarGutkaBaniId,
+                activeVerseId,
+                baniLengthCols[baniLength],
+                displayNextLine,
+              );
+              nextVerseData = nextRows.length === 1 ? nextRows[0] : bakeEmptyVerse();
+            }
+          }
+        }
+
+        if (ceremonyId && isCeremonyBani) {
+          const ceremonyVersesArray = await loadCeremony(ceremonyId);
+          const ceremonyVerses = ceremonyVersesArray.flat(1);
+
+          const activeCeremonyVerse = ceremonyVerses.filter(
+            (verse) => verse && verse.ID === activeVerseId,
+          );
+          const nextCeremonyVerse = ceremonyVerses.filter(
+            (verse) => verse && verse.ID === activeVerseId + 1,
+          );
+
+          nextVerseData = nextCeremonyVerse[0] || {};
+          verses = isAkhandPatt ? ceremonyVerses : activeCeremonyVerse;
+        }
+
+        return { verses, nextVerseData };
+      } catch (error) {
+        console.error('Error loading verses:', error);
+        return { verses: [], nextVerseData: {} };
+      }
+    },
+    [
+      activeVerseId,
+      activeShabadId,
+      sundarGutkaBaniId,
+      isSundarGutkaBani,
+      baniLength,
+      displayNextLine,
+      ceremonyId,
+      isCeremonyBani,
+      baniLengthCols,
+      bakeEmptyVerse,
+    ],
+  );
+
+  // Main effect for loading verses
+  useEffect(() => {
+    const loadData = async () => {
+      const { verses, nextVerseData } = await loadVerses(akhandpatt);
+
+      if (akhandpatt) {
+        // For Akhand Patt, load initial page
+        setActiveVerse(verses.slice(0, PAGE_SIZE));
+        setHasMore(verses.length > PAGE_SIZE);
+        setCurrentPage(0);
+      } else {
+        setActiveVerse(verses);
+        setNextVerse(nextVerseData);
+      }
+    };
+
+    loadData();
+  }, [
+    activeShabadId,
+    activeVerseId,
+    sundarGutkaBaniId,
+    ceremonyId,
+    akhandpatt,
+    displayNextLine,
+    baniLength,
+    isSundarGutkaBani,
+    isCeremonyBani,
+  ]);
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {
@@ -230,6 +263,64 @@ function ShabadDeck() {
       }
     }
   }, [isMiscSlide]);
+
+  // Load more verses for infinite scrolling in Akhand Patt
+  const loadMore = useCallback(async () => {
+    if (!hasMore || !akhandpatt) return;
+
+    const { verses } = await loadVerses(true);
+    const nextPage = currentPage + 1;
+    const newVerses = verses.slice(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE);
+
+    if (newVerses.length > 0) {
+      setActiveVerse((prev) => [...prev, ...newVerses]);
+      setCurrentPage(nextPage);
+      setHasMore(verses.length > (nextPage + 1) * PAGE_SIZE);
+    } else {
+      setHasMore(false);
+    }
+  }, [hasMore, akhandpatt, loadVerses, currentPage, PAGE_SIZE]);
+
+  // Unified verse renderer
+  const renderVerse = useCallback(
+    (index, verseObj = null) => {
+      const verse = verseObj || activeVerse[index];
+      if (!verse) return null;
+
+      return (
+        <Slide
+          key={verse.ID || index}
+          verseObj={verse}
+          nextLineObj={nextVerse}
+          isMiscSlide={isMiscSlide}
+          bgColor={applyOverlay()}
+          updateVerseRef={updateVerseRef}
+        />
+      );
+    },
+    [activeVerse, nextVerse, isMiscSlide, applyOverlay, updateVerseRef],
+  );
+
+  // Main render function
+  const SlideRender = () => {
+    if (akhandpatt && activeVerse.length > 100) {
+      return (
+        <Virtuoso
+          data={activeVerse}
+          itemContent={renderVerse}
+          overscan={200}
+          style={{ height: '100%' }}
+          endReached={loadMore}
+        />
+      );
+    }
+
+    if (!activeVerse.length) {
+      return <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />;
+    }
+
+    return activeVerse.map((verseObj, index) => renderVerse(index, verseObj));
+  };
   return (
     <>
       {themeBg.type === 'video' && (
@@ -248,20 +339,7 @@ function ShabadDeck() {
         style={applyTheme()}
       >
         {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {activeVerse.length ? (
-          activeVerse.map((activeVerseObj, index) => (
-            <Slide
-              key={index}
-              verseObj={activeVerseObj}
-              nextLineObj={nextVerse}
-              isMiscSlide={isMiscSlide}
-              bgColor={applyOverlay()}
-              updateVerseRef={updateVerseRef}
-            />
-          ))
-        ) : (
-          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
-        )}
+        {SlideRender()}
       </div>
       <ViewerIcon className="viewer-logo" />
     </>
