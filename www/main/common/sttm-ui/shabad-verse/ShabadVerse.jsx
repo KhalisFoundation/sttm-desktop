@@ -37,7 +37,7 @@ const ShabadVerse = ({
       </span>
       {verse ? (
         <span
-          className="gurmukhi verse-content"
+          className={`gurmukhi verse-content ${verseId === 61 ? 'flower-verse' : ''}`}
           onClick={() => {
             updateTraversedVerse(verseId, lineNumber);
           }}
