@@ -174,6 +174,7 @@ function openSecondaryWindow(windowName) {
       },
     });
     remote.enable(window.obj.webContents);
+    window.obj.webContents.openDevTools();
     window.obj.setMenu(null);
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
@@ -363,7 +364,7 @@ function createViewer(ipcData) {
     remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
-        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
+        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT } div.autoplay-icon-container { display: none }',
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -680,17 +681,6 @@ app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
-});
-
-ipcMain.on('sync-scroll', (event, data) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.executeJavaScript(`
-      document.querySelector('#verse-${data}').scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    `);
-  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
