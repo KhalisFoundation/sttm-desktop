@@ -103,10 +103,10 @@
 
 // Quick Tools Styles
 
-.slide-quicktools {
+.slide-quicktools, .slide-paddingtools {
   font-size: 12px;
   font-weight: bold;
-  height: 99%;
+  height: 100%;
   position: fixed;
   width: 18%;
   max-width: 150px;
@@ -121,7 +121,15 @@
   }
 }
 
-.quicktool {
+.slide-paddingtools {
+  right: 0;
+
+  &.hide-tool {
+    left: -18%;
+  }
+}
+
+.quicktool, .paddingtool {
   &-header {
     background-color: #0000001a;
     display: flex;
@@ -167,6 +175,35 @@
     &-hidden {
       display: none;
     }
+  }
+}
+
+.paddingtool {
+  margin-bottom: 16px;
+
+  &-icons {
+    align-items: center;
+
+    i.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &-icon-value {
+    margin: 0;
+  }
+
+  &-icon-title {
+    margin-bottom: 8px;
+  }
+
+  &-title {
+    text-align: center;
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
   }
 }
 
