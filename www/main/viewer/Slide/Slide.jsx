@@ -62,6 +62,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
       global.platform.ipc.send('cast-to-receiver');
     }, 200);
 
+    // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
   }, [verseObj, isMiscSlide, akhandpatt]);
 
