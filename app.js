@@ -174,7 +174,6 @@ function openSecondaryWindow(windowName) {
       },
     });
     remote.enable(window.obj.webContents);
-    window.obj.webContents.openDevTools();
     window.obj.setMenu(null);
     window.obj.webContents.on('did-finish-load', () => {
       window.obj.show();
