@@ -65,7 +65,7 @@ const getSanitizedViewer = () => {
   viewerHtml.querySelector('.slide-quicktools')?.remove();
   viewerHtml.querySelector('video')?.remove();
   viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
- viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
+  viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
 
   return viewerHtml.innerHTML;
 };
