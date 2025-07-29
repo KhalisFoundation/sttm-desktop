@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
+
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
 import {
@@ -44,12 +46,42 @@ function ShabadDeck() {
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
+  const verseRefKeys = useRef([]);
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.8,
+  };
+
+  const updateVerse = (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const visibleVerse = entry.target.dataset.verseid;
+        ipcRenderer.send('sync-scroll', visibleVerse);
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(updateVerse, observerOptions);
 
   const baniLengthCols = {
     short: 'existsSGPC',
     medium: 'existsMedium',
     long: 'existsTaksal',
     extralong: 'existsBuddhaDal',
+  };
+
+  const verseRefs = useRef({});
+
+  const updateVerseRef = (verseId, ref) => {
+    if (ref) {
+      verseRefs.current[verseId] = ref;
+      if (!verseRefKeys.current.includes(verseId)) {
+        verseRefKeys.current = [...verseRefKeys.current, verseId];
+      }
+      observer.observe(ref);
+    }
   };
 
   const getCurrentThemeInstance = () => themes.find((theme) => theme.key === currentTheme);
@@ -177,6 +209,19 @@ function ShabadDeck() {
   }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
 
   useEffect(() => {
+    if (activeVerseId && akhandpatt) {
+      const verseDOM = verseRefs.current[activeVerseId];
+
+      if (verseDOM) {
+        verseDOM.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }
+  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
+
+  useEffect(() => {
     if (isMiscSlide) {
       if (activeVerse.length !== 0) {
         setActiveVerse([]);
@@ -201,31 +246,21 @@ function ShabadDeck() {
         )}
         style={applyTheme()}
       >
-        <div className="slide-tools">
-          {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-          {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
-        </div>
-
-        <div
-          id="viewer-container-slide-wrapper"
-          style={{
-            padding: `${containerPadding.top}px ${containerPadding.right}px ${containerPadding.bottom}px ${containerPadding.left}px`,
-          }}
-        >
-          {activeVerse.length ? (
-            activeVerse.map((activeVerseObj, index) => (
-              <Slide
-                key={index}
-                verseObj={activeVerseObj}
-                nextLineObj={nextVerse}
-                isMiscSlide={isMiscSlide}
-                bgColor={applyOverlay()}
-              />
-            ))
-          ) : (
-            <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
-          )}
-        </div>
+        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
+        {activeVerse.length ? (
+          activeVerse.map((activeVerseObj, index) => (
+            <Slide
+              key={index}
+              verseObj={activeVerseObj}
+              nextLineObj={nextVerse}
+              isMiscSlide={isMiscSlide}
+              bgColor={applyOverlay()}
+              updateVerseRef={updateVerseRef}
+            />
+          ))
+        ) : (
+          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+        )}
       </div>
       <ViewerIcon className="viewer-logo" />
     </>

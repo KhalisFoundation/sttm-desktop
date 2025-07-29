@@ -110,17 +110,17 @@
     "SELECT": "Select",
     "DHAN_GURU_IN_GURMUKHI": "Dhan Guru in Gurmukhi",
     "DHAN_GURU": {
-      "AMARDAS_SAHIB_JI": "Guru Amardas Ji",
-      "ANGAD_DEV_JI": "Guru Angad Dev Ji",
-      "ARJUN_DEV_JI": "Guru Arjun Dev Ji",
-      "GOBIND_SINGH_SAHIB_JI": "Guru Gobind Singh Ji",
-      "GRANTH_SAHIB_JI": "Guru Granth Sahib Ji",
-      "HARGOBIND_SAHIB_JI": "Guru Hargobind Ji",
-      "HARKRISHAN_SAHIB_JI": "Guru Harkrishan Ji",
-      "HARRAI_SAHIB_JI": "Guru Harrai Ji",
-      "NANAK_DEV_JI": "Guru Nanak Dev Ji",
-      "RAMDAS_SAHIB_JI": "Guru Ramdas Ji",
-      "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Ji"
+      "AMARDAS_SAHIB_JI": "Guru Amar Das Jee",
+      "ANGAD_DEV_JI": "Guru Angad Dev Jee",
+      "ARJUN_DEV_JI": "Guru Arjun Dev Jee",
+      "GOBIND_SINGH_SAHIB_JI": "Guru Gobind Singh Jee",
+      "GRANTH_SAHIB_JI": "Guru Granth Sahib Jee",
+      "HARGOBIND_SAHIB_JI": "Guru Hargobind Jee",
+      "HARKRISHAN_SAHIB_JI": "Guru Har Krishan Jee",
+      "HARRAI_SAHIB_JI": "Guru Har Rai Jee",
+      "NANAK_DEV_JI": "Guru Nanak Dev Jee",
+      "RAMDAS_SAHIB_JI": "Guru Ram Das Jee",
+      "TEG_BAHADUR_SAHIB_JI": "Guru Teg Bahadur Jee"
     }
   },
   "MULTI_PANE": {
@@ -219,16 +219,16 @@
         "TEXT": "Dasam Granth Sahib"
       },
       "GURDAS_JI_VAARAN": {
-        "TEXT": "Bhai Gurdas Singh Ji Vaaran"
+        "TEXT": "Bhai Gurdas Singh Jee Vaaran"
       },
       "GURDAS_VAARAN": {
-        "TEXT": "Bhai Gurdas Ji Vaaran"
+        "TEXT": "Bhai Gurdas Jee Vaaran"
       },
       "GURU_GRANTH_SAHIB": {
-        "TEXT": "Guru Granth Sahib Ji"
+        "TEXT": "Guru Granth Sahib Jee"
       },
       "NAND_LAL_VAARAN": {
-        "TEXT": "Bhai Nand Lal Ji Vaaran"
+        "TEXT": "Bhai Nand Lal Jee Vaaran"
       },
       "REHATNAMAS": {
         "TEXT": "Rehatnamas & Panthic Sources"

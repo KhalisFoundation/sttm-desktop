@@ -8,8 +8,10 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const useSlides = () => {
-  const { akhandpatt, currentWorkspace } = useStoreState((state) => state.userSettings);
-  const { setAkhandpatt } = useStoreActions((state) => state.userSettings);
+  const { akhandpatt, currentWorkspace, autoplayToggle } = useStoreState(
+    (state) => state.userSettings,
+  );
+  const { setAkhandpatt, setAutoplayToggle } = useStoreActions((state) => state.userSettings);
   const {
     isMiscSlide,
     miscSlideText,
@@ -40,6 +42,9 @@ export const useSlides = () => {
     if (!isMiscSlide) {
       if (akhandpatt) {
         setAkhandpatt(false);
+      }
+      if (autoplayToggle) {
+        setAutoplayToggle(false);
       }
       setIsMiscSlide(true);
     }

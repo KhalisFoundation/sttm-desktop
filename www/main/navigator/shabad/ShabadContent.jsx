@@ -50,9 +50,8 @@ const ShabadContent = () => {
   } = useStoreActions((state) => state.navigator);
 
   // mangalPosition was removed from below settings
-  const { autoplayToggle, autoplayDelay, baniLength, liveFeed, intelligentSpacebar } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { autoplayToggle, autoplayDelay, baniLength, liveFeed, intelligentSpacebar } =
+    useStoreState((state) => state.userSettings);
 
   const [activeShabad, setActiveShabad] = useState([]);
   const [activeVerse, setActiveVerse] = useState({});
@@ -102,21 +101,21 @@ const ShabadContent = () => {
       const regex = checkPauri.length > 1 ? /]\d*]/ : /]/;
       return versesNew
         ? versesNew.map((verse, index) => {
-          if (verse) {
-            const verseObj = {
-              ID: index,
-              verseId: verse.ID,
-              verse: verse.Gurmukhi,
-              english: verse.English ? verse.English : '',
-              lineNo: currentLine,
-              crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
-            };
-            // eslint-disable-next-line no-unused-expressions
-            regex.test(verse.Gurmukhi) && currentLine++;
-            return verseObj;
-          }
-          return {};
-        })
+            if (verse) {
+              const verseObj = {
+                ID: index,
+                verseId: verse.ID,
+                verse: verse.Gurmukhi,
+                english: verse.English ? verse.English : '',
+                lineNo: currentLine,
+                crossPlatformId: verse.crossPlatformID ? verse.crossPlatformID : '',
+              };
+              // eslint-disable-next-line no-unused-expressions
+              regex.test(verse.Gurmukhi) && currentLine++;
+              return verseObj;
+            }
+            return {};
+          })
         : [];
     }
   };
@@ -292,7 +291,7 @@ const ShabadContent = () => {
         }
       }
       return nextVerseIndex;
-    }
+    };
 
     if (isSundarGutkaBani || isCeremonyBani) {
       openNextVerse();
@@ -305,7 +304,11 @@ const ShabadContent = () => {
       let nextVerseIndex = homeVerse;
 
       if (intelligentSpacebar) {
-        nextVerseIndex = handleIntelligentSpacebar(nextVerseIndex, mappedShabadArray, currentVerseIndex);
+        nextVerseIndex = handleIntelligentSpacebar(
+          nextVerseIndex,
+          mappedShabadArray,
+          currentVerseIndex,
+        );
       }
 
       const nextVerseId = mappedShabadArray[nextVerseIndex].verseId;

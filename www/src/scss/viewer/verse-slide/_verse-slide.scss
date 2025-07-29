@@ -3,6 +3,15 @@
     height: auto !important;
     padding: 10px !important;
   }
+
+  .verse-slide-wrapper {
+    align-items: center;
+    display: flex;
+
+    .verse-slide {
+      width: 100%;
+    }
+  }
 }
 
 .single-display-mode {

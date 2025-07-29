@@ -3,7 +3,10 @@
 
 name: Node.js CI
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - berry-build
 
 jobs:
   build:

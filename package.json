@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.2.2",
+  "version": "9.2.4",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
-    "dist:mac": "npm run build && electron-builder --mac --arm64 --x64 --publish always",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --publish always",
     "dist:macArm": "npm run build && electron-builder --mac --arm64 --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
@@ -80,6 +80,7 @@
     "@aptabase/electron": "^0.3.1",
     "@babel/polyfill": "^7.8.7",
     "@electron/remote": "^2.0.11",
+    "@sentry/electron": "^6.8.0",
     "anvaad-js": "^1.4.3",
     "axios": "^1.5.1",
     "copy-to-clipboard": "^3.3.3",
@@ -88,7 +89,7 @@
     "electron-chromecast": "^1.1.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "extract-zip": "^2.0.1",
     "get-json": "^1.0.1",
     "html-react-parser": "^4.2.2",
@@ -97,7 +98,7 @@
     "i18next": "^23.5.1",
     "i18next-node-fs-backend": "^2.1.3",
     "image-type": "^4.1.0",
-    "ip": "^1.1.8",
+    "ip": "^1.1.9",
     "is-electron": "^2.2.2",
     "is-online": "^9.0.1",
     "lodash.camelcase": "^4.3.0",
@@ -124,7 +125,7 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.12.1",
     "scroll": "^3.0.1",
     "sharp": "^0.32.6",
     "socket.io": "^4.7.2",
@@ -169,7 +170,8 @@
       "region": "us-west-2"
     },
     "dmg": {
-      "icon": "STTM-DMG.icns"
+      "icon": "assets/STTM-DMG.icns",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.dmg"
     },
     "mac": {
       "category": "public.app-category.reference",
@@ -177,13 +179,19 @@
       "hardenedRuntime": true,
       "entitlements": "./entitlements.mac.inherit.plist",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "notarize": {
         "teamId": ""
       }
     },
+    "afterSign": "./notarize.js",
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
       "deleteAppDataOnUninstall": true,
@@ -199,7 +207,8 @@
         "nsis"
       ],
       "verifyUpdateCodeSignature": false,
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
       "category": "Network",
