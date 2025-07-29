@@ -147,7 +147,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
       <CSSTransition
         in={showVerse}
         timeout={akhandpatt ? 0 : 300}
-        classNames={akhandpatt ? 'fade' : ''}
+        classNames="fade"
         unmountOnExit={!akhandpatt}
       >
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>

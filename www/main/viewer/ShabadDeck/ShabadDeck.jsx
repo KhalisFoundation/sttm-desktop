@@ -213,7 +213,7 @@ function ShabadDeck() {
 
   return (
     <>
-      {activeVerse.length ? <AutoPlayIcon /> : null}
+      {activeVerse.length && akhandpatt ? <AutoPlayIcon /> : null}
       {themeBg.type === 'video' && (
         <video className="video_preview" src={themeBg.url} autoPlay muted loop />
       )}
@@ -230,7 +230,7 @@ function ShabadDeck() {
         style={applyTheme()}
       >
         {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
+        {!minimizedBySingleDisplay && !akhandpatt && <PaddingTools isMiscSlide={isMiscSlide} />}
         <div
           id="viewer-container-slide-wrapper"
           style={{
