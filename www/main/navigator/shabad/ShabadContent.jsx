@@ -156,6 +156,9 @@ const ShabadContent = () => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
+    if (newTraversedVerse === 61) {
+      return;
+    }
     let currentShabad;
     if (isSundarGutkaBani) {
       currentShabad = sundarGutkaBaniId;
@@ -228,8 +231,12 @@ const ShabadContent = () => {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
       Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (mappedShabadArray.length - 1 > parseInt(activeVerseIndex, 10)) {
-          const newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
-          const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          let newVerseIndex = parseInt(activeVerseIndex, 10) + 1;
+          let newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          if (newVerseId === 61) {
+            newVerseIndex = parseInt(activeVerseIndex, 10) + 2;
+            newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          }
           updateTraversedVerse(newVerseId, newVerseIndex);
         }
       });
@@ -241,8 +248,12 @@ const ShabadContent = () => {
       const mappedShabadArray = filterRequiredVerseItems(activeShabad);
       Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (parseInt(activeVerseIndex, 10) > 0) {
-          const newVerseIndex = parseInt(activeVerseIndex, 10) - 1;
-          const newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          let newVerseIndex = parseInt(activeVerseIndex, 10) - 1;
+          let newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          if (newVerseId === 61) {
+            newVerseIndex = parseInt(activeVerseIndex, 10) - 2;
+            newVerseId = mappedShabadArray[newVerseIndex].verseId;
+          }
           updateTraversedVerse(newVerseId, newVerseIndex);
         }
       });

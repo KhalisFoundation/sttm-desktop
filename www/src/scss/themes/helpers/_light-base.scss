@@ -359,6 +359,9 @@
     .search-li,
     .shabad-li {
       &:hover {
+        &:has(.flower-verse) {
+          background-color: transparent;
+        }
         background-color: $transparent-light-black;
       }
     }
