@@ -17,7 +17,7 @@ const PADDING_VARIANTS = ['top', 'right', 'bottom', 'left'];
 const PADDING_MAX = 48;
 const PADDING_MIN = 0;
 
-const PaddingTools = (props) => {
+const PaddingTools = ({ isMiscSlide }) => {
   const viewerSettingsStore = useStoreState((state) => state.viewerSettings);
   const { setPaddingToolsOpen } = useStoreActions((state) => state.viewerSettings);
 
@@ -26,9 +26,9 @@ const PaddingTools = (props) => {
     const currentPadding = parseInt(viewerSettingsStore.containerPadding[variant], 10);
 
     if (name === 'minus') {
-      payload.value = currentPadding > PADDING_MIN ? currentPadding - 1 : PADDING_MIN;
+      payload.value = currentPadding > PADDING_MIN ? currentPadding - 4 : PADDING_MIN;
     } else if (name === 'plus') {
-      payload.value = currentPadding < PADDING_MAX ? currentPadding + 1 : PADDING_MAX;
+      payload.value = currentPadding < PADDING_MAX ? currentPadding + 4 : PADDING_MAX;
     }
 
     return {
@@ -46,8 +46,7 @@ const PaddingTools = (props) => {
       : currentPadding === PADDING_MAX;
     return (
       <i
-        disabled={isIconDisabled}
-        className={isMinusIcon ? 'fa fa-minus-circle' : 'fa fa-plus-circle'}
+        className={`${isMinusIcon ? 'fa fa-minus-circle' : 'fa fa-plus-circle'} ${isIconDisabled ? 'disabled' : ''}`}
         onClick={() => {
           if (!isIconDisabled) {
             const viewerSettingObj = createViewerSettingObject({ name, variant });
@@ -58,11 +57,11 @@ const PaddingTools = (props) => {
     );
   };
 
-  const createPaddingChanger = (variant) => {
+  const createPaddingChanger = (variant, index) => {
     const iconValue = viewerSettingsStore.containerPadding[variant];
 
     return (
-      <div className="paddingtool">
+      <div className="paddingtool" key={`padding-${index}`}>
         <h4 className="paddingtool-title">{`Padding-${convertToCamelCase(variant)}`}</h4>
         <div className="paddingtool-icons">
           {createPaddingIcon({ name: icons[0].name, variant })}
@@ -83,12 +82,8 @@ const PaddingTools = (props) => {
         <i className={`fa fa-caret-${viewerSettingsStore.paddingToolsOpen ? 'up' : 'down'}`}></i>
       </div>
       {viewerSettingsStore.paddingToolsOpen && (
-        <div
-          className={`paddingtool-body paddingtool-${
-            props.isMiscSlide ? 'announcement' : 'gurbani'
-          }`}
-        >
-          {PADDING_VARIANTS.map((variant) => createPaddingChanger(variant))}
+        <div className={`paddingtool-body paddingtool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
+          {PADDING_VARIANTS.map((variant, index) => createPaddingChanger(variant, index))}
         </div>
       )}
     </div>

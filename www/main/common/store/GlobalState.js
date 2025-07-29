@@ -62,37 +62,6 @@ const GlobalState = createStore({
     },
     quickTools: false,
     paddingTools: false,
-    slideOrder: ['translation', 'teeka', 'transliteration'],
-    setSlideOrder: action((state, payload) => {
-      const oldValue = state.slideOrder;
-      if (global.webview) {
-        global.webview.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            stateName: 'slideOrder',
-            payload,
-            oldValue,
-            actionName: 'setSlideOrder',
-            settingType: 'viewerSettings',
-          }),
-        );
-      }
-
-      if (global.platform) {
-        global.platform.ipc.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            stateName: 'slideOrder',
-            payload,
-            oldValue,
-            actionName: 'setSlideOrder',
-            settingType: 'viewerSettings',
-          }),
-        );
-      }
-      state.slideOrder = payload;
-      return state;
-    }),
     setPadding: action((state, payload) => {
       if (global.webview) {
         global.webview.send(

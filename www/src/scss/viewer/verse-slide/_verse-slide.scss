@@ -101,37 +101,29 @@
 
 // Quick Tools Styles
 
-.slide-tools {
-  position: fixed;
-  width: 22%;
-  z-index: 20;
-}
-
-.slide-wrapper {
-  height: 100%;
-  width: 100%;
-}
-
 .slide-quicktools, .slide-paddingtools {
   font-size: 12px;
   font-weight: bold;
-  position: relative;
-  height: 99%;
+  height: 100%;
+  position: fixed;
+  width: 18%;
   max-width: 150px;
+  z-index: 20;
 
   .single-display-mode & {
     height: calc(100% - 56px);
   }
 
   &.hide-quicktools {
-    left: -100%;
+    left: -18%;
   }
 }
 
 .slide-paddingtools {
-  
+  right: 0;
+
   &.hide-tool {
-    left: -100%;
+    left: -18%;
   }
 }
 
@@ -147,14 +139,9 @@
     background-color: $extra-light-grey;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 90px);
+    height: 95%;
     opacity: 0.9;
     padding: 8px;
-
-     // When .single-display-mode is a parent
-    .single-display-mode & { 
-      height: calc(100vh - 132px); // Modify as needed
-    }
   }
 
   &-gurbani {
@@ -194,6 +181,11 @@
 
   &-icons {
     align-items: center;
+
+    i.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
   &-icon-value {

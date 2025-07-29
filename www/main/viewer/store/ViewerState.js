@@ -37,11 +37,6 @@ const ViewerState = createStore({
     },
     quickToolsOpen: false,
     paddingToolsOpen: false,
-    slideOrder: ['translation', 'teeka', 'transliteration'],
-    setSlideOrder: action((state, slideOrder) => ({
-      ...state,
-      slideOrder,
-    })),
     setQuickToolsOpen: action((state, payload) => {
       const newState = state;
       newState.paddingToolsOpen = false; // explictely making sure we are closing the paddingTools when setting the quick tools.

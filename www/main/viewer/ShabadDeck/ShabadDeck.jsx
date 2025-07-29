@@ -247,20 +247,28 @@ function ShabadDeck() {
         style={applyTheme()}
       >
         {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {activeVerse.length ? (
-          activeVerse.map((activeVerseObj, index) => (
-            <Slide
-              key={index}
-              verseObj={activeVerseObj}
-              nextLineObj={nextVerse}
-              isMiscSlide={isMiscSlide}
-              bgColor={applyOverlay()}
-              updateVerseRef={updateVerseRef}
-            />
-          ))
-        ) : (
-          <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
-        )}
+        {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
+        <div
+          id="viewer-container-slide-wrapper"
+          style={{
+            padding: `${containerPadding.top}px ${containerPadding.right}px ${containerPadding.bottom}px ${containerPadding.left}px`,
+          }}
+        >
+          {activeVerse.length ? (
+            activeVerse.map((activeVerseObj, index) => (
+              <Slide
+                key={index}
+                verseObj={activeVerseObj}
+                nextLineObj={nextVerse}
+                isMiscSlide={isMiscSlide}
+                bgColor={applyOverlay()}
+                updateVerseRef={updateVerseRef}
+              />
+            ))
+          ) : (
+            <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+          )}
+        </div>
       </div>
       <ViewerIcon className="viewer-logo" />
     </>
