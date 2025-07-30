@@ -8,7 +8,7 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const useSlides = () => {
-  const { akhandpatt, currentWorkspace, autoplayToggle } = useStoreState(
+  const { akhandpatt, autoplayToggle, defaultPaneId } = useStoreState(
     (state) => state.userSettings,
   );
   const { setAkhandpatt, setAutoplayToggle } = useStoreActions((state) => state.userSettings);
@@ -90,37 +90,34 @@ export const useSlides = () => {
     if (!isCeremonyBani) {
       setIsCeremonyBani(true);
     }
-    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      if (paneId) {
-        switch (paneId) {
-          case 1:
-            setPane1({
-              ...pane1,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              baniType: 'ceremony',
-              activeShabad: 3,
-            });
-            break;
-          case 2:
-            setPane2({
-              ...pane2,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              baniType: 'ceremony',
-              activeShabad: 3,
-            });
-            break;
-          case 3:
-            setPane3({
-              ...pane3,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              baniType: 'ceremony',
-              activeShabad: 3,
-            });
-            break;
-          default:
-            break;
-        }
-      }
+    const currentPane = paneId || defaultPaneId;
+    switch (currentPane) {
+      case 1:
+        setPane1({
+          ...pane1,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          baniType: 'ceremony',
+          activeShabad: 3,
+        });
+        break;
+      case 2:
+        setPane2({
+          ...pane2,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          baniType: 'ceremony',
+          activeShabad: 3,
+        });
+        break;
+      case 3:
+        setPane3({
+          ...pane3,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          baniType: 'ceremony',
+          activeShabad: 3,
+        });
+        break;
+      default:
+        break;
     }
     analytics.trackEvent({
       category: 'ceremony',
