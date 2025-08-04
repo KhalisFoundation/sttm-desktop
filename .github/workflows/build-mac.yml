@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           source venv-gyp/bin/activate
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Ensure Python distutils support
         run: |

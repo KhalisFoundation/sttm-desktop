@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g npm@9.8.1
-          npm ci
+          npm install --legacy-peer-deps
 
       - name: Build for ${{ matrix.arch }}
         run: |

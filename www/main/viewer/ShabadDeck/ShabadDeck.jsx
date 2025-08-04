@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoreState } from 'easy-peasy';
-import { ipcRenderer } from 'electron';
 
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
+
 import {
   loadShabadVerse,
   loadBaniVerse,
@@ -13,6 +13,7 @@ import {
 } from '../../navigator/utils';
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
+import AutoPlayIcon from '../Slide/AutoPlayIcon';
 
 const os = require('os');
 const remote = require('@electron/remote');
@@ -38,7 +39,6 @@ function ShabadDeck() {
     theme: currentTheme,
     akhandpatt,
     baniLength,
-    // mangalPosition,
     displayNextLine,
     themeBg,
     currentWorkspace,
@@ -47,23 +47,6 @@ function ShabadDeck() {
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
   const verseRefKeys = useRef([]);
-
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.8,
-  };
-
-  const updateVerse = (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const visibleVerse = entry.target.dataset.verseid;
-        ipcRenderer.send('sync-scroll', visibleVerse);
-      }
-    });
-  };
-
-  const observer = new IntersectionObserver(updateVerse, observerOptions);
 
   const baniLengthCols = {
     short: 'existsSGPC',
@@ -80,7 +63,6 @@ function ShabadDeck() {
       if (!verseRefKeys.current.includes(verseId)) {
         verseRefKeys.current = [...verseRefKeys.current, verseId];
       }
-      observer.observe(ref);
     }
   };
 
@@ -231,6 +213,7 @@ function ShabadDeck() {
 
   return (
     <>
+      {activeVerse.length && akhandpatt ? <AutoPlayIcon /> : null}
       {themeBg.type === 'video' && (
         <video className="video_preview" src={themeBg.url} autoPlay muted loop />
       )}
@@ -247,7 +230,7 @@ function ShabadDeck() {
         style={applyTheme()}
       >
         {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
-        {!minimizedBySingleDisplay && <PaddingTools isMiscSlide={isMiscSlide} />}
+        {!minimizedBySingleDisplay && !akhandpatt && <PaddingTools isMiscSlide={isMiscSlide} />}
         <div
           id="viewer-container-slide-wrapper"
           style={{
@@ -263,6 +246,7 @@ function ShabadDeck() {
                 isMiscSlide={isMiscSlide}
                 bgColor={applyOverlay()}
                 updateVerseRef={updateVerseRef}
+                slideIndex={index}
               />
             ))
           ) : (
