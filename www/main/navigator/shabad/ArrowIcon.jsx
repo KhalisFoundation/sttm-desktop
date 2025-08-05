@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import banidb from '../../banidb';
@@ -15,23 +15,23 @@ const ArrowIcon = ({ paneId }) => {
     isCeremonyBani,
     activeVerseId,
     activePaneId,
-    homeVerse,
     pane1,
     pane2,
     pane3,
+    shortcuts,
   } = useStoreState((state) => state.navigator);
 
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const {
-    setActiveShabadId,
     setInitialVerseId,
     setActiveVerseId,
     setActivePaneId,
-    setHomeVerse,
+    setActiveShabadId,
     setPane1,
     setPane2,
     setPane3,
+    setShortcuts,
   } = useStoreActions((state) => state.navigator);
 
   const paneBani = {
@@ -97,33 +97,34 @@ const ArrowIcon = ({ paneId }) => {
       default:
         break;
     }
+    if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE') && activeShabadId !== currentShabad) {
+      setActiveShabadId(currentShabad);
+    }
   };
 
   const navigateVerseLeft = () => {
-    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      updatePaneShabad('left');
-    } else if (activeShabadId) {
-      const newShabadId = activeShabadId - 1;
-      setActiveShabadId(newShabadId);
-      loadShabadAndSetVerses(newShabadId);
-      if (homeVerse !== 0) {
-        setHomeVerse(0);
-      }
-    }
+    updatePaneShabad('left');
   };
 
   const navigateVerseRight = () => {
-    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      updatePaneShabad('right');
-    } else if (activeShabadId) {
-      const newShabadId = activeShabadId + 1;
-      setActiveShabadId(newShabadId);
-      loadShabadAndSetVerses(newShabadId);
-      if (homeVerse !== 0) {
-        setHomeVerse(0);
-      }
-    }
+    updatePaneShabad('right');
   };
+
+  useEffect(() => {
+    if (shortcuts.nextShabad) {
+      updatePaneShabad('right');
+      setShortcuts({
+        ...shortcuts,
+        nextShabad: false,
+      });
+    } else if (shortcuts.prevShabad) {
+      updatePaneShabad('left');
+      setShortcuts({
+        ...shortcuts,
+        prevShabad: false,
+      });
+    }
+  }, [shortcuts]);
 
   if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
     if (paneBani[paneId] === 'shabad') {

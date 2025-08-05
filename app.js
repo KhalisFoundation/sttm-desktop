@@ -5,7 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const op = require('portfinder');
+const portfinder = require('portfinder');
 const i18n = require('i18next');
 const i18nBackend = require('i18next-node-fs-backend');
 const os = require('os');
@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 const remote = require('@electron/remote/main');
 // eslint-disable-next-line import/no-unresolved
 const aptabase = require('@aptabase/electron/main');
+const Sentry = require('@sentry/electron/main');
 
 require('dotenv').config();
 
@@ -25,6 +26,7 @@ const http = require('http-shutdown')(httpBase);
 const io = require('socket.io')(http);
 /* eslint-enable */
 
+const prodConfig = require('./config.prod.json');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
@@ -86,7 +88,31 @@ let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
 app.setAsDefaultProtocolClient('sttm-desktop');
-aptabase.initialize(process.env.APTABASE_KEY);
+
+// Initialize Aptabase with key from appropriate source
+let aptabaseKey;
+let sentryDsn;
+if (process.env.NODE_ENV === 'development') {
+  aptabaseKey = process.env.APTABASE_KEY;
+  sentryDsn = process.env.SENTRY_DSN;
+} else {
+  try {
+    aptabaseKey = prodConfig.APTABASE_KEY;
+    sentryDsn = prodConfig.SENTRY_DSN;
+  } catch (error) {
+    console.error('Failed to load production config:', error);
+  }
+}
+
+if (aptabaseKey) {
+  aptabase.initialize(aptabaseKey);
+}
+
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
 
 if (process.argv.length >= 2) {
   app.setAsDefaultProtocolClient('sttm-desktop', process.execPath, [path.resolve(process.argv[1])]);
@@ -337,7 +363,7 @@ function createViewer(ipcData) {
     remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
       viewerWindow.webContents.insertCSS(
-        '.slide-quicktools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT }',
+        '.slide-quicktools, .slide-paddingtools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT } div.autoplay-icon-container { display: none }',
       );
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
@@ -466,7 +492,7 @@ const emptyOverlay = () => {
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const searchPorts = () => {
-  op.getPort(
+  portfinder.getPort(
     {
       // Re: http://www.sikhiwiki.org/index.php/Gurgadi
       ports: [1397, 1469, 1539, 1552, 1574, 1581, 1606, 1644, 1661, 1665, 1675, 1708],
@@ -654,17 +680,6 @@ app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
-});
-
-ipcMain.on('sync-scroll', (event, data) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.executeJavaScript(`
-      document.querySelector('#verse-${data}').scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    `);
-  }
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {

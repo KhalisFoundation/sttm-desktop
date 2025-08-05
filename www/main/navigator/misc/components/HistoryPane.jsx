@@ -40,48 +40,48 @@ export const HistoryPane = ({ className, paneId }) => {
     setPane3,
   } = useStoreActions((state) => state.navigator);
 
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const openShabadFromHistory = (element) => {
-    if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-      switch (paneId) {
-        case 1:
-          setPane1({
-            ...pane1,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: element.shabadId,
-            activeVerse: element.continueFrom,
-            baniType: element.type,
-            versesRead: element.versesRead,
-            homeVerse: element.homeVerse,
-          });
-          break;
-        case 2:
-          setPane2({
-            ...pane2,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: element.shabadId,
-            activeVerse: element.continueFrom,
-            baniType: element.type,
-            versesRead: element.versesRead,
-            homeVerse: element.homeVerse,
-          });
-          break;
-        case 3:
-          setPane3({
-            ...pane3,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            activeShabad: element.shabadId,
-            activeVerse: element.continueFrom,
-            baniType: element.type,
-            versesRead: element.versesRead,
-            homeVerse: element.homeVerse,
-          });
-          break;
-        default:
-          break;
-      }
-    } else {
+    const currentPane = paneId || defaultPaneId;
+    switch (currentPane) {
+      case 1:
+        setPane1({
+          ...pane1,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: element.shabadId,
+          activeVerse: element.continueFrom,
+          baniType: element.type,
+          versesRead: element.versesRead,
+          homeVerse: element.homeVerse,
+        });
+        break;
+      case 2:
+        setPane2({
+          ...pane2,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: element.shabadId,
+          activeVerse: element.continueFrom,
+          baniType: element.type,
+          versesRead: element.versesRead,
+          homeVerse: element.homeVerse,
+        });
+        break;
+      case 3:
+        setPane3({
+          ...pane3,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: element.shabadId,
+          activeVerse: element.continueFrom,
+          baniType: element.type,
+          versesRead: element.versesRead,
+          homeVerse: element.homeVerse,
+        });
+        break;
+      default:
+        break;
+    }
+    if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
       if (singleDisplayActiveTab !== 'shabad') {
         setSingleDisplayActiveTab('shabad');
       }

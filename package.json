@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.2.4",
+  "version": "9.2.5",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -80,6 +80,7 @@
     "@aptabase/electron": "^0.3.1",
     "@babel/polyfill": "^7.8.7",
     "@electron/remote": "^2.0.11",
+    "@sentry/electron": "^6.8.0",
     "anvaad-js": "^1.4.3",
     "axios": "^1.5.1",
     "copy-to-clipboard": "^3.3.3",
@@ -88,7 +89,7 @@
     "electron-chromecast": "^1.1.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "extract-zip": "^2.0.1",
     "get-json": "^1.0.1",
     "html-react-parser": "^4.2.2",
@@ -97,7 +98,7 @@
     "i18next": "^23.5.1",
     "i18next-node-fs-backend": "^2.1.3",
     "image-type": "^4.1.0",
-    "ip": "^1.1.8",
+    "ip": "^1.1.9",
     "is-electron": "^2.2.2",
     "is-online": "^9.0.1",
     "lodash.camelcase": "^4.3.0",
@@ -124,7 +125,7 @@
     "request": "^2.81.0",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.4",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.12.1",
     "scroll": "^3.0.1",
     "sharp": "^0.32.6",
     "socket.io": "^4.7.2",
@@ -180,7 +181,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "notarize": {

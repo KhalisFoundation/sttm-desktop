@@ -57,7 +57,7 @@ export const ShabadText = ({
     lineNumber,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar } =
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt } =
     useStoreState((state) => state.userSettings);
 
   const {
@@ -179,10 +179,11 @@ export const ShabadText = ({
         updateHomeVerse(initialVerseIndex);
         setActiveVerse({ [activeVerseIndex]: activeVerseId });
       }
-      if (activeShabadId === null && sundarGutkaBaniId === null && ceremonyId === null) {
-        if (initialVerseIndex >= 0) {
-          updateTraversedVerse(initialVerseId, initialVerseIndex);
-        }
+      if (
+        (activeShabadId === null && sundarGutkaBaniId === null && ceremonyId === null) ||
+        (initialVerseIndex >= 0 && Object.keys(activeVerse).length === 0)
+      ) {
+        updateTraversedVerse(initialVerseId, initialVerseIndex);
       }
     }
   }, [filteredItems]);
@@ -239,7 +240,6 @@ export const ShabadText = ({
     return null;
   };
 
-  // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
     if (activePaneId === currentPane) {
       if (shortcuts.nextVerse) {
@@ -247,11 +247,18 @@ export const ShabadText = ({
         if (nextVerse) {
           updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
           scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+        } else if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani) {
+          setShortcuts({
+            ...shortcuts,
+            nextShabad: true,
+            nextVerse: false,
+          });
+        } else {
+          setShortcuts({
+            ...shortcuts,
+            nextVerse: false,
+          });
         }
-        setShortcuts({
-          ...shortcuts,
-          nextVerse: false,
-        });
       }
       if (shortcuts.prevVerse) {
         const prevVerse = getVerse('prev');

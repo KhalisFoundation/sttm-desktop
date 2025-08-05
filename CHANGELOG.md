@@ -1,5 +1,21 @@
 ## New Updates
 
+### 9.2.5 - ਊਨਾ Release _Aug 8, 2025_
+
+#### New Features
+- **Padding Tools**: New feature to add space in the viewer on all sides (top, right, bottom, left) with adjustable padding controls.
+- **Translation Source Selection**: Added option to switch between different English translation sources for enhanced customization.
+- **Sentry Integration**: Integrated Sentry error tracking to catch and report runtime crashes for improved stability.
+
+#### Bug Fixes and Improvements
+- **Chromecast Fix**: Resolved missing content issues when casting to Chromecast devices.
+- **Package Updates**: Upgraded outdated packages including express (4.18.2 → 4.19.2), ip (1.1.8 → 1.1.9), and sanitize-html (2.11.0 → 2.12.1) for security and performance improvements.
+- **Build Improvements**: Enhanced build pipeline with better artifact naming and ARM64 support for macOS.
+- **Code Quality**: Various code refactors and stylistic enhancements to improve performance and maintainability.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.4 - ਊਨਾ Release _June 06, 2025_
 
 #### Misc. bug fix and other improvements
@@ -10,6 +26,9 @@
 
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
+
+<details>
+<summary>Previous Updates</summary>
 
 ### 9.2.2 - ਊਨਾ Release _July 15, 2024_
 
@@ -22,9 +41,6 @@
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
 
-
-<details>
-<summary>Previous Updates</summary>
 
 ### 9.2.1 - ਊਨਾ Release _May 24, 2024_
 

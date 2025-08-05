@@ -25,7 +25,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     pane3,
   } = useStoreState((state) => state.navigator);
 
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const {
     setIsSundarGutkaBani,
@@ -138,7 +138,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       openPaneMenu(e, baniId);
     } else {
-      loadBani(baniId);
+      loadBani(baniId, defaultPaneId);
     }
   };
 

@@ -19,7 +19,11 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
   const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
   const { setPane1, setPane2, setPane3 } = useStoreActions((state) => state.navigator);
   const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
-  const { theme: currentTheme, currentWorkspace } = useStoreState((state) => state.userSettings);
+  const {
+    theme: currentTheme,
+    currentWorkspace,
+    defaultPaneId,
+  } = useStoreState((state) => state.userSettings);
 
   const [paneSelectorActive, setPaneSelectorActive] = useState(false);
 
@@ -53,7 +57,7 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     setPaneSelectorActive(true);
   };
 
-  const onThemeClick = (event, theme, multipaneId = null) => {
+  const onThemeClick = (event, theme, multipaneId = defaultPaneId) => {
     let parsedTheme = theme;
     if (typeof theme === 'string') {
       parsedTheme = JSON.parse(theme);

@@ -58,7 +58,7 @@
     "language": {
       "title": "LANGUAGE_SETTINGS",
       "type": "dropdown",
-      "settings": ["teeka-source"]
+      "settings": ["teeka-source", "translation-english-source"]
     },
     "app-settings": {
       "title": "APP_SETTINGS",

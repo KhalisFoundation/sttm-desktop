@@ -11,11 +11,11 @@ const slideStrings = {
       gurmukhi: 'DMn gurU AMgd dyv jI',
     },
     {
-      english: 'Dhan Guru Amardas Sahib Jee',
+      english: 'Dhan Guru Amar Das Sahib Jee',
       gurmukhi: 'DMn gurU Amrdwsu swihb jI',
     },
     {
-      english: 'Dhan Guru Ramdas Sahib Jee',
+      english: 'Dhan Guru Ram Das Sahib Jee',
       gurmukhi: 'DMn gurU rwmdws swihb jI',
     },
     {
@@ -27,11 +27,11 @@ const slideStrings = {
       gurmukhi: 'DMn gurU hirgoibMd swihb jI',
     },
     {
-      english: 'Dhan Guru Harrai Sahib Jee',
+      english: 'Dhan Guru Har Rai Sahib Jee',
       gurmukhi: 'DMn gurU hirrwie swihb jI',
     },
     {
-      english: 'Dhan Guru Harkrishan Sahib Jee',
+      english: 'Dhan Guru Har Krishan Sahib Jee',
       gurmukhi: 'DMn gurU hirikRSn swihb jI',
     },
     {

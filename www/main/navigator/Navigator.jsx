@@ -25,8 +25,9 @@ const Navigator = () => {
   } = useSlides();
 
   let controllerMarkup = null;
+  const isCurrentWorkSpaceSingleDisplay = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
 
-  if (currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY')) {
+  if (isCurrentWorkSpaceSingleDisplay) {
     controllerMarkup = (
       <div
         className={`single-display-controller ${
@@ -73,12 +74,12 @@ const Navigator = () => {
     <>
       <div
         className={
-          currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY')
+          isCurrentWorkSpaceSingleDisplay
             ? 'single-display-viewer'
             : 'navigator-row'
         }
       >
-        {currentWorkspace !== i18n.t('WORKSPACES.SINGLE_DISPLAY') && <SearchPane />}
+        {!isCurrentWorkSpaceSingleDisplay && <SearchPane />}
         <ViewerPane />
       </div>
       {controllerMarkup}

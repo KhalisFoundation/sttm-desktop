@@ -22,6 +22,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APTABASE_KEY: ${{ secrets.APTABASE_KEY }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           source venv-gyp/bin/activate
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Ensure Python distutils support
         run: |

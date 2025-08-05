@@ -17,6 +17,8 @@ jobs:
       BONJOUR_SDK_HOME: 'C:\\Program Files\\Bonjour SDK'
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      APTABASE_KEY: ${{ secrets.APTABASE_KEY }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g npm@9.8.1
-          npm ci
+          npm install --legacy-peer-deps
 
       - name: Build for ${{ matrix.arch }}
         run: |
