@@ -18,6 +18,10 @@ export const OtherPane = ({ className }) => {
     singleDisplayActiveTab,
     isSundarGutkaBani,
     isCeremonyBani,
+    activePaneId,
+    pane1,
+    pane2,
+    pane3,
   } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
@@ -25,7 +29,12 @@ export const OtherPane = ({ className }) => {
     setSingleDisplayActiveTab,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
+    setPane1,
+    setPane2,
+    setPane3,
   } = useStoreActions((state) => state.navigator);
+
+  const { defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const setShabadId = (shabadId) => {
     if (!isRandomShabad) {
@@ -42,6 +51,29 @@ export const OtherPane = ({ className }) => {
     }
     if (isCeremonyBani) {
       setIsCeremonyBani(false);
+    }
+    const currentPane = activePaneId || defaultPaneId;
+    if (currentPane === 1) {
+      setPane1({
+        ...pane1,
+        activeShabad: shabadId,
+        content: i18n.t('MULTI_PANE.SHABAD'),
+        baniType: 'shabad',
+      });
+    } else if (currentPane === 2) {
+      setPane2({
+        ...pane2,
+        activeShabad: shabadId,
+        content: i18n.t('MULTI_PANE.SHABAD'),
+        baniType: 'shabad',
+      });
+    } else if (currentPane === 3) {
+      setPane3({
+        ...pane3,
+        activeShabad: shabadId,
+        content: i18n.t('MULTI_PANE.SHABAD'),
+        baniType: 'shabad',
+      });
     }
   };
 
