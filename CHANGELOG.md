@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.5 - ਊਨਾ Release _Aug 8, 2025_
+### 9.2.5 - ਊਨਾ Release _Aug 14, 2025_
 
 #### New Features
 - **Padding Tools**: New feature to add space in the viewer on all sides (top, right, bottom, left) with adjustable padding controls.
