@@ -199,7 +199,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
                       onClick={(e) =>
                         currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')
                           ? openPaneMenu(e, bani.id)
-                          : loadBani(bani.id)
+                          : loadBani(bani.id, defaultPaneId)
                       }
                     >
                       <span className={`tag tag-${bani.baniTag}`} />
