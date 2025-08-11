@@ -394,7 +394,9 @@ function createViewer(ipcData) {
     });
     viewerWindow.on('closed', () => {
       viewerWindow = false;
-      mainWindow.webContents.send('remove-external-display');
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('remove-external-display');
+      }
     });
     viewerWindow.on('resize', () => {
       const [width, height] = viewerWindow.getSize();
