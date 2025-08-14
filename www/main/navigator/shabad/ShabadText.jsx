@@ -253,12 +253,11 @@ export const ShabadText = ({
             nextShabad: true,
             nextVerse: false,
           });
-        } else {
-          setShortcuts({
-            ...shortcuts,
-            nextVerse: false,
-          });
         }
+        setShortcuts({
+          ...shortcuts,
+          nextVerse: false,
+        });
       }
       if (shortcuts.prevVerse) {
         const prevVerse = getVerse('prev');
