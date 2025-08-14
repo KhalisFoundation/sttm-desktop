@@ -27,6 +27,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
     content2Visibility,
     content3Visibility,
     akhandpatt,
+    animations,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -155,7 +156,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
     >
       <CSSTransition
         in={showVerse}
-        timeout={akhandpatt ? 0 : 300}
+        timeout={akhandpatt || !animations ? 0 : 300}
         classNames="fade"
         unmountOnExit={!akhandpatt}
       >
