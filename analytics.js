@@ -5,15 +5,13 @@ require('dotenv').config();
 
 class Analytics {
   trackEvent({ category, action, label, value }) {
-    // TODO: need to add variable that stops statistics collection
     isOnline().then((online) => {
       // TODO: for offline users, come up with a way of storing and send when online.
       if (online) {
-        console.log('action', action, 'options', { category, label, value });
         trackEvent(action, {
-          category,
-          label,
-          value,
+          category: category || '',
+          label: label || '',
+          value: value || '',
         });
       }
     });

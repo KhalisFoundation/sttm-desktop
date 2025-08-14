@@ -61,13 +61,12 @@ const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
-  viewerHtml.querySelector('.viewer-logo').remove();
-  viewerHtml.querySelector('.slide-quicktools').remove();
-  if (viewerHtml.querySelector('video')) {
-    viewerHtml.querySelector('video').remove();
-  }
-  viewerHtml.querySelector('.shabad-deck').removeAttribute('style');
-  viewerHtml.querySelector('.verse-slide-wrapper').removeAttribute('style');
+  viewerHtml.querySelector('.viewer-logo')?.remove();
+  viewerHtml.querySelector('.slide-quicktools')?.remove();
+  viewerHtml.querySelector('video')?.remove();
+  viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
+  viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
+
   return viewerHtml.innerHTML;
 };
 
@@ -105,7 +104,38 @@ export const sendMessage = (message) => {
 };
 
 export const castToReceiver = () => {
-  sendMessage(JSON.stringify(getSanitizedViewer()));
+  const waitForAnimationComplete = (attempts = 0) => {
+    if (attempts > 30) {
+      appendMessage('Animation timeout reached, casting anyway');
+      sendMessage(JSON.stringify(getSanitizedViewer()));
+      return;
+    }
+
+    const fadeElements = document.querySelectorAll(
+      '.fade-enter, .fade-enter-active, .fade-exit, .fade-exit-active',
+    );
+
+    if (fadeElements.length > 0) {
+      setTimeout(() => waitForAnimationComplete(attempts + 1), 50);
+      return;
+    }
+
+    const viewerContainer = document.querySelector('#viewer-container');
+    if (viewerContainer) {
+      const computedStyle = window.getComputedStyle(viewerContainer);
+      const opacity = parseFloat(computedStyle.opacity);
+
+      if (opacity < 1) {
+        setTimeout(() => waitForAnimationComplete(attempts + 1), 50);
+        return;
+      }
+    }
+
+    appendMessage('Fade animation complete, sending content to Chromecast');
+    sendMessage(JSON.stringify(getSanitizedViewer()));
+  };
+
+  waitForAnimationComplete();
 };
 
 const onRequestSessionSuccess = (e) => {

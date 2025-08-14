@@ -41,7 +41,9 @@
     "homeVerse": false,
     "openFirstResult": false,
     "openDhanGuruSlide": false,
-    "copyToClipboard": false
+    "copyToClipboard": false,
+    "nextShabad": false,
+    "prevShabad": false
   },
   "minimizedBySingleDisplay": false,
   "isDontSaveHistory": false,

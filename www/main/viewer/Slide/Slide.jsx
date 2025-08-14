@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
+const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -26,6 +26,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
     content1Visibility,
     content2Visibility,
     content3Visibility,
+    akhandpatt,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -50,6 +51,10 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
+    if (akhandpatt) {
+      setShowVerse(true);
+      return;
+    }
     setShowVerse(false);
 
     const timeoutId = setTimeout(() => {
@@ -57,8 +62,9 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       global.platform.ipc.send('cast-to-receiver');
     }, 200);
 
+    // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [verseObj, isMiscSlide]);
+  }, [verseObj, isMiscSlide, akhandpatt]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -69,7 +75,7 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
         });
       }
     }, 100);
-  }, [verseObj]);
+  }, [verseObj, akhandpatt]);
 
   useEffect(() => {
     const markup = [content1, content2, content3].map((content, index) => {
@@ -131,15 +137,19 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
 
   return verseObj ? (
     <div
-      className="verse-slide-wrapper"
+      className={akhandpatt ? '' : 'verse-slide-wrapper'}
       id={`verse-${verseObj.ID}`}
-      style={{ background: bgColor }}
       ref={(el) => {
         updateVerseRef(verseObj.ID, el);
       }}
       data-verseid={verseObj.ID}
     >
-      <CSSTransition in={showVerse} timeout={300} classNames="fade" unmountOnExit>
+      <CSSTransition
+        in={showVerse}
+        timeout={akhandpatt ? 0 : 300}
+        classNames="fade"
+        unmountOnExit={!akhandpatt}
+      >
         <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
           {verseObj && showVerse && !isMiscSlide && (
             <>
@@ -188,11 +198,13 @@ const Slide = ({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) 
       </CSSTransition>
     </div>
   ) : (
-    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+    <div className="verse-slide-wrapper">
       {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
     </div>
   );
-};
+});
+
+Slide.displayName = 'Slide';
 
 Slide.propTypes = {
   verseObj: PropTypes.object,

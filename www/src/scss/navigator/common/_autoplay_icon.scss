@@ -1,0 +1,74 @@
+.autoplay-icon-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    position: absolute;
+    bottom: 2px;
+    right: 10px;
+    z-index: 100;
+
+    &:hover {
+        .speed-display {
+            opacity: 1;
+        }
+    }
+}
+
+.increase-speed-btn, .decrease-speed-btn {
+    background: transparent;
+    color: $cadmium-orange;
+    outline: none;
+    cursor: pointer;
+
+    &.disabled {
+        color: $not-so-white;
+        cursor: not-allowed;
+    }
+}
+
+.speed-display {
+    text-align: center;
+    background: $cadmium-orange;
+    border-radius: 12px;
+    color: $white;
+    padding: 2px;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.autoplay-icon-btn {
+    align-items: center;
+    background: $white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    outline: none;
+    padding: 0;
+    width: 40px;
+    position: relative;
+
+
+    .bg-circle {
+        stroke: $not-so-white;
+    }
+
+    .progress-circle {
+        stroke: $cadmium-orange;
+    }
+
+    .play-pause-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $cadmium-orange;
+    }
+}

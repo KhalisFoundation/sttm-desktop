@@ -66,19 +66,22 @@ const FavShabadIcon = ({ paneId }) => {
   }, [favShabad, currentShabad]);
 
   const toggleFavShabad = () => {
-    if (favShabadIndex < 0) {
-      addToFav(currentShabad, currentVerse, userToken);
-    } else {
-      favShabad.splice(favShabadIndex, 1);
-      removeFromFav(currentShabad, userToken);
-      setFavShabad([...favShabad]);
-    }
-    const fetchProgress = fetchFavShabad(userToken);
     setLoading(true);
-    fetchProgress.then((data) => {
-      setFavShabad([...data]);
-      setLoading(false);
-    });
+    if (favShabadIndex < 0) {
+      addToFav(currentShabad, currentVerse, userToken)
+        .then(() => fetchFavShabad(userToken))
+        .then((data) => {
+          setFavShabad([...data]);
+          setLoading(false);
+        });
+    } else {
+      removeFromFav(currentShabad, userToken)
+        .then(() => fetchFavShabad(userToken))
+        .then((data) => {
+          setFavShabad([...data]);
+          setLoading(false);
+        });
+    }
   };
 
   if (

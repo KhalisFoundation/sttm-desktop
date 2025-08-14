@@ -16,7 +16,7 @@ const MiscSlides = () => {
     displayAnandSahibBhog,
   } = useSlides();
 
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const [paneSelectorActive, setPaneSelectorActive] = useState(false);
   const paneSelector = useRef(null);
@@ -53,7 +53,7 @@ const MiscSlides = () => {
               }
               setPaneSelectorActive(true);
             } else {
-              displayAnandSahibBhog({ openedFrom: 'shortcut-tray' });
+              displayAnandSahibBhog({ openedFrom: 'shortcut-tray', paneId: defaultPaneId });
             }
           }}
         >

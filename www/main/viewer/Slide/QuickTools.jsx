@@ -137,6 +137,7 @@ const QuickTools = ({ isMiscSlide }) => {
           className={getIconClassName(name, index, actionName)}
           onClick={() => {
             const globalObj = createGlobalPlatformObj(name, toolName, index, actionName);
+            console.log('globalObj', globalObj);
             if (globalObj) {
               global.platform.ipc.send('update-global-setting', JSON.stringify(globalObj));
             }
