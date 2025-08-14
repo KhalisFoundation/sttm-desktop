@@ -215,7 +215,10 @@ function ShabadDeck() {
     <>
       {activeVerse.length && akhandpatt ? <AutoPlayIcon /> : null}
       {themeBg.type === 'video' && (
-        <video className="video_preview" src={themeBg.url} autoPlay muted loop />
+        <>
+          <video className="video-preview" src={themeBg.url} autoPlay muted loop />
+          <div className="video-overlay" style={{ background: applyOverlay() }} />
+        </>
       )}
       <div
         className={classNames(
@@ -244,7 +247,6 @@ function ShabadDeck() {
                 verseObj={activeVerseObj}
                 nextLineObj={nextVerse}
                 isMiscSlide={isMiscSlide}
-                bgColor={applyOverlay()}
                 updateVerseRef={updateVerseRef}
                 slideIndex={index}
               />

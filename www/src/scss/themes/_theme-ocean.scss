@@ -32,7 +32,8 @@ $themeDark: (
     }
   }
 
-  .quicktool-body {
+  .quicktool-body,
+  .paddingtool-body {
     background-color: $black;
   }
 }

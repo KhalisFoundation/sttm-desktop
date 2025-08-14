@@ -133,7 +133,7 @@ const SettingViewer = () => {
       </div>
       <div className={`settings-viewer theme-${theme}`}>
         {themeBg.type === 'video' && (
-          <video className="video_preview" src={themeBg.url} autoPlay muted loop />
+          <video className="video-preview" src={themeBg.url} autoPlay muted loop />
         )}
         <div className="verse-slide" style={verseSlideBg()}>
           <h1 className="slide-gurbani gurbani gurmukhi" style={gurbaniStyles}>

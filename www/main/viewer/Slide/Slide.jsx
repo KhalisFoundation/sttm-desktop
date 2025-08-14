@@ -11,7 +11,7 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateVerseRef }) => {
+const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -139,7 +139,6 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
     <div
       className={akhandpatt ? '' : 'verse-slide-wrapper'}
       id={`verse-${verseObj.ID}`}
-      style={{ background: bgColor }}
       ref={(el) => {
         updateVerseRef(verseObj.ID, el);
       }}
@@ -199,7 +198,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, bgColor, updateV
       </CSSTransition>
     </div>
   ) : (
-    <div className="verse-slide-wrapper" style={{ background: bgColor }}>
+    <div className="verse-slide-wrapper">
       {isMiscSlide && <SlideAnnouncement getFontSize={getFontSize} isMiscSlide={isMiscSlide} />}
     </div>
   );
