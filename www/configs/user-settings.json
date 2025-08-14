@@ -18,7 +18,7 @@
         "display-vishraams",
         "vishraam-type",
         "vishraam-source",
-        "animations"
+        "slide-transitions"
       ]
     },
     "font-sizes": {
@@ -265,8 +265,8 @@
       },
       "initialValue": "sttm2"
     },
-    "animations": {
-      "title": "ANIMATIONS",
+    "slide-transitions": {
+      "title": "SLIDE_TRANSITIONS",
       "initialValue": true
     },
     "autoplay-toggle": {
