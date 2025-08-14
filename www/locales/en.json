@@ -139,7 +139,8 @@
       "PREFERENCES": "Preferences",
       "QUIT": "Quit {{appName}}",
       "SERVICES": "Services",
-      "VERSION": "Version {{version}}"
+      "VERSION": "Version {{version}}",
+      "DB_VERSION": "Database Version: {{version}}"
     },
     "CAST": {
       "SEARCH": "Search for Google Cast device",

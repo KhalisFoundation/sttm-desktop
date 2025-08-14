@@ -19,6 +19,10 @@ if (!isUnsupportedWindow) {
       enabled: false,
     },
     {
+      label: i18n.t('MENU.APP.DB_VERSION', { version: global.platform.getRealmDBLastModified() }),
+      enabled: false,
+    },
+    {
       label: i18n.t('MENU.UPDATE.CHECK'),
       accelerator: 'CmdOrCtrl+U',
       click: () => {
