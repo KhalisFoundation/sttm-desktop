@@ -38,6 +38,15 @@ const SOURCE_TYPES = {
   REHATNAMAS: 'R',
 };
 
+const BINDI_CHARS = {
+  '103': '090', //  ਗ: 'ਗ਼'
+  '106': '122', //  ਜ: 'ਜ਼'
+  '115': '083', //  ਸ: 'ਸ਼'
+  '075': '094', //  ਖ: 'ਖ਼'
+  '080': '038', //  ਫ: 'ਫ਼'
+  '097': '069', //  ੳ : ਓ
+};
+
 const SOURCE_TEXTS = {
   [SOURCE_TYPES.ALL_SOURCES]: 'ALL_SOURCES',
   [SOURCE_TYPES.GURU_GRANTH_SAHIB]: 'GURU_GRANTH_SAHIB',
@@ -56,4 +65,5 @@ module.exports = {
   SEARCH_TEXTS,
   SOURCE_TEXTS,
   SOURCE_TYPES,
+  BINDI_CHARS,
 };
