@@ -139,7 +139,8 @@
       "PREFERENCES": "Preferences",
       "QUIT": "Quit {{appName}}",
       "SERVICES": "Services",
-      "VERSION": "Version {{version}}"
+      "VERSION": "Version {{version}}",
+      "DB_VERSION": "Database Version: {{version}}"
     },
     "CAST": {
       "SEARCH": "Search for Google Cast device",
@@ -297,6 +298,7 @@
     "I_GURBANI": "iGurbani",
     "MULTI_COLOR": "Multi Color",
     "SHOW_VISHRAAMS": "Show Vishraams",
+    "SLIDE_TRANSITIONS": "Slide Transitions",
     "SINGLE_COLOR": "Single Color",
     "SLIDE_LAYOUT": "Slide Layout",
     "STTM": "BaniDB Living",
