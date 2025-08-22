@@ -37,6 +37,8 @@ const init = () => {
   }
 };
 
+const hasBindiCharacter = (charCode) => CONSTS.BINDI_CHARS[charCode] || false;
+
 /**
  * Retrieve lines matching queries
  *
@@ -84,11 +86,19 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
           }
         }
 
-        // Replace kh with kh pair bindi
         let replaced = '';
-        if (dbQuery.includes('075')) {
-          replaced = `OR ${searchCol} ${operator} '${dbQuery.replace(/075/g, '094')}'`;
+        let newQuery = '';
+        const dbQueryArray = dbQuery.split(',');
+        dbQueryArray.forEach((charCode) => {
+          const bindiCharCode = hasBindiCharacter(charCode);
+          if (bindiCharCode) {
+            newQuery = dbQuery.replaceAll(charCode, bindiCharCode);
+          }
+        });
+        if (newQuery) {
+          replaced = `OR ${searchCol} ${operator} '${newQuery}'`;
         }
+
         if (isWildChar) {
           dbQuery =
             searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
