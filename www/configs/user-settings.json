@@ -17,7 +17,8 @@
         "larivaar-assist-type",
         "display-vishraams",
         "vishraam-type",
-        "vishraam-source"
+        "vishraam-source",
+        "slide-transitions"
       ]
     },
     "font-sizes": {
@@ -263,6 +264,10 @@
         "sttm": "STTM"
       },
       "initialValue": "sttm2"
+    },
+    "slide-transitions": {
+      "title": "SLIDE_TRANSITIONS",
+      "initialValue": true
     },
     "autoplay-toggle": {
       "title": "AUTO_PLAY",

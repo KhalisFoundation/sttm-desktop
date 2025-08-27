@@ -65,6 +65,7 @@ const SearchContent = () => {
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isTranscriptLoading, setIsTranscriptLoading] = useState(false);
+  const [searchPending, setSearchPending] = useState(true);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -84,17 +85,20 @@ const SearchContent = () => {
   };
 
   const loadMoreSearchResults = useCallback(() => {
-    setTimeout(() => {
-      setSearchResultsCount(searchResultsCount + 20);
-      searchShabads(query, currentSearchType, currentSource, searchResultsCount).then(
-        (rows) => query && rows.length && setSearchData(rows),
-      );
-      analytics.trackEvent({
-        category: 'search',
-        action: 'load-more-search-results',
-        value: searchResultsCount,
-      });
-    }, 200);
+    if (searchPending) {
+      setTimeout(() => {
+        setSearchResultsCount(searchResultsCount + 20);
+        searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) => {
+          if (!rows.length) setSearchPending(false);
+          return query && rows.length && setSearchData(rows);
+        });
+        analytics.trackEvent({
+          category: 'search',
+          action: 'load-more-search-results',
+          value: searchResultsCount,
+        });
+      }, 200);
+    }
   });
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray

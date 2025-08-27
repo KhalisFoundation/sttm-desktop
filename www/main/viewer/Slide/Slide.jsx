@@ -27,6 +27,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
     content2Visibility,
     content3Visibility,
     akhandpatt,
+    slideTransitions,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -36,6 +37,14 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   const activeVerseRef = useRef(null);
 
   const visibilityStates = [content1Visibility, content2Visibility, content3Visibility];
+
+  const isOnlyGurbaniVisible = () => {
+    const hasOrderMarkup = orderMarkup && orderMarkup.some((item) => item !== null);
+    const hasEnglishTranslation = verseObj && verseObj.English;
+    const hasNextLine = displayNextLine && nextLineObj;
+
+    return !hasOrderMarkup && !hasEnglishTranslation && !hasNextLine;
+  };
 
   const getLarivaarAssistClass = () => {
     if (larivaarAssist) {
@@ -146,11 +155,15 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
     >
       <CSSTransition
         in={showVerse}
-        timeout={akhandpatt ? 0 : 300}
+        timeout={akhandpatt || !slideTransitions ? 0 : 300}
         classNames="fade"
         unmountOnExit={!akhandpatt}
       >
-        <div className={`verse-slide ${leftAlign ? ' slide-left-align' : ''}`}>
+        <div
+          className={`verse-slide ${leftAlign ? ' slide-left-align' : ''} ${
+            isOnlyGurbaniVisible() ? ' only-gurbani' : ''
+          }`}
+        >
           {verseObj && showVerse && !isMiscSlide && (
             <>
               {verseObj.Gurmukhi && (
