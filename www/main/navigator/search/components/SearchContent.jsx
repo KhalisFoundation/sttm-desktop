@@ -64,6 +64,7 @@ const SearchContent = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [isTranscriptLoading, setIsTranscriptLoading] = useState(false);
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -234,6 +235,8 @@ const SearchContent = () => {
           const audioBlob = new Blob(chunks, { type: 'audio/wav' });
           const reader = new FileReader();
 
+          setIsTranscriptLoading(true);
+
           reader.onload = async () => {
             const base64Audio = reader.result.toString().split(',')[1];
 
@@ -276,6 +279,8 @@ const SearchContent = () => {
                   value: data.message,
                 });
               }
+
+              setIsTranscriptLoading(false);
             } catch (error) {
               console.error('Network Error:', error.message);
               analytics.trackEvent({
@@ -284,6 +289,8 @@ const SearchContent = () => {
                 label: 'network-error',
                 value: error.message,
               });
+
+              setIsTranscriptLoading(false);
             }
           };
 
@@ -350,21 +357,31 @@ const SearchContent = () => {
   return (
     <div className="search-content-container">
       <div className="search-content">
-        {isRecording ? (
-          <div className="voice-wave-container">
-            <div className="recording-duration">{formatDuration(recordingDuration)}</div>
-            <VoiceWave />
-          </div>
-        ) : (
-          <InputBox
-            placeholder={getPlaceholder()}
-            disabled={databaseProgress < 1}
-            className={`${currentLanguage === 'gr' ? 'gurmukhi' : 'english'} mousetrap`}
-            databaseProgress={databaseProgress}
-            query={query}
-            setQuery={setQuery}
-          />
-        )}
+        {(() => {
+          if (isRecording) {
+            return (
+              <div className="voice-wave-container">
+                <div className="recording-duration">{formatDuration(recordingDuration)}</div>
+                <VoiceWave />
+              </div>
+            );
+          }
+
+          if (isTranscriptLoading) {
+            return <InputBox placeholder={'⏳ Processing audio...'} disabled={true} />;
+          }
+
+          return (
+            <InputBox
+              placeholder={getPlaceholder()}
+              disabled={databaseProgress < 1}
+              className={`${currentLanguage === 'gr' ? 'gurmukhi' : 'english'} mousetrap`}
+              databaseProgress={databaseProgress}
+              query={query}
+              setQuery={setQuery}
+            />
+          );
+        })()}
         <div className="input-buttons">
           {isConnected && (
             <IconButton
