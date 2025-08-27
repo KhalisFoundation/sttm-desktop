@@ -310,18 +310,34 @@ const SearchContent = () => {
           label: 'microphone-error',
           value: error.message,
         });
-        // Show user-friendly error message
+
         alert('Unable to access microphone. Please check permissions and try again.');
       }
     }
   };
 
-  // Timer for recording duration
   useEffect(() => {
     let interval;
     if (isRecording) {
       interval = setInterval(() => {
-        setRecordingDuration((prev) => prev + 1);
+        setRecordingDuration((prev) => {
+          const newDuration = prev + 1;
+
+          if (newDuration >= 10) {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+              mediaRecorder.stop();
+              setIsRecording(false);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'voice-search',
+                label: 'auto-stop-timeout',
+              });
+            }
+            return 0;
+          }
+
+          return newDuration;
+        });
       }, 1000);
     } else {
       setRecordingDuration(0);
@@ -329,7 +345,7 @@ const SearchContent = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRecording]);
+  }, [isRecording, mediaRecorder]);
 
   return (
     <div className="search-content-container">
