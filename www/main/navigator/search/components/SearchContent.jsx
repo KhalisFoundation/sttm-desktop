@@ -3,7 +3,6 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 import { Virtuoso } from 'react-virtuoso';
 import isOnline from 'is-online';
-import { unicode } from 'anvaad-js';
 
 import banidb from '../../../common/constants/banidb';
 import { filters, searchShabads } from '../../utils';
@@ -259,8 +258,7 @@ const SearchContent = () => {
               const data = await response.json();
 
               if (data.status === 'success') {
-                console.log('Transcript Initials:', data.transcriptInitials);
-                const decodedText = unicode(data.transcriptInitials, true);
+                const decodedText = data.transcriptInitials.ascii;
                 if (currentSearchType !== 1) {
                   setCurrentSearchType(1);
                 }
