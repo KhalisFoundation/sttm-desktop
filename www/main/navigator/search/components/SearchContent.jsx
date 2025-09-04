@@ -6,7 +6,7 @@ import isOnline from 'is-online';
 
 import banidb from '../../../common/constants/banidb';
 import { filters, searchShabads } from '../../utils';
-import { formatDuration, retrieveFilterOption } from '../utils';
+import { retrieveFilterOption } from '../utils';
 
 import { classNames } from '../../../common/utils';
 import {
@@ -61,8 +61,8 @@ const SearchContent = () => {
   const [searchResultsCount, setSearchResultsCount] = useState(40);
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioStream, setAudioStream] = useState(null);
   const [isTranscriptLoading, setIsTranscriptLoading] = useState(false);
   const [searchPending, setSearchPending] = useState(true);
 
@@ -218,7 +218,7 @@ const SearchContent = () => {
         mediaRecorder.stop();
       }
       setIsRecording(false);
-      setRecordingDuration(0);
+      setAudioStream(null);
       analytics.trackEvent({
         category: 'search',
         action: 'voice-search',
@@ -229,6 +229,8 @@ const SearchContent = () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const recorder = new MediaRecorder(stream);
         const chunks = [];
+
+        setAudioStream(stream);
 
         recorder.ondataavailable = (e) => {
           chunks.push(e.data);
@@ -299,12 +301,12 @@ const SearchContent = () => {
           reader.readAsDataURL(audioBlob);
 
           stream.getTracks().forEach((track) => track.stop());
+          setAudioStream(null);
         };
 
         setMediaRecorder(recorder);
         recorder.start();
         setIsRecording(true);
-        setRecordingDuration(0);
 
         analytics.trackEvent({
           category: 'search',
@@ -325,52 +327,34 @@ const SearchContent = () => {
     }
   };
 
-  useEffect(() => {
-    let interval;
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingDuration((prev) => {
-          const newDuration = prev + 1;
-
-          if (newDuration >= 10) {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-              mediaRecorder.stop();
-              setIsRecording(false);
-              analytics.trackEvent({
-                category: 'search',
-                action: 'voice-search',
-                label: 'auto-stop-timeout',
-              });
-            }
-            return 0;
-          }
-
-          return newDuration;
-        });
-      }, 1000);
-    } else {
-      setRecordingDuration(0);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRecording, mediaRecorder]);
-
   return (
     <div className="search-content-container">
       <div className="search-content">
         {(() => {
-          if (isRecording) {
+          if (isRecording && audioStream) {
             return (
-              <div className="voice-wave-container">
-                <div className="recording-duration">{formatDuration(recordingDuration)}</div>
-                <VoiceWave />
+              <div className="waveform-container">
+                <VoiceWave
+                  stream={audioStream}
+                  isRecording={isRecording}
+                  width={200}
+                  height={30}
+                  barColor="#007bff"
+                />
               </div>
             );
           }
 
           if (isTranscriptLoading) {
-            return <InputBox placeholder={'⏳ Processing audio...'} disabled={true} />;
+            return (
+              <input
+                className="input-box"
+                type="search"
+                placeholder="⏳ Processing audio..."
+                disabled={true}
+                readOnly
+              />
+            );
           }
 
           return (
