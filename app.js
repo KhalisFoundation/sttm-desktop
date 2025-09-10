@@ -153,6 +153,7 @@ const secondaryWindows = {
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
+let lastLine;
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
@@ -357,6 +358,9 @@ function createViewer(ipcData) {
         nodeIntegration: true,
         enableRemoteModule: true,
         contextIsolation: false,
+        webviewTag: true,
+        nodeIntegrationInSubFrames: true,
+        nodeIntegrationInWorker: true,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
@@ -379,6 +383,11 @@ function createViewer(ipcData) {
         secondaryWindows.changelogWindow.obj.focus();
       }
       viewerWindow.setFullScreen(true);
+
+      viewerWindow.webContents.send('wc-webview-enabled');
+      global.webview = viewerWindow.webContents;
+      viewerWindow.webContents.send('update-settings');
+
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -713,8 +722,6 @@ ipcMain.on('clear-apv', () => {
     viewerWindow.webContents.send('clear-apv');
   }
 });
-
-let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
