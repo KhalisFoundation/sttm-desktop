@@ -64,6 +64,7 @@ i18n.init({
 });
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
+expressApp.use(express.json());
 
 const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
 
@@ -199,6 +200,16 @@ function openSecondaryWindow(windowName) {
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
+
+expressApp.post('/api/bani-control', (req, res) => {
+  const data = req.body;
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bani-controller-data', data);
+  }
+
+  res.json({ success: true });
+});
 
 // autoUpdater events
 autoUpdater.on('checking-for-update', () => {
@@ -691,6 +702,13 @@ app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit();
   // }
+});
+
+ipcMain.handle('send-to-bani-controller', async (event, data) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bani-controller-data', data);
+  }
+  return { success: true };
 });
 
 ipcMain.on('enable-wc-webview', (event, data) => {
