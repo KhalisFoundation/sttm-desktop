@@ -196,6 +196,13 @@
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration"
   },
+  "MICROPHONE_ERROR": {
+    "NotAllowedError": "Microphone access was denied. Please check your system permissions and allow microphone access for this application.",
+    "NotFoundError": "No microphone found. Please connect a microphone and try again.",
+    "NotReadableError": "Microphone is being used by another application. Please close other applications using the microphone and try again.",
+    "OverconstrainedError": "Microphone constraints could not be satisfied. Please try again.",
+    "default": "Please check your microphone permissions and try again."
+  },
   "SEARCH": {
     "ANG": "Ang",
     "FIRST_LETTER_ANYWHERE": "First Letter (Anywhere)",

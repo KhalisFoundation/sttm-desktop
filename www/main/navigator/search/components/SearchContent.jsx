@@ -6,7 +6,7 @@ import isOnline from 'is-online';
 
 import banidb from '../../../common/constants/banidb';
 import { filters, searchShabads } from '../../utils';
-import { retrieveFilterOption, getMicError } from '../utils';
+import { retrieveFilterOption } from '../utils';
 
 import { classNames } from '../../../common/utils';
 import {
@@ -347,7 +347,7 @@ const SearchContent = () => {
           label: 'start-recording',
         });
       } catch (error) {
-        const { errorMessage, errorLabel } = getMicError(error);
+        const { errorMessage, errorLabel } = i18n.t(`MICROPHONE_ERROR.${error.name}`);
 
         analytics.trackEvent({
           category: 'search',
