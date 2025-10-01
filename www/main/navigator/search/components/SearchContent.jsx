@@ -347,13 +347,13 @@ const SearchContent = () => {
           label: 'start-recording',
         });
       } catch (error) {
-        const { errorMessage, errorLabel } =
+        const errorMessage =
           i18n.t(`MICROPHONE_ERROR.${error.name}`) || i18n.t('MICROPHONE_ERROR.default');
 
         analytics.trackEvent({
           category: 'search',
           action: 'voice-search',
-          label: errorLabel,
+          label: error.name,
           value: error.message,
         });
 
