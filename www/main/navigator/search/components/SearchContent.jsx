@@ -409,15 +409,6 @@ const SearchContent = () => {
             <IconButton
               icon={isRecording ? 'fa fa-stop' : 'fa fa-microphone'}
               onClick={handleMicClick}
-              title={(() => {
-                if (microphonePermissionStatus === 'denied') {
-                  return 'Microphone access denied - check system settings';
-                }
-                if (microphonePermissionStatus === 'not-determined') {
-                  return 'Click to request microphone access';
-                }
-                return 'Voice search';
-              })()}
               style={{
                 opacity: microphonePermissionStatus === 'denied' ? 0.5 : 1,
                 cursor: microphonePermissionStatus === 'denied' ? 'not-allowed' : 'pointer',
