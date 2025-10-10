@@ -65,6 +65,7 @@ const SearchContent = () => {
   const [audioStream, setAudioStream] = useState(null);
   const [isTranscriptLoading, setIsTranscriptLoading] = useState(false);
   const [searchPending, setSearchPending] = useState(true);
+  const [microphonePermissionStatus, setMicrophonePermissionStatus] = useState('unknown');
 
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
@@ -199,6 +200,17 @@ const SearchContent = () => {
     });
   }, []);
 
+  const checkMicrophonePermission = async () => {
+    try {
+      ipcRenderer.send('get-media-access-status', 'microphone');
+      const permission = await navigator.permissions.query({ name: 'microphone' });
+      return permission.state;
+    } catch (error) {
+      console.error('Error checking microphone permission:', error);
+      return 'unknown';
+    }
+  };
+
   useEffect(() => {
     const checkOnlineStatus = async () => {
       try {
@@ -210,7 +222,19 @@ const SearchContent = () => {
     };
 
     checkOnlineStatus();
+    checkMicrophonePermission();
   }, []);
+
+  const requestMicrophonePermission = () =>
+    new Promise((resolve) => {
+      const handlePermissionResponse = (event, status) => {
+        ipcRenderer.removeListener('media-access-status', handlePermissionResponse);
+        resolve(status);
+      };
+
+      ipcRenderer.on('media-access-status', handlePermissionResponse);
+      ipcRenderer.send('get-media-access-status', 'microphone');
+    });
 
   const handleMicClick = async () => {
     if (isRecording) {
@@ -226,7 +250,16 @@ const SearchContent = () => {
       });
     } else {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const permissionStatus = await requestMicrophonePermission();
+        setMicrophonePermissionStatus(permissionStatus);
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
         const recorder = new MediaRecorder(stream);
         const chunks = [];
 
@@ -314,15 +347,18 @@ const SearchContent = () => {
           label: 'start-recording',
         });
       } catch (error) {
-        console.error('Error accessing microphone:', error);
+        const errorMessage =
+          i18n.t(`MICROPHONE_ERROR.${error.name}`) || i18n.t('MICROPHONE_ERROR.default');
+
         analytics.trackEvent({
           category: 'search',
           action: 'voice-search',
-          label: 'microphone-error',
+          label: error.name,
           value: error.message,
         });
 
-        alert('Unable to access microphone. Please check permissions and try again.');
+        // eslint-disable-next-line no-alert
+        alert(errorMessage);
       }
     }
   };
@@ -373,6 +409,10 @@ const SearchContent = () => {
             <IconButton
               icon={isRecording ? 'fa fa-stop' : 'fa fa-microphone'}
               onClick={handleMicClick}
+              style={{
+                opacity: microphonePermissionStatus === 'denied' ? 0.5 : 1,
+                cursor: microphonePermissionStatus === 'denied' ? 'not-allowed' : 'pointer',
+              }}
             />
           )}
           {currentLanguage !== 'en' && (
