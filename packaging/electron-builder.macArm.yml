@@ -1,0 +1,22 @@
+publish:
+  provider: s3
+  bucket: sttm-releases
+  path: mac-${arch}
+  region: us-west-2
+
+mac:
+  category: "public.app-category.reference"
+  icon: "assets/STTM.icns"
+  hardenedRuntime: true
+  artifactName: "SikhiToTheMax-${version}-${os}-${arch}.${ext}"
+  entitlements: "./entitlements.mac.inherit.plist"
+  target:
+    - target: dmg
+      arch:
+        - arm64
+    - target: zip
+      arch:
+        - arm64
+  notarize:
+    teamId: "B3W82WVBU9"
+afterSign: "./notarize.js"
