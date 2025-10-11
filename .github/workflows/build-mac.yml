@@ -24,8 +24,8 @@ jobs:
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
       APTABASE_KEY: ${{ secrets.APTABASE_KEY }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
-      TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}
+      AUDIO_TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
+      AUDIO_TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

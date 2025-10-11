@@ -4,19 +4,13 @@ const fs = require('fs');
 const packageJson = require('../package.json');
 const prodConfig = require('../config.prod.json');
 
-// Exit gracefully if not on macOS
-if (process.platform !== 'darwin') {
-  console.log('Skipping package.json update - not on macOS platform');
-  process.exit(0);
-}
-
 const teamId = process.env.APPLE_TEAM_ID;
 const aptabaseKey = process.env.APTABASE_KEY;
 const sentryDsn = process.env.SENTRY_DSN;
 const audioTranscriptApi = process.env.AUDIO_TRANSCRIPT_API;
 const audioTranscriptApiKey = process.env.AUDIO_TRANSCRIPT_API_KEY;
 
-if (!teamId) {
+if (!teamId && process.platform === 'darwin') {
   console.error('TEAM_ID is not defined in the environment variables');
   process.exit(0);
 }
