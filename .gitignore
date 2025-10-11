@@ -13,3 +13,5 @@ npm-debug.log*
 **/.DS_Store
 www/js/
 .env
+venv/
+dist/
