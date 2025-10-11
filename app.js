@@ -65,7 +65,17 @@ i18n.init({
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
 
-const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
+const {
+  app,
+  webContents,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  safeStorage,
+  globalShortcut,
+  systemPreferences,
+  shell,
+} = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -153,6 +163,7 @@ const secondaryWindows = {
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
+let lastLine;
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
@@ -171,6 +182,7 @@ function openSecondaryWindow(windowName) {
         webviewTag: true,
         nodeIntegrationInSubFrames: true,
         nodeIntegrationInWorker: true,
+        media: true,
       },
     });
     remote.enable(window.obj.webContents);
@@ -239,7 +251,7 @@ autoUpdater.on('update-downloaded', () => {
         cancelId: 0,
       })
       .then(({ response }) => {
-        if (response === 1) {
+        if (response === 1 || response === '1') {
           autoUpdater.quitAndInstall();
         }
         global.analytics.trackEvent({
@@ -357,6 +369,10 @@ function createViewer(ipcData) {
         nodeIntegration: true,
         enableRemoteModule: true,
         contextIsolation: false,
+        webviewTag: true,
+        nodeIntegrationInSubFrames: true,
+        nodeIntegrationInWorker: true,
+        media: true,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
@@ -379,6 +395,11 @@ function createViewer(ipcData) {
         secondaryWindows.changelogWindow.obj.focus();
       }
       viewerWindow.setFullScreen(true);
+
+      viewerWindow.webContents.send('wc-webview-enabled');
+      global.webview = viewerWindow.webContents;
+      viewerWindow.webContents.send('update-settings');
+
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -597,6 +618,7 @@ app.on('ready', () => {
       webviewTag: true,
       nodeIntegrationInSubFrames: true,
       nodeIntegrationInWorker: true,
+      media: true,
     },
   });
   const splash = new BrowserWindow({
@@ -713,8 +735,6 @@ ipcMain.on('clear-apv', () => {
     viewerWindow.webContents.send('clear-apv');
   }
 });
-
-let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
@@ -875,6 +895,22 @@ ipcMain.on('update-global-setting', (event, setting) => {
 
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
+});
+
+ipcMain.on('get-media-access-status', async (event, mediaType) => {
+  try {
+    const isGranted = await systemPreferences.askForMediaAccess(mediaType);
+    if (!isGranted) {
+      if (mediaType === 'microphone') {
+        shell.openExternal(
+          'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+        );
+      }
+    }
+    event.reply('media-access-status', isGranted ? 'granted' : 'denied');
+  } catch (error) {
+    event.reply('media-access-status', 'error');
+  }
 });
 
 module.exports = {

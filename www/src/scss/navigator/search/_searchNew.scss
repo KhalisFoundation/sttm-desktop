@@ -241,6 +241,50 @@
       }
     }
 
+    .voice-wave-container {
+      flex-grow: 1;
+      height: 40px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      margin: 0 8px;
+      padding: 0 12px;
+
+      .recording-duration {
+        font-size: 14px;
+        font-weight: 500;
+        color: #e1802f;
+        margin-right: 16px;
+        min-width: 32px;
+        font-family: monospace;
+      }
+
+      .voice-wave {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        height: 20px;
+
+        .voice-bar {
+          width: 3px;
+          background: #e1802f;
+          border-radius: 2px;
+          animation: voiceWave 0.8s ease-in-out infinite;
+
+          &:nth-child(odd) {
+            height: 12px;
+          }
+
+          &:nth-child(even) {
+            height: 16px;
+          }
+        }
+      }
+    }
+
     &-container {
       display: flex;
       flex-direction: column;
@@ -303,4 +347,15 @@
   height: 2px;
   transition: all $transition-time $transition-easing;
   width: 10px;
+}
+
+@keyframes voiceWave {
+  0%, 100% {
+    transform: scaleY(0.5);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
