@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import isOnline from 'is-online';
+import { ipcRenderer } from 'electron';
 
 import BaniControllerItem from './BaniControllerItem';
 import { Overlay } from '../../../common/sttm-ui';
@@ -180,6 +181,20 @@ const BaniController = ({ onScreenClose, className }) => {
       }
     }
   }, [isListeners, adminPin]);
+
+  useEffect(() => {
+    ipcRenderer.on('bani-controller-data', (event, data) => {
+      setSocketData({
+        host: 'local-ipc',
+        type: data.type,
+        ...data,
+      });
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners('bani-controller-data');
+    };
+  }, []);
 
   useEffect(() => {
     useSocketListeners(
