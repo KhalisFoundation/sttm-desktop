@@ -239,7 +239,7 @@ autoUpdater.on('update-downloaded', () => {
         cancelId: 0,
       })
       .then(({ response }) => {
-        if (response === 1) {
+        if (response === 1 || response === '1') {
           autoUpdater.quitAndInstall();
         }
         global.analytics.trackEvent({

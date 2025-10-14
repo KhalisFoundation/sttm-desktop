@@ -1,5 +1,14 @@
 ## New Updates
 
+### 9.2.6 - ਊਨਾ Release _Oct 13, 2025_
+
+### Bug Fixes and Improvements
+- **Analytics Integration**: Fixed analytics integration issues in Windows builds to ensure proper data collection and reporting.
+- **Auto-Update System**: Resolved auto-update functionality issues in macOS builds to ensure users receive the latest updates seamlessly.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.5 - ਊਨਾ Release _Aug 14, 2025_
 
 #### New Features
