@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.2.6 - ਊਨਾ Release _Oct 15, 2025_
+### 9.3.0 - ਊਨਾ Release _Oct 17, 2025_
 
 #### New Features
 - **Voice Search**: Added the ability to search for shabads using voice commands.
@@ -13,6 +13,15 @@
 - **Enhanced Search**: Search functionality now includes bindi characters for more comprehensive results.
 
 **We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
+### 9.2.6 - ਊਨਾ Release _Oct 13, 2025_
+
+### Bug Fixes and Improvements
+- **Analytics Integration**: Fixed analytics integration issues in Windows builds to ensure proper data collection and reporting.
+- **Auto-Update System**: Resolved auto-update functionality issues in macOS builds to ensure users receive the latest updates seamlessly.
+
+**We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
 
 ### 9.2.5 - ਊਨਾ Release _Aug 14, 2025_
@@ -31,6 +40,10 @@
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
 
+
+<details>
+<summary>Previous Updates</summary>
+
 ### 9.2.4 - ਊਨਾ Release _June 06, 2025_
 
 #### Misc. bug fix and other improvements
@@ -41,9 +54,6 @@
 
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
-
-<details>
-<summary>Previous Updates</summary>
 
 ### 9.2.2 - ਊਨਾ Release _July 15, 2024_
 

@@ -9,10 +9,14 @@ on:
 
 jobs:
   build-mac:
-    runs-on: macos-14
     strategy:
       matrix:
-        arch: [x64, arm64]
+        include:
+          - arch: x64
+            runner: macos-13
+          - arch: arm64
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
     env:
       KEY_CHAIN: build.keychain
       CERTIFICATE_P12: certificate.p12
