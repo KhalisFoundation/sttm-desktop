@@ -125,6 +125,11 @@ jobs:
           git config --global user.name "GitHub Actions"
           
           # Run release script with appropriate platform
-          node packaging/release --branch=${{ github.ref_name }} --platform=mac --token=${{ secrets.GITHUB_TOKEN }}
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            PLATFORM="macArm"
+          else
+            PLATFORM="mac"
+          fi
+          node packaging/release --branch=${{ github.ref_name }} --platform=$PLATFORM --token=${{ secrets.GITHUB_TOKEN }}
           
           rm -fr *.p12
