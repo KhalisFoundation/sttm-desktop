@@ -18,5 +18,5 @@ mac:
       arch:
         - arm64
   notarize:
-    teamId: "B3W82WVBU9"
+    teamId:
 afterSign: "./notarize.js"
