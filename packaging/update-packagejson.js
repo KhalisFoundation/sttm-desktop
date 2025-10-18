@@ -12,6 +12,12 @@ if (process.platform === 'darwin') {
   }
   packageJson.build.mac.notarize.teamId = teamId;
   fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2), 'utf-8');
+
+  // Update electron-builder.macArm.yml
+  const macArmConfigPath = './packaging/electron-builder.macArm.yml';
+  let macArmConfig = fs.readFileSync(macArmConfigPath, 'utf-8');
+  macArmConfig = macArmConfig.replace(/teamId:\s*\n/, `teamId: ${teamId}\n`);
+  fs.writeFileSync(macArmConfigPath, macArmConfig, 'utf-8');
 }
 
 const aptabaseKey = process.env.APTABASE_KEY;
