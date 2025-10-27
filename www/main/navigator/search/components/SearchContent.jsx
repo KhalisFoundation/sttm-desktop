@@ -373,6 +373,7 @@ const SearchContent = () => {
                 <VoiceWave
                   stream={audioStream}
                   isRecording={isRecording}
+                  handleMicClick={handleMicClick}
                   width={200}
                   height={30}
                   barColor="#007bff"
