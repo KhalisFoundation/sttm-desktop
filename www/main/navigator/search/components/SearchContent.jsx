@@ -67,6 +67,8 @@ const SearchContent = () => {
   const [searchPending, setSearchPending] = useState(true);
   const [microphonePermissionStatus, setMicrophonePermissionStatus] = useState('unknown');
 
+  let loadMoreTimeout = null;
+
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
@@ -86,20 +88,27 @@ const SearchContent = () => {
 
   const loadMoreSearchResults = useCallback(() => {
     if (searchPending) {
-      setTimeout(() => {
+      setSearchPending(false);
+      if (loadMoreTimeout) {
+        clearTimeout(loadMoreTimeout);
+      }
+      loadMoreTimeout = setTimeout(() => {
         setSearchResultsCount(searchResultsCount + 20);
         searchShabads(query, currentSearchType, currentSource, searchResultsCount).then((rows) => {
-          if (!rows.length) setSearchPending(false);
+          if (searchData.length < rows.length) {
+            setSearchPending(true);
+            analytics.trackEvent({
+              category: 'search',
+              action: 'load-more-search-results',
+              value: rows.length,
+            });
+          }
           return query && rows.length && setSearchData(rows);
-        });
-        analytics.trackEvent({
-          category: 'search',
-          action: 'load-more-search-results',
-          value: searchResultsCount,
         });
       }, 200);
     }
-  });
+  }, [searchPending, searchData, currentSearchType, currentSource, query, searchResultsCount]);
+
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray
       ? searchedShabadsArray.map((verse) => ({
@@ -140,6 +149,7 @@ const SearchContent = () => {
   };
 
   useEffect(() => {
+    setSearchPending(true);
     setFilteredShabads(
       filters(mapVerseItems(searchData), currentWriter, currentRaag, writerArray, raagArray),
     );
@@ -373,6 +383,7 @@ const SearchContent = () => {
                 <VoiceWave
                   stream={audioStream}
                   isRecording={isRecording}
+                  handleMicClick={handleMicClick}
                   width={200}
                   height={30}
                   barColor="#007bff"

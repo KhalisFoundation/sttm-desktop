@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 export const VoiceWave = ({
   stream,
   isRecording,
+  handleMicClick,
   width = 200,
   height = 40,
   barColor = '#666',
@@ -16,11 +17,6 @@ export const VoiceWave = ({
   const startTimeRef = useRef(null);
   const [bars, setBars] = useState([]);
   const [duration, setDuration] = useState('00:00');
-
-  useEffect(() => {
-    console.log('stream', stream);
-    console.log('isRecording', isRecording);
-  }, [stream, isRecording]);
 
   useEffect(() => {
     if (!stream || !isRecording) {
@@ -70,6 +66,9 @@ export const VoiceWave = ({
         setDuration(
           `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
         );
+        if (seconds === 15) {
+          handleMicClick();
+        }
       }
 
       animationRef.current = requestAnimationFrame(draw);
@@ -126,6 +125,7 @@ export const VoiceWave = ({
 VoiceWave.propTypes = {
   stream: PropTypes.instanceOf(MediaStream),
   isRecording: PropTypes.bool.isRequired,
+  handleMicClick: PropTypes.func.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
   barColor: PropTypes.string,
