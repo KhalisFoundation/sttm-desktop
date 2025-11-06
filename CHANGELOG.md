@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.3.0 - ਊਨਾ Release _Oct 17, 2025_
+### 9.3.0 - ਊਨਾ Release _Nov 06, 2025_
 
 #### New Features
 - **Voice Search**: Added the ability to search for shabads using voice commands.
