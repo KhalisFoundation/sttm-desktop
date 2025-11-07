@@ -642,6 +642,19 @@ app.on('ready', () => {
   splash.loadURL(`file://${__dirname}/www/splash.html`);
   splash.center();
   remote.enable(mainWindow.webContents);
+
+  // Set up session permission handler for microphone access (required for Windows)
+  const { session } = electron;
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    if (permission === 'media') {
+      // Allow microphone access
+      callback(true);
+    } else {
+      // Deny other permissions by default
+      callback(false);
+    }
+  });
+
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send(
@@ -917,17 +930,23 @@ ipcMain.on('set-user-setting', (event, settingChanger) => {
 
 ipcMain.on('get-media-access-status', async (event, mediaType) => {
   try {
-    const isGranted = await systemPreferences.askForMediaAccess(mediaType);
-    if (!isGranted) {
-      if (mediaType === 'microphone') {
-        shell.openExternal(
-          'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
-        );
+    // macOS-specific API
+    if (platform === 'darwin' && systemPreferences.askForMediaAccess) {
+      const isGranted = await systemPreferences.askForMediaAccess(mediaType);
+      if (!isGranted) {
+        if (mediaType === 'microphone') {
+          shell.openExternal(
+            'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+          );
+        }
       }
+      event.reply('media-access-status', isGranted ? 'granted' : 'denied');
+    } else {
+      event.reply('media-access-status', 'granted');
     }
-    event.reply('media-access-status', isGranted ? 'granted' : 'denied');
   } catch (error) {
-    event.reply('media-access-status', 'error');
+    console.error('Error checking media access status:', error);
+    event.reply('media-access-status', 'granted');
   }
 });
 
