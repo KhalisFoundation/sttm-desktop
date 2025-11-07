@@ -40,13 +40,17 @@ const useSocketListeners = (
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
     const listenerActions = {
       shabad: (payload) => {
-        changeActiveShabad(payload.shabadId, payload.verseId);
-        if (lineNumber !== payload.lineCount) setLineNumber(payload.lineCount);
+        const shabadId = parseInt(payload.shabadId, 10);
+        const verseId = parseInt(payload.verseId, 10);
+        const lineCount = parseInt(payload.lineCount, 10);
+
+        changeActiveShabad(shabadId, verseId);
+        if (lineNumber !== lineCount) setLineNumber(lineCount);
         analytics.trackEvent({
           category: 'controller',
           action: 'shabad',
           label: 'shabadId',
-          value: payload.shabadId,
+          value: shabadId,
         });
       },
       text: (payload) => {
@@ -67,6 +71,8 @@ const useSocketListeners = (
         });
       },
       bani: (payload) => {
+        const baniId = parseInt(payload.baniId, 10);
+        const verseId = parseInt(payload.verseId, 10);
         if (isCeremonyBani) {
           setIsCeremonyBani(false);
         }
@@ -75,24 +81,25 @@ const useSocketListeners = (
           setIsSundarGutkaBani(true);
         }
 
-        if (sundarGutkaBaniId !== payload.baniId) {
-          setSundarGutkaBaniId(payload.baniId);
+        if (sundarGutkaBaniId !== baniId) {
+          setSundarGutkaBaniId(baniId);
         }
 
-        if (payload.verseId && activeVerseId !== payload.verseId) {
-          if (savedCrossPlatformId !== payload.verseId) {
-            setSavedCrossPlatformId(payload.verseId);
+        if (verseId && activeVerseId !== verseId) {
+          if (savedCrossPlatformId !== verseId) {
+            setSavedCrossPlatformId(verseId);
           }
         }
-        updatePane('bani', payload.baniId);
+        updatePane('bani', baniId);
         analytics.trackEvent({
           category: 'controller',
           action: 'bani',
           label: 'baniId',
-          value: payload.baniId,
+          value: baniId,
         });
       },
       ceremony: (payload) => {
+        const ceremonyPayload = parseInt(payload.ceremonyId, 10);
         if (!isCeremonyBani) {
           setIsCeremonyBani(true);
         }
@@ -101,15 +108,15 @@ const useSocketListeners = (
           setIsSundarGutkaBani(false);
         }
 
-        if (ceremonyId !== payload.ceremonyId) {
-          setCeremonyId(payload.ceremonyId);
+        if (ceremonyId !== ceremonyPayload) {
+          setCeremonyId(ceremonyPayload);
         }
-        updatePane('ceremony', payload.ceremonyId);
+        updatePane('ceremony', ceremonyPayload);
         analytics.trackEvent({
           category: 'controller',
           action: 'ceremony',
           label: 'ceremonyId',
-          value: payload.ceremonyId,
+          value: ceremonyPayload,
         });
       },
       'request-control': () =>

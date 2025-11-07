@@ -16,34 +16,26 @@ export const FavoritePane = ({ className, paneId }) => {
   const {
     activeShabadId,
     initialVerseId,
-    versesRead,
     isCeremonyBani,
     isSundarGutkaBani,
-    homeVerse,
-    activeVerseId,
     singleDisplayActiveTab,
     favShabad,
     pane1,
     pane2,
     pane3,
-    activePaneId,
   } = useStoreState((state) => state.navigator);
   const {
     setActiveShabadId,
     setInitialVerseId,
-    setVersesRead,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
-    setHomeVerse,
-    setActiveVerseId,
     setSingleDisplayActiveTab,
     setFavShabad,
     setPane1,
     setPane2,
     setPane3,
-    setActivePaneId,
   } = useStoreActions((state) => state.navigator);
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const { userToken } = useStoreState((state) => state.app);
   const [parsedFav, setParsedFav] = useState([]);
@@ -90,66 +82,60 @@ export const FavoritePane = ({ className, paneId }) => {
   };
 
   const openShabadFromFav = (shabadId, verseId) => {
-    if (singleDisplayActiveTab !== 'shabad') {
-      setSingleDisplayActiveTab('shabad');
+    const currentPane = paneId || defaultPaneId;
+    switch (currentPane) {
+      case 1:
+        setPane1({
+          ...pane1,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: shabadId,
+          activeVerse: verseId,
+          baniType: 'shabad',
+          versesRead: [verseId],
+          homeVerse: verseId,
+        });
+        break;
+      case 2:
+        setPane2({
+          ...pane2,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: shabadId,
+          activeVerse: verseId,
+          baniType: 'shabad',
+          versesRead: [verseId],
+          homeVerse: verseId,
+        });
+        break;
+      case 3:
+        setPane3({
+          ...pane3,
+          content: i18n.t('MULTI_PANE.SHABAD'),
+          activeShabad: shabadId,
+          activeVerse: verseId,
+          baniType: 'shabad',
+          versesRead: [verseId],
+          homeVerse: verseId,
+        });
+        break;
+      default:
+        break;
     }
-    if (shabadId !== activeShabadId) {
-      setActiveShabadId(shabadId);
 
-      if (verseId !== activeVerseId) {
-        setActiveVerseId(verseId);
+    if (currentWorkspace !== i18n.t('WORKSPACES.MULTI_PANE')) {
+      if (singleDisplayActiveTab !== 'shabad') {
+        setSingleDisplayActiveTab('shabad');
       }
-
       if (verseId !== initialVerseId) {
         setInitialVerseId(verseId);
       }
-
-      if (verseId !== homeVerse) {
-        setHomeVerse(verseId);
-      }
-
-      if (!versesRead.includes(verseId)) {
-        setVersesRead([verseId]);
-      }
-
       if (isSundarGutkaBani) {
         setIsSundarGutkaBani(false);
       }
-
       if (isCeremonyBani) {
         setIsCeremonyBani(false);
       }
-
-      if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
-        if (paneId !== activePaneId) setActivePaneId(paneId);
-        switch (paneId) {
-          case 1:
-            setPane1({
-              ...pane1,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: shabadId,
-              baniType: 'shabad',
-            });
-            break;
-          case 2:
-            setPane2({
-              ...pane2,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: shabadId,
-              baniType: 'shabad',
-            });
-            break;
-          case 3:
-            setPane3({
-              ...pane3,
-              content: i18n.t('MULTI_PANE.SHABAD'),
-              activeShabad: shabadId,
-              baniType: 'shabad',
-            });
-            break;
-          default:
-            break;
-        }
+      if (shabadId !== activeShabadId) {
+        setActiveShabadId(shabadId);
       }
     }
   };

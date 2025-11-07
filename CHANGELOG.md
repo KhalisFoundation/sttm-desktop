@@ -1,5 +1,20 @@
 ## New Updates
 
+### 9.3.0 - ਊਨਾ Release _Nov 06, 2025_
+
+#### New Features
+- **Voice Search**: Added the ability to search for shabads using voice commands.
+- **Toggle Animations**: Added a setting to disable slide fade transitions for a more static viewing experience.
+
+#### Bug Fixes and Improvements
+- **Gurbani Positioning**: Gurbani text now centers automatically when it's the only content displayed in the viewer.
+- **Auto Update**: Fixed a bug that was preventing the app from updating automatically.
+- **White Screen Error**: Resolved an edge case where a white screen would appear after connecting an external monitor after launching the app.
+- **Enhanced Search**: Search functionality now includes bindi characters for more comprehensive results.
+
+**We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.2.6 - ਊਨਾ Release _Oct 13, 2025_
 
 ### Bug Fixes and Improvements
@@ -25,6 +40,10 @@
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
 
+
+<details>
+<summary>Previous Updates</summary>
+
 ### 9.2.4 - ਊਨਾ Release _June 06, 2025_
 
 #### Misc. bug fix and other improvements
@@ -35,9 +54,6 @@
 
 **We would love to hear from you if there a feature that you have been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>
-
-<details>
-<summary>Previous Updates</summary>
 
 ### 9.2.2 - ਊਨਾ Release _July 15, 2024_
 

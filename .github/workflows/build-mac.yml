@@ -9,10 +9,14 @@ on:
 
 jobs:
   build-mac:
-    runs-on: macos-14
     strategy:
       matrix:
-        arch: [x64, arm64]
+        include:
+          - arch: x64
+            runner: macos-13
+          - arch: arm64
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
     env:
       KEY_CHAIN: build.keychain
       CERTIFICATE_P12: certificate.p12
@@ -24,6 +28,8 @@ jobs:
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
       APTABASE_KEY: ${{ secrets.APTABASE_KEY }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      AUDIO_TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
+      AUDIO_TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -119,6 +125,11 @@ jobs:
           git config --global user.name "GitHub Actions"
           
           # Run release script with appropriate platform
-          node packaging/release --branch=${{ github.ref_name }} --platform=mac --token=${{ secrets.GITHUB_TOKEN }}
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            PLATFORM="macArm"
+          else
+            PLATFORM="mac"
+          fi
+          node packaging/release --branch=${{ github.ref_name }} --platform=$PLATFORM --token=${{ secrets.GITHUB_TOKEN }}
           
           rm -fr *.p12

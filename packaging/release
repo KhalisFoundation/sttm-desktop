@@ -59,10 +59,14 @@ const release = async () => {
     process.exit(1);
   }
 
-  // Create and push git tag
-  console.log('Creating git tag...');
-  await git().addTag(releaseVersion);
-  await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
+  try {
+    // Create and push git tag
+    console.log('Creating git tag...');
+    await git().addTag(releaseVersion);
+    await git().pushTags(`https://${token}@github.com/khalisfoundation/sttm-desktop.git`);
+  } catch (err) {
+    console.log('Error pushing git tag, continuing..', err);
+  }
 };
 
 if (branch === 'release' || branch === 'master' || branch === 'dev' || branch === 'github-action') {

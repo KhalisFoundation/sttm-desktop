@@ -64,8 +64,19 @@ i18n.init({
 });
 
 expressApp.use(express.static(path.join(__dirname, 'www', 'obs')));
+expressApp.use(express.json());
 
-const { app, webContents, BrowserWindow, dialog, ipcMain, safeStorage, globalShortcut } = electron;
+const {
+  app,
+  webContents,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  safeStorage,
+  globalShortcut,
+  systemPreferences,
+  shell,
+} = electron;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -153,6 +164,7 @@ const secondaryWindows = {
 };
 let manualUpdate = false;
 const viewerWindowPos = {};
+let lastLine;
 
 function openSecondaryWindow(windowName) {
   const window = secondaryWindows[windowName];
@@ -171,6 +183,7 @@ function openSecondaryWindow(windowName) {
         webviewTag: true,
         nodeIntegrationInSubFrames: true,
         nodeIntegrationInWorker: true,
+        media: true,
       },
     });
     remote.enable(window.obj.webContents);
@@ -198,6 +211,16 @@ function openSecondaryWindow(windowName) {
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
+
+expressApp.post('/api/bani-control', (req, res) => {
+  const data = req.body;
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bani-controller-data', data);
+  }
+
+  res.json({ success: true });
+});
 
 // autoUpdater events
 autoUpdater.on('checking-for-update', () => {
@@ -357,6 +380,10 @@ function createViewer(ipcData) {
         nodeIntegration: true,
         enableRemoteModule: true,
         contextIsolation: false,
+        webviewTag: true,
+        nodeIntegrationInSubFrames: true,
+        nodeIntegrationInWorker: true,
+        media: true,
       },
     });
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
@@ -379,6 +406,11 @@ function createViewer(ipcData) {
         secondaryWindows.changelogWindow.obj.focus();
       }
       viewerWindow.setFullScreen(true);
+
+      viewerWindow.webContents.send('wc-webview-enabled');
+      global.webview = viewerWindow.webContents;
+      viewerWindow.webContents.send('update-settings');
+
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
       }
@@ -597,6 +629,7 @@ app.on('ready', () => {
       webviewTag: true,
       nodeIntegrationInSubFrames: true,
       nodeIntegrationInWorker: true,
+      media: true,
     },
   });
   const splash = new BrowserWindow({
@@ -609,6 +642,19 @@ app.on('ready', () => {
   splash.loadURL(`file://${__dirname}/www/splash.html`);
   splash.center();
   remote.enable(mainWindow.webContents);
+
+  // Set up session permission handler for microphone access (required for Windows)
+  const { session } = electron;
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    if (permission === 'media') {
+      // Allow microphone access
+      callback(true);
+    } else {
+      // Deny other permissions by default
+      callback(false);
+    }
+  });
+
   mainWindow.webContents.on('dom-ready', () => {
     if (checkForExternalDisplay()) {
       mainWindow.webContents.send(
@@ -684,6 +730,13 @@ app.on('window-all-closed', () => {
   // }
 });
 
+ipcMain.handle('send-to-bani-controller', async (event, data) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bani-controller-data', data);
+  }
+  return { success: true };
+});
+
 ipcMain.on('enable-wc-webview', (event, data) => {
   const webViewWC = webContents.fromId(parseInt(data, 10));
   remote.enable(webViewWC);
@@ -713,8 +766,6 @@ ipcMain.on('clear-apv', () => {
     viewerWindow.webContents.send('clear-apv');
   }
 });
-
-let lastLine;
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
@@ -875,6 +926,28 @@ ipcMain.on('update-global-setting', (event, setting) => {
 
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
+});
+
+ipcMain.on('get-media-access-status', async (event, mediaType) => {
+  try {
+    // macOS-specific API
+    if (platform === 'darwin' && systemPreferences.askForMediaAccess) {
+      const isGranted = await systemPreferences.askForMediaAccess(mediaType);
+      if (!isGranted) {
+        if (mediaType === 'microphone') {
+          shell.openExternal(
+            'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+          );
+        }
+      }
+      event.reply('media-access-status', isGranted ? 'granted' : 'denied');
+    } else {
+      event.reply('media-access-status', 'granted');
+    }
+  } catch (error) {
+    console.error('Error checking media access status:', error);
+    event.reply('media-access-status', 'granted');
+  }
 });
 
 module.exports = {

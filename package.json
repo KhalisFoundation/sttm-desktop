@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.2.6",
+  "version": "9.3.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -81,7 +81,7 @@
     "@babel/polyfill": "^7.8.7",
     "@electron/remote": "^2.0.11",
     "@sentry/electron": "^6.8.0",
-    "anvaad-js": "^1.4.3",
+    "anvaad-js": "^1.5.0",
     "axios": "^1.5.1",
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.3.1",
@@ -177,7 +177,15 @@
       "category": "public.app-category.reference",
       "icon": "assets/STTM.icns",
       "hardenedRuntime": true,
+      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Please give us access to your microphone for voice search",
+        "NSCameraUsageDescription": "Please give us access to your camera",
+        "com.apple.security.device.audio-input": true,
+        "com.apple.security.device.camera": true
+      },
       "entitlements": "./entitlements.mac.inherit.plist",
+      "entitlementsInherit": "./entitlements.mac.inherit.plist",
       "target": [
         {
           "target": "dmg",

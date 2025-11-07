@@ -26,6 +26,7 @@ const themes = require('../../../configs/themes.json');
 function ShabadDeck() {
   const {
     activeShabadId,
+    activePaneId,
     activeVerseId,
     isMiscSlide,
     miscSlideText,
@@ -34,7 +35,11 @@ function ShabadDeck() {
     ceremonyId,
     isCeremonyBani,
     minimizedBySingleDisplay,
+    pane1,
+    pane2,
+    pane3,
   } = useStoreState((state) => state.navigator);
+
   const {
     theme: currentTheme,
     akhandpatt,
@@ -42,6 +47,7 @@ function ShabadDeck() {
     displayNextLine,
     themeBg,
     currentWorkspace,
+    defaultPaneId,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
@@ -106,16 +112,27 @@ function ShabadDeck() {
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
   useEffect(() => {
+    let currentShabad = activeShabadId;
+    if (!currentShabad) {
+      const activePane = activePaneId || defaultPaneId;
+      if (activePane === 1) {
+        currentShabad = pane1.activeShabad;
+      } else if (activePane === 2) {
+        currentShabad = pane2.activeShabad;
+      } else if (activePane === 3) {
+        currentShabad = pane3.activeShabad;
+      }
+    }
     if (activeVerseId) {
       if (akhandpatt) {
-        loadShabad(activeShabadId, activeVerseId).then((verses) => setActiveVerse(verses));
+        loadShabad(currentShabad, activeVerseId).then((verses) => setActiveVerse(verses));
       } else {
-        loadShabadVerse(activeShabadId, activeVerseId).then((result) =>
+        loadShabadVerse(currentShabad, activeVerseId).then((result) =>
           result.map((activeRes) => setActiveVerse([activeRes])),
         );
         // load next line of searched shabad verse from db
         if (displayNextLine) {
-          loadShabadVerse(activeShabadId, activeVerseId, displayNextLine).then((result) => {
+          loadShabadVerse(currentShabad, activeVerseId, displayNextLine).then((result) => {
             if (result.length) {
               result.map((activeRes) => setNextVerse(activeRes));
             } else {
@@ -188,7 +205,17 @@ function ShabadDeck() {
         }
       });
     }
-  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt, displayNextLine]);
+  }, [
+    activeShabadId,
+    activeVerseId,
+    sundarGutkaBaniId,
+    ceremonyId,
+    akhandpatt,
+    displayNextLine,
+    pane1,
+    pane2,
+    pane3,
+  ]);
 
   useEffect(() => {
     if (activeVerseId && akhandpatt) {

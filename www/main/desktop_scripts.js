@@ -85,6 +85,20 @@ module.exports = {
   ipc,
   store,
 
+  getRealmDBLastModified() {
+    try {
+      if (fs.existsSync(dbPath)) {
+        const stats = fs.statSync(dbPath);
+        const lastModified = new Date(stats.mtime);
+        const formattedDate = moment(lastModified).format('LL');
+        return formattedDate;
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  },
+
   init() {
     // Initialize DB right away if it exists
     if (
@@ -99,6 +113,7 @@ module.exports = {
       // Download the DB
       this.downloadLatestDB(true);
     }
+
     checkForNotifcations();
 
     if (isUnsupportedWindow) {
