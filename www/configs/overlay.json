@@ -65,7 +65,7 @@
       "advanced-settings": {
         "title": "",
         "type": "switch",
-        "settings": ["fit-text-switch"]
+        "settings": ["fit-text-switch", "toggle-annoucement"]
       }
     },
     "settings": {
@@ -97,6 +97,11 @@
         "title": "FIT_TEXT",
         "tooltip": "Automatically set text size to fit screen",
         "initialValue": false
+      },
+      "toggle-annoucement": {
+        "title": "MISC_SLIDE_ANNOUNCEMENT",
+        "tooltip": "Toggle Annoucement",
+        "initialValue": true
       },
       "larivaarAssist": {
         "title":"LARIVAAR_ASSIST",
@@ -194,7 +199,7 @@
       "addons": {
         "title": "",
         "type": "icon-toggle",
-        "settings": ["toggle-logo", "toggle-annoucement", "green-screen-toggle"]
+        "settings": ["toggle-logo", "green-screen-toggle"]
       },
       "center-icons": {
         "title": "",
@@ -231,11 +236,6 @@
       "toggle-logo": {
         "icon": "sttm.png",
         "tooltip": "Toggle Logo",
-        "initialValue": false
-      },
-      "toggle-annoucement": {
-        "icon": "megaphone.png",
-        "tooltip": "Toggle Annoucement",
         "initialValue": false
       },
       "toggle-link": {
