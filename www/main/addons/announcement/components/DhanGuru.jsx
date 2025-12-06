@@ -13,12 +13,12 @@ const analytics = remote.getGlobal('analytics');
 const { gurus } = insertSlide.dropdownStrings;
 
 export const DhanGuru = ({ isGurmukhi }) => {
-  const { isMiscSlide, miscSlideText, isAnnoucement, isMiscSlideGurmukhi, shortcuts } =
+  const { isMiscSlide, miscSlideText, isAnnouncement, isMiscSlideGurmukhi, shortcuts } =
     useStoreState((state) => state.navigator);
   const {
     setIsMiscSlide,
     setMiscSlideText,
-    setIsAnnoucement,
+    setIsAnnouncement,
     setShortcuts,
     setIsMiscSlideGurmukhi,
   } = useStoreActions((state) => state.navigator);
@@ -35,8 +35,8 @@ export const DhanGuru = ({ isGurmukhi }) => {
   };
 
   const addDhanGuruSlide = (e) => {
-    if (!isAnnoucement) {
-      setIsAnnoucement(true);
+    if (!isAnnouncement) {
+      setIsAnnouncement(true);
     }
     if (typeof e === 'object') {
       addMiscSlide(e.target.value);
@@ -142,10 +142,10 @@ export const DhanGuru = ({ isGurmukhi }) => {
       ipcRenderer.send('show-misc-text', {
         text: miscSlideText,
         isGurmukhi: isMiscSlideGurmukhi,
-        isAnnoucement,
+        isAnnouncement,
       });
     }
-  }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnoucement]);
+  }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnouncement]);
 
   return (
     <>

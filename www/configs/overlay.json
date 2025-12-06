@@ -65,7 +65,7 @@
       "advanced-settings": {
         "title": "",
         "type": "switch",
-        "settings": ["fit-text-switch", "toggle-annoucement"]
+        "settings": ["fit-text-switch", "toggle-announcement"]
       }
     },
     "settings": {
@@ -98,9 +98,9 @@
         "tooltip": "Automatically set text size to fit screen",
         "initialValue": false
       },
-      "toggle-annoucement": {
+      "toggle-announcement": {
         "title": "MISC_SLIDE_ANNOUNCEMENT",
-        "tooltip": "Toggle Annoucement",
+        "tooltip": "Toggle Announcement",
         "initialValue": true
       },
       "larivaarAssist": {

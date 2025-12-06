@@ -14,10 +14,10 @@ const getBaniControllerItems = ({
   setAdminPinVisibility,
   toggleLockScreen,
 }) => {
-  const { isMiscSlide, isMiscSlideGurmukhi, isAnnoucement } = useStoreState(
+  const { isMiscSlide, isMiscSlideGurmukhi, isAnnouncement } = useStoreState(
     (state) => state.navigator,
   );
-  const { setMiscSlideText, setIsMiscSlide, setIsMiscSlideGurmukhi, setIsAnnoucement } =
+  const { setMiscSlideText, setIsMiscSlide, setIsMiscSlideGurmukhi, setIsAnnouncement } =
     useStoreActions((state) => state.navigator);
   return [
     {
@@ -33,8 +33,8 @@ const getBaniControllerItems = ({
           className="button copy-code-btn"
           onClick={() => {
             if (code) {
-              if (!isAnnoucement) {
-                setIsAnnoucement(true);
+              if (!isAnnouncement) {
+                setIsAnnouncement(true);
               }
               if (!isMiscSlide) {
                 setIsMiscSlide(true);

@@ -5,12 +5,12 @@ import ReactHtmlParser from 'html-react-parser';
 
 const SlideAnnouncement = ({ getFontSize }) => {
   const { announcementsFontSize } = useStoreState((state) => state.userSettings);
-  const { isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
+  const { isMiscSlideGurmukhi, miscSlideText, isAnnouncement } = useStoreState(
     (state) => state.navigator,
   );
   let gurmukhi = true;
 
-  if (isAnnoucement) {
+  if (isAnnouncement) {
     gurmukhi = isMiscSlideGurmukhi;
   }
 
