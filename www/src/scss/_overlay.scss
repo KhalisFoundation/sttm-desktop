@@ -543,6 +543,7 @@ input[type='color'] {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    text-align: left;
 
     .subcategory-title {
       margin-bottom: 8px;
@@ -564,7 +565,6 @@ input[type='color'] {
      
       .control-item-switch {
         display: flex;
-        justify-content: center;
         align-items: center;
         margin-top: 2px;
 

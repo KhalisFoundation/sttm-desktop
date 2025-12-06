@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 import { Overlay, Switch } from '../../../common/sttm-ui';
-import Announcement from './Annoucement';
+import Announcement from './Announcement';
 import { DhanGuru } from './DhanGuru';
 import MiscSlides from './MiscSlides';
 
