@@ -13,11 +13,15 @@
     <div id="viewer-container"></div>
     <script>
         const { ipcRenderer } = require('electron');
+        let root = null;
 
         ipcRenderer.on('wc-webview-enabled', () => {
           const app = require('./js/viewer/viewerApp.js').default;
           const { createRoot } = require('react-dom/client');
-          const root = createRoot(document.getElementById('viewer-container'));
+
+          if (!root) {
+            root = createRoot(document.getElementById('viewer-container'));
+          }
           root.render(app());
         });
     </script>
