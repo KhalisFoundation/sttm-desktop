@@ -15,7 +15,7 @@ export const useSlides = () => {
   const {
     isMiscSlide,
     miscSlideText,
-    isAnnoucement,
+    isAnnouncement,
     isSundarGutkaBani,
     isCeremonyBani,
     ceremonyId,
@@ -26,7 +26,7 @@ export const useSlides = () => {
   const {
     setIsMiscSlide,
     setMiscSlideText,
-    setIsAnnoucement,
+    setIsAnnouncement,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setCeremonyId,
@@ -36,8 +36,8 @@ export const useSlides = () => {
   } = useStoreActions((state) => state.navigator);
 
   const addMiscSlide = (givenText) => {
-    if (isAnnoucement) {
-      setIsAnnoucement(false);
+    if (isAnnouncement) {
+      setIsAnnouncement(false);
     }
     if (!isMiscSlide) {
       if (akhandpatt) {

@@ -216,7 +216,7 @@ export const ShabadText = ({
         scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
       }
     }
-  }, [activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
+  }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
 
   const getVerse = (direction) => {
     let verseIndex = null;

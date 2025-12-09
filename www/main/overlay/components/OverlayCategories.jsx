@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useStoreState } from 'easy-peasy';
 
 import OverlaySetting from './OverlaySetting';
 import { convertToCamelCase } from '../../common/utils';
@@ -10,7 +11,13 @@ const { i18n } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];
+  const baniOverlayState = useStoreState((state) => state.baniOverlay);
+  const showFitTextOptions = ['top', 'bottom'].includes(baniOverlayState.layout);
+
   Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
+    if (settingKey === 'fit-text-switch' && !showFitTextOptions) {
+      return;
+    }
     settingsDOM.push(
       <div
         className={`control-item control-${subCategory.settingObjs[settingKey].type}`}

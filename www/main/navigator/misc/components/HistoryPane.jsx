@@ -38,9 +38,18 @@ export const HistoryPane = ({ className, paneId }) => {
     setPane1,
     setPane2,
     setPane3,
+    setVerseHistory,
   } = useStoreActions((state) => state.navigator);
 
   const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+
+  const deleteFromHistory = (element, event) => {
+    event.stopPropagation();
+    const updatedHistory = verseHistory.filter(
+      (historyItem) => historyItem.shabadId !== element.shabadId,
+    );
+    setVerseHistory(updatedHistory);
+  };
 
   const openShabadFromHistory = (element) => {
     const currentPane = paneId || defaultPaneId;
@@ -138,15 +147,25 @@ export const HistoryPane = ({ className, paneId }) => {
 
   verseHistory.forEach((element) => {
     versesMarkup.push(
-      <p
-        className="history-item gurmukhi"
-        key={`history-${element.shabadId}`}
-        onClick={() => {
-          openShabadFromHistory(element);
-        }}
-      >
-        {element.label}
-      </p>,
+      <div className="history-item-container" key={`history-${element.shabadId}`}>
+        <div
+          className="history-item-text"
+          onClick={() => {
+            openShabadFromHistory(element);
+          }}
+        >
+          <p className="history-item gurmukhi">{element.label}</p>
+        </div>
+        <div className="history-item-options">
+          <button
+            onClick={(e) => {
+              deleteFromHistory(element, e);
+            }}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>,
     );
   });
 
