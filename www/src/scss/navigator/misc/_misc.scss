@@ -128,10 +128,50 @@ $misc-footer-active: 70px;
 .history-results {
   overflow-y: auto;
 
-  .history-item {
-    cursor: pointer;
-    margin: 0;
-    padding: 16px 10px;
+  .history-item-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 10px;
+    transition: 0.3s all ease;
+
+    .history-item-text {
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .history-item {
+      cursor: pointer;
+      margin: 0;
+      padding: 16px 0;
+    }
+
+    .history-item-options {
+      align-items: center;
+      color: $grey;
+      display: flex;
+      font-size: 12px;
+      font-style: italic;
+      margin-left: 8px;
+
+      > button {
+        background-color: transparent;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 14px;
+        height: 24px;
+        padding: 4px;
+        width: 24px;
+        transition: 0.3s all;
+        color: $grey;
+
+        &:hover {
+          color: $red;
+        }
+      }
+    }
   }
 }
 
