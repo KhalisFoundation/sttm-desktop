@@ -40,6 +40,7 @@ const Store = require('./www/js/store');
 const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
+const { styles } = require('./resetViewerStyles');
 /* eslint-enable */
 
 const savedSettings = savedSettingsCamelCase();
@@ -389,9 +390,7 @@ function createViewer(ipcData) {
     viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
     remote.enable(viewerWindow.webContents);
     viewerWindow.webContents.on('did-finish-load', () => {
-      viewerWindow.webContents.insertCSS(
-        '.slide-quicktools, .slide-paddingtools { display: none; } .verse-slide { padding-top: 40px !IMPORTANT } div.autoplay-icon-container { display: none }',
-      );
+      viewerWindow.webContents.insertCSS(styles);
       viewerWindow.show();
       const [width, height] = viewerWindow.getSize();
       mainWindow.webContents.send(
