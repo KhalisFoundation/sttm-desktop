@@ -151,9 +151,16 @@ const SearchContent = () => {
   useEffect(() => {
     setSearchPending(true);
     setFilteredShabads(
-      filters(mapVerseItems(searchData), currentWriter, currentRaag, writerArray, raagArray),
+      filters(
+        mapVerseItems(searchData),
+        currentWriter,
+        currentRaag,
+        currentSource,
+        writerArray,
+        raagArray,
+      ),
     );
-  }, [searchData, currentWriter, currentRaag]);
+  }, [searchData, currentWriter, currentRaag, currentSource]);
 
   // checks if keyboard shortcut is fired then it invokes the function
   useEffect(() => {
