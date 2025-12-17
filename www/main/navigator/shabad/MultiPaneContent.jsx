@@ -78,28 +78,28 @@ const MultiPaneContent = ({ data }) => {
           {goToShabadBtn}
           <ul className="history-results">
             <li
-              className="history-item"
+              className="history-item-container"
               onClick={() => displayAnandSahibBhog({ openedFrom: 'multipane-content', paneId })}
             >
-              {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
+              <p className="history-item">{i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}</p>
             </li>
             <li
-              className="history-item"
+              className="history-item-container"
               onClick={() => displayMoolMantraSlide({ openedFrom: 'multipane-content' })}
             >
-              {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
+              <p className="history-item">{i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}</p>
             </li>
             <li
-              className="gurmukhi history-item"
+              className="gurmukhi history-item-container"
               onClick={() => displayWaheguruSlide({ openedFrom: 'multipane-content' })}
             >
-              vwihgurU
+              <p className="history-item">vwihgurU</p>
             </li>
             <li
-              className="history-item"
+              className="history-item-container"
               onClick={() => displayBlankViewer({ openedFrom: 'multiplane-content' })}
             >
-              {i18n.t(`SHORTCUT_TRAY.BLANK`)}
+              <p className="history-item">{i18n.t(`SHORTCUT_TRAY.BLANK`)}</p>
             </li>
           </ul>
         </>
