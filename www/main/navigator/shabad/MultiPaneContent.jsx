@@ -18,6 +18,7 @@ const MultiPaneContent = ({ data }) => {
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
   const { activePaneId, homeVerse, versesRead } = navigatorState;
   const { setHomeVerse, setVersesRead } = navigatorActions;
+  const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const {
     displayWaheguruSlide,
@@ -32,6 +33,10 @@ const MultiPaneContent = ({ data }) => {
       if (versesRead !== paneAttributes.versesRead) setVersesRead(paneAttributes.versesRead);
     }
   }, [activePaneId]);
+
+  useEffect(() => {
+    setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
+  }, [currentWorkspace]);
 
   const goToShabadBtn = (
     <button
