@@ -17,6 +17,7 @@ import {
   copyToClipboard,
   intelligentNextVerse,
   sendToBaniController,
+  FLOWER_VERSE_ID,
 } from './utils';
 
 const baniLengthCols = {
@@ -79,7 +80,7 @@ export const ShabadText = ({
       setIsMiscSlide(false);
     }
     // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-    if (newTraversedVerse === 61) {
+    if (newTraversedVerse === FLOWER_VERSE_ID) {
       return;
     }
     if (activePaneId !== currentPane) {
@@ -229,7 +230,7 @@ export const ShabadText = ({
         if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
           let nextVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[nextVerseIndex].verseId === 61) {
+          if (filteredItems[nextVerseIndex].verseId === FLOWER_VERSE_ID) {
             nextVerseIndex++;
           }
           verseIndex = nextVerseIndex;
@@ -240,7 +241,7 @@ export const ShabadText = ({
         if (parseInt(activeVerseIndex, 10) > 0) {
           let prevVerseIndex = parseInt(activeVerseIndex, 10) - 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[prevVerseIndex].verseId === 61) {
+          if (filteredItems[prevVerseIndex].verseId === FLOWER_VERSE_ID) {
             prevVerseIndex--;
           }
           verseIndex = prevVerseIndex;
