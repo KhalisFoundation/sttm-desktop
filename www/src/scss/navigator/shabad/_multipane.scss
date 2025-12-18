@@ -184,10 +184,12 @@
     opacity: 1;
   }
 
-  p {
+  div {
     &.locked-option {
-      cursor: not-allowed;
       opacity: 0.5;
+      .history-item {
+        cursor: not-allowed;
+      }
     }
   }
 }

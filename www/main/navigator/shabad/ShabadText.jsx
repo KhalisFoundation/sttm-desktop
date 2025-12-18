@@ -17,6 +17,7 @@ import {
   copyToClipboard,
   intelligentNextVerse,
   sendToBaniController,
+  FLOWER_VERSE_ID,
 } from './utils';
 
 const baniLengthCols = {
@@ -77,6 +78,10 @@ export const ShabadText = ({
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
+    }
+    // Ignoring flower verse to avoid unwanted scroll during asa di vaar
+    if (newTraversedVerse === FLOWER_VERSE_ID) {
+      return;
     }
     if (activePaneId !== currentPane) {
       setActivePaneId(currentPane);
@@ -223,13 +228,23 @@ export const ShabadText = ({
     if (direction === 'next') {
       Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
-          verseIndex = parseInt(activeVerseIndex, 10) + 1;
+          let nextVerseIndex = parseInt(activeVerseIndex, 10) + 1;
+          // Ignoring flower verse to avoid unwanted scroll during asa di vaar
+          if (filteredItems[nextVerseIndex].verseId === FLOWER_VERSE_ID) {
+            nextVerseIndex++;
+          }
+          verseIndex = nextVerseIndex;
         }
       });
     } else if (direction === 'prev') {
       Object.keys(activeVerse).forEach((activeVerseIndex) => {
         if (parseInt(activeVerseIndex, 10) > 0) {
-          verseIndex = parseInt(activeVerseIndex, 10) - 1;
+          let prevVerseIndex = parseInt(activeVerseIndex, 10) - 1;
+          // Ignoring flower verse to avoid unwanted scroll during asa di vaar
+          if (filteredItems[prevVerseIndex].verseId === FLOWER_VERSE_ID) {
+            prevVerseIndex--;
+          }
+          verseIndex = prevVerseIndex;
         }
       });
     }
