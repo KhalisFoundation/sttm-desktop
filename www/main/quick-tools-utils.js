@@ -5,12 +5,20 @@ export const changeFontSize = (iconType, increase = true) => {
   const getterVar = `${iconType}FontSize`;
   const oldValue = parseInt(global.getUserSettings[getterVar], 10);
   const newValue = increase ? oldValue + 1 : oldValue - 1;
-  global.setUserSettings[setterAction](newValue);
+  try {
+    global.setUserSettings[setterAction](newValue);
+  } catch (error) {
+    console.error('Error changing font size:', error);
+  }
 };
 
 export const changeVisibility = (iconType) => {
   const setterAction = `set${firstCharToUpperCase(iconType)}Visibility`;
   const getterVar = `${iconType}Visibility`;
   const oldValue = global.getUserSettings[getterVar];
-  global.setUserSettings[setterAction](!oldValue);
+  try {
+    global.setUserSettings[setterAction](!oldValue);
+  } catch (error) {
+    console.error('Error changing visibility:', error);
+  }
 };

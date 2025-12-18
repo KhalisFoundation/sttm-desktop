@@ -1,4 +1,11 @@
-export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArray, raagArray) => {
+export const filters = (
+  allSearchedVerses,
+  currentWriter,
+  currentRaag,
+  currentSource,
+  writerArray,
+  raagArray,
+) => {
   let filteredResult = allSearchedVerses;
 
   // filteres searchedData with selected currentWriter
@@ -25,6 +32,16 @@ export const filters = (allSearchedVerses, currentWriter, currentRaag, writerArr
         return true;
       }
       return allRaags.every((raag) => !verse.raag.includes(raag.value));
+    });
+  }
+
+  // filters searchedData with selected currentSource
+  if (currentSource !== 'all') {
+    filteredResult = filteredResult.filter((verse) => {
+      if (!verse.sourceId) {
+        return false;
+      }
+      return verse.sourceId === currentSource;
     });
   }
 
