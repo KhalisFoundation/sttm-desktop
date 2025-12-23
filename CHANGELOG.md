@@ -1,10 +1,11 @@
 ## New Updates
 
-### 9.3.1 - ਊਨਾ Release _Dec 10, 2025_
+### 9.3.1 - ਊਨਾ Release _Dec 22, 2025_
 
 #### Bug Fixes and Improvements
 - **Bani Overlay**: Overlay now updates immediately when opening a shabad for improved performance.
 - **Announcement Toggle**: Updated UI for toggling announcements in the bani overlay.
+- **Search Filter**: Fixed source filter not updating search results.
 
 **We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
 </br>

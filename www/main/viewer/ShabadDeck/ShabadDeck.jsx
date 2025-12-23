@@ -131,7 +131,7 @@ function ShabadDeck() {
           result.map((activeRes) => setActiveVerse([activeRes])),
         );
         // load next line of searched shabad verse from db
-        if (displayNextLine) {
+        if (displayNextLine && !isMiscSlide) {
           loadShabadVerse(currentShabad, activeVerseId, displayNextLine).then((result) => {
             if (result.length) {
               result.map((activeRes) => setNextVerse(activeRes));
@@ -163,7 +163,7 @@ function ShabadDeck() {
           }
         });
         // load next line of bani
-        if (displayNextLine) {
+        if (displayNextLine && !isMiscSlide) {
           loadBaniVerse(
             sundarGutkaBaniId,
             activeVerseId,
