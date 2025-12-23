@@ -4,7 +4,7 @@ import { useStoreState } from 'easy-peasy';
 import ReactHtmlParser from 'html-react-parser';
 
 const SlideAnnouncement = ({ getFontSize }) => {
-  const { announcementsFontSize } = useStoreState((state) => state.userSettings);
+  const { announcementsFontSize, leftAlign } = useStoreState((state) => state.userSettings);
   const { isMiscSlideGurmukhi, miscSlideText, isAnnouncement } = useStoreState(
     (state) => state.navigator,
   );
@@ -15,7 +15,7 @@ const SlideAnnouncement = ({ getFontSize }) => {
   }
 
   return (
-    <div className="slide-announcement">
+    <div className={`slide-announcement ${leftAlign ? 'slide-left-align' : ''}`}>
       <span
         style={getFontSize(announcementsFontSize)}
         className={gurmukhi ? 'gurmukhi-announcement-slide' : ''}
