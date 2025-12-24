@@ -57,9 +57,9 @@
     const socket = io();
     const preview = document.location.href.indexOf('preview') > -1;
     let overlayPrefs;
-    let hasAnnoucement = false;
-    let lineBeforeAnnoucement = {};
-    let lastAnnoucement = {};
+    let hasAnnouncement = false;
+    let lineBeforeAnnouncement = {};
+    let lastAnnouncement = {};
     let fitTextInstances = [];
 
     const hexToRgb = hex => {
@@ -87,7 +87,7 @@
     };
 
     const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
-      lineBeforeAnnoucement = { Line, larivaar, larivaarAssist, languageSettings };
+      lineBeforeAnnouncement = { Line, larivaar, larivaarAssist, languageSettings };
       getElements('.o-gurbani').setProperty('innerHTML',
         assist(Line.Gurmukhi, larivaar, larivaarAssist));
 
@@ -109,9 +109,9 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
-    const writeText = (text, isGurmukhi, isAnnoucement) => {
+    const writeText = (text, isGurmukhi, isAnnouncement) => {
       let htmlCode;
-      if (isAnnoucement && !isGurmukhi) {
+      if (isAnnouncement && !isGurmukhi) {
         htmlCode = `<span>${text}</span>`;
         getElements('.o-translation').setProperty('innerHTML', htmlCode);
         getElements('.o-gurbani').setProperty('innerHTML', '');
@@ -177,7 +177,7 @@
         'layout-vertical-left',
       );
 
-      const { gurbaniFont, textFont, toggleAnnoucement } = overlayPrefs;
+      const { gurbaniFont, textFont, toggleAnnouncement } = overlayPrefs;
       getElements('.o-gurbani').setProperty('fontFamily', gurbaniFont);
       getElements('.o-translation').setProperty('fontFamily', textFont);
       getElements('.o-transliteration').setProperty('fontFamily', textFont);
@@ -193,14 +193,14 @@
       }
       document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
 
-      if (toggleAnnoucement) {
-        if (hasAnnoucement && Object.keys(lastAnnoucement).length) {
-          const { text, isGurmukhi, isAnnoucement } = lastAnnoucement;
-          writeText(text, isGurmukhi, isAnnoucement);
+      if (toggleAnnouncement) {
+        if (hasAnnouncement && Object.keys(lastAnnouncement).length) {
+          const { text, isGurmukhi, isAnnouncement } = lastAnnouncement;
+          writeText(text, isGurmukhi, isAnnouncement);
         }
       } else {
-        if (Object.keys(lineBeforeAnnoucement).length) {
-          const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnoucement;
+        if (Object.keys(lineBeforeAnnouncement).length) {
+          const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnouncement;
           writeLine(Line, larivaar, larivaarAssist, languageSettings);
         }
       }
@@ -276,13 +276,13 @@
     socket.on('show-misc-text', request => {
       if (!preview) {
         if (overlayPrefs) {
-          const { text, isGurmukhi, isAnnoucement } = request;
-          writeText(text, isGurmukhi, isAnnoucement);
-          if (isAnnoucement) {
-            hasAnnoucement = true;
-            lastAnnoucement = { text, isGurmukhi, isAnnoucement };
+          const { text, isGurmukhi, isAnnouncement } = request;
+          writeText(text, isGurmukhi, isAnnouncement);
+          if (isAnnouncement) {
+            hasAnnouncement = true;
+            lastAnnouncement = { text, isGurmukhi, isAnnouncement };
           } else {
-            hasAnnoucement = false;
+            hasAnnouncement = false;
           }
           applyOverlayPrefs();
         }

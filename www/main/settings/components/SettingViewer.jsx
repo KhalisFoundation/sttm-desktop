@@ -135,7 +135,10 @@ const SettingViewer = () => {
         {themeBg.type === 'video' && (
           <video className="video-preview" src={themeBg.url} autoPlay muted loop />
         )}
-        <div className="verse-slide" style={verseSlideBg()}>
+        <div
+          className={`verse-slide ${leftAlign ? 'slide-left-align' : ''}`}
+          style={verseSlideBg()}
+        >
           <h1 className="slide-gurbani gurbani gurmukhi" style={gurbaniStyles}>
             <div className={`settings-verse ${getLarivaarAssistClass()} ${getVishraamType()}`}>
               {!larivaar ? (

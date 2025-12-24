@@ -12,10 +12,10 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Announcement = ({ isGurmukhi }) => {
-  const { isMiscSlide, isMiscSlideGurmukhi, miscSlideText, isAnnoucement } = useStoreState(
+  const { isMiscSlide, isMiscSlideGurmukhi, miscSlideText, isAnnouncement } = useStoreState(
     (state) => state.navigator,
   );
-  const { setIsMiscSlide, setMiscSlideText, setIsAnnoucement, setIsMiscSlideGurmukhi } =
+  const { setIsMiscSlide, setMiscSlideText, setIsAnnouncement, setIsMiscSlideGurmukhi } =
     useStoreActions((state) => state.navigator);
 
   const [announcementVal, setAnnouncementVal] = useState('');
@@ -49,8 +49,8 @@ const Announcement = ({ isGurmukhi }) => {
     if (isGurmukhi !== isMiscSlideGurmukhi) {
       setIsMiscSlideGurmukhi(isGurmukhi);
     }
-    if (!isAnnoucement) {
-      setIsAnnoucement(true);
+    if (!isAnnouncement) {
+      setIsAnnouncement(true);
     }
     analytics.trackEvent(
       'display',
@@ -76,10 +76,10 @@ const Announcement = ({ isGurmukhi }) => {
       ipcRenderer.send('show-misc-text', {
         text: miscSlideText,
         isGurmukhi: isMiscSlideGurmukhi,
-        isAnnoucement,
+        isAnnouncement,
       });
     }
-  }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnoucement]);
+  }, [miscSlideText, isMiscSlide, isMiscSlideGurmukhi, isAnnouncement]);
 
   return (
     <div className="announcement-body">
