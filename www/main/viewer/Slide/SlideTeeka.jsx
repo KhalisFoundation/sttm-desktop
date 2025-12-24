@@ -21,7 +21,7 @@ const SlideTeeka = ({ getFontSize, teekaObj, position }) => {
 
   useEffect(() => {
     getTeeka(teekaObj);
-  }, [teekaObj]);
+  }, [teekaObj, teekaSource]);
 
   const customStyle = getFontSize(fontSizes[position]);
 
