@@ -29,7 +29,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, 
     if (translationObj) {
       getTranslation(translationObj);
     }
-  }, [translationObj, lang]);
+  }, [translationObj, lang, translationEnglishSource]);
 
   let translationMarkup;
 
