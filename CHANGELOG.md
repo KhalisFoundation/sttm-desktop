@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.3.1 - ਊਨਾ Release _Dec 22, 2025_
+### 9.3.1 - ਊਨਾ Release _Dec 24, 2025_
 
 #### Bug Fixes and Improvements
 - **Bani Overlay**: Overlay now updates immediately when opening a shabad for improved performance.
