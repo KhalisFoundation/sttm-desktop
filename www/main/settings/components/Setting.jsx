@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
@@ -33,10 +33,6 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       label: value,
     });
   };
-
-  useEffect(() => {
-    console.log('filteredBaniOptions', filteredBaniOptions);
-  }, [filteredBaniOptions]);
 
   const handleCheckboxChange = (event) => {
     const value = event.target.checked;
