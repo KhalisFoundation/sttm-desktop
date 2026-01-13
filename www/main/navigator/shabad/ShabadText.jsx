@@ -149,8 +149,17 @@ export const ShabadText = ({
             { verseHistory, setVerseHistory, baniLength },
             initialVerseId,
           );
-          setFilteredItems(filterRequiredVerseItems(verseList));
-          updateTraversedVerse(verseList[0].ID, 0);
+          const filtered = filterRequiredVerseItems(verseList);
+          setFilteredItems(filtered);
+          const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
+          if (filtered.length > 0) {
+            const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
+            if (resumeVerseIndex >= 0) {
+              updateTraversedVerse(resumeVerseId, resumeVerseIndex);
+            } else {
+              updateTraversedVerse(filtered[0].verseId, 0);
+            }
+          }
         }
       });
     } else if (baniType === 'ceremony') {
@@ -164,8 +173,17 @@ export const ShabadText = ({
             { verseHistory, setVerseHistory, baniLength },
             initialVerseId,
           );
-          setFilteredItems(filterRequiredVerseItems(verseList));
-          updateTraversedVerse(verseList[0].ID, 0);
+          const filtered = filterRequiredVerseItems(verseList);
+          setFilteredItems(filtered);
+          const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
+          if (filtered.length > 0) {
+            const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
+            if (resumeVerseIndex >= 0) {
+              updateTraversedVerse(resumeVerseId, resumeVerseIndex);
+            } else {
+              updateTraversedVerse(filtered[0].verseId, 0);
+            }
+          }
         }
       });
     }
