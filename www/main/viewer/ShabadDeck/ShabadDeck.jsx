@@ -123,7 +123,7 @@ function ShabadDeck() {
         currentShabad = pane3.activeShabad;
       }
     }
-    if (activeVerseId) {
+    if (!isMiscSlide && activeVerseId) {
       if (akhandpatt) {
         loadShabad(currentShabad, activeVerseId).then((verses) => setActiveVerse(verses));
       } else {
@@ -142,7 +142,7 @@ function ShabadDeck() {
         }
       }
     }
-    if (sundarGutkaBaniId && isSundarGutkaBani) {
+    if (!isMiscSlide && sundarGutkaBaniId && isSundarGutkaBani) {
       if (akhandpatt) {
         // mangalPosition was removed from 3rd argument of loadBani
         loadBani(sundarGutkaBaniId, baniLengthCols[baniLength]).then((baniRows) => {
@@ -180,7 +180,7 @@ function ShabadDeck() {
         }
       }
     }
-    if (ceremonyId && isCeremonyBani) {
+    if (!isMiscSlide && ceremonyId && isCeremonyBani) {
       loadCeremony(ceremonyId).then((ceremonyVersesArray) => {
         let ceremonyVerses;
         try {
@@ -212,6 +212,7 @@ function ShabadDeck() {
     ceremonyId,
     akhandpatt,
     displayNextLine,
+    isMiscSlide,
     pane1,
     pane2,
     pane3,
