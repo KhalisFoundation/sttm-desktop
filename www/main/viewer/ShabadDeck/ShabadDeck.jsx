@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useStoreState } from 'easy-peasy';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Slide from '../Slide/Slide';
 import QuickTools from '../Slide/QuickTools';
@@ -14,6 +14,7 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
+import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 
 const os = require('os');
 const remote = require('@electron/remote');
@@ -38,7 +39,10 @@ function ShabadDeck() {
     pane1,
     pane2,
     pane3,
+    filteredBaniOptions,
   } = useStoreState((state) => state.navigator);
+
+  const { setFilteredBaniOptions } = useStoreActions((state) => state.navigator);
 
   const {
     theme: currentTheme,
@@ -48,6 +52,8 @@ function ShabadDeck() {
     themeBg,
     currentWorkspace,
     defaultPaneId,
+    teekaSource,
+    translationEnglishSource,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
@@ -108,6 +114,26 @@ function ShabadDeck() {
     Gurmukhi: '',
     Visraam: '',
   });
+
+  const getFilteredBaniOptions = () => {
+    if (!activeVerse.length) return BASE_BANI_OPTIONS;
+
+    const translations = JSON.parse(activeVerse[0].Translations);
+
+    const visibilityMap = {
+      'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
+      'translation-english': translations?.en?.[translationEnglishSource]?.length,
+      'translation-hindi': translations?.hi?.ss?.length,
+      'translation-spanish': translations?.es?.sn?.length,
+      'transliteration-english': true,
+      'transliteration-hindi': true,
+    };
+
+    return BASE_BANI_OPTIONS.map((group) => ({
+      ...group,
+      options: group.options.filter((option) => visibilityMap[option.id]),
+    }));
+  };
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -238,6 +264,19 @@ function ShabadDeck() {
     }
   }, [isMiscSlide]);
 
+  useEffect(() => {
+    const updatedOptions = getFilteredBaniOptions().filter((option) => option.options.length);
+    setFilteredBaniOptions(updatedOptions);
+    global.platform.ipc.send(
+      'update-global-setting',
+      JSON.stringify({
+        actionName: `setFilteredBaniOptions`,
+        payload: updatedOptions,
+        settingType: 'navigator',
+      }),
+    );
+  }, [activeVerse, setFilteredBaniOptions]);
+
   return (
     <>
       {activeVerse.length && akhandpatt ? <AutoPlayIcon /> : null}
@@ -259,7 +298,12 @@ function ShabadDeck() {
         )}
         style={applyTheme()}
       >
-        {!minimizedBySingleDisplay && <QuickTools isMiscSlide={isMiscSlide} />}
+        {!minimizedBySingleDisplay && (
+          <QuickTools
+            isMiscSlide={isMiscSlide}
+            baniOptions={filteredBaniOptions.length ? filteredBaniOptions : BASE_BANI_OPTIONS}
+          />
+        )}
         {!minimizedBySingleDisplay && !akhandpatt && <PaddingTools isMiscSlide={isMiscSlide} />}
         <div
           id="viewer-container-slide-wrapper"

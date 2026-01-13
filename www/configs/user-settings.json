@@ -130,83 +130,20 @@
     "content1": {
       "title": "",
       "initialValue": "translation-english",
-      "type": "multilevel-dropdown",
-      "disableWhen": "content1-visibility",
-      "options": [
-        {
-          "label": "teeka",
-          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
-        },
-        {
-          "label": "translation",
-          "options": [
-            { "id": "translation-english", "text": "English" },
-            { "id": "translation-hindi", "text": "Hindi" },
-            { "id": "translation-spanish", "text": "Spanish" }
-          ]
-        },
-        {
-          "label": "transliteration",
-          "options": [
-            { "id": "transliteration-english", "text": "English" },
-            { "id": "transliteration-hindi", "text": "Hindi" }
-          ]
-        }
-      ]
+      "type": "bani-options-dropdown",
+      "disableWhen": "content1-visibility"
     },
     "content2": {
       "title": "",
       "initialValue": "teeka-punjabi",
-      "type": "multilevel-dropdown",
-      "disableWhen": "content2-visibility",
-      "options": [
-        {
-          "label": "teeka",
-          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
-        },
-        {
-          "label": "translation",
-          "options": [
-            { "id": "translation-english", "text": "English" },
-            { "id": "translation-hindi", "text": "Hindi" },
-            { "id": "translation-spanish", "text": "Spanish" }
-          ]
-        },
-        {
-          "label": "transliteration",
-          "options": [
-            { "id": "transliteration-english", "text": "English" },
-            { "id": "transliteration-hindi", "text": "Hindi" }
-          ]
-        }
-      ]
+      "type": "bani-options-dropdown",
+      "disableWhen": "content2-visibility"
     },
     "content3": {
       "title": "",
       "initialValue": "transliteration-english",
-      "type": "multilevel-dropdown",
-      "disableWhen": "content3-visibility",
-      "options": [
-        {
-          "label": "teeka",
-          "options": [{ "id": "teeka-punjabi", "text": "Punjabi" }]
-        },
-        {
-          "label": "translation",
-          "options": [
-            { "id": "translation-english", "text": "English" },
-            { "id": "translation-hindi", "text": "Hindi" },
-            { "id": "translation-spanish", "text": "Spanish" }
-          ]
-        },
-        {
-          "label": "transliteration",
-          "options": [
-            { "id": "transliteration-english", "text": "English" },
-            { "id": "transliteration-hindi", "text": "Hindi" }
-          ]
-        }
-      ]
+      "type": "bani-options-dropdown",
+      "disableWhen": "content3-visibility"
     },
     "akhandpatt": {
       "title": "AKHAND_PATH_VIEW",
