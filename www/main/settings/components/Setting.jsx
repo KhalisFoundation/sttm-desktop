@@ -16,7 +16,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const userSettings = useStoreState((state) => state.userSettings);
   const userSettingsActions = useStoreActions((state) => state.userSettings);
 
-  const { disabledContent } = useStoreState((state) => state.navigator);
+  const { disabledContent, filteredBaniOptions } = useStoreState((state) => state.navigator);
 
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
@@ -120,7 +120,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         />
       );
       break;
-    case 'multilevel-dropdown':
+    case 'bani-options-dropdown':
       settingDOM = (
         <>
           <select
@@ -128,7 +128,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
             onChange={handleInputChange}
             style={{ marginRight: '8px' }}
           >
-            {options.map((optionObj, optionIndex) => (
+            {filteredBaniOptions.map((optionObj, optionIndex) => (
               <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
                 {optionObj.options.map((optionName, nameIndex) => (
                   <option

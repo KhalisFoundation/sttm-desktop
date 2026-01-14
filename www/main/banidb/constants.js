@@ -58,6 +58,28 @@ const SOURCE_TEXTS = {
   [SOURCE_TYPES.REHATNAMAS]: 'REHATNAMAS',
 };
 
+const BASE_BANI_OPTIONS = [
+  {
+    label: 'teeka',
+    options: [{ id: 'teeka-punjabi', text: 'Punjabi' }],
+  },
+  {
+    label: 'translation',
+    options: [
+      { id: 'translation-english', text: 'English' },
+      { id: 'translation-hindi', text: 'Hindi' },
+      { id: 'translation-spanish', text: 'Spanish' },
+    ],
+  },
+  {
+    label: 'transliteration',
+    options: [
+      { id: 'transliteration-english', text: 'English' },
+      { id: 'transliteration-hindi', text: 'Hindi' },
+    ],
+  },
+];
+
 module.exports = {
   SEARCH_TYPES,
   GURMUKHI_SEARCH_TEXTS,
@@ -66,4 +88,5 @@ module.exports = {
   SOURCE_TEXTS,
   SOURCE_TYPES,
   BINDI_CHARS,
+  BASE_BANI_OPTIONS,
 };
