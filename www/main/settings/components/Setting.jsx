@@ -15,6 +15,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
   const userSettings = useStoreState((state) => state.userSettings);
   const userSettingsActions = useStoreActions((state) => state.userSettings);
+  const { containerPadding } = useStoreState((state) => state.viewerSettings);
 
   const { disabledContent, filteredBaniOptions } = useStoreState((state) => state.navigator);
 
@@ -69,6 +70,41 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         }
       });
     }
+  };
+
+  const handleResetPadding = () => {
+    const defaultPadding = {
+      left: 48,
+      top: 20,
+      right: 0,
+      bottom: 0,
+    };
+    Object.keys(containerPadding).forEach((key) => {
+      if (containerPadding[key] !== defaultPadding[key]) {
+        const payload = { type: key, value: defaultPadding[key] };
+        global.platform.ipc.send(
+          'update-global-setting',
+          JSON.stringify({
+            actionName: 'setPadding',
+            payload,
+            settingType: 'viewerSettings',
+          }),
+        );
+      }
+    });
+  };
+
+  const handleReset = (inputAction) => {
+    if (inputAction === 'RESET_FONT_SIZES') {
+      handleResetFontSizes();
+    } else if (inputAction === 'RESET_PADDING') {
+      handleResetPadding();
+    }
+    analytics.trackEvent({
+      category: 'setting',
+      action: inputAction,
+      label: 'default',
+    });
   };
 
   switch (type) {
@@ -148,9 +184,14 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
       break;
     case 'reset-button':
       settingDOM = (
-        <button onClick={handleResetFontSizes} className="icon-reset">
+        <button
+          onClick={() => {
+            handleReset(title);
+          }}
+          className="icon-reset"
+        >
           <img src="assets/img/icons/reset-transparent.svg" alt="Reset Font Sizes to Default" />
-          <span>{i18n.t(`SETTINGS.RESET_TO_DEFAULT`)}</span>
+          <span>{i18n.t(`SETTINGS.${title}`)}</span>
         </button>
       );
       break;
