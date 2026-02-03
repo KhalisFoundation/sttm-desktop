@@ -56,13 +56,14 @@ const onError = (message) => {
   }
 };
 
-// Removes quicktools and svg from clonedNode of viewer
+// Removes quicktools, paddingtools, and svg from clonedNode of viewer
 const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
   viewerHtml.querySelector('.viewer-logo')?.remove();
   viewerHtml.querySelector('.slide-quicktools')?.remove();
+  viewerHtml.querySelector('.slide-paddingtools')?.remove();
   viewerHtml.querySelector('video')?.remove();
   viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
   viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
