@@ -18,7 +18,8 @@
         "display-vishraams",
         "vishraam-type",
         "vishraam-source",
-        "slide-transitions"
+        "slide-transitions",
+        "reset-padding"
       ]
     },
     "font-sizes": {
@@ -205,6 +206,13 @@
     "slide-transitions": {
       "title": "SLIDE_TRANSITIONS",
       "initialValue": true
+    },
+    "reset-padding": {
+      "title": "RESET_PADDING",
+      "type": "reset-button",
+      "resetSettings": [
+        "containerPadding"
+      ]
     },
     "autoplay-toggle": {
       "title": "AUTO_PLAY",
