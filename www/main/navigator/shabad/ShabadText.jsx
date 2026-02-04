@@ -123,69 +123,37 @@ export const ShabadText = ({
     changeHomeVerse(verseIndex, { paneAttributes, setPaneAttributes });
   };
 
+  const setVerseList = (verseList) => {
+    if (verseList.length) {
+      setRawVerses(verseList);
+      saveToHistory(
+        shabadId,
+        verseList,
+        baniType,
+        { verseHistory, setVerseHistory, baniLength },
+        initialVerseId,
+      );
+      const filtered = filterRequiredVerseItems(verseList);
+      setFilteredItems(filtered);
+      const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
+      if (filtered.length > 0) {
+        const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
+        if (resumeVerseIndex >= 0) {
+          updateTraversedVerse(resumeVerseId, resumeVerseIndex);
+        } else {
+          updateTraversedVerse(filtered[0].verseId, 0);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     if (baniType === 'shabad') {
-      loadShabad(shabadId).then((verseList) => {
-        if (verseList.length) {
-          setRawVerses(verseList);
-          saveToHistory(
-            shabadId,
-            verseList,
-            baniType,
-            { verseHistory, setVerseHistory, baniLength },
-            initialVerseId,
-          );
-          setFilteredItems(filterRequiredVerseItems(verseList));
-        }
-      });
+      loadShabad(shabadId).then(setVerseList);
     } else if (baniType === 'bani') {
-      loadBani(shabadId, baniLengthCols[baniLength]).then((verseList) => {
-        if (verseList.length) {
-          setRawVerses(verseList);
-          saveToHistory(
-            shabadId,
-            verseList,
-            baniType,
-            { verseHistory, setVerseHistory, baniLength },
-            initialVerseId,
-          );
-          const filtered = filterRequiredVerseItems(verseList);
-          setFilteredItems(filtered);
-          const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
-          if (filtered.length > 0) {
-            const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
-            if (resumeVerseIndex >= 0) {
-              updateTraversedVerse(resumeVerseId, resumeVerseIndex);
-            } else {
-              updateTraversedVerse(filtered[0].verseId, 0);
-            }
-          }
-        }
-      });
+      loadBani(shabadId, baniLengthCols[baniLength]).then(setVerseList);
     } else if (baniType === 'ceremony') {
-      loadCeremony(shabadId).then((verseList) => {
-        if (verseList.length) {
-          setRawVerses(verseList);
-          saveToHistory(
-            shabadId,
-            verseList,
-            baniType,
-            { verseHistory, setVerseHistory, baniLength },
-            initialVerseId,
-          );
-          const filtered = filterRequiredVerseItems(verseList);
-          setFilteredItems(filtered);
-          const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
-          if (filtered.length > 0) {
-            const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
-            if (resumeVerseIndex >= 0) {
-              updateTraversedVerse(resumeVerseId, resumeVerseIndex);
-            } else {
-              updateTraversedVerse(filtered[0].verseId, 0);
-            }
-          }
-        }
-      });
+      loadCeremony(shabadId).then(setVerseList);
     }
   }, [shabadId, baniType, baniLength]);
 
