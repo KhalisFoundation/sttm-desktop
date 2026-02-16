@@ -12,6 +12,7 @@ export const loadBani = (baniId, baniLength) =>
     .loadBani(baniId, baniLength)
     .then((rows) =>
       rows
+        .filter((rowDb) => rowDb.MangalPosition !== 'above')
         .map((rowDb) => {
           let row = rowDb;
           if (rowDb.Verse) {
