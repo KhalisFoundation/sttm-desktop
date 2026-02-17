@@ -27,17 +27,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
+      - name: Setup Python 3.11 (node-gyp compatible)
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Create and activate Python virtual environment
+      - name: Ensure setuptools (distutils replacement)
         run: |
-          python3 -m venv venv-gyp
-          source venv-gyp/bin/activate
-          python3 -m pip install --upgrade pip
-          pip install setuptools wheel
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Configure npm to use Python
+        run: |
+          npm config set python python
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -48,12 +49,6 @@ jobs:
         run: |
           source venv-gyp/bin/activate
           npm install --legacy-peer-deps
-
-      - name: Ensure Python distutils support
-        run: |
-          source venv-gyp/bin/activate
-          brew install python-setuptools
-          python3 -m pip install --upgrade setuptools
 
       - name: Install Bonjour SDK
         run: |
