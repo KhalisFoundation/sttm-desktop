@@ -36,19 +36,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: Configure npm to use Python
+      - name: Set node-gyp Python path
         run: |
-          npm config set python python
+          echo "npm_config_python=$env:pythonLocation\python.exe" >> $env:GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
-
-      - name: Install dependencies
-        run: |
-          source venv-gyp/bin/activate
-          npm install --legacy-peer-deps
 
       - name: Install Bonjour SDK
         run: |
