@@ -12,6 +12,7 @@ export const loadBaniVerse = (baniId, verseId, baniLength, nextLine = false) =>
     .loadBani(baniId, baniLength)
     .then((allVerses) =>
       allVerses
+        .filter((rowDb) => rowDb.MangalPosition !== 'above')
         .map((rowDb) => {
           let row = rowDb;
           if (rowDb.Verse) {

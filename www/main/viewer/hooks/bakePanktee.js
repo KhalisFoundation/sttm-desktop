@@ -13,9 +13,11 @@ const bakePanktee = () => {
         Object.keys(vishraamPlacement).forEach((appliedVishraam) => {
           if (vishraamSource === appliedVishraam) {
             const rawActiveVishraams = vishraamPlacement[appliedVishraam];
-            rawActiveVishraams.forEach((rav) => {
-              activeVishraams[rav.p] = rav.t;
-            });
+            if (rawActiveVishraams && rawActiveVishraams.length > 0) {
+              rawActiveVishraams.forEach((rav) => {
+                activeVishraams[rav.p] = rav.t;
+              });
+            }
           }
         });
       }

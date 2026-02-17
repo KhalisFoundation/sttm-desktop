@@ -118,21 +118,25 @@ function ShabadDeck() {
   const getFilteredBaniOptions = () => {
     if (!activeVerse.length) return BASE_BANI_OPTIONS;
 
-    const translations = JSON.parse(activeVerse[0].Translations);
+    try {
+      const translations = JSON.parse(activeVerse[0].Translations);
 
-    const visibilityMap = {
-      'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
-      'translation-english': translations?.en?.[translationEnglishSource]?.length,
-      'translation-hindi': translations?.hi?.ss?.length,
-      'translation-spanish': translations?.es?.sn?.length,
-      'transliteration-english': true,
-      'transliteration-hindi': true,
-    };
+      const visibilityMap = {
+        'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
+        'translation-english': translations?.en?.[translationEnglishSource]?.length,
+        'translation-hindi': translations?.hi?.ss?.length,
+        'translation-spanish': translations?.es?.sn?.length,
+        'transliteration-english': true,
+        'transliteration-hindi': true,
+      };
 
-    return BASE_BANI_OPTIONS.map((group) => ({
-      ...group,
-      options: group.options.filter((option) => visibilityMap[option.id]),
-    }));
+      return BASE_BANI_OPTIONS.map((group) => ({
+        ...group,
+        options: group.options.filter((option) => visibilityMap[option.id]),
+      }));
+    } catch (error) {
+      return BASE_BANI_OPTIONS;
+    }
   };
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
