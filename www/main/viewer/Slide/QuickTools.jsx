@@ -10,7 +10,7 @@ const { i18n } = remote.require('./app');
 
 global.platform = require('../../desktop_scripts');
 
-const QuickTools = ({ isMiscSlide }) => {
+const QuickTools = ({ isMiscSlide, baniOptions }) => {
   const userSettings = useStoreState((state) => state.userSettings);
 
   const { quickToolsOpen } = useStoreState((state) => state.viewerSettings);
@@ -42,28 +42,6 @@ const QuickTools = ({ isMiscSlide }) => {
     }
     return '';
   };
-
-  const baniOptions = [
-    {
-      label: 'teeka',
-      options: [{ id: 'teeka-punjabi', text: 'Punjabi' }],
-    },
-    {
-      label: 'translation',
-      options: [
-        { id: 'translation-english', text: 'English' },
-        { id: 'translation-hindi', text: 'Hindi' },
-        { id: 'translation-spanish', text: 'Spanish' },
-      ],
-    },
-    {
-      label: 'transliteration',
-      options: [
-        { id: 'transliteration-english', text: 'English' },
-        { id: 'transliteration-hindi', text: 'Hindi' },
-      ],
-    },
-  ];
 
   const quickToolsModifiers = [
     {
@@ -137,7 +115,6 @@ const QuickTools = ({ isMiscSlide }) => {
           className={getIconClassName(name, index, actionName)}
           onClick={() => {
             const globalObj = createGlobalPlatformObj(name, toolName, index, actionName);
-            console.log('globalObj', globalObj);
             if (globalObj) {
               global.platform.ipc.send('update-global-setting', JSON.stringify(globalObj));
             }
@@ -166,19 +143,22 @@ const QuickTools = ({ isMiscSlide }) => {
       return <div>{dropdownLabel(order)}</div>;
     }
 
-    const markup = baniOptions.map((optionObj, optionIndex) => (
-      <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
-        {optionObj.options.map((optionName, nameIndex) => (
-          <option
-            key={`option-name-${nameIndex}`}
-            value={optionName.id}
-            disabled={disabledContent.includes(optionName.id)}
-          >
-            {optionName.text}
-          </option>
-        ))}
-      </optgroup>
-    ));
+    const markup = baniOptions.map(
+      (optionObj, optionIndex) =>
+        optionObj.options.length && (
+          <optgroup key={`option-${optionIndex}`} label={dropdownLabel(optionObj.label)}>
+            {optionObj.options.map((optionName, nameIndex) => (
+              <option
+                key={`option-name-${nameIndex}`}
+                value={optionName.id}
+                disabled={disabledContent.includes(optionName.id)}
+              >
+                {optionName.text}
+              </option>
+            ))}
+          </optgroup>
+        ),
+    );
     return (
       <>
         <div>{dropdownLabel(order)}</div>
@@ -226,6 +206,7 @@ const QuickTools = ({ isMiscSlide }) => {
 
 QuickTools.propTypes = {
   isMiscSlide: PropTypes.bool,
+  baniOptions: PropTypes.array,
 };
 
 export default QuickTools;

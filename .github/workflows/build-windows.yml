@@ -27,6 +27,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Python 3.11 (node-gyp compatible)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ensure setuptools (distutils replacement)
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Set node-gyp Python path
+        run: |
+          echo "npm_config_python=$env:pythonLocation\python.exe" >> $env:GITHUB_ENV
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -43,6 +56,12 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/bonjoursdksetup.exe" -OutFile "bonjoursdksetup.exe"
           Start-Process bonjoursdksetup.exe -ArgumentList "/quiet" -Wait
           Remove-Item bonjoursdksetup.exe
+
+      - name: Clean node_modules
+        run: |
+          if (Test-Path node_modules) {
+            Remove-Item node_modules -Recurse -Force -ErrorAction SilentlyContinue
+          }
 
       - name: Install dependencies
         run: |

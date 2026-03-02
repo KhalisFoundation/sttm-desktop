@@ -1,5 +1,17 @@
 ## New Updates
 
+### 9.3.2 - ਊਨਾ Release _March 02, 2026_
+
+#### Bug Fixes and Improvements
+- **External viewer**: Padding controls are no longer shown in the separate viewer window, so your presentation or cast view stays clean and distraction-free.
+- **Reset padding**: You can now reset all viewer padding (margins) back to default with one tap in settings.
+- **Sundar Gutka**: Opening a Sundar Gutka Bani from History now continues from where you left off instead of from the beginning.
+- **Voice search**: Voice search stops automatically when you stop speaking, so you don’t need to manually end the recording.
+- **White screen**: Fixed an issue where some shabads showed a blank white screen instead of the Gurbani text.
+
+**We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.3.1 - ਊਨਾ Release _Dec 24, 2025_
 
 #### Bug Fixes and Improvements

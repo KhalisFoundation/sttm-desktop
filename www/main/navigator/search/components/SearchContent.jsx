@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 import { Virtuoso } from 'react-virtuoso';
@@ -7,6 +7,7 @@ import isOnline from 'is-online';
 import banidb from '../../../common/constants/banidb';
 import { filters, searchShabads } from '../../utils';
 import { retrieveFilterOption } from '../utils';
+import { SilenceDetector, createAudioAnalyser } from './silence';
 
 import { classNames } from '../../../common/utils';
 import {
@@ -72,6 +73,11 @@ const SearchContent = () => {
   const sourcesObj = banidb.SOURCE_TEXTS;
   const writersObj = banidb.WRITER_TEXTS;
   const raagsObj = banidb.RAAG_TEXTS;
+
+  const audioContextRef = useRef(null);
+  const silenceDetectorRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const recordingChunksRef = useRef(null);
 
   const isShowFiltersTag =
     currentWriter !== 'all' || currentRaag !== 'all' || currentSource !== 'all';
@@ -253,132 +259,203 @@ const SearchContent = () => {
       ipcRenderer.send('get-media-access-status', 'microphone');
     });
 
-  const handleMicClick = async () => {
-    if (isRecording) {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
+  const stopRecording = async () => {
+    const recorder = mediaRecorderRef.current || mediaRecorder;
+
+    if (recorder && recorder.state !== 'inactive') {
+      if (recorder.state === 'recording') {
+        recorder.requestData();
       }
-      setIsRecording(false);
-      setAudioStream(null);
-      analytics.trackEvent({
-        category: 'search',
-        action: 'voice-search',
-        label: 'stop-recording',
+      recorder.stop();
+    }
+
+    if (silenceDetectorRef.current) {
+      silenceDetectorRef.current.stop();
+      silenceDetectorRef.current.destroy();
+      silenceDetectorRef.current = null;
+    }
+
+    setIsRecording(false);
+    setAudioStream(null);
+
+    analytics.trackEvent({
+      category: 'search',
+      action: 'voice-search',
+      label: 'stop-recording',
+    });
+  };
+
+  const startRecording = async () => {
+    try {
+      const permissionStatus = await requestMicrophonePermission();
+      setMicrophonePermissionStatus(permissionStatus);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
-    } else {
-      try {
-        const permissionStatus = await requestMicrophonePermission();
-        setMicrophonePermissionStatus(permissionStatus);
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
+      mediaRecorderRef.current = recorder;
+      recordingChunksRef.current = chunks;
+
+      setAudioStream(stream);
+
+      const { audioContext, analyser } = createAudioAnalyser(stream);
+      audioContextRef.current = audioContext;
+
+      const silenceDetector = new SilenceDetector(
+        analyser,
+        {
+          onSilenceDetected: () => {
+            stopRecording();
           },
-        });
-        const recorder = new MediaRecorder(stream);
-        const chunks = [];
+        },
+        {
+          threshold: 0.03,
+          durationMs: 1500,
+        },
+      );
+      silenceDetectorRef.current = silenceDetector;
 
-        setAudioStream(stream);
-
-        recorder.ondataavailable = (e) => {
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
           chunks.push(e.data);
-        };
+          recordingChunksRef.current = chunks;
+        }
+      };
 
-        recorder.onstop = async () => {
-          const audioBlob = new Blob(chunks, { type: 'audio/wav' });
-          const reader = new FileReader();
+      recorder.onstop = async () => {
+        const finalChunks = recordingChunksRef.current || chunks;
 
-          setIsTranscriptLoading(true);
+        if (!finalChunks || finalChunks.length === 0) {
+          console.warn('No audio data collected');
+          setIsTranscriptLoading(false);
+          setAudioStream(null);
+          mediaRecorderRef.current = null;
+          recordingChunksRef.current = null;
+          return;
+        }
 
-          reader.onload = async () => {
-            const base64Audio = reader.result.toString().split(',')[1];
+        const audioBlob = new Blob(finalChunks, { type: 'audio/wav' });
+        const reader = new FileReader();
 
-            try {
-              const response = await fetch(prodConfig.AUDIO_TRANSCRIPT_API, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  audioData: base64Audio,
-                  apiKey: prodConfig.AUDIO_TRANSCRIPT_API_KEY,
-                }),
-              });
+        setIsTranscriptLoading(true);
 
-              const data = await response.json();
+        reader.onload = async () => {
+          const base64Audio = reader.result.toString().split(',')[1];
 
-              if (data.status === 'success') {
-                const decodedText = data.transcriptInitials.ascii;
-                if (currentSearchType !== 1) {
-                  setCurrentSearchType(1);
-                }
-                if (currentLanguage !== 'gr') {
-                  setCurrentLanguage('gr');
-                }
-                setQuery(decodedText);
-                analytics.trackEvent({
-                  category: 'search',
-                  action: 'voice-search',
-                  label: 'transcript-success',
-                  value: data.transcriptInitials,
-                });
-              } else {
-                console.error('Error:', data.message);
-                analytics.trackEvent({
-                  category: 'search',
-                  action: 'voice-search',
-                  label: 'transcript-error',
-                  value: data.message,
-                });
+          try {
+            const response = await fetch(prodConfig.AUDIO_TRANSCRIPT_API, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                audioData: base64Audio,
+                apiKey: prodConfig.AUDIO_TRANSCRIPT_API_KEY,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+              const decodedText = data.transcriptInitials.ascii;
+              if (currentSearchType !== 1) {
+                setCurrentSearchType(1);
               }
-
-              setIsTranscriptLoading(false);
-            } catch (error) {
-              console.error('Network Error:', error.message);
+              if (currentLanguage !== 'gr') {
+                setCurrentLanguage('gr');
+              }
+              setQuery(decodedText);
               analytics.trackEvent({
                 category: 'search',
                 action: 'voice-search',
-                label: 'network-error',
-                value: error.message,
+                label: 'transcript-success',
+                value: data.transcriptInitials,
               });
-
-              setIsTranscriptLoading(false);
+            } else {
+              console.error('Error:', data.message);
+              analytics.trackEvent({
+                category: 'search',
+                action: 'voice-search',
+                label: 'transcript-error',
+                value: data.message,
+              });
             }
-          };
 
-          reader.readAsDataURL(audioBlob);
+            setIsTranscriptLoading(false);
+          } catch (error) {
+            console.error('Network Error:', error.message);
+            analytics.trackEvent({
+              category: 'search',
+              action: 'voice-search',
+              label: 'network-error',
+              value: error.message,
+            });
 
-          stream.getTracks().forEach((track) => track.stop());
-          setAudioStream(null);
+            setIsTranscriptLoading(false);
+          }
         };
 
-        setMediaRecorder(recorder);
-        recorder.start();
-        setIsRecording(true);
+        reader.readAsDataURL(audioBlob);
 
-        analytics.trackEvent({
-          category: 'search',
-          action: 'voice-search',
-          label: 'start-recording',
-        });
-      } catch (error) {
-        const errorMessage =
-          i18n.t(`MICROPHONE_ERROR.${error.name}`) || i18n.t('MICROPHONE_ERROR.default');
+        stream.getTracks().forEach((track) => track.stop());
+        setAudioStream(null);
 
-        analytics.trackEvent({
-          category: 'search',
-          action: 'voice-search',
-          label: error.name,
-          value: error.message,
-        });
+        mediaRecorderRef.current = null;
+        recordingChunksRef.current = null;
+      };
 
-        // eslint-disable-next-line no-alert
-        alert(errorMessage);
-      }
+      setMediaRecorder(recorder);
+      recorder.start();
+      silenceDetector.start();
+      setIsRecording(true);
+
+      analytics.trackEvent({
+        category: 'search',
+        action: 'voice-search',
+        label: 'start-recording',
+      });
+    } catch (error) {
+      const errorMessage =
+        i18n.t(`MICROPHONE_ERROR.${error.name}`) || i18n.t('MICROPHONE_ERROR.default');
+
+      analytics.trackEvent({
+        category: 'search',
+        action: 'voice-search',
+        label: error.name,
+        value: error.message,
+      });
+
+      // eslint-disable-next-line no-alert
+      alert(errorMessage);
     }
   };
+
+  const handleMicClick = async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  useEffect(
+    () => () => {
+      if (silenceDetectorRef.current) {
+        silenceDetectorRef.current.destroy();
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+      }
+    },
+    [],
+  );
 
   return (
     <div className="search-content-container">
