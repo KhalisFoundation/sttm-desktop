@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.3.2 - ਊਨਾ Release Feb 18, 2025_
+### 9.3.2 - ਊਨਾ Release _March 02, 2026_
 
 #### Bug Fixes and Improvements
 - **External viewer**: Padding controls are no longer shown in the separate viewer window, so your presentation or cast view stays clean and distraction-free.
