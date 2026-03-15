@@ -54,6 +54,7 @@
     "electron-publisher-s3": "^20.17.2",
     "electron-react-devtools": "^0.5.3",
     "electron-rebuild": "^3.2.8",
+    "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^8.50.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",

@@ -1,9 +1,22 @@
+const path = require('path');
+
+if (process.env.NODE_ENV === 'development') {
+  try {
+    require('electron-reload')(__dirname, {
+      electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+      hardResetMethod: 'exit', // ensures clean reload for multi-window apps
+      forceHardReset: true,    // useful for complex apps
+    });
+    console.log('Hot reload enabled');
+  } catch (err) {
+    console.error('Hot reload not enabled:', err);
+  }
+}
 const electron = require('electron');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const portfinder = require('portfinder');
 const i18n = require('i18next');
