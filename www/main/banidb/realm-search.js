@@ -169,7 +169,7 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
         break;
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ENGLISH:
         searchCol = 'FirstLetterEng';
-        condition = `${searchCol} CONTAINS '${saniQuery}'`;
+        condition = `${searchCol} CONTAINS[c] '${saniQuery}'`;
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
         }
