@@ -49,7 +49,7 @@
     "@electron/notarize": "^2.3.0",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
-    "electron": "^26.2.4",
+    "electron": "^41.1.1",
     "electron-builder": "^24.13.3",
     "electron-publisher-s3": "^20.17.2",
     "electron-react-devtools": "^0.5.3",
