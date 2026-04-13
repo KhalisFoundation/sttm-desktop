@@ -68,6 +68,12 @@ const getSanitizedViewer = () => {
   viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
   viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
 
+  const slideWrapper = viewerHtml.querySelector('#viewer-container-slide-wrapper');
+  if (slideWrapper) {
+    slideWrapper.style.width = '100%';
+    slideWrapper.style.height = '100%';
+    slideWrapper.style.padding = '0';
+  }
   return viewerHtml.innerHTML;
 };
 
