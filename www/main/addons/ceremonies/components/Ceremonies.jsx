@@ -24,9 +24,15 @@ const Ceremonies = ({ onScreenClose }) => {
         <div className="ceremonies-list ui-ceremonies">
           {isLoadingCeremonies && <div className="sttm-loader" />}
           {!isLoadingCeremonies &&
-            visibleCeremonies.map((c) => (
-              <CeremonyPane key={c.token} {...c} onScreenClose={onScreenClose} />
-            ))}
+            visibleCeremonies.map((c, index) => {
+              return (
+                <CeremonyPane
+                  key={c?.token}
+                  {...c}
+                  onScreenClose={onScreenClose}
+                />
+              );
+            })}
         </div>
       </div>
     </Overlay>
