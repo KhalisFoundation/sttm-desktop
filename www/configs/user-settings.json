@@ -34,6 +34,7 @@
         "content2-font-size",
         "content3-font-size",
         "announcements-font-size",
+        "english-font-size",
         "reset-font-sizes"
       ]
     },
@@ -102,6 +103,10 @@
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
+    "english-font-size": {
+      "title": "ENGLISH",
+      "initialValue": 5
+    },
     "reset-font-sizes": {
       "title": "RESET_FONT_SIZES",
       "type": "reset-button",
@@ -110,7 +115,8 @@
         "content1-font-size",
         "content2-font-size",
         "content3-font-size",
-        "announcements-font-size"
+        "announcements-font-size",
+        "english-font-size"
       ]
     },
     "content1-visibility": {

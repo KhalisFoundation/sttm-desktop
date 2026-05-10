@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
 const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, position }) => {
-  const { content1FontSize, content2FontSize, content3FontSize, translationEnglishSource } =
+  const { content1FontSize, content2FontSize, content3FontSize, englishFontSize, translationEnglishSource } =
     useStoreState((state) => state.userSettings);
   const [translationString, setTranslationString] = useState(null);
   const fontSizes = [content1FontSize, content2FontSize, content3FontSize];
@@ -33,7 +33,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, 
 
   let translationMarkup;
 
-  const customStyle = getFontSize(fontSizes[position]);
+  const customStyle = translationHTML ? getFontSize(englishFontSize) : getFontSize(fontSizes[position]);
 
   if (translationHTML) {
     translationMarkup = (

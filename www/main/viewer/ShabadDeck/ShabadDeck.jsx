@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Slide from '../Slide/Slide';
@@ -59,6 +59,11 @@ function ShabadDeck() {
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
   const verseRefKeys = useRef([]);
+
+  const hasEnglish = useMemo(() => activeVerse.some(v => v.English), [activeVerse]);
+  const hasTranslation = useMemo(() => activeVerse.some(v => v.Translations), [activeVerse]);
+  const hasTransliteration = useMemo(() => activeVerse.some(v => v.Gurmukhi), [activeVerse]);
+  const hasTeeka = hasTranslation;
 
   const baniLengthCols = {
     short: 'existsSGPC',
@@ -307,6 +312,10 @@ function ShabadDeck() {
           <QuickTools
             isMiscSlide={isMiscSlide}
             baniOptions={filteredBaniOptions.length ? filteredBaniOptions : BASE_BANI_OPTIONS}
+            hasEnglish={hasEnglish}
+            hasTranslation={hasTranslation}
+            hasTransliteration={hasTransliteration}
+            hasTeeka={hasTeeka}
           />
         )}
         {!minimizedBySingleDisplay && !akhandpatt && <PaddingTools isMiscSlide={isMiscSlide} />}
