@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { broadcastHistory } from '../../../addons/bani-controller/controller-bus';
 
 const remote = require('@electron/remote');
 
@@ -49,6 +50,16 @@ export const HistoryPane = ({ className, paneId }) => {
       (historyItem) => historyItem.shabadId !== element.shabadId,
     );
     setVerseHistory(updatedHistory);
+    // Mirror the removal to a connected web controller, if any. No-op when
+    // no controller session is active.
+    broadcastHistory('remove', {
+      entry: {
+        shabadId: element.shabadId,
+        verseId: element.verseId,
+        label: element.label,
+        kind: element.type === 'bani' || element.type === 'ceremony' ? element.type : 'shabad',
+      },
+    });
   };
 
   const openShabadFromHistory = (element) => {
@@ -145,7 +156,19 @@ export const HistoryPane = ({ className, paneId }) => {
 
   const versesMarkup = [];
 
-  verseHistory.forEach((element) => {
+  // Defensive dedup against any legacy state that may have stored two entries
+  // with the same shabadId (e.g. a shabad and a bani sharing an id). Local
+  // saveToHistory and the wire receive both dedup by shabadId, but persisted
+  // state from before that invariant was enforced can still violate it and
+  // crash React's child-key reconciliation.
+  const seenShabadIds = new Set();
+  const uniqueHistory = verseHistory.filter((h) => {
+    if (seenShabadIds.has(h.shabadId)) return false;
+    seenShabadIds.add(h.shabadId);
+    return true;
+  });
+
+  uniqueHistory.forEach((element) => {
     versesMarkup.push(
       <div className="history-item-container" key={`history-${element.shabadId}`}>
         <div

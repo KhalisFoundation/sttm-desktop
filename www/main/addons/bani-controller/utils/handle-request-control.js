@@ -2,6 +2,15 @@ const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 
+// Maps a navigator verseHistory entry to the wire-format history entry used
+// by the controller history sync protocol.
+const toWireHistoryEntry = (entry) => ({
+  shabadId: entry.shabadId,
+  verseId: entry.verseId,
+  label: entry.label,
+  kind: entry.type === 'bani' || entry.type === 'ceremony' ? entry.type : 'shabad',
+});
+
 const handleRequestControl = (
   isPinCorrect,
   fontSizes,
@@ -13,6 +22,8 @@ const handleRequestControl = (
   sundarGutkaBaniId,
   baniLength,
   // mangalPosition,
+  verseHistory = [],
+  adminPin = 0,
 ) => {
   document.body.classList.toggle(`controller-on`, isPinCorrect);
   window.socket.emit('data', {
@@ -23,6 +34,18 @@ const handleRequestControl = (
       fontSizes,
     },
   });
+
+  // After a successful join, snapshot the operator's current history to the
+  // controller so the web-side History tab matches what desktop shows.
+  if (isPinCorrect && Array.isArray(verseHistory) && verseHistory.length > 0) {
+    window.socket.emit('data', {
+      host: 'sttm-desktop',
+      type: 'history',
+      pin: parseInt(adminPin, 10) || 0,
+      action: 'sync',
+      entries: verseHistory.map(toWireHistoryEntry),
+    });
+  }
   // if Pin is correct and there is a shabad already in desktop, emit that shabad details.
   if (isPinCorrect) {
     const currentShabad = {

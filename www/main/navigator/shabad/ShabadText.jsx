@@ -43,23 +43,31 @@ export const ShabadText = ({
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
 
-  const {
-    activeVerseId,
-    isMiscSlide,
-    isSundarGutkaBani,
-    sundarGutkaBaniId,
-    isCeremonyBani,
-    ceremonyId,
-    activeShabadId,
-    verseHistory,
-    initialVerseId,
-    activePaneId,
-    shortcuts,
-    lineNumber,
-  } = useStoreState((state) => state.navigator);
+  // Select specific fields rather than destructuring from a parent slice —
+  // the parent-slice form returns an immer/easy-peasy proxy that can get
+  // revoked between renders during error recovery and rapid bani↔shabad
+  // transitions, causing "Cannot perform 'get' on a proxy that has been
+  // revoked" crashes that cascade into Launchpad.
+  const activeVerseId = useStoreState((state) => state.navigator.activeVerseId);
+  const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
+  const isSundarGutkaBani = useStoreState((state) => state.navigator.isSundarGutkaBani);
+  const sundarGutkaBaniId = useStoreState((state) => state.navigator.sundarGutkaBaniId);
+  const isCeremonyBani = useStoreState((state) => state.navigator.isCeremonyBani);
+  const ceremonyId = useStoreState((state) => state.navigator.ceremonyId);
+  const activeShabadId = useStoreState((state) => state.navigator.activeShabadId);
+  const verseHistory = useStoreState((state) => state.navigator.verseHistory);
+  const initialVerseId = useStoreState((state) => state.navigator.initialVerseId);
+  const activePaneId = useStoreState((state) => state.navigator.activePaneId);
+  const shortcuts = useStoreState((state) => state.navigator.shortcuts);
+  const lineNumber = useStoreState((state) => state.navigator.lineNumber);
+  const savedCrossPlatformId = useStoreState((state) => state.navigator.savedCrossPlatformId);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt } =
-    useStoreState((state) => state.userSettings);
+  const baniLength = useStoreState((state) => state.userSettings.baniLength);
+  const liveFeed = useStoreState((state) => state.userSettings.liveFeed);
+  const autoplayDelay = useStoreState((state) => state.userSettings.autoplayDelay);
+  const autoplayToggle = useStoreState((state) => state.userSettings.autoplayToggle);
+  const intelligentSpacebar = useStoreState((state) => state.userSettings.intelligentSpacebar);
+  const akhandpatt = useStoreState((state) => state.userSettings.akhandpatt);
 
   const {
     setActiveVerseId,
@@ -72,7 +80,6 @@ export const ShabadText = ({
     setCeremonyId,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
-    savedCrossPlatformId,
   } = useStoreActions((actions) => actions.navigator);
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
@@ -138,10 +145,19 @@ export const ShabadText = ({
       const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
       if (filtered.length > 0) {
         const resumeVerseIndex = filtered.findIndex((v) => v.verseId === resumeVerseId);
+        // Pass crossPlatformId explicitly so sendToBaniController skips the
+        // `activeShabad.find(obj.verseId === ...)` lookup. That lookup uses
+        // the closure-captured `filteredItems` (still empty on first load
+        // since setFilteredItems above was just queued), so the find returns
+        // undefined and crashes on `.crossPlatformId` access.
         if (resumeVerseIndex >= 0) {
-          updateTraversedVerse(resumeVerseId, resumeVerseIndex);
+          updateTraversedVerse(
+            resumeVerseId,
+            resumeVerseIndex,
+            filtered[resumeVerseIndex].crossPlatformId,
+          );
         } else {
-          updateTraversedVerse(filtered[0].verseId, 0);
+          updateTraversedVerse(filtered[0].verseId, 0, filtered[0].crossPlatformId);
         }
       }
     }
@@ -180,11 +196,28 @@ export const ShabadText = ({
   }, [filteredItems]);
 
   useEffect(() => {
-    const baniVerseIndex = filteredItems.findIndex(
+    // Try crossPlatformId first (desktop's native bani-row identifier — this
+    // is what desktop ↔ desktop sync uses, and what the existing wire
+    // convention sends in the `highlight`/`verseId` field for bani /
+    // ceremony events). Fall back to BaniDB global verseId when
+    // crossPlatformId doesn't match — the web Bani Controller sends verseId
+    // here because the public BaniDB API doesn't expose desktop's local row
+    // IDs. Both fields exist on filteredItems, so the fallback preserves
+    // existing behavior while making web verse-clicks navigate correctly.
+    let baniVerseIndex = filteredItems.findIndex(
       (obj) => obj.crossPlatformId === savedCrossPlatformId,
     );
+    if (baniVerseIndex < 0) {
+      baniVerseIndex = filteredItems.findIndex((obj) => obj.verseId === savedCrossPlatformId);
+    }
     if (baniVerseIndex >= 0) {
-      updateTraversedVerse(filteredItems[baniVerseIndex].ID, baniVerseIndex);
+      const matched = filteredItems[baniVerseIndex];
+      // First arg is the BaniDB verseId (matches every other call site of
+      // updateTraversedVerse). Pass the row's crossPlatformId as the third
+      // arg so sendToBaniController doesn't need to look it up via
+      // `activeShabad.find(obj.verseId === arrayIndex)` — that lookup
+      // returns undefined and crashes on `.crossPlatformId` access.
+      updateTraversedVerse(matched.verseId, baniVerseIndex, matched.crossPlatformId);
     }
   }, [savedCrossPlatformId]);
 

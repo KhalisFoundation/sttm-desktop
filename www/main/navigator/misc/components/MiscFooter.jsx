@@ -4,6 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { uploadImage } from '../../../settings/utils/theme-bg-uploader';
 import { classNames } from '../../../common/utils';
+import { broadcastHistory } from '../../../addons/bani-controller/controller-bus';
 
 const remote = require('@electron/remote');
 
@@ -21,6 +22,9 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
   // Event Handlers
   const clearHistory = () => {
     setVerseHistory([]);
+    // Mirror the wipe to a connected web controller, if any. No-op when
+    // no controller session is active.
+    broadcastHistory('clear');
   };
 
   const setTab = (tabName) => {

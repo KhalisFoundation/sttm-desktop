@@ -1,3 +1,5 @@
+import { broadcastHistory } from '../../../addons/bani-controller/controller-bus';
+
 export const saveToHistory = (
   shabadId,
   verses,
@@ -35,22 +37,29 @@ export const saveToHistory = (
   }
   const check = verseHistory.filter((historyObj) => historyObj.shabadId === baniId);
   if (check.length === 0) {
-    const updatedHistory = [
-      {
-        shabadId: baniId,
-        verseId,
-        label: verse,
-        type: verseType,
-        meta: {
-          baniLength,
-        },
-        versesRead: [verseId],
-        continueFrom: verseId,
-        homeVerse: firstVerseIndex,
+    const newEntry = {
+      shabadId: baniId,
+      verseId,
+      label: verse,
+      type: verseType,
+      meta: {
+        baniLength,
       },
-      ...verseHistory,
-    ];
-    setVerseHistory(updatedHistory);
+      versesRead: [verseId],
+      continueFrom: verseId,
+      homeVerse: firstVerseIndex,
+    };
+    setVerseHistory([newEntry, ...verseHistory]);
+    // Mirror the new entry to a connected web controller, if any. No-op when
+    // no controller session is active.
+    broadcastHistory('add', {
+      entry: {
+        shabadId: newEntry.shabadId,
+        verseId: newEntry.verseId,
+        label: newEntry.label,
+        kind: verseType === 'bani' || verseType === 'ceremony' ? verseType : 'shabad',
+      },
+    });
     return true;
   }
   return false;

@@ -11,12 +11,17 @@ const { i18n } = remote.require('./app');
 
 const MultiPaneHeader = ({ data }) => {
   const paneId = data.multiPaneId;
-  const navigatorState = useStoreState((state) => state.navigator);
-  const navigatorActions = useStoreActions((state) => state.navigator);
-  const paneAttributes = navigatorState[`pane${paneId}`];
-  const setPaneAttributes = navigatorActions[`setPane${paneId}`];
+  // Per-leaf selectors avoid easy-peasy proxy-revocation crashes during
+  // rapid bani↔shabad transitions. Subscribe to each pane individually so
+  // the dynamic `pane${id}` lookup happens against fresh values.
+  const pane1 = useStoreState((state) => state.navigator.pane1);
+  const pane2 = useStoreState((state) => state.navigator.pane2);
+  const pane3 = useStoreState((state) => state.navigator.pane3);
+  const panes = { pane1, pane2, pane3 };
+  const paneAttributes = panes[`pane${paneId}`];
+  const setPaneAttributes = useStoreActions((actions) => actions.navigator[`setPane${paneId}`]);
 
-  const { defaultPaneId } = useStoreState((state) => state.userSettings);
+  const defaultPaneId = useStoreState((state) => state.userSettings.defaultPaneId);
   const { setDefaultPaneId } = useStoreActions((actions) => actions.userSettings);
 
   const [disableLock, setDisableLock] = useState(false);
@@ -40,7 +45,7 @@ const MultiPaneHeader = ({ data }) => {
       } else {
         nextPane++;
       }
-      if (!navigatorState[`pane${nextPane}`].locked) {
+      if (!panes[`pane${nextPane}`].locked) {
         return nextPane;
       }
     } while (nextPane !== givenPaneId);
@@ -67,14 +72,14 @@ const MultiPaneHeader = ({ data }) => {
 
   useEffect(() => {
     const remainingPanes = [1, 2, 3].filter((pane) => pane !== paneId);
-    if (remainingPanes.every((pane) => navigatorState[`pane${pane}`].locked)) {
+    if (remainingPanes.every((pane) => panes[`pane${pane}`].locked)) {
       lockIcon.current.classList.add('disabled');
       setDisableLock(true);
     } else {
       lockIcon.current.classList.remove('disabled');
       setDisableLock(false);
     }
-  }, [navigatorState.pane1, navigatorState.pane2, navigatorState.pane3]);
+  }, [pane1, pane2, pane3]);
 
   const selectPaneOption = (event) => {
     setPaneAttributes({ ...paneAttributes, content: event.target.value });
