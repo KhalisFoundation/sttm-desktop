@@ -213,7 +213,20 @@ const useSocketListeners = (
       settings: (payload) => {
         const { settings } = payload;
         if (settings.action === 'changeFontSize') {
-          changeFontSize(settings.target, settings.value === 'plus');
+          // Web sends labelled controller targets (gurbani / translation /
+          // teeka / transliteration). The userSettings store keys those
+          // sliders as content1/2/3 — without this map, changeFontSize
+          // looks up setTranslationFontSize / setTeekaFontSize /
+          // setTransliterationFontSize, which don't exist, and the call
+          // silently no-ops.
+          const FONT_TARGET_MAP = {
+            gurbani: 'gurbani',
+            translation: 'content1',
+            teeka: 'content2',
+            transliteration: 'content3',
+          };
+          const target = FONT_TARGET_MAP[settings.target] || settings.target;
+          changeFontSize(target, settings.value === 'plus');
         }
         analytics.trackEvent({
           category: 'controller',
