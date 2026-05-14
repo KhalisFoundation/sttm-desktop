@@ -14,6 +14,7 @@ export const useNewShabad = () => {
     isSundarGutkaBani,
     isCeremonyBani,
     isMiscSlide,
+    isAnnouncement,
     singleDisplayActiveTab,
     searchVerse,
   } = useStoreState((state) => state.navigator);
@@ -26,6 +27,7 @@ export const useNewShabad = () => {
     setVersesRead,
     setActiveVerseId,
     setIsMiscSlide,
+    setIsAnnouncement,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
@@ -46,6 +48,12 @@ export const useNewShabad = () => {
     }
     if (isMiscSlide) {
       setIsMiscSlide(false);
+    }
+    if (isAnnouncement) {
+      // Drop the announcement flag too — otherwise the next misc-slide
+      // emitted from anywhere on the desktop inherits the announcement
+      // styling because the flag was never reset.
+      setIsAnnouncement(false);
     }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);

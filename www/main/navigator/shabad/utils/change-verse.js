@@ -104,17 +104,37 @@ export const sendToBaniController = (
   },
 ) => {
   if (window.socket !== undefined && window.socket !== null) {
-    let baniVerse;
-    if (!crossPlatformId) {
-      baniVerse = activeShabad.find((obj) => obj.verseId === newTraversedVerse);
+    // Resolve a highlight value safely. `crossPlatformId` may be:
+    //   - a real Realm crossPlatformID (best — desktop↔desktop sync)
+    //   - '' (empty string) for Custom ceremony rows that have no Realm
+    //     crossPlatformID column
+    //   - undefined / null (caller didn't pass one)
+    // When it's missing, look up the matching row in `activeShabad` by
+    // `verseId`. The closure-captured `activeShabad` may still be empty
+    // during the initial setVerseList → updateTraversedVerse call, so
+    // guard the `.find` result before reading `.crossPlatformId`. As a
+    // final fallback, ship the BaniDB-global `newTraversedVerse` as
+    // `highlight` — web prefers the explicit `verseId` field anyway.
+    let resolvedHighlight = crossPlatformId;
+    if (!resolvedHighlight) {
+      const matched = Array.isArray(activeShabad)
+        ? activeShabad.find((obj) => obj && obj.verseId === newTraversedVerse)
+        : null;
+      resolvedHighlight = (matched && matched.crossPlatformId) || newTraversedVerse;
     }
+
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
         type: 'bani',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        // `highlight` carries the Realm crossPlatformId (desktop ↔ desktop
+        // convention). `verseId` is the BaniDB-global verseId so the web
+        // client — which has no crossPlatformId column on its rows — can
+        // actually match the highlighted verse against its loaded list.
+        highlight: resolvedHighlight,
+        verseId: newTraversedVerse,
         baniLength,
         // mangalPosition,
         verseChange: false,
@@ -125,7 +145,8 @@ export const sendToBaniController = (
         type: 'ceremony',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        highlight: resolvedHighlight,
+        verseId: newTraversedVerse,
         verseChange: false,
       });
     } else if (activeShabadId) {

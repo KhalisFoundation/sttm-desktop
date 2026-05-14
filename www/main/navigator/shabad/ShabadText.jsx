@@ -196,19 +196,22 @@ export const ShabadText = ({
   }, [filteredItems]);
 
   useEffect(() => {
-    // Try crossPlatformId first (desktop's native bani-row identifier — this
-    // is what desktop ↔ desktop sync uses, and what the existing wire
-    // convention sends in the `highlight`/`verseId` field for bani /
-    // ceremony events). Fall back to BaniDB global verseId when
-    // crossPlatformId doesn't match — the web Bani Controller sends verseId
-    // here because the public BaniDB API doesn't expose desktop's local row
-    // IDs. Both fields exist on filteredItems, so the fallback preserves
-    // existing behavior while making web verse-clicks navigate correctly.
+    // Try crossPlatformId first (desktop ↔ desktop sync uses Realm
+    // crossPlatformID for this). Then fall back to BaniDB global verseId
+    // — works for shabads and banis where web and desktop share IDs.
+    // For ceremonies, desktop's Realm stores rows under a different
+    // verseId space than the BaniDB HTTP API the web client reads, so
+    // neither id-based match succeeds. As a last resort, use the
+    // operator's wire-supplied `lineNumber` (1-based position in the
+    // verse list) since both clients render the same row order.
     let baniVerseIndex = filteredItems.findIndex(
       (obj) => obj.crossPlatformId === savedCrossPlatformId,
     );
     if (baniVerseIndex < 0) {
       baniVerseIndex = filteredItems.findIndex((obj) => obj.verseId === savedCrossPlatformId);
+    }
+    if (baniVerseIndex < 0 && lineNumber && lineNumber > 0 && lineNumber <= filteredItems.length) {
+      baniVerseIndex = lineNumber - 1;
     }
     if (baniVerseIndex >= 0) {
       const matched = filteredItems[baniVerseIndex];
@@ -219,7 +222,7 @@ export const ShabadText = ({
       // returns undefined and crashes on `.crossPlatformId` access.
       updateTraversedVerse(matched.verseId, baniVerseIndex, matched.crossPlatformId);
     }
-  }, [savedCrossPlatformId]);
+  }, [savedCrossPlatformId, lineNumber]);
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);

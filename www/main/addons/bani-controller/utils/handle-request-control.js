@@ -24,14 +24,24 @@ const handleRequestControl = (
   // mangalPosition,
   verseHistory = [],
   adminPin = 0,
+  miscState = {},
 ) => {
-  document.body.classList.toggle(`controller-on`, isPinCorrect);
+  document.body.classList.toggle(`controller-on`, Boolean(isPinCorrect));
   window.socket.emit('data', {
     host: 'sttm-desktop',
     type: 'response-control',
-    success: isPinCorrect,
+    success: Boolean(isPinCorrect),
     settings: {
       fontSizes,
+    },
+    // Echo the current misc-slide / announcement state at connect so the
+    // web controller can hydrate its `activeAnnouncement` chip if the
+    // operator is mid-announcement when a client joins.
+    miscState: {
+      isMiscSlide: Boolean(miscState.isMiscSlide),
+      isAnnouncement: Boolean(miscState.isAnnouncement),
+      miscSlideText: miscState.miscSlideText ?? '',
+      isMiscSlideGurmukhi: Boolean(miscState.isMiscSlideGurmukhi),
     },
   });
 
@@ -73,9 +83,13 @@ const handleRequestControl = (
         highlight = activeVerseId;
         homeId = homeVerse;
       } else if (currentShabad.type === 'ceremony') {
-        highlight = ceremonyId;
+        // Previously `highlight` was the ceremonyId itself, which is
+        // useless to web (it tries to match a verseId against the verse
+        // list and finds nothing). Send the currently-active verseId so
+        // the web pane highlights the correct row on connect.
+        highlight = activeVerseId;
       } else if (currentShabad.type === 'bani') {
-        highlight = sundarGutkaBaniId;
+        highlight = activeVerseId;
       }
 
       window.socket.emit('data', {
@@ -84,6 +98,7 @@ const handleRequestControl = (
         id: currentShabad.id,
         shabadid: currentShabad.id, // @deprecated
         highlight: parseInt(highlight, 10),
+        verseId: parseInt(activeVerseId, 10),
         homeId: parseInt(homeId, 10),
         baniLength: currentShabad.baniLength,
         // mangalPosition: currentShabad.mangalPosition,

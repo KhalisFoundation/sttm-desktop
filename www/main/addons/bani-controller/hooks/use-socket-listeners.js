@@ -105,6 +105,34 @@ const useSocketListeners = (
       bani: (payload) => {
         const baniId = parseInt(payload.baniId, 10);
         const verseId = parseInt(payload.verseId, 10);
+        const lineCount = parseInt(payload.lineCount, 10);
+        const hasVerseId = !Number.isNaN(verseId) && verseId > 0;
+        const hasLineCount = !Number.isNaN(lineCount) && lineCount > 0;
+        if (hasLineCount && lineNumber !== lineCount) {
+          setLineNumber(lineCount);
+        }
+        // Honor an optional baniLength from the wire (e.g. when the web
+        // controller wants to project a specific length variant). The
+        // payload key matches what BaaniSearchPanel / handleBani send.
+        if (
+          payload.baniLength &&
+          typeof payload.baniLength === 'string' &&
+          payload.baniLength !== baniLength &&
+          global.setUserSettings &&
+          typeof global.setUserSettings.setBaniLength === 'function'
+        ) {
+          global.setUserSettings.setBaniLength(payload.baniLength);
+        }
+        // Navigation events should drop the misc-slide overlay so the
+        // operator's projection actually switches to the bani — otherwise a
+        // prior Waheguru / Mool Mantra / announcement stays on screen and
+        // the state change happens invisibly behind it.
+        if (isMiscSlide) {
+          setIsMiscSlide(false);
+        }
+        if (isAnnouncement) {
+          setIsAnnouncement(false);
+        }
         if (isCeremonyBani) {
           setIsCeremonyBani(false);
         }
@@ -117,13 +145,16 @@ const useSocketListeners = (
           setSundarGutkaBaniId(baniId);
         }
 
-        if (verseId && savedCrossPlatformId !== verseId) {
+        if (hasVerseId && savedCrossPlatformId !== verseId) {
           // savedCrossPlatformId triggers the verse-highlight effect in
           // ShabadText (matches against crossPlatformId, then falls back to
           // verseId for clients like web that don't have crossPlatformId).
           setSavedCrossPlatformId(verseId);
         }
-        updatePane('bani', baniId);
+        // Pass verseId into updatePane so the pane's activeVerse is set
+        // directly — fallback in case the savedCrossPlatformId effect
+        // misses on a same-bani re-trigger.
+        updatePane('bani', baniId, hasVerseId ? verseId : undefined);
         analytics.trackEvent({
           category: 'controller',
           action: 'bani',
@@ -134,6 +165,26 @@ const useSocketListeners = (
       ceremony: (payload) => {
         const ceremonyPayload = parseInt(payload.ceremonyId, 10);
         const verseId = parseInt(payload.verseId, 10);
+        const lineCount = parseInt(payload.lineCount, 10);
+        const hasVerseId = !Number.isNaN(verseId) && verseId > 0;
+        const hasLineCount = !Number.isNaN(lineCount) && lineCount > 0;
+        // Pipe lineCount into the navigator's lineNumber state so the
+        // ShabadText effect can fall back to position-based seeking when
+        // the BaniDB-global verseId from web doesn't match desktop's
+        // Realm-local verseIds (ceremonies in particular live in a
+        // different ID space).
+        if (hasLineCount && lineNumber !== lineCount) {
+          setLineNumber(lineCount);
+        }
+        // Same misc-slide / announcement cleanup as the bani path — a
+        // ceremony click should exit any active text overlay so the
+        // ceremony view becomes visible on the projection.
+        if (isMiscSlide) {
+          setIsMiscSlide(false);
+        }
+        if (isAnnouncement) {
+          setIsAnnouncement(false);
+        }
         if (!isCeremonyBani) {
           setIsCeremonyBani(true);
         }
@@ -145,13 +196,18 @@ const useSocketListeners = (
         if (ceremonyId !== ceremonyPayload) {
           setCeremonyId(ceremonyPayload);
         }
-        if (verseId && savedCrossPlatformId !== verseId) {
+        if (hasVerseId && savedCrossPlatformId !== verseId) {
           // Mirror the bani path: setting savedCrossPlatformId triggers the
           // verse-highlight effect in ShabadText so a remote verse-click
           // actually navigates the ceremony pane.
           setSavedCrossPlatformId(verseId);
         }
-        updatePane('ceremony', ceremonyPayload);
+        // Pass verseId into updatePane so the pane's activeVerse is set
+        // directly. This is a belt-and-suspenders fallback: even if the
+        // savedCrossPlatformId effect in ShabadText misses (race or stale
+        // closure), the pane attributes carry the active verse so the
+        // ShabadText load/resume path lands on the right row.
+        updatePane('ceremony', ceremonyPayload, hasVerseId ? verseId : undefined);
         analytics.trackEvent({
           category: 'controller',
           action: 'ceremony',
@@ -197,7 +253,7 @@ const useSocketListeners = (
       },
       'request-control': () =>
         handleRequestControl(
-          adminPin,
+          isPinCorrect,
           fontSizes,
           activeShabad,
           activeShabadId,
@@ -209,6 +265,12 @@ const useSocketListeners = (
           // mangalPosition,
           verseHistory,
           adminPin,
+          {
+            isMiscSlide,
+            isAnnouncement,
+            miscSlideText,
+            isMiscSlideGurmukhi,
+          },
         ),
       settings: (payload) => {
         const { settings } = payload;
