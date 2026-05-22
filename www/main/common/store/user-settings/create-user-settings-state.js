@@ -70,11 +70,17 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
         global.controller[settingKey](payload);
       }
 
+      // Schema keys are `gurbani-font-size` and the generic `contentN-font-size`
+      // slots, which map onto the controller's labeled translation / teeka /
+      // transliteration sliders. The earlier `*-font-size` keys below were
+      // looking up names that don't exist in the settings schema, so the
+      // values came back NaN and the web controller's font-size readouts
+      // reset when any one of them changed.
       const fontSizes = {
         gurbani: parseInt(savedSettings['gurbani-font-size'], 10),
-        translation: parseInt(savedSettings['translation-font-size'], 10),
-        teeka: parseInt(savedSettings['teeka-font-size'], 10),
-        transliteration: parseInt(savedSettings['transliteration-font-size'], 10),
+        translation: parseInt(savedSettings['content1-font-size'], 10),
+        teeka: parseInt(savedSettings['content2-font-size'], 10),
+        transliteration: parseInt(savedSettings['content3-font-size'], 10),
       };
 
       if (window.socket !== undefined && window.socket !== null) {

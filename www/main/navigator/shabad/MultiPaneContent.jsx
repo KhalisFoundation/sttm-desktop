@@ -12,13 +12,17 @@ const { i18n } = remote.require('./app');
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
-  const navigatorState = useStoreState((state) => state.navigator);
-  const navigatorActions = useStoreActions((state) => state.navigator);
-  const paneAttributes = navigatorState[`pane${paneId}`];
-  const setPaneAttributes = navigatorActions[`setPane${paneId}`];
-  const { activePaneId, homeVerse, versesRead } = navigatorState;
-  const { setHomeVerse, setVersesRead } = navigatorActions;
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  // Per-leaf selectors avoid the easy-peasy proxy-revocation crash that
+  // surfaces during rapid bani↔shabad transitions when whole-slice
+  // subscriptions return a draft proxy that gets revoked between renders.
+  const paneAttributes = useStoreState((state) => state.navigator[`pane${paneId}`]);
+  const activePaneId = useStoreState((state) => state.navigator.activePaneId);
+  const homeVerse = useStoreState((state) => state.navigator.homeVerse);
+  const versesRead = useStoreState((state) => state.navigator.versesRead);
+  const setPaneAttributes = useStoreActions((actions) => actions.navigator[`setPane${paneId}`]);
+  const setHomeVerse = useStoreActions((actions) => actions.navigator.setHomeVerse);
+  const setVersesRead = useStoreActions((actions) => actions.navigator.setVersesRead);
+  const currentWorkspace = useStoreState((state) => state.userSettings.currentWorkspace);
 
   const {
     displayWaheguruSlide,

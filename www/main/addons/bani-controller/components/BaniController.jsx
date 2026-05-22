@@ -18,6 +18,7 @@ import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
 import updateMultipane from '../../../navigator/search/utils/update-multipane';
+import { setControllerBus, clearControllerBus } from '../controller-bus';
 
 const remote = require('@electron/remote');
 
@@ -48,21 +49,25 @@ const BaniController = ({ onScreenClose, className }) => {
     (actions) => actions.baniController,
   );
 
-  const {
-    activeShabad,
-    activeShabadId,
-    activeVerseId,
-    homeVerse,
-    ceremonyId,
-    sundarGutkaBaniId,
-    isSundarGutkaBani,
-    isCeremonyBani,
-    isMiscSlide,
-    miscSlideText,
-    isMiscSlideGurmukhi,
-    savedCrossPlatformId,
-    lineNumber,
-  } = useStoreState((state) => state.navigator);
+  // Per-field selectors avoid the easy-peasy proxy-revoked crash that occurs
+  // during rapid bani↔shabad transitions when a component subscribes to a
+  // whole slice — the cached parent-slice proxy can be revoked between
+  // renders, and the next render's `.x` access throws inside Launchpad.
+  const activeShabad = useStoreState((state) => state.navigator.activeShabad);
+  const activeShabadId = useStoreState((state) => state.navigator.activeShabadId);
+  const activeVerseId = useStoreState((state) => state.navigator.activeVerseId);
+  const homeVerse = useStoreState((state) => state.navigator.homeVerse);
+  const ceremonyId = useStoreState((state) => state.navigator.ceremonyId);
+  const sundarGutkaBaniId = useStoreState((state) => state.navigator.sundarGutkaBaniId);
+  const isSundarGutkaBani = useStoreState((state) => state.navigator.isSundarGutkaBani);
+  const isCeremonyBani = useStoreState((state) => state.navigator.isCeremonyBani);
+  const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
+  const miscSlideText = useStoreState((state) => state.navigator.miscSlideText);
+  const isMiscSlideGurmukhi = useStoreState((state) => state.navigator.isMiscSlideGurmukhi);
+  const isAnnouncement = useStoreState((state) => state.navigator.isAnnouncement);
+  const savedCrossPlatformId = useStoreState((state) => state.navigator.savedCrossPlatformId);
+  const lineNumber = useStoreState((state) => state.navigator.lineNumber);
+  const verseHistory = useStoreState((state) => state.navigator.verseHistory);
 
   const {
     setIsSundarGutkaBani,
@@ -72,18 +77,17 @@ const BaniController = ({ onScreenClose, className }) => {
     setIsMiscSlide,
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
+    setIsAnnouncement,
     setSavedCrossPlatformId,
     setLineNumber,
+    setVerseHistory,
   } = useStoreActions((state) => state.navigator);
 
-  const {
-    gurbaniFontSize,
-    content1FontSize,
-    content2FontSize,
-    content3FontSize,
-    baniLength,
-    // mangalPosition,
-  } = useStoreState((state) => state.userSettings);
+  const gurbaniFontSize = useStoreState((state) => state.userSettings.gurbaniFontSize);
+  const content1FontSize = useStoreState((state) => state.userSettings.content1FontSize);
+  const content2FontSize = useStoreState((state) => state.userSettings.content2FontSize);
+  const content3FontSize = useStoreState((state) => state.userSettings.content3FontSize);
+  const baniLength = useStoreState((state) => state.userSettings.baniLength);
 
   const fontSizes = {
     gurbani: parseInt(gurbaniFontSize, 10),
@@ -178,8 +182,17 @@ const BaniController = ({ onScreenClose, className }) => {
         window.socket.on('data', (data) => {
           setSocketData(data);
         });
+        // Register the active socket so non-controller mutation sites
+        // (save-to-history, HistoryPane delete, MiscFooter clear-all) can
+        // broadcast history events without prop-drilling the socket.
+        setControllerBus(window.socket, adminPin);
       }
+    } else {
+      clearControllerBus();
     }
+    return () => {
+      clearControllerBus();
+    };
   }, [isListeners, adminPin]);
 
   useEffect(() => {
@@ -227,6 +240,10 @@ const BaniController = ({ onScreenClose, className }) => {
       lineNumber,
       setLineNumber,
       updatePane,
+      isAnnouncement,
+      setIsAnnouncement,
+      verseHistory,
+      setVerseHistory,
     );
   }, [socketData]);
 

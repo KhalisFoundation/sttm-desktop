@@ -25,12 +25,43 @@ const main = remote.require('./app');
 
 export const InputContext = createContext();
 
+const EMPTY_SHORTCUTS = {};
+
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState((state) => state.app);
-  const { shortcuts } = useStoreState((state) => state.navigator);
-  const { setShortcuts } = useStoreActions((state) => state.navigator);
-  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  // Select specific fields rather than destructuring from a parent slice —
+  // the parent-slice form returns an immer/easy-peasy proxy that can get
+  // revoked between renders during error recovery, leading to spurious
+  // "Cannot perform 'get' on a proxy that has been revoked" crashes.
+  //
+  // Even with per-field selectors, the parent-slice proxy can transiently be
+  // revoked mid-tick during rapid action cascades (e.g. fast bani↔shabad
+  // transitions over the controller). The safeSelect wrapper catches those
+  // revoked-proxy reads and returns a stable fallback, so the next render
+  // re-runs against a fresh state instead of the whole tree unmounting.
+  // Fallbacks are module-level constants so repeated failures don't churn
+  // useSyncExternalStore equality checks and loop.
+  const safeSelect = (selector, fallback) => {
+    try {
+      const value = selector();
+      return value === undefined ? fallback : value;
+    } catch (e) {
+      return fallback;
+    }
+  };
+  const overlayScreen = useStoreState((state) =>
+    safeSelect(() => state.app.overlayScreen, DEFAULT_OVERLAY),
+  );
+  const shortcuts = useStoreState((state) =>
+    safeSelect(() => state.navigator.shortcuts, EMPTY_SHORTCUTS),
+  );
+  const setShortcuts = useStoreActions((state) => state.navigator.setShortcuts);
+  const setOverlayScreen = useStoreActions((actions) => actions.app.setOverlayScreen);
+  const currentWorkspace = useStoreState((state) =>
+    safeSelect(() => state.userSettings.currentWorkspace, ''),
+  );
+  const defaultPaneId = useStoreState((state) =>
+    safeSelect(() => state.userSettings.defaultPaneId, 1),
+  );
 
   const {
     displayWaheguruSlide,

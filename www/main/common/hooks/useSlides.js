@@ -8,21 +8,23 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const useSlides = () => {
-  const { akhandpatt, autoplayToggle, defaultPaneId } = useStoreState(
-    (state) => state.userSettings,
-  );
+  // Per-field selectors avoid easy-peasy proxy-revocation crashes during
+  // rapid action cascades (e.g. fast bani↔shabad transitions). Subscribing
+  // to a whole slice returns a draft proxy that can be revoked mid-tick;
+  // subscribing to leaves returns plain values.
+  const akhandpatt = useStoreState((state) => state.userSettings.akhandpatt);
+  const autoplayToggle = useStoreState((state) => state.userSettings.autoplayToggle);
+  const defaultPaneId = useStoreState((state) => state.userSettings.defaultPaneId);
   const { setAkhandpatt, setAutoplayToggle } = useStoreActions((state) => state.userSettings);
-  const {
-    isMiscSlide,
-    miscSlideText,
-    isAnnouncement,
-    isSundarGutkaBani,
-    isCeremonyBani,
-    ceremonyId,
-    pane1,
-    pane2,
-    pane3,
-  } = useStoreState((state) => state.navigator);
+  const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
+  const miscSlideText = useStoreState((state) => state.navigator.miscSlideText);
+  const isAnnouncement = useStoreState((state) => state.navigator.isAnnouncement);
+  const isSundarGutkaBani = useStoreState((state) => state.navigator.isSundarGutkaBani);
+  const isCeremonyBani = useStoreState((state) => state.navigator.isCeremonyBani);
+  const ceremonyId = useStoreState((state) => state.navigator.ceremonyId);
+  const pane1 = useStoreState((state) => state.navigator.pane1);
+  const pane2 = useStoreState((state) => state.navigator.pane2);
+  const pane3 = useStoreState((state) => state.navigator.pane3);
   const {
     setIsMiscSlide,
     setMiscSlideText,
