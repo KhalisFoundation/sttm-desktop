@@ -35,22 +35,35 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, 
 
   const customStyle = getFontSize(fontSizes[position]);
 
+  const scriptClass = {
+    'translation-hindi': 'hindi',
+  }[lang];
+
+  const langAttr = {
+    'translation-english': 'en',
+    'translation-spanish': 'es',
+    'translation-hindi': 'hi',
+  }[lang];
+
+  const className = ['slide-translation', scriptClass].filter(Boolean).join(' ');
+
   if (translationHTML) {
     translationMarkup = (
       <div
-        className={`slide-translation custom-english`}
+        className={`${className} custom-english`}
         style={customStyle}
+        lang={langAttr}
         dangerouslySetInnerHTML={{ __html: translationHTML }}
       />
     );
   } else if (translationString) {
     translationMarkup = (
-      <div className={`slide-translation`} style={customStyle}>
+      <div className={className} style={customStyle} lang={langAttr}>
         {translationString}
       </div>
     );
   } else {
-    translationMarkup = <div className={`slide-translation`} style={customStyle}></div>;
+    translationMarkup = <div className={className} style={customStyle} lang={langAttr}></div>;
   }
 
   return translationMarkup;

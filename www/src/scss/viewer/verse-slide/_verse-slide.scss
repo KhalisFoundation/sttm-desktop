@@ -84,6 +84,15 @@
     overflow-y: auto;
     justify-content: space-evenly;
   }
+
+  // Devanagari: avoid synthetic bold stroke thickening that overlaps conjuncts/matras at large sizes
+  &.hindi {
+    font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'ITF Devanagari', 'Nirmala UI',
+      'Mangal', 'Devanagari Sangam MN', sans-serif;
+    font-synthesis: none;
+    font-weight: normal;
+    line-height: 1.5;
+  }
 }
 
 .slide-teeka {
@@ -95,6 +104,25 @@
 .slide-transliteration {
   font-weight: 600;
   margin: 10px 0;
+
+  // Devanagari: avoid synthetic bold stroke thickening that overlaps conjuncts/matras at large sizes
+  &.devanagari {
+    font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'ITF Devanagari', 'Nirmala UI',
+      'Mangal', 'Devanagari Sangam MN', sans-serif;
+    font-synthesis: none;
+    font-weight: normal;
+    line-height: 1.5;
+    text-transform: none;
+  }
+
+  &.shahmukhi {
+    font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Geeza Pro', 'Segoe UI', 'Arial',
+      sans-serif;
+    font-synthesis: none;
+    font-weight: normal;
+    line-height: 1.6;
+    text-transform: none;
+  }
 }
 
 .slide-next-line {
