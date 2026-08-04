@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+      - master
+      - release
+
+jobs:
+  test:
+    name: Lint and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+
+      # `npm ci` rather than `npm install` so this job also proves the lockfile:
+      # it installs strictly from it and verifies every integrity hash.
+      #
+      # The suite is pure JavaScript (jest, eslint and htmlhint, with `electron`
+      # mocked where a module under test imports it). Skipping install scripts
+      # therefore skips only the native rebuild (realm, mdns) that the packaging
+      # workflows need and these tests do not, which keeps this job quick and
+      # keeps a red cross here meaning a real failure.
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+
+      - name: Run tests
+        run: npm test

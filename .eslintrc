@@ -26,5 +26,16 @@
         "extensions": [".js",".jsx"]
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["test/**/*.js"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "no-continue": "off"
+      }
+    }
+  ]
 }
