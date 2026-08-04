@@ -1,5 +1,6 @@
 import Noty from 'noty';
 import banidb from '../../banidb';
+import { materializeSearchRows } from './materialize-search-rows';
 
 const remote = require('@electron/remote');
 
@@ -8,7 +9,7 @@ const { i18n } = remote.require('./app');
 export const searchShabads = (searchQuery, searchType, searchSource, howManyRows) =>
   banidb
     .query(searchQuery, searchType, searchSource, howManyRows)
-    .then((verses) => verses)
+    .then((verses) => materializeSearchRows(verses))
     .catch((err) => {
       const dbStatus = !!localStorage.getItem('isDbDownloaded');
       if (dbStatus) {

@@ -18,6 +18,8 @@ export const HistoryPane = ({ className, paneId }) => {
     sundarGutkaBaniId,
     homeVerse,
     activeVerseId,
+    isMiscSlide,
+    verseSelectionNonce,
     historyOrder,
     singleDisplayActiveTab,
     pane1,
@@ -34,6 +36,8 @@ export const HistoryPane = ({ className, paneId }) => {
     setSundarGutkaBaniId,
     setHomeVerse,
     setActiveVerseId,
+    setIsMiscSlide,
+    setVerseSelectionNonce,
     setSingleDisplayActiveTab,
     setPane1,
     setPane2,
@@ -52,6 +56,16 @@ export const HistoryPane = ({ className, paneId }) => {
   };
 
   const openShabadFromHistory = (element) => {
+    // The viewer renders nothing but the misc slide while this is set, so leaving
+    // it would silently swallow the click. Every other route into the viewer
+    // clears it; this one never did.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
+    // Picking the entry you are already reading must still count as a selection,
+    // which `activeVerseId` alone cannot express. See `ShabadText`.
+    setVerseSelectionNonce(verseSelectionNonce + 1);
+
     const currentPane = paneId || defaultPaneId;
     switch (currentPane) {
       case 1:

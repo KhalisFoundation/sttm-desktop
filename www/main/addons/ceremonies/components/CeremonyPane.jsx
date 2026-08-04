@@ -17,7 +17,9 @@ const { getTheme } = require('../../../theme_editor');
 
 const CeremonyPane = ({ token, name, id, onScreenClose }) => {
   const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
-  const { setPane1, setPane2, setPane3 } = useStoreActions((state) => state.navigator);
+  const { setPane1, setPane2, setPane3, setIsMiscSlide } = useStoreActions(
+    (state) => state.navigator,
+  );
   const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
   const {
     theme: currentTheme,
@@ -29,7 +31,7 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
 
   const paneSelector = useRef(null);
 
-  const { ceremonyId, isCeremonyBani, isSundarGutkaBani } = useStoreState(
+  const { ceremonyId, isCeremonyBani, isSundarGutkaBani, isMiscSlide } = useStoreState(
     (state) => state.navigator,
   );
   const { setCeremonyId, setIsCeremonyBani, setIsSundarGutkaBani } = useStoreActions(
@@ -64,6 +66,11 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
     }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
+    }
+    // The viewer renders nothing but the misc slide while this is set, so leaving
+    // it would silently swallow the click. See `viewer-entry-points.test.js`.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
     }
 
     if (ceremonyId !== currentCeremony) {

@@ -1,5 +1,6 @@
 import Noty from 'noty';
 import banidb from '../../banidb';
+import { materializeSearchRows } from './materialize-search-rows';
 
 const remote = require('@electron/remote');
 
@@ -8,7 +9,7 @@ const { i18n } = remote.require('./app');
 export const loadAng = (angNo) =>
   banidb
     .loadAng(angNo)
-    .then((verses) => verses)
+    .then((verses) => materializeSearchRows(verses))
     .catch((err) => {
       new Noty({
         type: 'error',

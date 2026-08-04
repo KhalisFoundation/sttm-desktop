@@ -8,10 +8,11 @@ import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
+import { shallowEqual } from '../../common/utils';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }) => {
+const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, akhandpattView, updateVerseRef }) => {
   const {
     larivaar,
     larivaarAssist,
@@ -26,9 +27,31 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
     content1Visibility,
     content2Visibility,
     content3Visibility,
-    akhandpatt,
     slideTransitions,
-  } = useStoreState((state) => state.userSettings);
+  } = useStoreState(
+    // Subscribe to only the formatting fields this Slide renders from, compared
+    // shallowly. Without this scoping the selector returns the whole
+    // `userSettings` slice, so every mounted Slide re-renders on any change in
+    // it, including the high-frequency Akhand Paatth scroll-speed and autoplay
+    // ticks, which on a long Shabad (hundreds of Slides) froze the UI.
+    (state) => ({
+      larivaar: state.userSettings.larivaar,
+      larivaarAssist: state.userSettings.larivaarAssist,
+      larivaarAssistType: state.userSettings.larivaarAssistType,
+      leftAlign: state.userSettings.leftAlign,
+      vishraamSource: state.userSettings.vishraamSource,
+      vishraamType: state.userSettings.vishraamType,
+      displayNextLine: state.userSettings.displayNextLine,
+      content1: state.userSettings.content1,
+      content2: state.userSettings.content2,
+      content3: state.userSettings.content3,
+      content1Visibility: state.userSettings.content1Visibility,
+      content2Visibility: state.userSettings.content2Visibility,
+      content3Visibility: state.userSettings.content3Visibility,
+      slideTransitions: state.userSettings.slideTransitions,
+    }),
+    shallowEqual,
+  );
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
   const [showVerse, setShowVerse] = useState(true);
@@ -60,7 +83,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
-    if (akhandpatt) {
+    if (akhandpattView) {
       setShowVerse(true);
       return;
     }
@@ -73,10 +96,13 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [verseObj, isMiscSlide, akhandpatt]);
+  }, [verseObj, isMiscSlide, akhandpattView]);
 
   useEffect(() => {
-    setTimeout(() => {
+    if (akhandpattView) {
+      return undefined;
+    }
+    const timeoutId = setTimeout(() => {
       if (activeVerseRef && activeVerseRef.current?.className.includes('active-viewer-verse')) {
         activeVerseRef.current.scrollIntoView({
           behavior: 'smooth',
@@ -84,7 +110,8 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
         });
       }
     }, 100);
-  }, [verseObj, akhandpatt]);
+    return () => clearTimeout(timeoutId);
+  }, [verseObj, akhandpattView]);
 
   useEffect(() => {
     const markup = [content1, content2, content3].map((content, index) => {
@@ -151,18 +178,20 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   ) : (
     verseObj && (
       <div
-        className={akhandpatt ? '' : 'verse-slide-wrapper'}
+        className={akhandpattView ? '' : 'verse-slide-wrapper'}
         id={`verse-${verseObj.ID}`}
         ref={(el) => {
           updateVerseRef(verseObj.ID, el);
         }}
+        // Read back by the Akhand Paatth scroll engine; see
+        // `viewer/akhandpatt/verse-elements` for what depends on it.
         data-verseid={verseObj.ID}
       >
         <CSSTransition
           in={showVerse}
-          timeout={akhandpatt || !slideTransitions ? 0 : 300}
+          timeout={akhandpattView || !slideTransitions ? 0 : 300}
           classNames="fade"
-          unmountOnExit={!akhandpatt}
+          unmountOnExit={!akhandpattView}
         >
           <div
             className={`verse-slide ${leftAlign ? ' slide-left-align' : ''} ${
@@ -225,6 +254,7 @@ Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
+  akhandpattView: PropTypes.bool,
   bgColor: PropTypes.string,
   updateVerseRef: PropTypes.func,
 };

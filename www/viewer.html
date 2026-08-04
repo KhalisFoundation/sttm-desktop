@@ -13,6 +13,7 @@
     <div id="viewer-container"></div>
     <script>
         const { ipcRenderer } = require('electron');
+        const React = require('react');
         let root = null;
 
         ipcRenderer.on('wc-webview-enabled', () => {
@@ -22,7 +23,10 @@
           if (!root) {
             root = createRoot(document.getElementById('viewer-container'));
           }
-          root.render(app());
+          // `createElement`, not `app()`. Calling it here would run its body
+          // outside React's render, leaving the hook dispatcher unset, and any
+          // hook it uses would throw before the tree could mount.
+          root.render(React.createElement(app));
         });
     </script>
   </body>

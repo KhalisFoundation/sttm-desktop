@@ -11,6 +11,12 @@ const createNavigatorSettingsState = (settingsSchema) => {
 
     navigatorSettingsState[stateFuncName] = action((state, payload) => {
       const oldValue = state[stateVarName];
+      // Mutate the Immer draft in place and return nothing. Returning the draft
+      // makes easy-peasy re-assign it onto the *previous* committed state before
+      // finalising (see simpleProduce), which then revokes that proxy. Any later
+      // read of the old state then throws "proxy that has been revoked" and
+      // white-screens the app (hit when a userSettings change is followed by a
+      // navigator change, e.g. toggling Akhand Paatth then selecting a line).
       // eslint-disable-next-line no-param-reassign
       state[stateVarName] = payload;
 
@@ -39,8 +45,6 @@ const createNavigatorSettingsState = (settingsSchema) => {
           }),
         );
       }
-
-      return state;
     });
   });
   return navigatorSettingsState;

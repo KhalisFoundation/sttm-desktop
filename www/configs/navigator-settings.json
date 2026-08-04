@@ -12,6 +12,7 @@
   "currentWriter": "all",
   "activeShabadId": null,
   "activeVerseId": "",
+  "verseSelectionNonce": 0,
   "searchShabadsCount": 0,
   "savedCrossPlatformId": null,
   "historyOrder": "newest",

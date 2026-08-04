@@ -219,6 +219,39 @@ const loadShabad = (ShabadID) =>
   });
 
 /**
+ * Retrieve all lines for a Shabad, resolving an empty array when the Shabad
+ * does not exist instead of never settling.
+ *
+ * Unlike {@link loadShabad}, which only resolves when at least one row is found
+ * (and therefore hangs forever for an out-of-range ShabadID), this always
+ * resolves. That deterministic "no more verses" signal is what lets the
+ * Akhand Paatth infinite scroll know it has reached the end of the Granth.
+ *
+ * @since 9.3.2
+ * @param {number} ShabadID The specific Shabad to get
+ * @returns {Promise<Array>} Resolves with the Shabad's verse rows, or an empty array
+ * @example
+ *
+ * loadShabadSafe(2776);
+ * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
+ */
+const loadShabadSafe = (ShabadID) =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then((realm) => {
+        const rows = realm
+          .objects('Verse')
+          .filtered('ANY Shabads.ShabadID == $0', ShabadID)
+          .sorted('ID');
+        resolve(rows);
+      })
+      .catch(reject);
+  });
+
+/**
  * Retrieve all lines from a Bani
  *
  * @param {number} BaniID The specific Bani to get
@@ -506,6 +539,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadShabadSafe,
   loadBanis,
   loadBani,
   loadCeremony,

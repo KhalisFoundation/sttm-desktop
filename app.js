@@ -378,6 +378,12 @@ function createViewer(ipcData) {
       frame: false,
       backgroundColor: '#000000',
       webPreferences: {
+        // Chromium's native window-occlusion detection on Windows intermittently marks
+        // this full-screen secondary-display window as hidden even while it is
+        // on-screen, which stops requestAnimationFrame outright. Harmless for the
+        // event-driven slide view, but it freezes the Akhand Paatth continuous scroll on
+        // the projection while the operator's preview keeps moving.
+        backgroundThrottling: false,
         nodeIntegration: true,
         enableRemoteModule: true,
         contextIsolation: false,
@@ -408,7 +414,10 @@ function createViewer(ipcData) {
 
       viewerWindow.webContents.send('wc-webview-enabled');
       global.webview = viewerWindow.webContents;
-      viewerWindow.webContents.send('update-settings');
+      // The new window starts from the built-in layout defaults and missed every
+      // change made before it existed, so ask the main window, which holds the
+      // settings, to replay them.
+      mainWindow.webContents.send('viewer-window-ready');
 
       if (typeof ipcData !== 'undefined') {
         viewerWindow.webContents.send(ipcData.send, ipcData.data);
@@ -622,6 +631,16 @@ app.on('ready', () => {
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
     webPreferences: {
+      // The Akhand Paatth preview deck lives in the #webview-viewer guest and is the
+      // master of the scroll-sync: it broadcasts the anchor the projection follows.
+      // Chromium stops requestAnimationFrame in an occluded window (and in its webview
+      // guests), so alt-tabbing away froze the preview while the projection carried on
+      // under its own velocity. On returning, the preview asserted its stale position
+      // and snapped the projection backwards in front of the sangat. That loop runs for
+      // as long as Akhand Paatth mode is selected, not only while a scroll is running,
+      // and was measured to leave the guest 98.6% idle paused and 93.0% scrolling. No
+      // other view schedules an animation, so in every other mode nothing is lifted.
+      backgroundThrottling: false,
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
@@ -760,12 +779,6 @@ ipcMain.on('cast-to-receiver', (event) => {
 ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
-ipcMain.on('clear-apv', () => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('clear-apv');
-  }
-});
-
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
 });
@@ -781,7 +794,7 @@ io.on('connection', (socket) => {
   }
 });
 
-ipcMain.on('show-line', (event, arg) => {
+function broadcastOverlayLine(arg) {
   lastLine = JSON.parse(arg);
   showLine(JSON.parse(arg));
   if (viewerWindow) {
@@ -795,6 +808,39 @@ ipcMain.on('show-line', (event, arg) => {
   if (JSON.parse(arg).live) {
     createBroadcastFiles(JSON.parse(arg));
   }
+}
+
+ipcMain.on('show-line', (event, arg) => {
+  broadcastOverlayLine(arg);
+});
+
+// Akhand Paatth continuous scroll samples the centred line from every viewer
+// that renders the deck: the in-app preview and, when attached, the external
+// display. The preview leads for the same reason it leads the scroll position
+// below: it is the deck the operator drives, it is always present, and the
+// external display is a mirror of it. Deriving the overlay from the mirror
+// instead would stop the OBS, socket and Zoom feeds whenever the mirror is
+// absent, blank, or still coming up. A display plugged in mid-reading is still
+// starting, so the mirror's own emissions are dropped and the preview's are
+// broadcast.
+ipcMain.on('akhandpatt-overlay-line', (event, arg) => {
+  if (viewerWindow && event.sender === viewerWindow.webContents) {
+    return;
+  }
+  broadcastOverlayLine(arg);
+});
+
+// The operator's in-app preview is the single authority for where the Akhand
+// Paatth scroll sits: it is the window they wheel to nudge back to the Granthi's
+// line. Relay its content anchor to the external display so the projection shows
+// the same position. Only this process knows the window topology, so arbitration
+// lives here: the external display's own emissions are dropped because it is a
+// follower, and with no external display attached there is nothing to relay.
+ipcMain.on('akhandpatt-scroll-sync', (event, arg) => {
+  if (!viewerWindow || event.sender === viewerWindow.webContents) {
+    return;
+  }
+  viewerWindow.webContents.send('akhandpatt-scroll-sync', arg);
 });
 
 ipcMain.on('show-misc-text', (event, arg) => {

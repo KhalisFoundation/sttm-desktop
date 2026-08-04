@@ -8,10 +8,8 @@ const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const useSlides = () => {
-  const { akhandpatt, autoplayToggle, defaultPaneId } = useStoreState(
-    (state) => state.userSettings,
-  );
-  const { setAkhandpatt, setAutoplayToggle } = useStoreActions((state) => state.userSettings);
+  const { autoplayToggle, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { setAutoplayToggle } = useStoreActions((state) => state.userSettings);
   const {
     isMiscSlide,
     miscSlideText,
@@ -40,9 +38,12 @@ export const useSlides = () => {
       setIsAnnouncement(false);
     }
     if (!isMiscSlide) {
-      if (akhandpatt) {
-        setAkhandpatt(false);
-      }
+      // `akhandpatt` is deliberately left alone. The viewer already stands a misc
+      // slide down over the continuous view, and the setting is written to disk,
+      // so clearing it here would end the operator's reading for good instead of
+      // interrupting it: they would come back to the slide view and have to find
+      // the setting again. Stopping autoplay as well means the reading is paused
+      // rather than running on unseen behind the slide.
       if (autoplayToggle) {
         setAutoplayToggle(false);
       }
@@ -81,6 +82,13 @@ export const useSlides = () => {
   };
 
   const displayAnandSahibBhog = ({ openedFrom, paneId = null }) => {
+    // The viewer only renders a ceremony when it is not showing a misc slide, so
+    // leaving that flag set here would silently swallow the request, which is
+    // what happens when this is opened straight after Waheguru or Mool Mantar.
+    // Every other route into the viewer clears it the same way.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
     }

@@ -56,6 +56,7 @@ export const ShabadText = ({
     activePaneId,
     shortcuts,
     lineNumber,
+    verseSelectionNonce,
   } = useStoreState((state) => state.navigator);
 
   const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt } =
@@ -72,6 +73,7 @@ export const ShabadText = ({
     setCeremonyId,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
+    setVerseSelectionNonce,
     savedCrossPlatformId,
   } = useStoreActions((actions) => actions.navigator);
 
@@ -83,6 +85,12 @@ export const ShabadText = ({
     if (newTraversedVerse === FLOWER_VERSE_ID) {
       return;
     }
+    // Every explicit move to a line funnels through here, so this is where it is
+    // recorded. `activeVerseId` alone cannot carry that: picking the active line
+    // leaves it unchanged. In Akhand Paatth, the deck scrolls away from that line
+    // without reselecting it, so it cannot distinguish a repeat selection from
+    // no selection.
+    setVerseSelectionNonce(verseSelectionNonce + 1);
     if (activePaneId !== currentPane) {
       setActivePaneId(currentPane);
     }
@@ -189,14 +197,21 @@ export const ShabadText = ({
   }, [savedCrossPlatformId]);
 
   useEffect(() => {
-    const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
-    ipcRenderer.send(
-      'show-line',
-      JSON.stringify({
-        Line: overlayVerse,
-        live: liveFeed,
-      }),
-    );
+    // In Akhand Paatth view the deck emits `show-line` for the centred verse as
+    // it scrolls; emitting here too would fight it, so let the deck own overlay.
+    // `akhandpatt` is a dependency so that switching back re-emits the selected
+    // line: without it the overlay and live feed would sit on whichever line the
+    // reading last scrolled past until the operator picked another verse.
+    if (!akhandpatt) {
+      const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
+      ipcRenderer.send(
+        'show-line',
+        JSON.stringify({
+          Line: overlayVerse,
+          live: liveFeed,
+        }),
+      );
+    }
     if (
       (isCeremonyBani && ceremonyId === paneAttributes.activeShabad) ||
       (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
@@ -207,7 +222,7 @@ export const ShabadText = ({
         scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
       }
     }
-  }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
+  }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId, akhandpatt]);
 
   const getVerse = (direction) => {
     let verseIndex = null;
@@ -303,7 +318,9 @@ export const ShabadText = ({
   useEffect(() => {
     const milisecondsDelay = parseInt(autoplayDelay, 10) * 1000;
     const interval = setInterval(() => {
-      if (autoplayToggle) {
+      // In Akhand Paatth view autoplayToggle drives the continuous scroll
+      // (owned by ShabadDeck), so it must not also step verses here.
+      if (autoplayToggle && !akhandpatt) {
         setShortcuts({
           ...shortcuts,
           nextVerse: true,
@@ -313,7 +330,7 @@ export const ShabadText = ({
     return () => {
       clearInterval(interval);
     };
-  }, [autoplayToggle, autoplayDelay]);
+  }, [autoplayToggle, autoplayDelay, akhandpatt]);
 
   return (
     <div className="shabad-list">

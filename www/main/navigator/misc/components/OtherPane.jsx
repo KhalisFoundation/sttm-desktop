@@ -15,6 +15,7 @@ export const OtherPane = ({ className }) => {
   const {
     activeShabadId,
     isRandomShabad,
+    isMiscSlide,
     singleDisplayActiveTab,
     isSundarGutkaBani,
     isCeremonyBani,
@@ -26,6 +27,7 @@ export const OtherPane = ({ className }) => {
   const {
     setActiveShabadId,
     setIsRandomShabad,
+    setIsMiscSlide,
     setSingleDisplayActiveTab,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
@@ -37,6 +39,11 @@ export const OtherPane = ({ className }) => {
   const { defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const setShabadId = (shabadId) => {
+    // The viewer renders nothing but the misc slide while this is set, so leaving
+    // it would silently swallow the click. See `viewer-entry-points.test.js`.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
     if (!isRandomShabad) {
       setIsRandomShabad(true);
     }

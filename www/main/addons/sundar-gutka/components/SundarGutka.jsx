@@ -19,6 +19,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     isSundarGutkaBani,
     sundarGutkaBaniId,
     isCeremonyBani,
+    isMiscSlide,
     singleDisplayActiveTab,
     pane1,
     pane2,
@@ -29,6 +30,7 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
 
   const {
     setIsSundarGutkaBani,
+    setIsMiscSlide,
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
@@ -79,6 +81,12 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   };
 
   const loadBani = (baniId, paneId = null) => {
+    // The viewer renders nothing but the misc slide while this is set, so leaving
+    // it would silently swallow the click. See `viewer-entry-points.test.js`.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
+
     if (isCeremonyBani) {
       setIsCeremonyBani(false);
     }

@@ -2,6 +2,8 @@ const menu = require('./menu');
 const themeEditor = require('./theme_editor');
 const settings = require('./settings');
 
+const { syncViewerState } = require('./common/store/GlobalState');
+
 /**
  * Check if the platform has a method and call if it is does
  *
@@ -18,8 +20,16 @@ function platformMethod(method, args) {
   }
 }
 
+// The settings pane needs redrawing.
 global.platform.ipc.on('sync-settings', () => {
   settings.init();
+});
+
+// A deck has just been created. The in-app preview's `<webview>` handles this
+// for itself in `ViewerContent`, but the presentation window is opened by the
+// main process, which has no access to the settings. It asks here instead.
+global.platform.ipc.on('viewer-window-ready', () => {
+  syncViewerState();
 });
 module.exports = {
   menu,

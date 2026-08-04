@@ -20,8 +20,6 @@ const createOverlayActions = () => {
           settingType: 'baniOverlay',
         }),
       );
-
-      return state;
     });
   });
   return overlayActions;
