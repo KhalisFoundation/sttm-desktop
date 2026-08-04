@@ -90,7 +90,7 @@ const SettingViewer = () => {
       </div>
     ),
     'translation-hindi': (
-      <div className="slide-translation translation">
+      <div className="slide-translation translation hindi" lang="hi">
         <span className="hindi-translation transtext">
           हे भाई ! प्रभू के दास अपने प्रभू से जो कुछ माँगते हैं वह वही कुछ उनको देता है।
         </span>
@@ -114,12 +114,12 @@ const SettingViewer = () => {
       </div>
     ),
     'transliteration-hindi': (
-      <div className="slide-transliteration transliteration">
+      <div className="slide-transliteration transliteration devanagari" lang="hi">
         जो मागहि ठाकुर अपुने ते सोई सोई देवै ॥
       </div>
     ),
     'transliteration-shahmukhi': (
-      <div className="slide-transliteration transliteration">
+      <div className="slide-transliteration transliteration shahmukhi" lang="pa-Arab">
         {' '}
         جو ماگه ٹھاکر اپنے تے سوای سوای دےوَے ۔۔
       </div>
