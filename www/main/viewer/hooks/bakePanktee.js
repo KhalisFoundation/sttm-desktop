@@ -1,9 +1,22 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
+import { shallowEqual } from '../../common/utils';
+import { fontSizeSetting } from '../font-sizes';
+
 const bakePanktee = () => {
+  // Scoped and compared shallowly for the same reason as in `Slide`: Akhand
+  // Paatth mounts one of these per verse, so an unscoped `userSettings`
+  // selector re-renders every mounted verse whenever any setting changes.
   const { displayVishraams, larivaarAssist, larivaar, gurbaniFontSize } = useStoreState(
-    (state) => state.userSettings,
+    (state) => ({
+      displayVishraams: state.userSettings.displayVishraams,
+      larivaarAssist: state.userSettings.larivaarAssist,
+      larivaar: state.userSettings.larivaar,
+      gurbaniFontSize:
+        state.userSettings[fontSizeSetting('gurbani', state.userSettings.akhandpatt).stateName],
+    }),
+    shallowEqual,
   );
 
   return (getFontSize, vishraamPlacement, vishraamSource, gurmukhiString = '') => {

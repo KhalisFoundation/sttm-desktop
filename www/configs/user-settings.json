@@ -30,9 +30,13 @@
       "step": 1,
       "settings": [
         "gurbani-font-size",
+        "akhandpatt-gurbani-font-size",
         "content1-font-size",
+        "akhandpatt-content1-font-size",
         "content2-font-size",
+        "akhandpatt-content2-font-size",
         "content3-font-size",
+        "akhandpatt-content3-font-size",
         "announcements-font-size",
         "reset-font-sizes"
       ]
@@ -81,22 +85,57 @@
   "settings": {
     "gurbani-font-size": {
       "title": "BANI",
-      "initialValue": 9
+      "initialValue": 9,
+      "condition": "akhandpatt",
+      "conditionValue": false
+    },
+    "akhandpatt-gurbani-font-size": {
+      "title": "BANI",
+      "initialValue": 8,
+      "condition": "akhandpatt",
+      "conditionValue": true
     },
     "content1-font-size": {
       "title": "",
       "initialValue": 5,
-      "addon": ["content1-visibility", "content1"]
+      "addon": ["content1-visibility", "content1"],
+      "condition": "akhandpatt",
+      "conditionValue": false
+    },
+    "akhandpatt-content1-font-size": {
+      "title": "",
+      "initialValue": 5,
+      "addon": ["content1-visibility", "content1"],
+      "condition": "akhandpatt",
+      "conditionValue": true
     },
     "content2-font-size": {
       "title": "",
       "initialValue": 4,
-      "addon": ["content2-visibility", "content2"]
+      "addon": ["content2-visibility", "content2"],
+      "condition": "akhandpatt",
+      "conditionValue": false
+    },
+    "akhandpatt-content2-font-size": {
+      "title": "",
+      "initialValue": 4,
+      "addon": ["content2-visibility", "content2"],
+      "condition": "akhandpatt",
+      "conditionValue": true
     },
     "content3-font-size": {
       "title": "",
       "initialValue": 4,
-      "addon": ["content3-visibility", "content3"]
+      "addon": ["content3-visibility", "content3"],
+      "condition": "akhandpatt",
+      "conditionValue": false
+    },
+    "akhandpatt-content3-font-size": {
+      "title": "",
+      "initialValue": 4,
+      "addon": ["content3-visibility", "content3"],
+      "condition": "akhandpatt",
+      "conditionValue": true
     },
     "announcements-font-size": {
       "title": "ANNOUNCEMENTS",
@@ -107,9 +146,13 @@
       "type": "reset-button",
       "resetSettings": [
         "gurbani-font-size",
+        "akhandpatt-gurbani-font-size",
         "content1-font-size",
+        "akhandpatt-content1-font-size",
         "content2-font-size",
+        "akhandpatt-content2-font-size",
         "content3-font-size",
+        "akhandpatt-content3-font-size",
         "announcements-font-size"
       ]
     },
@@ -147,14 +190,14 @@
       "disableWhen": "content3-visibility"
     },
     "akhandpatt": {
-      "title": "AKHAND_PATH_VIEW",
+      "title": "AKHAND_PAATTH_VIEW",
       "notes": "CHROMECAST_UNAVAILABLE",
       "initialValue": false,
       "disableSetting": "display-next-line"
     },
     "display-next-line": {
       "title": "NEXT_LINE",
-      "notes": "AKHAND_PATH_UNAVAILABLE",
+      "notes": "AKHAND_PAATTH_UNAVAILABLE",
       "initialValue": false,
       "disableWhen": "akhandpatt"
     },
@@ -229,6 +272,9 @@
       "min": 1,
       "step": 1,
       "initialValue": 10
+    },
+    "akhandpatt-scroll-speed": {
+      "initialValue": 30
     },
     "bani-length": {
       "title": "BANI_LENGTH",

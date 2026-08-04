@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useStoreState } from 'easy-peasy';
 import anvaad from 'anvaad-js';
 
+import useContentFontSizes from '../hooks/useContentFontSizes';
+
 const SlideTransliteration = ({ getFontSize, gurmukhiString, lang, position }) => {
-  const { content1FontSize, content2FontSize, content3FontSize } = useStoreState(
-    (state) => state.userSettings,
-  );
-  const fontSizes = [content1FontSize, content2FontSize, content3FontSize];
+  const fontSizes = useContentFontSizes();
   const [transliterationString, setTransliterationString] = useState(null);
 
   const getTransliteration = (gurmukhi) => {

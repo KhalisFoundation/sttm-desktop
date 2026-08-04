@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { convertToCamelCase } from '../../common/utils';
+import { fontSizeSetting } from '../font-sizes';
 
 const remote = require('@electron/remote');
 
@@ -65,7 +66,18 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
     const maxFontSize = 20;
     const minFontSize = 1;
 
-    if (index > 0) {
+    // The two views keep separate type sizes for the Gurbani and each content
+    // slot; this stepper drives whichever view is on screen. Slots with no
+    // per-view size, and the visibility toggles, fall through to the generic
+    // naming below.
+    const sizeForView =
+      action === 'FontSize'
+        ? fontSizeSetting(index > 0 ? `content${index}` : toolname, userSettings.akhandpatt)
+        : null;
+
+    if (sizeForView) {
+      ({ stateName, actionName } = sizeForView);
+    } else if (index > 0) {
       stateName = `content${index}${action}`;
       actionName = `setContent${index}${action}`;
     } else {
