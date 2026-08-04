@@ -1,19 +1,17 @@
 /**
  * The user settings that change how *tall* a rendered verse is.
  *
- * Akhand Paatth holds the reader's place by content anchor: the scroll position
- * is remembered as "this verse, this far into it" rather than as a pixel offset,
- * so it survives the deck growing and shrinking underneath it (see
- * `useAkhandpattScroll`). That repair is driven by an explicit revision token
- * rather than by watching `scrollHeight`, because `scrollHeight` also moves on
- * every just-in-time load and prune, and those carry their own scroll
- * compensation the repair must not fight.
+ * Akhand Paatth remembers the reader's place as "this verse, this far into it",
+ * not as a pixel offset, so it survives the deck growing and shrinking underneath
+ * it (see `useAkhandpattScroll`). An explicit revision token drives that repair,
+ * because `scrollHeight` also moves on every just-in-time load and prune, and
+ * those carry their own scroll compensation the repair must not fight.
  *
  * So the deck has to say when a *layout* change happened, which means naming the
- * settings that cause one. They are gathered here, rather than inline at the
- * call site, because they are scattered across the Slide subtree (the font
- * sizes are read by `bakePanktee` and `useContentFontSizes`, the visibility flags
- * by `Slide`), and a list assembled by eye from those files would quietly rot.
+ * settings that cause one. They are gathered here because they are scattered
+ * across the Slide subtree — `bakePanktee` and `useContentFontSizes` read the
+ * font sizes, `Slide` reads the visibility flags — and a list assembled by eye
+ * from those files would quietly rot.
  *
  * The test in `test/viewer/akhandpatt/layout-revision.test.js` partitions every
  * setting the Slide subtree reads into this list and an explicit height-neutral

@@ -13,13 +13,12 @@ const TEXT_ENTRY = [
 
 /**
  * Keys that a focused control already acts on itself, paired with the control.
- * A shortcut must stay out of their way because it would handle the press twice.
- * Since `useKeys` cancels the browser default for Space and the vertical arrows,
- * it could also take the key away from the control.
+ * A shortcut must stay out of their way, or the press is handled twice; and
+ * because `useKeys` cancels the browser default for Space and the vertical
+ * arrows, it could take the key away from the control altogether.
  *
- * Each entry lists only the keys that control owns. Ignoring all shortcuts
- * whenever a control has focus would remove most of the app's keyboard, so each
- * list below is limited to the control's own keys.
+ * Each entry lists only the keys that control owns. Ignoring every shortcut
+ * whenever a control has focus would remove most of the app's keyboard.
  */
 const NATIVE_KEY_OWNERS = [
   {

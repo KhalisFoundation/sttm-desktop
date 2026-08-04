@@ -23,7 +23,7 @@ boxes and both spacing axes) and `src/scss/viewer/shabad-deck/_shabad-deck.scss`
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Akhand Paatth | An unbroken cover-to-cover reading of the SGGS, taking around 48 hours in relay. The reason this feature exists.                                                               |
 | Shabad        | One composition, and the unit the database indexes and this feature loads and drops. Lengths vary enormously, from two verses to several hundred.                              |
-| Verse         | One line of a Shabad, and the unit everything here measures: a `verseId` identifies it, `data-verseid` marks its element, and the scroll anchor is expressed against it.       |
+| Verse         | One line of a Shabad, and the unit everything here measures. A `verseId` names it and `data-verseid` tags its element.                                                        |
 | SGGS          | Sri Guru Granth Sahib. Its Shabads run `1..5540`, skipping 1640 and 4196. A reading stops at 5540 rather than running on into Dasam Bani.                                      |
 | Bani          | A named, finite selection: Japji Sahib, Rehras Sahib, a ceremony. Also loaded into the deck, but it _ends_: there is no "next", so infinite scrolling is off for these.        |
 | Larivaar      | Gurmukhi written without spaces between words, as in the original manuscripts. A display option, and one that changes verse heights, hence its place in `layout-revision.js`.  |
@@ -32,12 +32,12 @@ boxes and both spacing axes) and `src/scss/viewer/shabad-deck/_shabad-deck.scss`
 
 | File                     | Responsibility                                                                                                                                                                                                                                                  |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `useAkhandpattScroll.js` | Owns the scroll loop, mouse wheel handling, seeking to a line, just-in-time loading and pruning, and cross-window sync. The helpers below keep this file focused on behaviour rather than arithmetic.                                                           |
+| `useAkhandpattScroll.js` | Owns the scroll loop, mouse wheel handling, seeking to a line, just-in-time loading and pruning, and cross-window sync. The helpers below pull the arithmetic out so this file is mostly behaviour.                                                             |
 | `shabad-window.js`       | Pure model of the loaded window of Shabads (append / prepend / drop), with no DOM or React. Unit-tested.                                                                                                                                                        |
 | `shabad-feed.js`         | The only place that reads Shabads from the database. Turns Realm rows into plain objects, keeps a reading inside the source it began in, and steps over unused ids so that a gap is not mistaken for the end. See "Reading past a wide gap".   |
 | `scroll-config.js`       | Every tunable constant, each with the reasoning (and usually the measurement) behind its value, plus the speed model. Read this before changing a number.                                                                                                       |
 | `scroll-anchor.js`       | Converts a scroll position to a _content_ anchor (`{ verseId, fraction }`) and back, so the preview and the projection can agree on a line despite laying it out at very different sizes.                                                                       |
-| `scroll-motion.js`       | The arithmetic of moving smoothly: how hard to correct towards the window being mirrored, and how to express a position that is not a whole number of pixels. Both were bugs visible only on a projector; both reduce to functions that can be pinned by tests. |
+| `scroll-motion.js`       | The arithmetic of moving smoothly: how hard to correct towards the window being mirrored, and how to express a position that is not a whole number of pixels. Both were bugs you could only see on a projector, and both come down to functions the tests can pin. |
 | `verse-elements.js`      | The only place that knows a verse is found in the DOM by `data-verseid`. `Slide.jsx` stamps the attribute; everything that measures verses reads it through here.                                                                                               |
 | `layout-revision.js`     | Names the settings that change a verse's height, and builds the token that tells the deck a reflow happened so it can put the reader's line back.                                                                                                               |
 | `reading-position.js`    | Remembers where the reader had got to, outside React, so a render fault that unmounts the deck resumes the reading instead of restarting it.                                                                                                                    |
@@ -59,8 +59,8 @@ be viewport-relative so the preview stays a true scaled replica, lives in
 Layout does not finish when React commits. Fonts arrive late, a resize animates
 over many frames, and a newly mounted Shabad inflates as its Gurmukhi loads. All
 of these move the Gurbani out from under the reader unless something holds it.
-`useAkhandpattScroll` runs three short correction loops for this. They look alike
-and are not interchangeable:
+`useAkhandpattScroll` runs three short correction loops for this. They look
+similar but do different jobs:
 
 | Loop                                            | Triggered by                                         | Corrects                                                 | Stops when                                                                                             |
 | ----------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -73,26 +73,26 @@ and are not interchangeable:
 Every change to the scroll position goes through `setScrollTop`, or
 `writeScrollPosition` beneath it; a caller that assigned `container.scrollTop`
 directly would lose the sub-pixel fraction (see "Smoothness on the projection"
-below). Six movers ask for a position, held apart by what each one checks before
-it writes, not by the order they run in, since `requestAnimationFrame` gives no
-ordering between separately registered callbacks.
+below). Six movers ask for a position. What keeps them apart is what each one
+checks before it writes — `requestAnimationFrame` gives no ordering between
+separately registered callbacks, so they cannot rely on running in a fixed order.
 
 | Mover | Runs | Stands down for |
 | --- | --- | --- |
 | the scroll step | every frame while playing | a pause, a wheel gesture, a seek |
-| the wheel glide | every frame while easing to where the wheel asked | nothing: it *is* the gesture, and cancels the seek settle as it starts |
-| a seek | once, when a verse is chosen | nothing: it cancels the anchor settle first |
-| the seek settle | a short run of frames after a seek | nothing: it *is* the seek that the others stand down for |
+| the wheel glide | every frame while easing to where the wheel asked | nothing; it is the gesture, and cancels the seek settle as it starts |
+| a seek | once, when a verse is chosen | nothing; it cancels the anchor settle first |
+| the seek settle | a short run of frames after a seek | nothing; it is the seek the others stand down for |
 | the viewport repair | every frame while the layout is unsettled | a wheel gesture, a seek |
 | the anchor settle | a short run of frames after a Shabad is prepended | nothing |
 
 ## Smoothness on the projection
 
 Two things make the projection harder to scroll smoothly than the operator's own
-preview. Both were found by eye on real hardware before they were understood in
-code, and `scroll-motion.js` holds the arithmetic for each.
+preview. Both showed up by eye on real hardware first and only made sense in code
+later, and `scroll-motion.js` holds the arithmetic for each.
 
-**The projection is a follower.** The preview broadcasts an anchor every frame
+The projection is a follower. The preview broadcasts an anchor every frame
 while the projection also integrates its own velocity, so one scroll position has
 two writers. The anchor is re-resolved through different typography each frame,
 so it disagrees with the local integration by around a pixel either way at
@@ -101,7 +101,7 @@ a fraction of the way towards it (`SYNC_CORRECTION_GAIN`), snapping only when th
 disagreement is too large to be noise (`SYNC_SNAP_RATIO`) or when its own loop is
 not running.
 
-**`scrollTop` can only address a whole physical pixel.** At 3.33px/frame a 1x
+`scrollTop` can only address a whole physical pixel. At 3.33px/frame a 1x
 display renders 3, 4, 3, 3, 4, plainly visible at reading speed. A 2x laptop
 screen has a 0.5px quantum and does not show it, so the fault is invisible on
 the machine most operators develop and rehearse on. The whole pixels go to
@@ -153,8 +153,8 @@ boundary:
 `MAX_SHABAD_ID_GAP` does not cause this and widening it does not help: the ids
 beyond each of those boundaries exist and are populated, they simply belong to
 another source. None of the three is read as an Akhand Paatth, and the operator
-can open the next Shabad by hand and carry on, so this is a known limit rather
-than a fault being worked around.
+can open the next Shabad by hand and carry on, so it is a known limit, not a bug
+being papered over.
 
 Closing it means asking the database for the next id **in a given source**
 rather than probing forward. That is one query, but not a drop-in replacement:

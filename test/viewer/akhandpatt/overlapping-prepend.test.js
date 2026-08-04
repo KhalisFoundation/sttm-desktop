@@ -3,22 +3,12 @@
  */
 
 /**
- * Reading backwards loads the previous Shabad above the viewport. Those verses
- * mount at roughly nothing and reach their real height a few frames later, so a
- * one-shot compensation at commit time cannot see the growth. A settle loop
- * covers it: it holds one anchor verse still while the content above it fills
- * in.
- *
- * Scrolling up quickly asks for a second Shabad before the first has finished
- * growing. Each prepend anchors on the verse that was the head before it ran, so
- * the second anchor is always further up the page than the first. An anchor only
- * absorbs growth above itself, so re-anchoring upward abandons the part of the
- * page the reader is actually looking at, and the first Shabad's remaining
- * growth pushes the reader down.
- *
- * This drives the real hook through two overlapping prepends and then inflates
- * the first one, which is the order the app hits when the wheel crosses two
- * boundaries in quick succession.
+ * Reading backwards prepends the previous Shabad above the viewport. Its verses
+ * mount near zero height and grow a few frames later, so a settle loop holds one
+ * anchor verse still while the content above fills in. A second quick prepend
+ * re-anchors further up the page, and an anchor only absorbs growth above itself,
+ * so the first Shabad's late growth then pushes the reader down. Drives two
+ * overlapping prepends, then inflates the first.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -299,7 +289,6 @@ describe('two prepends that overlap while the first is still growing', () => {
     });
   };
 
-  /** Runs frames, advancing both the frame clock and `performance.now()`. */
   const runFrames = async (count, stepMs = 16) => {
     for (let i = 0; i < count; i += 1) {
       clock += stepMs;

@@ -23,8 +23,8 @@ const MAX_CRASH_LOG_BYTES = 512 * 1024;
  * otherwise unmounts the whole React tree and leaves a blank window. This
  * boundary limits the failure to its subtree, records the error and component
  * stack, and attempts a bounded number of remounts before showing a fallback.
- * A remount gives the child tree another opportunity to render from current
- * state without assuming a cause for the error.
+ * A remount gives the child tree another go at rendering from current state
+ * without assuming a cause for the error.
  *
  * A caught error unmounts the subtree, so the deck loses its scroll state and
  * remounts fresh. `akhandpatt/reading-position` holds the position in module
@@ -32,8 +32,7 @@ const MAX_CRASH_LOG_BYTES = 512 * 1024;
  * fault caught by the navigator's boundary recreates the `<webview>` that hosts
  * the preview deck, which reloads `viewer.html` into a new JavaScript context
  * and loses that module state, so the reading restarts from the operator's last
- * selection. That is still a recovery: without a boundary a render fault in
- * either renderer leaves a blank window and no reading at all.
+ * selection.
  *
  * The crash log is written to `sttm-crash.log` under the app's userData dir so
  * issues that only reproduce on a user's machine can still be diagnosed.

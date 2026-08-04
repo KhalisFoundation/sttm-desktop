@@ -4,19 +4,17 @@
  * The two views want genuinely different type sizes. A slide gives a single
  * verse the whole screen, so it can afford to be large; Akhand Paatth stacks
  * verses into a scrolling column, where the same size leaves too few lines in
- * view to read ahead. So each line of a verse (the Gurbani and the three
- * content slots beneath it) keeps a separate persisted size per view, and each
- * view remembers what was last set in it.
+ * view to read ahead. Each line of a verse (the Gurbani and the three content
+ * slots beneath it) therefore keeps a separate persisted size per view.
  *
  * Only the *size* splits. Which content a slot shows, and whether it shows at
  * all, stay shared: those are choices about the Gurbani, not about how a
  * particular layout renders it.
  *
- * Everything else about the controls is unchanged: the same Quick Tools steppers
- * and the same Font Sizes sliders drive both views, over the same range and in
- * the same steps. Only the setting they land on differs, and it differs here, in
- * one place, so that a stepper and a renderer can never end up reading and
- * writing different settings.
+ * The controls themselves are unchanged — the same Quick Tools steppers and
+ * Font Sizes sliders drive both views, over the same range and steps. Only the
+ * setting they land on differs, and it is resolved here, in one place, so a
+ * stepper and a renderer cannot end up on different settings.
  */
 
 /** The content slots, in the order they render beneath the Gurbani. */

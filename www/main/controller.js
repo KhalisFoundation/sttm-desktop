@@ -438,7 +438,7 @@ global.platform.ipc.on('next-ang', (event, arg) => {
 // (`slide-layout.display-options.akhandpaatt`, `disable-akhandpaatt`, the
 // `akhandpaatt` body class and a `clear-apv` IPC round trip). None was read
 // anywhere at `7af235dc`, and none touched the React `akhandpatt` setting, so
-// casting never actually left Akhand Paatth view. They are removed rather than
+// casting never actually left Akhand Paatth view. They are removed and not
 // repointed at the real setting: it is persisted, and `cast-session-stopped`
 // does not fire when the app quits, so quitting mid-cast would strand the
 // operator out of Akhand Paatth across restarts.

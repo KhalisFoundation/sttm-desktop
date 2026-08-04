@@ -1,16 +1,10 @@
 /**
- * Every locale key named in the source has to exist in the locale file.
- *
- * i18next answers an unknown key with the key itself, so a typo or a forgotten
- * entry does not throw; it puts `AUTOPLAY.PAUSE` on screen where the label
- * should be. This suite checks literal key uses during the build.
- *
- * This runs over the whole of `www/main` because the rule is not specific to
- * Akhand Paatth.
- *
- * This scans literal calls because `i18n` is reached through
- * `remote.require('./app')` and the resolver exists only inside a running
- * Electron main process.
+ * Every locale key named in the source must exist in the locale file. i18next
+ * answers an unknown key with the key itself, so a typo or missing entry does
+ * not throw; it puts `AUTOPLAY.PAUSE` on screen where the label should be. Scans
+ * literal key uses across all of `www/main` (`i18n` is reached through
+ * `remote.require('./app')`, which only resolves inside a running Electron main
+ * process).
  */
 const fs = require('fs');
 const path = require('path');
@@ -68,7 +62,7 @@ describe('locale keys', () => {
    * at the time of writing, rounded well down: it is asserting that the scan
    * still works, not pinning the size of the app.
    */
-  it('finds the keys it is meant to be checking', () => {
+  it('finds literal locale keys', () => {
     expect(usages.length).toBeGreaterThan(200);
     expect(new Set(usages.map((u) => u.key)).size).toBeGreaterThan(100);
   });

@@ -3,14 +3,10 @@
  */
 
 /**
- * Loading the next Shabad is a database read, and the reader can choose a
- * different Shabad while it is in flight. Appending the old result would add
- * Gurbani that does not follow the content on screen.
- *
- * The loaders guard against it by re-checking the window boundary they read
- * from before mutating anything. That guard is invisible to any test that lets
- * the read settle, because the race never happens. So this holds the read open,
- * moves the reader, and only then lets it finish.
+ * Loading the next Shabad is a database read, and the reader can pick a
+ * different Shabad while it is in flight. The loaders re-check the window
+ * boundary before appending, a guard that never fires unless the read is held
+ * open. So this holds the read open, moves the reader, then lets it finish.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');

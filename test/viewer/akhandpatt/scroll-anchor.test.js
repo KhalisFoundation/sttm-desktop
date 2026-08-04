@@ -5,15 +5,11 @@ import {
 import { createDeck } from './deck-fixture';
 
 /**
- * The external display mirrors the operator's preview by content anchor rather
- * than by pixel offset, because the two windows lay the same Gurbani out at very
- * different sizes. These tests pin that contract down.
- *
- * The geometry used throughout is the real measured geometry from a 1080p laptop
- * preview beside a 1440p projection: the preview showed ~5.6 verses per screen at
- * 152px a verse in a 497px viewport, the projection the same ~5.6 verses at 351px
- * a verse in a 1150px viewport. Sending a pixel offset between those two is
- * meaningless, and doing so is what made the decks drift 1.5x apart.
+ * The external display mirrors the operator's preview by content anchor, not by
+ * pixel offset, because the two windows lay the same Gurbani out at very
+ * different sizes. The geometry throughout is real measured geometry: a 1080p
+ * laptop preview (~152px a verse in a 497px viewport) beside a 1440p projection
+ * (~351px a verse in a 1150px viewport).
  */
 
 const VERSE_IDS = [60200, 60201, 60202, 60203, 60204, 60205, 60206, 60207, 60208, 60209];
@@ -46,7 +42,7 @@ describe('readScrollAnchor / resolveAnchorScrollTop', () => {
     }
   });
 
-  it('survives the round trip when offset space is skewed by a positioned ancestor', () => {
+  it('round-trips with a positioned offset parent', () => {
     // `offsetTop` is measured from the nearest positioned ancestor, not the
     // scroll container, and the deck sets `position: relative`. Dropping the
     // correction for that skew would still round-trip within one window but put
@@ -208,7 +204,7 @@ describe('the sub-pixel scroll split', () => {
     }
   });
 
-  it('resolves to a whole pixel, so a seek can land a fraction short', () => {
+  it('resolves anchors to whole pixels', () => {
     // The one residual of the split. `resolveAnchorScrollTop` answers in whole
     // pixels, so seeking to an anchor drops the fraction the deck was painted
     // with. It is under a pixel and taken fresh from the DOM each time rather

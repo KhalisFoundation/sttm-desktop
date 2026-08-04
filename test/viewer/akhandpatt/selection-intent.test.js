@@ -3,18 +3,10 @@
  */
 
 /**
- * Behavioural cover for the one decision that has caused every seek regression:
- * when a verse is not mounted, is that because the reader asked for a line that
- * has been pruned away, or because nothing has rendered yet?
- *
- * Getting it wrong is silent. The window is rebuilt either way, so the deck
- * still shows Gurbani; what is lost is the remembered reading position, and the
- * only visible symptom is that a reading resumes in the wrong place after a
- * remount. Source-scanning for the call cannot show whether it runs.
- *
- * So this drives the real hook through the real `reading-position` module and
- * reads the decisions back out of the trace buffer the hook already writes for
- * diagnostics.
+ * When a selected verse isn't mounted, is it pruned or just not rendered yet?
+ * Getting it wrong silently resumes a reading in the wrong place after a
+ * remount. Drives the real hook and reads its decisions back out of the
+ * diagnostic trace buffer.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -155,7 +147,7 @@ describe('deciding whether a selection means "the reader moved"', () => {
     stopTracing();
   });
 
-  it('does not rebuild the window just because nothing has rendered yet', async () => {
+  it('does not rebuild before verses mount', async () => {
     // A fresh open: the chosen verse is legitimately absent from `verseRefs`,
     // because the seed load has not returned. Treating that as a pruned verse
     // throws away the seed effect's work and, on a remount, the reader's place.
@@ -184,9 +176,7 @@ describe('deciding whether a selection means "the reader moved"', () => {
 
     await render({ activeVerseId: 1, verseSelectionNonce: 8, mountedVerseRefs: {} });
 
-    // Rebuilding from the same seed has the same state as a remount. The outcome
-    // distinguishes an executed reset from a call that is present but
-    // unreachable.
+    // Rebuilding from the same seed has the same state as a remount.
     const seeds = trace().filter((entry) => entry.event === 'seed');
     expect(seeds.length).toBeGreaterThan(0);
     expect(seeds[seeds.length - 1].resumed).toBe(false);
@@ -204,7 +194,7 @@ describe('deciding whether a selection means "the reader moved"', () => {
     expect(seed.resumed).toBe(true);
   });
 
-  it('treats one selection as one request, however often the effect re-runs', async () => {
+  it('handles each selection nonce once', async () => {
     await render({ activeVerseId: 2, verseSelectionNonce: 7, mountedVerseRefs: {} });
     // A real selection, which rebuilds the window.
     await render({ activeVerseId: 2, verseSelectionNonce: 8, mountedVerseRefs: {} });

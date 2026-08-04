@@ -5,26 +5,14 @@
 /**
  * What the keyboard does while a continuous reading is on screen.
  *
- * The slide view advances the Gurbani one verse at a time, and the arrows are
- * how the operator does it. A continuous reading advances itself, so the same
- * keys have nothing to step. The selection they would move is the last line the
- * operator clicked, which the reading may have scrolled past.
+ * The arrows step a verse in slide view, but a continuous reading advances
+ * itself, so they are blocked where they are raised: one press can travel two
+ * hops (`Launchpad` raises `nextVerse`; `ShabadText` steps, then at a Shabad's
+ * end raises `nextShabad`), and blocking one consumer alone leaves the other
+ * reachable. Space plays/pauses the reading instead of jumping to the home
+ * verse, but must keep the route back from a Quick Insert.
  *
- * The press is stopped where it is raised rather than where it is acted on,
- * because one press can travel two hops: `Launchpad` raises `nextVerse`,
- * `ShabadText` steps a verse and, at the end of a Shabad, raises `nextShabad`
- * for `ArrowIcon` to act on. Blocking either consumer alone would leave the
- * other reachable.
- *
- * Space is the other key the Launchpad owns. In the slide view it moves to the
- * home verse, which is also how a Quick Insert comes back down. A reading has
- * its own position, so Space plays and pauses it instead. That replacement must
- * retain the route back from a Quick Insert.
- *
- * This renders the real component and dispatches real key events, so it fails
- * if a guard is removed, if a new binding forgets it, or if a guard is computed
- * and then not consulted. Its neighbours (the toolbar, navigator, and add-ons)
- * are stubbed out because none takes part in a key press.
+ * Renders the real component with real key events; neighbours are stubbed.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');

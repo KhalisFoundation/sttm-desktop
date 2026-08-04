@@ -10,14 +10,11 @@
  * references them (`navigator.searchData`), then throws
  * `Cannot perform 'get' on a proxy that has been revoked`, unmounting the UI.
  *
- * This is especially easy to hit in Akhand Paatth mode, whose continuous scroll
- * issues a steady stream of `loadShabadSafe` calls (each a fresh `Realm.open`)
- * while stale search results linger in the store.
- *
- * Materialising the rows the moment they leave the data layer keeps only the
- * fields the search UI actually consumes (see `mapVerseItems` in
- * `SearchContent`) and severs the Realm binding entirely, so nothing revocable
- * ever reaches React state or the easy-peasy store.
+ * Akhand Paatth mode hits this easily: its continuous scroll issues a steady
+ * stream of `loadShabadSafe` calls, each a fresh `Realm.open`, while stale
+ * search results linger in the store. Copying the fields the search UI consumes
+ * (see `mapVerseItems` in `SearchContent`) severs the binding, so nothing
+ * revocable reaches React state or the store.
  *
  * @param {Array|Realm.Results} rows Live Realm verse rows (or an empty result).
  * @returns {Array<object>} Plain objects mirroring the shape `mapVerseItems` reads.

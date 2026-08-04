@@ -1,10 +1,9 @@
 /**
  * Reads Shabads from the source for the infinitely scrolling deck.
  *
- * Three concerns live here rather than in the scroll hook: detaching rows from
- * Realm before they reach React state, stepping over unused Shabad ids so that
- * a hole in the numbering is not mistaken for the end of a source, and stopping
- * when the ids run on into a different scripture.
+ * It keeps three jobs out of the scroll hook: detaching rows from Realm before
+ * they reach React state, stepping over unused Shabad ids, and stopping when the
+ * ids run on into a different scripture.
  *
  * Shabad ids ascend, but a source does not own one unbroken run of them. The
  * SGGS skips 1640 and 4196, and asking for an unused id returns no verses;
@@ -20,16 +19,15 @@ const banidb = require('../../banidb');
  * How many consecutive empty ids to step over before concluding that the source
  * has ended.
  *
- * Its whole job is the two holes in the SGGS, at 1640 and 4196. Both are a
- * single id, and no other gap exists below 5540, so ten is already generous.
- * Dasam Bani's body, 7402 to 12808, has no holes at all. A probe costs about
- * 0.065ms, so the budget is spent in well under a millisecond and only at the
- * end of a source.
+ * This exists for the two holes in the SGGS, at 1640 and 4196. Both are a single
+ * id, no other gap exists below 5540, and Dasam Bani's body (7402 to 12808) has
+ * none at all, so ten is generous. A probe costs about 0.065ms, and probing only
+ * happens at the end of a source.
  *
- * Widening it would not extend any reading. Where a reading stops short it is
- * because the next populated id belongs to a different source, which the
- * scripture check rejects however much budget is left; see
- * `Reading past a wide gap` in the README.
+ * Widening it would not extend any reading. Where a reading stops short, the
+ * next populated id belongs to a different source, which the scripture check
+ * rejects however much budget is left; see `Reading past a wide gap` in the
+ * README.
  */
 export const MAX_SHABAD_ID_GAP = 10;
 

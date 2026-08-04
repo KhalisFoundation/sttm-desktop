@@ -11,30 +11,26 @@ const { i18n } = remote.require('./app');
  * Padding Tools insets a fixed slide from four edges, which means little in a
  * continuously scrolling document: top and bottom only pad the two extreme ends
  * of a Shabad that never stops, and a fixed pixel inset would break the deck's
- * scaled-replica property (see `_verse-slide.scss`). The equivalent adjustment
- * here is the air around and inside a verse, offered through the same
- * collapsible header and minus / value / plus controls.
+ * scaled-replica property (see `_verse-slide.scss`). The equivalent here is the
+ * spacing around and inside a verse, offered through the same collapsible header
+ * and minus / value / plus controls.
  *
- * Two axes rather than one. "Between Verses" pads each verse and so sets the gap
- * to the next; "Between Lines" separates the Gurbani from its translation,
- * transliteration and teeka. Held apart, a reader can bind a verse's own lines
- * together while still giving verses room to breathe. A single value can only
- * trade one against the other; on a projected Akhand Paatth, the distinction
- * shows the sangat where one verse ends.
+ * There are two axes, not one. "Between Verses" sets the gap to the next verse;
+ * "Between Lines" separates the Gurbani from its translation, transliteration
+ * and teeka. Kept apart, a reader can bind a verse's own lines together and
+ * still space the verses out; a single value can only trade one against the
+ * other.
  *
- * The body carries the `paddingtool-spacing` variant rather than Padding Tools'
- * `paddingtool-gurbani`, because the layout that spreads four edge controls over
- * a full-height panel would strand two spacing controls at its extreme ends.
- * See `_verse-slide.scss`.
+ * The body carries the `paddingtool-spacing` variant, not Padding Tools'
+ * `paddingtool-gurbani`: that layout spreads four edge controls over a
+ * full-height panel and would strand two controls at its extreme ends.
  *
- * Shares `paddingToolsOpen` with Padding Tools because `ShabadDeck` renders one
- * of the two. The flag means "the second tool panel is open", and the reader's
+ * `paddingToolsOpen` is shared with Padding Tools because `ShabadDeck` renders
+ * one of the two, so the flag means "the second tool panel is open" and the
  * preference carries across a mode switch.
  *
- * Values are in reference-design pixels, on the same 0-48 scale and in the same
- * steps of 4 as Padding Tools, so the numbers carry over from a reader's
- * existing feel for the padding controls. `_verse-slide.scss` converts them to
- * viewport units.
+ * Values are in reference-design pixels, on the same 0-48 scale and steps of 4
+ * as Padding Tools. `_verse-slide.scss` converts them to viewport units.
  */
 const SPACING_MIN = 0;
 const SPACING_MAX = 48;

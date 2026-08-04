@@ -4,16 +4,13 @@ const path = require('path');
 /**
  * The replay to a deck that has just become ready.
  *
- * A deck is a separate renderer with its own copy of the store, kept in step by
- * one-way messages sent as things change. A deck created after a change has
- * missed it and would keep the built-in defaults until the next change. This
- * could leave the operator's pane and the sangat's screen different;
- * `syncViewerState` closes that window by replaying on arrival.
- *
- * What it replays is an explicit list. This compares the replay with the
- * settings the viewer declares and the matched navigator fields it reads.
- *
- * Read from source rather than imported because `GlobalState` pulls in Electron.
+ * A deck is a separate renderer with its own store copy, kept in step by one-way
+ * messages. A deck created after a change has missed it and would keep the
+ * defaults until the next change, leaving the operator's pane and the sangat's
+ * screen out of step; `syncViewerState` closes that window by replaying on
+ * arrival. This compares the replay's explicit list with the settings the viewer
+ * declares and the navigator fields it reads. Read from source because
+ * `GlobalState` pulls in Electron.
  */
 
 const MAIN_DIR = path.join(__dirname, '..', '..', 'www', 'main');
@@ -115,8 +112,7 @@ describe('syncViewerState', () => {
    * initial replay because a continuous reading does not require another click.
    */
   describe('the current selection', () => {
-    // The control: a scan that found nothing would let both assertions below
-    // pass for the wrong reason.
+    // guard against an empty scan
     it('finds the fields the viewer reads', () => {
       expect(navigatorFieldsTheViewerReads().size).toBeGreaterThan(5);
     });

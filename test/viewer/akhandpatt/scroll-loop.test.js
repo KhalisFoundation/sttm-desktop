@@ -3,15 +3,13 @@
  */
 
 /**
- * The autoscroll loop is a `requestAnimationFrame` chain, so each frame is
- * responsible for booking the next one. Its body reads layout, syncs across
- * windows and drives the just-in-time loaders, any of which can throw: a revoked
- * Realm proxy, a detached element, or a read that races a prune. If a throw
- * escapes the frame, the next frame is not booked and the scroll stops. A React
- * error boundary cannot catch an error raised inside the callback.
- *
- * So this drives the real hook with a real fault: a container whose
- * `scrollHeight` throws, which is what a detached or revoked element does.
+ * The autoscroll loop is a `requestAnimationFrame` chain, so each frame books
+ * the next. Its body reads layout, syncs across windows and drives the loaders,
+ * any of which can throw (a revoked Realm proxy, a detached element, a read that
+ * races a prune). An escaping throw means the next frame is never booked and the
+ * scroll stops, and a React error boundary can't catch a throw from inside the
+ * callback. Drives the real hook with a real fault: a container whose
+ * `scrollHeight` throws.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -204,7 +202,7 @@ describe('the autoscroll frame loop', () => {
     expect(frames.booked()).toBeGreaterThan(0);
   });
 
-  it('keeps scrolling after a fault clears, rather than staying dead', async () => {
+  it('resumes after a frame fault', async () => {
     await mountWithFaultyContainer();
     expect(await pumpUntilFault()).toBe(true);
 

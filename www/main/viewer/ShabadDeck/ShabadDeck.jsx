@@ -70,7 +70,7 @@ function ShabadDeck() {
   // Waheguru, a blank screen) takes the deck over while it is up without
   // changing that choice, so everything that renders, measures or scrolls the
   // continuous view keys off this combined flag instead. Slides are passed the
-  // answer rather than recomputing it.
+  // answer, not the two inputs.
   const akhandpattView = akhandpatt && !isMiscSlide;
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});

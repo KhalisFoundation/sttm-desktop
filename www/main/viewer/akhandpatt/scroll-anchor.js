@@ -1,22 +1,17 @@
 /**
- * The content anchor: a place in the Gurbani rather than a place on the screen.
+ * The content anchor: which verse the centre line sits on, and how far through
+ * that verse it is.
  *
- * The operator's in-app preview and the external display mount the same deck and
- * run the same scroll loop, but lay the Gurbani out at different sizes, so a
- * pixel offset means nothing to the other window. What both agree on is the
- * *content*: which verse the centre line sits on, and how far through that verse
- * it is. That pair, `{ verseId, fraction }`, is the anchor.
+ * The operator's preview and the external display mount the same deck but lay it
+ * out at different sizes, so a pixel offset from one means nothing in the other.
+ * `{ verseId, fraction }` survives the difference. `readScrollAnchor` turns a
+ * scroll position into an anchor and `resolveAnchorScrollTop` turns it back;
+ * within a window they are exact inverses. The preview reads, the display
+ * resolves, and both land on the same line whatever their viewport, font size or
+ * loaded range.
  *
- * The two functions are exact inverses within a window: `readScrollAnchor`
- * turns a scroll position into an anchor, `resolveAnchorScrollTop` turns an
- * anchor back into the scroll position that puts it on the centre line. So the
- * preview reads its anchor, the external display resolves it, and both show the
- * same line, regardless of viewport size, font size, or which verses each
- * window happens to have loaded.
- *
- * Sending the anchor between windows is the hook's job; this module only
- * converts. The same conversion also holds the reader's place through a reflow,
- * where nothing is sent anywhere.
+ * Sending the anchor between windows is the hook's job. The same conversion also
+ * holds the reader's place through a reflow, where nothing is sent anywhere.
  */
 
 import { mountedVerses, verseElement, verseIdOf } from './verse-elements';

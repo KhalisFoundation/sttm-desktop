@@ -55,15 +55,11 @@ import {
 import { mountedVerses, enclosingVerse, verseIdOf } from './verse-elements';
 
 /**
- * Average rendered height, in this container's pixels, of the verses currently
- * mounted in the deck. This is the bridge between the content-relative speed
- * setting (verses/second) and the pixels/second the scroll loop must apply, so
- * every window advances through the same Gurbani at the same rate whatever its
- * size or typography (see `scroll-config`).
+ * Average mounted verse height, excluding the deck's centring padding.
+ * Used to convert verses/second to this window's pixels/second.
  *
- * Measured across the mounted span rather than from `scrollHeight` so the deck's
- * own centring padding is excluded, and averaged over the whole window so the
- * velocity glides as verse lengths vary instead of stepping verse to verse.
+ * Averaged over the whole mounted window rather than per verse, so the velocity
+ * glides as verse lengths vary instead of stepping from one verse to the next.
  *
  * @param {HTMLElement} container The scrollable deck element
  * @returns {number|null} Average verse height in px, or null if not measurable
@@ -80,54 +76,33 @@ const measureAverageVerseHeight = (container) => {
 };
 
 /**
- * Drives the continuous ("teleprompter") vertical auto-scroll used by Akhand
- * Paatth view.
+ * Drives the Akhand Paatth teleprompter scroll and centred-line overlay.
  *
- * Responsibilities:
- *  - animate the deck container's `scrollTop` at a constant, frame-rate
- *    independent velocity while playing;
- *  - for a SGGS Shabad, own a sliding window of verses: loading the next
- *    Shabad just before the reader reaches the bottom and pruning exhausted
- *    Shabads off the top (with scroll compensation) so the DOM stays bounded
- *    and the scroll never has to stop until the end of the Granth;
- *  - keep the OBS / bottom-bar overlay in step with the line currently centred
- *    on screen, sent on `akhandpatt-overlay-line`, throttled, and without
- *    touching verse history.
+ * Infinite SGGS content uses a bounded sliding window of Shabads. Finite content
+ * keeps its caller-owned verse list and uses the same scrolling.
  *
- * Finite Akhand Paatth content (Sundar Gutka banis, ceremonies) reuses the same
- * smooth scroll and overlay sync but skips just-in-time loading; the caller
- * keeps ownership of `activeVerse` for those and sets `infinite` false.
+ * The rAF loops share refs so they can read current props without restarting.
+ * Effects list only values that should trigger them; adding render-local helpers
+ * as dependencies would restart the loops on every render. `react-hooks/
+ * exhaustive-deps` is not enabled in this repo and would flag these as missing;
+ * they are deliberate.
  *
- * MAP. Roughly a third of this file is four frame loops and the state they share
- * between frames, which is why it is one module rather than several (the README
- * argues that at length). In reading order:
+ * Roughly a third of the file is four frame loops and the state they share
+ * between frames, which is why it is one module. In reading order:
  *
- *   refs             Props mirrored into refs, so a loop reads the current speed
- *                    or play state without being torn down and rebuilt.
- *   requestSeek      Ask for a verse to be centred; the layout effect below does it.
- *   the scroll writer `writeScrollPosition` is the only assignment to `scrollTop`
- *                    in the file; everything else goes through `setScrollTop` or
- *                    `moveScrollTopBy`, which keep the sub-pixel accumulator with it.
- *   pinHeldAnchor    + a layout effect that re-pins the reader's line, before
- *                    paint, whenever a setting reflows the deck.
- *   the overlay      Which verse is on the centre line, and telling the app.
- *   two settle loops One waits for a seek to land, one for a reflow to stop moving.
- *   the window       Load the next/previous Shabad, prune the far one away.
- *   seed effect      Build the window for a new Shabad.
- *   selection effect Honour a manual selection, remounting the line if it was pruned.
- *   layout effect    Apply pending anchor compensation once the DOM has the verses.
- *   autoscroll loop  Mounted only while playing.
- *   anchor loop      Mounted whenever the deck is up: holds the centre line across
- *                    reflows, and broadcasts it to the other window.
- *   wheel handler    A momentary manual override of the autoscroll.
- *
- * The effects below list only the values that should *cause* them to run, not
- * every value they read. The helpers above are plain consts, rebuilt each
- * render, so naming them as dependencies would re-run each effect on every
- * render: the frame loop would cancel and restart its `requestAnimationFrame`,
- * and a seek would re-fire continuously instead of once per `seekNonce`. Live
- * values are read through refs for that reason. `react-hooks/exhaustive-deps`
- * is not enabled in this repo and would flag these; they are deliberate.
+ *   refs               Props mirrored into refs for the loops to read.
+ *   requestSeek        Ask for a verse to be centred; a layout effect does it.
+ *   writeScrollPosition The only assignment to `scrollTop` in the file.
+ *   pinHeldAnchor      Re-pins the reader's line, before paint, after a reflow.
+ *   overlay            Which verse is on the centre line, and telling the app.
+ *   settle loops       One waits for a seek to land, one for a reflow to stop.
+ *   the window         Load the next/previous Shabad, prune the far one away.
+ *   seed effect        Build the window for a new Shabad.
+ *   selection effect   Honour a manual selection, remounting a pruned line.
+ *   layout effect      Apply pending anchor compensation once the DOM is ready.
+ *   autoscroll loop    Mounted only while playing.
+ *   anchor loop        Holds the centre line and broadcasts it to the other window.
+ *   wheel handler      A momentary manual override of the autoscroll.
  *
  * @param {object} params
  * @param {React.RefObject<HTMLElement>} params.containerRef The scrollable deck element
@@ -167,158 +142,102 @@ export const useAkhandpattScroll = ({
 }) => {
   const modelRef = useRef(null);
   /**
-   * Which reading a database read belongs to.
-   *
-   * A read that was started for one reading must not touch a different one, and
-   * the window alone cannot tell them apart: choosing a new Shabad marks the new
-   * seed and then waits for its own read, so for as long as that takes the old
-   * window is still the current one. A read returning in that gap sees the
-   * boundary it started from, unchanged, and concludes it is still current.
-   *
-   * So ownership is stamped rather than inferred. Every read captures this
-   * counter when it starts and abandons itself if the counter has moved on,
-   * including in `finally`, since releasing another reading's loading mark is
-   * itself enough to let a stale continuation through.
+   * Tags async reads with the reading that started them. The old window can
+   * remain mounted while a new seed loads, so its contents cannot identify stale
+   * reads. The generation check also applies in `finally`.
    */
   const readingGenerationRef = useRef(0);
   const loadingRef = useRef(false);
   const endedRef = useRef(false);
-  // Latches once the scroll comes to rest at the end of a reading, so the deck
-  // is told exactly once. It clears itself: any growth below the current
-  // position means the scroll is no longer at the bottom.
+  // Latches the end callback until content grows below the current position.
+  // This keeps the deck's end transition to one call per stop.
   const reachedEndRef = useRef(false);
   const onReadingEndedRef = useRef(onReadingEnded);
   onReadingEndedRef.current = onReadingEnded;
-  // Mirrors of `loadingRef`/`endedRef` for the backward (top) direction, so a
-  // forward load can't block a backward one and reaching the start of the Granth
-  // is tracked independently of reaching its end.
+  // Separate load and boundary state for the backward direction, so forward and
+  // backward reads can overlap without sharing an end marker.
   const loadingPrevRef = useRef(false);
   const atStartRef = useRef(false);
-  // Latches from the moment a backward prepend is applied to the DOM until its
-  // scroll compensation runs in the layout effect. `loadingPrevRef` only covers
-  // the async DB read; it clears the instant the read resolves, which is still
-  // one or more frames before React commits the inserted verses and the layout
-  // effect corrects scrollTop. In that gap scrollTop is unchanged and still sits
-  // below the load-ahead threshold, so an unguarded loadPrevShabad fires again
-  // and again, stacking several Shabads' worth of verses (hundreds) before a
-  // single compensation runs: the giant reflow then overshoots the view and
-  // skips over whole Shabads. Gating on this ref admits exactly one prepend per
-  // layout cycle; by the time the next is allowed the compensation has already
-  // pushed scrollTop up past the threshold, which self-rate-limits the next load.
+  // `loadingPrevRef` clears before React commits the prepend. Keep this set until
+  // layout compensation runs, otherwise the load-ahead check can queue several
+  // Shabads against the same scroll position.
   const prependCompPendingRef = useRef(false);
   const pendingSeekRef = useRef(null);
-  // Restores the on-screen position of an anchor verse after the DOM grows or
-  // shrinks above the viewport. Shared by the top prune (removes verses above)
-  // and the backward prepend (inserts verses above); both shift on-screen
-  // content and are compensated identically.
+  // Anchor used to compensate for a prepend or prune above the viewport. Both
+  // operations move visible content despite having opposite height deltas.
   const scrollAnchorRef = useRef(null);
   const lastCenterIdRef = useRef(null);
-  // The Shabad the live window was built from. The hook owns the window once it
-  // exists, so this, not "is the seed Shabad still mounted", decides when a
-  // rebuild is warranted, letting the seed Shabad be pruned off the top during
-  // normal scrolling without ever snapping back to the start.
+  // Tracks window ownership even after the seed Shabad has been pruned. Mounted
+  // content cannot answer whether a seed change requires a rebuild.
   const windowSeedRef = useRef(null);
-  // The selection this hook has already responded to. Seeded from the current
-  // value so a mount is never mistaken for a fresh request: the reader asking to
-  // be moved is the *only* thing that should tear down and rebuild the window.
+  // Seeded with the current selection so mounting does not look like a new request.
+  // Only explicit selection changes should rebuild a pruned line.
   const handledSelectionRef = useRef(verseSelectionNonce);
-  // Sub-pixel scroll accumulator. `scrollTop` is an integer, so at slow speeds a
-  // frame's advance can round to zero and the scroll stalls; accumulating in a
-  // float and only rounding on write keeps even the slowest scroll moving.
+  // Float accumulator keeps sub-pixel advances that `scrollTop` rounds away.
+  // The rounded browser value is only used when local state has to be reset.
   const scrollTopFloatRef = useRef(0);
-  // Manual-wheel momentum: wheel events arrive in coarse, discrete deltas, so
-  // rather than snapping scrollTop per event (which looks juddery) we accumulate
-  // them into a target and glide towards it over successive frames.
+  // Wheel deltas accumulate into a target for the glide loop instead of moving
+  // the deck once per coarse wheel event.
   const wheelTargetRef = useRef(null);
   const wheelRafRef = useRef(null);
-  // True for the duration of a manual wheel gesture (until it settles). While it
-  // is set the autoscroll loop holds and the wheel glide owns scrollTop; when it
-  // clears, the autoscroll resumes in whatever play state it was already in. It
-  // never touches the global autoplay toggle, so a momentary manual correction
-  // doesn't make the play/pause button flicker.
+  // Gives the wheel glide temporary ownership of scrollTop without changing autoplay.
+  // Autoscroll resumes in the existing play state after the gesture.
   const manualScrollRef = useRef(false);
   const wheelResumeTimerRef = useRef(null);
-  // A seek (search result / navigator click / fresh seed) pins the chosen line
-  // to its target on-screen position for a short settle window while
-  // late reflow (web font, async content) finishes changing verse heights. While
-  // `seekingRef` is set the autoscroll loop holds so it cannot fight the pin, and
-  // `seekSettleRafRef` owns the re-pin animation frame so a newer seek, or a
-  // manual wheel, can cancel it cleanly.
+  // Holds autoscroll while a seek is re-pinned through late font/content reflow.
+  // The frame handle allows a newer seek or wheel gesture to cancel the old one.
   const seekingRef = useRef(false);
   const seekSettleRafRef = useRef(null);
-  // Incremented on every seek so a late async callback (fonts.ready) belonging to
-  // a superseded seek can detect it lost the race and do nothing.
+  // Invalidates late `fonts.ready` callbacks from superseded seeks, including
+  // callbacks left behind after manual wheel input.
   const seekTokenRef = useRef(0);
-  // Owns the post-prepend anchor settle animation frame: as the freshly-mounted
-  // previous Shabad inflates above the viewport, this folds the growth into
-  // scrollTop so the view stays visually still. Teardown, and anything else
-  // that takes charge of the scroll position, cancels it.
+  // Frame handle for compensating late growth in a prepended Shabad. Other
+  // scroll owners cancel this loop before writing their own position.
   const anchorSettleRafRef = useRef(null);
-  // The verse the running settle is holding, and the window it is holding it
-  // for. Both live outside the loop's closure so a prepend arriving mid-settle
-  // can extend the window without restarting the loop on a different verse.
+  // Stored outside the loop so an overlapping prepend can extend its deadlines
+  // while keeping the older anchor.
   const anchorSettleVerseRef = useRef(null);
   const anchorSettleDeadlinesRef = useRef(null);
   const [seekNonce, setSeekNonce] = useState(0);
-  // Bumped to re-attempt a seed that failed (e.g. a cold-realm rejection).
+  // Bumped to retry a failed seed through the seed effect.
   const [seedNonce, setSeedNonce] = useState(0);
-  // Per-seed attempt bookkeeping, so that a seed which keeps failing backs off
-  // rather than hammering the database, and a genuinely new seed always starts
-  // its count fresh.
+  // Per-seed attempts control retry backoff. A different seed starts again with
+  // fast retries.
   const seedAttemptRef = useRef({ id: null, attempts: 0 });
   const seedRetryTimerRef = useRef(null);
-  // How the infinite window's seed is getting on:
-  //   'idle':    nothing outstanding; whatever is on screen is current
-  //   'loading': a read is in flight or a quick retry is pending
-  //   'stalled': the quick retries are spent and it has backed off
-  // The deck shows a loader for 'loading' only when it has nothing else to show,
-  // so an ordinary Shabad change does not flash; 'stalled' always shows one,
-  // because by then the Gurbani on screen belongs to a reading the operator has
-  // already left.
+  // Infinite seed state: idle means current content is ready;
+  //   loading: a read or quick retry is pending
+  //   stalled: quick retries are exhausted
   const [seedState, setSeedState] = useState('idle');
-  // Timestamp of the most recent scroll anchor received from the operator's
-  // preview. Its freshness is what makes this window a follower (see
-  // `REMOTE_SYNC_STALE_MS`) so no explicit role has to be plumbed through.
-  //
-  // "Never received one" has to be infinitely stale rather than zero, because
-  // this clock counts from the moment the document loaded: with zero, every
-  // window would believe it was following for its own first second, swallowing
-  // wheel gestures and withholding its anchor during the period an operator is
-  // most likely to be setting the reading up.
+  // A fresh remote anchor marks this window as a follower. Negative infinity
+  // keeps a new window from following during its first `REMOTE_SYNC_STALE_MS`.
+  // No explicit window role is needed.
   const remoteAnchorAtRef = useRef(Number.NEGATIVE_INFINITY);
-  // True while another window is telling this one where to scroll. Inferred
-  // rather than plumbed, so a window whose source goes away reverts to
-  // scrolling under its own steam instead of freezing.
+  // Inference lets a window resume local control when its source disappears
+  // instead of leaving it frozen as a follower.
   const isFollowing = () => performance.now() - remoteAnchorAtRef.current < REMOTE_SYNC_STALE_MS;
 
-  // Mirror frequently-read props into refs so the animation loop can stay
-  // mounted across speed/content changes without capturing stale values.
+  // Keep loop inputs current without remounting the animation loop. Recreating a
+  // loop would discard its timing and in-flight correction state.
   const speedRef = useRef(scrollSpeed);
   const infiniteRef = useRef(infinite);
   const liveFeedRef = useRef(liveFeed);
   const activeVerseRef = useRef(activeVerse);
-  // Mirror the selected verse so the seed's async completion aligns to the line
-  // the reader actually chose (search result / navigator click) rather than
-  // always snapping to the Shabad's first line.
+  // Lets an async seed completion use the latest selected verse, including a
+  // navigator selection made while the database read was pending.
   const activeVerseIdRef = useRef(activeVerseId);
-  // Mirrors `isPlaying` so a wheel nudge can freeze the animation loop the same
-  // frame, a beat before the paused state round-trips through global settings.
+  // Lets a wheel nudge hold the loop before global state catches up in this window.
   const isPlayingRef = useRef(isPlaying);
-  // Last `layoutRevision` the hook acted on, so the mount pass is a no-op and
-  // only a genuine change opens a repair window.
+  // Makes the initial layout revision a no-op; later values open a repair window.
   const layoutRevisionRef = useRef(layoutRevision);
-  // Set when the deck has been reflowed by a setting change and the scroll loop
-  // has not yet re-pinned the reader's place. Consumed once, on the next frame.
+  // Requests one repair window after a settings reflow. It is consumed by the
+  // next anchor frame rather than inferred from changing scrollHeight.
   const relayoutPendingRef = useRef(false);
-  // The content point the reader is on, refreshed every frame the layout is
-  // quiet and pinned back whenever it is not. A ref rather than a local of the
-  // scroll loop because the reflow is signalled from a layout effect, which has
-  // to read the anchor captured before the reflow, and does so while the DOM
-  // is still unpainted, so the correction lands in the same frame as the change.
+  // Last quiet-layout anchor, shared with the pre-paint layout repair. Keeping it
+  // outside the loop preserves the pre-reflow value through React's commit.
   const heldAnchorRef = useRef(null);
-  // Where a follower's leader currently is, when that is close enough to be
-  // drift rather than a different passage. Held rather than applied so the
-  // scroll loop remains the only writer of the scroll position.
+  // Nearby leader position for gradual correction by the scroll loop. Large
+  // differences are applied directly as passage changes.
   const remoteTargetRef = useRef(null);
   useEffect(() => {
     speedRef.current = scrollSpeed;
@@ -340,26 +259,22 @@ export const useAkhandpattScroll = ({
   }, [isPlaying]);
 
   const requestSeek = (verseId, align = 'center') => {
+    // Defer measurement until React has committed the requested verse. The layout
+    // effect below applies the seek before paint.
     pendingSeekRef.current = { verseId, align };
     setSeekNonce((nonce) => nonce + 1);
   };
 
-  // Write a scroll position that may carry a fraction of a pixel.
-  //
   // Chromium quantises `scrollTop` to a whole *physical* pixel, so on an
-  // ordinary 1x projector a velocity of 3.3px/frame is rendered 3, 4, 3, 3, 4:
-  // a flutter that is plainly visible at the speeds this view is read at, and
-  // which the operator's own 2x laptop screen (a 0.5px quantum) does not show.
-  // The whole pixels go to `scrollTop` and the remainder is carried as a
-  // transform on the content, which paints at sub-pixel precision.
+  // ordinary 1x projector 3.3px/frame paints as 3, 4, 3, 3, 4. Write whole
+  // pixels to `scrollTop` and paint the remainder as a transform.
+  // A 2x laptop has a 0.5px quantum and can hide the same flutter.
   //
-  // The two must stay complementary. `scroll-anchor` measures verses through a
-  // bounding rect, which the transform does shift, so the split is visible to it,
-  // and correctly so: a shifted rect read against a truncated `scrollTop`
-  // describes the position actually painted. Rounding here instead of
-  // truncating, or transforming by anything other than the discarded remainder,
-  // would put the anchor on a different line from the one on screen.
-  // `scroll-anchor.test.js` pins that.
+  // The values must stay complementary: anchor measurements use transformed
+  // bounding rects against truncated `scrollTop`. See `scroll-anchor.test.js`.
+  // Rounding either side differently makes the measured anchor disagree with
+  // the position actually painted.
+  // `wholePixels` and `subPixelTransform` implement the same split.
   const writeScrollPosition = (value) => {
     const container = containerRef.current;
     if (!container) {
@@ -379,16 +294,14 @@ export const useAkhandpattScroll = ({
     }
   };
 
-  // The sub-pixel offset belongs to Akhand Paatth alone, so leaving the view
-  // (or unmounting) hands back a wrapper with no residual fraction of a pixel
-  // and no transform, a transform being a stacking and compositing boundary that
-  // ordinary slides never asked for. This is its own effect: the scroll loop
-  // is gated on `isPlaying` and registers no cleanup while paused,
-  // so a wheel nudge on a paused deck would otherwise leave an offset behind.
+  // Clear the transform on exit, including while paused. A leftover transform
+  // would create a stacking/compositing boundary for ordinary slides that reuse
+  // the wrapper.
   useEffect(() => clearSubPixelOffset, [akhandpatt]);
 
-  // Write the scroll position and keep the float accumulator in step, clamped so
-  // short content can never come to rest scrolled past its end (or above 0).
+  // Clamp writes and keep the float accumulator in step. Short content cannot
+  // retain a position beyond its current end.
+  // All direct positioning paths pass through this helper.
   const setScrollTop = (value) => {
     const container = containerRef.current;
     if (!container) {
@@ -398,18 +311,14 @@ export const useAkhandpattScroll = ({
     const clamped = Math.min(maxScrollTop, Math.max(0, value));
     writeScrollPosition(clamped);
     scrollTopFloatRef.current = clamped;
-    // A seek, a pin, or a wheel glide puts the deck where it should be, so any
-    // correction still converging towards a position from before that decision is
-    // now wrong.
+    // Direct local writes invalidate an older remote correction, which was
+    // calculated from the previous position.
     remoteTargetRef.current = null;
   };
 
-  // Nudge the deck from where it already is, rather than to a position worked out
-  // from scratch. Both callers are correcting for content that changed height
-  // underneath the reader, so all they know is how far it moved, and the base
-  // they add that to has to be the position last asked for, not the truncated one
-  // the container reports back. `currentScrollTop` is the only place that choice
-  // is made; going through here is what stops a caller making it again, wrongly.
+  // Apply layout compensation to the last requested position, not the browser's
+  // truncated `scrollTop`.
+  // Both callers supply a height delta, so they need the float as their base.
   const moveScrollTopBy = (delta) => {
     const container = containerRef.current;
     if (!container) {
@@ -418,13 +327,12 @@ export const useAkhandpattScroll = ({
     setScrollTop(currentScrollTop(scrollTopFloatRef.current, container.scrollTop) + delta);
   };
 
-  // Put the content point the reader was on back on the centre line. Returns
-  // whether it could: the anchor's verse may have been pruned, or the deck may
-  // not be mounted yet.
+  // Re-pin the held content point, returning false if it is no longer mounted
+  // or the deck is temporarily unavailable.
   const pinHeldAnchor = () => {
     const container = containerRef.current;
-    // A manual scroll or seek owns scrollTop outright; don't add a second
-    // writer. It settles in a moment and the anchor is re-read after it.
+    // Manual scroll and seek have temporary ownership of scrollTop. The held
+    // anchor is refreshed after they finish.
     if (!container || manualScrollRef.current || seekingRef.current) {
       return false;
     }
@@ -436,24 +344,9 @@ export const useAkhandpattScroll = ({
     return true;
   };
 
-  // A setting that reflows the deck (line spacing, a font size, a visibility
-  // toggle; see `layout-revision.js`) changes how much content sits above the
-  // centre line without changing the container's size, so the viewport repair,
-  // which watches for size changes, would not notice and the reader's place
-  // would slide away under them. The hook does not care *which* setting
-  // changed; the caller says only that it did.
-  //
-  // This has to be a layout effect. React has already written the new styles to
-  // the DOM by the time it runs, but the browser has not yet painted them, so
-  // re-pinning here corrects the position in the very frame that moved it;
-  // the reader sees no jump at all. Deferring to the scroll loop would show one
-  // frame of the wrong Gurbani, and worse: that frame would refresh the anchor
-  // from the already-drifted position, and the repair that followed would
-  // faithfully restore the drift.
-  //
-  // The repair window is still opened, because the reflow is rarely finished:
-  // web fonts and images settle over the following frames, and the loop keeps
-  // re-pinning until the height holds still.
+  // Settings can reflow content without resizing the container. Re-pin before
+  // paint, then repair late font/image reflow without sampling a drifted anchor.
+  // The revision says only that caller-owned layout changed.
   useLayoutEffect(() => {
     if (layoutRevisionRef.current === layoutRevision) {
       return;
@@ -472,10 +365,8 @@ export const useAkhandpattScroll = ({
     if (!overlayVerse || !Object.keys(overlayVerse).length) {
       return;
     }
-    // A dedicated channel (rather than `show-line`) lets the main process pick
-    // which deck drives the overlay: both scroll in lock-step, so only the
-    // operator's preview is broadcast and the external display's duplicate
-    // emissions are dropped.
+    // The dedicated channel lets the main process discard duplicate projection output.
+    // Both decks emit centred lines, but only the preview should drive the overlay.
     ipcRenderer.send(
       'akhandpatt-overlay-line',
       JSON.stringify({
@@ -491,6 +382,8 @@ export const useAkhandpattScroll = ({
       return null;
     }
     const rect = container.getBoundingClientRect();
+    // Hit-test the painted centre so transforms and differing verse heights are
+    // reflected in the overlay line.
     const el = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
     const verseEl = enclosingVerse(el);
     if (!verseEl) {
@@ -501,6 +394,8 @@ export const useAkhandpattScroll = ({
   };
 
   const syncOverlayToCentre = (force = false) => {
+    // Normal samples emit only when the centred verse changes. Forced samples
+    // refresh consumers after a seek or settle.
     const verseId = getCenteredVerseId();
     if (verseId === null) {
       return;
@@ -511,9 +406,8 @@ export const useAkhandpattScroll = ({
     lastCenterIdRef.current = verseId;
     emitOverlay(verseId);
 
-    // Note the place, so a render fault that unmounts this deck can resume here
-    // rather than restarting the reading. Only meaningful while we own the
-    // window; the deck drives itself for finite content.
+    // Remember the place for an infinite window remount. Finite content keeps its
+    // own position through the deck.
     const model = modelRef.current;
     if (model && windowSeedRef.current !== null) {
       const shabadId = shabadIdOfVerse(model, verseId);
@@ -523,10 +417,9 @@ export const useAkhandpattScroll = ({
     }
   };
 
-  // Cancel any in-flight post-seek settle and release the hold on the autoscroll
-  // loop. Bumping the seek token invalidates a still-pending fonts.ready
-  // correction from the settle being cancelled. Called before starting a new
-  // settle, when a manual wheel takes over, and on teardown.
+  // Cancel settling and invalidate its pending `fonts.ready` correction. This is
+  // shared by replacement seeks, wheel takeover, and teardown.
+  // Clearing `seekingRef` hands control back to autoscroll.
   const cancelSeekSettle = () => {
     if (seekSettleRafRef.current !== null) {
       cancelAnimationFrame(seekSettleRafRef.current);
@@ -536,18 +429,9 @@ export const useAkhandpattScroll = ({
     seekingRef.current = false;
   };
 
-  // Keep a selected line pinned to its intended on-screen position while late
-  // reflow settles. The verse's height, and every height above it, is not
-  // final on the frame the seek is applied: the Gurmukhi web font and other
-  // async content land a few frames later and push the line down, so a one-shot
-  // seek leaves the wrong line centred. Re-pin every frame (adjusting scrollTop
-  // by however far the line has drifted from its target) for the whole settle
-  // window, so however late the reflow completes the line is dragged back onto
-  // target. It does not stop early on transient stability: right after placement
-  // the line briefly *looks* settled, a beat before the font reflow shoves it;
-  // an early exit there would leave the wrong line centred. The autoscroll loop
-  // holds while `seekingRef` is set, so this can never fight it; the window is
-  // short enough that the brief hold is imperceptible.
+  // Re-pin the selected line while the Gurmukhi font and async content reflow.
+  // Fallback-font layout can look stable before the real font lands. Autoscroll
+  // waits for the fixed window and one final `fonts.ready` correction.
   const startSeekSettle = (verseId, align) => {
     cancelSeekSettle();
     if (!containerRef.current) {
@@ -556,8 +440,8 @@ export const useAkhandpattScroll = ({
     seekingRef.current = true;
     seekTokenRef.current += 1;
     const token = seekTokenRef.current;
-    // Re-pin the line to its target on-screen position; shared by the per-frame
-    // settle loop and the one-shot fonts.ready correction below.
+    // Shared by the frame loop and final `fonts.ready` correction so both use the
+    // same alignment calculation.
     const pin = () => {
       const node = verseRefs.current[verseId];
       if (!containerRef.current || !node) {
@@ -566,6 +450,8 @@ export const useAkhandpattScroll = ({
       const containerRect = containerRef.current.getBoundingClientRect();
       const nodeRect = node.getBoundingClientRect();
       const currentY = nodeRect.top - containerRect.top;
+      // Compute drift in viewport coordinates; content offsets may change while
+      // the font is reflowing.
       const desiredY =
         align === 'top' ? 0 : (containerRef.current.clientHeight - nodeRect.height) / 2;
       const drift = currentY - desiredY;
@@ -588,10 +474,9 @@ export const useAkhandpattScroll = ({
       seekSettleRafRef.current = requestAnimationFrame(settle);
     };
     seekSettleRafRef.current = requestAnimationFrame(settle);
-    // A cold Gurmukhi web-font load can complete after the settle window closes;
-    // when the fonts finally resolve, re-pin once more so a slow first open still
-    // lands on the chosen line, but only if this seek is still the current one
-    // and the reader hasn't since taken manual control.
+    // A cold font load may finish after the settle window. Re-pin once when
+    // `fonts.ready` resolves, but only for the current seek and scroll owner.
+    // The token prevents an old promise from moving a newer selection.
     if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
         if (seekTokenRef.current === token && !manualScrollRef.current) {
@@ -602,7 +487,9 @@ export const useAkhandpattScroll = ({
     }
   };
 
-  // Content-space Y (in scroll coordinates) of a rendered verse's top edge.
+  // Content-space Y of a rendered verse's top edge. Unlike viewport Y, this
+  // changes when content is inserted or removed above it.
+  // Adding scrollTop removes ordinary viewport movement from the measurement.
   const verseOffsetInContent = (verseId) => {
     const container = containerRef.current;
     const node = verseRefs.current[verseId];
@@ -614,12 +501,8 @@ export const useAkhandpattScroll = ({
     );
   };
 
-  // A verse's on-screen Y relative to the container's top edge, i.e. where it is
-  // rendered. Unlike verseOffsetInContent (a content-space coordinate that moves
-  // when content is inserted/removed above), this is the rendered viewport
-  // position, so comparing it before a DOM change and after the compensation
-  // measures the visible skip in screen pixels, independent of scrollTop
-  // numerics or the browser's scroll clamp.
+  // Rendered Y relative to the container, independent of scrollTop clamping.
+  // Comparing it before and after compensation measures the visible skip.
   const verseViewportTop = (verseId) => {
     const container = containerRef.current;
     const node = verseRefs.current[verseId];
@@ -629,8 +512,7 @@ export const useAkhandpattScroll = ({
     return node.getBoundingClientRect().top - container.getBoundingClientRect().top;
   };
 
-  // Cancel an in-flight post-prepend anchor settle, because the view is tearing
-  // down or because something else has taken charge of the scroll position.
+  // Cancel post-prepend settling and discard its mutable deadlines.
   const cancelAnchorSettle = () => {
     if (anchorSettleRafRef.current !== null) {
       cancelAnimationFrame(anchorSettleRafRef.current);
@@ -639,34 +521,21 @@ export const useAkhandpattScroll = ({
     anchorSettleDeadlinesRef.current = null;
   };
 
-  // Hold the view visually still while a newly prepended previous Shabad inflates
-  // above the viewport. The prepended verses mount with near-zero height and only
-  // reach their true height a few frames later (late web-font/async reflow),
-  // growing the content above the anchor by up to a whole Shabad. With overflow
-  // anchoring disabled the browser leaves the anchor, and everything below it,
-  // to lurch down by that growth: the large backward skip seen scrolling up
-  // across a Shabad boundary. The one-shot anchor compensation in the layout
-  // effect runs before this late growth, so it cannot see it. Here we track the
-  // anchor verse's content offset every frame for the settle window and add any
-  // frame-to-frame growth above it to scrollTop (and, if a manual glide is still
-  // in flight, its target), so the anchor keeps its on-screen position as the
-  // Shabad fills in. This compensates only reflow growth (the offset
-  // is a content-space coordinate that a scroll does not change) so an active
-  // upward glide continues undisturbed.
+  // Prepended verses keep growing after the layout effect. Track the anchor's
+  // content offset during that reflow and add growth to scrollTop and any wheel
+  // target. Content-space offsets do not change during the active upward glide.
+  // Overflow anchoring is disabled, so this loop owns the late compensation.
+  // A one-shot layout-effect correction cannot observe this later growth.
   const startAnchorSettle = (verseId) => {
     const container = containerRef.current;
     if (!container) {
       return;
     }
-    // Scrolling up quickly asks for a second Shabad before the first has
-    // finished growing. Each prepend anchors on the verse that was the head
-    // before it ran, so a later prepend's anchor is always further up the page
-    // than the one already being held. An anchor only absorbs growth above
-    // itself, so the anchor already running is the one that covers both
-    // Shabads; re-anchoring upward would leave the first Shabad's remaining
-    // growth to push the reader down by its whole height. Keep the running
-    // anchor and give it a fresh window instead, since more content has just
-    // arrived above it and has yet to reflow.
+    // On overlapping prepends, keep the older anchor: it sits below both new
+    // Shabads and absorbs growth from each. Only restart the deadlines.
+    // Switching to the newer, higher anchor would miss remaining growth in the
+    // first prepend.
+    // The running loop keeps its original `lastOffset`.
     if (anchorSettleRafRef.current !== null && anchorSettleDeadlinesRef.current) {
       const extendedFrom = performance.now();
       anchorSettleDeadlinesRef.current = {
@@ -700,6 +569,8 @@ export const useAkhandpattScroll = ({
       const offsetNow = verseOffsetInContent(verseId);
       if (offsetNow !== null) {
         const growth = offsetNow - lastOffset;
+        // Fold only layout growth into scroll state; user scrolling does not alter
+        // this content-space offset.
         if (Math.abs(growth) > SUB_PIXEL_EPSILON_PX) {
           moveScrollTopBy(growth);
           if (wheelTargetRef.current !== null) {
@@ -712,15 +583,10 @@ export const useAkhandpattScroll = ({
           stableFrames += 1;
         }
       }
-      // Exit once the prepended Shabad's height has held steady for a short run
-      // of frames (reflow done), but only after the minimum floor, since the
-      // verses first mount at fallback-font height and can look "stable" for a
-      // beat before the real font lands and inflates them. The cap is a safety
-      // backstop for a reflow that never settles. Adapting to when reflow
-      // actually finishes both stops promptly for a quick reflow and keeps
-      // compensating a long/slow one a fixed window would abandon mid-inflation.
-      // Both deadlines are read from the ref so a prepend arriving mid-settle
-      // can push them out without disturbing the anchor.
+      // The minimum deadline covers false stability at fallback-font height.
+      // Stop after stable frames or at the maximum deadline; both deadlines are
+      // in the ref so another prepend can extend them.
+      // The cap handles fonts or content that never report a stable run.
       const now = performance.now();
       const settled = now >= deadlines.min && stableFrames >= ANCHOR_SETTLE_STABLE_FRAMES;
       if (!settled && now < deadlines.max) {
@@ -743,6 +609,8 @@ export const useAkhandpattScroll = ({
   };
 
   const loadNextShabad = () => {
+    // Start a forward read once the remaining content falls inside the load-ahead
+    // distance. The loading flag coalesces repeated JIT samples.
     const container = containerRef.current;
     const model = modelRef.current;
     if (!container || !model || loadingRef.current || endedRef.current) {
@@ -760,25 +628,25 @@ export const useAkhandpattScroll = ({
     const generation = readingGenerationRef.current;
     readNextShabad(tailId)
       .then((next) => {
-        // Discard a stale load. The generation catches a read left over from a
-        // reading the operator has moved on from; the tail check additionally
-        // catches the window shifting under a read within one reading. A
-        // top-prune leaves the tail untouched, so this still allows a
-        // concurrent prune.
+        // The generation rejects old readings; the tail rejects a shifted window.
+        // A concurrent top prune leaves both checks valid.
+        // The checks run before touching either model or loading state.
         if (readingGenerationRef.current !== generation) {
           return;
         }
         if (lastShabadId(modelRef.current) !== tailId) {
           return;
         }
-        // Null means the source really has ended: the feed has already
-        // stepped over any gap in the id space.
+        // The feed returns null only after stepping over gaps in the id space,
+        // so this can latch the real end of the source.
+        // A rejected read follows the retry path instead.
         if (!next) {
           endedRef.current = true;
           return;
         }
         modelRef.current = appendShabad(modelRef.current, next.shabadId, next.verses);
-        // Growth is at the bottom, so existing content, and scrollTop, is undisturbed.
+        // Growth is at the bottom, so existing content, and scrollTop, is
+        // undisturbed. That is why an append needs no anchor and a prepend does.
         setActiveVerse(modelRef.current.verses);
         traceScroll('append', {
           nextId: next.shabadId,
@@ -789,8 +657,7 @@ export const useAkhandpattScroll = ({
         });
       })
       .catch((error) => {
-        // A failed read must not latch `endedRef`: the source has not ended, so
-        // leaving the flag clear lets the next sample retry.
+        // Leave `endedRef` clear so a failed read can retry on the next JIT sample.
         traceScroll('appendFailed', { tailId, message: error && error.message });
       })
       .finally(() => {
@@ -801,13 +668,12 @@ export const useAkhandpattScroll = ({
       });
   };
 
-  // The backward mirror of loadNextShabad: as the reader manually scrolls up
-  // towards the top of the window, fetch the previous Shabad and prepend it so
-  // they can scroll back through Shabads already pruned off the top. That
-  // preserves a document-style read. Only reached from the manual wheel
-  // glide (autoscroll only ever moves forward), so opening a fresh Shabad never
-  // eagerly loads the one before it.
+  // Load a previous Shabad when a manual upward scroll approaches the window's
+  // top. Autoscroll only moves forward, so fresh windows do not preload backward.
+  // This restores Shabads that have already been pruned from the top.
   const loadPrevShabad = () => {
+    // The prepend-compensation latch extends beyond the database loading flag and
+    // blocks another read until React has committed this one.
     const container = containerRef.current;
     const model = modelRef.current;
     if (
@@ -830,35 +696,29 @@ export const useAkhandpattScroll = ({
     const generation = readingGenerationRef.current;
     readPrevShabad(headId)
       .then((prev) => {
-        // The forward loader's reasoning, mirrored: the generation catches a
-        // read left over from an abandoned reading, the head check catches the
-        // window shifting under a read within one reading (a concurrent
-        // prepend). A bottom prune leaves the head untouched, so this still
-        // allows a concurrent bottom prune.
+        // The generation rejects old readings; the head rejects a shifted window.
+        // A concurrent bottom prune leaves both checks valid.
+        // The checks run before capturing a compensation anchor.
         if (readingGenerationRef.current !== generation) {
           return;
         }
         if (firstShabadId(modelRef.current) !== headId) {
           return;
         }
-        // Null means the start of the source, gaps already stepped over.
+        // Null means the feed reached the start after stepping over gaps. Failed
+        // reads leave this marker clear.
         if (!prev) {
           atStartRef.current = true;
           return;
         }
-        // Anchor on the current head verse: remember its on-screen position now
-        // so the layout effect can restore it after the prepend pushes it (and
-        // everything below) down by the inserted height. Same mechanism as the
-        // top prune, with growth instead of shrinkage above the viewport.
+        // Capture the head's screen position for post-prepend compensation. The
+        // inserted height will otherwise move every mounted verse downward.
+        // The same anchor shape is consumed for top pruning.
         const headVerse = modelRef.current.verses[0];
         const headTop = verseOffsetInContent(headVerse.ID);
-        // Without a measurable head verse there is nothing to anchor the
-        // compensation to. Prepending anyway would shove the viewport backward by
-        // the inserted height, and (because the one-per-cycle latch is tied to
-        // capturing the anchor) would leave that latch open for the next tick to
-        // stack another prepend on top. Return, as `pruneTopShabad` does for its
-        // own anchor; the head becomes measurable again within a frame or
-        // two and the wheel/autoscroll re-triggers the load.
+        // Do not prepend without a measurable anchor. The next wheel sample retries
+        // after the head is laid out.
+        // The latch is not set until this measurement succeeds.
         if (headTop === null) {
           return;
         }
@@ -870,10 +730,8 @@ export const useAkhandpattScroll = ({
           anchorViewportTop: verseViewportTop(headVerse.ID),
           reason: 'prepend',
         };
-        // Block any further prepend until this one's compensation has run (see
-        // prependCompPendingRef): one prepend per layout cycle, no large batch.
-        // Tied to capturing the anchor so the layout effect (gated on the same
-        // anchor) is guaranteed to clear it; no path can wedge it stuck true.
+        // Admit one prepend per layout-compensation cycle. The layout effect that
+        // consumes this anchor releases the latch.
         prependCompPendingRef.current = true;
         modelRef.current = prependShabad(modelRef.current, prev.shabadId, prev.verses);
         setActiveVerse(modelRef.current.verses);
@@ -885,8 +743,8 @@ export const useAkhandpattScroll = ({
         });
       })
       .catch((error) => {
-        // As with the forward feed, a failed read leaves `atStartRef` clear so
-        // the next wheel-up can retry rather than the top being sealed off.
+        // Leave `atStartRef` clear so the next wheel-up can retry instead of
+        // treating a database error as the start of the Granth.
         traceScroll('prependFailed', { headId, message: error && error.message });
       })
       .finally(() => {
@@ -898,13 +756,15 @@ export const useAkhandpattScroll = ({
   };
 
   const pruneTopShabad = () => {
+    // Keep a safety screen above the viewport before removing the oldest segment.
+    // The next segment's first verse survives as the compensation anchor.
     const container = containerRef.current;
     const model = modelRef.current;
     if (!container || !model || model.segments.length <= MIN_MOUNTED_SEGMENTS) {
       return;
     }
-    // The boundary is the first verse of the second segment; once it sits a full
-    // screen above the viewport the entire first Shabad is safely off-screen.
+    // The second segment's first verse marks when the first is safely off-screen,
+    // including the configured safety margin.
     const boundaryVerse = model.verses[model.segments[0].count];
     if (!boundaryVerse) {
       return;
@@ -916,12 +776,9 @@ export const useAkhandpattScroll = ({
     if (boundaryTop >= container.scrollTop - container.clientHeight * PRUNE_SAFETY_SCREENS) {
       return;
     }
-    // Anchor on the boundary verse: remember its current on-screen position
-    // (viewport-relative Y) now, then after the removed verses leave the DOM
-    // recompute the scroll position that puts it back at exactly that Y.
-    // Capturing the on-screen Y (not a content-space delta) lets compensation be
-    // computed absolutely on the far side, so it stays correct even if the
-    // browser clamped scrollTop when the shorter content shrank scrollHeight.
+    // Capture the boundary's screen Y. Restoration can then be absolute and
+    // remains correct if the shorter content makes the browser clamp scrollTop.
+    // A content-space delta cannot recover the pre-clamp screen position.
     const prevViewportY = boundaryTop - container.scrollTop;
     scrollAnchorRef.current = {
       verseId: boundaryVerse.ID,
@@ -933,7 +790,6 @@ export const useAkhandpattScroll = ({
     };
     modelRef.current = dropFirstSegment(model);
     setActiveVerse(modelRef.current.verses);
-    // Freeing verses off the top means we're no longer at the start of the Granth.
     atStartRef.current = false;
     traceScroll('prune', {
       boundaryVerseId: boundaryVerse.ID,
@@ -943,11 +799,9 @@ export const useAkhandpattScroll = ({
     });
   };
 
-  // The backward mirror of pruneTopShabad: once the reader has scrolled up far
-  // enough that the bottom-most Shabad sits a full screen below the viewport,
-  // drop it to keep the DOM bounded. Removing content below the viewport shifts
-  // nothing on screen, so, unlike a top prune, no scroll compensation is
-  // needed.
+  // Drop a trailing Shabad once it is safely below an upward-moving viewport.
+  // Content removed below the viewport needs no compensation.
+  // Keeping the same minimum segment count bounds both scroll directions.
   const pruneBottomShabad = () => {
     const container = containerRef.current;
     const model = modelRef.current;
@@ -969,7 +823,6 @@ export const useAkhandpattScroll = ({
     }
     modelRef.current = dropLastSegment(model);
     setActiveVerse(modelRef.current.verses);
-    // Freeing verses off the bottom means we're no longer at the end of the Granth.
     endedRef.current = false;
     traceScroll('pruneBottom', {
       lastShabadId: lastSegment.shabadId,
@@ -978,10 +831,9 @@ export const useAkhandpattScroll = ({
     });
   };
 
-  // Own the sliding window (infinite) or defer to the deck (finite content). The
-  // window is rebuilt only for a genuinely new seed Shabad, never because the
-  // original seed scrolled off the top, which is what stops the scroll from
-  // periodically snapping backwards through a run of short Shabads.
+  // Rebuild an infinite window only for a new seed, not when its original seed
+  // is pruned. `windowSeedRef` records ownership independently of mounted segments.
+  // Generation changes invalidate any feed work from the previous window.
   useEffect(() => {
     if (!akhandpatt) {
       modelRef.current = null;
@@ -990,15 +842,9 @@ export const useAkhandpattScroll = ({
       setSeedState('idle');
       cancelAnchorSettle();
       prependCompPendingRef.current = false;
-      // Leaving the view ends the reading. The remembered place exists to
-      // survive a remount *within* a reading, so keeping it here would let a
-      // later return to the same Shabad open wherever the last reading drifted
-      // to, possibly hours of Gurbani away, instead of the selected line.
-      //
-      // A misc slide is not leaving. Raising a Quick Insert or an announcement
-      // takes the deck off screen for a moment mid-reading, and the reader
-      // expects to come back to the line they were on, not to the line they
-      // opened hours ago. Only a genuine exit from the view forgets.
+      // Keep the reading position through temporary suspension by a misc slide.
+      // A genuine exit clears it so a later reading starts at its selection.
+      // This distinguishes an interrupted reading from a later use of the same seed.
       if (!viewSuspended) {
         forgetReadingPosition();
       }
@@ -1008,14 +854,14 @@ export const useAkhandpattScroll = ({
       if (windowSeedRef.current === seedShabadId) {
         return undefined;
       }
-      // Reset the attempt counter only when the seed Shabad itself changes, so a
-      // retry of the same seed keeps counting towards the backoff.
+      // Retries of the same seed keep counting toward backoff. A new seed resets
+      // the attempt record before its first read.
       if (seedAttemptRef.current.id !== seedShabadId) {
         seedAttemptRef.current = { id: seedShabadId, attempts: 0 };
       }
       windowSeedRef.current = seedShabadId;
-      // A new reading starts here. Anything still in flight for the old one is
-      // now stale, whatever the window happens to look like when it returns.
+      // Invalidate all reads from the previous reading before starting the new
+      // database request.
       readingGenerationRef.current += 1;
       const generation = readingGenerationRef.current;
       endedRef.current = false;
@@ -1025,14 +871,14 @@ export const useAkhandpattScroll = ({
       prependCompPendingRef.current = false;
       lastCenterIdRef.current = null;
       seedAttemptRef.current.attempts += 1;
-      // One rule, applied both on the way in and on the way round again, so a
-      // stalled seed does not drop back to 'loading' on each slow retry.
+      // Slow retries remain stalled rather than flashing back to loading. The
+      // state changes only when the seed succeeds or changes.
       const stalled = seedAttemptRef.current.attempts > SEED_FAST_ATTEMPTS;
       setSeedState(stalled ? 'stalled' : 'loading');
 
-      // Clear the seed marker and schedule another attempt. The deck keeps a
-      // loader up for as long as this is retrying, so the reader always sees
-      // either Gurbani that is current or a "still loading" state.
+      // Clear ownership before scheduling the next seed attempt. The nonce then
+      // re-enters this effect for the same seed.
+      // Backoff controls how quickly that nonce is bumped.
       const scheduleReseed = () => {
         windowSeedRef.current = null;
         seedRetryTimerRef.current = setTimeout(
@@ -1043,19 +889,21 @@ export const useAkhandpattScroll = ({
         );
       };
 
-      // Resume where this reading left off if the deck is remounting (see
-      // `reading-position`); otherwise open the Shabad the reader selected.
+      // Resume a remount from its saved Shabad and verse; otherwise open the
+      // selected seed.
+      // Reading-position storage holds only the current continuous reading.
       const resume = recallReadingPosition(seedShabadId);
       if (!resume) {
-        // A different selection, so the previous reading's place is stale. At
-        // most one reading is ever remembered, and it is the one on screen.
+        // At most one reading position is retained, so a different selection
+        // discards the previous reading.
         forgetReadingPosition();
       }
       const loadShabadId = resume ? resume.shabadId : seedShabadId;
 
       readShabad(loadShabadId)
         .then((seed) => {
-          // Discard a superseded seed if a newer selection landed mid-read.
+          // Discard a superseded seed if a newer selection landed mid-read. Its
+          // `finally` block uses the same generation guard.
           if (readingGenerationRef.current !== generation) {
             return;
           }
@@ -1068,14 +916,9 @@ export const useAkhandpattScroll = ({
           modelRef.current = createWindow(loadShabadId, verses);
           setActiveVerse(verses);
           setSeedState('idle');
-          // Align to the line the reader actually chose. A search result or a
-          // navigator click sets `activeVerseId`; centre that line so opening a
-          // Shabad lands on the selected verse (not always its first line). When
-          // the chosen line *is* the first verse, or nothing specific was
-          // selected, top-align instead, so a fresh Shabad opened from its start
-          // rests cleanly at the top rather than mid-screen with a blank gap.
-          // A resumed reading always centres: its line was mid-screen when the
-          // fault hit, and putting it back there is the whole point.
+          // Centre an explicit selection or resumed position. A fresh Shabad
+          // starting at its first verse is top-aligned to avoid a blank gap.
+          // A selection outside these verses falls back to the first verse.
           const chosenId = resume ? resume.verseId : activeVerseIdRef.current;
           const chosenIsMounted = chosenId && verses.some((verse) => verse.ID === chosenId);
           const centreOnChosen = chosenIsMounted && (resume || chosenId !== verses[0].ID);
@@ -1106,7 +949,7 @@ export const useAkhandpattScroll = ({
           loadingRef.current = false;
         });
     } else {
-      // Finite Akhand Paatth content: the deck owns activeVerse, we only scroll it.
+      // Finite content keeps caller-owned verses and skips the feed window.
       modelRef.current = null;
       windowSeedRef.current = null;
       readingGenerationRef.current += 1;
@@ -1115,8 +958,8 @@ export const useAkhandpattScroll = ({
       setSeedState('idle');
       requestSeek(activeVerseId, 'center');
     }
-    // Cancel a pending retry when the seed changes or the deck unmounts, so a
-    // stale reseed can't fire against a Shabad the reader has already left.
+    // Cancel retries when the seed changes or the deck unmounts. Generation
+    // checks handle database requests that cannot be cancelled.
     return () => {
       if (seedRetryTimerRef.current) {
         clearTimeout(seedRetryTimerRef.current);
@@ -1125,17 +968,9 @@ export const useAkhandpattScroll = ({
     };
   }, [akhandpatt, viewSuspended, infinite, seedShabadId, seedNonce]);
 
-  // A verse selection (search result, navigator click) centres that line. If
-  // the line is still mounted we seek to it. If it isn't, and the window was
-  // already built for the current seed (so the seed effect won't rebuild on its
-  // own), the line must have scrolled off the top and been pruned. Rebuild the
-  // window from the seed so it remounts, then the seed effect centres it. A
-  // brand-new seed is left entirely to the seed effect.
-  //
-  // `verseSelectionNonce` is in the dependencies so that reselecting the line
-  // that is *already* active still seeks. The deck scrolls away from the active
-  // line without changing it, so without this the obvious way to get back to a
-  // line (click it in the navigator) would silently do nothing.
+  // Seek mounted selections and rebuild pruned ones. The selection nonce allows
+  // reselecting the active line and distinguishes a pruned line from initial render.
+  // The seed effect owns alignment after a rebuild.
   useEffect(() => {
     if (!akhandpatt || !activeVerseId) {
       return;
@@ -1147,32 +982,25 @@ export const useAkhandpattScroll = ({
       requestSeek(activeVerseId, 'center');
       return;
     }
-    // The line isn't mounted, but that alone doesn't mean it was pruned: on a
-    // mount, and on a newly seeded Shabad, nothing has rendered yet either. The
-    // seed effect marks the window as its own synchronously, before its load
-    // resolves, so the test below cannot tell those apart on its own; only a
-    // change of selection can. Without this the branch would run on every open
-    // and every remount, discarding the position the seed effect was about to
-    // restore and paying for a second window build.
+    // An unmounted line may still be waiting for its initial render. Only a new
+    // selection can mean the owned window needs rebuilding.
+    // Rebuilding on mount would discard a saved position and start a second read.
     if (!isNewSelection) {
       return;
     }
     if (infiniteRef.current && windowSeedRef.current === seedShabadId) {
       traceScroll('reseedForPrunedVerse', { activeVerseId, seedShabadId });
-      // The reader has said where to go, so the place this reading had drifted
-      // to is no longer the place to return to. Without this the reseed below
-      // looks like a remount to the seed effect (same seed id), and it would
-      // restore the scroll position instead of honouring the selection, landing
-      // back where the reading already was.
+      // A manual selection supersedes the remembered remount position. Clear it
+      // before making the same seed look new to the seed effect.
       forgetReadingPosition();
       windowSeedRef.current = null;
       setSeedNonce((nonce) => nonce + 1);
     }
   }, [akhandpatt, activeVerseId, verseSelectionNonce, seedShabadId]);
 
-  // Apply pending scroll-anchor compensation (top prune or backward prepend) and
-  // seed seeks once the DOM reflects the latest verses. useLayoutEffect keeps
-  // both flash-free.
+  // Apply anchor compensation and seeks after DOM updates but before paint.
+  // Both operations depend on measurements from the committed verse nodes.
+  // Pending work stays in refs across the render that changes the verse list.
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) {
@@ -1184,27 +1012,19 @@ export const useAkhandpattScroll = ({
       const newOffset = verseOffsetInContent(verseId);
       if (newOffset !== null) {
         const before = container.scrollTop;
-        // Recompute the absolute scroll position that keeps the anchor verse at
-        // the same on-screen Y. Computing it absolutely (newOffset - viewportY)
-        // rather than as a delta off the live scrollTop makes it immune to the
-        // browser having already clamped scrollTop when the content above the
-        // viewport shrank (top prune) or grew (backward prepend); a delta-based
-        // shift double-counted the change and yanked the scroll (the old
-        // skip-back symptom through runs of short Shabads).
+        // Restore absolutely as `newOffset - viewportY`. A delta from live
+        // scrollTop double-counts any browser clamp after content grows or shrinks.
+        // This is used for both prepends and top prunes.
+        // The captured viewport Y survives either clamp direction.
         setScrollTop(newOffset - prevViewportY);
-        // A manual wheel glide eases towards an absolute scroll position; shift
-        // its target by the same compensation so growing/shrinking content above
-        // the viewport (a backward prepend lands mid-glide) doesn't make the
-        // glide jump to a now-stale target.
+        // Shift an active wheel target by the same compensation; it stores an
+        // absolute destination in the changing content coordinates.
         if (wheelTargetRef.current !== null) {
           wheelTargetRef.current += container.scrollTop - before;
         }
-        // `visibleSkip` is how many screen pixels the anchor verse moved between
-        // the capture and the post-compensation position. This is what the eye
-        // sees, independent of scrollTop numerics or the browser's clamp; a
-        // non-zero value is a real, visible skip. `interimDrift` (scrollTop
-        // movement since capture) is expected and benign for prunes (the browser
-        // clamp) but reveals a late React commit racing a live glide for prepends.
+        // `visibleSkip` measures rendered movement despite scrollTop clamping.
+        // `interimDrift` records movement before React's commit, separating a
+        // visible skip from expected numeric movement. These values are diagnostics only.
         const newViewportTop = verseViewportTop(verseId);
         const visibleSkip =
           newViewportTop !== null && anchorViewportTop !== null
@@ -1223,22 +1043,17 @@ export const useAkhandpattScroll = ({
           before: Math.round(before),
           after: Math.round(container.scrollTop),
         });
-        // A backward prepend mounts the previous Shabad above the viewport with
-        // near-zero height; it inflates over the next few frames (late reflow),
-        // growing the content above the anchor and lurching it down. The one-shot
-        // compensation above runs before that growth, so hand off to a short
-        // settle that keeps the anchor pinned as the Shabad fills in. Prunes need
-        // no settle: the content they remove/leave above the boundary was already
-        // on-screen and fully laid out, so it cannot grow late.
+        // Prepended verses keep growing after this layout effect, so continue
+        // pinning their anchor. Pruned content was already laid out.
+        // The settle loop observes the late offset growth frame by frame.
+        // Only prepends open this second compensation phase.
         if (reason === 'prepend') {
           startAnchorSettle(verseId);
         }
       }
       scrollAnchorRef.current = null;
-      // This commit reflects the prepend, so its compensation has now run;
-      // release the one-per-cycle latch to admit the next backward load. Cleared
-      // unconditionally (even if the anchor node was missing above) so a missed
-      // measurement can never wedge backward loading shut.
+      // Release the prepend latch even when its anchor measurement failed. A
+      // missing node must not block every later backward load.
       if (reason === 'prepend') {
         prependCompPendingRef.current = false;
       }
@@ -1248,16 +1063,13 @@ export const useAkhandpattScroll = ({
       const targetTop = verseOffsetInContent(verseId);
       const node = verseRefs.current[verseId];
       if (targetTop !== null && node) {
-        // 'top' rests the line at the container's top edge (a fresh Shabad);
-        // 'center' lines it up with the centre-line the overlay samples (a
-        // resume or a manual re-selection). setScrollTop clamps both so the view
-        // can never settle scrolled past the content's end.
+        // Fresh Shabads use the top edge; resumes and selections use the centre.
+        // `setScrollTop` clamps either alignment for short content.
         const target =
           align === 'top'
             ? targetTop
             : targetTop - (container.clientHeight - node.offsetHeight) / 2;
-        // A seek repositions the view; abandon any in-flight post-prepend anchor
-        // settle so the two never fight over scrollTop.
+        // A seek takes ownership from post-prepend settling before its first write.
         cancelAnchorSettle();
         setScrollTop(target);
         pendingSeekRef.current = null;
@@ -1268,15 +1080,13 @@ export const useAkhandpattScroll = ({
           target: Math.round(target),
           after: Math.round(container.scrollTop),
         });
-        // Hold the line on target across the next few frames while late reflow
-        // (web font, async content) finishes resizing the verses above it, so the
-        // seek lands on the chosen line rather than a stale, pre-reflow position.
+        // Keep the line pinned through late font/content reflow. The initial
+        // layout-effect measurement is not the final verse geometry.
         startSeekSettle(verseId, align);
       }
     }
   }, [activeVerse, seekNonce]);
 
-  // The animation loop: only mounted while actually scrolling.
   useEffect(() => {
     if (!akhandpatt || !isPlaying) {
       return undefined;
@@ -1289,18 +1099,17 @@ export const useAkhandpattScroll = ({
     let lastTimestamp = performance.now();
     let sinceCentre = 0;
     let sinceJit = 0;
-    // Cached so the velocity does not force a layout read every frame; the deck
-    // only changes shape when verses are appended, pruned or reflowed, so the
-    // JIT cadence below is a natural refresh point.
+    // Cached to avoid a layout read every frame; refresh on the JIT cadence when
+    // appends, prunes, and reflows may have changed the mounted average.
     let averageVerseHeight = measureAverageVerseHeight(container);
-    // Resume from wherever the scroll currently sits (e.g. after a manual wheel
-    // nudge or a seek) so toggling play/pause never causes a jump.
+    // Resume from the current position after a wheel, seek, or pause instead of
+    // carrying an older float into the new loop.
     scrollTopFloatRef.current = container.scrollTop;
 
     let reportedStepFault = false;
 
-    // Close a fraction of a follower's remaining error each frame, retiring the
-    // target once the two windows agree to within a pixel neither can paint.
+    // Close part of a follower's remaining error each frame. Retire the target
+    // once the remaining difference is below the paintable threshold.
     const converge = (position) => {
       if (remoteTargetRef.current === null) {
         return position;
@@ -1314,27 +1123,21 @@ export const useAkhandpattScroll = ({
     };
 
     const stepFrame = (timestamp) => {
-      // Bounded so a hitch outside our control becomes a brief pause rather
-      // than a proportional leap forward (see `MAX_FRAME_DELTA_SECONDS`).
+      // Cap long frame gaps so a browser hitch pauses instead of leaping forward.
+      // This also covers a backgrounded or blocked renderer.
       const deltaSeconds = Math.min((timestamp - lastTimestamp) / 1000, MAX_FRAME_DELTA_SECONDS);
       lastTimestamp = timestamp;
 
-      // Hold position while a manual wheel gesture owns the scroll (the glide
-      // drives scrollTop then hands back once it settles) or if playback was
-      // paused. `lastTimestamp` is still advanced above, so on resume the first
-      // frame's delta is a single frame, never the whole hold, so there is no
-      // catch-up jump.
+      // Hold while paused, seeking, or under wheel control. Advancing
+      // `lastTimestamp` prevents a catch-up jump when control returns.
+      // The active owner writes scrollTop independently.
       if (!isPlayingRef.current || manualScrollRef.current || seekingRef.current) {
         return;
       }
 
       const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
-      // Detector: between our last write and now, did something move scrollTop
-      // backward against our intent? The float is what we last set; if the actual
-      // scrollTop is now meaningfully smaller, an external force (a re-render, a
-      // prune-compensation overshoot, scroll-anchoring) pulled us back: the
-      // "skip-back" symptom. Capture it with full context the instant it
-      // happens so the cause is unambiguous.
+      // Trace unexpected backward movement since the last float write. React
+      // commits, anchor compensation, and browser anchoring can all move it.
       const actualBefore = container.scrollTop;
       if (actualBefore < scrollTopFloatRef.current - 4) {
         traceScroll('backJump', {
@@ -1345,16 +1148,14 @@ export const useAkhandpattScroll = ({
           clientHeight: container.clientHeight,
           maxScrollTop: Math.round(maxScrollTop),
         });
-        // Re-sync the float to the browser's truth so we resume from here rather
-        // than snapping forward to a now-invalid float.
+        // Resume from the browser's position after an external move instead of
+        // snapping forward to the stale float.
         scrollTopFloatRef.current = actualBefore;
       }
       if (scrollTopFloatRef.current < maxScrollTop && averageVerseHeight) {
-        // Velocity is verses/second converted through this window's own average
-        // verse height, so the preview and the external display advance through
-        // the same Gurbani at the same rate despite laying it out differently.
-        // Accumulate in a float and only round on write, so a sub-pixel-per-frame
-        // advance still moves.
+        // Speed is verses/second, converted through each window's average verse
+        // height so preview and projection advance together across different layouts.
+        // The float retains advances smaller than one physical pixel.
         const velocity = speedToVersesPerSecond(speedRef.current) * averageVerseHeight;
         const advanced = scrollTopFloatRef.current + velocity * deltaSeconds;
         const next = Math.max(0, Math.min(maxScrollTop, converge(advanced)));
@@ -1362,14 +1163,8 @@ export const useAkhandpattScroll = ({
         writeScrollPosition(next);
       }
 
-      // A reading that has run out of Gurbani stops moving, and nothing else on
-      // screen changes, indistinguishable from a hang, which is the failure
-      // this whole view exists to avoid. Tell the deck once so it can put the
-      // control back to "start", the same way the slide view does when it
-      // reaches the last verse. The latch clears on its own as soon as anything
-      // is loaded below, because the scroll is then no longer at the bottom.
-      // Only a continuous reading can reach this: `endedRef` is latched by the
-      // forward loader, which finite content never runs.
+      // Report the end of continuous content once. Appending below clears the latch.
+      // Finite content never sets `endedRef`.
       const atBottom = scrollTopFloatRef.current >= maxScrollTop - 1;
       if (endedRef.current && atBottom) {
         if (!reachedEndRef.current) {
@@ -1398,11 +1193,8 @@ export const useAkhandpattScroll = ({
       }
     };
 
-    // The frame body is wrapped so the next frame is always scheduled. A throw
-    // from layout measurement, cross-window sync or the JIT loaders would
-    // otherwise skip the `requestAnimationFrame` and stop the scroll for good; a
-    // React error boundary cannot see a fault raised inside a callback. Report
-    // once, then carry on.
+    // Keep scheduling after callback errors, which React error boundaries do not catch.
+    // Log only the first failure to avoid flooding the renderer console.
     const step = (timestamp) => {
       try {
         stepFrame(timestamp);
@@ -1424,29 +1216,10 @@ export const useAkhandpattScroll = ({
     };
   }, [akhandpatt, isPlaying]);
 
-  // Holds the centre line: across viewport changes here, and across windows.
-  //
-  // One loop, because `heldAnchor` is one value: the content point pinned
-  // through a reflow is the same point broadcast to the projection. During a
-  // repair the anchor is not re-read, so anything reading its own anchor would
-  // publish the mid-reflow position, which is the drift the repair exists to
-  // suppress.
-  //
-  // Both windows mount this hook and run the same loop, so autoplay alone keeps
-  // them together: speed is in verses/second precisely so it survives their very
-  // different typography. What they cannot agree on unaided is anything done by
-  // hand: a wheel nudge back to the Granthi's line moves the preview only, and
-  // that offset would never heal. So the preview broadcasts the content point on
-  // its centre line and the projection puts that point on its own; the frames in
-  // between are the follower's own loop, already running the same speed.
-  //
-  // Sent every interval, not only when the preview has moved. The follower
-  // coasts between anchors, so silence reads as "carry on", not "stay put",
-  // and the preview does hold still for a beat after each wheel gesture. Sending
-  // unconditionally bounds the follower's coasting error to one interval rather
-  // than the whole hold. The main process routes it, being the only component
-  // that knows the window topology, and a window that is being told where to
-  // scroll stops broadcasting its own position.
+  // The same held centre anchor repairs local reflows and synchronises windows.
+  // Autoplay uses verses/second in each layout; anchors carry manual movement.
+  // Followers continue their own loop between updates, so the preview broadcasts
+  // even while stationary. A follower never publishes its received position.
   useEffect(() => {
     if (!akhandpatt) {
       return undefined;
@@ -1456,33 +1229,25 @@ export const useAkhandpattScroll = ({
       return undefined;
     }
 
-    // The centred line feeds the overlay, which changes at most once a verse.
-    // Anchors arrive every frame, and sampling the centre forces a hit-test, so
-    // it is rate-limited to the same interval the autoscroll loop uses rather
-    // than run sixty times a second on the window driving the sangat's screen.
+    // Rate-limit the centre hit-test used for overlay updates. Remote anchors
+    // arrive every frame, while the centred verse changes much less often.
     let lastCentreSampleMs = 0;
     const onRemoteAnchor = (event, payload) => {
+      // Receipt time doubles as follower-role detection and is updated even when
+      // local wheel or seek ownership delays applying the anchor.
       remoteAnchorAtRef.current = performance.now();
-      // Local intent wins while the operator is scrolling this window by hand,
-      // and while a seek settles onto a chosen line; both are already driving
-      // scrollTop and both resolve within a moment.
+      // Wheel and seek retain local ownership until they settle. Applying a
+      // remote anchor here would introduce a second scrollTop writer.
       if (manualScrollRef.current || seekingRef.current) {
         return;
       }
       const anchor = JSON.parse(payload);
       const target = resolveAnchorScrollTop(container, anchor);
       if (target !== null) {
-        // A follower is running its own copy of this motion, so an anchor is a
-        // correction to it, not a position to take. Assigning it here would put
-        // two writers on `scrollTop`, this one and the scroll loop, and the
-        // projection would visibly lurch around a position both windows already
-        // agree on. Hand the loop the target and let it converge.
-        //
-        // Paused, there is no loop to hand it to, so the position is taken
-        // directly. That branch still runs on every anchor, which is every
-        // frame, because it is also what repairs a follower whose layout moved
-        // under it while nothing was scrolling. Skipping an anchor that resolves
-        // to where the float already sits would skip exactly that repair.
+        // While playing, nearby anchors become correction targets for the existing
+        // loop. Paused or far-away followers take the position directly. Apply
+        // every paused anchor because it also repairs layout changes.
+        // `SYNC_SNAP_RATIO` separates ordinary drift from a different passage.
         const drifting =
           isPlayingRef.current &&
           Math.abs(target - scrollTopFloatRef.current) < container.clientHeight * SYNC_SNAP_RATIO;
@@ -1497,12 +1262,9 @@ export const useAkhandpattScroll = ({
           syncOverlayToCentre();
         }
       }
-      // Either the anchor's verse is not mounted here, or honouring it would
-      // land outside this window's scroll range: the operator has scrolled to
-      // Gurbani this window has not loaded (a manual scrub, or it sat paused
-      // while the preview moved on). Grow towards them and let a later anchor
-      // land exactly. The loaders' own in-flight guards hold this to one load at
-      // a time despite an anchor arriving every frame.
+      // Grow toward an anchor outside the mounted/range window. Loader guards
+      // limit the per-frame requests to one in-flight read.
+      // A later anchor resolves exactly once the required Shabad is mounted.
       if (!infiniteRef.current) {
         return;
       }
@@ -1516,9 +1278,8 @@ export const useAkhandpattScroll = ({
           ? anchor.verseId > verseIdOf(verses[verses.length - 1])
           : target > container.scrollHeight - container.clientHeight;
       if (behind) {
-        // Same direction-aware policy as the manual glide: grow the edge being
-        // travelled towards and free the edge being left, so following a long
-        // scrub cannot grow this window's DOM without bound.
+        // Grow the approached edge and prune the trailing edge. This keeps a long
+        // remote scrub from expanding the follower DOM without bound.
         loadPrevShabad();
         pruneBottomShabad();
       } else if (ahead) {
@@ -1536,26 +1297,15 @@ export const useAkhandpattScroll = ({
     let repairStableFrames = 0;
 
     const syncFrame = (timestamp) => {
-      // Hold the centre line across viewport changes. The deck is sized in `vh`,
-      // so docking the navigator panel, switching between Single-Display and
-      // Presentation, or resizing the window reflows every verse, while
-      // `scrollTop` is a raw pixel count that survives the reflow pointing at
-      // different Gurbani.
+      // Viewport changes reflow `vh` content while retaining pixel scrollTop.
+      // `scrollHeight` kept shrinking for ~230ms after the container stopped
+      // resizing, so keep one anchor pinned until height is stable or the repair
+      // deadline expires.
+      // Ending at the container resize left the reading eight verses adrift in
+      // the workspace-switch probe.
       //
-      // The repair has to outlast the resize. Measured across a workspace switch,
-      // the deck reaches its final size several frames before the verses finish
-      // reflowing into it (`scrollHeight` kept shrinking for ~230ms afterwards),
-      // and handing back the moment the size held still let the Gurbani slide out
-      // from under the centre line, eight verses adrift. So a size change opens
-      // a window that re-pins every frame until `scrollHeight` is steady for
-      // `ANCHOR_SETTLE_STABLE_FRAMES`, or the `VIEWPORT_REPAIR_MAX_MS` backstop.
-      // The anchor is not re-read while it is open, so one content point stays
-      // pinned for the whole transition, CSS animation included.
-      //
-      // A settings-driven reflow needs the same treatment but changes only the
-      // content's height, so the caller signals it (`layoutRevision`) rather than
-      // it being inferred from `scrollHeight`, which also moves on every load
-      // and prune, and those carry their own compensation this must not fight.
+      // Settings reflows are signalled by `layoutRevision`; inferring them from
+      // scrollHeight would also catch loads and prunes with their own compensation.
       const width = container.clientWidth;
       const height = container.clientHeight;
       const { scrollHeight } = container;
@@ -1568,9 +1318,11 @@ export const useAkhandpattScroll = ({
       lastScrollHeight = scrollHeight;
 
       if (sizeChanged || relayoutRequested) {
+        // Keep the old held anchor for the whole repair window.
         repairDeadline = timestamp + VIEWPORT_REPAIR_MAX_MS;
         repairStableFrames = 0;
       } else if (repairDeadline) {
+        // Stability is based on content height, not container size.
         repairStableFrames = contentChanged ? 0 : repairStableFrames + 1;
         if (repairStableFrames >= ANCHOR_SETTLE_STABLE_FRAMES || timestamp >= repairDeadline) {
           repairDeadline = 0;
@@ -1580,28 +1332,16 @@ export const useAkhandpattScroll = ({
       if (repairDeadline) {
         pinHeldAnchor();
       } else if (!contentChanged) {
-        // Only re-read when the layout is quiet. A frame that lands mid-reflow
-        // would capture the drifted position the repair exists to undo, and
-        // since the repair resolves whatever it finds here, that drift would be
-        // restored rather than corrected, losing the reader's place for good.
+        // Do not replace the held anchor with a mid-reflow position. Re-reading
+        // there would make the repair preserve the drift it is correcting.
         heldAnchorRef.current = readScrollAnchor(container) || heldAnchorRef.current;
       }
 
-      // Broadcast the anchor every frame. The projection predicts the gaps using
-      // the same speed setting, so during autoplay each anchor arrives where it
-      // was already heading and the correction is invisible. The gap only shows
-      // when the two move at different rates: a wheel gesture, where the preview
-      // glides many times faster, and the hand-back pause after it.
-      //
-      // Rate-limiting this to a nominal frame was measured to make things worse:
-      // at 60Hz it never fired, and above 60Hz it fired the wrong way, holding a
-      // 144Hz display to every third frame, a *lower* anchor rate than a 60Hz
-      // display gets. Sending costs 0.0022ms. Receiving costs under 0.05ms on
-      // both arms of the receiver, which measured within noise of each other
-      // (0.045ms scrolling, 0.047ms paused), so even at 144Hz the path is under
-      // 1% of a thread measured 91% idle.
-      //
-      // A follower's position is not its own to publish.
+      // Broadcast once per native frame; a nominal 60Hz limiter suppressed 60Hz
+      // updates and reduced 144Hz to every third frame. Sending costs 0.0022ms;
+      // receiving measured 0.045ms scrolling and 0.047ms paused (under 0.05ms).
+      // At 144Hz this used under 1% of a thread measured 91% idle.
+      // Followers return before publishing.
       if (isFollowing()) {
         return;
       }
@@ -1610,10 +1350,8 @@ export const useAkhandpattScroll = ({
       }
     };
 
-    // Wrapped for the same reason as the autoscroll loop, and more urgently: this
-    // one runs for as long as the deck is open, not just while playing, and it
-    // carries the anchor the projection follows. A throw that ended it would
-    // unmirror the display and stop holding the reader's place, in silence.
+    // Keep the always-on anchor loop running after callback errors. It remains
+    // active while paused because viewport repair and window sync still apply.
     let reportedSyncFault = false;
     const frame = (timestamp) => {
       rafId = requestAnimationFrame(frame);
@@ -1637,20 +1375,10 @@ export const useAkhandpattScroll = ({
     };
   }, [akhandpatt]);
 
-  // Wheeling over the deck takes momentary manual control: it glides the
-  // document to follow the wheel so the operator can make a one-off correction
-  // (nudging back to the Granthi's line) without juggling the speed. It is a
-  // *momentary override*: while the wheel is active the autoscroll loop holds
-  // (see `manualScrollRef` in the step loop), and once the gesture settles the
-  // autoscroll resumes in whatever play state it was already in. It never
-  // flips the global autoplay toggle, so the play/pause button doesn't flicker
-  // and pausing/playing stays under the operator's explicit control.
-  // Wheel events are coarse and discrete, so we accumulate their deltas into a
-  // target and ease towards it over successive frames rather than snapping per
-  // event, which keeps the motion smooth like any native document. It works in
-  // the in-app preview and the external display alike, since both mount the
-  // deck. The Akhand Paatth view hides its native scrollbar, so preventDefault
-  // only stops the wheel bubbling to an ancestor.
+  // Wheel input temporarily owns scrollTop without changing autoplay. Coarse
+  // deltas accumulate into a target and glide over successive frames. Native
+  // scrolling is hidden, so prevent the event from reaching an ancestor.
+  // The same handler is mounted in preview and projection; followers reject it.
   useEffect(() => {
     if (!akhandpatt) {
       return undefined;
@@ -1660,37 +1388,31 @@ export const useAkhandpattScroll = ({
       return undefined;
     }
 
-    // Advances the glide by one frame. Returns whether the gesture is still
-    // running, so that `glideFrame` below is the only place that owns the frame
-    // handle: there is then exactly one path that arms it and one that clears
-    // it, whether the glide finishes normally or throws.
+    // Return whether `glideFrame` should schedule another frame. That wrapper is
+    // the sole owner of `wheelRafRef`.
     const glide = () => {
-      // The gesture settling (or the view tearing down) hands scroll ownership
-      // back to the autoscroll; abandon the glide so the two never fight.
+      // Hand scroll ownership back when the gesture settles or the deck unmounts.
+      // Clear the target before returning to the autoscroll loop.
       if (!containerRef.current || wheelTargetRef.current === null || !manualScrollRef.current) {
         wheelTargetRef.current = null;
         return false;
       }
-      // Ease towards the target off the sub-pixel float accumulator, not the
-      // browser-snapped integer `scrollTop`. Reading the integer back each frame
-      // quantised the motion (a small remaining distance eased by 22% rounded to
-      // 0px), making the wheel scroll judder; gliding off the float advances
-      // smoothly and only rounds on write.
+      // Glide from the float accumulator. Reading rounded scrollTop each frame
+      // makes a small remaining distance eased by 22% round to 0px and stall.
+      // Only the final write is quantised for Chromium.
       const { current } = scrollTopFloatRef;
       const diff = wheelTargetRef.current - current;
       const absDiff = Math.abs(diff);
+      // Snap the final sub-pixel remainder and release the target.
       if (absDiff < SUB_PIXEL_EPSILON_PX) {
         setScrollTop(wheelTargetRef.current);
         wheelTargetRef.current = null;
         syncOverlayToCentre(true);
         return false;
       }
-      // Ease toward the target, but clamp the per-frame velocity between a floor
-      // and a cap so the glide keeps a uniform pace. A plain ease-out spikes as a
-      // notch lands then decays to a slow limp near the end: the pulsing that
-      // reads as judder at slow speeds. The cap trims the spike (stacked notches
-      // no longer lurch), the floor removes the decaying tail, and the final
-      // `Math.min(..., absDiff)` lands exactly on the target without overshooting.
+      // Clamp each eased step: the cap handles stacked notches, the floor removes
+      // the slow tail, and `absDiff` prevents overshoot.
+      // This keeps the middle of the glide close to a uniform pace.
       const eased = absDiff * WHEEL_GLIDE_EASING;
       const clampedStep = Math.min(
         WHEEL_GLIDE_MAX_STEP_PX,
@@ -1699,17 +1421,10 @@ export const useAkhandpattScroll = ({
       const stepPx = Math.min(clampedStep, absDiff) * Math.sign(diff);
       setScrollTop(current + stepPx);
       syncOverlayToCentre();
-      // Manual scrolling feeds the same just-in-time window as autoscroll, so the
-      // reader can wheel straight on into the next Shabad (down) or back into an
-      // already-pruned previous one (up). The load/prune calls are direction-aware:
-      // only the edge we are travelling towards is grown, and only the edge we are
-      // leaving is freed. Pruning the trailing edge shrinks scrollHeight, which
-      // would re-trip the *leading* edge's near-boundary guard if both ran
-      // together, thrashing the same Shabad on and off the far edge (load<->prune)
-      // every frame. Both edges must prune: a top prune moves
-      // scrollTop and scrollHeight by the same amount, so the glide's absolute
-      // target is corrected by the anchor compensation in the layout effect and
-      // the distance to the bottom boundary is unchanged.
+      // Manual glides use the same JIT window, growing only the approached edge
+      // and pruning the trailing one. Running both directions together can make
+      // the trailing prune re-trigger the opposite load guard.
+      // Top-prune compensation also shifts the glide's absolute target.
       if (infiniteRef.current) {
         if (diff > 0) {
           loadNextShabad();
@@ -1722,12 +1437,8 @@ export const useAkhandpattScroll = ({
       return true;
     };
 
-    // Runs one glide frame and owns the frame handle for it. A throw anywhere in
-    // the glide would otherwise leave the handle set and the target non-null, and
-    // `onWheel` only starts a glide when both are clear, so the wheel would be
-    // dead for the rest of the session, with no way back short of restarting the
-    // app. Abandoning the gesture instead lets the very next notch start a fresh
-    // glide.
+    // Clear glide state after an error so the next wheel event can restart it.
+    // A stale non-null frame handle would otherwise block `onWheel`.
     const glideFrame = () => {
       try {
         wheelRafRef.current = glide() ? requestAnimationFrame(glideFrame) : null;
@@ -1740,26 +1451,21 @@ export const useAkhandpattScroll = ({
 
     const onWheel = (event) => {
       event.preventDefault();
-      // The external display mirrors the operator's preview; its scroll position
-      // is not its own. A wheel here would be overwritten within a frame by the
-      // next anchor, so swallow it rather than let the operator fight the mirror;
-      // the same gesture on the preview is honoured and reaches the projection
-      // through the mirror anyway.
+      // Ignore wheel input on a following display; the next anchor would replace it.
+      // The same gesture on the preview reaches this display through sync.
       if (isFollowing()) {
         return;
       }
-      // A manual wheel gesture overrides any in-flight post-seek settle so the
-      // two never fight over scrollTop.
+      // Wheel input takes ownership from seek settling before changing the target.
       cancelSeekSettle();
-      // Take manual control and (re)arm the hand-back. Resetting the timer on
-      // every event means a burst of notches counts as one gesture; once the
-      // wheel goes quiet for WHEEL_RESUME_DELAY_MS the autoscroll takes over
-      // again in whatever play state it was in.
+      // Group a burst of notches into one gesture before handing back to autoscroll.
+      // Each event resets the quiet-period timer.
       manualScrollRef.current = true;
       if (wheelResumeTimerRef.current) {
         clearTimeout(wheelResumeTimerRef.current);
       }
       wheelResumeTimerRef.current = setTimeout(() => {
+        // Resume from the position maintained by the glide's float accumulator.
         manualScrollRef.current = false;
         wheelResumeTimerRef.current = null;
         traceScroll('wheelResume', { scrollTop: Math.round(container.scrollTop) });
@@ -1768,24 +1474,20 @@ export const useAkhandpattScroll = ({
       const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
       const base = wheelTargetRef.current === null ? container.scrollTop : wheelTargetRef.current;
       if (wheelTargetRef.current === null) {
-        // Start the glide from exactly where the view sits so its first frame
-        // never jumps if the float drifted from the integer scrollTop.
+        // Start a new glide from the browser's current position. This discards
+        // float drift left by the previous scroll owner.
         scrollTopFloatRef.current = container.scrollTop;
       }
-      // Normalise the notch to pixels (mice may report lines/pages) and scale it
-      // down so a manual nudge is gentle; smaller impulses also read as smoother
-      // at slow speeds, since each notch is its own ease curve.
+      // Normalise line/page wheel modes to the configured pixel nudge. Different
+      // mouse drivers do not agree on the unit in `deltaY`.
       const step = normalizeWheelDeltaY(event, container.clientHeight);
       const wish = base + step;
       wheelTargetRef.current = Math.min(maxScrollTop, Math.max(0, wish));
-      // A wish outside the loaded range is the reader asking for Gurbani that
-      // is not in the window yet, and it has to be served here rather than in
-      // the glide below. The glide can only ask for more as a side-effect of
-      // moving, and at an edge there is nowhere to move: the target clamps to
-      // the position already held, so the glide finishes before it reaches its
-      // own load call. A Shabad shorter than the viewport never has room to
-      // move at all. The periodic loader would cover both, but it only runs
-      // while playing, and paused is where a reading starts.
+      // Load immediately when the requested target lies outside the window. At
+      // an edge the clamped glide cannot move far enough to invoke its loader,
+      // especially while paused or when a Shabad is shorter than the viewport.
+      // The periodic loader is unavailable while paused.
+      // In-flight guards coalesce repeated edge notches.
       if (infiniteRef.current) {
         if (wish > maxScrollTop) {
           loadNextShabad();
@@ -1799,6 +1501,7 @@ export const useAkhandpattScroll = ({
     };
     container.addEventListener('wheel', onWheel, { passive: false });
     return () => {
+      // Release every timer and scroll owner used by the wheel effect.
       container.removeEventListener('wheel', onWheel);
       if (wheelRafRef.current !== null) {
         cancelAnimationFrame(wheelRafRef.current);
@@ -1813,6 +1516,7 @@ export const useAkhandpattScroll = ({
       manualScrollRef.current = false;
       wheelTargetRef.current = null;
       prependCompPendingRef.current = false;
+      // The sub-pixel transform is cleared by the separate view cleanup effect.
     };
   }, [akhandpatt]);
 

@@ -1,12 +1,9 @@
 /**
- * `isMiscSlide` outranks everything else in the viewer: while it is set,
- * `ShabadDeck` skips all three of its content effects. So any code that asks the
- * viewer to open something must clear the flag first, or the requested content
- * remains hidden.
- *
- * This scan matches literal calls that enable one of the three content sources
- * and checks that the same file clears the flag. A dynamic or re-exported caller
- * would not be matched.
+ * `isMiscSlide` outranks everything else in the viewer: while set, `ShabadDeck`
+ * skips all three content effects, so any code that opens content must clear the
+ * flag first or it stays hidden. Scans literal calls that enable a content
+ * source and checks the same file clears the flag; a dynamic or re-exported
+ * caller is not matched.
  */
 const fs = require('fs');
 const path = require('path');
@@ -77,7 +74,7 @@ const entryPoints = [...files.entries()]
   .map(([file]) => file);
 
 describe('matched viewer entry points clear the misc slide', () => {
-  it('finds the entry points at all, so the suite cannot pass by scanning nothing', () => {
+  it('finds viewer entry points', () => {
     expect(entryPoints.length).toBeGreaterThanOrEqual(9);
   });
 

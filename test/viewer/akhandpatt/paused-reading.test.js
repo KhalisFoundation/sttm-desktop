@@ -4,14 +4,11 @@
 
 /**
  * A reading can be navigated while paused, which is also the deck's initial
- * state.
- *
- * While paused there is no frame loop, so the periodic just-in-time loader that
- * keeps the window full is not running. The only thing that can grow the window
- * is the wheel. This holds it to that job: a reader who scrolls to the bottom of
- * what is loaded must be able to carry on into the next Shabad, including from a
- * Shabad so short it does not fill the screen and so offers no room to scroll at
- * all.
+ * state. Paused, there is no frame loop, so the periodic just-in-time loader
+ * isn't running and only the wheel can grow the window. A reader who scrolls to
+ * the bottom of what is loaded must still carry on into the next Shabad,
+ * including from a Shabad too short to fill the screen and so offering no room
+ * to scroll.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');

@@ -89,10 +89,10 @@ const GlobalState = createStore({
       bottom: 0,
     },
     // Akhand Paatth spacing, in reference-design pixels (see `_verse-slide.scss`).
-    // `verseSpacing` is the air around a verse and so sets the gap between verses;
-    // `lineSpacing` is the gap between the lines within one. Both sit beside
-    // `containerPadding` as viewer layout preferences adjusted live from the
-    // deck, so they inherit the Settings page's reset button.
+    // `verseSpacing` is the gap between verses, `lineSpacing` the gap between the
+    // lines within one. Both sit beside `containerPadding` as viewer layout
+    // preferences adjusted live from the deck, so they inherit the Settings
+    // page's reset button.
     verseSpacing: DEFAULT_VERSE_SPACING,
     lineSpacing: DEFAULT_LINE_SPACING,
     quickTools: false,

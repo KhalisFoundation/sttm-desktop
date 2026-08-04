@@ -178,7 +178,7 @@ describe('the persisted scroll speed', () => {
     expect(initialValue).toBeLessThanOrEqual(MAX_SPEED);
   });
 
-  it('carries no display metadata, because nothing renders it', () => {
+  it('has no display metadata', () => {
     // The speed lives in the schema only so it persists; it is not listed in any
     // settings category, so `min`/`max`/`step` metadata would render nowhere.
     // The control bounds are `MIN_SPEED` and `MAX_SPEED`.

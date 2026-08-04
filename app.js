@@ -817,12 +817,10 @@ ipcMain.on('show-line', (event, arg) => {
 // Akhand Paatth continuous scroll samples the centred line from every viewer
 // that renders the deck: the in-app preview and, when attached, the external
 // display. The preview leads for the same reason it leads the scroll position
-// below: it is the deck the operator drives, it is always present, and the
-// external display is a mirror of it. Deriving the overlay from the mirror
-// instead would stop the OBS, socket and Zoom feeds whenever the mirror is
-// absent, blank, or still coming up. A display plugged in mid-reading is still
-// starting, so the mirror's own emissions are dropped and the preview's are
-// broadcast.
+// below — it is the deck the operator drives, it is always present, and the
+// external display mirrors it. Deriving the overlay from the mirror would stop
+// the OBS, socket and Zoom feeds whenever the mirror is absent, blank, or still
+// coming up, so the mirror's emissions are dropped and the preview's broadcast.
 ipcMain.on('akhandpatt-overlay-line', (event, arg) => {
   if (viewerWindow && event.sender === viewerWindow.webContents) {
     return;

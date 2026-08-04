@@ -1,23 +1,12 @@
 /**
  * Guards the store layer against an easy-peasy `action()` returning its Immer
- * draft.
- *
- * easy-peasy's `simpleProduce` (see easy-peasy/dist/index.cjs.js) does, for any
- * action nested under a slice key:
- *
- *     const parent  = get(parentPath, state);   // the PREVIOUS committed state
- *     const current = get(path, draft);
- *     const result  = fn(current);
- *     if (result) parent[last] = result;        // stores a live draft on it
- *     return finishDraft(draft);                // ...which is then revoked
- *
- * So returning the draft plants a revoked proxy in the committed state tree. The
- * next dispatch throws `Cannot perform 'get' on a proxy that has been revoked`.
- * Store-driven controls stop while non-React handlers (the viewer's native wheel
- * listener) keep working, making this resemble a rendering failure.
- *
- * Actions must mutate the draft and return nothing. The resulting failure is
- * delayed until the next dispatch, so this checks action bodies directly.
+ * draft. easy-peasy's `simpleProduce` assigns any returned value onto the
+ * committed state and then revokes the draft, so returning the draft plants a
+ * revoked proxy: the next dispatch throws `Cannot perform 'get' on a proxy that
+ * has been revoked`. Store-driven controls stop while the viewer's native wheel
+ * listener keeps working, so it looks like a rendering failure. Actions must
+ * mutate the draft and return nothing. The failure is delayed until the next
+ * dispatch, so this checks action bodies directly.
  */
 const fs = require('fs');
 const path = require('path');
@@ -88,7 +77,7 @@ describe('easy-peasy actions must not return their draft', () => {
     expect(storeFiles.length).toBeGreaterThan(0);
   });
 
-  it('reports the ways an action can return, and only those', () => {
+  it('detects value-returning action callbacks', () => {
     const code = [
       'const a = action((state) => state);',
       'const b = action((state) => { state.x = 1; });',

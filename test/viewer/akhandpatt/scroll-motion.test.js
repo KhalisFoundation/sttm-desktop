@@ -27,7 +27,7 @@ describe('closing on the window being mirrored', () => {
     expect(remoteCorrection(140, 100)).toBeLessThan(0);
   });
 
-  it('stops once the two agree to within a pixel neither can paint', () => {
+  it('ignores sub-pixel sync errors', () => {
     expect(remoteCorrection(100, 100 + SUB_PIXEL_EPSILON_PX / 2)).toBe(0);
     expect(remoteCorrection(100, 100 - SUB_PIXEL_EPSILON_PX / 2)).toBe(0);
   });

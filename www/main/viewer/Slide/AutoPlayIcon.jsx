@@ -62,13 +62,12 @@ PauseIcon.propTypes = {
   size: PropTypes.number,
 };
 
-// The steppers draw their glyphs rather than setting them as text. A text `+` or
+// The steppers draw their glyphs instead of setting them as text. A text `+` or
 // minus sign is placed by the font's own metrics, with the baseline above the
 // box centre and the descent reserved below it, so inside a small round button
-// the mark lands visibly low by an amount that varies with whichever font the
-// platform resolves. Drawing them centres the mark on the button by
-// construction, makes the weight explicit rather than a property of the font,
-// and matches how the play and pause marks above are already done.
+// the mark sits visibly low by an amount that varies with whichever font the
+// platform resolves. Drawing centres the mark by construction and matches the
+// play and pause marks above.
 const STEP_ICON_STROKE = 3.5;
 
 const PlusIcon = ({ size = 14 }) => (

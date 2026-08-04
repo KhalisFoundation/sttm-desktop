@@ -3,16 +3,13 @@
  */
 
 /**
- * Two ways a reading can come to a stop without saying so.
+ * Two ways a reading can stop without saying so.
  *
- * The first is reaching the end of the Gurbani. The scroll comes to rest at the
- * bottom, which looks like a stalled reading unless the deck is notified. The
- * deck then puts the control back to "start".
- *
- * The second is a fault inside the wheel glide. The glide books its own next
- * frame and a new gesture only starts one when none is booked, so a throw that
- * escapes leaves the frame handle set for ever and the wheel stops responding
- * for the rest of the session, with no way back short of restarting the app.
+ * Reaching the end of the Gurbani: the scroll rests at the bottom, which looks
+ * stalled unless the deck is told, so it can reset the control to "start". A
+ * fault inside the wheel glide: the glide books its own next frame and a new
+ * gesture only starts one when none is booked, so an escaping throw leaves the
+ * frame handle set for ever and the wheel goes dead for the rest of the session.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -196,7 +193,7 @@ describe('a reading that comes to a stop', () => {
     jest.clearAllMocks();
   });
 
-  it('says nothing while there is still Gurbani to come', async () => {
+  it('does not report the end while more Gurbani is available', async () => {
     await open({ contentPx: 10000, scrollTop: 9500, endOfSource: false });
     await run(6);
     expect(onReadingEnded).not.toHaveBeenCalled();
@@ -208,7 +205,7 @@ describe('a reading that comes to a stop', () => {
     expect(onReadingEnded).not.toHaveBeenCalled();
   });
 
-  it('tells the deck when it has run out of Gurbani at the bottom', async () => {
+  it('reports end of source at the bottom', async () => {
     await open({ contentPx: 900, scrollTop: 400 });
     await run(6);
     expect(onReadingEnded).toHaveBeenCalled();

@@ -2,12 +2,10 @@
  * Checks the settings included in `LAYOUT_AFFECTING_SETTINGS`.
  *
  * The Akhand Paatth deck holds the reader's place across a reflow by being told
- * that one happened. If a setting that changes a verse's height is missing from
- * that list, adjusting it can slide the reader's place away.
- *
- * Every setting the Slide subtree reads is partitioned here: it is either
- * height-affecting, and named in the module's list, or height-neutral, and named
- * in the allow-list below. A setting not present in either list fails this test.
+ * one happened. A height-changing setting missing from that list can slide the
+ * reader's place away when adjusted. Every setting the Slide subtree reads must
+ * be either height-affecting (in the module's list) or height-neutral (in the
+ * allow-list below); one in neither fails this test.
  */
 const fs = require('fs');
 const path = require('path');
@@ -132,7 +130,7 @@ describe('buildLayoutRevision', () => {
       expect(buildLayoutRevision(base, padded(DEFAULT_EDGES))).not.toContain('[object Object]');
     });
 
-    it('changes when a vertical edge moves, which translates every verse', () => {
+    it('changes when vertical padding changes', () => {
       expect(buildLayoutRevision(base, padded({ ...DEFAULT_EDGES, top: 60 }))).not.toBe(
         buildLayoutRevision(base, padded(DEFAULT_EDGES)),
       );
@@ -253,9 +251,6 @@ describe('LAYOUT_AFFECTING_SETTINGS', () => {
   });
 
   it('does not classify any setting as both', () => {
-    // Totality alone is not a partition. A key in both lists would satisfy the
-    // test above while being described as both height-affecting and
-    // height-neutral.
     const both = LAYOUT_AFFECTING_SETTINGS.filter((name) => HEIGHT_NEUTRAL_SETTINGS.includes(name));
     expect(both).toEqual([]);
   });

@@ -6,10 +6,10 @@ export const DEFAULT_OVERLAY = 'none';
  * Defaults for the two Akhand Paatth spacing axes, in the reference-design pixels
  * the Spacing control and `_verse-slide.scss` both work in.
  *
- * `verse` is the air around each verse, so it sets the gap between one verse and
- * the next. `line` is the air between the lines *inside* a verse: the Gurbani
- * and its translation, transliteration and teeka. Keeping the inner gap a little
- * tighter than the outer one is what visually binds a verse together.
+ * `verse` is the gap between one verse and the next. `line` is the gap between
+ * the lines *inside* a verse: the Gurbani and its translation, transliteration
+ * and teeka. Keeping the inner gap tighter than the outer one is what visually
+ * binds a verse together.
  *
  * `$akhandpatt-default-verse-spacing` and `$akhandpatt-default-line-spacing` in
  * `_verse-slide.scss` mirror these as the CSS fallbacks; keep them in step.

@@ -45,14 +45,13 @@ const ArrowIcon = ({ paneId }) => {
   /**
    * Would stepping to another Shabad mean anything here?
    *
-   * The arrows move `pane.activeShabad`, which is the operator's last explicit
-   * selection. A continuous Akhand Paatth reading loads the next Shabad just in
-   * time and flows into it unattended, so after a while what is on screen is far
-   * ahead of that selection. "Next" would throw the Paatth back near the last
-   * click. The reading advances itself, so there is nothing left for the arrows
-   * to do either.
+   * The arrows move `pane.activeShabad`, the operator's last explicit selection.
+   * A continuous Akhand Paatth reading loads the next Shabad just in time and
+   * flows into it unattended, so after a while what is on screen is far ahead of
+   * that selection and "Next" would throw the Paatth back near the last click.
+   * The reading advances itself anyway.
    *
-   * Banis and ceremonies are finite, so they still step: this asks the same
+   * Banis and ceremonies are finite, so they still step. This asks the same
    * question as the deck's `isInfiniteShabad`, from the state the navigator has.
    */
   const isInfiniteReading =

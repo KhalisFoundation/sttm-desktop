@@ -111,14 +111,13 @@ const Launchpad = () => {
   };
 
   // Stepping a verse at a time belongs to the slide view, where the operator
-  // advances the Gurbani by hand. A continuous reading advances itself, so no
-  // arrow action is needed. The selection it would move is the operator's last
-  // explicit click, which the reading has long since scrolled past; stepping it
-  // throws the Paatth back to that point. Space still starts and stops the
-  // reading, and any line is still one
-  // click away in the navigator. Held while a misc slide covers the deck too:
-  // the reading is still the session, and moving the selection behind the slide
-  // would only surface as a jump when it came down.
+  // advances the Gurbani by hand. A continuous reading advances itself, and the
+  // selection an arrow would move is the operator's last explicit click, which
+  // the reading has long since scrolled past — stepping it throws the Paatth
+  // back to that point. Space still starts and stops the reading, and any line
+  // is still one click away in the navigator. This holds while a misc slide
+  // covers the deck too: moving the selection behind the slide would only
+  // surface as a jump when it came down.
   const canStepVerses = () => !akhandpatt && document.activeElement !== ref.current;
 
   const handleDownAndRight = () => {

@@ -37,8 +37,7 @@ export const filterRequiredVerseItems = (verses) => {
  *
  * Called from two places that render Gurbani independently: `ShabadText` for the
  * slide view, and `useAkhandpattScroll` for the Akhand Paatth deck. Both must
- * produce an identical line for the same verse, so this stays a single function
- * rather than one per view.
+ * produce an identical line for the same verse, so it stays a single function.
  *
  * @param {Array} verses The verses of the current Shabad
  * @param {number} verseId The verse to build

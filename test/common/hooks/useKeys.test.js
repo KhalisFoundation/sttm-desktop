@@ -3,20 +3,16 @@
  */
 
 /**
- * `shouldIgnoreShortcut` decides whether a global keyboard shortcut is allowed to
- * fire for a given keydown. It is the shared keyboard path used by Akhand Paatth.
- * All app shortcuts pass through it, including the arrows used for line
- * navigation.
+ * `shouldIgnoreShortcut` decides whether a global keyboard shortcut may fire for
+ * a given keydown. Every app shortcut passes through it, including the arrows
+ * used for line navigation in Akhand Paatth.
  *
- * The suite is in two halves. The first calls the predicate directly, which is
- * where the policy lives and where it is cheapest to state exhaustively. The
- * second binds the real hook and dispatches real key events, because the policy
- * is only half the contract: a key that the predicate correctly withholds is
- * still lost if the browser default was already cancelled by the time the
- * predicate ran.
- *
- * The predicate uses DOM APIs (`closest`, `matches`, and `instanceof Element`)
- * but does not read layout, so jsdom provides what this suite needs.
+ * Two halves: the first calls the predicate directly, where the policy is
+ * cheapest to state exhaustively; the second binds the real hook and dispatches
+ * real key events, because a key the predicate correctly withholds is still lost
+ * if the browser default was cancelled before the predicate ran. The predicate
+ * uses DOM APIs (`closest`, `matches`, `instanceof Element`) but reads no
+ * layout, so jsdom is enough.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -182,7 +178,7 @@ describe('shouldIgnoreShortcut', () => {
     const controls = () =>
       mount('<input id="c" type="checkbox" /><input id="r" type="radio" name="g" />');
 
-    it('keeps the space bar, which is what toggles it', () => {
+    it('keeps Space for checkboxes and radios', () => {
       const $ = controls();
       expect(shouldIgnoreShortcut(keydown($('#c'), 'Space'))).toBe(true);
       expect(shouldIgnoreShortcut(keydown($('#r'), 'Space'))).toBe(true);

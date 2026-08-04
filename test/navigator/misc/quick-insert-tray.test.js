@@ -5,22 +5,16 @@
 /**
  * The Quick Insert tray must survive a re-render of the navigator.
  *
- * `Pane` renders `header`, `content` and `footer` as component *types*, so a
- * component built inside `MiscPane`'s render body gets a new type every time and
- * React tears the whole footer down and builds it again rather than updating it.
+ * `Pane` renders `header`/`content`/`footer` as component *types*, so a footer
+ * built inside `MiscPane`'s render body gets a new type every render and React
+ * tears it down and rebuilds it. A browser raises `click` only when press and
+ * release land on the same element, so a rebuild between them drops the click
+ * (and restarts the button's `:hover` and CSS transition). The navigator
+ * re-renders for unrelated reasons, so this can't be dodged by keeping quiet.
  *
- * A browser only raises `click` when the press and release land on the same
- * element, so a rebuild between them drops the click. A rebuilt button also
- * loses its `:hover` state and restarts its CSS transition.
- *
- * The navigator re-renders for reasons that have nothing to do with this tray
- * (the search pane writes to the same store slice, for one), so the tray has to
- * be robust to it rather than relying on the rest of the app staying quiet.
- *
- * These tests render the real `MiscPane`, `Pane`, `PaneFooter` and `MiscFooter`
- * and compare DOM node identity across a parent re-render, which is the property
- * under test. `MiscHeader` and `MiscContent` are stubbed because they are not
- * involved.
+ * Renders the real `MiscPane`, `Pane`, `PaneFooter` and `MiscFooter` and
+ * compares DOM node identity across a parent re-render. `MiscHeader` and
+ * `MiscContent` are stubbed.
  */
 const React = require('react');
 const { createRoot } = require('react-dom/client');
@@ -122,7 +116,7 @@ describe('the Quick Insert tray across a navigator re-render', () => {
     act(() => root.unmount());
   });
 
-  it('would lose them if the footer were built inside the render body', () => {
+  it('remounts buttons when the footer component is inline', () => {
     // A footer defined inline has a new type every render.
     const Footer = () => React.createElement('button', { className: 'tray-item-icon' }, 'x');
     const Inline = () =>

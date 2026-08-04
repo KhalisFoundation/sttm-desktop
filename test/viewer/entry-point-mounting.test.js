@@ -1,21 +1,13 @@
 /**
  * An HTML entry point that calls its component cannot support hooks.
  *
- * `www/*.html` mount React by hand, with no bundler and no JSX, so each one
- * chooses how to hand its root component to `createRoot(...).render(...)`.
- * Passing `app()` calls the component outside React's render, which leaves the
- * hook dispatcher unset: the first hook it reaches throws
- * `Cannot read properties of null (reading 'useEffect')` before the tree can
- * mount, and the window comes up blank.
- *
- * Nothing else catches this. The entry points are HTML, so no lint or unit test
- * loads them, and `www/js/` is gitignored build output, so the fault only
- * appears once someone rebuilds. A component can therefore gain a hook and the
- * whole suite stays green.
- *
- * The rule below is the weakest one that holds: an entry point may keep calling
- * its component for as long as that component uses no hooks. Add a hook and the
- * entry point has to render it as an element.
+ * `www/*.html` mount React by hand, so each hands its root component to
+ * `createRoot(...).render(...)` its own way. Passing `app()` calls the component
+ * outside React's render, leaving the hook dispatcher unset: the first hook
+ * throws `Cannot read properties of null (reading 'useEffect')` and the window
+ * comes up blank. No lint or unit test loads the HTML, and `www/js/` is
+ * gitignored build output, so the fault only shows after a rebuild. An entry
+ * point may keep calling its component only for as long as it uses no hooks.
  */
 const fs = require('fs');
 const path = require('path');
@@ -164,7 +156,7 @@ describe('mounting a React root from an HTML entry point', () => {
     expect([name, hooks, site.called]).toEqual([name, hooks, false]);
   });
 
-  it('viewer.html renders its component as an element, because it uses hooks', () => {
+  it('viewer.html renders its hook-using component as an element', () => {
     const viewer = mounts.find((m) => m.name === 'viewer.html');
     expect(viewer.hooks.length).toBeGreaterThan(0);
     expect(viewer.site.called).toBe(false);
