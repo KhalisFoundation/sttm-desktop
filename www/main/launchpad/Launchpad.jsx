@@ -27,10 +27,13 @@ export const InputContext = createContext();
 
 const Launchpad = () => {
   const { overlayScreen } = useStoreState((state) => state.app);
-  const { shortcuts } = useStoreState((state) => state.navigator);
-  const { setShortcuts } = useStoreActions((state) => state.navigator);
+  const { shortcuts, isMiscSlide } = useStoreState((state) => state.navigator);
+  const { setShortcuts, setIsMiscSlide } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId, akhandpatt, autoplayToggle } = useStoreState(
+    (state) => state.userSettings,
+  );
+  const { setAutoplayToggle } = useStoreActions((state) => state.userSettings);
 
   const {
     displayWaheguruSlide,
@@ -107,8 +110,19 @@ const Launchpad = () => {
     }
   };
 
+  // Stepping a verse at a time belongs to the slide view, where the operator
+  // advances the Gurbani by hand. A continuous reading advances itself, so no
+  // arrow action is needed. The selection it would move is the operator's last
+  // explicit click, which the reading has long since scrolled past; stepping it
+  // throws the Paatth back to that point. Space still starts and stops the
+  // reading, and any line is still one
+  // click away in the navigator. Held while a misc slide covers the deck too:
+  // the reading is still the session, and moving the selection behind the slide
+  // would only surface as a jump when it came down.
+  const canStepVerses = () => !akhandpatt && document.activeElement !== ref.current;
+
   const handleDownAndRight = () => {
-    if (!shortcuts.nextVerse && document.activeElement !== ref.current) {
+    if (!shortcuts.nextVerse && canStepVerses()) {
       setShortcuts({
         ...shortcuts,
         nextVerse: true,
@@ -117,7 +131,7 @@ const Launchpad = () => {
   };
 
   const handleUpAndLeft = () => {
-    if (!shortcuts.prevVerse && document.activeElement !== ref.current) {
+    if (!shortcuts.prevVerse && canStepVerses()) {
       setShortcuts({
         ...shortcuts,
         prevVerse: true,
@@ -126,7 +140,24 @@ const Launchpad = () => {
   };
 
   const handleSpacebar = () => {
-    if (!shortcuts.homeVerse && document.activeElement !== ref.current) {
+    if (akhandpatt) {
+      if (overlayScreen !== DEFAULT_OVERLAY) {
+        return;
+      }
+      if (isMiscSlide) {
+        // Space is how an operator puts a Quick Insert away without reaching for
+        // the mouse. In slide view that runs through the home verse, which also
+        // clears the slide; here the reading has its own position, possibly
+        // hours from the selected line, so only take the slide down. A second
+        // press starts the reading again.
+        setIsMiscSlide(false);
+      } else {
+        setAutoplayToggle(!autoplayToggle);
+      }
+      return;
+    }
+
+    if (!shortcuts.homeVerse) {
       setShortcuts({
         ...shortcuts,
         homeVerse: true,
