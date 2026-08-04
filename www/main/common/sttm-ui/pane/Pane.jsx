@@ -4,7 +4,11 @@ import PaneContent from './PaneContent';
 import PaneFooter from './PaneFooter';
 import PaneHeader from './PaneHeader';
 
-const Pane = ({ content, header, footer, className, data }) => (
+// Shared so the default keeps one identity across renders, as `defaultProps`
+// did; a fresh `{}` per render would defeat memoisation in anything downstream.
+const NO_DATA = {};
+
+const Pane = ({ content = null, header = null, footer = null, className = '', data = NO_DATA }) => (
   <div className={`pane ${className}`.trim()}>
     {header ? <PaneHeader Header={header} data={data} /> : ''}
     {content ? <PaneContent Content={content} data={data} /> : ''}
@@ -18,14 +22,6 @@ Pane.propTypes = {
   footer: PropTypes.any,
   className: PropTypes.string,
   data: PropTypes.any,
-};
-
-Pane.defaultProps = {
-  content: null,
-  header: null,
-  footer: null,
-  className: '',
-  data: {},
 };
 
 export default Pane;

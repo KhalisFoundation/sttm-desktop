@@ -6,7 +6,6 @@ import { MiscPane } from './misc/components';
 import ViewerPane from './viewer/ViewerPane';
 import { Pane } from '../common/sttm-ui/pane';
 import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
-import { useSlides } from '../common/hooks';
 
 const remote = require('@electron/remote');
 
@@ -16,13 +15,6 @@ const Navigator = () => {
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
-
-  const {
-    displayWaheguruSlide,
-    displayMoolMantraSlide,
-    displayBlankViewer,
-    displayAnandSahibBhog,
-  } = useSlides();
 
   let controllerMarkup = null;
   const isCurrentWorkSpaceSingleDisplay = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
@@ -60,25 +52,14 @@ const Navigator = () => {
     controllerMarkup = (
       <div className="navigator-row">
         <ShabadPane />
-        <MiscPane
-          waheguruSlide={displayWaheguruSlide}
-          moolMantraSlide={displayMoolMantraSlide}
-          blankSlide={displayBlankViewer}
-          anandSahibBhog={displayAnandSahibBhog}
-        />
+        <MiscPane />
       </div>
     );
   }
 
   return (
     <>
-      <div
-        className={
-          isCurrentWorkSpaceSingleDisplay
-            ? 'single-display-viewer'
-            : 'navigator-row'
-        }
-      >
+      <div className={isCurrentWorkSpaceSingleDisplay ? 'single-display-viewer' : 'navigator-row'}>
         {!isCurrentWorkSpaceSingleDisplay && <SearchPane />}
         <ViewerPane />
       </div>

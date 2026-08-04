@@ -1,16 +1,22 @@
 import React, { useRef } from 'react';
-import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { uploadImage } from '../../../settings/utils/theme-bg-uploader';
 import { classNames } from '../../../common/utils';
+import { useSlides } from '../../../common/hooks';
 
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
-export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {
+export const MiscFooter = () => {
+  const {
+    displayWaheguruSlide,
+    displayMoolMantraSlide,
+    displayBlankViewer,
+    displayAnandSahibBhog,
+  } = useSlides();
   const { overlayScreen } = useStoreState((state) => state.app);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
   const { setVerseHistory } = useStoreActions((actions) => actions.navigator);
@@ -74,25 +80,25 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
       >
         <button
           className="tray-item-icon"
-          onClick={() => anandSahibBhog({ openedFrom: 'shortcut-tray' })}
+          onClick={() => displayAnandSahibBhog({ openedFrom: 'shortcut-tray' })}
         >
           {i18n.t(`SHORTCUT_TRAY.ANAND_SAHIB`)}
         </button>
         <button
           className="tray-item-icon"
-          onClick={() => moolMantraSlide({ openedFrom: 'shortcut-tray' })}
+          onClick={() => displayMoolMantraSlide({ openedFrom: 'shortcut-tray' })}
         >
           {i18n.t(`SHORTCUT_TRAY.MOOL_MANTRA`)}
         </button>
         <button
           className="gurmukhi tray-item-icon"
-          onClick={() => waheguruSlide({ openedFrom: 'shortcut-tray' })}
+          onClick={() => displayWaheguruSlide({ openedFrom: 'shortcut-tray' })}
         >
           vwihgurU
         </button>
         <button
           className="tray-item-icon"
-          onClick={() => blankSlide({ openedFrom: 'shortcut-tray' })}
+          onClick={() => displayBlankViewer({ openedFrom: 'shortcut-tray' })}
         >
           {i18n.t(`SHORTCUT_TRAY.BLANK`)}
         </button>
@@ -114,11 +120,4 @@ export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSa
       </div>
     </div>
   );
-};
-
-MiscFooter.propTypes = {
-  waheguruSlide: PropTypes.func,
-  moolMantraSlide: PropTypes.func,
-  blankSlide: PropTypes.func,
-  anandSahibBhog: PropTypes.func,
 };
