@@ -38,12 +38,17 @@ const SOURCE_TYPES = {
   REHATNAMAS: 'R',
 };
 
+// Keys are zero-padded three-digit character codes so every row lines up with
+// the Gurmukhi it maps, which is what makes the table readable. prettier wants
+// to unquote the three keys that happen to be numeric, breaking that alignment
+// and the padding convention for no gain.
+// prettier-ignore
 const BINDI_CHARS = {
-  '103': '090', //  ਗ: 'ਗ਼'
-  '106': '122', //  ਜ: 'ਜ਼'
-  '115': '083', //  ਸ: 'ਸ਼'
-  '075': '094', //  ਖ: 'ਖ਼'
-  '080': '038', //  ਫ: 'ਫ਼'
+  '103': '090', //  ਗ: 'ਗ਼'
+  '106': '122', //  ਜ: 'ਜ਼'
+  '115': '083', //  ਸ: 'ਸ਼'
+  '075': '094', //  ਖ: 'ਖ਼'
+  '080': '038', //  ਫ: 'ਫ਼'
   '097': '069', //  ੳ : ਓ
 };
 

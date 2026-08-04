@@ -24,8 +24,6 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
       ipcRenderer.send('save-overlay-settings', JSON.stringify(state));
-
-      return state;
     });
   });
   return userSettingsState;

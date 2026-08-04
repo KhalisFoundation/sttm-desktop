@@ -5,6 +5,7 @@ const search = require('./realm-search');
 const {
   query,
   loadShabad,
+  loadShabadSafe,
   loadBanis,
   loadBani,
   loadCeremony,
@@ -22,6 +23,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadShabadSafe,
   loadBanis,
   loadBani,
   loadCeremony,

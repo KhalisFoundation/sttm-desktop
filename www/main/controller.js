@@ -434,6 +434,18 @@ global.platform.ipc.on('next-ang', (event, arg) => {
   global.core.search.loadAng(PageNo, SourceID);
 });
 
+// Casting used to clear four vestigial pre-React keys here
+// (`slide-layout.display-options.akhandpaatt`, `disable-akhandpaatt`, the
+// `akhandpaatt` body class and a `clear-apv` IPC round trip). None was read
+// anywhere at `7af235dc`, and none touched the React `akhandpatt` setting, so
+// casting never actually left Akhand Paatth view. They are removed and not
+// repointed at the real setting: it is persisted, and `cast-session-stopped`
+// does not fire when the app quits, so quitting mid-cast would strand the
+// operator out of Akhand Paatth across restarts.
+//
+// The standing limitation is unchanged from `7af235dc`: `Slide` sends
+// `cast-to-receiver` only for slide view, so a Chromecast receiver shows the
+// deck as it stood when the session started and does not follow it afterwards.
 global.platform.ipc.on('cast-session-active', () => {
   menuCast.items[0].visible = false;
   menuCast.items[1].visible = true;
@@ -442,12 +454,6 @@ global.platform.ipc.on('cast-session-active', () => {
   checkPresenterView();
   updateViewerScale();
 
-  store.set('userPrefs.slide-layout.display-options.akhandpaatt', false);
-  store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', true);
-  if (global.webview) global.webview.send('clear-apv');
-  global.platform.ipc.send('clear-apv');
-
-  document.body.classList.remove('akhandpaatt');
   global.core.platformMethod('updateSettings');
   analytics.trackEvent({
     category: 'chromecast',
@@ -457,7 +463,6 @@ global.platform.ipc.on('cast-session-active', () => {
 global.platform.ipc.on('cast-session-stopped', () => {
   menuCast.items[1].visible = false;
   menuCast.items[0].visible = true;
-  store.set('userPrefs.slide-layout.display-options.disable-akhandpaatt', false);
   analytics.trackEvent({
     category: 'chromecast',
     action: 'stop',

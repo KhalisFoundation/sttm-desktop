@@ -1,16 +1,24 @@
 import React from 'react';
 import { useStoreState } from 'easy-peasy';
 
+import { fontSizeSetting } from '../../viewer/font-sizes';
+import useContentFontSizes from '../../viewer/hooks/useContentFontSizes';
+
 const themes = require('../../../configs/themes.json');
 
 const SettingViewer = () => {
   const { themeBg } = useStoreState((state) => state.userSettings);
 
+  // The Font Sizes panel shows whichever view's sizes are in play, so the
+  // preview has to follow the same ones for the sliders to have any visible
+  // effect.
+  const gurbaniFontSize = useStoreState(
+    (state) =>
+      state.userSettings[fontSizeSetting('gurbani', state.userSettings.akhandpatt).stateName],
+  );
+  const contentFontSizes = useContentFontSizes();
+
   const {
-    gurbaniFontSize,
-    content1FontSize,
-    content2FontSize,
-    content3FontSize,
     content1Visibility,
     content2Visibility,
     content3Visibility,
@@ -46,9 +54,9 @@ const SettingViewer = () => {
   };
 
   const contentAttributes = {
-    1: { visibility: content1Visibility, fontSize: content1FontSize },
-    2: { visibility: content2Visibility, fontSize: content2FontSize },
-    3: { visibility: content3Visibility, fontSize: content3FontSize },
+    1: { visibility: content1Visibility, fontSize: contentFontSizes[0] },
+    2: { visibility: content2Visibility, fontSize: contentFontSizes[1] },
+    3: { visibility: content3Visibility, fontSize: contentFontSizes[2] },
   };
 
   const getContentStyles = (contentId) => ({

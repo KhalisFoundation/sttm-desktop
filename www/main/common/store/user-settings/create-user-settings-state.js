@@ -86,8 +86,6 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           },
         });
       }
-
-      return state;
     });
   });
   return userSettingsState;

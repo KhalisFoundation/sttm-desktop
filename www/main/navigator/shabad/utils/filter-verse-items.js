@@ -31,12 +31,29 @@ export const filterRequiredVerseItems = (verses) => {
     : [];
 };
 
+/**
+ * Builds the single line sent to the overlay and broadcast pipeline (OBS, the
+ * Sikh Sangat app), with translations and transliterations resolved.
+ *
+ * Called from two places that render Gurbani independently: `ShabadText` for the
+ * slide view, and `useAkhandpattScroll` for the Akhand Paatth deck. Both must
+ * produce an identical line for the same verse, so it stays a single function.
+ *
+ * @param {Array} verses The verses of the current Shabad
+ * @param {number} verseId The verse to build
+ * @returns {Object} The overlay line, or `{}` if the verse is not in `verses`
+ */
 export const filterOverlayVerseItems = (verses, verseId) => {
   if (verses) {
     const currentIndex = verses.findIndex((obj) => obj.ID === verseId);
     const currentVerse = verses[currentIndex];
     if (currentVerse) {
-      const Line = { ...currentVerse.toJSON() };
+      // Akhand Paatth materialises its verses to plain objects (see
+      // useAkhandpattScroll) which have no Realm `toJSON`; the navigator's live
+      // Realm verses do. Handle both so the overlay line is built identically.
+      const Line = {
+        ...(typeof currentVerse.toJSON === 'function' ? currentVerse.toJSON() : currentVerse),
+      };
       if (Line.Translations) {
         const lineTranslations = JSON.parse(Line.Translations);
         Line.English = lineTranslations.en.bdb || lineTranslations.en.ms || lineTranslations.en.ssk;

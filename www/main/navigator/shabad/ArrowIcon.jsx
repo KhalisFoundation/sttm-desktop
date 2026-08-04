@@ -13,6 +13,7 @@ const ArrowIcon = ({ paneId }) => {
     activeShabadId,
     initialVerseId,
     isCeremonyBani,
+    isMiscSlide,
     activeVerseId,
     activePaneId,
     pane1,
@@ -21,13 +22,14 @@ const ArrowIcon = ({ paneId }) => {
     shortcuts,
   } = useStoreState((state) => state.navigator);
 
-  const { currentWorkspace } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, akhandpatt } = useStoreState((state) => state.userSettings);
 
   const {
     setInitialVerseId,
     setActiveVerseId,
     setActivePaneId,
     setActiveShabadId,
+    setIsMiscSlide,
     setPane1,
     setPane2,
     setPane3,
@@ -39,6 +41,21 @@ const ArrowIcon = ({ paneId }) => {
     2: pane2.baniType,
     3: pane3.baniType,
   };
+
+  /**
+   * Would stepping to another Shabad mean anything here?
+   *
+   * The arrows move `pane.activeShabad`, the operator's last explicit selection.
+   * A continuous Akhand Paatth reading loads the next Shabad just in time and
+   * flows into it unattended, so after a while what is on screen is far ahead of
+   * that selection and "Next" would throw the Paatth back near the last click.
+   * The reading advances itself anyway.
+   *
+   * Banis and ceremonies are finite, so they still step. This asks the same
+   * question as the deck's `isInfiniteShabad`, from the state the navigator has.
+   */
+  const isInfiniteReading =
+    akhandpatt && !isMiscSlide && !!activeVerseId && !isSundarGutkaBani && !isCeremonyBani;
 
   const loadShabadAndSetVerses = (shabadId, setPane, currentPane, targetPaneId) =>
     banidb
@@ -71,6 +88,16 @@ const ArrowIcon = ({ paneId }) => {
       });
 
   const updatePaneShabad = (direction) => {
+    // Reachable without a click, through `shortcuts.nextShabad`, so the reading
+    // is checked here as well as in the render.
+    if (isInfiniteReading) {
+      return;
+    }
+    // The viewer renders only the misc slide while this is set, so leaving it
+    // would keep the requested Shabad hidden. See `viewer-entry-points.test.js`.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
     let currentShabad;
     switch (paneId) {
       case 1:
@@ -126,6 +153,12 @@ const ArrowIcon = ({ paneId }) => {
     }
   }, [shortcuts]);
 
+  // Asked before the workspace is considered, so Multi Pane cannot reach the
+  // arrows by another route. Hiding them is not the whole guard: `updatePaneShabad`
+  // refuses as well, because `shortcuts.nextShabad` reaches it without a click.
+  if (isInfiniteReading) {
+    return null;
+  }
   if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
     if (paneBani[paneId] === 'shabad') {
       return (

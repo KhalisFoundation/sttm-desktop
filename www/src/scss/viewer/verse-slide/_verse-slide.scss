@@ -1,18 +1,85 @@
+// Akhand Paatth renders the *same* Gurbani simultaneously on the operator's
+// preview pane and on the sangat's projection, which are very different sizes
+// (here: 907x497 vs 2560x1440). The operator scrolls by what they see, so the
+// preview must represent the projection faithfully, which makes the deck a true
+// scaled replica of itself: the same lines framed on both screens at the same
+// proportions.
+//
+// The viewer's typography is already `vh`-based (a word is sized from the user's
+// font-size setting in `vh`), so any *fixed* pixel contribution to a verse's
+// height breaks the replica: 10px is 2% of a tall verse on a projector but 7% of
+// a short one on the preview. Measured, that framed 3.75 verses per preview
+// screen against 5.69 on the projection, so the operator was reading a different
+// amount of Gurbani from the sangat.
+//
+// Every remaining contribution is expressed in `vh` too, via
+// `akhandpatt-vh()` below.
+//
+// The reference height is the resolution at which these values reproduce the
+// original pixel design exactly. 1080p is a common Gurdwara projector
+// resolution, so a given setting means the same number of pixels there as the
+// equivalent px value always did. Larger displays get proportionally more room
+// by design: the Gurbani grows with the screen, so the space around it must too.
+$akhandpatt-design-height: 1080;
+
+/// Convert a length from the 1080p reference design into viewport units.
+@function akhandpatt-vh($px) {
+  @return strip-unit($px) / $akhandpatt-design-height * 100vh;
+}
+
+// Akhand Paatth spacing, in reference-design pixels. Set at runtime by the
+// Spacing control (see `SpacingTools`), which is the Akhand Paatth analogue
+// of Padding Tools: in a continuously scrolling document the meaningful
+// adjustment is the air around and inside a verse, not the inset of a fixed
+// slide.
+//
+// Two axes, because they do different jobs. The verse axis pads each verse and
+// so sets the gap between one verse and the next; the line axis separates the
+// Gurbani from its translation, transliteration and teeka. Held apart, the
+// reader can bind a verse's own lines together while still spacing verses
+// generously, where one value could only ever trade one against the other.
+//
+// Both are *unitless* custom properties rather than lengths so that the same
+// number can be shown to the reader and converted here. That keeps one source of
+// truth, and the `vh` conversion cannot be bypassed by a caller passing `px`.
+$akhandpatt-default-verse-spacing: 32;
+$akhandpatt-default-line-spacing: 14;
+
+@function akhandpatt-verse-spacing() {
+  @return calc(
+    var(--akhandpatt-verse-spacing, #{$akhandpatt-default-verse-spacing}) /
+      #{$akhandpatt-design-height} * 100vh
+  );
+}
+
+@function akhandpatt-line-spacing() {
+  @return calc(
+    var(--akhandpatt-line-spacing, #{$akhandpatt-default-line-spacing}) /
+      #{$akhandpatt-design-height} * 100vh
+  );
+}
+
 .akhandpatt-view {
   .verse-slide {
     height: auto !important;
-    padding: 10px !important;
+    padding: akhandpatt-verse-spacing() !important;
   }
 
-  .verse-slide-wrapper {
-    align-items: center;
-    display: flex;
-    height: initial;
-    padding: 8px;
+  // `.slide-gurbani` is a heading whose words are each sized individually from
+  // the font-size setting, so its own font-size only ever sets the inline strut,
+  // an effective minimum line height. The floor has to scale with the viewport:
+  // a fixed one would dominate on the preview, where the words are ~3x smaller,
+  // setting every line box itself and holding verses at a constant height
+  // however small the panel got. In `vh` it applies equally on both screens,
+  // keeping its purpose without breaking the scaled replica.
+  .slide-gurbani {
+    font-size: akhandpatt-vh(45px);
+  }
 
-    .verse-slide {
-      width: 100%;
-    }
+  .slide-translation,
+  .slide-teeka,
+  .slide-transliteration {
+    margin: akhandpatt-line-spacing() 0;
   }
 }
 
@@ -157,6 +224,21 @@
 
   &-announcement {
     justify-content: center;
+  }
+
+  // Akhand Paatth offers two spacing axes where Padding Tools offers four edges.
+  // Distributing two controls over a full-height panel strands them at the
+  // extreme ends, and the lower one lands under the autoplay controller. This
+  // variant lets the panel hug its content instead, which keeps the pair
+  // together, clears the controller, and stops a mostly-empty panel covering
+  // Gurbani it has no need to cover. The four-edge layout above is untouched.
+  &-spacing {
+    height: auto;
+    justify-content: flex-start;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
   }
 
   &-item {

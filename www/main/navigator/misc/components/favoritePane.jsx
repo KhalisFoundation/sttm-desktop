@@ -17,6 +17,7 @@ export const FavoritePane = ({ className, paneId }) => {
     activeShabadId,
     initialVerseId,
     isCeremonyBani,
+    isMiscSlide,
     isSundarGutkaBani,
     singleDisplayActiveTab,
     favShabad,
@@ -28,6 +29,7 @@ export const FavoritePane = ({ className, paneId }) => {
     setActiveShabadId,
     setInitialVerseId,
     setIsCeremonyBani,
+    setIsMiscSlide,
     setIsSundarGutkaBani,
     setSingleDisplayActiveTab,
     setFavShabad,
@@ -82,6 +84,12 @@ export const FavoritePane = ({ className, paneId }) => {
   };
 
   const openShabadFromFav = (shabadId, verseId) => {
+    // The viewer renders nothing but the misc slide while this is set, so leaving
+    // it would silently swallow the click. See `viewer-entry-points.test.js`.
+    if (isMiscSlide) {
+      setIsMiscSlide(false);
+    }
+
     const currentPane = paneId || defaultPaneId;
     switch (currentPane) {
       case 1:

@@ -117,16 +117,21 @@ const SearchContent = () => {
 
   const mapVerseItems = (searchedShabadsArray) =>
     searchedShabadsArray
-      ? searchedShabadsArray.map((verse) => ({
-          ang: verse.PageNo,
-          raag: verse.Raag ? verse.Raag.RaagEnglish : '',
-          shabadId: verse.Shabads[0].ShabadID,
-          source: verse.Source ? verse.Source.SourceEnglish : '',
-          sourceId: verse.Source ? verse.Source.SourceID : '',
-          verse: verse.Gurmukhi,
-          verseId: verse.ID,
-          writer: verse.Writer ? verse.Writer.WriterEnglish : '',
-        }))
+      ? searchedShabadsArray
+          // A verse whose parent Shabad is missing cannot be opened, so listing
+          // it offers the operator a result that does nothing when selected.
+          // Reading its Shabad id also threw, which emptied the search pane.
+          .filter((verse) => verse.Shabads && verse.Shabads.length)
+          .map((verse) => ({
+            ang: verse.PageNo,
+            raag: verse.Raag ? verse.Raag.RaagEnglish : '',
+            shabadId: verse.Shabads[0].ShabadID,
+            source: verse.Source ? verse.Source.SourceEnglish : '',
+            sourceId: verse.Source ? verse.Source.SourceID : '',
+            verse: verse.Gurmukhi,
+            verseId: verse.ID,
+            writer: verse.Writer ? verse.Writer.WriterEnglish : '',
+          }))
       : [];
 
   const [filteredShabads, setFilteredShabads] = useState([]);
@@ -191,10 +196,14 @@ const SearchContent = () => {
     }
   }, [filteredShabads]);
 
-  ipcRenderer.on('database-progress', (data) => {
-    const { percent } = JSON.parse(data);
-    setDatabaseProgress(percent);
-  });
+  useEffect(() => {
+    const onDatabaseProgress = (data) => {
+      const { percent } = JSON.parse(data);
+      setDatabaseProgress(percent);
+    };
+    ipcRenderer.on('database-progress', onDatabaseProgress);
+    return () => ipcRenderer.removeListener('database-progress', onDatabaseProgress);
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {

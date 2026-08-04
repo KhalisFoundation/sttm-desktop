@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
+import useContentFontSizes from '../hooks/useContentFontSizes';
+
 const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, position }) => {
-  const { content1FontSize, content2FontSize, content3FontSize, translationEnglishSource } =
-    useStoreState((state) => state.userSettings);
+  const { translationEnglishSource } = useStoreState((state) => state.userSettings);
   const [translationString, setTranslationString] = useState(null);
-  const fontSizes = [content1FontSize, content2FontSize, content3FontSize];
+  const fontSizes = useContentFontSizes();
 
   const getTranslation = (translations) => {
     switch (lang) {

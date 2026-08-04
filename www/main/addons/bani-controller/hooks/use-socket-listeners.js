@@ -73,6 +73,12 @@ const useSocketListeners = (
       bani: (payload) => {
         const baniId = parseInt(payload.baniId, 10);
         const verseId = parseInt(payload.verseId, 10);
+        // The viewer renders nothing but the misc slide while this is set, so
+        // leaving it would silently swallow the request. The `shabad` handler is
+        // covered by `changeActiveShabad`. See `viewer-entry-points.test.js`.
+        if (isMiscSlide) {
+          setIsMiscSlide(false);
+        }
         if (isCeremonyBani) {
           setIsCeremonyBani(false);
         }
@@ -100,6 +106,10 @@ const useSocketListeners = (
       },
       ceremony: (payload) => {
         const ceremonyPayload = parseInt(payload.ceremonyId, 10);
+        // See the `bani` handler above.
+        if (isMiscSlide) {
+          setIsMiscSlide(false);
+        }
         if (!isCeremonyBani) {
           setIsCeremonyBani(true);
         }

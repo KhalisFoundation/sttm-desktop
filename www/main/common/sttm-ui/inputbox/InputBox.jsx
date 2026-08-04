@@ -19,12 +19,6 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
     setQuery(event.target.value);
   };
 
-  const handleSpace = (event) => {
-    if (event.keyCode === 32 && [2, 3].includes(currentSearchType)) {
-      setQuery(`${query} `);
-    }
-  };
-
   // keyboard shortcut to focus on search input
   const focusInputbox = () => {
     inputContextRef.current.focus();
@@ -72,7 +66,6 @@ const InputBox = ({ placeholder, disabled, className, databaseProgress, query, s
         value={query}
         onBlur={sendAnalytics}
         onChange={handleChange}
-        onKeyDown={handleSpace}
         disabled={disabled}
       />
     </>

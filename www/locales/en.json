@@ -197,6 +197,19 @@
     "TRANSLATION": "Translation",
     "TRANSLITERATION": "Transliteration"
   },
+  "SPACING_TOOLS": {
+    "SELF": "Spacing Tools",
+    "BETWEEN_VERSES": "Between Verses",
+    "BETWEEN_LINES": "Between Lines"
+  },
+  "AUTOPLAY": {
+    "START": "Start autoplay",
+    "PAUSE": "Pause autoplay",
+    "SPEED_DOWN": "Decrease scroll speed",
+    "SPEED_UP": "Increase scroll speed",
+    "SPEED": "Scroll speed",
+    "SPEED_CURRENT": "Current scroll speed"
+  },
   "MICROPHONE_ERROR": {
     "NotAllowedError": "Microphone access was denied. Please check your system permissions and allow microphone access for this application.",
     "NotFoundError": "No microphone found. Please connect a microphone and try again.",
@@ -326,9 +339,9 @@
     "RESET_PADDING": "Reset Padding",
     "RESET_TO_DEFAULT": "Reset to Default",
     "DISPLAY_OPTIONS": "Display Options",
-    "AKHAND_PATH_VIEW": "Akhand Paatth View",
+    "AKHAND_PAATTH_VIEW": "Akhand Paatth View",
     "CHROMECAST_UNAVAILABLE": "Google Chromecast Unavailable",
-    "AKHAND_PATH_UNAVAILABLE": "Unavailable in Akhand Paatth View",
+    "AKHAND_PAATTH_UNAVAILABLE": "Unavailable in Akhand Paatth View",
     "LARIVAAR": "Larivaar",
     "LARIVAAR_ASSIST": "Larivaar Assist",
     "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",

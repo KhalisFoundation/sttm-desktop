@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
+import { resetPaddingUpdates } from '../utils';
 import { settings } from '../../../configs/user-settings.json';
 
 const remote = require('@electron/remote');
@@ -15,7 +16,9 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
   const userSettings = useStoreState((state) => state.userSettings);
   const userSettingsActions = useStoreActions((state) => state.userSettings);
-  const { containerPadding } = useStoreState((state) => state.viewerSettings);
+  const { containerPadding, verseSpacing, lineSpacing } = useStoreState(
+    (state) => state.viewerSettings,
+  );
 
   const { disabledContent, filteredBaniOptions } = useStoreState((state) => state.navigator);
 
@@ -73,24 +76,13 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleResetPadding = () => {
-    const defaultPadding = {
-      left: 48,
-      top: 20,
-      right: 0,
-      bottom: 0,
-    };
-    Object.keys(containerPadding).forEach((key) => {
-      if (containerPadding[key] !== defaultPadding[key]) {
-        const payload = { type: key, value: defaultPadding[key] };
-        global.platform.ipc.send(
-          'update-global-setting',
-          JSON.stringify({
-            actionName: 'setPadding',
-            payload,
-            settingType: 'viewerSettings',
-          }),
-        );
-      }
+    resetPaddingUpdates({
+      containerPadding,
+      verseSpacing,
+      lineSpacing,
+      akhandpatt: userSettings.akhandpatt,
+    }).forEach((update) => {
+      global.platform.ipc.send('update-global-setting', JSON.stringify(update));
     });
   };
 

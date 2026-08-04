@@ -1,4 +1,5 @@
 export { searchShabads } from './search-shabads';
+export { materializeSearchRows } from './materialize-search-rows';
 export { loadShabad } from './load-shabad';
 export { loadShabadVerse } from './load-shabad-verse';
 export { filters } from './filters';

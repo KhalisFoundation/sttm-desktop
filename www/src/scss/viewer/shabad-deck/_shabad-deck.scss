@@ -3,11 +3,21 @@
   background-position: center;
   height: 100%;
 
+  // Everything here must either be inert on the slide view or non-animatable:
+  // `#viewer-container *` in `_viewer.scss` puts a blanket `0.2s all` transition
+  // on every descendant, so any layout property that differs between the two
+  // views animates for 200ms when the view changes, which reads as a misc slide
+  // drifting into place over a reading rather than simply appearing.
   &.akhandpatt-view {
     background-attachment: fixed;
     background-size: cover;
     overflow-y: hidden;
-    padding-bottom: 10px;
+    // The hook compensates scrollTop itself after a top-prune; browser scroll
+    // anchoring would add a second, conflicting shift and make the scroll jump
+    // backwards through short Shabads. Disable it so compensation is exact.
+    overflow-anchor: none;
+    // Positioning context for the centred seeding loader overlay.
+    position: relative;
     width: 100%;
   }
 
@@ -40,6 +50,18 @@
 
 .empty-slide {
   height: 100% !important;
+}
+
+// Centred loader shown while the infinite window seeds (for example a slow cold
+// open of the database on the first Shabad), so the reader sees progress rather
+// than a blank deck. Positioned against `.shabad-deck.akhandpatt-view`.
+.akhandpatt-loading {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
 }
 
 .viewer-logo {

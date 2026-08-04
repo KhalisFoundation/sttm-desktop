@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 
+import useContentFontSizes from '../hooks/useContentFontSizes';
+
 const SlideTeeka = ({ getFontSize, teekaObj, position }) => {
-  const { content1FontSize, content2FontSize, content3FontSize, teekaSource } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { teekaSource } = useStoreState((state) => state.userSettings);
   const [teekaString, setTeekaString] = useState(null);
-  const fontSizes = [content1FontSize, content2FontSize, content3FontSize];
+  const fontSizes = useContentFontSizes();
 
   const getTeeka = (inputTeeka) => {
     if (inputTeeka && inputTeeka.pu) {

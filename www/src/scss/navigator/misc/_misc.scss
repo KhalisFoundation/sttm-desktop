@@ -110,8 +110,13 @@ $misc-footer-active: 70px;
         @include flex($jc-value: center, $width: fit-content);
 
         &:hover {
-          height: 60px;
-          padding: 14px;
+          // Grown with a transform, not with height and padding. This row is
+          // `space-evenly`, and the items are `fit-content`, so anything that
+          // changes an item's box re-runs the row's layout and shoves every
+          // other button sideways, measured at 7.7px wider and 2.2px left for
+          // the item under the cursor alone. A transform is painted, not laid
+          // out, so the buttons stay exactly where they are.
+          transform: scale(1.1);
         }
       }
     }
