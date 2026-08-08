@@ -32,7 +32,8 @@
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "electron-builder install-app-deps"
+    "rebuild-sqlite": "cross-env npm_config_build_from_source=true electron-rebuild -f --only better-sqlite3",
+    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite"
   },
   "repository": {
     "type": "git",
@@ -83,6 +84,7 @@
     "@sentry/electron": "^6.8.0",
     "anvaad-js": "^1.5.0",
     "axios": "^1.5.1",
+    "better-sqlite3": "^9.6.0",
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.3.1",
     "easy-peasy": "^6.0.3",
@@ -154,10 +156,18 @@
       "!www/package.json",
       "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map",
-      "!www/main/**/*.{js,jsx}"
+      "!www/main/**/*.{js,jsx}",
+      "!www/assets/*.db"
     ],
     "extraResources": [
-      "data.db"
+      "data.db",
+      {
+        "from": "www/assets",
+        "to": "assets",
+        "filter": [
+          "*.db"
+        ]
+      }
     ],
     "directories": {
       "buildResources": "assets",

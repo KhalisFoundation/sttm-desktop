@@ -18,6 +18,7 @@ import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 
 const os = require('os');
 const remote = require('@electron/remote');
+const aiTranslationDB = require('../../banidb/pss-db');
 
 const { i18n } = remote.require('./app');
 const platform = os.platform();
@@ -120,6 +121,19 @@ function ShabadDeck() {
 
     try {
       const translations = JSON.parse(activeVerse[0].Translations);
+
+      // Inject the AI translation when one of its sources is selected, so the
+      // English option's visibility is computed from the text actually shown
+      if (aiTranslationDB.isAiSource(translationEnglishSource)) {
+        const translationText = aiTranslationDB.getTranslation(
+          activeVerse[0].ID,
+          translationEnglishSource,
+        );
+        if (translationText) {
+          if (!translations.en) translations.en = {};
+          translations.en[translationEnglishSource] = translationText;
+        }
+      }
 
       const visibilityMap = {
         'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
@@ -280,7 +294,7 @@ function ShabadDeck() {
         settingType: 'navigator',
       }),
     );
-  }, [activeVerse, setFilteredBaniOptions]);
+  }, [activeVerse, setFilteredBaniOptions, translationEnglishSource, teekaSource]);
 
   return (
     <>
