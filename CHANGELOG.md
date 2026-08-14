@@ -1,5 +1,14 @@
 ## New Updates
 
+### 9.4.0 - Internal Release _August 14, 2026_
+
+#### Bug Fixes and Improvements
+- **Translation sources**: Added two new English Translation sources: Prof Sahib Singh, and Prof Sahib Singh - Short
+
+**We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
+
 ### 9.3.2 - ਊਨਾ Release _March 02, 2026_
 
 #### Bug Fixes and Improvements
