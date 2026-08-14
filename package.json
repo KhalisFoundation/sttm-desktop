@@ -1,7 +1,7 @@
 {
   "productName": "SikhiToTheMax",
   "name": "sttm-desktop",
-  "version": "9.3.2",
+  "version": "9.4.0",
   "description": "The SikhiToTheMax desktop app",
   "main": "app.js",
   "scripts": {
@@ -15,13 +15,13 @@
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
-    "pack:macArm": "npm run build && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",
+    "pack:macArm": "npm run build && npm run rebuild-sqlite && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",
     "pack:win": "npm run build && electron-builder --win --x64",
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
     "dist:mac": "npm run build && electron-builder --mac --x64 --publish always",
-    "dist:macArm": "npm run build && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish always",
+    "dist:macArm": "npm run build && npm run rebuild-sqlite && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish always",
     "dist:win": "npm run pack:win && electron-builder --win --x64 --publish always",
     "dist:win32": "npm run pack:win32 && electron-builder --win --ia32 --publish always",
     "build-css": "run-p build-css:*",
@@ -32,7 +32,8 @@
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "electron-builder install-app-deps"
+    "rebuild-sqlite": "cross-env npm_config_build_from_source=true electron-rebuild -f --only better-sqlite3",
+    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite"
   },
   "repository": {
     "type": "git",
@@ -83,6 +84,7 @@
     "@sentry/electron": "^6.8.0",
     "anvaad-js": "^1.5.0",
     "axios": "^1.5.1",
+    "better-sqlite3": "^9.6.0",
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.3.1",
     "easy-peasy": "^6.0.3",
@@ -154,10 +156,21 @@
       "!www/package.json",
       "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map",
-      "!www/main/**/*.{js,jsx}"
+      "!www/main/**/*.{js,jsx}",
+      "!www/assets/*.db"
+    ],
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
     ],
     "extraResources": [
-      "data.db"
+      "data.db",
+      {
+        "from": "www/assets",
+        "to": "assets",
+        "filter": [
+          "*.db"
+        ]
+      }
     ],
     "directories": {
       "buildResources": "assets",
