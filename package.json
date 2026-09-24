@@ -16,7 +16,7 @@
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
     "pack:macArm": "npm run build && npm run rebuild-sqlite && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",
-    "pack:win": "npm run build && electron-builder --win --x64",
+    "pack:win": "npm run build && npm run rebuild-sqlite && electron-builder --win --x64",
     "pack:win32": "npm run build && electron-builder --win --ia32",
     "pack:linux": "npm run build && electron-builder --linux --x64",
     "pack:berry": "export USE_SYSTEM_FPM=true && npm run build && electron-builder --linux --arm64",
@@ -162,6 +162,7 @@
     "asarUnpack": [
       "node_modules/better-sqlite3/**/*"
     ],
+    "npmRebuild": false,
     "extraResources": [
       "data.db",
       {
