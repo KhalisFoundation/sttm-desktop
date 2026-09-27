@@ -5,6 +5,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { filterRequiredVerseItems } from '../../../navigator/shabad/utils/filter-verse-items';
 import { loadBani as loadBaniRows } from '../../../navigator/utils/load-bani';
 import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
+import updateMultipane from '../../../navigator/search/utils/update-multipane';
 
 const anvaad = require('anvaad-js');
 const { ipcRenderer } = require('electron');
@@ -380,6 +381,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const changeActiveShabad = useNewShabad();
   const openShabadRef = useRef(changeActiveShabad);
   openShabadRef.current = changeActiveShabad;
+  // The navigator pane (bottom-left in Presentation) shows whatever its pane
+  // attributes name; opening a Bani must update them too, exactly as the Sundar
+  // Gutka screen does, or the pane keeps the old content and never highlights.
+  const updatePane = updateMultipane();
+  const updatePaneRef = useRef(updatePane);
+  updatePaneRef.current = updatePane;
 
   const [status, setStatus] = useState('idle'); // idle|connecting|listening|detecting|error|stopped
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
@@ -1166,7 +1173,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (cand.shabadId !== currentShabadIdRef.current) {
           currentShabadIdRef.current = cand.shabadId;
           if (baniId != null) {
-            // Same actions the Sundar Gutka screen uses to open a Bani.
+            // Same actions the Sundar Gutka screen uses to open a Bani, plus the
+            // pane (at the recited line, so it does not restart at the top).
+            updatePaneRef.current('bani', baniId, cand.verseId);
             setIsCeremonyBani(false);
             setSingleDisplayActiveTab('shabad');
             setIsSundarGutkaBani(true);
