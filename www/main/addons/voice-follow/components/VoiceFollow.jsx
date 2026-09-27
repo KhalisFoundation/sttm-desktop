@@ -208,6 +208,54 @@ const PAATH_SKIP_SHABADS = new Set([
 // Mool Mantar and the "Aad sach ... Hai bhee sach" salok open Japji's paath but
 // are recited and sung on their own (simran, before kirtan), so they never open it.
 const PAATH_SKIP_VERSES = new Set([1, 2, 3, 4]);
+// Rehras and Sohila shabads are sung as kirtan too, so one line never opens those
+// Banis. But paath reads straight through while kirtan keeps returning to its rahao:
+// this many distinct lines of the shown shabad read in order, never stepping back,
+// is a paath, and a shabad that belongs to exactly one of these Banis opens it.
+const PAATH_READ_LINES = 3;
+// Rehras, Sohila, and Japji (whose opening shabad starts with the Mool Mantar, which
+// never opens it on its own line).
+const PAATH_READ_BANIS = [21, 23, 2];
+// Jaap Sahib is stored as 22 chhand shabads of short, similar lines: while searching,
+// the evidence spreads over several of them and no single chhand ever leads, so it
+// never locks. Pool the votes of a paath Bani's shabads (split over at least two)
+// into one candidate; a steady clear pooled lead locks its best shabad, and the
+// one-line paath rule then opens the Bani.
+const PAATH_POOL_BANIS = [4]; // Jaap Sahib
+const PAATH_POOL_STABLE = 3; // decodes the pooled lead must hold
+// The same pooling on the full-text search (the first letters of Jaap's short words
+// are often misheard, so the vote above can stay empty): this many of the last
+// PAATH_POOL_WINDOW searches whose top line is a shabad of that Bani lock it.
+const PAATH_POOL_WINDOW = 8;
+const PAATH_POOL_HITS = 5;
+const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
+const BANI_LENGTH_ALL = ['existsSGPC', 'existsMedium', 'existsTaksal', 'existsBuddhaDal'];
+// Pooled search votes of one PAATH_POOL_BANIS Bani (see there), or null.
+function poolPaathVotes(ranked, index) {
+  let bani = null;
+  let pool = 0;
+  let other = 0;
+  let bestSid = null;
+  let bestV = 0;
+  let members = 0;
+  ranked.forEach(([sid, v]) => {
+    const b = (index.byShabad.get(sid) || [])
+      .map((x) => x.bani)
+      .find((x) => PAATH_POOL_BANIS.includes(x));
+    if (b != null && !PAATH_SKIP_SHABADS.has(sid) && (bani == null || b === bani)) {
+      bani = b;
+      pool += v;
+      members += 1;
+      if (v > bestV) {
+        bestV = v;
+        bestSid = sid;
+      }
+    } else if (v > other) other = v;
+  });
+  if (bani == null || members < 2 || pool < DETECT_MIN_EVIDENCE) return null;
+  if (pool / (pool + other) < AUTO_LOCK_CONF) return null;
+  return { bani, sid: bestSid };
+}
 // The Bani in which `nextId` follows `prevId` most closely, in order; else null.
 function findBaniSequence(index, prevId, nextId) {
   const a = index.byShabad.get(prevId) || [];
@@ -400,6 +448,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   baniLengthRef.current = baniLength;
   const baniIndexRef = useRef(null); // { col, promise } shabad<->Bani index, built once per length
   const curBaniShabadsRef = useRef(null); // Set of shabads inside the Bani being followed
+  const seqReadRef = useRef({ id: null, last: -1, lines: new Set(), fired: false }); // PAATH_READ_LINES
   const autopilotLockRef = useRef(null);
   // Settings > Other Options > "Help Improve Voice-Follow" (on by default): keep the
   // audio before a sevadaar correction, on this computer only.
@@ -515,6 +564,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const detectVotesRef = useRef(new Map()); // shabadId -> accumulated vote weight
   const detectRowsRef = useRef(new Map()); // shabadId -> best {verseId, verse, shabadId, rank}
   const detectStableRef = useRef({ id: null, count: 0 }); // leader-stability counter
+  const poolStableRef = useRef({ bani: null, count: 0 }); // PAATH_POOL_STABLE counter
   const emptyStreakRef = useRef(0); // consecutive no-hit decodes (shortlist hold)
 
   const cleanup = useCallback(() => {
@@ -950,24 +1000,27 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     return paathLinesRef.current.promise;
   }, []);
 
-  const loadBaniProfile = useCallback(
-    async (baniId) => {
-      const col = BANI_LENGTH_COLS[baniLengthRef.current] || BANI_LENGTH_COLS.short;
-      const rows = await loadBaniRows(baniId, col);
-      const filtered = (rows || []).filter((r) => r && r.ID != null && r.Gurmukhi);
-      const verses = filtered.map((r) => ({
-        verseId: r.ID,
-        words: tokenize(anvaad.unicode(r.Gurmukhi)),
-      }));
-      const linesNorm = verses.map((v) => vfNorm((v.words || []).join(' ')));
-      const displayLines = filtered.map((r) => anvaad.unicode(r.Gurmukhi));
-      const rawLines = filtered.map((r) => r.Gurmukhi);
-      const index = await getBaniIndex();
-      const shabadIds = new Set((index && index.banis[baniId]) || []);
-      return { verses, linesNorm, displayLines, rawLines, shabadIds };
-    },
-    [getBaniIndex],
-  );
+  const loadBaniProfile = useCallback(async (baniId) => {
+    const col = BANI_LENGTH_COLS[baniLengthRef.current] || BANI_LENGTH_COLS.short;
+    const rows = await loadBaniRows(baniId, col);
+    const filtered = (rows || []).filter((r) => r && r.ID != null && r.Gurmukhi);
+    const verses = filtered.map((r) => ({
+      verseId: r.ID,
+      words: tokenize(anvaad.unicode(r.Gurmukhi)),
+    }));
+    const linesNorm = verses.map((v) => vfNorm((v.words || []).join(' ')));
+    const displayLines = filtered.map((r) => anvaad.unicode(r.Gurmukhi));
+    const rawLines = filtered.map((r) => r.Gurmukhi);
+    // Every length's shabads belong to the Bani being followed: a reader of the
+    // long Rehras reads shabads the short one lacks, and those must hold the
+    // Bani on screen rather than pull the app out of it to a separate shabad.
+    const shabadIds = new Set();
+    const all = await Promise.all(
+      BANI_LENGTH_ALL.map((c) => banidb.loadBaniIndex(c).catch(() => ({}))),
+    );
+    all.forEach((idx) => ((idx && idx[baniId]) || []).forEach((sid) => shabadIds.add(sid)));
+    return { verses, linesNorm, displayLines, rawLines, shabadIds };
+  }, []);
 
   const loadShabadProfile = useCallback(async (shabadId) => {
     const rows = await banidb.loadShabad(shabadId);
@@ -1400,6 +1453,49 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             return;
           const top = leaders?.[0];
           const margin = top ? top.score - (leaders[1]?.score || 0) : 0;
+          // Full-text pooling for PAATH_POOL_BANIS (Jaap): the top line keeps landing
+          // on one of that Bani's shabads, whichever chhand it is.
+          const stale = () =>
+            session !== sessionRef.current ||
+            !recognizingRef.current ||
+            phaseRef.current !== 'searching' ||
+            lockingRef.current ||
+            contextEvidenceRef.current !== memory ||
+            memory.step !== step;
+          const poolIndex = await getBaniIndex().catch(() => null);
+          if (stale()) return;
+          const poolBani =
+            top &&
+            poolIndex &&
+            top.score >= PAATH_POOL_TEXT_MIN &&
+            !PAATH_SKIP_SHABADS.has(top.shabadId)
+              ? (poolIndex.byShabad.get(top.shabadId) || [])
+                  .map((x) => x.bani)
+                  .find((b) => PAATH_POOL_BANIS.includes(b))
+              : undefined;
+          memory.pool = [...(memory.pool || []), poolBani ?? null].slice(-PAATH_POOL_WINDOW);
+          if (
+            poolBani != null &&
+            memory.pool.filter((b) => b === poolBani).length >= PAATH_POOL_HITS
+          ) {
+            let poolProfile;
+            try {
+              poolProfile = await loadShabadProfile(top.shabadId);
+            } catch (_) {
+              return;
+            }
+            if (stale()) return;
+            const at = poolProfile.verses.findIndex((v) => v.verseId === top.verseId);
+            if (at >= 0) {
+              memory.pool = [];
+              autopilotLock({
+                shabadId: top.shabadId,
+                verseId: top.verseId,
+                verse: poolProfile.rawLines[at],
+              });
+              return;
+            }
+          }
           if (
             top &&
             top.score >= 0.3 &&
@@ -1722,6 +1818,22 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (lockingRef.current) return;
 
         if (phaseRef.current === 'searching') {
+          // Paath evidence split across a Bani's shabads (Jaap): pool it.
+          if (fl.length >= AP_LOCK_MIN_LETTERS) {
+            const index = await getBaniIndex().catch(() => null);
+            if (!isCurrentTranscript() || lockingRef.current) return;
+            const pooled = index && poolPaathVotes(ranked, index);
+            const ps = poolStableRef.current;
+            if (!pooled) poolStableRef.current = { bani: null, count: 0 };
+            else if (ps.bani === pooled.bani) ps.count += 1;
+            else poolStableRef.current = { bani: pooled.bani, count: 1 };
+            const row = pooled && rowByShabad.get(pooled.sid);
+            if (row && row.verse && poolStableRef.current.count >= PAATH_POOL_STABLE) {
+              poolStableRef.current = { bani: null, count: 0 };
+              autopilotLock({ shabadId: pooled.sid, verseId: row.verseId, verse: row.verse });
+              return;
+            }
+          }
           // Require the unique full-text leader to agree with the first-letter
           // nominee. Ties and stale asynchronous answers cannot establish a lock.
           if (
@@ -2425,6 +2537,49 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             lastVerseRef.current = out.verseId;
             setActiveVerseId(out.verseId);
             setLineNumber(out.lineIndex + 1);
+          }
+          // Straight-through reading of a Rehras or Sohila shabad: open the Bani.
+          const sid = currentShabadIdRef.current;
+          if (seqReadRef.current.id !== sid) {
+            seqReadRef.current = { id: sid, last: -1, lines: new Set(), fired: false };
+          }
+          const sr = seqReadRef.current;
+          if (
+            typeof sid === 'number' &&
+            !PAATH_SKIP_SHABADS.has(sid) &&
+            !sr.fired &&
+            out.lineIndex !== sr.last
+          ) {
+            if (out.lineIndex < sr.last) sr.lines = new Set();
+            sr.lines.add(out.lineIndex);
+            sr.last = out.lineIndex;
+            if (sr.lines.size >= PAATH_READ_LINES) {
+              sr.fired = true;
+              const { verseId } = out;
+              const verse = (curProfileRef.current?.rawLines || [])[out.lineIndex];
+              getBaniIndex()
+                .then((index) => {
+                  const banis = (index.byShabad.get(sid) || [])
+                    .map((x) => x.bani)
+                    .filter((b) => PAATH_READ_BANIS.includes(b));
+                  if (
+                    banis.length !== 1 ||
+                    !verse ||
+                    session !== sessionRef.current ||
+                    !autopilotRef.current ||
+                    lockingRef.current ||
+                    currentShabadIdRef.current !== sid ||
+                    !autopilotLockRef.current
+                  ) {
+                    return;
+                  }
+                  autopilotLockRef.current(
+                    { shabadId: `${BANI_KEY}${banis[0]}`, verseId, verse },
+                    { promote: true },
+                  );
+                })
+                .catch(() => {});
+            }
           }
         }
       });

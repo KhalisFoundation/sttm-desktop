@@ -113,7 +113,6 @@ function bestLineMatch(hypNorm, linesNorm, minLineChars = 0) {
   return { s: best, index: at };
 }
 
-
 // Order-tolerant line match for the CURRENT shabad. Kirtan constantly re-sings
 // the rahao and rotates word order ("tera ant na jaana mere laal" for the line
 // "mere laal jio tera ant na jaana"). partialRatio is order-sensitive, so the
