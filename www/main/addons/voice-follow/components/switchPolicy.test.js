@@ -9,6 +9,7 @@ const {
   screenByFirstLetters,
   bestLineMatch,
   orderFreeLineScore,
+  sameGurbani,
 } = require('./switchPolicy');
 // Shipped tuning, read from VoiceFollow.jsx so tests track the app's config.
 const { CFG, CONFIRM, HOLD } = require('./switchPolicy.config');
@@ -255,5 +256,32 @@ describe('orderFreeLineScore', () => {
     assert.equal(orderFreeLineScore([], [line], 15), 0);
     assert.equal(orderFreeLineScore(['ਹਰਿ'], [line], 15), 0);
     assert.equal(orderFreeLineScore(['ਹਰਿ', 'ਜਨ'], [], 15), 0);
+  });
+});
+
+describe('sameGurbani', () => {
+  const aarti = [
+    'ਧਨਾਸਰੀ ਮਹਲਾ ੧ ਆਰਤੀ',
+    'ਗਗਨ ਮੈ ਥਾਲੁ ਰਵਿ ਚੰਦੁ ਦੀਪਕ ਬਨੇ ਤਾਰਿਕਾ ਮੰਡਲ ਜਨਕ ਮੋਤੀ ॥',
+    'ਧੂਪੁ ਮਲਆਨਲੋ ਪਵਣੁ ਚਵਰੋ ਕਰੇ ਸਗਲ ਬਨਰਾਇ ਫੂਲੰਤ ਜੋਤੀ ॥੧॥',
+    'ਕੈਸੀ ਆਰਤੀ ਹੋਇ ॥ ਭਵ ਖੰਡਨਾ ਤੇਰੀ ਆਰਤੀ ॥',
+  ];
+  it('treats a copy with small spelling differences as the same Gurbani', () => {
+    const copy = [
+      'ਆਰਤੀ',
+      'ਗਗਨ ਮੈ ਥਾਲੁ ਰਵਿ ਚੰਦੁ ਦੀਪਕ ਬਨੇ ਤਾਰਿਕਾ ਮੰਡਲ ਜਨਕ ਮੋਤੀ ॥',
+      'ਧੂਪੁ ਮਲਿਆਨਲੋ ਪਵਣੁ ਚਵਰੋ ਕਰੇ ਸਗਲ ਬਨਰਾਇ ਫੂਲੰਤ ਜੋਤੀ ॥੧॥',
+      'ਕੈਸੀ ਆਰਤੀ ਹੋਇ ॥ ਭਵ ਖੰਡਨਾ ਤੇਰੀ ਆਰਤੀ ॥',
+    ];
+    assert.equal(sameGurbani(aarti, copy), true);
+  });
+  it('keeps shabads that only share a line apart', () => {
+    const other = [
+      'ਕੈਸੀ ਆਰਤੀ ਹੋਇ ॥ ਭਵ ਖੰਡਨਾ ਤੇਰੀ ਆਰਤੀ ॥',
+      'ਹਰਿ ਜਨ ਬੋਲਤ ਸ੍ਰੀਰਾਮ ਨਾਮਾ ਮਿਲਿ ਸਾਧਸੰਗਤਿ ਹਰਿ ਤੋਰ ॥',
+      'ਮਨ ਮੇਰੇ ਰਾਮ ਨਾਮਿ ਚਿਤੁ ਲਾਇ ਕੋਟਿ ਜਨਮ ਕੇ ਕਿਲਵਿਖ ਜਾਹਿ ॥',
+    ];
+    assert.equal(sameGurbani(aarti, other), false);
+    assert.equal(sameGurbani(aarti, []), false);
   });
 });

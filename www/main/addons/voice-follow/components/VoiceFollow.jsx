@@ -27,6 +27,7 @@ const {
   maxLineScore,
   bestLineMatch,
   orderFreeLineScore,
+  sameGurbani,
 } = require('./switchPolicy');
 
 // maxLineScore lives in ./switchPolicy (same implementation, unit-tested there)
@@ -156,6 +157,10 @@ const SWITCH_CAND_MIN_LINE_CHARS = 15;
 // (misses switches: recall 68->60%), so raising it is not safe. The 9s stress ceiling
 // (~35% on-correct) is latency-bound (react time ~4-5s vs 9s dwell), not tunable.
 const SWITCH_CONFIRM = 3; // consecutive winning decodes needed to commit a switch
+// Same-Gurbani lock (ported from cycle 11): the same text stored as two shabads (Aarti in
+// Sohila and in Dhanasari, a Rehras shabad and its SGGS original) searches as an exact
+// tie, and a tie never locks. 1 = while searching, treat such copies as one candidate.
+const DUP_AWARE_LOCK = 1;
 // Returning to the shabad we JUST left is low-risk (we were confidently following
 // it moments ago) and slow returns are the main cost of a brief pramaan quote or a
 // mistaken switch: the true shabad kept reaching 2 wins but the shared contender
@@ -486,6 +491,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const flIndexLoadingRef = useRef(null); // in-flight index promise
   const lineCacheRef = useRef(new Map()); // shabadId -> { linesNorm, verses } | null (loading)
   const bsWinsRef = useRef(new Map()); // backstop wins banked per shabadId (survives screen flap)
+  const sameGurbaniRef = useRef(new Map()); // 'a:b' -> Promise<boolean> (DUP_AWARE_LOCK)
   const bsAdoptKeyRef = useRef(''); // last screened field we ran adoption against
   const flIndexFailAtRef = useRef(0); // last index-build failure (backoff clock)
   // Seeking slide: while a switch evaluation is genuinely live (a contender is
@@ -976,8 +982,44 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     // Preserve the exact BaniDB text for display, separately from tokenized
     // alignment words (which omit punctuation and verse numbers).
     const displayLines = filtered.map((it) => anvaad.unicode(it.verse));
-    return { verses, linesNorm, displayLines };
+    const rawLines = filtered.map((it) => it.verse);
+    return { verses, linesNorm, displayLines, rawLines };
   }, []);
+
+  // DUP_AWARE_LOCK: whether two shabads are one Gurbani text stored twice (cached).
+  const isSameGurbani = useCallback(
+    (a, b) => {
+      if (a === b) return Promise.resolve(false);
+      const key = a < b ? `${a}:${b}` : `${b}:${a}`;
+      const cache = sameGurbaniRef.current;
+      if (!cache.has(key)) {
+        cache.set(
+          key,
+          Promise.all([loadShabadProfile(a), loadShabadProfile(b)])
+            .then(([pa, pb]) => sameGurbani(pa.displayLines, pb.displayLines))
+            .catch(() => false),
+        );
+      }
+      return cache.get(key);
+    },
+    [loadShabadProfile],
+  );
+
+  // Drop search leaders that are a copy of a higher-ranked leader, keeping n.
+  const distinctLeaders = useCallback(
+    async (list, n) => {
+      if (!list || list.length < 2) return list;
+      const copies = await Promise.all(
+        list.map((c, i) =>
+          Promise.all(list.slice(0, i).map((o) => isSameGurbani(o.shabadId, c.shabadId))).then(
+            (r) => r.some(Boolean),
+          ),
+        ),
+      );
+      return list.filter((c, i) => !copies[i]).slice(0, n);
+    },
+    [isSameGurbani],
+  );
 
   // Prepare independently of audio inference. A failed service backs off;
   // obsolete preparation cannot publish into a restarted microphone session.
@@ -1345,7 +1387,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           transcriptAbortRef.current?.abort();
           const request = new AbortController();
           transcriptAbortRef.current = request;
-          const leaders = await searchCanonicalText(text, 3, request.signal);
+          let leaders = await searchCanonicalText(text, 3 + DUP_AWARE_LOCK, request.signal);
+          if (DUP_AWARE_LOCK) leaders = await distinctLeaders(leaders, 3);
           if (
             session !== sessionRef.current ||
             !recognizingRef.current ||
@@ -1622,7 +1665,19 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       // the leader so the top guess reads as a full bar.
       const ranked = [...votes.entries()].sort((a, b) => b[1] - a[1]);
       const best = ranked[0][1];
-      const second = ranked[1] ? ranked[1][1] : 0;
+      let runnerUp = 1;
+      if (DUP_AWARE_LOCK && autopilotRef.current && phaseRef.current === 'searching') {
+        // A copy of the leader's text is the same candidate, not its rival.
+        while (
+          runnerUp < 3 &&
+          ranked[runnerUp] &&
+          // eslint-disable-next-line no-await-in-loop
+          (await isSameGurbani(ranked[0][0], ranked[runnerUp][0]))
+        )
+          runnerUp += 1;
+        if (!isCurrentTranscript()) return;
+      }
+      const second = ranked[runnerUp] ? ranked[runnerUp][1] : 0;
       const leaderId = ranked[0][0];
       const lead = best / (best + second || best);
 
@@ -1675,7 +1730,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             best >= DETECT_MIN_EVIDENCE &&
             st.count >= AP_LOCK_STABLE
           ) {
-            const leaders = await searchCanonicalText(text, 2, abort.signal);
+            let leaders = await searchCanonicalText(text, 2 + DUP_AWARE_LOCK, abort.signal);
+            if (DUP_AWARE_LOCK) leaders = await distinctLeaders(leaders, 2);
+            if (
+              DUP_AWARE_LOCK &&
+              leaders?.[0] &&
+              leaders[0].shabadId !== cand.shabadId &&
+              (await isSameGurbani(leaders[0].shabadId, cand.shabadId))
+            )
+              leaders = [{ ...leaders[0], shabadId: cand.shabadId }, ...leaders.slice(1)];
             if (
               !isCurrentTranscript() ||
               lockingRef.current ||

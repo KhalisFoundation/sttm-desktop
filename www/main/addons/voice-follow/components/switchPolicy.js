@@ -141,7 +141,43 @@ function orderFreeLineScore(hypWords, linesWords, minLineChars = 0) {
   return best;
 }
 
+// Two shabads that are the same Gurbani text in two places (Aarti's SGGS
+// shabad vs its copy in the Aarti Bani, a Sohila shabad repeated elsewhere)
+// search as an exact tie, and a tie can never lock. sameGurbani(a, b) says
+// whether two shabads' display lines are such a copy: at least 80% of the
+// shorter one's real lines (headings dropped, vowel signs and small spelling
+// differences ignored) appear in the longer one.
+const DUP_HEADING = /ੴ|ਮਹਲਾ|ਪਾਤਿਸਾਹੀ|ਘਰੁ|^ਪਉੜੀ|^ਸਲੋਕ|^ਰਾਗੁ/;
+const DUP_VOWELS = { ਆ: 'ਅ', ਈ: 'ਇ', ਊ: 'ਉ', ਐ: 'ਏ', ਔ: 'ਓ' };
+const dupLines = (lines) =>
+  new Set(
+    (lines || [])
+      .filter((l) => l && !DUP_HEADING.test(l))
+      .map((l) =>
+        l
+          .replace(/[।॥|0-9੦-੯.,;:!?\-\s]+/g, '')
+          .replace(/[ਾ-ੌਁ-ਃੰੱ਼੍]/g, '')
+          .replace(/[ਆਈਊਐਔ]/g, (c) => DUP_VOWELS[c]),
+      )
+      .filter((l) => l.length >= 8),
+  );
+function sameGurbani(linesA, linesB) {
+  const a = dupLines(linesA);
+  const b = dupLines(linesB);
+  const [small, big] = a.size <= b.size ? [a, b] : [b, a];
+  if (small.size < 2) return false;
+  const near = (l) =>
+    big.has(l) ||
+    [...big].some((m) => Math.abs(l.length - m.length) <= 4 && partialRatio(l, m) >= 90);
+  let k = 0;
+  small.forEach((l) => {
+    if (near(l)) k += 1;
+  });
+  return k >= 0.8 * small.size;
+}
+
 module.exports = {
+  sameGurbani,
   nextSwitchWins,
   nextEmptyStreak,
   maxLineScore,
