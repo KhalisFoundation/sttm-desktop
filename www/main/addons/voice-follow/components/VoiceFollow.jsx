@@ -161,6 +161,12 @@ const SWITCH_CONFIRM = 3; // consecutive winning decodes needed to commit a swit
 // Sohila and in Dhanasari, a Rehras shabad and its SGGS original) searches as an exact
 // tie, and a tie never locks. 1 = while searching, treat such copies as one candidate.
 const DUP_AWARE_LOCK = 1;
+// Mool Mantar home (ported from cycle 12): the Mool Mantar begins dozens of shabads, so
+// it ties exactly and never locks, leaving nothing on screen. After this many distinct
+// heard fragments that tie between Japji's Mool Mantar and other shabads, show Japji's
+// opening shabad (the right words); Japji Sahib itself opens only once pauri 1 is read.
+const MOOL_HOME = 4;
+const MOOL_HOME_MIN = 0.6;
 // Returning to the shabad we JUST left is low-risk (we were confidently following
 // it moments ago) and slow returns are the main cost of a brief pramaan quote or a
 // mistaken switch: the true shabad kept reaching 2 wins but the shared contender
@@ -1577,6 +1583,45 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             return;
           const top = leaders?.[0];
           const margin = top ? top.score - (leaders[1]?.score || 0) : 0;
+          if (
+            MOOL_HOME > 0 &&
+            top &&
+            top.shabadId === 1 &&
+            top.verseId === 1 &&
+            top.score >= MOOL_HOME_MIN &&
+            leaders[1] &&
+            Math.abs(top.score - leaders[1].score) < 1e-9
+          ) {
+            const mm =
+              memory.mool && step - memory.mool.last <= 4
+                ? memory.mool
+                : { hyps: new Set(), last: step };
+            mm.hyps.add(hyp);
+            mm.last = step;
+            memory.mool = mm;
+            if (mm.hyps.size >= MOOL_HOME) {
+              let moolProfile;
+              try {
+                moolProfile = await loadShabadProfile(1);
+              } catch (_) {
+                return;
+              }
+              if (
+                session !== sessionRef.current ||
+                !recognizingRef.current ||
+                phaseRef.current !== 'searching' ||
+                lockingRef.current ||
+                contextEvidenceRef.current !== memory ||
+                memory.step !== step
+              )
+                return;
+              const at = moolProfile.verses.findIndex((v) => v.verseId === 1);
+              if (at >= 0) {
+                autopilotLock({ shabadId: 1, verseId: 1, verse: moolProfile.rawLines[at] });
+                return;
+              }
+            }
+          }
           // Full-text pooling for PAATH_POOL_BANIS (Jaap): the top line keeps landing
           // on one of that Bani's shabads, whichever chhand it is.
           const stale = () =>
