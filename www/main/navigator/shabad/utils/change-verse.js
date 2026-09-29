@@ -108,6 +108,12 @@ export const sendToBaniController = (
     if (!crossPlatformId) {
       baniVerse = activeShabad.find((obj) => obj.verseId === newTraversedVerse);
     }
+    // The verse's 1-based position. Bani and ceremony verse ids don't share
+    // a space with the web controller's (ceremony rows have Realm-local ids
+    // and no crossPlatformId), so the web finds the verse by its position,
+    // as the desktop does for the controller's lineCount.
+    const verseIndex = activeShabad.findIndex((obj) => obj.verseId === newTraversedVerse);
+    const lineCount = verseIndex >= 0 ? verseIndex + 1 : undefined;
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
@@ -115,6 +121,7 @@ export const sendToBaniController = (
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
         highlight: crossPlatformId || baniVerse?.crossPlatformId,
+        lineCount,
         baniLength,
         // mangalPosition,
         verseChange: false,
@@ -126,6 +133,7 @@ export const sendToBaniController = (
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
         highlight: crossPlatformId || baniVerse?.crossPlatformId,
+        lineCount,
         verseChange: false,
       });
     } else if (activeShabadId) {
