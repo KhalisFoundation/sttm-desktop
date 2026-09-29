@@ -153,7 +153,12 @@ function ShabadDeck() {
         currentShabad = pane3.activeShabad;
       }
     }
-    if (!isMiscSlide && activeVerseId) {
+    // A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
+    // aren't verse ids, so looking them up in the pane's "shabad" (the bani
+    // id) showed that shabad's verses instead, e.g. Japji Sahib's for Gur
+    // Mantar (bani 1 → shabad 1).
+    const isShabadShown = !isSundarGutkaBani && !isCeremonyBani;
+    if (!isMiscSlide && activeVerseId && isShabadShown) {
       if (akhandpatt) {
         loadShabad(currentShabad, activeVerseId).then((verses) => setActiveVerse(verses));
       } else {
