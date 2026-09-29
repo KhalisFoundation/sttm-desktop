@@ -42,6 +42,8 @@ export const ShabadText = ({
 
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
+  // Id of the shabad/bani whose verses are currently in filteredItems.
+  const loadedShabadIdRef = useRef(null);
 
   const {
     activeVerseId,
@@ -134,6 +136,7 @@ export const ShabadText = ({
         initialVerseId,
       );
       const filtered = filterRequiredVerseItems(verseList);
+      loadedShabadIdRef.current = shabadId;
       setFilteredItems(filtered);
       const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
       if (filtered.length > 0) {
@@ -156,6 +159,21 @@ export const ShabadText = ({
       loadCeremony(shabadId).then(setVerseList);
     }
   }, [shabadId, baniType, baniLength]);
+
+  // Re-opening the bani that is already loaded (from Sundar Gutka) doesn't
+  // change shabadId, so nothing reloads. Restart it from the first verse here.
+  // A different bani is still loading, so setVerseList handles that case.
+  useEffect(() => {
+    if (
+      paneAttributes.baniOpenedAt &&
+      baniType === 'bani' &&
+      loadedShabadIdRef.current === shabadId &&
+      filteredItems.length
+    ) {
+      updateTraversedVerse(filteredItems[0].verseId, 0);
+      scrollToVerse(filteredItems[0].verseId, filteredItems, virtuosoRef);
+    }
+  }, [paneAttributes.baniOpenedAt]);
 
   useEffect(() => {
     if (filteredItems.length) {

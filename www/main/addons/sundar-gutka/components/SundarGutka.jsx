@@ -20,6 +20,9 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     sundarGutkaBaniId,
     isCeremonyBani,
     singleDisplayActiveTab,
+    initialVerseId,
+    lineNumber,
+    savedCrossPlatformId,
     pane1,
     pane2,
     pane3,
@@ -32,6 +35,9 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     setSundarGutkaBaniId,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
+    setInitialVerseId,
+    setLineNumber,
+    setSavedCrossPlatformId,
     setPane1,
     setPane2,
     setPane3,
@@ -95,31 +101,41 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
       setSingleDisplayActiveTab('shabad');
     }
 
+    // A bani opened from Sundar Gutka always starts at its first verse. Clear
+    // anything that ShabadText would otherwise resume from: the search/history
+    // initial verse and a leftover bani controller position.
+    if (initialVerseId !== null) {
+      setInitialVerseId(null);
+    }
+    if (lineNumber !== null) {
+      setLineNumber(null);
+    }
+    if (savedCrossPlatformId !== null) {
+      setSavedCrossPlatformId(null);
+    }
+
+    // Drop the previous verse position carried by the pane. baniOpenedAt lets
+    // ShabadText restart the bani even when the same bani is already loaded.
+    const freshBani = {
+      content: i18n.t('MULTI_PANE.SHABAD'),
+      baniType: 'bani',
+      activeShabad: baniId,
+      activeVerse: '',
+      versesRead: [],
+      homeVerse: false,
+      baniOpenedAt: Date.now(),
+    };
+
     if (paneId !== null) {
       switch (paneId) {
         case 1:
-          setPane1({
-            ...pane1,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            baniType: 'bani',
-            activeShabad: baniId,
-          });
+          setPane1({ ...pane1, ...freshBani });
           break;
         case 2:
-          setPane2({
-            ...pane2,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            baniType: 'bani',
-            activeShabad: baniId,
-          });
+          setPane2({ ...pane2, ...freshBani });
           break;
         case 3:
-          setPane3({
-            ...pane3,
-            content: i18n.t('MULTI_PANE.SHABAD'),
-            baniType: 'bani',
-            activeShabad: baniId,
-          });
+          setPane3({ ...pane3, ...freshBani });
           break;
         default:
           break;

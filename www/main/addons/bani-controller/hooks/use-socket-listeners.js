@@ -35,6 +35,8 @@ const useSocketListeners = (
   lineNumber,
   setLineNumber,
   updatePane,
+  isAnnouncement,
+  setIsAnnouncement,
 ) => {
   if (socketData) {
     const isPinCorrect = parseInt(socketData.pin, 10) === adminPin;
@@ -69,6 +71,11 @@ const useSocketListeners = (
         }
         if (isMiscSlideGurmukhi !== payload.isGurmukhi) {
           setIsMiscSlideGurmukhi(payload.isGurmukhi);
+        }
+        // SlideAnnouncement only honours isMiscSlideGurmukhi when isAnnouncement
+        // is set; without it English text renders in the Gurmukhi font.
+        if (isAnnouncement !== !!payload.isAnnouncement) {
+          setIsAnnouncement(!!payload.isAnnouncement);
         }
         analytics.trackEvent({
           category: 'controller',

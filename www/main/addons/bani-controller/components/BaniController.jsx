@@ -60,6 +60,7 @@ const BaniController = ({ onScreenClose, className }) => {
     isMiscSlide,
     miscSlideText,
     isMiscSlideGurmukhi,
+    isAnnouncement,
     savedCrossPlatformId,
     lineNumber,
   } = useStoreState((state) => state.navigator);
@@ -72,6 +73,7 @@ const BaniController = ({ onScreenClose, className }) => {
     setIsMiscSlide,
     setMiscSlideText,
     setIsMiscSlideGurmukhi,
+    setIsAnnouncement,
     setSavedCrossPlatformId,
     setLineNumber,
   } = useStoreActions((state) => state.navigator);
@@ -227,6 +229,8 @@ const BaniController = ({ onScreenClose, className }) => {
       lineNumber,
       setLineNumber,
       updatePane,
+      isAnnouncement,
+      setIsAnnouncement,
     );
   }, [socketData]);
 
