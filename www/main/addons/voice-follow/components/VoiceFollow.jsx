@@ -1073,6 +1073,22 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     [loadShabadProfile],
   );
 
+  // Synchronous view of isSameGurbani for the switch judge: false until known. The first
+  // time a pair meets, the check starts in the background; a switch needs several wins
+  // over a second or more, so the answer is in by the time it matters.
+  const sameKnownRef = useRef(new Map());
+  const knownSame = (a, b) => {
+    if (typeof a !== 'number' || typeof b !== 'number' || a === b) return false;
+    const key = a < b ? `${a}:${b}` : `${b}:${a}`;
+    const known = sameKnownRef.current;
+    if (known.has(key)) return known.get(key);
+    known.set(key, false);
+    isSameGurbani(a, b)
+      .then((same) => known.set(key, same))
+      .catch(() => {});
+    return false;
+  };
+
   // Drop search leaders that are a copy of a higher-ranked leader, keeping n.
   const distinctLeaders = useCallback(
     async (list, n) => {
@@ -2005,7 +2021,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           // Suppress confirmation only for identities in the tied leader set.
           const vetoed =
             !!(vetoRef.current && vetoRef.current.id === slot.shabadId) ||
-            !!(curBaniShabadsRef.current && curBaniShabadsRef.current.has(slot.shabadId));
+            !!(curBaniShabadsRef.current && curBaniShabadsRef.current.has(slot.shabadId)) ||
+            // Another copy of the same Gurbani is not a new shabad: same words on screen.
+            knownSame(curId, slot.shabadId);
           if (tiedLeaderIds.has(slot.shabadId) || vetoed) {
             slot.wins = 0; // eslint-disable-line no-param-reassign
             slot.lastScore = sCand; // eslint-disable-line no-param-reassign
@@ -2172,7 +2190,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         // --- Return slot: the shabad we just left, judged in its own slot. ---
         {
           const prev = prevShabadRef.current;
-          if (prev && prev.id !== curId && prev.profile && prev.profile.linesNorm) {
+          if (
+            prev &&
+            prev.id !== curId &&
+            !knownSame(prev.id, curId) &&
+            prev.profile &&
+            prev.profile.linesNorm
+          ) {
             prev.decodesSince += 1;
             if (prev.decodesSince > RETURN_WINDOW_DECODES) {
               prevShabadRef.current = null;
