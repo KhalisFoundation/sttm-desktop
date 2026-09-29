@@ -185,9 +185,14 @@ const baniIdOf = (id) =>
 // so the two-shabad rule above could never see them. Listed in preference order:
 // the 6-pauri Anand (1000) is recited far more often than the full 40 (10), so a
 // pauri 1-5 or 40 line opens it and a pauri 6-39 line opens (or moves up to) 10.
-// Rehras, Sohila and Aarti are NOT here: their shabads are sung as kirtan too,
-// so they keep the two-shabads-in-order rule.
-const PAATH_BANIS = [1000, 10, 2, 4, 6, 7, 9]; // Anand 6, Anand, Japji, Jaap, Savaiye x2, Chaupai
+// Rehras and Sohila are NOT here: their shabads are sung as kirtan too, so they keep
+// the two-shabads-in-order and reading rules. Aarti IS here, opened at the user's length
+// exactly as Sundar Gutka's popular list opens it, but only by lines no other paath
+// has (Bhagat Dhanna ji's "Jo jan tumree bhagat karante"); a line Aarti shares with
+// Sohila (Gagan mai thaal) or Rehras (the Savaiya and Dohra) never opens it.
+const PAATH_BANIS = [1000, 10, 2, 4, 6, 7, 9, 22]; // Anand 6, Anand, Japji, Jaap, Savaiye x2, Chaupai, Aarti
+const AARTI_BANI = 22;
+const AARTI_SHARED_BANIS = [21, 23]; // Rehras, Sohila
 const PAATH_FAMILY = {
   1000: 'anand',
   10: 'anand',
@@ -196,10 +201,11 @@ const PAATH_FAMILY = {
   6: 'savaiye',
   7: 'savaiye',
   9: 'chaupai',
+  22: 'aarti',
 };
 // A line also in one of these is said or sung outside a paath (Mool Mantar, Aarti
 // chhands, Sohila, Ardas), so it never opens a paath on its own.
-const NOT_PAATH_BANIS = [1, 22, 23, 24]; // Gur Mantar, Aarti, Sohila, Ardas
+const NOT_PAATH_BANIS = [1, 23, 24]; // Gur Mantar, Sohila, Ardas (Aarti is a paath family now)
 // Shabads of a paath that are also sung as kirtan in their own right.
 const PAATH_SKIP_SHABADS = new Set([
   39, // Japji closing salok (Pavan Guru), also in Sohila
@@ -974,9 +980,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       const promise = Promise.all([
         Promise.all(PAATH_BANIS.map((b) => banidb.loadBani(b, col))),
         Promise.all(NOT_PAATH_BANIS.map((b) => banidb.loadBani(b, col))),
-      ]).then(([paath, notPaath]) => {
+        Promise.all(AARTI_SHARED_BANIS.map((b) => banidb.loadBani(b, col))),
+      ]).then(([paath, notPaath, aartiShared]) => {
         const blocked = new Set();
         notPaath.forEach((rows) => verseIds(rows).forEach((v) => blocked.add(v)));
+        const aartiBlocked = new Set();
+        aartiShared.forEach((rows) => verseIds(rows).forEach((v) => aartiBlocked.add(v)));
         const families = new Map();
         const lines = new Map();
         paath.forEach((rows, k) => {
@@ -991,6 +1000,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         // Headers and lines shared by two different paaths decide nothing.
         families.forEach((fams, v) => {
           if (fams.size > 1 || blocked.has(v)) lines.delete(v);
+          else if (lines.get(v) === AARTI_BANI && aartiBlocked.has(v)) lines.delete(v);
         });
         PAATH_SKIP_VERSES.forEach((v) => lines.delete(v));
         return lines;
