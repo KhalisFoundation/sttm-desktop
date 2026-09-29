@@ -235,6 +235,17 @@ const PAATH_POOL_STABLE = 3; // decodes the pooled lead must hold
 const PAATH_POOL_WINDOW = 8;
 const PAATH_POOL_HITS = 5;
 const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
+// Rehras is followed at the long length by default: the long Rehras contains the short
+// one plus long readers' opening ("Har jug jug bhagat upaya" and its salok) and the extra
+// Dasam shabads, so both kinds of reader are followed from the first line. While Rehras
+// is open the Bani length is raised to this (never lowered) and restored when it ends.
+const REHRAS_BANI = 21;
+const REHRAS_LENGTH = 'long';
+const LENGTH_ORDER = ['short', 'medium', 'long', 'extralong'];
+const baniLengthFor = (baniId, userLength) =>
+  baniId === REHRAS_BANI && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(REHRAS_LENGTH)
+    ? REHRAS_LENGTH
+    : userLength;
 const BANI_LENGTH_ALL = ['existsSGPC', 'existsMedium', 'existsTaksal', 'existsBuddhaDal'];
 // Pooled search votes of one PAATH_POOL_BANIS Bani (see there), or null.
 function poolPaathVotes(ranked, index) {
@@ -431,6 +442,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const sundarGutkaBaniId = useStoreState((state) => state.navigator.sundarGutkaBaniId);
   const baniLength = useStoreState((state) => state.userSettings.baniLength);
   const { setActiveVerseId, setLineNumber } = useStoreActions((actions) => actions.navigator);
+  const setBaniLength = useStoreActions((actions) => actions.userSettings.setBaniLength);
+  const setBaniLengthRef = useRef(setBaniLength);
+  setBaniLengthRef.current = setBaniLength;
+  // { prev }: the user's own Bani length while Voice-Follow has raised it for Rehras.
+  const lengthOverrideRef = useRef(null);
   const {
     setIsSundarGutkaBani,
     setSundarGutkaBaniId,
@@ -457,6 +473,19 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const vetoRef = useRef(null); // { id, left }: shabad a tap just left, and judged decodes remaining
   const baniLengthRef = useRef('short');
   baniLengthRef.current = baniLength;
+  // The user's own length (what they chose), even while Rehras has it raised.
+  const userLength = () =>
+    (lengthOverrideRef.current && lengthOverrideRef.current.prev) || baniLengthRef.current;
+  const restoreBaniLength = () => {
+    const o = lengthOverrideRef.current;
+    if (!o) return;
+    lengthOverrideRef.current = null;
+    try {
+      setBaniLengthRef.current(o.prev);
+    } catch (_) {
+      /* Closing store. */
+    }
+  };
   const baniIndexRef = useRef(null); // { col, promise } shabad<->Bani index, built once per length
   const curBaniShabadsRef = useRef(null); // Set of shabads inside the Bani being followed
   const seqReadRef = useRef({ id: null, last: -1, lines: new Set(), fired: false }); // PAATH_READ_LINES
@@ -702,6 +731,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   }, []);
 
   const stop = useCallback(() => {
+    restoreBaniLength();
     if (sessionIdRef.current) {
       sessionLog.logEvent('session_end', {
         session: sessionIdRef.current,
@@ -945,9 +975,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // Load a shabad's verses (tokenized, for a Follower) and normalized line texts
   // (for acoustic scoring). Throws if it can't be loaded / has no usable lines.
   const getBaniIndex = useCallback(() => {
-    const col = BANI_LENGTH_COLS[baniLengthRef.current] || BANI_LENGTH_COLS.short;
+    const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
     if (!baniIndexRef.current || baniIndexRef.current.col !== col) {
-      const promise = banidb.loadBaniIndex(col).then((banis) => {
+      const rehrasCol = BANI_LENGTH_COLS[baniLengthFor(REHRAS_BANI, userLength())];
+      const promise = Promise.all([
+        banidb.loadBaniIndex(col),
+        rehrasCol === col ? null : banidb.loadBaniIndex(rehrasCol),
+      ]).then(([banis, rehrasBanis]) => {
+        // eslint-disable-next-line no-param-reassign
+        if (rehrasBanis && rehrasBanis[REHRAS_BANI]) banis[REHRAS_BANI] = rehrasBanis[REHRAS_BANI];
         const byShabad = new Map();
         Object.keys(banis).forEach((b) =>
           banis[b].forEach((sid, order) => {
@@ -973,7 +1009,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // verseId -> paath Bani for lines only a paath contains (see PAATH_BANIS).
   const paathLinesRef = useRef(null);
   const getPaathLines = useCallback(() => {
-    const col = BANI_LENGTH_COLS[baniLengthRef.current] || BANI_LENGTH_COLS.short;
+    const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
     if (!paathLinesRef.current || paathLinesRef.current.col !== col) {
       const verseIds = (rows) =>
         (rows || []).filter((r) => r && r.Verse && r.Verse.ID != null).map((r) => r.Verse.ID);
@@ -1016,7 +1052,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   }, []);
 
   const loadBaniProfile = useCallback(async (baniId) => {
-    const col = BANI_LENGTH_COLS[baniLengthRef.current] || BANI_LENGTH_COLS.short;
+    const col = BANI_LENGTH_COLS[baniLengthFor(baniId, userLength())] || BANI_LENGTH_COLS.short;
     const rows = await loadBaniRows(baniId, col);
     const filtered = (rows || []).filter((r) => r && r.ID != null && r.Gurmukhi);
     const verses = filtered.map((r) => ({
@@ -1324,6 +1360,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         bsAdoptKeyRef.current = '';
         if (cand.shabadId !== currentShabadIdRef.current) {
           currentShabadIdRef.current = cand.shabadId;
+          const wantLength = baniId != null ? baniLengthFor(baniId, userLength()) : null;
+          if (wantLength && wantLength !== baniLengthRef.current) {
+            if (!lengthOverrideRef.current) lengthOverrideRef.current = { prev: userLength() };
+            setBaniLengthRef.current(wantLength);
+          } else if (!wantLength || wantLength === userLength()) {
+            restoreBaniLength();
+          }
           if (baniId != null) {
             // Same actions the Sundar Gutka screen uses to open a Bani, plus the
             // pane (at the recited line, so it does not restart at the top).
