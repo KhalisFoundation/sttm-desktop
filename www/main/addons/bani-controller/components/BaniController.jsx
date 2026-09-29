@@ -8,7 +8,12 @@ import { ipcRenderer } from 'electron';
 import BaniControllerItem from './BaniControllerItem';
 import { Overlay } from '../../../common/sttm-ui';
 
-import { getBaniControllerItems, generateQrCode, shareSync } from '../utils';
+import {
+  getBaniControllerItems,
+  generateQrCode,
+  shareSync,
+  getControllerFontSizes,
+} from '../utils';
 
 import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
 
@@ -78,21 +83,10 @@ const BaniController = ({ onScreenClose, className }) => {
     setLineNumber,
   } = useStoreActions((state) => state.navigator);
 
-  const {
-    gurbaniFontSize,
-    content1FontSize,
-    content2FontSize,
-    content3FontSize,
-    baniLength,
-    // mangalPosition,
-  } = useStoreState((state) => state.userSettings);
+  const userSettings = useStoreState((state) => state.userSettings);
+  const { baniLength } = userSettings;
 
-  const fontSizes = {
-    gurbani: parseInt(gurbaniFontSize, 10),
-    translation: parseInt(content1FontSize, 10),
-    teeka: parseInt(content2FontSize, 10),
-    transliteration: parseInt(content3FontSize, 10),
-  };
+  const fontSizes = getControllerFontSizes(userSettings);
 
   const showSyncError = (errorMessage) => {
     setCodeLabel(errorMessage);

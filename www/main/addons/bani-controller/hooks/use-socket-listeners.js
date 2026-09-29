@@ -1,4 +1,4 @@
-import { handleRequestControl } from '../utils';
+import { handleRequestControl, getFontSizeSlot } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
 
 const remote = require('@electron/remote');
@@ -193,7 +193,9 @@ const useSocketListeners = (
       settings: (payload) => {
         const { settings } = payload;
         if (settings.action === 'changeFontSize') {
-          changeFontSize(settings.target, settings.value === 'plus');
+          // The web targets a content type; resize the slot showing it.
+          const slot = getFontSizeSlot(settings.target, global.getUserSettings);
+          if (slot) changeFontSize(slot, settings.value === 'plus');
         }
         analytics.trackEvent({
           category: 'controller',
