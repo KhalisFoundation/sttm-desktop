@@ -252,6 +252,10 @@ const baniLengthFor = (baniId, userLength) =>
   baniId === REHRAS_BANI && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(REHRAS_LENGTH)
     ? REHRAS_LENGTH
     : userLength;
+// Of the long Rehras's extra shabads, only its opening (Har jug jug bhagat upaya and the
+// salok after it) may open Rehras by the reading rule: its closing saloks and pauris
+// (e.g. 1944) are sung as kirtan in their own right (Level 2 clip04).
+const REHRAS_READ_OPENING = new Set([1661, 1721]);
 const BANI_LENGTH_ALL = ['existsSGPC', 'existsMedium', 'existsTaksal', 'existsBuddhaDal'];
 // Pooled search votes of one PAATH_POOL_BANIS Bani (see there), or null.
 function poolPaathVotes(ranked, index) {
@@ -988,6 +992,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         banidb.loadBaniIndex(col),
         rehrasCol === col ? null : banidb.loadBaniIndex(rehrasCol),
       ]).then(([banis, rehrasBanis]) => {
+        // The user-length Rehras, kept for the reading rule (see REHRAS_READ_OPENING).
+        const rehrasUser = new Set(banis[REHRAS_BANI] || []);
         // eslint-disable-next-line no-param-reassign
         if (rehrasBanis && rehrasBanis[REHRAS_BANI]) banis[REHRAS_BANI] = rehrasBanis[REHRAS_BANI];
         const byShabad = new Map();
@@ -998,7 +1004,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             byShabad.set(sid, list);
           }),
         );
-        return { banis, byShabad };
+        return { banis, byShabad, rehrasUser };
       });
       promise.catch(() => {
         if (baniIndexRef.current && baniIndexRef.current.promise === promise) {
@@ -2750,7 +2756,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                       ...(index.byShabad.get(sid) || []).map((x) => x.bani),
                       ...copies.keys(),
                     ]),
-                  ].filter((b) => PAATH_READ_BANIS.includes(b));
+                  ]
+                    .filter((b) => PAATH_READ_BANIS.includes(b))
+                    .filter(
+                      (b) =>
+                        b !== REHRAS_BANI ||
+                        !index.rehrasUser ||
+                        index.rehrasUser.has(sid) ||
+                        REHRAS_READ_OPENING.has(sid),
+                    );
                   if (
                     banis.length !== 1 ||
                     !verse ||
