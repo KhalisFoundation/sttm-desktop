@@ -215,7 +215,7 @@ const PAATH_SKIP_VERSES = new Set([1, 2, 3, 4]);
 const PAATH_READ_LINES = 3;
 // Rehras, Sohila, and Japji (whose opening shabad starts with the Mool Mantar, which
 // never opens it on its own line).
-const PAATH_READ_BANIS = [21, 23, 2];
+const PAATH_READ_BANIS = [21, 23, 2, 22]; // + Aarti: a shabad in both Sohila and Aarti opens neither
 // Jaap Sahib is stored as 22 chhand shabads of short, similar lines: while searching,
 // the evidence spreads over several of them and no single chhand ever leads, so it
 // never locks. Pool the votes of a paath Bani's shabads (split over at least two)
@@ -308,6 +308,11 @@ const EMPTY_HOLD_DECODES = 60;
 // actually are (a small band around the cursor, biased forward for normal singing).
 const CUR_SCORE_BACK = 1; // lines behind the cursor still counted as "current"
 const CUR_SCORE_AHEAD = 5; // lines ahead of the cursor still counted as "current"
+// A Bani on screen has hundreds of lines (Rehras ~300, full Anand ~200), and some line
+// of it partly matches almost any new kirtan, so judging the current text across ALL its
+// lines kept the app inside the Bani long after a new shabad began. For a Bani, the
+// all-lines bar only looks this far around the cursor (a shabad-sized neighbourhood).
+const BANI_CUR_SPAN = 8;
 // Highlight gating: don't chase the projected line onto similar-worded lines of the
 // OLD shabad. Freeze entirely while a switch is being evaluated; otherwise move on
 // any reasonably confident frame. (Kept modest so a freshly-switched follower, which
@@ -1074,6 +1079,32 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     [isSameGurbani],
   );
 
+  // Identical copies of a shabad inside the PAATH_READ_BANIS it is not in itself, as
+  // Map bani -> copy shabadId (Gagan mai thaal is stored once in Sohila, once in Aarti).
+  // A lock picks whichever copy ranks first, so both paath rules must see the others.
+  const paathCopiesRef = useRef(new Map());
+  const paathCopies = useCallback(
+    (sid, index) => {
+      if (!paathCopiesRef.current.has(sid)) {
+        const own = new Set((index.byShabad.get(sid) || []).map((x) => x.bani));
+        const jobs = [];
+        PAATH_READ_BANIS.forEach((b) => {
+          if (own.has(b)) return;
+          (index.banis[b] || []).forEach((s2) => {
+            if (s2 !== sid)
+              jobs.push(isSameGurbani(sid, s2).then((same) => (same ? [b, s2] : null)));
+          });
+        });
+        paathCopiesRef.current.set(
+          sid,
+          Promise.all(jobs).then((r) => new Map(r.filter(Boolean))),
+        );
+      }
+      return paathCopiesRef.current.get(sid);
+    },
+    [isSameGurbani],
+  );
+
   // Prepare independently of audio inference. A failed service backs off;
   // obsolete preparation cannot publish into a restarted microphone session.
   const ensureFlIndex = useCallback(() => {
@@ -1380,7 +1411,31 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           currentShabadIdRef.current === cand.shabadId &&
           !lockingRef.current
         ) {
-          const bani = findBaniSequence(index, fromId, cand.shabadId);
+          let bani = findBaniSequence(index, fromId, cand.shabadId);
+          // The previous shabad may have been locked as the other Bani's copy of the
+          // same Gurbani (Sohila's Gagan mai thaal before Aarti's next shabad).
+          if (
+            bani == null &&
+            (index.byShabad.get(fromId) || []).some((x) => PAATH_READ_BANIS.includes(x.bani))
+          ) {
+            let copies = null;
+            try {
+              copies = await paathCopies(fromId, index);
+            } catch (_) {
+              copies = null;
+            }
+            [...((copies && copies.values()) || [])].some((c) => {
+              bani = findBaniSequence(index, c, cand.shabadId);
+              return bani != null;
+            });
+            if (
+              session !== sessionRef.current ||
+              currentShabadIdRef.current !== cand.shabadId ||
+              lockingRef.current
+            ) {
+              bani = null;
+            }
+          }
           if (bani != null && autopilotLockRef.current) {
             autopilotLockRef.current(
               { shabadId: `${BANI_KEY}${bani}`, verseId: cand.verseId, verse: cand.verse },
@@ -1915,9 +1970,17 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         // re-sung) and with word order ignored (kirtan rotates phrases). The
         // candidate keeps its own scoring; only the bar it must clear is honest.
         const hypWordsNorm = tokenize(text).map(vfNorm).filter(Boolean);
+        let curLinesAll = curLinesNormRef.current;
+        let curWordsAll = curWordsNormRef.current;
+        if (baniIdOf(curId) != null && curCursorRef.current != null && curLinesAll) {
+          const from = Math.max(0, curCursorRef.current - BANI_CUR_SPAN);
+          const to = curCursorRef.current + BANI_CUR_SPAN + 1;
+          curLinesAll = curLinesAll.slice(from, to);
+          curWordsAll = (curWordsAll || []).slice(from, to);
+        }
         const sCurAll = Math.max(
-          maxLineScore(hypFull, curLinesNormRef.current, SWITCH_CAND_MIN_LINE_CHARS),
-          orderFreeLineScore(hypWordsNorm, curWordsNormRef.current, SWITCH_CAND_MIN_LINE_CHARS),
+          maxLineScore(hypFull, curLinesAll, SWITCH_CAND_MIN_LINE_CHARS),
+          orderFreeLineScore(hypWordsNorm, curWordsAll, SWITCH_CAND_MIN_LINE_CHARS),
         );
         const sCurFull = Math.max(sCurWindow, sCurAll);
         const acousticCfg = {
@@ -2558,10 +2621,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               const { verseId } = out;
               const verse = (curProfileRef.current?.rawLines || [])[out.lineIndex];
               getBaniIndex()
-                .then((index) => {
-                  const banis = (index.byShabad.get(sid) || [])
-                    .map((x) => x.bani)
-                    .filter((b) => PAATH_READ_BANIS.includes(b));
+                .then(async (index) => {
+                  const copies = await paathCopies(sid, index).catch(() => new Map());
+                  const banis = [
+                    ...new Set([
+                      ...(index.byShabad.get(sid) || []).map((x) => x.bani),
+                      ...copies.keys(),
+                    ]),
+                  ].filter((b) => PAATH_READ_BANIS.includes(b));
                   if (
                     banis.length !== 1 ||
                     !verse ||
