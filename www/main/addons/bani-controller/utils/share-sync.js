@@ -19,9 +19,8 @@ async function getNewCode(host) {
   try {
     const currentTimestamp = new Date().getTime();
 
-    const response = await axios.request(
-      `${SYNC_API_URL}/sync/begin/${host}?ts=${currentTimestamp}`,
-    );
+    const beginUrl = `${SYNC_API_URL}/sync/begin/${host}?ts=${currentTimestamp}`;
+    const response = await axios.request(beginUrl);
     const { data: result } = response;
     const {
       data: { namespaceString },

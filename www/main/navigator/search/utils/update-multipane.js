@@ -46,6 +46,13 @@ const updateMultipane = () => {
         content: i18n.t('MULTI_PANE.SHABAD'),
         activeShabad: shabadId,
         baniType,
+        // A new shabad/bani/ceremony arriving with no target verse (e.g. a fresh
+        // bani pick from the controller sends only the id): clear the previous
+        // item's active verse so it opens at the start instead of carrying over
+        // a stale highlight from the last bani. Same item + no verse leaves it.
+        ...(pane.activeShabad !== shabadId
+          ? { activeVerse: null, versesRead: [] }
+          : {}),
       };
     }
     if (pane !== newAttributes) {
