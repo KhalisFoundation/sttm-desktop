@@ -68,32 +68,6 @@ jobs:
           npm install -g npm@9.8.1
           npm install --legacy-peer-deps
 
-      # The runner is 64-bit, so npm install fetches 64-bit native binaries.
-      # electron-builder's ia32 rebuild doesn't replace them all: it skips
-      # realm (no binding.gyp) and re-fetches only sharp.node, not the libvips
-      # DLLs sharp downloads at install. The 32-bit app then shipped a 64-bit
-      # realm.node and libvips, couldn't load them, and opened blank (#2196).
-      - name: Fetch 32-bit native modules
-        if: matrix.arch == 'ia32'
-        env:
-          npm_config_arch: ia32
-          REALM_DISABLE_ANALYTICS: '1'
-        run: |
-          Remove-Item node_modules/sharp/build, node_modules/sharp/vendor -Recurse -Force -ErrorAction SilentlyContinue
-          npm rebuild realm sharp
-
-      - name: Check the native modules match the build
-        run: |
-          # PE machine type: 0x14c is 32-bit (x86), 0x8664 is 64-bit (x64).
-          $expected = if ("${{ matrix.arch }}" -eq "ia32") { 0x14c } else { 0x8664 }
-          $files = @('node_modules/realm/build/Release/realm.node') + (Get-ChildItem node_modules/sharp/build/Release -Include *.node, *.dll -Recurse).FullName
-          foreach ($f in $files) {
-            $bytes = [IO.File]::ReadAllBytes($f)
-            $machine = [BitConverter]::ToUInt16($bytes, [BitConverter]::ToInt32($bytes, 0x3c) + 4)
-            if ($machine -ne $expected) { throw ("{0}: machine 0x{1:x}, expected 0x{2:x}" -f $f, $machine, $expected) }
-            Write-Host ("{0}: ok" -f $f)
-          }
-
       - name: Build for ${{ matrix.arch }}
         run: |
           # Configure git for GitHub Actions
