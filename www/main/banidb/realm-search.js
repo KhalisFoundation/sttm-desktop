@@ -169,7 +169,11 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
         break;
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ENGLISH:
         searchCol = 'FirstLetterEng';
-        condition = `${searchCol} CONTAINS[c] '${saniQuery}'`;
+        // `*` stands for any letters, as in the Gurmukhi first-letter search;
+        // CONTAINS would look for a literal `*`.
+        condition = saniQuery.includes('*')
+          ? `${searchCol} LIKE[c] '*${saniQuery.replace(/\*+/g, '*')}*'`
+          : `${searchCol} CONTAINS[c] '${saniQuery}'`;
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
         }
