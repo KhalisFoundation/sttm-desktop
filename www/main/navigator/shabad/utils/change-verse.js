@@ -11,12 +11,20 @@ export const udpateHistory = (
     currentHistoryObj.continueFrom = newTraversedVerse;
     if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
       currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
-      setPaneAttributes({
-        ...paneAttributes,
-        activeVerse: newTraversedVerse,
-        versesRead: currentHistoryObj.versesRead,
-      });
     }
+  }
+  // The list's ticks are the verses read since the shabad was opened, so add this
+  // one to them. Copying the shabad's whole history in brought back every verse
+  // ever read at once, and only on a never-read verse.
+  const versesRead = paneAttributes.versesRead || [];
+  if (paneAttributes.activeVerse !== newTraversedVerse || !versesRead.includes(newTraversedVerse)) {
+    setPaneAttributes({
+      ...paneAttributes,
+      activeVerse: newTraversedVerse,
+      versesRead: versesRead.includes(newTraversedVerse)
+        ? versesRead
+        : [...versesRead, newTraversedVerse],
+    });
   }
 };
 
