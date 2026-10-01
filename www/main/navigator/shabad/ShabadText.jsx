@@ -277,8 +277,10 @@ export const ShabadText = ({
     if (Object.values(activeVerse).includes(activeVerseId)) return;
     const verseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
     if (verseIndex >= 0) {
+      // Jump straight there: a smooth scroll to a far-off verse left the list on
+      // the old verse for a moment after the display had already changed.
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, 'auto');
       updateTraversedVerse(activeVerseId, verseIndex);
-      scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
     }
   }, [activeVerseId]);
 
