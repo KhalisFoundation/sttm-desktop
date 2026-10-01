@@ -288,9 +288,13 @@
     &-container {
       display: flex;
       flex-direction: column;
-      flex-wrap: wrap;
+      // No wrapping: in a short pane (Multi-Pane, or a small / scaled screen) the
+      // open keyboard wrapped into a hidden second column, leaving an empty block.
+      // Scroll the pane instead when the search box and keyboard don't fit.
+      flex-wrap: nowrap;
       height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
   }
   .search-results {
