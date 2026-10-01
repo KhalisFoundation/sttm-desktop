@@ -1,0 +1,56 @@
+// Shabad source / Ang / writer / raag on the slide, in the position picked in
+// Settings. Scoped under #viewer-container so its fade isn't overridden by the
+// container's `* { transition }`.
+$shabad-info-edge: 3vh;
+// Clears the SikhiToTheMax logo (bottom left) and the Quick / Padding Tools bars.
+$shabad-info-logo-clear: calc(#{$shabad-info-edge} + 30px);
+$shabad-info-tools-clear: calc(#{$shabad-info-edge} + 24px);
+
+// Plain text in the theme's translation colour; size from Settings.
+#viewer-container .shabad-info {
+  max-width: 60%;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  text-overflow: ellipsis;
+  transition: opacity 0.6s ease;
+  white-space: nowrap;
+  z-index: 5;
+
+  &--visible {
+    opacity: 1;
+  }
+
+  &--top-left,
+  &--top-center,
+  &--top-right {
+    top: $shabad-info-tools-clear;
+  }
+
+  &--bottom-center,
+  &--bottom-right {
+    bottom: $shabad-info-edge;
+  }
+
+  &--bottom-left {
+    bottom: $shabad-info-logo-clear;
+  }
+
+  &--top-left,
+  &--bottom-left {
+    left: $shabad-info-edge;
+  }
+
+  &--top-right,
+  &--bottom-right {
+    right: $shabad-info-edge;
+  }
+
+  &--top-center,
+  &--bottom-center {
+    left: 50%;
+    max-width: 80%;
+    transform: translateX(-50%);
+  }
+}

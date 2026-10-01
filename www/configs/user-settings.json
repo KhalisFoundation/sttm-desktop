@@ -3,7 +3,7 @@
     "slide-layout": {
       "title": "SLIDE_LAYOUT",
       "type": "title",
-      "subcategories": ["font-sizes", "display-options", "autoplay-options"]
+      "subcategories": ["font-sizes", "display-options", "shabad-info-options", "autoplay-options"]
     },
     "display-options": {
       "title": "DISPLAY_OPTIONS",
@@ -20,6 +20,19 @@
         "vishraam-source",
         "slide-transitions",
         "reset-padding"
+      ]
+    },
+    "shabad-info-options": {
+      "title": "SHABAD_INFO_OPTIONS",
+      "type": "switch",
+      "settings": [
+        "shabad-info",
+        "shabad-info-position",
+        "shabad-info-font-size",
+        "shabad-info-source",
+        "shabad-info-ang",
+        "shabad-info-writer",
+        "shabad-info-raag"
       ]
     },
     "font-sizes": {
@@ -205,6 +218,55 @@
     },
     "slide-transitions": {
       "title": "SLIDE_TRANSITIONS",
+      "initialValue": true
+    },
+    "shabad-info": {
+      "title": "SHABAD_INFO",
+      "type": "dropdown",
+      "initialValue": "off",
+      "options": {
+        "off": "SHABAD_INFO_OFF",
+        "5s": "SHABAD_INFO_5_SECONDS",
+        "10s": "SHABAD_INFO_10_SECONDS",
+        "15s": "SHABAD_INFO_15_SECONDS",
+        "always": "SHABAD_INFO_ALWAYS"
+      }
+    },
+    "shabad-info-position": {
+      "title": "SHABAD_INFO_POSITION",
+      "type": "dropdown",
+      "initialValue": "bottom-center",
+      "options": {
+        "top-left": "TOP_LEFT",
+        "top-center": "TOP_CENTER",
+        "top-right": "TOP_RIGHT",
+        "bottom-left": "BOTTOM_LEFT",
+        "bottom-center": "BOTTOM_CENTER",
+        "bottom-right": "BOTTOM_RIGHT"
+      }
+    },
+    "shabad-info-font-size": {
+      "title": "SHABAD_INFO_FONT_SIZE",
+      "type": "range",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "initialValue": 2
+    },
+    "shabad-info-source": {
+      "title": "SHABAD_INFO_SOURCE",
+      "initialValue": true
+    },
+    "shabad-info-ang": {
+      "title": "SHABAD_INFO_ANG",
+      "initialValue": true
+    },
+    "shabad-info-writer": {
+      "title": "SHABAD_INFO_WRITER",
+      "initialValue": true
+    },
+    "shabad-info-raag": {
+      "title": "SHABAD_INFO_RAAG",
       "initialValue": true
     },
     "reset-padding": {
