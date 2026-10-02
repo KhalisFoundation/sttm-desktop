@@ -36,7 +36,7 @@ const SlideTranslation = ({ getFontSize, translationObj, translationHTML, lang, 
   const customStyle = getFontSize(fontSizes[position]);
 
   const scriptClass = {
-    'translation-hindi': 'hindi',
+    'translation-hindi': 'devanagari',
   }[lang];
 
   const langAttr = {
