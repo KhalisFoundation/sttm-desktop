@@ -7,10 +7,7 @@ import { shell } from 'electron';
 import { fetchFavShabad, removeFromFav } from '../utils';
 import banidb from '../../../banidb';
 import { SP_API } from '../../../common/constants/api-urls';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 export const FavoritePane = ({ className, paneId }) => {
   const {

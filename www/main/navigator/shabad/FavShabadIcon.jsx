@@ -4,10 +4,7 @@ import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import classNames from '../../common/utils/classnames';
 import { addToFav, fetchFavShabad, removeFromFav } from '../misc/utils';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const FavShabadIcon = ({ paneId }) => {
   const [isLoading, setLoading] = useState(false);

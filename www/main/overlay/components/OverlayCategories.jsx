@@ -4,10 +4,7 @@ import { useStoreState } from 'easy-peasy';
 
 import OverlaySetting from './OverlaySetting';
 import { convertToCamelCase } from '../../common/utils';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];

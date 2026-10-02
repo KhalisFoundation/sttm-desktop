@@ -15,11 +15,10 @@ import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
+import { i18n } from '../../common/i18n';
 
 const os = require('os');
-const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const platform = os.platform();
 
 const themes = require('../../../configs/themes.json');
