@@ -27,7 +27,6 @@
       "type": "switch",
       "settings": [
         "shabad-info",
-        "shabad-info-position",
         "shabad-info-font-size",
         "shabad-info-source",
         "shabad-info-ang",
@@ -230,19 +229,6 @@
         "10s": "SHABAD_INFO_10_SECONDS",
         "15s": "SHABAD_INFO_15_SECONDS",
         "always": "SHABAD_INFO_ALWAYS"
-      }
-    },
-    "shabad-info-position": {
-      "title": "SHABAD_INFO_POSITION",
-      "type": "dropdown",
-      "initialValue": "bottom-center",
-      "options": {
-        "top-left": "TOP_LEFT",
-        "top-center": "TOP_CENTER",
-        "top-right": "TOP_RIGHT",
-        "bottom-left": "BOTTOM_LEFT",
-        "bottom-center": "BOTTOM_CENTER",
-        "bottom-right": "BOTTOM_RIGHT"
       }
     },
     "shabad-info-font-size": {

@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
 import { loadShabad } from '../../navigator/utils';
+import ViewerIcon from '../icons/ViewerIcon';
 
 const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 
-// A shabad's source, Ang, writer and raag in a corner or edge of the slide. Shown
-// for a few seconds when a shabad opens (staying through line changes), or
-// always, depending on the "Shabad Info on Display" setting.
+// A bar under the slide with the logo and the shabad's source, Ang, writer and
+// raag. The details show for a few seconds when a shabad opens (staying through
+// line changes), or always, depending on the "Show on Display" setting; the bar
+// itself stays so the slide doesn't move when they hide.
 
 // The shabad's details, not the current line's: a heading line has no writer,
 // and the Ang is where the shabad starts (lines can run onto the next Ang).
@@ -22,10 +24,10 @@ const getShabadDetails = (verses) => {
     raag: first((v) => v.Raag?.RaagEnglish),
   };
 };
+
 export const ShabadInfo = ({ verse, color }) => {
   const {
     shabadInfo,
-    shabadInfoPosition,
     shabadInfoFontSize,
     shabadInfoSource,
     shabadInfoAng,
@@ -62,31 +64,30 @@ export const ShabadInfo = ({ verse, color }) => {
     return () => clearTimeout(timeout);
   }, [shabadId, shabadInfo]);
 
-  // Until this shabad's details have loaded, show nothing rather than the last one's.
+  // Until this shabad's details have loaded, show none rather than the last one's.
   const info = shabad.id === shabadId ? shabad.details : null;
-  if (!info) {
-    return null;
-  }
-
-  const details = [
-    shabadInfoSource && info.source,
-    shabadInfoAng && info.ang && `${i18n.t('SETTINGS.SHABAD_INFO_ANG_LABEL')} ${info.ang}`,
-    shabadInfoWriter && info.writer,
-    shabadInfoRaag && info.raag,
-  ].filter(Boolean);
-
-  if (!details.length) {
-    return null;
-  }
+  const details = info
+    ? [
+        shabadInfoSource && info.source,
+        shabadInfoAng && info.ang && `${i18n.t('SETTINGS.SHABAD_INFO_ANG_LABEL')} ${info.ang}`,
+        shabadInfoWriter && info.writer,
+        shabadInfoRaag && info.raag,
+      ].filter(Boolean)
+    : [];
 
   return (
-    <div
-      className={`shabad-info shabad-info--${shabadInfoPosition || 'bottom-center'} ${
-        isVisible ? 'shabad-info--visible' : ''
-      }`}
-      style={{ color, fontSize: `${shabadInfoFontSize || 2}vh` }}
-    >
-      {details.join('  ·  ')}
+    <div className={`shabad-info ${isVisible ? 'shabad-info--visible' : ''}`}>
+      <ViewerIcon className="shabad-info__logo" />
+      <div
+        className="shabad-info__text"
+        style={{ color, fontSize: `${shabadInfoFontSize || 2}vh` }}
+      >
+        {details.map((detail) => (
+          <span key={detail} className="shabad-info__detail">
+            {detail}
+          </span>
+        ))}
+      </div>
     </div>
   );
 };

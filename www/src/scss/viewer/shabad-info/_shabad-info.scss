@@ -1,56 +1,62 @@
-// Shabad source / Ang / writer / raag on the slide, in the position picked in
-// Settings. Scoped under #viewer-container so its fade isn't overridden by the
-// container's `* { transition }`.
-$shabad-info-edge: 3vh;
-// Clears the SikhiToTheMax logo (bottom left) and the Quick / Padding Tools bars.
-$shabad-info-logo-clear: calc(#{$shabad-info-edge} + 30px);
-$shabad-info-tools-clear: calc(#{$shabad-info-edge} + 24px);
+// Shabad info: a bar under the slide with the logo and the shabad's source,
+// Ang, writer and raag. Scoped under #viewer-container so its fade isn't
+// overridden by the container's `* { transition }`.
+$shabad-info-logo-width: 100px;
 
-// Plain text in the theme's translation colour; size from Settings.
-#viewer-container .shabad-info {
-  max-width: 60%;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
-  position: absolute;
-  text-overflow: ellipsis;
-  transition: opacity 0.6s ease;
-  white-space: nowrap;
-  z-index: 5;
+#viewer-container {
+  // The slide takes the height left above the bar, so the bar never covers or
+  // cuts its text.
+  .shabad-deck--with-info {
+    display: flex;
+    flex-direction: column;
 
-  &--visible {
-    opacity: 1;
+    #viewer-container-slide-wrapper {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+      // A slide with more than fits stops at the bar, as it would at the
+      // bottom of the screen, instead of spilling over it.
+      overflow: hidden;
+    }
   }
 
-  &--top-left,
-  &--top-center,
-  &--top-right {
-    top: $shabad-info-tools-clear;
-  }
+  .shabad-info {
+    align-items: center;
+    background-color: rgba(128, 128, 128, 0.12);
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: 46px;
+    // Room for the logo on the left, and the same on the right to keep the
+    // details centred.
+    padding: 0.8vh calc(#{$shabad-info-logo-width} + 24px);
+    position: relative;
+    z-index: 5;
 
-  &--bottom-center,
-  &--bottom-right {
-    bottom: $shabad-info-edge;
-  }
+    &__logo {
+      fill: $grey;
+      left: 12px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: $shabad-info-logo-width;
+    }
 
-  &--bottom-left {
-    bottom: $shabad-info-logo-clear;
-  }
+    &__text {
+      line-height: 1.4;
+      opacity: 0;
+      text-align: center;
+      transition: opacity 0.6s ease;
+    }
 
-  &--top-left,
-  &--bottom-left {
-    left: $shabad-info-edge;
-  }
+    &.shabad-info--visible .shabad-info__text {
+      opacity: 1;
+    }
 
-  &--top-right,
-  &--bottom-right {
-    right: $shabad-info-edge;
-  }
-
-  &--top-center,
-  &--bottom-center {
-    left: 50%;
-    max-width: 80%;
-    transform: translateX(-50%);
+    .shabad-info__detail + .shabad-info__detail::before {
+      content: '•';
+      margin: 0 0.8em;
+      opacity: 0.5;
+    }
   }
 }

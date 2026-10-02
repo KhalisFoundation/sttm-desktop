@@ -316,6 +316,8 @@ function ShabadDeck() {
           akhandpatt && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
+          // The info bar sits under the slide, which shrinks to make room.
+          showsShabadInfo && 'shabad-deck--with-info',
         )}
         style={applyTheme()}
       >
@@ -354,7 +356,8 @@ function ShabadDeck() {
           />
         ) : null}
       </div>
-      <ViewerIcon className="viewer-logo" />
+      {/* The info bar carries the logo while it's shown. */}
+      {!showsShabadInfo && <ViewerIcon className="viewer-logo" />}
     </>
   );
 }
