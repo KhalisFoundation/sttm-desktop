@@ -103,10 +103,11 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
           dbQuery =
             searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
         }
-        condition = `${searchCol} ${operator} '${dbQuery}' ${replaced}`;
-        if (saniQuery.length < 3) {
-          order.push('FirstLetterLen');
-        }
+        // In brackets, so the source filter below applies to both spellings.
+        condition = `(${searchCol} ${operator} '${dbQuery}' ${replaced})`;
+        // Shortest lines first for one or two letters; otherwise in database
+        // order, so Guru Granth Sahib comes before the other sources.
+        order.push(saniQuery.length < 3 ? 'FirstLetterLen' : 'ID');
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
         }
