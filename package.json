@@ -11,7 +11,10 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
+    "test:unit": "node --test www/main/addons/voice-follow/components/ && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
+    "smoke": "npm run build:local && cross-env VF_SMOKE=1 electron .",
+    "debug": "npm run build:local && cross-env NODE_ENV=development electron . --remote-debugging-port=9222",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
@@ -32,7 +35,8 @@
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "test:voice-follow": "node --test test/voice-follow/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -113,6 +117,7 @@
     "node-fetch-progress": "^1.0.2",
     "node-gyp": "^9.4.0",
     "noty": "^3.2.0-beta",
+    "onnxruntime-node": "^1.18.0",
     "portfinder": "1.0.32",
     "prop-types": "^15.8.1",
     "qrcode": "^1.5.3",

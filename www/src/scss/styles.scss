@@ -43,11 +43,12 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
-  'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
-  'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad', 'navigator/shabad/multipane',
-  'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
-  'navigator/search/gurmukhi-keyboard', 'navigator/common/autoplay_icon';
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon',
+  'akhandpaatt', 'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar',
+  'navigator/common/pane', 'navigator/common/verse-block', 'navigator/search/searchNew',
+  'navigator/shabad/shabad', 'navigator/shabad/multipane', 'navigator/misc/misc',
+  'navigator/common/icon-button', 'navigator/viewer/viewer', 'navigator/search/gurmukhi-keyboard',
+  'navigator/common/autoplay_icon';
 
 @import 'utils/utils', 'viewer/viewer';
 
@@ -151,7 +152,8 @@ button {
   flex-direction: column;
 }
 
-.sync-wrapper, .auth-wrapper {
+.sync-wrapper,
+.auth-wrapper {
   bottom: 0;
   height: 100vh;
   left: 60px;
@@ -490,6 +492,13 @@ button {
     background-image: url('../../assets/img/icons/megaphone.png');
     background-position: center center;
     background-repeat: no-repeat;
+  }
+
+  #tool-voice-follow {
+    background-image: url('../../assets/img/icons/voice-follow.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 62%;
   }
 
   #tool-sync-button,
@@ -1243,4 +1252,1149 @@ body.show-overlay {
   & > span {
     margin-right: 4px;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Voice-Follow floating widget (addons/voice-follow)                 */
+/* ------------------------------------------------------------------ */
+$vf-accent: #5b73ff;
+$vf-accent-2: #3d5afe;
+$vf-glass: linear-gradient(160deg, rgba(34, 36, 47, 0.94), rgba(19, 20, 27, 0.96));
+
+@keyframes vf-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vf-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(46, 204, 113, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+.vf-panel {
+  position: fixed;
+  top: 88px;
+  left: 56px;
+  z-index: 100000;
+  width: 252px;
+  padding: 16px 16px 18px;
+  border-radius: 16px;
+  color: #f3f4f8;
+  font:
+    13px/1.45 -apple-system,
+    'Segoe UI',
+    sans-serif;
+  background: $vf-glass;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: vf-in 0.16s ease-out;
+}
+
+.vf-caret {
+  position: absolute;
+  left: -7px;
+  top: 22px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid rgba(34, 36, 47, 0.94);
+}
+
+.vf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  cursor: move;
+  user-select: none;
+}
+
+.vf-title {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.vf-grip {
+  margin-right: 8px;
+  opacity: 0.35;
+  font-size: 12px;
+  letter-spacing: -1px;
+}
+
+.vf-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+  flex: 0 0 auto;
+
+  &.is-live {
+    animation: vf-pulse 1.6s infinite;
+  }
+}
+
+.vf-tag {
+  margin-left: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(91, 115, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.vf-hdr-btns {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.vf-hdr-btn {
+  border: none;
+  background: transparent;
+  color: #9aa0ad;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 7px;
+  transition:
+    background 0.12s,
+    color 0.12s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: #fff;
+  }
+}
+
+.vf-modes {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vf-mode {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: #aab0bd;
+  transition:
+    background 0.14s,
+    color 0.14s,
+    box-shadow 0.14s;
+
+  &:hover:not(:disabled):not(.is-active) {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, $vf-accent, $vf-accent-2);
+    box-shadow: 0 3px 12px rgba(61, 90, 254, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.vf-main {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 11px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.is-start {
+    background: linear-gradient(135deg, #2ecc71, #23a85a);
+    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
+  }
+
+  &.is-stop {
+    background: linear-gradient(135deg, #ff5a5f, #e0393f);
+    box-shadow: 0 4px 16px rgba(224, 57, 63, 0.4);
+  }
+}
+
+.vf-status {
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.78;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.vf-dl {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+
+  .vf-dl-bar {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #5b73ff, #8a5bff);
+    transition: width 0.2s ease;
+  }
+}
+
+.vf-stats {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+}
+
+.vf-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 4px;
+
+  & + & {
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+.vf-stat-val {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.82);
+  font-variant-numeric: tabular-nums;
+}
+
+.vf-stat-label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.45;
+}
+
+.vf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.12s,
+    color 0.12s;
+
+  input {
+    flex: none;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: $vf-accent;
+    cursor: pointer;
+  }
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  input:disabled {
+    cursor: default;
+  }
+
+  &:has(input:disabled) {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.vf-toggle-primary {
+  background: rgba($vf-accent, 0.14);
+  color: #fff;
+  font-weight: 600;
+  border: 1px solid rgba($vf-accent, 0.4);
+
+  &:hover {
+    background: rgba($vf-accent, 0.2);
+  }
+}
+
+.vf-detect {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.vf-detect-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.vf-detect-spin {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid rgba(91, 115, 255, 0.25);
+  border-top-color: $vf-accent;
+  animation: vf-spin 0.7s linear infinite;
+}
+
+.vf-detect-text {
+  word-break: break-word;
+}
+
+.vf-raw {
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+  word-break: break-word;
+}
+
+.vf-heard {
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 15px;
+  line-height: 1.3;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.9);
+  word-break: break-word;
+  direction: ltr;
+}
+
+.vf-cands {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.vf-cand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 255, 255, 0.85);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.12s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  &.is-leader {
+    box-shadow: inset 0 0 0 1px rgba(91, 115, 255, 0.5);
+  }
+}
+
+.vf-cand-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(91, 115, 255, 0.28), rgba(91, 115, 255, 0.1));
+  z-index: 0;
+  transition: width 0.25s ease;
+}
+
+.vf-cand-line {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf-cand-pct {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+// Autopilot following: background switch-detection visibility.
+.vf-follow {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.vf-follow-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.vf-follow-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #27ae60;
+  box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.5);
+  animation: vf-pulse 1.6s ease-out infinite;
+}
+
+.vf-follow-text {
+  word-break: break-word;
+}
+
+.vf-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(243, 156, 18, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(243, 156, 18, 0.35);
+}
+
+.vf-switch-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: rgba(243, 156, 18, 0.95);
+}
+
+.vf-switch-line {
+  font-size: 15px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf-switch-scores {
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.vf-switch-score {
+  &.is-cand {
+    color: rgba(243, 156, 18, 0.95);
+  }
+
+  &.is-cur {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.vf-switch-bar-wrap {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.vf-switch-bar {
+  display: block;
+  height: 100%;
+  background: $vf-accent;
+  transition: width 0.2s ease;
+}
+
+@keyframes vf-pulse {
+  to {
+    box-shadow: 0 0 0 7px rgba(39, 174, 96, 0);
+  }
+}
+
+@keyframes vf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vf-pill {
+  position: fixed;
+  bottom: 20px;
+  left: 56px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  color: #f3f4f8;
+  font:
+    600 12px/1 -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  background: $vf-glass;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+  animation: vf-in 0.16s ease-out;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 28px rgba(0, 0, 0, 0.55);
+  }
+}
+
+// Compact Voice Follow overview. Candidate colors never change projection policy.
+.vf-panel {
+  width: 290px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+.vf-compact-content {
+  padding: 6px 0;
+}
+.vf-section-label {
+  font-size: 12px;
+  color: #c2ccdc;
+  margin-bottom: 5px;
+}
+.vf-canonical-line {
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.vf-explanation {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #c2ccdc;
+}
+.vf-heading-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.vf-listening-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: #c2ccdc;
+}
+.vf-mic-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  margin-left: 8px;
+}
+.vf-mic-bars > span {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: #78bca7;
+  transition: height 0.2s linear;
+}
+.vf-other-matches {
+  margin-top: 12px;
+}
+.vf-other-matches summary {
+  font-size: 12px;
+  color: #c2ccdc;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.vf-compact-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.vf-compact-footer.is-idle {
+  justify-content: center;
+}
+.vf-compact-footer .vf-main {
+  width: auto;
+  margin: 0;
+  padding: 9px 12px;
+}
+.vf-match-card {
+  margin-top: 7px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: linear-gradient(115deg, #24324d, #1c2539);
+  box-shadow: inset 0 0 0 1px rgba(137, 166, 220, 0.12);
+}
+.vf-match-meta {
+  margin-bottom: 3px;
+  color: #c8d7ef;
+  font-size: 11px;
+}
+.vf-current-shabad {
+  padding: 8px 10px;
+  border-left: 2px solid transparent;
+}
+.vf-current-shabad.is-following {
+  border-left-color: #78bca7;
+  background: linear-gradient(90deg, rgba(70, 139, 113, 0.13), transparent);
+}
+.vf-current-shabad.is-following .vf-section-label {
+  color: #a1d5c0;
+}
+.vf-change-preview {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(243, 156, 18, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(243, 156, 18, 0.3);
+}
+.vf-change-preview .vf-section-label {
+  color: #f0c582;
+}
+.vf-change-track {
+  margin-top: 9px;
+  height: 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.09);
+}
+.vf-change-track > span {
+  display: block;
+  height: 100%;
+  background: #6c82ff;
+  transition: width 0.25s ease;
+}
+.vf-current-shabad .vf-canonical-line,
+.vf-change-preview .vf-canonical-line {
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vf-mic-bars > span,
+  .vf-change-track > span {
+    transition: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Voice-Follow panel, redesign (2026-09): the sevadar's control card.
+// Matches the controller's own palette (white card, #222 text, STTM orange
+// accent) instead of a dark glass sheet. Layout: Now (the line being followed)
+// -> Might change to (the judge's live candidates with honest scores) -> one
+// button. Motion is kept to fades and short slides so nothing jumps.
+// ---------------------------------------------------------------------------
+$vf2-orange: #f39c1d;
+$vf2-ink: #222;
+$vf2-muted: #6b6b6b;
+$vf2-faint: #9a9a9a;
+$vf2-line: #ececec;
+$vf2-green: #43ac6a;
+
+.vf-panel {
+  width: 300px;
+  padding: 14px 16px 16px;
+  border-radius: 18px;
+  color: $vf2-ink;
+  font:
+    13px/1.45 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+}
+.vf-caret {
+  border-bottom-color: rgba(255, 255, 255, 0.94);
+}
+.vf-header {
+  color: $vf2-ink;
+  margin-bottom: 10px;
+}
+.vf-title,
+.vf-heading-copy {
+  color: $vf2-ink;
+}
+.vf-grip {
+  color: $vf2-faint;
+}
+.vf-listening-label {
+  color: $vf2-muted;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.vf-mic-bars > span {
+  background: $vf2-green;
+}
+.vf-hdr-btn {
+  color: $vf2-muted;
+  background: transparent;
+  border: 0;
+  &:hover {
+    color: $vf2-ink;
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+.vf-dl {
+  background: $vf2-line;
+  .vf-dl-bar {
+    background: $vf2-orange;
+  }
+}
+.vf-status {
+  color: $vf2-muted;
+}
+
+.vf2-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vf2-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $vf2-muted;
+}
+.vf2-lineno,
+.vf2-cur-score {
+  margin-left: auto;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: $vf2-faint;
+  font-variant-numeric: tabular-nums;
+}
+.vf2-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $vf2-faint;
+  &.is-on {
+    background: $vf2-green;
+    box-shadow: 0 0 0 3px rgba(67, 172, 106, 0.18);
+  }
+  &.is-seeking {
+    background: $vf2-orange;
+    animation: vf2-breathe 1.4s ease-in-out infinite;
+  }
+}
+@keyframes vf2-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(243, 156, 29, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(243, 156, 29, 0);
+  }
+}
+
+// Now: the line being followed.
+.vf2-now {
+  padding: 12px 14px 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid $vf2-line;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  &.is-following {
+    border-color: rgba(67, 172, 106, 0.35);
+  }
+  &.is-searching .vf2-line {
+    color: $vf2-muted;
+    font-size: 15px;
+  }
+}
+.vf2-line {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.35;
+  color: $vf2-ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  animation: vf2-fade 0.28s ease-out;
+  &.is-expanded {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+.vf2-opening {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: $vf2-faint;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes vf2-fade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// Might change to: the judge's live candidates.
+.vf2-next {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vf2-cand {
+  padding: 9px 12px 8px;
+  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid $vf2-line;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+  animation: vf2-fade 0.28s ease-out;
+  &.is-checking {
+    background: #fff8ec;
+    border-color: rgba(243, 156, 29, 0.35);
+  }
+  &.is-confirming {
+    background: #fff3dc;
+    border-color: $vf2-orange;
+    transform: translateY(-1px);
+  }
+}
+.vf2-cand-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.vf2-cand-line {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: $vf2-ink;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vf2-cand-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: $vf2-muted;
+  font-variant-numeric: tabular-nums;
+  .is-checking &,
+  .is-confirming & {
+    color: $vf2-orange;
+  }
+}
+.vf2-cand-track {
+  margin-top: 7px;
+  height: 3px;
+  border-radius: 2px;
+  background: $vf2-line;
+  overflow: hidden;
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    background: $vf2-orange;
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+.vf2-cand-meta {
+  margin-top: 5px;
+  font-size: 11px;
+  color: $vf2-faint;
+}
+
+// One button.
+.vf-compact-footer {
+  margin-top: 12px;
+  .vf-main {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease,
+      background 0.2s ease;
+    &.is-start {
+      color: #fff;
+      background: $vf2-orange;
+      box-shadow: 0 6px 16px rgba(243, 156, 29, 0.35);
+    }
+    &.is-stop {
+      color: #fff;
+      background: #e0393f;
+      box-shadow: none;
+    }
+    &:hover {
+      transform: translateY(-1px);
+    }
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+  }
+}
+
+// Collapsed pill.
+.vf-pill {
+  color: $vf2-ink;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+// Possible matches: collapsed by default, one calm row to open it.
+.vf2-matches {
+  border-radius: 12px;
+  border: 1px solid $vf2-line;
+  background: #fafafa;
+  > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $vf2-muted;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+  &[open] > summary .vf2-chevron {
+    transform: rotate(90deg);
+  }
+  .vf2-next {
+    padding: 0 8px 8px;
+  }
+  .vf2-cand {
+    background: #fff;
+  }
+}
+.vf2-summary-hint {
+  margin-left: auto;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: $vf2-faint;
+  font-variant-numeric: tabular-nums;
+}
+.vf2-empty {
+  padding: 4px 6px 2px;
+  font-size: 12px;
+  color: $vf2-faint;
+}
+
+// One card, only while a change is being confirmed.
+.vf2-change {
+  padding: 10px 12px 10px;
+  border-radius: 12px;
+  background: #fff8ec;
+  border: 1px solid rgba(243, 156, 29, 0.35);
+  animation: vf2-fade 0.28s ease-out;
+  .vf2-cand-line {
+    display: block;
+    margin-top: 5px;
+    font-size: 16px;
+  }
+  &.is-confirming {
+    background: #fff3dc;
+    border-color: $vf2-orange;
+  }
+}
+
+// Small −/+ box on the Now header to fold the line to one row and back.
+.vf2-fold {
+  margin-left: 6px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid $vf2-line;
+  background: #fff;
+  color: $vf2-muted;
+  font:
+    600 13px/16px -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif;
+  cursor: pointer;
+  flex: 0 0 auto;
+  &:hover {
+    color: $vf2-ink;
+    border-color: #d5d5d5;
+  }
+}
+.vf2-lineno + .vf2-fold {
+  margin-left: 8px;
+}
+.vf2-label .vf2-fold:only-of-type:not(.vf2-lineno ~ .vf2-fold) {
+  margin-left: auto;
+}
+
+// --- Sevadaar assist: Auto / Ask me, and tappable candidates ---------------
+.vf2-cand.is-tappable,
+.vf2-change.is-tappable {
+  background: #eefbf0;
+  border-color: #2e9e5b;
+  animation: vf2-ready 1.4s ease-in-out infinite;
+  .vf2-dot.is-on {
+    background: #2e9e5b;
+  }
+}
+.vf2-change .vf2-cand-pct {
+  margin-left: auto;
+}
+// Chevron: an SVG so it stays crisp and centred on the text line.
+.vf2-chevron {
+  flex: none;
+  color: $vf2-faint;
+  transition: transform 0.2s ease;
+}
+// Count of candidates, as a small badge beside the title.
+.vf2-summary-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: $vf2-muted;
+  font-variant-numeric: tabular-nums;
+}
+// Header never overflows the card: the title may truncate, nothing else grows.
+.vf2-summary-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+// Hint lives inside the open list, on its own line, so it never crowds the header.
+.vf2-next-hint {
+  padding: 0 4px 6px;
+  font-size: 11px;
+  font-weight: 400;
+  color: $vf2-faint;
 }

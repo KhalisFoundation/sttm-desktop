@@ -19,6 +19,7 @@ const ToolbarItem = ({ itemName }) => {
     settings: i18n.t('TOOLBAR.SETTINGS'),
     'sunder-gutka': i18n.t('TOOLBAR.SUNDAR_GUTKA'),
     ceremonies: i18n.t('TOOLBAR.CEREMONIES'),
+    'voice-follow': i18n.t('TOOLBAR.VOICE_FOLLOW'),
     announcement: i18n.t('QUICK_TOOLS.ANNOUNCEMENTS'),
   };
 

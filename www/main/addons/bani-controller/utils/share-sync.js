@@ -13,7 +13,7 @@ function onConnect(namespaceString) {
   window.socket = window.io(`${SYNC_API_URL}/${namespaceString}`);
 }
 
-async function getNewCode(host) {
+async function getNewCode(host, silent = false) {
   let newCode = null;
 
   try {
@@ -38,19 +38,24 @@ async function getNewCode(host) {
       action: 'error',
       value: error,
     });
-    new Noty({
-      type: 'error',
-      text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
-      timeout: 3000,
-      modal: true,
-    }).show();
+    // Only nag with the modal banner on a user-initiated sync. The automatic
+    // startup attempt passes silent=true (the staging sync API is often
+    // unreachable in dev — no reason to alarm the user on every launch).
+    if (!silent) {
+      new Noty({
+        type: 'error',
+        text: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
+        timeout: 3000,
+        modal: true,
+      }).show();
+    }
     newCode = null;
   }
   return newCode;
 }
 
 const shareSync = {
-  async tryConnection() {
+  async tryConnection(silent = false) {
     const host = store.get('userId');
     let syncCode = null;
 
@@ -59,7 +64,7 @@ const shareSync = {
       await axios.get(`${SYNC_API_URL}/sync/join/${window.namespaceString}`);
       syncCode = window.namespaceString;
     } catch (e) {
-      syncCode = await getNewCode(host);
+      syncCode = await getNewCode(host, silent);
     }
 
     return syncCode;
