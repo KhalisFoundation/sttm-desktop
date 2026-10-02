@@ -267,6 +267,23 @@ export const ShabadText = ({
     }
   }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
 
+  useEffect(() => {
+    // Picking another verse of the shabad that's already open (e.g. searching a
+    // different line of it) changes activeVerseId without reloading the list, so
+    // the list's own position (activeVerse, which the arrow keys move from) stayed
+    // on the old verse. Move it as if that verse had been clicked.
+    if (baniType !== 'shabad' || isSundarGutkaBani || isCeremonyBani) return;
+    if (activeShabadId !== shabadId || loadedShabadIdRef.current !== shabadId) return;
+    if (Object.values(activeVerse).includes(activeVerseId)) return;
+    const verseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
+    if (verseIndex >= 0) {
+      // Jump straight there: a smooth scroll to a far-off verse left the list on
+      // the old verse for a moment after the display had already changed.
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, 'auto');
+      updateTraversedVerse(activeVerseId, verseIndex);
+    }
+  }, [activeVerseId]);
+
   const getVerse = (direction) => {
     let verseIndex = null;
     if (direction === 'next') {
