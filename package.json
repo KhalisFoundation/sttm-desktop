@@ -142,7 +142,7 @@
         "sttm-desktop"
       ]
     },
-    "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "copyright": "Copyright \u00a9 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -238,6 +238,17 @@
   "extendInfo": {
     "NSAppTransportSecurity": {
       "NSAllowsArbitraryLoads": true
+    }
+  },
+  "overrides": {
+    "app-builder-lib": {
+      "form-data": "4.0.6"
+    },
+    "axios": {
+      "form-data": "4.0.6"
+    },
+    "request": {
+      "form-data": "4.0.6"
     }
   }
 }
