@@ -4,10 +4,11 @@ import { useStoreState } from 'easy-peasy';
 
 import Setting from './Setting';
 import { convertToCamelCase } from '../../common/utils';
+import { i18n } from '../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { store, i18n } = remote.require('./app');
+const { store } = remote.require('./app');
 
 const SettingsFactory = ({ subCategory }) => {
   const settingsDOM = [];

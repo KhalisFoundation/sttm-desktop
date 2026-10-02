@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 
 import OverlayCategories from './OverlayCategories';
 import { Switch } from '../../common/sttm-ui';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const OverlaySettingsContainer = ({ settingsObj }) => {
   const settingsList = [];
