@@ -128,6 +128,25 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
       hverse[k] = null;
     }
   });
+  // A Bani and a shabad showing the same verse are the same Gurbani on screen (Voice-Follow
+  // opens Rehras/Sohila/Japji from a shabad read in order; a sevadaar may do the reverse).
+  // Such seconds count as agreement on the sevadaar's label, and are counted on their own
+  // (baniSameVerse) so the data shows how often the framing differs.
+  let baniSameVerse = 0;
+  for (let i = 0; i < length; i += 1) {
+    const k = skey[i];
+    const h = hkey[i];
+    if (!k || !h || k === h || sverse[i] == null) continue;
+    const kinds = (k.startsWith('bani:') ? 1 : 0) + (h.startsWith('bani:') ? 1 : 0);
+    if (kinds !== 1) continue;
+    let same = false;
+    for (let m = Math.max(0, i - C.LAG_S); m <= Math.min(length - 1, i + C.LAG_S) && !same; m += 1)
+      if (hkey[m] === h && hverse[m] === sverse[i]) same = true;
+    if (same) {
+      skey[i] = h;
+      baniSameVerse += 1;
+    }
+  }
 
   const level = new Array(length).fill(0);
   const letters = new Array(length).fill(0);
@@ -252,6 +271,7 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
     modelSwitchesRight: 0, // ...to a shabad the sevadaar had (within LAG_S) or opened (within EARLY_S)
     modelLineMoves: 0, // line moves Voice-Follow made within a shabad the sevadaar was also on
     modelLineMovesRight: 0, // ...to a line the sevadaar had (LINE_LAG_S before) or reached (LINE_AHEAD_S)
+    baniSameVerse, // seconds a Bani and a shabad showed the same verse (scored as agreement)
   };
   const outcome = new Array(length).fill(null);
   for (let i = 0; i < length; i += 1) {
@@ -474,6 +494,7 @@ function summarize(sc) {
     pausedMin: min(sc.paused),
     vfDownMin: min(sc.vfDown || 0),
     falseAlarmPct: pct(sc.falseAlarm, sc.idle),
+    baniSameVerseS: sc.baniSameVerse || 0,
   };
 }
 
