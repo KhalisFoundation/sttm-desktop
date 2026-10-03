@@ -107,6 +107,24 @@ const voiceFollowRetrieval = registerRetrievalService({
 app.once('will-quit', () => {
   voiceFollowRetrieval.dispose().catch(() => {});
 });
+// Tester build: hold the quit up to 20 s to upload the session that just ended.
+// Anything going wrong here must never stop the app from quitting.
+let shadowFlushed = false;
+app.on('will-quit', (e) => {
+  if (shadowFlushed) return;
+  shadowFlushed = true;
+  e.preventDefault();
+  try {
+    // eslint-disable-next-line global-require
+    const shadowUploader = require('./www/js/addons/voice-follow/shadow/uploader');
+    shadowUploader
+      .flush(path.join(app.getPath('userData'), 'voice-follow', 'shadow'), 20000)
+      .catch(() => {})
+      .finally(() => app.quit());
+  } catch (_) {
+    app.quit();
+  }
+});
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
@@ -683,8 +701,17 @@ app.on('ready', () => {
       mainWindow.webContents.send('userToken', token);
     }
     // Platform-specific app stores have their own update mechanism
-    // so only check if we're not in one
-    if (!appstore && !isUnsupportedWindow) {
+    // so only check if we're not in one. The tester build never auto-updates: its updater
+    // points at the public sttm-desktop releases, and the next public release would replace
+    // the tester app (and its bundled model) with the standard one.
+    let shadowBuild = false;
+    try {
+      // eslint-disable-next-line global-require
+      shadowBuild = !!require('./www/js/addons/voice-follow/shadow/config').SHADOW_BUILD;
+    } catch (_) {
+      shadowBuild = false;
+    }
+    if (!appstore && !isUnsupportedWindow && !shadowBuild) {
       checkForUpdates();
     }
     // Show changelog if last version wasn't seen

@@ -30,7 +30,19 @@ class Infer {
   constructor(sess, vocab) { this.sess = sess; this.vocab = vocab; }
 
   static async create(modelPath, vocab = VOCAB) {
-    const sess = await ort.InferenceSession.create(modelPath);
+    // ONNX Runtime defaults to one spinning thread per core (9.9 cores busy on a 20-core PC
+    // for work 4 threads finish in 239 ms of the 500 ms hop). 4 threads give bit-identical
+    // output to the default (58/58 kirtan windows, zero confidence difference) and use 2.3
+    // of 8 cores. Machines with fewer than 8 logical cores get 2 threads: 4 would still take
+    // 3.1 of 4 cores; 2 keep up (325 ms) at ~1 core with near-identical text (49/58 windows).
+    // eslint-disable-next-line global-require
+    const cores = require('os').cpus().length;
+    const threads = cores >= 8 ? 4 : Math.max(1, Math.min(2, cores));
+    const sess = await ort.InferenceSession.create(modelPath, {
+      intraOpNumThreads: threads,
+      interOpNumThreads: 1,
+      extra: { session: { 'session.intra_op.allow_spinning': '0' } },
+    });
     return new Infer(sess, vocab);
   }
 

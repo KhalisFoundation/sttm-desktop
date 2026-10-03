@@ -22,7 +22,21 @@ function modelDir() {
   return path.join(base, 'voice-follow');
 }
 
+// A copy shipped inside the installer (tester builds bundle it so a Gurdwara never has
+// to download 184 MB). Used when present and complete; otherwise the per-user download.
+function bundledModelPath() {
+  try {
+    const res = process.resourcesPath;
+    return res ? path.join(res, 'voice-follow', MODEL_FILE) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 function modelPath() {
+  const bundled = bundledModelPath();
+  // eslint-disable-next-line no-use-before-define
+  if (bundled && isComplete(bundled)) return bundled;
   return path.join(modelDir(), MODEL_FILE);
 }
 

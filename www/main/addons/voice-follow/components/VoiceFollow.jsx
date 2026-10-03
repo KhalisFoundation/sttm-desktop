@@ -17,6 +17,31 @@ const { Follower: AcousticFollower } = require('../engine/follower');
 const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
 const sessionLog = require('../engine/session-log');
+const shadowBus = require('../shadow/bus');
+const { diag } = require('../shadow/diag');
+const { SHADOW_BUILD, SHADOW_CPU_PAUSE, SHADOW_CPU_RESUME } = require('../shadow/config');
+const os = require('os'); // eslint-disable-line import/order
+
+// Shadow mode (tester builds): Voice-Follow runs with no panel and never touches the
+// screen; each thing it would show goes to the shadow bus, which scores it live against
+// what the sevadaar shows by hand. These stand in for the screen actions.
+const shadowSetVerse = (verseId) => shadowBus.system({ verseId });
+const shadowNoop = () => {};
+const shadowOpen = (shabadId, verseId) => shadowBus.system({ shabadId, verseId });
+// Stands in for updatePane('bani', id, verseId): the Bani Voice-Follow would open.
+const shadowOpenBani = (kind, baniId, verseId) =>
+  shadowBus.system({ bani: baniId, shabadId: null, verseId: verseId ?? null, slide: null });
+// Busy fraction of all cores between two os.cpus() samples (works on Windows too,
+// where os.loadavg() is always 0).
+const cpuSample = () =>
+  os.cpus().reduce(
+    (a, c) => {
+      const t = c.times;
+      const total = t.user + t.nice + t.sys + t.idle + t.irq;
+      return { idle: a.idle + t.idle, total: a.total + total };
+    },
+    { idle: 0, total: 0 },
+  );
 
 const { norm: vfNorm, partialRatio } = engine;
 
@@ -451,32 +476,51 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const isCeremonyBani = useStoreState((state) => state.navigator.isCeremonyBani);
   const sundarGutkaBaniId = useStoreState((state) => state.navigator.sundarGutkaBaniId);
   const baniLength = useStoreState((state) => state.userSettings.baniLength);
-  const { setActiveVerseId, setLineNumber } = useStoreActions((actions) => actions.navigator);
+  const navActions = useStoreActions((actions) => actions.navigator);
+  const setActiveVerseId = SHADOW_BUILD ? shadowSetVerse : navActions.setActiveVerseId;
+  const setLineNumber = SHADOW_BUILD ? shadowNoop : navActions.setLineNumber;
+  const setMiscSlideText = SHADOW_BUILD ? shadowNoop : navActions.setMiscSlideText;
+  // Rehras is followed at the long length: the user's Sundar Gutka length is raised while
+  // Voice-Follow shows it and restored after. In shadow mode the real setting is never
+  // touched (the Bani column hidden Voice-Follow loads comes from baniLengthFor(userLength())
+  // and so still raises for Rehras on its own).
   const setBaniLength = useStoreActions((actions) => actions.userSettings.setBaniLength);
-  const setBaniLengthRef = useRef(setBaniLength);
-  setBaniLengthRef.current = setBaniLength;
+  const setBaniLengthRef = useRef(null);
+  setBaniLengthRef.current = SHADOW_BUILD ? shadowNoop : setBaniLength;
   // { prev }: the user's own Bani length while Voice-Follow has raised it for Rehras.
   const lengthOverrideRef = useRef(null);
-  const {
-    setIsSundarGutkaBani,
-    setSundarGutkaBaniId,
-    setIsCeremonyBani,
-    setSingleDisplayActiveTab,
-  } = useStoreActions((actions) => actions.navigator);
-  const { setIsMiscSlide, setMiscSlideText } = useStoreActions((actions) => actions.navigator);
+  // Opening a Bani is the same four navigator actions the Sundar Gutka screen uses; in
+  // shadow mode they become one system update ("bani:<id>" at a line), nothing on screen.
+  const setIsSundarGutkaBani = SHADOW_BUILD ? shadowNoop : navActions.setIsSundarGutkaBani;
+  const setSundarGutkaBaniId = SHADOW_BUILD ? shadowNoop : navActions.setSundarGutkaBaniId;
+  const setIsCeremonyBani = SHADOW_BUILD ? shadowNoop : navActions.setIsCeremonyBani;
+  const setSingleDisplayActiveTab = SHADOW_BUILD
+    ? shadowNoop
+    : navActions.setSingleDisplayActiveTab;
+  // In shadow mode the slide Voice-Follow would put up is its own, never the sevadaar's.
+  const shadowSlideRef = useRef(null);
+  if (!shadowSlideRef.current) {
+    shadowSlideRef.current = (visible) => {
+      // eslint-disable-next-line no-use-before-define
+      isMiscSlideRef.current = !!visible;
+      shadowBus.system({ slide: visible ? true : null });
+    };
+  }
+  const setIsMiscSlide = SHADOW_BUILD ? shadowSlideRef.current : navActions.setIsMiscSlide;
   const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
   const setOverlayScreen = useStoreActions((actions) => actions.app.setOverlayScreen);
   // Proper "open this shabad" action (drives viewer/projector/history/socket).
   // Kept in a ref so the async detect->lock path always calls the latest one.
   const changeActiveShabad = useNewShabad();
   const openShabadRef = useRef(changeActiveShabad);
-  openShabadRef.current = changeActiveShabad;
+  openShabadRef.current = SHADOW_BUILD ? shadowOpen : changeActiveShabad;
   // The navigator pane (bottom-left in Presentation) shows whatever its pane
   // attributes name; opening a Bani must update them too, exactly as the Sundar
   // Gutka screen does, or the pane keeps the old content and never highlights.
+  // In shadow mode the pane is the sevadaar's: the Bani goes to the shadow bus instead.
   const updatePane = updateMultipane();
-  const updatePaneRef = useRef(updatePane);
-  updatePaneRef.current = updatePane;
+  const updatePaneRef = useRef(null);
+  updatePaneRef.current = SHADOW_BUILD ? shadowOpenBani : updatePane;
 
   const [status, setStatus] = useState('idle'); // idle|connecting|listening|detecting|error|stopped
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
@@ -599,7 +643,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // never clear a misc slide the user opened themselves.
   const seekingRef = useRef(false);
   const isMiscSlideRef = useRef(false);
-  isMiscSlideRef.current = isMiscSlide;
+  if (!SHADOW_BUILD) isMiscSlideRef.current = isMiscSlide;
   const ctxRef = useRef(null);
   const streamRef = useRef(null);
   const nodeRef = useRef(null);
@@ -1196,12 +1240,18 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         flIndexRef.current = client;
         return client;
       })
-      .catch(() => {
+      .catch((error) => {
         if (session === sessionRef.current && retrievalOwnerRef.current === client) {
           flIndexFailAtRef.current = Date.now();
           retrievalOwnerRef.current = null;
         }
         client.dispose().catch(() => {});
+        // Diagnostics only: a tester's events.jsonl and errors.log say why no shabad came.
+        if (SHADOW_BUILD) {
+          const message = (error && error.message) || String(error);
+          shadowBus.note({ type: 'vf_retrieval_failed', stage: 'prepare', error: message });
+          diag(`vf retrieval prepare failed: ${message}`);
+        }
         return null;
       });
     flIndexLoadingRef.current = p;
@@ -1223,6 +1273,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           flIndexRef.current = null;
           flIndexFailAtRef.current = Date.now();
           client.dispose().catch(() => {});
+          if (SHADOW_BUILD) {
+            shadowBus.note({ type: 'vf_retrieval_failed', stage: 'search', error: error.message });
+            diag(`vf retrieval search failed: ${error.message}`);
+          }
         }
         return null;
       }
@@ -1558,6 +1612,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const handleTranscript = useCallback(
     async (text) => {
       if (!recognizingRef.current) return;
+      // Shadow activity log: words are being heard (singing or speech) right now.
+      if (SHADOW_BUILD) shadowBus.heard(text || '');
       const session = sessionRef.current;
       // Accumulate distinct hypotheses while identifying the first Shabad.
       // Canonical retrieval supplies identities; recognized text is never displayed.
@@ -2850,6 +2906,76 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     }
   }, [activeShabadId, sundarGutkaBaniId, isSundarGutkaBani, isCeremonyBani, status, start, stop]);
 
+  // Shadow mode: follow silently whenever a shadow recording session is running, and
+  // step aside while the computer is busy (resuming once it has calmed down).
+  const shadowStateRef = useRef({ running: false, paused: false, since: 0, cpu: null, up: null });
+  const shadowStatusRef = useRef('');
+  shadowStatusRef.current = `${status}: ${detail}`;
+  useEffect(() => {
+    if (!SHADOW_BUILD) return undefined;
+    const check = () => {
+      const st = shadowStateRef.current;
+      const nowMs = Date.now();
+      // CPU load over the last 30 s (the check itself runs every 5 s so a session that
+      // just started is followed quickly).
+      let busy = null;
+      if (!st.cpu || nowMs - st.cpuAt >= 30000) {
+        const sample = cpuSample();
+        if (st.cpu) {
+          const dt = sample.total - st.cpu.total;
+          busy = dt > 0 ? 1 - (sample.idle - st.cpu.idle) / dt : null;
+        }
+        st.cpu = sample;
+        st.cpuAt = nowMs;
+      }
+      // CPU load once a minute, so a slow result can later be traced to a busy computer.
+      if (busy != null && shadowBus.active() && nowMs - (st.lastCpuLog || 0) >= 60000) {
+        st.lastCpuLog = nowMs;
+        shadowBus.note({ type: 'cpu', busy: Math.round(busy * 100) / 100 });
+      }
+      // Busy means two readings in a row (a minute): one spike is not a busy computer.
+      if (busy != null) st.busyRuns = busy > SHADOW_CPU_PAUSE ? (st.busyRuns || 0) + 1 : 0;
+      if (st.running && st.busyRuns >= 2 && nowMs - st.since > 60000) {
+        st.paused = true;
+        st.since = nowMs;
+        shadowBus.setPaused(true);
+        shadowBus.system({ bani: null, shabadId: null, verseId: null, slide: null });
+        stop();
+        st.running = false;
+        return;
+      }
+      if (st.paused && busy != null && busy < SHADOW_CPU_RESUME && nowMs - st.since > 300000) {
+        st.paused = false;
+        shadowBus.setPaused(false);
+      }
+      // Voice-Follow stopped itself (its mic ended, an error): start it again.
+      if (st.running && !autopilotRef.current) st.running = false;
+      // Record whether hidden Voice-Follow is actually listening (model and mic up), so
+      // a machine where it cannot run (missing system files, no model) shows in the data.
+      const up = !!(autopilotRef.current && recognizerRef.current);
+      if (shadowBus.active() && !st.paused && st.running && up !== st.up) {
+        if (up || nowMs - st.since > 60000) {
+          st.up = up;
+          shadowBus.note({ type: up ? 'vf_up' : 'vf_down', status: shadowStatusRef.current });
+        }
+      }
+      if (shadowBus.active() && !st.running && !st.paused) {
+        st.running = true;
+        st.since = nowMs;
+        startAutopilot();
+      } else if (!shadowBus.active() && st.running) {
+        st.running = false;
+        stop();
+      }
+    };
+    const timer = setInterval(check, 5000);
+    const first = setTimeout(check, 2000);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(first);
+    };
+  }, [startAutopilot, stop]);
+
   const listening = status === 'listening' || status === 'connecting';
   const detecting = status === 'detecting';
   const active = listening || detecting; // a session (follow or detect) is running
@@ -2995,6 +3121,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   else if (liveLead && liveLead.wins >= 2) judgeWord = 'Confirming a change';
   else if (liveLead && liveLead.wins >= 1) judgeWord = 'Checking';
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
+
+  // Tester builds: no panel, no pill. Voice-Follow only runs in the shadow.
+  if (SHADOW_BUILD) return null;
 
   return (
     <>

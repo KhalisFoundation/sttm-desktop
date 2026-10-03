@@ -1,0 +1,130 @@
+# Voice-Follow tester installers, built the way Khalis builds releases (see build-windows.yml
+# and build-mac.yml): same runner setup, same dependency install, same electron-builder
+# commands via the package.json scripts. Differences, on purpose: no code signing or
+# notarization, no publishing, the speech model is bundled, the upload key is injected from
+# a repository secret (VF_UPLOAD_KEY), and the installers are kept as workflow artifacts.
+name: Tester build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # windows-2022: node-gyp 9 (pinned by the lockfile) does not recognise the Visual
+          # Studio 2026 on windows-latest.
+          - os: windows-2022
+            platform: win
+          - os: macos-14
+            platform: macArm
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      BONJOUR_SDK_HOME: 'C:\Program Files\Bonjour SDK'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.11 (node-gyp compatible)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Ensure setuptools (distutils replacement)
+        run: python -m pip install --upgrade pip setuptools wheel
+      - name: Set node-gyp Python path
+        shell: bash
+        run: echo "npm_config_python=$pythonLocation/python${{ matrix.platform == 'win' && '.exe' || '3' }}" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+
+      - name: Install Bonjour SDK
+        if: matrix.platform == 'win'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/Bonjour64.msi" -OutFile "Bonjour64.msi"
+          Start-Process msiexec.exe -ArgumentList "/i Bonjour64.msi /qn" -Wait
+          Remove-Item Bonjour64.msi
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/bonjoursdksetup.exe" -OutFile "bonjoursdksetup.exe"
+          Start-Process bonjoursdksetup.exe -ArgumentList "/quiet" -Wait
+          Remove-Item bonjoursdksetup.exe
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          npm install -g npm@9.8.1
+          npm install --legacy-peer-deps
+
+      - name: Speech model (bundled into the installer)
+        shell: bash
+        run: |
+          mkdir -p build-resources/voice-follow
+          curl -L --retry 3 -o build-resources/voice-follow/model.int8.onnx \
+            "https://huggingface.co/karansea/indicconformer-stt-pa-ctc-shabad-preview/resolve/main/model.int8.onnx?download=true"
+          SIZE=$(wc -c < build-resources/voice-follow/model.int8.onnx | tr -d ' ')
+          echo "model bytes: $SIZE"; test "$SIZE" -gt 180000000
+
+      - name: Exclude research data from the installer
+        shell: bash
+        run: node -e 'const fs=require("fs");const p=JSON.parse(fs.readFileSync("package.json"));if(!p.build.files.includes("!research${/*}"))p.build.files.push("!research${/*}");fs.writeFileSync("package.json",JSON.stringify(p,null,2)+"\n")'
+
+      - name: Build (npm run build, as pack:* does)
+        shell: bash
+        run: npm run build
+
+      - name: Inject the upload key into the compiled config
+        shell: bash
+        env:
+          VF_UPLOAD_KEY: ${{ secrets.VF_UPLOAD_KEY }}
+        run: |
+          test -n "$VF_UPLOAD_KEY" || { echo "VF_UPLOAD_KEY secret is not set"; exit 1; }
+          f=www/js/addons/voice-follow/shadow/config.js
+          node -e 'const fs=require("fs");const f=process.argv[1];const s=fs.readFileSync(f,"utf8");if(!s.includes("__VF_UPLOAD_KEY__"))process.exit(2);fs.writeFileSync(f,s.replace("__VF_UPLOAD_KEY__",process.env.VF_UPLOAD_KEY))' "$f"
+          grep -q "__VF_UPLOAD_KEY__" "$f" && exit 1 || echo "key injected"
+
+      # The electron-builder half of pack:win / pack:macArm, with publishing off, plus
+      # npmRebuild=false: the postinstall (electron-builder install-app-deps) already built the
+      # native modules for Electron, and electron-builder's second rebuild stalls on GitHub's
+      # runners while fetching sharp's binary (runs 1-5 and 10 hung there).
+      - name: Package (Windows, as pack:win)
+        if: matrix.platform == 'win'
+        timeout-minutes: 60
+        shell: bash
+        run: npx electron-builder --win --x64 --publish never -c.npmRebuild=false
+
+      - name: Package (macOS Apple Silicon, as pack:macArm, unsigned)
+        if: matrix.platform == 'macArm'
+        timeout-minutes: 60
+        shell: bash
+        run: npx electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never -c.npmRebuild=false
+
+      - name: Checks on the output
+        shell: bash
+        # pack:win writes to builds/ (package.json); pack:macArm's config writes to dist/.
+        run: |
+          OUT=builds; [ "${{ matrix.platform }}" = win ] || OUT=dist
+          ls -la "$OUT"/ | grep -E "\.exe$|\.dmg$|\.zip$"
+          node -e 'const p=require("./node_modules/anvaad-js/package.json");if(p.version<"1.5.1")process.exit(1);console.log("anvaad-js",p.version)'
+          if [ "${{ matrix.platform }}" = win ]; then
+            test -f builds/win-unpacked/resources/voice-follow/model.int8.onnx
+            file builds/win-unpacked/resources/app.asar.unpacked/node_modules/realm/build/Release/realm.node | grep -q "PE32+"
+          else
+            ls dist/mac-arm64/*.app/Contents/Resources/voice-follow/model.int8.onnx
+            file dist/mac-arm64/*.app/Contents/Resources/app.asar.unpacked/node_modules/realm/build/Release/realm.node | grep -q "arm64"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tester-${{ matrix.platform }}
+          path: |
+            builds/*.exe
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
+          retention-days: 30
