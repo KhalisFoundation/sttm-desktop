@@ -117,12 +117,20 @@ app.on('will-quit', (e) => {
   try {
     // eslint-disable-next-line global-require
     const shadowUploader = require('./www/js/addons/voice-follow/shadow/uploader');
+    // The second quit must come on a later turn of the event loop: a quit issued while
+    // this will-quit is still being dispatched (nothing left to upload resolves at once)
+    // is swallowed and the app stays open with no window. Whatever happens, exit.
+    const quitAgain = () => setTimeout(() => app.quit(), 50);
+    const hardExit = setTimeout(() => app.exit(0), 30000);
     shadowUploader
       .flush(path.join(app.getPath('userData'), 'voice-follow', 'shadow'), 20000)
       .catch(() => {})
-      .finally(() => app.quit());
+      .finally(() => {
+        clearTimeout(hardExit);
+        quitAgain();
+      });
   } catch (_) {
-    app.quit();
+    setTimeout(() => app.quit(), 50);
   }
 });
 let viewerWindow = false;
