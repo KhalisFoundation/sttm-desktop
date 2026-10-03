@@ -9,8 +9,13 @@ export const udpateHistory = (
   const currentHistoryObj = verseHistory[existingShabadIndex];
   if (currentHistoryObj) {
     currentHistoryObj.continueFrom = newTraversedVerse;
-    if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
+    const isNewRead = !currentHistoryObj.versesRead.includes(newTraversedVerse);
+    if (isNewRead) {
       currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
+    }
+    // Always keep pane.activeVerse in sync so Display 2 / multipane highlight tracks
+    // re-selection of already-read lines, not only first-time reads.
+    if (isNewRead || paneAttributes.activeVerse !== newTraversedVerse) {
       setPaneAttributes({
         ...paneAttributes,
         activeVerse: newTraversedVerse,

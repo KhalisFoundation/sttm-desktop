@@ -89,33 +89,12 @@
 .slide-teeka {
   @extend .gurmukhi-vaak;
   font-weight: 600;
-  line-height: 1.4;
   margin: 10px 0;
-}
-
-// Devanagari: avoid synthetic bold stroke thickening that overlaps conjuncts/matras at large sizes
-.slide-translation.devanagari,
-.slide-transliteration.devanagari {
-  font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'ITF Devanagari', 'Nirmala UI',
-    'Mangal', 'Devanagari Sangam MN', sans-serif;
-  font-synthesis: none;
-  font-weight: normal;
-  line-height: 1.4;
-  text-transform: none;
 }
 
 .slide-transliteration {
   font-weight: 600;
   margin: 10px 0;
-
-  &.shahmukhi {
-    font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Geeza Pro', 'Segoe UI', 'Arial',
-      sans-serif;
-    font-synthesis: none;
-    font-weight: normal;
-    line-height: 1.6;
-    text-transform: none;
-  }
 }
 
 .slide-next-line {
@@ -129,7 +108,8 @@
 
 // Quick Tools Styles
 
-.slide-quicktools, .slide-paddingtools {
+.slide-quicktools,
+.slide-paddingtools {
   font-size: 12px;
   font-weight: bold;
   height: 100%;
@@ -155,7 +135,8 @@
   }
 }
 
-.quicktool, .paddingtool {
+.quicktool,
+.paddingtool {
   &-header {
     background-color: #0000001a;
     display: flex;
