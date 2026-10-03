@@ -17,6 +17,8 @@ const SettingsNav = ({ settingsNavObj }) => {
         return activeTab === 'app-settings' ? 'settings-nav-active' : '';
       case 'bani-and-languages':
         return activeTab === 'bani-and-languages' ? 'settings-nav-active' : '';
+      case 'recording-settings':
+        return activeTab === 'recording-settings' ? 'settings-nav-active' : '';
       default:
         return activeTab === 'slide-layout' ? 'settings-nav-active' : '';
     }

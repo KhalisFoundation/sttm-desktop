@@ -65,6 +65,117 @@ $gurmukhi-font-family-thick: 'gurbaniakharthick';
 /*
   Custom Styles
 */
+.workspace-bar {
+  position: relative;
+}
+
+.recording-controls {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  position: absolute;
+  right: 14px;
+  top: 4px;
+  z-index: 3;
+
+  button {
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    font-family: $body-font-family;
+    font-size: 13px;
+    font-weight: 600;
+    height: 22px;
+    line-height: 20px;
+    margin: 0;
+    padding: 0 14px;
+    vertical-align: middle;
+  }
+
+  .dataset-switch {
+    background: #8e8e93;
+    border: 0;
+    border-radius: 11px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    width: 168px;
+
+    &::before {
+      background: #34c759;
+      border-radius: 9px;
+      content: '';
+      height: 18px;
+      left: 2px;
+      position: absolute;
+      top: 2px;
+      transition: transform 0.15s ease;
+      width: 82px;
+      z-index: 0;
+    }
+
+    &.kirtan::before {
+      transform: translateX(82px);
+    }
+
+    span {
+      display: inline-block;
+      height: 22px;
+      line-height: 22px;
+      position: relative;
+      text-align: center;
+      width: 50%;
+      z-index: 1;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.7;
+    }
+  }
+
+  > button.record-toggle {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 50%;
+    color: #111;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 11px;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    width: 22px;
+
+    i {
+      line-height: 1;
+    }
+
+    &.recording {
+      animation: recording-pulse 1.6s ease-in-out infinite;
+      background: rgba(220, 53, 69, 0.95);
+      border-color: transparent;
+      color: #fff;
+      font-size: 9px;
+    }
+  }
+}
+
+@keyframes recording-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
 body {
   background-color: #fff;
   color: #222;

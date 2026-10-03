@@ -132,7 +132,7 @@
 
     span {
       flex-grow: 1;
-      padding: 16px;
+      padding: 10px 8px;
       text-align: center;
 
       &:hover {
@@ -180,6 +180,50 @@
         min-height: 40px;
         padding: 6px;
         transition: 0.2s background-color ease;
+
+        .token-field {
+          align-items: center;
+          display: flex;
+          position: relative;
+          width: 280px;
+
+          input {
+            box-sizing: border-box;
+            height: 28px;
+            max-width: none;
+            padding: 0 28px 0 8px;
+            width: 100%;
+          }
+
+          .token-eye {
+            background: url('../../assets/img/icons/invisible.svg') center / 16px no-repeat;
+            border: 0;
+            cursor: pointer;
+            height: 24px;
+            opacity: 0.6;
+            padding: 0;
+            position: absolute;
+            right: 2px;
+            width: 24px;
+
+            &.on {
+              background-image: url('../../assets/img/icons/visibility.svg');
+              opacity: 1;
+            }
+          }
+        }
+
+        input.recording-field {
+          box-sizing: border-box;
+          height: 28px;
+          max-width: 280px;
+          padding: 0 8px;
+          width: 280px;
+        }
+
+        input {
+          max-width: 180px;
+        }
 
         .range-value {
           margin: 8px;
