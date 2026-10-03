@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+import { useRecordingState } from '../../common/hooks';
 import {
   changeHomeVerse,
   changeVerse,
@@ -33,6 +34,8 @@ export const ShabadText = ({
   paneAttributes,
   setPaneAttributes,
   currentPane,
+  isProjection = false,
+  projectionSource = false,
 }) => {
   const [previousVerseIndex, setPreviousIndex] = useState();
   const [filteredItems, setFilteredItems] = useState([]);
@@ -42,8 +45,10 @@ export const ShabadText = ({
 
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
+  const listScrollRef = useRef(null);
   // Id of the shabad/bani whose verses are currently in filteredItems.
   const loadedShabadIdRef = useRef(null);
+  const isRecording = useRecordingState();
 
   const {
     activeVerseId,
@@ -61,7 +66,7 @@ export const ShabadText = ({
     savedCrossPlatformId,
   } = useStoreState((state) => state.navigator);
 
-  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt } =
+  const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt, defaultPaneId } =
     useStoreState((state) => state.userSettings);
 
   const {
@@ -85,7 +90,9 @@ export const ShabadText = ({
     if (newTraversedVerse === FLOWER_VERSE_ID) {
       return;
     }
-    if (activePaneId !== currentPane) {
+    // activePaneId is null until first focus — treat null as "this pane is live"
+    const livePaneId = activePaneId || defaultPaneId || 1;
+    if (livePaneId !== currentPane) {
       setActivePaneId(currentPane);
     }
     changeVerse(newTraversedVerse, verseIndex, shabadId, {
@@ -119,6 +126,9 @@ export const ShabadText = ({
       activeShabadId,
       paneAttributes,
     });
+    if (isRecording) {
+      ipcRenderer.send('recording-event', { event: 'verse', verseId: newTraversedVerse });
+    }
   };
 
   const updateHomeVerse = (verseIndex) => {
@@ -177,6 +187,16 @@ export const ShabadText = ({
 
   useEffect(() => {
     if (filteredItems.length) {
+      if (isProjection) {
+        const liveActiveId = activeVerseId || paneAttributes?.activeVerse;
+        const projectedActiveIndex = filteredItems.findIndex(
+          (verse) => verse.verseId === liveActiveId,
+        );
+        if (projectedActiveIndex >= 0) {
+          setActiveVerse({ [projectedActiveIndex]: liveActiveId });
+        }
+        return;
+      }
       setTimeout(() => {
         scrollToVerse(initialVerseId, filteredItems, virtuosoRef);
       }, 100);
@@ -195,9 +215,10 @@ export const ShabadText = ({
         updateTraversedVerse(initialVerseId, initialVerseIndex);
       }
     }
-  }, [filteredItems]);
+  }, [filteredItems, isProjection, paneAttributes?.activeVerse, activeVerseId]);
 
   useEffect(() => {
+if (isProjection) return;
     // Bani/ceremony verse sync from a controller.
     // Index-based sync for bani/ceremony. The web controller and desktop load
     // the same bani/ceremony, so their verse lists share order and count — but
@@ -244,55 +265,133 @@ export const ShabadText = ({
     // above), so this never re-applies a stale verse to a freshly-loaded bani.
     // `lineNumber` is a dep so a ceremony verse change that only moves the line
     // position (same savedCrossPlatformId space) still re-resolves by position.
-  }, [savedCrossPlatformId, filteredItems, lineNumber]);
+  }, [isProjection, savedCrossPlatformId, filteredItems, lineNumber]);
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
-    ipcRenderer.send(
-      'show-line',
-      JSON.stringify({
-        Line: overlayVerse,
-        live: liveFeed,
-      }),
-    );
+    // Only the live controller pane should drive Display 1 / Display 2.
+    // Other multipane panes keep their local list but must not overwrite show-line.
+    // activePaneId starts as null until the user focuses a pane — treat that as
+    // the default pane so the first verse selection still reaches the viewer.
+    const livePaneId = activePaneId || defaultPaneId || 1;
+    if (!isProjection && Number(livePaneId) === Number(currentPane)) {
+      ipcRenderer.send(
+        'show-line',
+        JSON.stringify({
+          Line: overlayVerse,
+          live: liveFeed,
+          activeVerseId,
+          baniType,
+          shabadId,
+          currentPane,
+        }),
+      );
+    }
     if (
-      (isCeremonyBani && ceremonyId === paneAttributes.activeShabad) ||
-      (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
-      (!isSundarGutkaBani && !isCeremonyBani && activeShabadId === paneAttributes.activeShabad)
+      !isProjection &&
+      ((isCeremonyBani && ceremonyId === paneAttributes.activeShabad) ||
+        (isSundarGutkaBani && sundarGutkaBaniId === paneAttributes.activeShabad) ||
+        (!isSundarGutkaBani && !isCeremonyBani && activeShabadId === paneAttributes.activeShabad))
     ) {
       if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
         setActiveVerse({ [lineNumber - 1]: activeVerseId });
         scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
       }
     }
-  }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
+  }, [
+    rawVerses,
+    activeShabadId,
+    activeVerseId,
+    sundarGutkaBaniId,
+    ceremonyId,
+    isProjection,
+    activePaneId,
+    defaultPaneId,
+    currentPane,
+    shabadId,
+    baniType,
+  ]);
+
+  // Display 2: full DOM list (no Virtuoso windowing). Scroll active row into view.
+  // Virtuoso only mounts viewport rows — with scaled stage height, bottom rows never
+  // enter the item-list and cannot scroll into view. Full list fixes that.
+  useEffect(() => {
+    if (!isProjection || !filteredItems.length) return undefined;
+    const liveActiveId = activeVerseId || paneAttributes?.activeVerse;
+    if (liveActiveId == null) return undefined;
+    const activeVerseIndex = filteredItems.findIndex((verse) => verse.verseId === liveActiveId);
+    if (activeVerseIndex < 0) return undefined;
+    setActiveVerse({ [activeVerseIndex]: liveActiveId });
+
+    const apply = () => {
+      const el = activeVerseRef.current;
+      const scroller = listScrollRef.current;
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+        return;
+      }
+      if (scroller && el) {
+        const rowTop = el.offsetTop;
+        const rowHeight = el.offsetHeight || 0;
+        const viewHeight = scroller.clientHeight || 0;
+        scroller.scrollTop = Math.max(0, rowTop - (viewHeight - rowHeight) / 2);
+      }
+    };
+
+    const t1 = setTimeout(apply, 0);
+    const t2 = setTimeout(apply, 50);
+    const t3 = setTimeout(apply, 150);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [isProjection, filteredItems, activeVerseId, paneAttributes?.activeVerse]);
 
   const getVerse = (direction) => {
     let verseIndex = null;
+    const activeKeys = Object.keys(activeVerse);
+    // Fall back to the live verse id when local highlight map is empty
+    // (can happen after pane switches / projection sync) so arrow keys still work.
+    if (!activeKeys.length && filteredItems.length) {
+      const liveId = activeVerseId || paneAttributes?.activeVerse;
+      const fallbackIndex = filteredItems.findIndex((verse) => verse.verseId === liveId);
+      if (fallbackIndex >= 0) {
+        activeKeys.push(String(fallbackIndex));
+      } else if (direction === 'next') {
+        activeKeys.push('-1');
+      } else {
+        activeKeys.push('0');
+      }
+    }
     if (direction === 'next') {
-      Object.keys(activeVerse).forEach((activeVerseIndex) => {
+      activeKeys.forEach((activeVerseIndex) => {
         if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
           let nextVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[nextVerseIndex].verseId === FLOWER_VERSE_ID) {
+          if (filteredItems[nextVerseIndex]?.verseId === FLOWER_VERSE_ID) {
             nextVerseIndex++;
           }
-          verseIndex = nextVerseIndex;
+          if (nextVerseIndex < filteredItems.length) {
+            verseIndex = nextVerseIndex;
+          }
         }
       });
     } else if (direction === 'prev') {
-      Object.keys(activeVerse).forEach((activeVerseIndex) => {
+      activeKeys.forEach((activeVerseIndex) => {
         if (parseInt(activeVerseIndex, 10) > 0) {
           let prevVerseIndex = parseInt(activeVerseIndex, 10) - 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[prevVerseIndex].verseId === FLOWER_VERSE_ID) {
+          if (filteredItems[prevVerseIndex]?.verseId === FLOWER_VERSE_ID) {
             prevVerseIndex--;
           }
-          verseIndex = prevVerseIndex;
+          if (prevVerseIndex >= 0) {
+            verseIndex = prevVerseIndex;
+          }
         }
       });
     }
-    if (verseIndex !== null) {
+    if (verseIndex !== null && filteredItems[verseIndex]) {
       const { verseId } = filteredItems[verseIndex];
       return { verseIndex, verseId };
     }
@@ -300,7 +399,9 @@ export const ShabadText = ({
   };
 
   useEffect(() => {
-    if (activePaneId === currentPane) {
+    if (isProjection) return;
+    const livePaneId = activePaneId || defaultPaneId || 1;
+    if (livePaneId === currentPane) {
       if (shortcuts.nextVerse) {
         const nextVerse = getVerse('next');
         if (nextVerse) {
@@ -359,6 +460,7 @@ export const ShabadText = ({
   }, [shortcuts]);
 
   useEffect(() => {
+    if (isProjection) return undefined;
     const milisecondsDelay = parseInt(autoplayDelay, 10) * 1000;
     const interval = setInterval(() => {
       if (autoplayToggle) {
@@ -371,35 +473,50 @@ export const ShabadText = ({
     return () => {
       clearInterval(interval);
     };
-  }, [autoplayToggle, autoplayDelay]);
+  }, [autoplayToggle, autoplayDelay, isProjection]);
+
+  const renderVerse = (index, verseObj) => {
+    const { verseId, verse, english } = verseObj;
+    return (
+      <ShabadVerse
+        key={verseId != null ? verseId : index}
+        activeVerse={activeVerse}
+        isHomeVerse={paneAttributes.homeVerse}
+        lineNumber={index}
+        versesRead={paneAttributes.versesRead}
+        activeVerseRef={activeVerseRef}
+        verse={verse}
+        englishVerse={english}
+        verseId={verseId}
+        changeHomeVerse={updateHomeVerse}
+        updateTraversedVerse={updateTraversedVerse}
+      />
+    );
+  };
 
   return (
     <div className="shabad-list">
-      <div className="verse-block">
-        <Virtuoso
-          id={`shabad-text-${currentPane}`}
-          data={filteredItems}
-          ref={virtuosoRef}
-          totalCount={filteredItems.length}
-          itemContent={(index, verseObj) => {
-            const { verseId, verse, english } = verseObj;
-            return (
-              <ShabadVerse
-                key={index}
-                activeVerse={activeVerse}
-                isHomeVerse={paneAttributes.homeVerse}
-                lineNumber={index}
-                versesRead={paneAttributes.versesRead}
-                activeVerseRef={activeVerseRef}
-                verse={verse}
-                englishVerse={english}
-                verseId={verseId}
-                changeHomeVerse={updateHomeVerse}
-                updateTraversedVerse={updateTraversedVerse}
-              />
-            );
-          }}
-        />
+      <div className="verse-block" ref={isProjection ? listScrollRef : undefined}>
+        {isProjection ? (
+          // Full list on Display 2 — every row is in the DOM (no Virtuoso windowing).
+          // Controller keeps Virtuoso for performance; projection needs last lines reachable.
+          <div className="shabad-list-full" data-testid="shabad-item-list" style={{ width: '100%' }}>
+            {filteredItems.map((verseObj, index) => renderVerse(index, verseObj))}
+          </div>
+        ) : (
+          <Virtuoso
+            id={`shabad-text-${currentPane}`}
+            data={filteredItems}
+            ref={virtuosoRef}
+            totalCount={filteredItems.length}
+            rangeChanged={(range) => {
+              if (projectionSource && !isProjection) {
+                ipcRenderer.send('projection-range', { paneId: currentPane, ...range });
+              }
+            }}
+            itemContent={(index, verseObj) => renderVerse(index, verseObj)}
+          />
+        )}
       </div>
     </div>
   );
@@ -412,4 +529,6 @@ ShabadText.propTypes = {
   paneAttributes: PropTypes.object,
   setPaneAttributes: PropTypes.func,
   currentPane: PropTypes.number,
+  isProjection: PropTypes.bool,
+  projectionSource: PropTypes.bool,
 };

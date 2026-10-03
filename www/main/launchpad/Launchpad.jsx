@@ -1,10 +1,11 @@
-import React, { createContext, useRef } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
-import { useKeys, useSlides } from '../common/hooks';
+import { useKeys, useSlides, useAudioRecorder, useRecordingState } from '../common/hooks';
 
 import {
   Ceremonies,
@@ -23,14 +24,27 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
+const serializeState = (state) => {
+  try {
+    return JSON.parse(JSON.stringify(state));
+  } catch (err) {
+    // Never let projection sync crash the main controller UI.
+    console.error('[projection] state serialize failed', err);
+    return {};
+  }
+};
+
 export const InputContext = createContext();
 
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState((state) => state.app);
-  const { shortcuts } = useStoreState((state) => state.navigator);
+  const appState = useStoreState((state) => state.app);
+  const { overlayScreen } = appState;
+  const navigatorState = useStoreState((state) => state.navigator);
+  const { shortcuts } = navigatorState;
   const { setShortcuts } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const userSettings = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = userSettings;
 
   const {
     displayWaheguruSlide,
@@ -40,6 +54,36 @@ const Launchpad = () => {
   } = useSlides();
 
   const ref = useRef();
+  const projectionStateRef = useRef();
+  projectionStateRef.current = { app: appState, navigator: navigatorState, userSettings };
+
+  useAudioRecorder();
+  const isRecording = useRecordingState();
+  const [recordingReady, setRecordingReady] = useState(false);
+  const [datasetType, setDatasetType] = useState('kirtan');
+
+  const refreshRecordingSettings = () => {
+    ipcRenderer.invoke('get-recording-settings').then((prefs) => {
+      setRecordingReady(Boolean(prefs.gurdwaraName) && prefs.hfTokenKhalisSaved);
+    });
+  };
+
+  useEffect(() => {
+    refreshRecordingSettings();
+  }, [overlayScreen]);
+
+  useEffect(() => {
+    const requestProjectionState = () => {
+      ipcRenderer.send('projection-state-response', {
+        app: serializeState(projectionStateRef.current.app),
+        navigator: serializeState(projectionStateRef.current.navigator),
+        userSettings: serializeState(projectionStateRef.current.userSettings),
+      });
+    };
+
+    ipcRenderer.on('projection-state-request', requestProjectionState);
+    return () => ipcRenderer.removeListener('projection-state-request', requestProjectionState);
+  }, []);
 
   const onScreenClose = React.useCallback(
     (evt) => {
@@ -134,6 +178,11 @@ const Launchpad = () => {
     }
   };
 
+  const handleRecordingToggle = () => {
+    if (!recordingReady || document.activeElement === ref.current) return;
+    ipcRenderer.send('toggle-recording', { datasetType });
+  };
+
   const handleEnter = () => {
     if (!shortcuts.openFirstResult) {
       ref.current.blur();
@@ -174,6 +223,7 @@ const Launchpad = () => {
   useKeys('ArrowUp', 'single', handleUpAndLeft);
   useKeys('ArrowLeft', 'single', handleUpAndLeft);
   useKeys('Space', 'single', handleSpacebar);
+  useKeys('KeyR', 'single', handleRecordingToggle);
   useKeys('Enter', 'single', handleEnter);
   useKeys('NumpadEnter', 'single', handleEnter);
   useKeys('KeyG', 'combination', handleCtrlG);
@@ -191,6 +241,29 @@ const Launchpad = () => {
   return (
     <>
       <WorkspaceBar />
+      {recordingReady && (
+        <div className="recording-controls">
+          <button
+            type="button"
+            className={`dataset-switch${datasetType === 'kirtan' ? ' kirtan' : ''}`}
+            aria-label={`Recording type ${datasetType}`}
+            disabled={isRecording}
+            onClick={() => setDatasetType(datasetType === 'paath' ? 'kirtan' : 'paath')}
+          >
+            <span>Paath</span>
+            <span>Kirtan</span>
+          </button>
+          <button
+            type="button"
+            className={`record-toggle${isRecording ? ' recording' : ''}`}
+            aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+            title={isRecording ? 'Stop recording' : 'Start recording'}
+            onClick={handleRecordingToggle}
+          >
+            <i className={isRecording ? 'fa fa-stop' : 'fa fa-microphone'} />
+          </button>
+        </div>
+      )}
       <div className={`launchpad${isSingleDisplayMode ? ' single-display misc-pane' : ''}`}>
         <Toolbar />
         {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}

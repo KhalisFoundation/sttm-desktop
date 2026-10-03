@@ -12,6 +12,8 @@ const { i18n } = remote.require('./app');
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
+  const isProjection = data.isProjection || false;
+  const projectionSource = data.projectionSource || false;
   const navigatorState = useStoreState((state) => state.navigator);
   const navigatorActions = useStoreActions((state) => state.navigator);
   const paneAttributes = navigatorState[`pane${paneId}`];
@@ -28,14 +30,16 @@ const MultiPaneContent = ({ data }) => {
   } = useSlides();
 
   useEffect(() => {
-    if (activePaneId === paneId) {
+    if (!isProjection && activePaneId === paneId) {
       if (homeVerse !== paneAttributes.homeVerse) setHomeVerse(paneAttributes.homeVerse);
       if (versesRead !== paneAttributes.versesRead) setVersesRead(paneAttributes.versesRead);
     }
   }, [activePaneId]);
 
   useEffect(() => {
-    setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
+    if (!isProjection) {
+      setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
+    }
   }, [currentWorkspace]);
 
   const goToShabadBtn = (
@@ -68,6 +72,8 @@ const MultiPaneContent = ({ data }) => {
           paneAttributes={paneAttributes}
           setPaneAttributes={setPaneAttributes}
           currentPane={paneId}
+          isProjection={isProjection}
+          projectionSource={projectionSource}
         />
       );
     case i18n.t('TOOLBAR.HISTORY'):

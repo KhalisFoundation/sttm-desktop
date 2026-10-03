@@ -11,7 +11,8 @@ import SlideAnnouncement from './SlideAnnouncement';
 
 global.platform = require('../../desktop_scripts');
 
-const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }) => {
+const Slide = React.memo((props) => {
+  const { verseObj, nextLineObj, isMiscSlide, continuousView, updateVerseRef } = props;
   const {
     larivaar,
     larivaarAssist,
@@ -31,6 +32,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
+  const showContinuousVerses = akhandpatt || continuousView;
   const [showVerse, setShowVerse] = useState(true);
   const [orderMarkup, setOrderMarkup] = useState(null);
 
@@ -60,7 +62,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   const getFontSize = (verseType) => ({ fontSize: `${verseType}vh` });
 
   useEffect(() => {
-    if (akhandpatt) {
+    if (showContinuousVerses) {
       setShowVerse(true);
       return;
     }
@@ -73,7 +75,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [verseObj, isMiscSlide, akhandpatt]);
+  }, [verseObj, isMiscSlide, showContinuousVerses]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -151,7 +153,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
   ) : (
     verseObj && (
       <div
-        className={akhandpatt ? '' : 'verse-slide-wrapper'}
+        className={showContinuousVerses ? '' : 'verse-slide-wrapper'}
         id={`verse-${verseObj.ID}`}
         ref={(el) => {
           updateVerseRef(verseObj.ID, el);
@@ -160,9 +162,9 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
       >
         <CSSTransition
           in={showVerse}
-          timeout={akhandpatt || !slideTransitions ? 0 : 300}
+          timeout={showContinuousVerses || !slideTransitions ? 0 : 300}
           classNames="fade"
-          unmountOnExit={!akhandpatt}
+          unmountOnExit={!showContinuousVerses}
         >
           <div
             className={`verse-slide ${leftAlign ? ' slide-left-align' : ''} ${
@@ -225,6 +227,7 @@ Slide.propTypes = {
   verseObj: PropTypes.object,
   nextLineObj: PropTypes.object,
   isMiscSlide: PropTypes.bool,
+  continuousView: PropTypes.bool,
   bgColor: PropTypes.string,
   updateVerseRef: PropTypes.func,
 };
