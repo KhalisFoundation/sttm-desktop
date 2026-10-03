@@ -1,5 +1,6 @@
-import React, { createContext, useRef } from 'react';
+import React, { createContext, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
@@ -23,14 +24,27 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
+const serializeState = (state) => {
+  try {
+    return JSON.parse(JSON.stringify(state));
+  } catch (err) {
+    // Never let projection sync crash the main controller UI.
+    console.error('[projection] state serialize failed', err);
+    return {};
+  }
+};
+
 export const InputContext = createContext();
 
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState((state) => state.app);
-  const { shortcuts } = useStoreState((state) => state.navigator);
+  const appState = useStoreState((state) => state.app);
+  const { overlayScreen } = appState;
+  const navigatorState = useStoreState((state) => state.navigator);
+  const { shortcuts } = navigatorState;
   const { setShortcuts } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const userSettings = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = userSettings;
 
   const {
     displayWaheguruSlide,
@@ -40,6 +54,21 @@ const Launchpad = () => {
   } = useSlides();
 
   const ref = useRef();
+  const projectionStateRef = useRef();
+  projectionStateRef.current = { app: appState, navigator: navigatorState, userSettings };
+
+  useEffect(() => {
+    const requestProjectionState = () => {
+      ipcRenderer.send('projection-state-response', {
+        app: serializeState(projectionStateRef.current.app),
+        navigator: serializeState(projectionStateRef.current.navigator),
+        userSettings: serializeState(projectionStateRef.current.userSettings),
+      });
+    };
+
+    ipcRenderer.on('projection-state-request', requestProjectionState);
+    return () => ipcRenderer.removeListener('projection-state-request', requestProjectionState);
+  }, []);
 
   const onScreenClose = React.useCallback(
     (evt) => {
