@@ -194,7 +194,7 @@ const ShadowCollector = () => {
               tester: readTester(shadowTester),
               startedAt: new Date(t0).toISOString(),
               app: remote.app.getVersion(),
-              build: 'mvp-8.1-shadow',
+              build: 'mvp-8.6c-shadow',
               platform: process.platform,
               microphone: stream.getAudioTracks()[0]?.label || '',
               startedBy: startReasonRef.current,
