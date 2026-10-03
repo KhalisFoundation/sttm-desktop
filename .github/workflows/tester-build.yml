@@ -98,25 +98,27 @@ jobs:
         shell: bash
         run: npx electron-builder --win --x64 --publish never -c.npmRebuild=false
 
-      - name: Package (macOS Apple Silicon, as pack:macArm, unsigned)
+      - name: Package (macOS Apple Silicon, as pack:mac but arm64, unsigned)
         if: matrix.platform == 'macArm'
         timeout-minutes: 60
         shell: bash
-        run: npx electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never -c.npmRebuild=false
+        # pack:macArm's own config file (packaging/electron-builder.macArm.yml) replaces the
+        # package.json build block entirely, so the app would lose the bundled speech model,
+        # the microphone usage text and the tester product name. Use the package.json config
+        # (as pack:mac does) and only change the architecture.
+        run: npx electron-builder --mac dmg zip --arm64 --publish never -c.npmRebuild=false
 
       - name: Checks on the output
         shell: bash
-        # pack:win writes to builds/ (package.json); pack:macArm's config writes to dist/.
         run: |
-          OUT=builds; [ "${{ matrix.platform }}" = win ] || OUT=dist
-          ls -la "$OUT"/ | grep -E "\.exe$|\.dmg$|\.zip$"
+          ls -la builds/ | grep -E "\.exe$|\.dmg$|\.zip$"
           node -e 'const p=require("./node_modules/anvaad-js/package.json");if(p.version<"1.5.1")process.exit(1);console.log("anvaad-js",p.version)'
           if [ "${{ matrix.platform }}" = win ]; then
             test -f builds/win-unpacked/resources/voice-follow/model.int8.onnx
             file builds/win-unpacked/resources/app.asar.unpacked/node_modules/realm/build/Release/realm.node | grep -q "PE32+"
           else
-            ls dist/mac-arm64/*.app/Contents/Resources/voice-follow/model.int8.onnx
-            file dist/mac-arm64/*.app/Contents/Resources/app.asar.unpacked/node_modules/realm/build/Release/realm.node | grep -q "arm64"
+            ls builds/mac-arm64/*.app/Contents/Resources/voice-follow/model.int8.onnx
+            file builds/mac-arm64/*.app/Contents/Resources/app.asar.unpacked/node_modules/realm/build/Release/realm.node | grep -q "arm64"
           fi
 
       - uses: actions/upload-artifact@v4
@@ -124,7 +126,7 @@ jobs:
           name: tester-${{ matrix.platform }}
           path: |
             builds/*.exe
-            dist/*.dmg
-            dist/*.zip
+            builds/*.dmg
+            builds/*.zip
           if-no-files-found: error
           retention-days: 30
