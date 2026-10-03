@@ -1,9 +1,7 @@
 const remote = require('@electron/remote');
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
 
-const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
 const userBackgroundsURL = new URL(`file:///${userBackgroundsPath}`).href;
@@ -15,7 +13,9 @@ const errorAlert = (error) => {
 
 export const upsertCustomBackgrounds = (responseCallback = () => {}) => {
   try {
-    if (!fs.existsSync(userBackgroundsPath)) mkdir(userBackgroundsPath);
+    // Synchronous: the readdir below ran before the folder existed on a fresh install, and
+    // the "Error fetching files" alert then blocked the window the first time Settings opened.
+    if (!fs.existsSync(userBackgroundsPath)) fs.mkdirSync(userBackgroundsPath);
   } catch (error) {
     errorAlert('Unable to create File');
   }

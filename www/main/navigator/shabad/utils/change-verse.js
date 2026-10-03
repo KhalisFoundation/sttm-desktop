@@ -114,7 +114,7 @@ export const sendToBaniController = (
         type: 'bani',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        highlight: crossPlatformId || (baniVerse && baniVerse.crossPlatformId),
         baniLength,
         // mangalPosition,
         verseChange: false,
@@ -125,7 +125,7 @@ export const sendToBaniController = (
         type: 'ceremony',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        highlight: crossPlatformId || (baniVerse && baniVerse.crossPlatformId),
         verseChange: false,
       });
     } else if (activeShabadId) {
