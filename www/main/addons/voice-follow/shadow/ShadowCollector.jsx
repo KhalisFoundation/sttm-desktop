@@ -156,6 +156,13 @@ const ShadowCollector = () => {
 
   const enabled = SHADOW_BUILD && !!tester.name && shadowRecording !== false;
 
+  // The uploader runs from the moment a registered tester opens the app, so a session left
+  // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
+  useEffect(() => {
+    if (enabled) uploader.start(shadowRoot(), tester);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
   // An older install stored the registration as plain JSON (with spaces): re-save it packed.
   useEffect(() => {
     if (tester.name && shadowTester && /\s/.test(shadowTester)) setShadowTester(packTester(tester));
