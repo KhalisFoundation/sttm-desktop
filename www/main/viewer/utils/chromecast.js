@@ -1,6 +1,8 @@
 /* global chrome */
 import { ipcRenderer } from 'electron';
 
+import { CAST_LAYOUT_CSS } from './cast-layout-css';
+
 const remote = require('@electron/remote');
 
 /* eslint-disable-next-line global-require */
@@ -74,7 +76,7 @@ const getSanitizedViewer = () => {
     slideWrapper.style.height = '100%';
     slideWrapper.style.padding = '0';
   }
-  return viewerHtml.innerHTML;
+  return `<style>${CAST_LAYOUT_CSS}</style>${viewerHtml.innerHTML}`;
 };
 
 /**
