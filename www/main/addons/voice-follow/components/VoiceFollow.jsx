@@ -240,6 +240,10 @@ const PAATH_POOL_STABLE = 3; // decodes the pooled lead must hold
 // PAATH_POOL_WINDOW searches whose top line is a shabad of that Bani lock it.
 const PAATH_POOL_WINDOW = 8;
 const PAATH_POOL_HITS = 5;
+// Aarti needs fewer: its pieces are long Savaiye whose words score low when a whole hall
+// sings them, so the top line lands on an Aarti piece persistently but weakly. 4 of 8 at
+// the same score floor fires on no kirtan cold start (41 Level 2 clips) that 5 of 8 did not.
+const PAATH_POOL_HITS_BY_BANI = { [AARTI_BANI]: 4 };
 const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 // Rehras is followed at the long length by default: the long Rehras contains the short
 // one plus long readers' opening ("Har jug jug bhagat upaya" and its salok) and the extra
@@ -1679,7 +1683,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           memory.pool = [...(memory.pool || []), poolBani ?? null].slice(-PAATH_POOL_WINDOW);
           if (
             poolBani != null &&
-            memory.pool.filter((b) => b === poolBani).length >= PAATH_POOL_HITS
+            memory.pool.filter((b) => b === poolBani).length >=
+              (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS)
           ) {
             let poolProfile;
             try {
