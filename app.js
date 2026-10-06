@@ -358,16 +358,16 @@ function trackDisplay(action) {
   });
 }
 
+function getExternalDisplays() {
+  const primaryDisplayId = electron.screen.getPrimaryDisplay().id;
+  return electron.screen.getAllDisplays().filter((display) => display.id !== primaryDisplayId);
+}
+
 function trackDisplay2Connection() {
   const connected = getExternalDisplays().length >= 2;
   if (connected === display2Connected) return;
   display2Connected = connected;
   trackDisplay(connected ? 'display-2-connected' : 'display-2-disconnected');
-}
-
-function getExternalDisplays() {
-  const primaryDisplayId = electron.screen.getPrimaryDisplay().id;
-  return electron.screen.getAllDisplays().filter((display) => display.id !== primaryDisplayId);
 }
 
 /** Stable sort so first-time bootstrap is deterministic, not API enumeration order. */
@@ -400,7 +400,7 @@ function resolveDisplayRoles() {
     presenterDisplay = byId.get(viewerWindow.displayId);
     pinnedPresenterDisplayId = presenterDisplay.id;
   } else if (externals.length > 0) {
-    presenterDisplay = externals[0];
+    [presenterDisplay] = externals;
     pinnedPresenterDisplayId = presenterDisplay.id;
   } else {
     pinnedPresenterDisplayId = null;
@@ -423,7 +423,7 @@ function resolveDisplayRoles() {
     projectionDisplay = remainingById.get(projectionWindow.displayId);
     pinnedProjectionDisplayId = projectionDisplay.id;
   } else if (remaining.length > 0) {
-    projectionDisplay = remaining[0];
+    [projectionDisplay] = remaining;
     pinnedProjectionDisplayId = projectionDisplay.id;
   } else {
     pinnedProjectionDisplayId = null;
@@ -466,29 +466,33 @@ function coverProjectionDisplay(browserWindow, display) {
   presentOnExternalDisplay(browserWindow, display);
 }
 
+// Pending placement timer per window, so a new move cancels the previous one
+const placeDisplayTimers = new WeakMap();
 
 function placeWindowOnDisplay(browserWindow, display) {
   if (!browserWindow || browserWindow.isDestroyed() || !display) return;
 
-  if (browserWindow._placeDisplayTimer) {
-    clearTimeout(browserWindow._placeDisplayTimer);
-    browserWindow._placeDisplayTimer = null;
-  }
+  clearTimeout(placeDisplayTimers.get(browserWindow));
+  placeDisplayTimers.delete(browserWindow);
 
   const isProjection = browserWindow === projectionWindow;
-  const label =
-    browserWindow === viewerWindow
-      ? 'presenter'
-      : isProjection
-        ? 'projection'
-        : 'window';
+  let label = 'window';
+  if (browserWindow === viewerWindow) {
+    label = 'presenter';
+  } else if (isProjection) {
+    label = 'projection';
+  }
   const { x, y, width, height } = display.bounds;
   const targetId = display.id;
+  // eslint-disable-next-line no-param-reassign
   browserWindow.displayId = targetId;
 
   // Exit any FS mode so bounds can change, then re-apply the right cover.
   try {
-    if (typeof browserWindow.setSimpleFullScreen === 'function' && browserWindow.isSimpleFullScreen()) {
+    if (
+      typeof browserWindow.setSimpleFullScreen === 'function' &&
+      browserWindow.isSimpleFullScreen()
+    ) {
       browserWindow.setSimpleFullScreen(false);
     }
     if (browserWindow.isFullScreen()) {
@@ -499,14 +503,15 @@ function placeWindowOnDisplay(browserWindow, display) {
     log.warn(`[display] ${label} pre-move exit failed: ${err.message}`);
   }
 
-  browserWindow._placeDisplayTimer = setTimeout(() => {
-    browserWindow._placeDisplayTimer = null;
+  const placeTimer = setTimeout(() => {
+    placeDisplayTimers.delete(browserWindow);
     if (browserWindow.isDestroyed()) return;
     if (isProjection) {
       coverProjectionDisplay(browserWindow, display);
     } else {
       presentOnExternalDisplay(browserWindow, display);
     }
+    // eslint-disable-next-line no-param-reassign
     browserWindow.displayId = targetId;
     const bounds = browserWindow.getBounds();
     const onTarget =
@@ -532,6 +537,7 @@ function placeWindowOnDisplay(browserWindow, display) {
       }, 100);
     }
   }, 50);
+  placeDisplayTimers.set(browserWindow, placeTimer);
 }
 
 function replayLastPresenterIpc(targetWindow) {
@@ -680,7 +686,9 @@ function createProjection(display) {
   paneWindow.displayId = display.id;
   pinnedProjectionDisplayId = display.id;
   paneWindow.loadURL(`file://${__dirname}/www/viewer.html?paneProjection=1`);
-  pendingProjectionWebContents = paneWindow.webContents;
+  // Keep a reference: paneWindow.webContents can't be read once the window is destroyed
+  const paneWebContents = paneWindow.webContents;
+  pendingProjectionWebContents = paneWebContents;
   remote.enable(paneWindow.webContents);
   paneWindow.webContents.on('did-fail-load', (_event, code, description, url) => {
     log.error(`[projection] Load failed (${code}): ${description} ${url}`);
@@ -709,7 +717,7 @@ function createProjection(display) {
     }
   });
   paneWindow.on('closed', () => {
-    if (pendingProjectionWebContents === paneWindow.webContents) {
+    if (pendingProjectionWebContents === paneWebContents) {
       pendingProjectionWebContents = null;
     }
     if (projectionWindow === paneWindow) {
@@ -742,11 +750,19 @@ ipcMain.on('projection-render-state', (event, state) => {
   }
 });
 
+/** Tell controller whether Swap Displays is available (2+ externals). */
+function notifyDualDisplayState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send('dual-display-state', {
+    canSwap: getExternalDisplays().length >= 2,
+  });
+}
+
 /**
  * Reconcile classic (Display 1) + optional teleprompter (Display 2) windows.
  * Prefer move-in-place over destroy/recreate so Display 1 does not blank.
  * Call on display topology changes — not on every show-line.
- * Swap uses recreateViewerWindows() instead (native FS move is broken on virtuals).
+ * Swap uses swapDisplayRoles() instead (native FS move is broken on virtuals).
  */
 function syncViewerWindows() {
   const { presenterDisplay, projectionDisplay } = resolveDisplayRoles();
@@ -812,53 +828,6 @@ function syncViewerWindows() {
 }
 
 /**
- * Close both externals and create again on current pins.
- * Same path as initial load (upstream D1: show → setFullScreen).
- * Topology recovery only — not Swap.
- */
-function recreateViewerWindows() {
-  const { presenterDisplay, projectionDisplay } = resolveDisplayRoles();
-  const presenterIpc = lastPresenterIpc
-    ? { send: lastPresenterIpc.channel, data: lastPresenterIpc.data }
-    : undefined;
-
-  log.info(
-    `[display] recreate presenter=${presenterDisplay ? presenterDisplay.id : 'none'} ` +
-      `projection=${projectionDisplay ? projectionDisplay.id : 'none'}`,
-  );
-
-  if (viewerWindow && !viewerWindow.isDestroyed()) {
-    const previous = viewerWindow;
-    viewerWindow = false;
-    previous.removeAllListeners('closed');
-    previous.close();
-  }
-  if (projectionWindow && !projectionWindow.isDestroyed()) {
-    const previous = projectionWindow;
-    projectionWindow = false;
-    previous.removeAllListeners('closed');
-    previous.close();
-  }
-
-  if (presenterDisplay) {
-    createViewer(presenterIpc, presenterDisplay);
-  }
-  if (projectionDisplay) {
-    createProjection(projectionDisplay);
-  }
-
-  notifyDualDisplayState();
-}
-
-/** Tell controller whether Swap Displays is available (2+ externals). */
-function notifyDualDisplayState() {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
-  mainWindow.webContents.send('dual-display-state', {
-    canSwap: getExternalDisplays().length >= 2,
-  });
-}
-
-/**
  * Swap = flip pins, create NEW windows (same path as initial load), then close old.
  * Do NOT: close-then-create (menu bar), or in-place loadURL (blank first swap).
  */
@@ -891,9 +860,7 @@ function swapDisplayRoles() {
   log.info(
     `[display] swap pins ${previousPresenterId}/${previousProjectionId} → ` +
       `${pinnedPresenterDisplayId}/${pinnedProjectionDisplayId}; ` +
-      `externals=${externals
-        .map((d) => `${d.id}@(${d.bounds.x},${d.bounds.y})`)
-        .join(' ')}`,
+      `externals=${externals.map((d) => `${d.id}@(${d.bounds.x},${d.bounds.y})`).join(' ')}`,
   );
 
   const { presenterDisplay, projectionDisplay } = resolveDisplayRoles();
@@ -902,7 +869,8 @@ function swapDisplayRoles() {
     : undefined;
 
   const oldViewer = viewerWindow && !viewerWindow.isDestroyed() ? viewerWindow : null;
-  const oldProjection = projectionWindow && !projectionWindow.isDestroyed() ? projectionWindow : null;
+  const oldProjection =
+    projectionWindow && !projectionWindow.isDestroyed() ? projectionWindow : null;
 
   // Detach globals so create* can run; keep old windows alive until new ones are up.
   viewerWindow = false;
@@ -947,6 +915,7 @@ function swapDisplayRoles() {
   // Close previous pair after new windows finish their first load (FS already applied).
   let pending = (presenterDisplay ? 1 : 0) + (projectionDisplay ? 1 : 0);
   let settled = false;
+  let safetyTimer = null;
   const finishSwap = () => {
     if (settled) return;
     settled = true;
@@ -973,7 +942,7 @@ function swapDisplayRoles() {
 
   // Safety: if load hangs, still tear down old windows and recover FS.
   // Skip once both windows have loaded, or if a newer swap already replaced them.
-  const safetyTimer = setTimeout(() => {
+  safetyTimer = setTimeout(() => {
     if (
       (presenterDisplay && viewerWindow !== createdViewer) ||
       (projectionDisplay && projectionWindow !== createdProjection)
@@ -985,7 +954,6 @@ function swapDisplayRoles() {
 
   notifyDualDisplayState();
 }
-
 
 ipcMain.on('projection-state-request', (event) => {
   const fromCurrentProjection =
