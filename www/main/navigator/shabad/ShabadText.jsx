@@ -414,6 +414,7 @@ export const ShabadText = ({
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
+                isFlowerVerse={isFlowerVerse(verseId, isAsaDiVaar)}
                 changeHomeVerse={updateHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />
