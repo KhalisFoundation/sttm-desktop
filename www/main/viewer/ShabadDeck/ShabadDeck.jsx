@@ -14,6 +14,7 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
+import ExperimentalBadge from '../../common/sttm-ui/experimental-badge';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 
 const os = require('os');
@@ -21,6 +22,8 @@ const remote = require('@electron/remote');
 
 const { i18n } = remote.require('./app');
 const platform = os.platform();
+// The viewer also runs embedded in the main window as a <webview>; the external viewer window doesn't
+const isEmbeddedViewer = remote.getCurrentWebContents().getType() === 'webview';
 
 const themes = require('../../../configs/themes.json');
 
@@ -338,6 +341,7 @@ function ShabadDeck() {
         </div>
       </div>
       <ViewerIcon className="viewer-logo" />
+      {!isEmbeddedViewer && <ExperimentalBadge className="viewer-experimental-badge" />}
     </>
   );
 }

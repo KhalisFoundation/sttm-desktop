@@ -74,6 +74,10 @@
     "SINGLE_DISPLAY": "Single-Display",
     "MULTI_PANE": "Multi-Pane"
   },
+  "EXPERIMENTAL": {
+    "LABEL": "Experimental build",
+    "DESCRIPTION": "You're using an experimental build of SikhiToTheMax ({{version}}). It's for trying out new features before they're released, so some things may be unfinished or may not work. Please use the stable SikhiToTheMax app for live programs, and report any problems you find."
+  },
   "CHROMECAST": {
     "CANCEL": "Cancel",
     "MSG_SENT": "Message sent: ",

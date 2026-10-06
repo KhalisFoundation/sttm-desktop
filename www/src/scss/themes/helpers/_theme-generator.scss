@@ -99,4 +99,15 @@
   }
 
   @include vishraamStyles($visraam, $yamki);
+
+  // Experimental build badge (a sibling of the themed .shabad-deck): the Gurbani color is the
+  // one each theme keeps readable against its background, so use it as the badge fill
+  & ~ .viewer-experimental-badge {
+    background-color: $gurbani;
+    @if lightness($gurbani) > 50% {
+      color: $black;
+    } @else {
+      color: $white;
+    }
+  }
 }

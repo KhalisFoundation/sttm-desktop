@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
+import ExperimentalBadge from '../../common/sttm-ui/experimental-badge';
 
 const remote = require('@electron/remote');
 
@@ -53,6 +54,7 @@ const WorkspaceBar = () => {
           <span className="workspace-name"> {workspace} </span>
         </div>
       ))}
+      <ExperimentalBadge className="workspace-experimental-badge" />
     </div>
   );
 };

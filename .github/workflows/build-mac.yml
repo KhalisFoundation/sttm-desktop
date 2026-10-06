@@ -12,12 +12,11 @@ jobs:
   build-mac:
     strategy:
       matrix:
-        include:
-          - arch: x64
-            runner: macos-15-intel
-          - arch: arm64
-            runner: macos-14
-    runs-on: ${{ matrix.runner }}
+        arch: [x64, arm64]
+        # Experimental releases only ship the Apple Silicon build
+        exclude:
+          - arch: ${{ github.ref_name == 'experimental-release' && 'x64' || '' }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-15-intel' }}
     env:
       KEY_CHAIN: build.keychain
       CERTIFICATE_P12: certificate.p12

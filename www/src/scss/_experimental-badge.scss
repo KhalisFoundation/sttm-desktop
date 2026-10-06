@@ -1,0 +1,56 @@
+// Shown only in experimental builds (see ExperimentalBadge.jsx)
+.experimental-badge {
+  align-items: center;
+  background-color: $princeton-orange;
+  border-radius: 4px;
+  color: $black;
+  cursor: default;
+  display: flex;
+  font-size: 11px;
+  font-weight: bold;
+  gap: 6px;
+  letter-spacing: 0.5px;
+  line-height: 20px;
+  padding: 0 8px;
+  pointer-events: auto;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.workspace-bar .workspace-experimental-badge {
+  cursor: help;
+  height: auto;
+  min-width: 0;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// Top-right of the external viewer window: the logo sits bottom-left and autoplay bottom-right.
+// Colors follow the active viewer theme (see generateTheme in themes/helpers/_theme-generator.scss)
+.viewer-experimental-badge {
+  box-shadow: 0 0 4px $transparent-black;
+  opacity: 0.9;
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  z-index: 1;
+}
+
+// In single-display mode the viewer sits below the workspace bar
+.shabad-deck.single-display-mode ~ .viewer-experimental-badge {
+  top: 42px;
+}
+
+.shabad-deck.single-display-mode.win32 ~ .viewer-experimental-badge {
+  top: 68px;
+}
+
+.shabad-deck.single-display-minimized ~ .viewer-experimental-badge {
+  top: 12px;
+}
+
+.shabad-deck.single-display-minimized.win32 ~ .viewer-experimental-badge {
+  top: 44px;
+}
