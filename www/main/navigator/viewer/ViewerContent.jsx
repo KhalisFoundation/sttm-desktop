@@ -6,9 +6,15 @@ const ViewerContent = () => {
 
   useEffect(() => {
     const handleDomReady = () => {
-      ipcRenderer.send('enable-wc-webview', webviewRef.current.getWebContentsId());
-      global.webview = webviewRef.current;
-      global.webview.send('update-settings');
+      if (!webviewRef.current) return;
+      try {
+        ipcRenderer.send('enable-wc-webview', webviewRef.current.getWebContentsId());
+        global.webview = webviewRef.current;
+        global.webview.send('update-settings');
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[preview] webview dom-ready failed', err);
+      }
     };
 
     const webviewElement = webviewRef.current;
@@ -19,7 +25,9 @@ const ViewerContent = () => {
     return () => {
       if (webviewElement) {
         webviewElement.removeEventListener('dom-ready', handleDomReady);
-        global.webview = null;
+        if (global.webview === webviewElement) {
+          global.webview = null;
+        }
       }
     };
   }, []);
@@ -41,3 +49,4 @@ const ViewerContent = () => {
 };
 
 export default ViewerContent;
+
