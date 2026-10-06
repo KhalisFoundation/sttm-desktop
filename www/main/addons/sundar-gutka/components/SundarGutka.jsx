@@ -8,11 +8,11 @@ import ExtraBani from './ExtraBani';
 import { convertToHyphenCase } from '../../../common/utils';
 import { nitnemBaniIds, popularBaniIds } from '../../../common/constants';
 import useLoadBani from '../hooks/use-load-bani';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
-const { i18n } = remote.require('./app');
 
 const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
   const {

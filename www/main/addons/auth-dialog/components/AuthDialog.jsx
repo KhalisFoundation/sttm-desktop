@@ -7,11 +7,11 @@ import isOnline from 'is-online';
 
 import { Overlay } from '../../../common/sttm-ui';
 import { SP_API } from '../../../common/constants/api-urls';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
-const { i18n } = remote.require('./app');
 
 const AuthDialog = ({ onScreenClose, className }) => {
   const { userToken } = useStoreState((state) => state.app);

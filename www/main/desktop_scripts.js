@@ -10,7 +10,9 @@ const remote = require('@electron/remote');
 const moment = require('moment');
 const tingle = require('../assets/js/vendor/tingle');
 
-const { i18n, isUnsupportedWindow } = remote.require('./app');
+const { isUnsupportedWindow } = remote.require('./app');
+const { i18n } = require('./common/i18n');
+
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
