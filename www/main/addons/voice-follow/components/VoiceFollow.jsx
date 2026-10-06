@@ -233,7 +233,7 @@ const PAATH_READ_BANIS = [21, 23, 2, 22]; // + Aarti: a shabad in both Sohila an
 // never locks. Pool the votes of a paath Bani's shabads (split over at least two)
 // into one candidate; a steady clear pooled lead locks its best shabad, and the
 // one-line paath rule then opens the Bani.
-const PAATH_POOL_BANIS = [4]; // Jaap Sahib
+const PAATH_POOL_BANIS = [4, AARTI_BANI]; // Jaap Sahib; Aarti (a medley of pieces)
 const PAATH_POOL_STABLE = 3; // decodes the pooled lead must hold
 // The same pooling on the full-text search (the first letters of Jaap's short words
 // are often misheard, so the vote above can stay empty): this many of the last
@@ -284,21 +284,41 @@ function poolPaathVotes(ranked, index) {
   return { bani, sid: bestSid };
 }
 // The Bani in which `nextId` follows `prevId` most closely, in order; else null.
-function findBaniSequence(index, prevId, nextId) {
+// Two Banis can hold the same pair in order (the Savaiya and Dohra close both the long
+// Rehras and the Aarti): then the Bani that also holds the shabads shown just before
+// wins (`prefer`: bani -> how many recent shabads it contains), and failing that Aarti,
+// whose pieces are sung straight through, over Rehras, which the reading rule catches.
+function findBaniSequence(index, prevId, nextId, prefer = null) {
   const a = index.byShabad.get(prevId) || [];
   const b = index.byShabad.get(nextId) || [];
   let best = null;
   let bestGap = Infinity;
+  let bestPref = -1;
+  const rank = (bani) => (prefer && prefer.get(bani)) || (bani === AARTI_BANI ? 0.5 : 0);
   a.forEach((x) =>
     b.forEach((y) => {
       const gap = y.pos - x.pos;
-      if (x.bani === y.bani && gap >= 1 && gap <= BANI_NEXT_MAX && gap < bestGap) {
+      if (x.bani !== y.bani || gap < 1 || gap > BANI_NEXT_MAX) return;
+      const pref = rank(x.bani);
+      if (gap < bestGap || (gap === bestGap && pref > bestPref)) {
         best = x.bani;
         bestGap = gap;
+        bestPref = pref;
       }
     }),
   );
   return best;
+}
+// Recently shown shabads (newest last), for the Bani preference above.
+const RECENT_SHABADS = 4;
+function baniPreference(index, recent) {
+  const prefer = new Map();
+  recent.forEach((sid) =>
+    (index.byShabad.get(sid) || []).forEach((x) =>
+      prefer.set(x.bani, (prefer.get(x.bani) || 0) + 1),
+    ),
+  );
+  return prefer;
 }
 const CORRECTION_SECONDS = 45; // audio kept before a sevadaar correction
 const RETURN_WINDOW_DECODES = 240; // ~2 min at the 0.5 s following hop
@@ -499,6 +519,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const baniIndexRef = useRef(null); // { col, promise } shabad<->Bani index, built once per length
   const curBaniShabadsRef = useRef(null); // Set of shabads inside the Bani being followed
   const seqReadRef = useRef({ id: null, last: -1, lines: new Set(), fired: false }); // PAATH_READ_LINES
+  const recentShabadsRef = useRef([]); // last RECENT_SHABADS plain shabads shown (see baniPreference)
   const autopilotLockRef = useRef(null);
   // Settings > Other Options > "Help Improve Voice-Follow" (on by default): keep the
   // audio before a sevadaar correction, on this computer only.
@@ -1372,6 +1393,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         bsAdoptKeyRef.current = '';
         if (cand.shabadId !== currentShabadIdRef.current) {
           currentShabadIdRef.current = cand.shabadId;
+          if (typeof cand.shabadId === 'number') {
+            recentShabadsRef.current = [
+              ...recentShabadsRef.current.filter((x) => x !== cand.shabadId),
+              cand.shabadId,
+            ].slice(-RECENT_SHABADS);
+          }
           const wantLength = baniId != null ? baniLengthFor(baniId, userLength()) : null;
           if (wantLength && wantLength !== baniLengthRef.current) {
             if (!lengthOverrideRef.current) lengthOverrideRef.current = { prev: userLength() };
@@ -1492,7 +1519,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           currentShabadIdRef.current === cand.shabadId &&
           !lockingRef.current
         ) {
-          let bani = findBaniSequence(index, fromId, cand.shabadId);
+          const prefer = baniPreference(index, recentShabadsRef.current.slice(0, -1));
+          let bani = findBaniSequence(index, fromId, cand.shabadId, prefer);
           // The previous shabad may have been locked as the other Bani's copy of the
           // same Gurbani (Sohila's Gagan mai thaal before Aarti's next shabad).
           if (
@@ -1506,7 +1534,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               copies = null;
             }
             [...((copies && copies.values()) || [])].some((c) => {
-              bani = findBaniSequence(index, c, cand.shabadId);
+              bani = findBaniSequence(index, c, cand.shabadId, prefer);
               return bani != null;
             });
             if (
@@ -2732,7 +2760,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           // Straight-through reading of a Rehras or Sohila shabad: open the Bani.
           const sid = currentShabadIdRef.current;
           if (seqReadRef.current.id !== sid) {
-            seqReadRef.current = { id: sid, last: -1, lines: new Set(), fired: false };
+            seqReadRef.current = {
+              id: sid,
+              last: -1,
+              lines: new Set(),
+              fired: false,
+              aarti: false,
+            };
           }
           const sr = seqReadRef.current;
           if (
@@ -2741,7 +2775,53 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             !sr.fired &&
             out.lineIndex !== sr.last
           ) {
-            if (out.lineIndex < sr.last) sr.lines = new Set();
+            if (out.lineIndex < sr.last) {
+              sr.lines = new Set();
+              // Sung, not read (a line came back): a shabad that is a copy of an Aarti piece
+              // (Sohila's Gagan mai thaal) is the Aarti being sung, so open the Aarti Bani at
+              // this line; from inside the Bani the next pieces follow without a new search.
+              if (!sr.aarti) {
+                sr.aarti = true;
+                const lineText = (curProfileRef.current?.rawLines || [])[out.lineIndex];
+                getBaniIndex()
+                  .then(async (index) => {
+                    const own = (index.byShabad.get(sid) || []).map((x) => x.bani);
+                    let copies = null;
+                    if (!own.includes(AARTI_BANI))
+                      copies = await paathCopies(sid, index).catch(() => null);
+                    const inAarti = own.includes(AARTI_BANI) || (copies && copies.has(AARTI_BANI));
+                    if (
+                      !inAarti ||
+                      !lineText ||
+                      session !== sessionRef.current ||
+                      !autopilotRef.current ||
+                      lockingRef.current ||
+                      currentShabadIdRef.current !== sid ||
+                      !autopilotLockRef.current
+                    ) {
+                      return;
+                    }
+                    // The Aarti row with this line's text (the copy's own verse id differs).
+                    const prof = await loadBaniProfile(AARTI_BANI);
+                    const want = vfNorm(anvaad.unicode(lineText));
+                    let at = prof.rawLines.findIndex((l) => vfNorm(anvaad.unicode(l)) === want);
+                    if (at < 0)
+                      at = prof.rawLines.findIndex(
+                        (l) => partialRatio(vfNorm(anvaad.unicode(l)), want) >= 90,
+                      );
+                    if (at < 0 || currentShabadIdRef.current !== sid || lockingRef.current) return;
+                    autopilotLockRef.current(
+                      {
+                        shabadId: `${BANI_KEY}${AARTI_BANI}`,
+                        verseId: prof.verses[at].verseId,
+                        verse: prof.rawLines[at],
+                      },
+                      { promote: true },
+                    );
+                  })
+                  .catch(() => {});
+              }
+            }
             sr.lines.add(out.lineIndex);
             sr.last = out.lineIndex;
             if (sr.lines.size >= PAATH_READ_LINES) {
