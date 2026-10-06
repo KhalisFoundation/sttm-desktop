@@ -382,6 +382,17 @@ function checkPresenterView() {
   global.platform.ipc.send('presenter-view', inPresenterView);
 }
 
+// Apply presenter layout on boot. Without this, #navigator stays the small
+// fixed 470x300 bottom-right box (non-presenter chrome) and the controller
+// looks blank / crushed into a corner until an external-display IPC fires.
+checkPresenterView();
+updateViewerScale();
+// Viewer webview mounts after React paint — re-scale once layout is ready.
+if (typeof requestAnimationFrame === 'function') {
+  requestAnimationFrame(() => updateViewerScale());
+}
+setTimeout(() => updateViewerScale(), 300);
+
 global.platform.ipc.on('presenter-view', () => {
   checkPresenterView();
   updateViewerScale();

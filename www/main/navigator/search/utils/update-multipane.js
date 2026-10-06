@@ -5,8 +5,10 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 
 const updateMultipane = () => {
-  const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
-  const { setPane1, setPane2, setPane3 } = useStoreActions((actions) => actions.navigator);
+  const { pane1, pane2, pane3, activePaneId } = useStoreState((state) => state.navigator);
+  const { setPane1, setPane2, setPane3, setActivePaneId } = useStoreActions(
+    (actions) => actions.navigator,
+  );
   const { defaultPaneId } = useStoreState((state) => state.userSettings);
 
   const paneMap = {
@@ -33,7 +35,6 @@ const updateMultipane = () => {
 
     if (verseId) {
       newAttributes = {
-        ...pane,
         content: i18n.t('MULTI_PANE.SHABAD'),
         activeShabad: shabadId,
         baniType,
@@ -42,7 +43,6 @@ const updateMultipane = () => {
       };
     } else {
       newAttributes = {
-        ...pane,
         content: i18n.t('MULTI_PANE.SHABAD'),
         activeShabad: shabadId,
         baniType,
@@ -57,6 +57,12 @@ const updateMultipane = () => {
     }
     if (pane !== newAttributes) {
       setPane(newAttributes);
+    }
+    // The pane a shabad, bani, or ceremony was just opened in is the live pane.
+    // Display 2 follows activePaneId, and opening content never set it, so the
+    // projected list stayed on the previous pane.
+    if (multiPaneId && shabadPane !== activePaneId) {
+      setActivePaneId(shabadPane);
     }
   };
 };
