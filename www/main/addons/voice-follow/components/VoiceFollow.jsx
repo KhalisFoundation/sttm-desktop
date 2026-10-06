@@ -252,10 +252,15 @@ const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 const REHRAS_BANI = 21;
 const REHRAS_LENGTH = 'long';
 const LENGTH_ORDER = ['short', 'medium', 'long', 'extralong'];
-const baniLengthFor = (baniId, userLength) =>
-  baniId === REHRAS_BANI && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(REHRAS_LENGTH)
-    ? REHRAS_LENGTH
-    : userLength;
+// Aarti likewise is followed at the extra-long length: a sung Aarti (Renton) runs through
+// pieces the short list lacks (Kabir's Sorath "Bhookhe bhagat na keejai", the opening
+// Savaiya), and a Bani profile without those lines has nothing to show while they are sung.
+const AARTI_LENGTH = 'extralong';
+const BANI_MIN_LENGTH = { [REHRAS_BANI]: REHRAS_LENGTH, [AARTI_BANI]: AARTI_LENGTH };
+const baniLengthFor = (baniId, userLength) => {
+  const min = BANI_MIN_LENGTH[baniId];
+  return min && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(min) ? min : userLength;
+};
 // Of the long Rehras's extra shabads, only its opening (Har jug jug bhagat upaya and the
 // salok after it) may open Rehras by the reading rule: its closing saloks and pauris
 // (e.g. 1944) are sung as kirtan in their own right (Level 2 clip04).
@@ -1012,15 +1017,24 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const getBaniIndex = useCallback(() => {
     const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
     if (!baniIndexRef.current || baniIndexRef.current.col !== col) {
-      const rehrasCol = BANI_LENGTH_COLS[baniLengthFor(REHRAS_BANI, userLength())];
+      // Banis followed at a longer length than the user's (Rehras, Aarti) take their shabad
+      // list from that length, so sequence and copy rules see every piece they can follow.
+      const longer = Object.keys(BANI_MIN_LENGTH)
+        .map(Number)
+        .map((b) => [b, BANI_LENGTH_COLS[baniLengthFor(b, userLength())]])
+        .filter(([, c]) => c !== col);
+      const extraCols = [...new Set(longer.map(([, c]) => c))];
       const promise = Promise.all([
         banidb.loadBaniIndex(col),
-        rehrasCol === col ? null : banidb.loadBaniIndex(rehrasCol),
-      ]).then(([banis, rehrasBanis]) => {
+        ...extraCols.map((c) => banidb.loadBaniIndex(c)),
+      ]).then(([banis, ...extra]) => {
         // The user-length Rehras, kept for the reading rule (see REHRAS_READ_OPENING).
         const rehrasUser = new Set(banis[REHRAS_BANI] || []);
-        // eslint-disable-next-line no-param-reassign
-        if (rehrasBanis && rehrasBanis[REHRAS_BANI]) banis[REHRAS_BANI] = rehrasBanis[REHRAS_BANI];
+        longer.forEach(([b, c]) => {
+          const got = extra[extraCols.indexOf(c)];
+          // eslint-disable-next-line no-param-reassign
+          if (got && got[b]) banis[b] = got[b];
+        });
         const byShabad = new Map();
         Object.keys(banis).forEach((b) =>
           banis[b].forEach((sid, order) => {
