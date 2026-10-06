@@ -14,6 +14,8 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
+import { ShabadInfo } from '../Slide/ShabadInfo';
+import { useShabadInfo } from '../hooks/use-shabad-info';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 
 const os = require('os');
@@ -140,6 +142,12 @@ function ShabadDeck() {
   };
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
+
+  // Shabad info is only shown for shabads (banis and ceremonies mix Angs), and
+  // only while there's something to show; otherwise the display is unchanged.
+  const isShabad = !isMiscSlide && !isSundarGutkaBani && !isCeremonyBani;
+  const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
+  const showsShabadInfo = shabadInfoDetails.length > 0;
 
   useEffect(() => {
     let currentShabad = activeShabadId;
@@ -305,6 +313,8 @@ function ShabadDeck() {
           akhandpatt && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
+          // The info bar sits under the slide, which shrinks to make room.
+          showsShabadInfo && 'shabad-deck--with-info',
         )}
         style={applyTheme()}
       >
@@ -336,8 +346,15 @@ function ShabadDeck() {
             <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
           )}
         </div>
+        {showsShabadInfo ? (
+          <ShabadInfo
+            details={shabadInfoDetails}
+            color={getCurrentThemeInstance()['translation-color']}
+          />
+        ) : null}
       </div>
-      <ViewerIcon className="viewer-logo" />
+      {/* The info bar carries the logo while it's shown. */}
+      {!showsShabadInfo && <ViewerIcon className="viewer-logo" />}
     </>
   );
 }
