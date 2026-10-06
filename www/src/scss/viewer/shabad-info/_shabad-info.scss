@@ -1,6 +1,6 @@
 // Shabad info: a bar under the slide with the logo and the shabad's source,
-// Ang, writer and raag. Scoped under #viewer-container so its fade isn't
-// overridden by the container's `* { transition }`.
+// Ang, writer and raag. It's only on screen while the details are showing.
+// Scoped under #viewer-container to win over the container's own styles.
 $shabad-info-logo-width: 100px;
 
 #viewer-container {
@@ -43,14 +43,9 @@ $shabad-info-logo-width: 100px;
     }
 
     &__text {
+      animation: shabad-info-fade-in 0.6s ease;
       line-height: 1.4;
-      opacity: 0;
       text-align: center;
-      transition: opacity 0.6s ease;
-    }
-
-    &.shabad-info--visible .shabad-info__text {
-      opacity: 1;
     }
 
     .shabad-info__detail + .shabad-info__detail::before {
@@ -58,5 +53,15 @@ $shabad-info-logo-width: 100px;
       margin: 0 0.8em;
       opacity: 0.5;
     }
+  }
+}
+
+@keyframes shabad-info-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

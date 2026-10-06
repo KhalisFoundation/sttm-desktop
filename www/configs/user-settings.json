@@ -233,11 +233,13 @@
     },
     "shabad-info-font-size": {
       "title": "SHABAD_INFO_FONT_SIZE",
-      "type": "range",
-      "min": 1,
-      "max": 10,
-      "step": 1,
-      "initialValue": 2
+      "type": "dropdown",
+      "initialValue": "small",
+      "options": {
+        "small": "SHABAD_INFO_FONT_SMALL",
+        "medium": "SHABAD_INFO_FONT_MEDIUM",
+        "large": "SHABAD_INFO_FONT_LARGE"
+      }
     },
     "shabad-info-source": {
       "title": "SHABAD_INFO_SOURCE",

@@ -15,6 +15,7 @@ import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
 import { ShabadInfo } from '../Slide/ShabadInfo';
+import { useShabadInfo } from '../hooks/use-shabad-info';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 
 const os = require('os');
@@ -55,7 +56,6 @@ function ShabadDeck() {
     defaultPaneId,
     teekaSource,
     translationEnglishSource,
-    shabadInfo,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const [activeVerse, setActiveVerse] = useState([]);
@@ -143,14 +143,11 @@ function ShabadDeck() {
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
-  // Shabad info is only shown for shabads (banis and ceremonies mix Angs).
-  const showsShabadInfo =
-    !isMiscSlide &&
-    !isSundarGutkaBani &&
-    !isCeremonyBani &&
-    activeVerse.length > 0 &&
-    shabadInfo &&
-    shabadInfo !== 'off';
+  // Shabad info is only shown for shabads (banis and ceremonies mix Angs), and
+  // only while there's something to show; otherwise the display is unchanged.
+  const isShabad = !isMiscSlide && !isSundarGutkaBani && !isCeremonyBani;
+  const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
+  const showsShabadInfo = shabadInfoDetails.length > 0;
 
   useEffect(() => {
     let currentShabad = activeShabadId;
@@ -351,7 +348,7 @@ function ShabadDeck() {
         </div>
         {showsShabadInfo ? (
           <ShabadInfo
-            verse={activeVerse[0]}
+            details={shabadInfoDetails}
             color={getCurrentThemeInstance()['translation-color']}
           />
         ) : null}
