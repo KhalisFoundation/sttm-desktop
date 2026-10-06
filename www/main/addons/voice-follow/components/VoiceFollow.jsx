@@ -294,7 +294,7 @@ function findBaniSequence(index, prevId, nextId, prefer = null) {
   let best = null;
   let bestGap = Infinity;
   let bestPref = -1;
-  const rank = (bani) => (prefer && prefer.get(bani)) || (bani === AARTI_BANI ? 0.5 : 0);
+  const rank = (bani) => ((prefer && prefer.get(bani)) || 0) + (bani === AARTI_BANI ? 0.5 : 0);
   a.forEach((x) =>
     b.forEach((y) => {
       const gap = y.pos - x.pos;
