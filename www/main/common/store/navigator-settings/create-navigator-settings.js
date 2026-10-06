@@ -40,7 +40,12 @@ const createNavigatorSettingsState = (settingsSchema) => {
         );
       }
 
-      return state;
+      // NOTE: do NOT `return state` here. easy-peasy actions run inside immer;
+      // returning the draft makes immer treat it as the replacement state, then
+      // revokes it once the action finalizes. Any later read of the navigator
+      // slice then throws "Cannot perform 'get' on a proxy that has been
+      // revoked" (crashed VoiceFollow while highlighting). Mutating the draft is
+      // sufficient — immer applies the change with no return value.
     });
   });
   return navigatorSettingsState;

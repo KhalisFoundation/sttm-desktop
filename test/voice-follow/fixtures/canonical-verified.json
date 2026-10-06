@@ -1,0 +1,38 @@
+{
+  "source": "local STTM BaniDB, read-only",
+  "retrievedAt": "2026-09-14T08:12:47.339Z",
+  "databaseSha256": "3c520fce398a2e35140a87fd2a244f51c0ceeb4dd935dc4162a77ed1bfe52b7b",
+  "schemaSha256": "dd2c2e7e4493c0edb7cff9574a1d0e2365d8f7ec12338ffea989dfabb6f04456",
+  "rows": [
+    {
+      "verseId": 4132,
+      "shabadId": 300,
+      "shabadIds": [
+        300
+      ],
+      "text": "ਤੂੰ ਮੇਰਾ ਪਿਤਾ ਤੂੰਹੈ ਮੇਰਾ ਮਾਤਾ ॥",
+      "ascii": "qUM myrw ipqw qUMhY myrw mwqw ]",
+      "fl": "qmpqmm"
+    },
+    {
+      "verseId": 4134,
+      "shabadId": 300,
+      "shabadIds": [
+        300
+      ],
+      "text": "ਤੂੰ ਮੇਰਾ ਰਾਖਾ ਸਭਨੀ ਥਾਈ ਤਾ ਭਉ ਕੇਹਾ ਕਾੜਾ ਜੀਉ ॥੧॥",
+      "ascii": "qUM myrw rwKw sBnI QweI qw Bau kyhw kwVw jIau ]1]",
+      "fl": "qmrsQqBkkj"
+    },
+    {
+      "verseId": 15269,
+      "shabadId": 1341,
+      "shabadIds": [
+        1341
+      ],
+      "text": "ਬਿਖੈ ਬਾਚੁ ਹਰਿ ਰਾਚੁ ਸਮਝੁ ਮਨ ਬਉਰਾ ਰੇ ॥",
+      "ascii": "ibKY bwcu hir rwcu smJu mn baurw ry ]",
+      "fl": "bbhrsmbr"
+    }
+  ]
+}

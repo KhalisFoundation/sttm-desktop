@@ -1,5 +1,5 @@
 {
-  "productName": "SikhiToTheMax",
+  "productName": "Voice-Sikhi-To-The-Max",
   "name": "sttm-desktop",
   "version": "9.3.2",
   "description": "The SikhiToTheMax desktop app",
@@ -11,7 +11,10 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
+    "test:unit": "node --test www/main/addons/voice-follow/components/ && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
+    "smoke": "npm run build:local && cross-env VF_SMOKE=1 electron .",
+    "debug": "npm run build:local && cross-env NODE_ENV=development electron . --remote-debugging-port=9222",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
@@ -32,7 +35,8 @@
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "test:voice-follow": "node --test test/voice-follow/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -81,7 +85,7 @@
     "@babel/polyfill": "^7.8.7",
     "@electron/remote": "^2.0.11",
     "@sentry/electron": "^6.8.0",
-    "anvaad-js": "^1.5.0",
+    "anvaad-js": "^1.5.1",
     "axios": "^1.5.1",
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.3.1",
@@ -113,6 +117,7 @@
     "node-fetch-progress": "^1.0.2",
     "node-gyp": "^9.4.0",
     "noty": "^3.2.0-beta",
+    "onnxruntime-node": "^1.18.0",
     "portfinder": "1.0.32",
     "prop-types": "^15.8.1",
     "qrcode": "^1.5.3",
@@ -135,14 +140,14 @@
     "uuid": "^9.0.1"
   },
   "build": {
-    "appId": "org.khalisfoundation.sttm",
+    "appId": "org.khalisfoundation.sttm.voice",
     "protocols": {
       "name": "SikhiToTheMax",
       "schemes": [
         "sttm-desktop"
       ]
     },
-    "copyright": "Copyright © 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
+    "copyright": "Copyright \u00a9 2022 Khalis Foundation , SikhiToTheMax Trademark SHARE Charity, UK\n",
     "files": [
       "**/*",
       "!assets${/*}",
@@ -154,20 +159,12 @@
       "!www/package.json",
       "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map",
-      "!www/main/**/*.{js,jsx}"
-    ],
-    "extraResources": [
-      "data.db"
+      "!www/main/**/*.{js,jsx}",
+      "!build-resources${/*}"
     ],
     "directories": {
       "buildResources": "assets",
       "output": "builds"
-    },
-    "publish": {
-      "provider": "s3",
-      "bucket": "sttm-releases",
-      "path": "${os}-${arch}",
-      "region": "us-west-2"
     },
     "dmg": {
       "icon": "assets/STTM-DMG.icns",
@@ -206,9 +203,11 @@
     },
     "afterSign": "./notarize.js",
     "nsis": {
-      "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
-      "deleteAppDataOnUninstall": true,
-      "perMachine": true
+      "artifactName": "Voice-Sikhi-To-The-Max-Setup-${version}.${ext}",
+      "deleteAppDataOnUninstall": false,
+      "perMachine": true,
+      "shortcutName": "Voice-Sikhi-To-The-Max",
+      "uninstallDisplayName": "Voice-Sikhi-To-The-Max"
     },
     "win": {
       "icon": "assets/STTM.ico",
@@ -221,13 +220,20 @@
       ],
       "verifyUpdateCodeSignature": false,
       "rfc3161TimeStampServer": "http://timestamp.digicert.com",
-      "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}"
+      "artifactName": "Voice-Sikhi-To-The-Max-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
       "category": "Network",
       "target": "deb",
       "icon": "assets"
-    }
+    },
+    "productName": "Voice-Sikhi-To-The-Max",
+    "extraResources": [
+      {
+        "from": "build-resources/voice-follow/model.int8.onnx",
+        "to": "voice-follow/model.int8.onnx"
+      }
+    ]
   },
   "husky": {
     "hooks": {

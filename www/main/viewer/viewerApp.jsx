@@ -4,6 +4,7 @@ import { ipcRenderer } from 'electron';
 
 import ShabadDeck from './ShabadDeck/ShabadDeck';
 import ViewerState from './store/ViewerState';
+import ErrorBoundary from '../common/ErrorBoundary';
 import { castToReceiver, appendMessage, requestSession, stopApp, tingle } from './utils';
 
 const chromecast = require('electron-chromecast');
@@ -74,9 +75,11 @@ const ViewerApp = () => {
     castToReceiver();
   });
   return (
-    <StoreProvider store={ViewerState}>
-      <ShabadDeck />
-    </StoreProvider>
+    <ErrorBoundary label="viewer-window">
+      <StoreProvider store={ViewerState}>
+        <ShabadDeck />
+      </StoreProvider>
+    </ErrorBoundary>
   );
 };
 

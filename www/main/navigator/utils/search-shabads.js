@@ -2,6 +2,7 @@ import Noty from 'noty';
 import banidb from '../../banidb';
 
 const remote = require('@electron/remote');
+const { diag, errText } = require('../../addons/voice-follow/shadow/diag');
 
 const { i18n } = remote.require('./app');
 
@@ -10,6 +11,7 @@ export const searchShabads = (searchQuery, searchType, searchSource, howManyRows
     .query(searchQuery, searchType, searchSource, howManyRows)
     .then((verses) => verses)
     .catch((err) => {
+      diag(`search failed (type ${searchType}, source ${searchSource}): ${errText(err)}`);
       const dbStatus = !!localStorage.getItem('isDbDownloaded');
       if (dbStatus) {
         new Noty({
