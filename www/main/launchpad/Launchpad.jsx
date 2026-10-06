@@ -1,5 +1,6 @@
-import React, { createContext, useRef } from 'react';
+import React, { createContext, useEffect, useRef } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import { ipcRenderer } from 'electron';
 
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
@@ -23,14 +24,27 @@ const remote = require('@electron/remote');
 const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
+const serializeState = (state) => {
+  try {
+    return JSON.parse(JSON.stringify(state));
+  } catch (err) {
+    // Never let projection sync crash the main controller UI.
+    console.error('[projection] state serialize failed', err);
+    return {};
+  }
+};
+
 export const InputContext = createContext();
 
 const Launchpad = () => {
-  const { overlayScreen } = useStoreState((state) => state.app);
-  const { shortcuts } = useStoreState((state) => state.navigator);
+  const appState = useStoreState((state) => state.app);
+  const { overlayScreen } = appState;
+  const navigatorState = useStoreState((state) => state.navigator);
+  const { shortcuts } = navigatorState;
   const { setShortcuts } = useStoreActions((state) => state.navigator);
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
-  const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const userSettings = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, defaultPaneId } = userSettings;
 
   const {
     displayWaheguruSlide,
@@ -40,6 +54,73 @@ const Launchpad = () => {
   } = useSlides();
 
   const ref = useRef();
+  const projectionStateRef = useRef();
+  projectionStateRef.current = { app: appState, navigator: navigatorState, userSettings };
+
+  const {
+    activeShabadId,
+    activePaneId,
+    activeVerseId,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    sundarGutkaBaniId,
+    ceremonyId,
+  } = navigatorState;
+
+  useEffect(() => {
+    // The startup snapshot is the only full copy Display 2 gets. After that,
+    // only scalar settings sync, so a shabad opened in another pane stays on
+    // the old list. Push just the live pane fields — a full snapshot revokes
+    // the store proxy and crashes the controller.
+    const nav = projectionStateRef.current && projectionStateRef.current.navigator;
+    if (!nav) return;
+    const pane = nav[`pane${nav.activePaneId}`];
+    if (!pane || !pane.activeShabad) return;
+    ipcRenderer.send(
+      'show-line',
+      JSON.stringify({
+        paneSync: true,
+        activePaneId: nav.activePaneId,
+        activeShabadId: nav.activeShabadId,
+        activeVerseId: nav.activeVerseId,
+        isSundarGutkaBani: nav.isSundarGutkaBani,
+        isCeremonyBani: nav.isCeremonyBani,
+        sundarGutkaBaniId: nav.sundarGutkaBaniId,
+        ceremonyId: nav.ceremonyId,
+        pane: pane
+          ? {
+              content: pane.content,
+              activeShabad: pane.activeShabad,
+              baniType: pane.baniType,
+              activeVerse: pane.activeVerse,
+              versesRead: pane.versesRead ? [...pane.versesRead] : [],
+              homeVerse: pane.homeVerse,
+            }
+          : null,
+      }),
+    );
+  }, [
+    activeShabadId,
+    activePaneId,
+    activeVerseId,
+    isSundarGutkaBani,
+    isCeremonyBani,
+    sundarGutkaBaniId,
+    ceremonyId,
+  ]);
+
+  useEffect(() => {
+    const requestProjectionState = () => {
+      ipcRenderer.send('projection-state-response', {
+        app: serializeState(projectionStateRef.current.app),
+        navigator: serializeState(projectionStateRef.current.navigator),
+        userSettings: serializeState(projectionStateRef.current.userSettings),
+      });
+    };
+
+    ipcRenderer.on('projection-state-request', requestProjectionState);
+    return () => ipcRenderer.removeListener('projection-state-request', requestProjectionState);
+  }, []);
 
   const onScreenClose = React.useCallback(
     (evt) => {

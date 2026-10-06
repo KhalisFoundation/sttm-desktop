@@ -5,6 +5,16 @@ import { getControllerFontSizes } from '../../../addons/bani-controller/utils/co
 // can we change them to import?
 const fs = require('fs');
 
+// JSON.stringify on an immer draft revokes the proxy and crashes the next dispatch.
+const toPlain = (value) => {
+  if (value == null || typeof value !== 'object') return value;
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch (err) {
+    return value;
+  }
+};
+
 const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) => {
   const userSettingsState = {};
   Object.keys(settingsSchema).forEach((settingKey) => {
@@ -18,15 +28,16 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
     }
 
     userSettingsState[stateFuncName] = action((state, payload) => {
-      const oldValue = state[stateVarName];
+      const oldValue = toPlain(state[stateVarName]);
+      const plainPayload = toPlain(payload);
       // eslint-disable-next-line no-param-reassign
-      state[stateVarName] = payload;
+      state[stateVarName] = plainPayload;
       if (global.webview) {
         global.webview.send(
           'update-viewer-setting',
           JSON.stringify({
             stateName: stateVarName,
-            payload,
+            payload: plainPayload,
             oldValue,
             actionName: stateFuncName,
             settingType: 'userSettings',
@@ -39,7 +50,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           'update-viewer-setting',
           JSON.stringify({
             stateName: stateVarName,
-            payload,
+            payload: plainPayload,
             oldValue,
             actionName: stateFuncName,
             settingType: 'userSettings',
@@ -49,7 +60,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
 
       // Save settings to file
       const updatedSettings = savedSettings;
-      updatedSettings[settingKey] = payload;
+      updatedSettings[settingKey] = plainPayload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
       // Update localStorage
@@ -58,17 +69,17 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
       }
 
       // Update global object
-      global.getUserSettings[stateVarName] = payload;
+      global.getUserSettings[stateVarName] = plainPayload;
 
       // Update DOM if ready
       if (document && !settingsSchema[settingKey].dontApplyClass) {
         document.body.classList.remove(`${settingKey}-${oldValue}`);
-        document.body.classList.add(`${settingKey}-${payload}`);
+        document.body.classList.add(`${settingKey}-${plainPayload}`);
       }
 
       // Run the sideeffects
       if (typeof global.controller[settingKey] === 'function') {
-        global.controller[settingKey](payload);
+        global.controller[settingKey](plainPayload);
       }
 
       const fontSizes = getControllerFontSizes(global.getUserSettings);
@@ -82,8 +93,6 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           },
         });
       }
-
-      return state;
     });
   });
   return userSettingsState;
