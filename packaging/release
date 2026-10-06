@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-  argv: { branch, platform, token },
+  argv: { branch, platform, token, dryRun },
 } = require('yargs');
 
 const checkVersion = require('./check-version');
@@ -18,13 +18,26 @@ const release = async () => {
   if (branch === 'dev') track = 'alpha';
   else if (branch === 'master') track = 'beta';
   else if (branch === 'release') track = '';
+  else if (branch === 'experimental-release') track = 'experimental';
   else track = branch;
 
   console.log(`Platform: ${platform}`);
   console.log(`Branch: ${branch}`);
+  if (dryRun) {
+    console.log('Dry run: building locally without publishing or tagging');
+  }
   if (track) {
     console.log(`Prerelease Track: ${track}`);
   }
+
+  // Keep the original configs so a dry run can restore them
+  const pkgPath = path.join(__dirname, '..', 'package.json');
+  const originalPkg = fs.readFileSync(pkgPath, 'utf8');
+  const macArmConfigPath = path.join(__dirname, 'electron-builder.macArm.yml');
+  const originalMacArmConfig = fs.readFileSync(macArmConfigPath, 'utf8');
+  // The prebuild step writes secrets into config.prod.json
+  const prodConfigPath = path.join(__dirname, '..', 'config.prod.json');
+  const originalProdConfig = fs.readFileSync(prodConfigPath, 'utf8');
 
   // Get all tags, sort in desc order, and get latest from current track
   const gitTags = await git().tags();
@@ -36,27 +49,58 @@ const release = async () => {
   console.log(`New release version: ${releaseVersion}`);
 
   // Update package.json with new version and track-specific settings
-  const pkgPath = path.join(__dirname, '..', 'package.json');
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
   pkg.version = releaseVersion;
   if (track) {
+    // Fall back to the alpha icons for tracks that don't have their own yet
+    const iconTrack = fs.existsSync(path.join(__dirname, '..', 'assets', `STTM-${track}.icns`))
+      ? track
+      : 'alpha';
     pkg.productName = `${pkg.productName} ${track.charAt(0).toUpperCase()}${track.slice(1)}`;
-    pkg.build.mac.icon = `assets/STTM-${track}.icns`;
-    pkg.build.win.icon = `assets/STTM-${track}.ico`;
+    pkg.build.mac.icon = `assets/STTM-${iconTrack}.icns`;
+    pkg.build.win.icon = `assets/STTM-${iconTrack}.ico`;
   } else {
     pkg.build.mac.icon = 'assets/STTM.icns';
     pkg.build.win.icon = 'assets/STTM.ico';
   }
+  // Experimental builds get their own identity so they install alongside the stable app
+  // (separate bundle id / Windows install entry, and a separate updater cache dir)
+  if (track === 'experimental') {
+    pkg.name = `${pkg.name}-experimental`;
+    pkg.build.appId = `${pkg.build.appId}.experimental`;
+  }
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+
+  // macArm builds use their own electron-builder config, so keep its icon (and appId) in sync
+  let macArmConfig = originalMacArmConfig.replace(/icon: ".*"/, `icon: "${pkg.build.mac.icon}"`);
+  if (track === 'experimental') {
+    macArmConfig = `appId: ${pkg.build.appId}\n${macArmConfig}`;
+  }
+  fs.writeFileSync(macArmConfigPath, macArmConfig);
 
   console.log('Building application...');
   try {
-    const { stdout, stderr } = await exec(`npm run dist:${platform}`);
+    // pack:* scripts build with publishing disabled
+    const { stdout, stderr } = await exec(`npm run ${dryRun ? 'pack' : 'dist'}:${platform}`);
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
   } catch (err) {
     console.error(err);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
+  } finally {
+    if (dryRun) {
+      fs.writeFileSync(pkgPath, originalPkg);
+      fs.writeFileSync(macArmConfigPath, originalMacArmConfig);
+      fs.writeFileSync(prodConfigPath, originalProdConfig);
+    }
+  }
+
+  if (dryRun) {
+    console.log(
+      `Dry run complete: ${releaseVersion} built locally (builds/, or dist/ for macArm), not published or tagged`,
+    );
+    return;
   }
 
   try {
@@ -69,6 +113,12 @@ const release = async () => {
   }
 };
 
-if (branch === 'release' || branch === 'master' || branch === 'dev' || branch === 'github-action') {
+if (
+  branch === 'release' ||
+  branch === 'master' ||
+  branch === 'dev' ||
+  branch === 'experimental-release' ||
+  branch === 'github-action'
+) {
   release();
 }

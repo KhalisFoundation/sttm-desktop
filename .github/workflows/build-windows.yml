@@ -6,6 +6,7 @@ on:
       - dev
       - master
       - release
+      - experimental-release
 
 jobs:
   build-windows:
