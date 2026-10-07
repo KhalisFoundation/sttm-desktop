@@ -82,6 +82,11 @@ function createBoard(params = {}) {
         role: k === cur ? 'current' : 'candidate',
       };
     });
+    // Each role is calibrated on its own, so during a change the current card and a challenger
+    // can add up to more than 100%. Shown side by side that reads as a contradiction; share
+    // them out so the cards on screen never total more than 100%.
+    const total = items.reduce((acc, it) => acc + it.pct, 0);
+    if (total > 1) items = items.map((it) => ({ ...it, pct: it.pct / total }));
     [...seen.keys()].forEach((k) => {
       if (k !== cur && now - seen.get(k) > P.hold) {
         seen.delete(k);

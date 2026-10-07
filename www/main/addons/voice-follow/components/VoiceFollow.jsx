@@ -476,8 +476,8 @@ const STATUS_LABEL = {
 // A live percentage: eases to each new calibrated value in ~0.2 s (the value itself updates
 // every decode, so the motion tracks real evidence), coloured by level.
 const pctLevel = (v) => {
-  if (v >= 0.85) return 'is-high';
-  if (v >= 0.5) return 'is-mid';
+  if (v >= 0.8) return 'is-high';
+  if (v >= 0.4) return 'is-mid';
   return 'is-low';
 };
 const fmtPct = (v) => `${Math.min(99.9, Math.max(0, v * 100)).toFixed(1)}%`;
@@ -3341,7 +3341,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <span>{heard || '…'}</span>
                 </div>
               )}
-              <section className={`vf2-now${currentView ? ' is-following' : ' is-searching'}`}>
+              <section
+                className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
+                  boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
+                }`}
+              >
                 <div className="vf2-label" aria-live="polite">
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
                   {currentView ? currentLabel : 'Finding the Shabad'}
@@ -3392,7 +3396,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
               {currentView && liveLead && liveLead.wins >= 1 && (
                 <section
-                  className={`vf2-change${liveLead.wins >= 2 ? ' is-confirming' : ''} is-tappable`}
+                  className={`vf2-change${liveLead.wins >= 2 ? ' is-confirming' : ''} is-tappable${
+                    boardPct(liveLead.shabadId) != null
+                      ? ` lvl-${pctLevel(boardPct(liveLead.shabadId))}`
+                      : ''
+                  }`}
                   aria-live="polite"
                   role="button"
                   tabIndex={0}
@@ -3416,20 +3424,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <div className="vf2-cand-line" lang="pa">
                     {liveLead.line || '…'}
                   </div>
-                  <div
-                    className="vf2-cand-track"
-                    role="meter"
-                    aria-label="Confirmation progress"
-                    aria-valuemin={0}
-                    aria-valuemax={liveLead.needed}
-                    aria-valuenow={Math.min(liveLead.wins, liveLead.needed)}
-                  >
-                    <span
-                      style={{
-                        width: `${(Math.min(liveLead.wins, liveLead.needed) / liveLead.needed) * 100}%`,
-                      }}
-                    />
-                  </div>
+                  {boardPct(liveLead.shabadId) != null && (
+                    <LiveBar value={boardPct(liveLead.shabadId)} />
+                  )}
                 </section>
               )}
               <details className="vf2-matches" open>
@@ -3467,7 +3464,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   {boardOthers.map((c) => (
                     <button
                       type="button"
-                      className={`vf2-cand is-tappable ${c.pct >= 0.5 ? 'is-confirming' : 'is-checking'}`}
+                      className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
                       key={c.shabadId}
                       onClick={() => pickCandidate(c)}
                       title={

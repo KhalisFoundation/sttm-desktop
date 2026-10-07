@@ -1969,6 +1969,9 @@ $vf2-muted: #6b6b6b;
 $vf2-faint: #9a9a9a;
 $vf2-line: #ececec;
 $vf2-green: #43ac6a;
+$vf2-red: #d64545;
+$vf2-yellow: #c99700;
+$vf2-yellow-bar: #f2c200;
 
 .vf-panel {
   width: 300px;
@@ -2202,7 +2205,7 @@ $vf2-green: #43ac6a;
     transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
-// Live board: calibrated percentages that move with the evidence (grey -> amber -> green).
+// Live board: calibrated percentages that move with the evidence (red -> yellow -> green).
 .vf2-live-pct {
   margin-left: auto;
   font-size: 12px;
@@ -2212,10 +2215,10 @@ $vf2-green: #43ac6a;
   font-variant-numeric: tabular-nums;
   transition: color 0.25s ease;
   &.is-low {
-    color: $vf2-faint;
+    color: $vf2-red;
   }
   &.is-mid {
-    color: $vf2-orange;
+    color: $vf2-yellow;
   }
   &.is-high {
     color: $vf2-green;
@@ -2232,10 +2235,10 @@ $vf2-green: #43ac6a;
     width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
     background 0.25s ease !important;
   &.is-low {
-    background: $vf2-faint !important;
+    background: $vf2-red !important;
   }
   &.is-mid {
-    background: $vf2-orange !important;
+    background: $vf2-yellow-bar !important;
   }
   &.is-high {
     background: $vf2-green !important;
@@ -2438,6 +2441,30 @@ $vf2-green: #43ac6a;
   .vf2-dot.is-on {
     background: #2e9e5b;
   }
+}
+// Card tint follows its own percentage, so colour and number always agree.
+.vf2-now.lvl-is-high,
+.vf2-cand.is-tappable.lvl-is-high,
+.vf2-change.is-tappable.lvl-is-high {
+  background: #eefbf0;
+  border-color: #2e9e5b;
+}
+.vf2-now.lvl-is-mid,
+.vf2-cand.is-tappable.lvl-is-mid,
+.vf2-change.is-tappable.lvl-is-mid {
+  background: #fff9e0;
+  border-color: #e6b800;
+  animation: none;
+}
+.vf2-now.lvl-is-low,
+.vf2-cand.is-tappable.lvl-is-low,
+.vf2-change.is-tappable.lvl-is-low {
+  background: #fdf2f2;
+  border-color: rgba(214, 69, 69, 0.45);
+  animation: none;
+}
+.vf2-cand.is-tappable.lvl-is-high {
+  animation: vf2-ready 1.4s ease-in-out infinite;
 }
 .vf2-change .vf2-cand-pct {
   margin-left: auto;
