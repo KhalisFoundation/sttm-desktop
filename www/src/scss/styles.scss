@@ -2202,6 +2202,71 @@ $vf2-green: #43ac6a;
     transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
+// Live board: calibrated percentages that move with the evidence (grey -> amber -> green).
+.vf2-live-pct {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease;
+  &.is-low {
+    color: $vf2-faint;
+  }
+  &.is-mid {
+    color: $vf2-orange;
+  }
+  &.is-high {
+    color: $vf2-green;
+  }
+}
+.vf2-cand-row .vf2-live-pct {
+  flex: none;
+}
+.vf2-now .vf2-cand-track {
+  margin-top: 8px;
+}
+.vf2-live-fill {
+  transition:
+    width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.25s ease !important;
+  &.is-low {
+    background: $vf2-faint !important;
+  }
+  &.is-mid {
+    background: $vf2-orange !important;
+  }
+  &.is-high {
+    background: $vf2-green !important;
+  }
+}
+// What the model hears: one faint line, newest words on the right, older ones fading out.
+.vf2-heard {
+  margin: -4px 2px -2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: $vf2-faint;
+  white-space: nowrap;
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22%);
+  mask-image: linear-gradient(to right, transparent 0, #000 22%);
+  > span {
+    direction: ltr;
+    unicode-bidi: plaintext;
+  }
+}
+.vf-heard-toggle {
+  opacity: 0.55;
+  &.is-on {
+    opacity: 1;
+  }
+  svg {
+    display: block;
+  }
+}
 .vf2-cand-meta {
   margin-top: 5px;
   font-size: 11px;

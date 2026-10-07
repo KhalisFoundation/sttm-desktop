@@ -17,6 +17,10 @@ const { Follower: AcousticFollower } = require('../engine/follower');
 const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
 const sessionLog = require('../engine/session-log');
+const { createBoard, mergeTranscript } = require('./liveBoard');
+const { installDemoAudio } = require('./devAudio');
+
+installDemoAudio(); // developer demos only (VF_DEMO_WAV); a no-op otherwise
 
 const { norm: vfNorm, partialRatio } = engine;
 
@@ -469,6 +473,44 @@ const STATUS_LABEL = {
   stopped: 'Stopped',
 };
 
+// A live percentage: eases to each new calibrated value in ~0.2 s (the value itself updates
+// every decode, so the motion tracks real evidence), coloured by level.
+const pctLevel = (v) => {
+  if (v >= 0.85) return 'is-high';
+  if (v >= 0.5) return 'is-mid';
+  return 'is-low';
+};
+const fmtPct = (v) => `${Math.min(99.9, Math.max(0, v * 100)).toFixed(1)}%`;
+const LivePct = ({ value }) => {
+  const [shown, setShown] = useState(value);
+  const shownRef = useRef(value);
+  useEffect(() => {
+    const from = shownRef.current;
+    const t0 = performance.now();
+    let raf = 0;
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 200);
+      const v = from + (value - from) * (1 - (1 - k) ** 3);
+      shownRef.current = v;
+      setShown(v);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <span className={`vf2-live-pct ${pctLevel(value)}`}>{fmtPct(shown)}</span>;
+};
+LivePct.propTypes = { value: PropTypes.number.isRequired };
+const LiveBar = ({ value }) => (
+  <div className="vf2-cand-track">
+    <span
+      className={`vf2-live-fill ${pctLevel(value)}`}
+      style={{ width: `${Math.round(value * 1000) / 10}%` }}
+    />
+  </div>
+);
+LiveBar.propTypes = { value: PropTypes.number.isRequired };
+
 const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // Select the primitive directly rather than holding the whole navigator slice
   // object across renders — a slice reference can be an immer proxy that gets
@@ -593,6 +635,46 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // judge actually compares), wins = confirmation progress. Honest by design:
   // what the sevadar sees is exactly what decides a switch.
   const [liveCands, setLiveCands] = useState({ sCur: 0, items: [] });
+  // Live board: calibrated % for the current Shabad and every Shabad in contention, updated
+  // every decode (see liveBoard.js); and a rolling transcript of what the model hears.
+  const boardRef = useRef(null);
+  if (!boardRef.current) boardRef.current = createBoard();
+  const [board, setBoard] = useState([]);
+  const boardAtRef = useRef(0);
+  const publishBoard = useCallback((force = false) => {
+    const now = Date.now();
+    if (!force && now - boardAtRef.current < 180) return;
+    boardAtRef.current = now;
+    setBoard(boardRef.current.snapshot());
+  }, []);
+  const heardRef = useRef('');
+  const [heard, setHeard] = useState('');
+  const heardAtRef = useRef(0);
+  const [showHeard, setShowHeard] = useState(() => {
+    try {
+      return window.localStorage.getItem('vf-show-heard') !== '0';
+    } catch (_) {
+      return true;
+    }
+  });
+  const toggleHeard = useCallback(() => {
+    setShowHeard((v) => {
+      try {
+        window.localStorage.setItem('vf-show-heard', v ? '0' : '1');
+      } catch (_) {
+        /* preference only */
+      }
+      return !v;
+    });
+  }, []);
+  const noteHeard = useCallback((text) => {
+    heardRef.current = mergeTranscript(heardRef.current, text);
+    const now = Date.now();
+    if (now - heardAtRef.current >= 200) {
+      heardAtRef.current = now;
+      setHeard(heardRef.current);
+    }
+  }, []);
   const [lineExpanded, setLineExpanded] = useState(true); // full pangti (wrapped) vs one line
   const liveSigRef = useRef('');
   const liveAtRef = useRef(0);
@@ -789,6 +871,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -981,6 +1065,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -2010,6 +2096,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         };
       });
       publishRanks(shortlist);
+      if (!(autopilotRef.current && phaseRef.current === 'following')) {
+        boardRef.current.search({ ranked, rows: rowByShabad });
+        publishBoard();
+      }
       // Don't surface the detect shortlist while following — it's background
       // switch-detection, not something the presenter should see or tap.
       if (!(autopilotRef.current && phaseRef.current === 'following')) setCands(shortlist);
@@ -2438,6 +2528,16 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             }
           }
           live.sort((a, b) => b.wins - a.wins || b.score - a.score);
+          // Board: every decode, the current Shabad's score and every challenger's score.
+          if (hypFull.length >= SWITCH_HYP_MIN) {
+            boardRef.current.follow({
+              now: Date.now(),
+              cur: currentShabadIdRef.current,
+              sCur: sCurFull,
+              cands: live,
+            });
+          } else boardRef.current.hold(Date.now());
+          publishBoard();
           // Gate for the panel: only candidates that clear the judge's own
           // minimum match (the bar a win needs), and nothing at all while the
           // heard fragment is too thin to judge (silence, a breath, a pause) —
@@ -2629,7 +2729,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (!r || !recognizingRef.current) return;
         const out = await r.push(pcm);
         if (session !== sessionRef.current || recognizerRef.current !== r) return;
-        if (out && out.text) handleTranscript(out.text);
+        if (out && out.text) {
+          noteHeard(out.text);
+          handleTranscript(out.text);
+        }
       });
     } catch (e) {
       if (session !== sessionRef.current) return;
@@ -2673,6 +2776,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -2742,7 +2847,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (r) {
           const rout = await r.push(pcm);
           if (session !== sessionRef.current || recognizerRef.current !== r) return;
-          if (rout && rout.text) handleTranscript(rout.text);
+          if (rout && rout.text) {
+            noteHeard(rout.text);
+            handleTranscript(rout.text);
+          }
         }
         // While following, also advance the follower for the live line/word cursor.
         if (phaseRef.current === 'following') {
@@ -3083,10 +3191,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const liveItems = currentView ? liveCands.items : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
   const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
-  // Gated: only candidates the app is actually collecting wins for are listed.
-  const gatedItems = liveItems.filter(
-    (c) => !(liveLead && liveLead.wins >= 1 && c.shabadId === liveLead.shabadId),
-  );
   let changeLabel = 'Might be changing to';
   if (liveLead && liveLead.wins >= 2) changeLabel = 'Changing to';
   let judgeWord = 'Following';
@@ -3094,6 +3198,19 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   else if (liveLead && liveLead.wins >= 2) judgeWord = 'Confirming a change';
   else if (liveLead && liveLead.wins >= 1) judgeWord = 'Checking';
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
+  // Live board: the current Shabad's calibrated % and the others in contention.
+  const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
+  const boardPct = (id) => {
+    const b = board.find((x) => x.shabadId === id);
+    return b ? b.pct : null;
+  };
+  const boardOthers = board
+    .filter((b) => b.role !== 'current')
+    .filter(
+      (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
+    )
+    .slice(0, 3)
+    .map((b) => ({ ...b, line: b.line || (b.verse ? anvaad.unicode(b.verse) : '') }));
 
   return (
     <>
@@ -3128,6 +3245,28 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               )}
             </span>
             <span className="vf-hdr-btns">
+              <button
+                type="button"
+                className={`vf-hdr-btn vf-heard-toggle${showHeard ? ' is-on' : ''}`}
+                title={showHeard ? 'Hide what Voice-Follow hears' : 'Show what Voice-Follow hears'}
+                aria-label={showHeard ? 'Hide transcript' : 'Show transcript'}
+                aria-pressed={showHeard}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={toggleHeard}
+              >
+                <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                  <path
+                    d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  />
+                  <circle cx="8" cy="8" r="2" fill="currentColor" />
+                  {!showHeard && (
+                    <path d="M2.5 13.5 13.5 2.5" stroke="currentColor" strokeWidth="1.4" />
+                  )}
+                </svg>
+              </button>
               <button
                 type="button"
                 className="vf-hdr-btn"
@@ -3190,6 +3329,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
           {active && (
             <div className="vf2-body">
+              {showHeard && (
+                <div className="vf2-heard" lang="pa" title="What Voice-Follow is hearing">
+                  <span>{heard || '…'}</span>
+                </div>
+              )}
               <section className={`vf2-now${currentView ? ' is-following' : ' is-searching'}`}>
                 <div className="vf2-label" aria-live="polite">
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
@@ -3197,6 +3341,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   {currentView && lineNo != null && (
                     <span className="vf2-lineno">line {lineNo}</span>
                   )}
+                  {boardCur && <LivePct value={boardCur.pct} />}
                   {currentView && (
                     <button
                       type="button"
@@ -3224,6 +3369,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 >
                   {liveLine || 'Listening…'}
                 </div>
+                {boardCur && <LiveBar value={boardCur.pct} />}
               </section>
 
               {currentView && liveLead && liveLead.wins >= 1 && (
@@ -3241,9 +3387,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <div className="vf2-label">
                     <span className="vf2-dot is-seeking" />
                     {changeLabel}
-                    <span className="vf2-cand-pct">
-                      {Math.round((liveLead.score || 0) * 100)}% match
-                    </span>
+                    {boardPct(liveLead.shabadId) != null ? (
+                      <LivePct value={boardPct(liveLead.shabadId)} />
+                    ) : (
+                      <span className="vf2-cand-pct">
+                        {Math.round((liveLead.score || 0) * 100)}% match
+                      </span>
+                    )}
                   </div>
                   <div className="vf2-cand-line" lang="pa">
                     {liveLead.line || '…'}
@@ -3264,66 +3414,59 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   </div>
                 </section>
               )}
-              {currentView && (
-                <details className="vf2-matches">
-                  <summary>
-                    <svg
-                      className="vf2-chevron"
-                      viewBox="0 0 10 10"
-                      width="10"
-                      height="10"
-                      aria-hidden="true"
+              <details className="vf2-matches" open>
+                <summary>
+                  <svg
+                    className="vf2-chevron"
+                    viewBox="0 0 10 10"
+                    width="10"
+                    height="10"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3.5 2 6.5 5 3.5 8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="vf2-summary-title">
+                    {currentView ? 'Possible New Shabad' : 'Possible Shabad'}
+                  </span>
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-count">{boardOthers.length}</span>
+                  )}
+                </summary>
+                <div className="vf2-next" aria-live="polite">
+                  {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
+                  {boardOthers.length > 0 && (
+                    <div className="vf2-next-hint">
+                      {currentView ? 'Tap a Shabad to switch to it' : 'Tap a Shabad to open it'}
+                    </div>
+                  )}
+                  {boardOthers.map((c) => (
+                    <button
+                      type="button"
+                      className={`vf2-cand is-tappable ${c.pct >= 0.5 ? 'is-confirming' : 'is-checking'}`}
+                      key={c.shabadId}
+                      onClick={() => pickCandidate(c)}
+                      title={
+                        currentView ? 'Tap to change to this Shabad now' : 'Tap to open this Shabad'
+                      }
                     >
-                      <path
-                        d="M3.5 2 6.5 5 3.5 8"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span className="vf2-summary-title">Possible New Shabad</span>
-                    {gatedItems.length > 0 && (
-                      <span className="vf2-summary-count">{gatedItems.length}</span>
-                    )}
-                  </summary>
-                  <div className="vf2-next" aria-live="polite">
-                    {gatedItems.length === 0 && <div className="vf2-empty">None right now.</div>}
-                    {gatedItems.length > 0 && (
-                      <div className="vf2-next-hint">Tap a Shabad to switch to it</div>
-                    )}
-                    {gatedItems.map((c) => (
-                      <button
-                        type="button"
-                        className={`vf2-cand is-tappable ${c.wins >= 2 ? 'is-confirming' : 'is-checking'}`}
-                        key={c.shabadId}
-                        onClick={() => pickCandidate(c)}
-                        title="Tap to change to this Shabad now"
-                      >
-                        <div className="vf2-cand-row">
-                          <span className="vf2-cand-line" lang="pa">
-                            {c.line || '…'}
-                          </span>
-                          <span className="vf2-cand-pct">{Math.round((c.score || 0) * 100)}%</span>
-                        </div>
-                        <div
-                          className="vf2-cand-track"
-                          role="meter"
-                          aria-label="Confirmation progress"
-                          aria-valuemin={0}
-                          aria-valuemax={c.needed}
-                          aria-valuenow={Math.min(c.wins, c.needed)}
-                        >
-                          <span
-                            style={{ width: `${(Math.min(c.wins, c.needed) / c.needed) * 100}%` }}
-                          />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </details>
-              )}
+                      <div className="vf2-cand-row">
+                        <span className="vf2-cand-line" lang="pa">
+                          {c.line || '…'}
+                        </span>
+                        <LivePct value={c.pct} />
+                      </div>
+                      <LiveBar value={c.pct} />
+                    </button>
+                  ))}
+                </div>
+              </details>
             </div>
           )}
           <div className={`vf-compact-footer${active ? '' : ' is-idle'}`}>
