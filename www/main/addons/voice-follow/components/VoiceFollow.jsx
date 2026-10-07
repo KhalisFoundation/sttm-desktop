@@ -3188,6 +3188,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     (currentView && currentView.line) ||
     null;
   const lineNo = posIsCurrent ? pos.lineIndex + 1 : null;
+  // Option: preview the next lines once the app is sure of the Shabad (>= 95%).
+  let showNext = false;
+  try {
+    showNext = window.localStorage.getItem('vf-next-lines') === '1';
+  } catch (e) {
+    showNext = false;
+  }
   const liveItems = currentView ? liveCands.items : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
   const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
@@ -3369,6 +3376,17 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 >
                   {liveLine || 'Listening…'}
                 </div>
+                {showNext &&
+                  posIsCurrent &&
+                  profLines &&
+                  boardCur &&
+                  boardCur.pct >= 0.95 &&
+                  profLines.slice(pos.lineIndex + 1, pos.lineIndex + 3).map((l, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <div key={i} className="vf2-next-line" lang="pa">
+                      {l}
+                    </div>
+                  ))}
                 {boardCur && <LiveBar value={boardCur.pct} />}
               </section>
 

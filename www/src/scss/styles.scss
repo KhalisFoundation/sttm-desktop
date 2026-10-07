@@ -2242,6 +2242,20 @@ $vf2-green: #43ac6a;
   }
 }
 // What the model hears: one faint line, newest words on the right, older ones fading out.
+.vf2-next-line {
+  margin-top: 4px;
+  font-size: 0.82em;
+  line-height: 1.35;
+  opacity: 0.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf2-next-line + .vf2-next-line {
+  opacity: 0.3;
+}
+
 .vf2-heard {
   margin: -4px 2px -2px;
   font-size: 12px;
