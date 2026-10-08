@@ -3334,30 +3334,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
-  // Words of the line on screen (normalised), so the Hearing strip can light up matches.
-  const wordKey = (w) => vfNorm(w).replace(/[\u0a3f\u0a41]$/, ''); // ignore a final short vowel
-  const lineWords = [
-    ...new Set(
-      (liveLine || '')
-        .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
-        .split(/\s+/)
-        .filter((w) => w.length >= 2)
-        .map(wordKey),
-    ),
-  ];
-  const heardLit = (w) => {
-    const k = wordKey(w);
-    if (k.length < 2) return false;
-    return lineWords.some(
-      (l) => l === k || (k.length >= 4 && (l.startsWith(k) || k.startsWith(l))),
-    );
-  };
-  let cardStyle = 'rail';
-  try {
-    cardStyle = window.localStorage.getItem('vf-card-style') || 'rail';
-  } catch (e) {
-    cardStyle = 'rail';
-  }
   const boardPct = (id) => {
     const b = board.find((x) => x.shabadId === id);
     return b ? b.pct : null;
@@ -3498,23 +3474,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               {showHeard && (
                 <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
                   <span className="vf2-heard-label">Hearing</span>
-                  <span
-                    className="vf2-heard-text"
-                    lang="pa"
-                    style={boardCur ? { '--pc': pctColor(boardCur.pct) } : undefined}
-                  >
-                    {heard
-                      ? heard
-                          .split('\u0001')[0]
-                          .split(' ')
-                          .map((w, i) => (
-                            // eslint-disable-next-line react/no-array-index-key
-                            <span key={i} className={heardLit(w) ? 'vf2-heard-lit' : ''}>
-                              {i ? ' ' : ''}
-                              {w}
-                            </span>
-                          ))
-                      : '…'}
+                  <span className="vf2-heard-text" lang="pa">
+                    {heard ? heard.split('\u0001')[0] : '…'}
                     {heard && heard.split('\u0001')[1] && (
                       <span className="vf2-heard-tentative"> {heard.split('\u0001')[1]}</span>
                     )}

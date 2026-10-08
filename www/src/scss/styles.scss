@@ -2568,12 +2568,6 @@ $vf2-yellow-bar: #f2c200;
     transform: scale(1);
   }
 }
-// Hearing: words that match the line on screen take its colour as they land.
-.vf2-heard-lit {
-  color: var(--pc, #2e9e5b);
-  font-weight: 500;
-  transition: color 0.4s ease;
-}
 .vf2-change .vf2-cand-pct {
   margin-left: auto;
 }
