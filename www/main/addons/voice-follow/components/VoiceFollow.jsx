@@ -3321,11 +3321,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
-  let cardStyle = 'wash';
+  let cardStyle = 'rail';
   try {
-    cardStyle = window.localStorage.getItem('vf-card-style') || 'wash';
+    cardStyle = window.localStorage.getItem('vf-card-style') || 'rail';
   } catch (e) {
-    cardStyle = 'wash';
+    cardStyle = 'rail';
   }
   const boardPct = (id) => {
     const b = board.find((x) => x.shabadId === id);
