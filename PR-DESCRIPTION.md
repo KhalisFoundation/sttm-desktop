@@ -51,4 +51,4 @@ Run on 2026-10-08. CI build of this exact code is green on macOS and Windows: [r
 
 Merged with the latest `experimental-release`; the three conflicts were resolved keeping both sides' intent.
 
-Still open from before: whether this build keeps its separate app identity (installs beside normal STTM, no auto-update) or takes the standard one. Say which and I'll change it on this branch.
+This build uses the standard app identity and publish settings, so the experimental channel's release script renames it, publishes it and auto-updates it like any other experimental build. The arm64 Mac config bundles the speech model.
