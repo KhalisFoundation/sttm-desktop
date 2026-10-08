@@ -379,7 +379,8 @@ const BANI_CUR_SPAN = 8;
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
 const UI_MOVE_CONF = 0.4;
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
-const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word // follower confidence required to move the on-screen line
+const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
+const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter // follower confidence required to move the on-screen line
 
 // Two modes carried over from the web lab: Path (spoken paatth) and Kirtan
 // (sung). Both map to the karansea CTC + line decoder with the same tuned
@@ -490,8 +491,9 @@ const pctHue = (v) => {
   return x <= 0.5 ? 4 + (48 - 4) * (x / 0.5) : 48 + (135 - 48) * ((x - 0.5) / 0.5);
 };
 const pctColor = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 42%)`;
-const pctTint = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 96%)`;
-const pctEdge = (v) => `hsl(${pctHue(v).toFixed(0)} 60% 70%)`;
+// Each card carries its percentage as CSS variables; the card style (wash / rail / clean,
+// chosen by the sevadar) decides how that shows. Colour lives in what moves, not in a box.
+const pctVars = (v) => ({ '--pc': pctColor(v), '--pct': `${Math.round(v * 1000) / 10}%` });
 // True while a value is still moving: drives the sheen that shows the bar is alive.
 const useMoving = (value) => {
   const [moving, setMoving] = useState(false);
@@ -719,18 +721,26 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // so a hypothesis has to be confident and contain at least one real word to be shown,
   // and the strip clears after a few seconds without one.
   const heardClearRef = useRef(0);
+  // Each decode covers the last few seconds of audio, so its final word or two is usually
+  // cut mid-word and gets re-spelt on the next decode. Those are shown lighter as "still
+  // hearing"; only words that were fully sung join the settled text.
+  const tentativeRef = useRef('');
   const noteHeard = useCallback((text, confidence = 1) => {
-    const words = (text || '').split(/\s+/).filter((w) => w.length >= 3);
+    const all = (text || '').split(/\s+/).filter(Boolean);
+    const words = all.filter((w) => w.length >= 3);
     if (confidence < HEARD_MIN_CONF || !words.length) return;
-    heardRef.current = mergeTranscript(heardRef.current, text);
+    const settled = all.slice(0, -HEARD_TENTATIVE_WORDS).join(' ');
+    tentativeRef.current = all.slice(-HEARD_TENTATIVE_WORDS).join(' ');
+    if (settled) heardRef.current = mergeTranscript(heardRef.current, settled);
     const now = Date.now();
     if (now - heardAtRef.current >= 200) {
       heardAtRef.current = now;
-      setHeard(heardRef.current);
+      setHeard(`${heardRef.current}\u0001${tentativeRef.current}`);
     }
     clearTimeout(heardClearRef.current);
     heardClearRef.current = setTimeout(() => {
       heardRef.current = '';
+      tentativeRef.current = '';
       setHeard('');
     }, HEARD_CLEAR_MS);
   }, []);
@@ -3311,6 +3321,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
+  let cardStyle = 'wash';
+  try {
+    cardStyle = window.localStorage.getItem('vf-card-style') || 'wash';
+  } catch (e) {
+    cardStyle = 'wash';
+  }
   const boardPct = (id) => {
     const b = board.find((x) => x.shabadId === id);
     return b ? b.pct : null;
@@ -3328,7 +3344,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       {/* Non-modal, draggable floating panel. No backdrop, so the Gurbani stays
           fully visible while you set up and sing. Drag it by the header. */}
       {panelVisible && (
-        <div ref={panelRef} data-vf-widget className="vf-panel" style={posOverride || undefined}>
+        <div
+          ref={panelRef}
+          data-vf-widget
+          data-vf-cards={cardStyle}
+          className="vf-panel"
+          style={posOverride || undefined}
+        >
           {!widgetPos && <span className="vf-caret" />}
           <div className="vf-header" onMouseDown={startDrag} title="Drag to move">
             <span className="vf-title">
@@ -3446,7 +3468,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
                   <span className="vf2-heard-label">Hearing</span>
                   <span className="vf2-heard-text" lang="pa">
-                    {heard || '…'}
+                    {heard ? heard.split('\u0001')[0] : '…'}
+                    {heard && heard.split('\u0001')[1] && (
+                      <span className="vf2-heard-tentative"> {heard.split('\u0001')[1]}</span>
+                    )}
                   </span>
                 </div>
               )}
@@ -3454,11 +3479,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
                   boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
                 }`}
-                style={
-                  boardCur
-                    ? { background: pctTint(boardCur.pct), borderColor: pctEdge(boardCur.pct) }
-                    : undefined
-                }
+                style={boardCur ? pctVars(boardCur.pct) : undefined}
               >
                 <div className="vf2-label" aria-live="polite">
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
@@ -3521,10 +3542,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   title="Tap to change to this Shabad now"
                   style={
                     boardPct(liveLead.shabadId) != null
-                      ? {
-                          background: pctTint(boardPct(liveLead.shabadId)),
-                          borderColor: pctEdge(boardPct(liveLead.shabadId)),
-                        }
+                      ? pctVars(boardPct(liveLead.shabadId))
                       : undefined
                   }
                   onClick={() => pickCandidate(liveLead)}
@@ -3590,7 +3608,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                       type="button"
                       className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
                       key={c.shabadId}
-                      style={{ background: pctTint(c.pct), borderColor: pctEdge(c.pct) }}
+                      style={pctVars(c.pct)}
                       onClick={() => pickCandidate(c)}
                       title={
                         currentView ? 'Tap to change to this Shabad now' : 'Tap to open this Shabad'
