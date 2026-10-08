@@ -1,9 +1,6 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 const SearchFooter = () => {
   const { searchShabadsCount, pane1, pane2, pane3, activePaneId } = useStoreState(

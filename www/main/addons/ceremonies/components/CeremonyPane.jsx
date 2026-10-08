@@ -7,11 +7,12 @@ import { ceremoniesFilter } from '../../../common/constants';
 
 import { getUserPreferenceFor } from '../utils';
 import { applyTheme } from '../../../settings/utils';
+import { i18n } from '../../../common/i18n';
 // import { loadCeremony } from '../../../navigator/utils';
 
 const remote = require('@electron/remote');
 
-const { store, i18n } = remote.require('./app');
+const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 const { getTheme } = require('../../../theme_editor');
 

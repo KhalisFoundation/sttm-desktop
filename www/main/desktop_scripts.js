@@ -11,7 +11,9 @@ const moment = require('moment');
 const tingle = require('../assets/js/vendor/tingle');
 const { diag, errText } = require('./addons/voice-follow/shadow/diag');
 
-const { i18n, isUnsupportedWindow } = remote.require('./app');
+const { isUnsupportedWindow } = remote.require('./app');
+const { i18n } = require('./common/i18n');
+
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
 const database = {
@@ -21,6 +23,12 @@ const database = {
     dbSchema: 'realm-schema-evergreen.json',
     md5: 'sttmdesktop-evergreen-v2.md5',
   },
+};
+
+const aiTranslationsDB = {
+  dbCompressedName: 'ai-translations.zip',
+  dbName: 'ai-translations.db',
+  md5: 'ai-translations.md5',
 };
 
 const dbPlatform = 'realm';
@@ -114,6 +122,7 @@ module.exports = {
       // Download the DB
       this.downloadLatestDB(true);
     }
+    this.downloadAiTranslationsDB();
 
     checkForNotifcations();
 
@@ -221,6 +230,79 @@ module.exports = {
         diag(`db: offline${force ? ', no database yet' : ''}`);
         if (force) global.core.search.offline(10);
       }
+    });
+  },
+
+  // Downloads the AI translations database (PSS) into userData when it is missing or
+  // its md5 on the server has changed. Each version is saved under its own name
+  // (ai-translations-<md5>.db) because sqlite keeps the current file open in every
+  // window that shows a translation, and Windows can't replace an open file.
+  downloadAiTranslationsDB() {
+    const curFile = store.get('aiTranslationsFile');
+    const curFileExists = !!curFile && fs.existsSync(path.resolve(userDataPath, curFile));
+
+    // Remove versions left behind by earlier updates
+    fs.readdir(userDataPath, (readErr, files) => {
+      if (readErr) return;
+      files
+        .filter((file) => /^ai-translations-.+\.db$/.test(file) && file !== curFile)
+        .forEach((file) => fs.unlink(path.resolve(userDataPath, file), () => {}));
+    });
+
+    isOnline().then((online) => {
+      if (!online) return;
+      request(
+        `https://banidb.blob.core.windows.net/database/${aiTranslationsDB.md5}`,
+        (error, response, newestHash) => {
+          if (error || response.statusCode !== 200) return;
+          if (curFileExists && store.get('aiTranslationsHash') === newestHash) return;
+
+          const hashMatch = newestHash.match(/[a-f0-9]{32}/i);
+          const newFile = `ai-translations-${hashMatch ? hashMatch[0] : Date.now()}.db`;
+          const dbCompressed = path.resolve(userDataPath, aiTranslationsDB.dbCompressedName);
+          const extractFolder = path.resolve(userDataPath, 'new-ai-translations');
+          let downloaded = false;
+
+          request(
+            `https://banidb.blob.core.windows.net/database/${aiTranslationsDB.dbCompressedName}`,
+          )
+            .on('response', (zipResponse) => {
+              downloaded = zipResponse.statusCode === 200;
+            })
+            .on('error', (err) => {
+              /* eslint-disable-next-line no-console */
+              console.log(`Could not download AI translations: ${err}`);
+            })
+            .pipe(fs.createWriteStream(dbCompressed))
+            .on('finish', () => {
+              if (!downloaded) {
+                fs.rm(dbCompressed, { force: true }, () => {});
+                return;
+              }
+              extract(dbCompressed, { dir: extractFolder })
+                .then(() => {
+                  fs.renameSync(
+                    path.resolve(extractFolder, aiTranslationsDB.dbName),
+                    path.resolve(userDataPath, newFile),
+                  );
+                  store.set('aiTranslationsFile', newFile);
+                  // Save the hash for comparison next time
+                  store.set('aiTranslationsHash', newestHash);
+                  // Windows reopen the new file on their next lookup; the old one is
+                  // removed on the next launch, once nothing has it open
+                  ipcRenderer.send('ai-translations-updated');
+                })
+                .catch((err) => {
+                  /* eslint-disable-next-line no-console */
+                  console.log(`Could not install AI translations: ${err}`);
+                })
+                .finally(() => {
+                  fs.rm(dbCompressed, { force: true }, () => {});
+                  fs.rm(extractFolder, { recursive: true, force: true }, () => {});
+                });
+            });
+        },
+      );
     });
   },
 

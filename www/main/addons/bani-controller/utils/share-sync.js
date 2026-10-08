@@ -3,10 +3,11 @@ import axios from 'axios';
 import Noty from 'noty';
 
 import { API_ENDPOINT as SYNC_API_URL } from '../../../common/constants';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { store, i18n } = remote.require('./app');
+const { store } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 function onConnect(namespaceString) {

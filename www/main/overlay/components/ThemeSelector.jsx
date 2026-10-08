@@ -2,11 +2,11 @@ import React from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import getThemeMarkup from '../utils/get-theme-markup';
+import { i18n } from '../../common/i18n';
 
 const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
-const { i18n } = remote.require('./app');
 const themeObjects = require('../../../configs/overlay_presets.json');
 
 export const ThemeSelector = () => {

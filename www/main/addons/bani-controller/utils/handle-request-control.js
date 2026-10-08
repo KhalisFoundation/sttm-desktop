@@ -14,7 +14,10 @@ const handleRequestControl = (
   baniLength,
   // mangalPosition,
 ) => {
-  document.body.classList.toggle(`controller-on`, isPinCorrect);
+  // A wrong PIN mustn't hide the signal of a controller that's already connected.
+  if (isPinCorrect) {
+    document.body.classList.add('controller-on');
+  }
   window.socket.emit('data', {
     host: 'sttm-desktop',
     type: 'response-control',

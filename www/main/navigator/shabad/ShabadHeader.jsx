@@ -5,13 +5,11 @@ import { useStoreState } from 'easy-peasy';
 import classNames from '../../common/utils/classnames';
 import FavShabadIcon from './FavShabadIcon';
 import ArrowIcon from './ArrowIcon';
+import { i18n } from '../../common/i18n';
 
 const electron = require('electron');
 
 const { ipcRenderer } = electron;
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 const ShabadHeader = ({ data = {} }) => {
   const [showViewer, setShowViewer] = useState(true);

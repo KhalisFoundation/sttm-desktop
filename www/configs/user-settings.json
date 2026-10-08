@@ -266,7 +266,9 @@
       "options": {
         "bdb": "BANI_DB",
         "ms": "MANMOHAN_SINGH",
-        "ssk": "SANT_SINGH_KHALSA"
+        "ssk": "SANT_SINGH_KHALSA",
+        "pss": "PROF_SAHIB_SINGH",
+        "pss_simple": "PROF_SAHIB_SINGH_SIMPLIFIED"
       },
       "condition": "translation-language",
       "conditionValue": "English",

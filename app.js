@@ -598,6 +598,11 @@ function sendToViewerWindows(channel, ...args) {
 }
 
 function showChangelog() {
+  // Experimental builds don't have changelog entries of their own
+  if (appVersion.includes('experimental')) {
+    return false;
+  }
+
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
   const { limitChangeLog } = savedSettings;
@@ -1663,6 +1668,13 @@ ipcMain.on('scroll-pos', (event, arg) => {
 ipcMain.on('update-settings', () => {
   sendToViewerWindows('update-settings');
   mainWindow.webContents.send('sync-settings');
+});
+
+// A new AI translations database was downloaded; every window reopens it
+ipcMain.on('ai-translations-updated', () => {
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.webContents.send('ai-translations-updated');
+  });
 });
 
 ipcMain.on('save-settings', (event, setting) => {

@@ -10,7 +10,8 @@ const tingle = require('../assets/js/vendor/tingle');
 const { savedSettings } = require('./common/store/user-settings/get-saved-user-settings');
 const { applyUserSettings } = require('./common/store/user-settings/apply-user-settings');
 
-const { i18n } = remote.require('./app');
+const { i18n } = require('./common/i18n');
+
 const analytics = remote.getGlobal('analytics');
 
 const modal = new tingle.Modal({

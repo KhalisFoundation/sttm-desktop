@@ -1,10 +1,8 @@
 import Noty from 'noty';
 import copy from 'copy-to-clipboard';
+import { i18n } from '../../../common/i18n';
 
 const anvaad = require('anvaad-js');
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 export const copyToClipboard = (activeVerseRef) => {
   if (activeVerseRef && activeVerseRef.current) {

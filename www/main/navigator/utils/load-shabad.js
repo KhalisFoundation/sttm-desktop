@@ -1,10 +1,8 @@
 import Noty from 'noty';
 import banidb from '../../banidb';
+import { i18n } from '../../common/i18n';
 
-const remote = require('@electron/remote');
 const { diag, errText } = require('../../addons/voice-follow/shadow/diag');
-
-const { i18n } = remote.require('./app');
 
 export const loadShabad = (shabadID) =>
   banidb

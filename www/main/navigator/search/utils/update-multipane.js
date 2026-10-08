@@ -1,8 +1,5 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 const updateMultipane = () => {
   const { pane1, pane2, pane3, activePaneId } = useStoreState((state) => state.navigator);
@@ -50,9 +47,7 @@ const updateMultipane = () => {
         // bani pick from the controller sends only the id): clear the previous
         // item's active verse so it opens at the start instead of carrying over
         // a stale highlight from the last bani. Same item + no verse leaves it.
-        ...(pane.activeShabad !== shabadId
-          ? { activeVerse: null, versesRead: [] }
-          : {}),
+        ...(pane.activeShabad !== shabadId ? { activeVerse: null, versesRead: [] } : {}),
       };
     }
     if (pane !== newAttributes) {

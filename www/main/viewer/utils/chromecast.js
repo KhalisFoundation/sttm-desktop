@@ -1,12 +1,12 @@
 /* global chrome */
 import { ipcRenderer } from 'electron';
+import { i18n } from '../../common/i18n';
 
 const remote = require('@electron/remote');
 
 /* eslint-disable-next-line global-require */
 export const tingle = require('../../../assets/js/vendor/tingle');
 
-const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const applicationID = 'ECF05819';
