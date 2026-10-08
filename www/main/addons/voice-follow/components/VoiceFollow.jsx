@@ -3370,11 +3370,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               <span className="vf-grip">⠿</span>
               <span className="vf-heading-copy">
                 <span>Voice Follow</span>
-                {!(active && currentView && judgeWord === 'Following') && (
-                  <span className="vf-listening-label">
-                    {active && currentView ? judgeWord : microphoneLabel}
-                  </span>
-                )}
+                {(() => {
+                  const sub = active && currentView ? judgeWord : microphoneLabel;
+                  // The title line stays quiet in the normal states; it only speaks up when
+                  // something is in progress or needs attention.
+                  if (sub === 'Following' || sub === 'Listening' || sub === 'Ready') return null;
+                  return <span className="vf-listening-label">{sub}</span>;
+                })()}
               </span>
               {active && (
                 <span
