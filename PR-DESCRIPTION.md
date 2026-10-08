@@ -1,60 +1,42 @@
-## 📖 Voice-Follow autopilot: follow singing, change Shabads on its own
+## Why
 
-Press Autopilot once. It listens, finds the Shabad being sung, follows line by line, and moves to the next Shabad when singing changes. Built for presenters running the projector while Kirtan flows.
+Voice-Follow listens to the kirtan through the laptop microphone and follows along on screen, using an on-device speech model. Before it is shown to sevadaars, we want to know how well it does in real Gurdwaras. This PR adds Voice-Follow in a **hidden "shadow" mode**: it runs silently, records the audio and what the sevadaar shows by hand, scores itself against that, and uploads the result for the team to study. The sevadaar's experience is unchanged.
 
-## 📊 Benchmarks on large Kirtan sets
+## What's in it
 
-Harness rows grade the shipped judge settings (confirm 3, bar 0.65, 15-char floor). LEN15 is shipped behavior:
+- **Voice-Follow MVP 8.6** under `www/main/addons/voice-follow/` (Cycle 8 kirtan following, same-Gurbani lock, Sundar Gutka paath following).
+- **Shadow layer** under `www/main/addons/voice-follow/shadow/`. The Voice-Follow button and panel are not shown. On first launch a consent card asks for the tester's name and Gurdwara; nothing is recorded or uploaded before it is accepted, and it can be switched off in Settings ("Voice-Follow Test Recording"). Sessions start on their own at the first screen change and stop after 8 idle minutes.
+- **Uploads go to Khalis's Azure Blob container** `voice-follow-training-data` (account `banidb`), straight from the app with a container SAS that allows create, write and list only. Layout: `raw/<gurdwara>/<tester>/<date>/<session>/` with the audio (Opus/WebM, ~14 MB per hour), both timelines and a score file. Uploads resume after a restart or a dropped connection.
 
-| Dataset | ✅ Right | ❌ Wrong | 🎯 Caught |
-|---|---|---|---|
-| ⏳ 86min live | 69.9% | 10.5% | 86 / 116 |
-| 🎶 88, 20 voices | 64.7% | 17.4% | 78 / 87 |
-| 🎵 51 clean | 73.6% | 14.2% | 49 / 50 |
+## One thing to set up before the experimental build
 
-| Dataset | ⚡ Speed | 🪫 Starved |
-|---|---|---|
-| ⏳ 86min live | 10.2s | 11 stuck |
-| 🎶 88, 20 voices | 7.9s | 0 stuck |
-| 🎵 51 clean | 5.4s | 0 stuck |
+The SAS is **not committed**. After `npm run build`, `packaging/inject-upload-sas.js` (the `postbuild` script) writes it into the compiled config from the `VF_UPLOAD_SAS` environment variable. `build-mac.yml` and `build-windows.yml` in this PR pass that variable from a repository secret.
 
-Policy checks on this tree (`npm run test:unit`):
+**Add a repository secret `VF_UPLOAD_SAS`** (Settings → Secrets and variables → Actions) with the container SAS. Without it the build still succeeds; the app just does not upload.
 
-| Check | Result |
-|---|---|
-| 🧪 Unit tests | 30 / 30 pass |
-| 📋 Eval cases | 12 / 13 pass |
-| ⚠️ Known limit | Spurious still commits |
+Also, as before: the 184 MB speech model must be fetched into `build-resources/voice-follow/model.int8.onnx` before packaging (URL in `.github/workflows/tester-build.yml` on `Arash2348/sttm-desktop@mvp-8.6c-shadow`), and `packaging/electron-builder.macArm.yml` needs the same `extraResources` entry.
 
-## 🎯 North-star scorecard
+## Test plan
 
-| Star | Target | Now | Light |
-|---|---|---|---|
-| ✅ Right page | Higher | 69.9% live | 🟡 |
-| ❌ Wrong page | Under 5% | 10.5% live | 🔴 |
-| 🔒 Lock starves | Zero | 11 stuck | 🔴 |
-| ⏳ Stale | Tolerable | 19.5% | 🟢 |
-| ⚡ Speed | About 8s | 10.2s live | 🟡 |
+Everything below was run on 2026-10-08. The CI tester build of this exact code is green on macOS (arm64) and Windows: [run 37744089265](https://github.com/Arash2348/sttm-desktop/actions/runs/37744089265).
 
-Honest note on provenance: the harness grades the judge only. It cannot see the backstop, strong-wins, or list-hold, which are covered by the green unit and eval rows plus live feel. Live numbers on a large set are the next measurement to take.
+**1. Installer end to end (macOS, the CI-built DMG, fresh install)** — [video, 5 min](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/azure-upload-e2e-installer.mp4)
+1. Install from the DMG with an empty user-data folder; the app downloads the database itself and the speech model is bundled.
+2. Consent card appears; enter a tester name and Gurdwara, accept.
+3. Put a Bani on screen (Anand Sahib from Quick Insert). A session starts. A real Aarti recording plays as the microphone.
+4. After the audio ends the session stops on its own, and every file lands in the Azure container (listing shown at the end of the video). Sizes read back from Azure match the local files byte for byte.
+5. Hidden Voice-Follow inside the session found the Aarti Bani and followed its lines (`system.jsonl`), while the screen stayed on what the "sevadaar" chose.
 
-## 📈 How each number moves, cheapest first
+**2. Same flow from source (dev build)** — [video, 5 min](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/azure-upload-e2e-dev-build.mp4). Same result.
 
-- ❌ Wrong page: the eval names the hole. Sustained-spurious matches still commit at 3. Small, bench-gated fix.
-- 🔒 Starves: backstop adoption is the lever, already shipped. If the judge still will not commit on right lines, the 0.65 bar is the wall.
-- 🎯 Caught: widen backstop rescore pool or lower its overlap floor, each step priced against false-jump risk.
-- ⚡ Speed: strong-wins already cover decisive cases. The rest is acoustic floor, not code.
-- 🎤 Above all of it: Kirtan-tuned acoustics. The bake-off showed about 50% is the model wall. Biggest win, biggest cost, after code plateaus.
+**3. Resilience** (code paths, exercised in earlier tester builds): kill the app mid-session → files upload at the next launch; drop the network → uploads resume on the next minute tick; switch the setting off → no recording.
 
-## 📦 What's in this PR
+**4. Build checks**: `npm run build` and `eslint` clean on the shadow folder; the compiled config contains the SAS and no placeholder (the tester workflow fails the build otherwise).
 
-- ⚙️ Feature code: detector, follower, switch judge, backstop, panel. Clean: zero TODOs, zero dead code, 30/30 tests green.
-- 🎨 Panel styles, scoped to the feature. No app-wide restyling.
-- 🔌 Small integration points: toolbar entry, overlay state, viewer hooks, model dependency.
-- 🧪 Switch-policy tests plus eval harness so future tuning stays gated.
+**What a reviewer can check without running anything**: `www/main/addons/voice-follow/shadow/uploader.js` (the PUT), `config.js` (the placeholder), `packaging/inject-upload-sas.js`, and the two workflow files.
 
-## 🔗 Where the numbers come from
+## Merge notes
 
-- 🎬 Kirtan audio: [Shabad Gurbani With Meaning (Lyrics)](https://www.youtube.com/playlist?list=PLnnODsM2enUaj15N8rLldcIJKhNM6nFlN), a 729-video playlist by [Shabad Gurbani Audio](https://www.youtube.com/@ShabadGurbaniAudio). 32 of the 38 finder A/B tracks come from it; the other 6 are three targeted YouTube clips studied individually (Chaupai: `21Zth-_kn-w`, ajan: `mSA0H-jCXuo`, Sohila: `H5pWQGfVDvU`, each watchable at `https://www.youtube.com/watch?v=<id>`) plus three slow-sung control clips.
-- 🧪 KPI harness and datasets: `handoff/benchmark/run_kpis.sh` plus `handoff/benchmark/vf-kirtan-switch-eval.js` and the `handoff/benchmark/kirtan_*.json` manifests, all in this PR.
-- 🧪 Policy gates: `www/main/addons/voice-follow/components/switchPolicy.test.js` and `switchPolicy.eval.js` (run with `npm run test:unit`).
+Merged with `experimental-release` as of 49959e84. Conflicts resolved: the two easy-peasy store files keep upstream's removal of `return state` (same fix both sides), and `viewerApp.jsx` keeps upstream's `ViewerContent` inside our `ErrorBoundary`.
+
+Open from before: app identity (`org.khalisfoundation.sttm.voice` / `Voice-Sikhi-To-The-Max`, updater off) versus the standard identity for the experimental channel. Say which you want and I'll change it on this branch.
