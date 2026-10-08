@@ -2260,7 +2260,7 @@ $vf2-yellow-bar: #f2c200;
       rgba(255, 255, 255, 0.55) 50%,
       rgba(255, 255, 255, 0) 100%
     );
-    animation: vf2-sheen 0.9s ease-out;
+    animation: vf2-sheen 1.2s ease-out;
   }
   &.is-low {
     background: $vf2-red !important;

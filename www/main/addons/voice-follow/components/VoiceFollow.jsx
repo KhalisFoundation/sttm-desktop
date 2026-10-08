@@ -500,7 +500,7 @@ const useMoving = (value) => {
     if (Math.abs(value - prev.current) >= 0.004) {
       prev.current = value;
       setMoving(true);
-      const t = setTimeout(() => setMoving(false), 900);
+      const t = setTimeout(() => setMoving(false), 1400);
       return () => clearTimeout(t);
     }
     prev.current = value;
@@ -508,16 +508,20 @@ const useMoving = (value) => {
   }, [value]);
   return moving;
 };
+// A change rolls through the numbers in between (odometer style) rather than jumping:
+// the bigger the move, the longer the roll, so 33% -> 67% is seen counting up.
+const rollMs = (from, to) => 350 + 1800 * Math.min(1, Math.abs(to - from));
 const LivePct = ({ value }) => {
   const [shown, setShown] = useState(value);
   const shownRef = useRef(value);
   useEffect(() => {
     const from = shownRef.current;
     const t0 = performance.now();
+    const dur = rollMs(from, value);
     let raf = 0;
     const step = (t) => {
-      const k = Math.min(1, (t - t0) / 200);
-      const v = from + (value - from) * (1 - (1 - k) ** 3);
+      const k = Math.min(1, (t - t0) / dur);
+      const v = from + (value - from) * (1 - (1 - k) ** 2);
       shownRef.current = v;
       setShown(v);
       if (k < 1) raf = requestAnimationFrame(step);
@@ -534,11 +538,20 @@ const LivePct = ({ value }) => {
 LivePct.propTypes = { value: PropTypes.number.isRequired };
 const LiveBar = ({ value }) => {
   const moving = useMoving(value);
+  const prev = useRef(value);
+  const dur = rollMs(prev.current, value);
+  useEffect(() => {
+    prev.current = value;
+  }, [value]);
   return (
     <div className="vf2-cand-track">
       <span
         className={`vf2-live-fill ${pctLevel(value)}${moving ? ' is-moving' : ''}`}
-        style={{ width: `${Math.round(value * 1000) / 10}%`, background: pctColor(value) }}
+        style={{
+          width: `${Math.round(value * 1000) / 10}%`,
+          background: pctColor(value),
+          transitionDuration: `${dur}ms, ${dur}ms`,
+        }}
       />
     </div>
   );
