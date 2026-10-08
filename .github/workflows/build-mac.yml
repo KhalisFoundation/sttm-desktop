@@ -120,6 +120,15 @@ jobs:
           security import "${CERTIFICATE_P12}" -k "${KEY_CHAIN}" -P "${{ secrets.CSC_KEY_PASSWORD }}" -T /usr/bin/codesign > /dev/null 2>&1
           security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.CSC_KEY_PASSWORD }}" "${KEY_CHAIN}"
 
+      - name: Speech model (Voice-Follow, bundled into the installer)
+        shell: bash
+        run: |
+          mkdir -p build-resources/voice-follow
+          curl -L --retry 3 -o build-resources/voice-follow/model.int8.onnx \
+            "https://huggingface.co/karansea/indicconformer-stt-pa-ctc-shabad-preview/resolve/main/model.int8.onnx?download=true"
+          SIZE=$(wc -c < build-resources/voice-follow/model.int8.onnx | tr -d ' ')
+          echo "model bytes: $SIZE"; test "$SIZE" -gt 180000000
+
       - name: Build for ${{ matrix.arch }}
         run: |
           source venv-gyp/bin/activate
