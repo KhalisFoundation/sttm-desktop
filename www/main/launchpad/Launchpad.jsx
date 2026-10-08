@@ -1,11 +1,11 @@
-import React, { createContext, useEffect, useRef } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
-import { useKeys, useSlides } from '../common/hooks';
+import { useKeys, useSlides, useAudioRecorder, useRecordingState } from '../common/hooks';
 
 import {
   Ceremonies,
@@ -109,6 +109,21 @@ const Launchpad = () => {
     sundarGutkaBaniId,
     ceremonyId,
   ]);
+
+  useAudioRecorder();
+  const isRecording = useRecordingState();
+  const [recordingReady, setRecordingReady] = useState(false);
+  const [datasetType, setDatasetType] = useState('kirtan');
+
+  const refreshRecordingSettings = () => {
+    ipcRenderer.invoke('get-recording-settings').then((prefs) => {
+      setRecordingReady(Boolean(prefs.gurdwaraName) && prefs.hfTokenKhalisSaved);
+    });
+  };
+
+  useEffect(() => {
+    refreshRecordingSettings();
+  }, [overlayScreen]);
 
   useEffect(() => {
     const requestProjectionState = () => {
@@ -216,6 +231,11 @@ const Launchpad = () => {
     }
   };
 
+  const handleRecordingToggle = () => {
+    if (!recordingReady || document.activeElement === ref.current) return;
+    ipcRenderer.send('toggle-recording', { datasetType });
+  };
+
   const handleEnter = () => {
     if (!shortcuts.openFirstResult) {
       ref.current.blur();
@@ -256,6 +276,7 @@ const Launchpad = () => {
   useKeys('ArrowUp', 'single', handleUpAndLeft);
   useKeys('ArrowLeft', 'single', handleUpAndLeft);
   useKeys('Space', 'single', handleSpacebar);
+  useKeys('KeyR', 'single', handleRecordingToggle);
   useKeys('Enter', 'single', handleEnter);
   useKeys('NumpadEnter', 'single', handleEnter);
   useKeys('KeyG', 'combination', handleCtrlG);
@@ -274,6 +295,29 @@ const Launchpad = () => {
   return (
     <>
       <WorkspaceBar />
+      {recordingReady && (
+        <div className="recording-controls">
+          <button
+            type="button"
+            className={`dataset-switch${datasetType === 'kirtan' ? ' kirtan' : ''}`}
+            aria-label={`Recording type ${datasetType}`}
+            disabled={isRecording}
+            onClick={() => setDatasetType(datasetType === 'paath' ? 'kirtan' : 'paath')}
+          >
+            <span>Paath</span>
+            <span>Kirtan</span>
+          </button>
+          <button
+            type="button"
+            className={`record-toggle${isRecording ? ' recording' : ''}`}
+            aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+            title={isRecording ? 'Stop recording' : 'Start recording'}
+            onClick={handleRecordingToggle}
+          >
+            <i className={isRecording ? 'fa fa-stop' : 'fa fa-microphone'} />
+          </button>
+        </div>
+      )}
       <div className={`launchpad${isSingleDisplayMode ? ' single-display misc-pane' : ''}`}>
         <Toolbar />
         {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
