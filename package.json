@@ -16,6 +16,7 @@
     "smoke": "npm run build:local && cross-env VF_SMOKE=1 electron .",
     "debug": "npm run build:local && cross-env NODE_ENV=development electron . --remote-debugging-port=9222",
     "build": "npm run build-css & npm run build-js",
+    "postbuild": "node packaging/inject-upload-sas.js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
     "pack:macArm": "npm run build && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",

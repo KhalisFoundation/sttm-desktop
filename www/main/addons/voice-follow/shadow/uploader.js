@@ -1,13 +1,13 @@
-// Uploads shadow sessions to the Voice-Follow team's private S3 bucket.
-// The app never holds AWS keys: it asks UPLOAD_ENDPOINT for a one-time presigned PUT
-// URL per file (sending UPLOAD_KEY, which only allows uploads into sessions/), then
-// PUTs the file. Each session folder keeps uploaded.json (file -> size uploaded), so
-// a restart, a sleep or Gurdwara Wi-Fi dropping out just resumes later. Live files
-// (score, timelines) are re-sent every LIVE_EVERY_MS while the service is running, so the
-// bucket is never more than a couple of minutes behind what is on the laptop.
+// Uploads shadow sessions to the Voice-Follow training-data container on Khalis's Azure
+// Blob storage. Each file is PUT straight to the container with a SAS that allows only
+// create, write and list, under raw/<gurdwara>/<tester name>/<date>/<session>/<file>, so
+// the folders can be browsed by people. Each session folder keeps uploaded.json
+// (file -> size uploaded), so a restart, a sleep or Gurdwara Wi-Fi dropping out just resumes
+// later. Live files (score, timelines) are re-sent every LIVE_EVERY_MS while the service is
+// running, so the container is never more than a couple of minutes behind the laptop.
 const fs = require('fs');
 const path = require('path');
-const { UPLOAD_ENDPOINT, UPLOAD_KEY } = require('./config');
+const { UPLOAD_URL, UPLOAD_SAS } = require('./config');
 
 // The renderer has fetch; the main process (quit-time flush) may not.
 // eslint-disable-next-line global-require
@@ -44,13 +44,16 @@ const readJson = (f, d) => {
   }
 };
 
+// Uploads are off in a build that never had the SAS injected (a plain dev build).
+const uploadsOn = () => Boolean(UPLOAD_URL && UPLOAD_SAS && !UPLOAD_SAS.startsWith('__'));
+
 async function putFile(dir, file) {
   const full = path.join(dir, file);
-  if (!fs.existsSync(full) || !UPLOAD_ENDPOINT) return false;
+  if (!fs.existsSync(full) || !uploadsOn()) return false;
   const session = readJson(path.join(dir, 'session.json'), {});
   const t = session.tester || (dir === root ? rootTester : null) || {};
   const testerId = t.id || 'unknown';
-  // Bucket folders people can browse: raw/<gurdwara>/<tester name>/<date>/<session>/
+  // Container folders people can browse: raw/<gurdwara>/<tester name>/<date>/<session>/
   const slug = (x, d) =>
     String(x || '')
       .toLowerCase()
@@ -59,23 +62,20 @@ async function putFile(dir, file) {
       .slice(0, 40) || d;
   const gurdwara = slug(t.gurdwara, 'unknown-gurdwara');
   const name = slug(t.name, testerId);
+  const sessionId = dir === root ? 'errors' : path.basename(dir);
+  const date = sessionId === 'errors' ? 'undated' : sessionId.slice(0, 10);
+  const key = ['raw', gurdwara, name, date, sessionId, file].map(encodeURIComponent).join('/');
   const body = fs.readFileSync(full);
   const contentType = TYPES[path.extname(file)] || 'application/octet-stream';
-  const res = await fetch(UPLOAD_ENDPOINT, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-vf-key': UPLOAD_KEY },
-    body: JSON.stringify({
-      tester: testerId,
-      gurdwara,
-      name,
-      session: dir === root ? 'errors' : path.basename(dir),
-      file,
-      contentType,
-    }),
+  const put = await fetch(`${UPLOAD_URL}/${key}?${UPLOAD_SAS}`, {
+    method: 'PUT',
+    headers: {
+      'content-type': contentType,
+      'content-length': String(body.length),
+      'x-ms-blob-type': 'BlockBlob',
+    },
+    body,
   });
-  if (!res.ok) throw new Error(`endpoint ${res.status}`);
-  const { url } = await res.json();
-  const put = await fetch(url, { method: 'PUT', headers: { 'content-type': contentType }, body });
   if (!put.ok) throw new Error(`upload ${put.status}`);
   const doneFile = path.join(dir, 'uploaded.json');
   const done = readJson(doneFile, {});
@@ -133,7 +133,7 @@ async function drain() {
       queue.shift();
     }
   } catch (_) {
-    /* offline or endpoint down: keep the queue, try next tick */
+    /* offline or storage unreachable: keep the queue, try next tick */
   } finally {
     busy = false;
   }
