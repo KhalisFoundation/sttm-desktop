@@ -1574,6 +1574,13 @@ ipcMain.on('update-settings', () => {
   mainWindow.webContents.send('sync-settings');
 });
 
+// A new AI translations database was downloaded; every window reopens it
+ipcMain.on('ai-translations-updated', () => {
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.webContents.send('ai-translations-updated');
+  });
+});
+
 ipcMain.on('save-settings', (event, setting) => {
   sendToViewerWindows('save-settings', setting);
 });

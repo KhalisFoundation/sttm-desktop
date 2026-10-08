@@ -7,11 +7,10 @@ import ShabadDeck from './ShabadDeck/ShabadDeck';
 import ViewerState from './store/ViewerState';
 import ShabadPane from '../navigator/shabad/ShabadPane';
 import { castToReceiver, appendMessage, requestSession, stopApp, tingle } from './utils';
+import { i18n } from '../common/i18n';
 
 const chromecast = require('electron-chromecast');
-const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const isPaneProjection = new URLSearchParams(window.location.search).has('paneProjection');
 
 /** Letterbox shells: match live .pane chrome so contain-scale edges aren't theme bands. */

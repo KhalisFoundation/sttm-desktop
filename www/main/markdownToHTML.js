@@ -1,9 +1,8 @@
+import { i18n } from './common/i18n';
+
 const marked = require('marked');
 const fs = require('fs');
 const path = require('path');
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 const markdownFiles = {
   changelog: '../CHANGELOG.md',

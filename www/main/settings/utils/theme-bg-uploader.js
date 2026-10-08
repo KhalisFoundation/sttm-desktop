@@ -1,4 +1,5 @@
 import GlobalState from '../../common/store/GlobalState';
+import { i18n } from '../../common/i18n';
 
 const remote = require('@electron/remote');
 const fs = require('fs');
@@ -14,8 +15,6 @@ const { store } = remote.require('./app');
 const mkdir = util.promisify(fs.mkdir);
 const userDataPath = remote.app.getPath('userData');
 const userBackgroundsPath = path.resolve(userDataPath, 'user_backgrounds');
-
-const { i18n } = remote.require('./app');
 
 const errorAlert = (error) => {
   /* eslint-disable-next-line no-alert */
