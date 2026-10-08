@@ -182,12 +182,12 @@ function ShabadDeck() {
 
       } else {
         loadShabadVerse(currentShabad, activeVerseId).then((result) =>
-          result.map((activeRes) => setActiveVerse([activeRes])),
+          (result || []).map((activeRes) => setActiveVerse([activeRes])),
         );
         // load next line of searched shabad verse from db
         if (displayNextLine && !isMiscSlide) {
           loadShabadVerse(currentShabad, activeVerseId, displayNextLine).then((result) => {
-            if (result.length) {
+            if (result && result.length) {
               result.map((activeRes) => setNextVerse(activeRes));
             } else {
               setNextVerse(bakeEmptyVerse());

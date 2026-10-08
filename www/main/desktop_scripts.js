@@ -9,6 +9,7 @@ const progress = require('request-progress');
 const remote = require('@electron/remote');
 const moment = require('moment');
 const tingle = require('../assets/js/vendor/tingle');
+const { diag, errText } = require('./addons/voice-follow/shadow/diag');
 
 const { isUnsupportedWindow } = remote.require('./app');
 const { i18n } = require('./common/i18n');
@@ -142,6 +143,7 @@ module.exports = {
     } else {
       localStorage.setItem('isDbDownloaded', true);
     }
+    diag(`db: ${force ? 'first download' : 'update check'} starting`);
     isOnline().then((online) => {
       if (online) {
         request(
@@ -154,11 +156,13 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
+                diag('db: downloading');
                 progress(
                   request(
                     `https://banidb.blob.core.windows.net/database/${database[dbPlatform].dbCompressedName}`,
                   ),
                 )
+                  .on('error', (err) => diag(`db: download FAILED ${errText(err)}`))
                   .on('progress', (state) => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
@@ -166,52 +170,65 @@ module.exports = {
                   })
                   .on('end', () => {
                     ipcRenderer.emit('database-progress', JSON.stringify({ percent: 1 }));
+                    diag('db: downloaded, extracting');
                     try {
-                      extract(dbCompressed, { dir: newDBFolder }).then(() => {
-                        fs.chmodSync(newDBPath, '755');
-                        // Save the hash for comparison next time
-                        store.set('curDBHash', newestDBHash);
-                        // Delete compressed database
-                        fs.unlinkSync(dbCompressed);
-                        // Replace current DB file with new version
-                        fs.renameSync(newDBPath, dbPath);
-                        if (dbPlatform === 'realm') {
-                          fs.renameSync(newDBSchema, dbSchema);
-                        }
-                        module.exports.initDB();
-                        // Delete old DBs
-                        // TODO: Update to check if directory and use fs.rmdir
-                        // TODO: Add sttmdesktop.realm.management
-                        const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
-                        oldDBs.forEach((oldDB) => {
-                          const oldDBPath = path.resolve(userDataPath, oldDB);
-                          fs.access(oldDBPath, (err) => {
-                            if (!err) {
-                              fs.unlink(oldDBPath, (err1) => {
-                                if (err1) {
-                                  // eslint-disable-next-line no-console
-                                  console.log(`Could not delete old database ${oldDB}: ${err1}`);
-                                }
-                              });
-                            }
+                      extract(dbCompressed, { dir: newDBFolder })
+                        .then(() => {
+                          fs.chmodSync(newDBPath, '755');
+                          // Save the hash for comparison next time
+                          store.set('curDBHash', newestDBHash);
+                          // Delete compressed database
+                          fs.unlinkSync(dbCompressed);
+                          // Replace current DB file with new version
+                          fs.renameSync(newDBPath, dbPath);
+                          if (dbPlatform === 'realm') {
+                            fs.renameSync(newDBSchema, dbSchema);
+                          }
+                          localStorage.setItem('isDbDownloaded', true);
+                          diag(`db: ready (${fs.statSync(dbPath).size} bytes)`);
+                          module.exports.initDB();
+                          // Delete old DBs
+                          // TODO: Update to check if directory and use fs.rmdir
+                          // TODO: Add sttmdesktop.realm.management
+                          const oldDBs = ['data.db', 'sttmdesktop.realm', 'sttmdesktop.realm.lock'];
+                          oldDBs.forEach((oldDB) => {
+                            const oldDBPath = path.resolve(userDataPath, oldDB);
+                            fs.access(oldDBPath, (err) => {
+                              if (!err) {
+                                fs.unlink(oldDBPath, (err1) => {
+                                  if (err1) {
+                                    // eslint-disable-next-line no-console
+                                    console.log(`Could not delete old database ${oldDB}: ${err1}`);
+                                  }
+                                });
+                              }
+                            });
                           });
-                        });
-                        const win = remote.getCurrentWindow();
-                        win.setProgressBar(-1);
-                      });
+                          const win = remote.getCurrentWindow();
+                          win.setProgressBar(-1);
+                        })
+                        .catch((err) => diag(`db: extract/install FAILED ${errText(err)}`));
                     } catch (err) {
+                      diag(`db: extract/install FAILED ${errText(err)}`);
                       // handle any errors
                       /* eslint-disable-next-line no-console */
                       console.log(err);
                     }
                   })
                   .pipe(fs.createWriteStream(dbCompressed));
+              } else {
+                diag('db: up to date');
               }
+            } else {
+              diag(
+                `db: version check FAILED ${error ? errText(error) : `HTTP ${response && response.statusCode}`}`,
+              );
             }
           },
         );
-      } else if (force) {
-        global.core.search.offline(10);
+      } else {
+        diag(`db: offline${force ? ', no database yet' : ''}`);
+        if (force) global.core.search.offline(10);
       }
     });
   },

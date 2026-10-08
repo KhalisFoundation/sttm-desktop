@@ -2,11 +2,14 @@ import Noty from 'noty';
 import banidb from '../../banidb';
 import { i18n } from '../../common/i18n';
 
+const { diag, errText } = require('../../addons/voice-follow/shadow/diag');
+
 export const loadShabad = (shabadID) =>
   banidb
     .loadShabad(shabadID)
     .then((rows) => rows)
     .catch((err) => {
+      diag(`load shabad ${shabadID} failed: ${errText(err)}`);
       const dbStatus = !!localStorage.getItem('isDbDownloaded');
       if (dbStatus) {
         new Noty({

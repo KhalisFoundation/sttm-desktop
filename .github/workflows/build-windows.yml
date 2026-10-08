@@ -26,6 +26,9 @@ jobs:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       AUDIO_TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
       AUDIO_TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}
+      # Voice-Follow shadow uploads (Azure Blob SAS); injected after npm run build. Optional:
+      # without it the build still succeeds and the app simply does not upload sessions.
+      VF_UPLOAD_SAS: ${{ secrets.VF_UPLOAD_SAS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

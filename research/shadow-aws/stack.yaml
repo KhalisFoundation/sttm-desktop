@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Voice-Follow shadow-session uploads (tester builds). Private bucket + presigned-URL endpoint.
+Parameters:
+  UploadKey:
+    Type: String
+    NoEcho: true
+  PreviousUploadKey:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: Still accepted while already-installed apps move to the new key
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'vf-shadow-sessions-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+  FnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement: [{ Effect: Allow, Principal: { Service: lambda.amazonaws.com }, Action: sts:AssumeRole }]
+      ManagedPolicyArns: [arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole]
+      Policies:
+        - PolicyName: put-sessions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub '${Bucket.Arn}/raw/*'
+  Fn:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Timeout: 10
+      Role: !GetAtt FnRole.Arn
+      Environment:
+        Variables: { BUCKET: !Ref Bucket, UPLOAD_KEY: !Ref UploadKey, PREVIOUS_UPLOAD_KEY: !Ref PreviousUploadKey }
+      Code:
+        ZipFile: |
+          const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+          const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+          const s3 = new S3Client({});
+          const SAFE = /^[A-Za-z0-9._-]{1,120}$/;
+          const TYPES = ['audio/webm', 'application/json', 'application/x-ndjson', 'application/octet-stream'];
+          const out = (code, body) => ({ statusCode: code, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+          exports.handler = async (event) => {
+            const h = event.headers || {};
+            const key = h['x-vf-key'] || '';
+            const ok = key === process.env.UPLOAD_KEY || (process.env.PREVIOUS_UPLOAD_KEY && key === process.env.PREVIOUS_UPLOAD_KEY);
+            if (!ok) return out(403, { error: 'forbidden' });
+            let b;
+            try { b = JSON.parse(event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body || '{}'); } catch (e) { return out(400, { error: 'bad json' }); }
+            const { tester, session, file, contentType, gurdwara, name } = b;
+            if (![tester, session, file].every((x) => typeof x === 'string' && SAFE.test(x))) return out(400, { error: 'bad name' });
+            // Folders people can browse: raw/<gurdwara>/<tester name>/<date>/<session>/
+            const byPlace = [gurdwara, name].every((x) => typeof x === 'string' && SAFE.test(x));
+            if (!TYPES.includes(contentType)) return out(400, { error: 'bad type' });
+            const date = /^\d{4}-\d{2}-\d{2}/.test(session) ? session.slice(0, 10) : 'undated';
+            const Key = byPlace ? `raw/${gurdwara}/${name}/${date}/${session}/${file}` : `raw/${tester}/${date}/${session}/${file}`;
+            const url = await getSignedUrl(s3, new PutObjectCommand({ Bucket: process.env.BUCKET, Key, ContentType: contentType }), { expiresIn: 900 });
+            return out(200, { url, key: Key });
+          };
+  Api:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: vf-shadow-upload
+      ProtocolType: HTTP
+      Target: !GetAtt Fn.Arn
+  ApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref Fn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*'
+Outputs:
+  Endpoint: { Value: !GetAtt Api.ApiEndpoint }
+  BucketName: { Value: !Ref Bucket }

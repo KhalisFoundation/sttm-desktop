@@ -1,11 +1,22 @@
 import { getFilterOption } from '../../../banidb/realm-search';
 import { i18n } from '../../../common/i18n';
 
+const { diag, errText } = require('../../../addons/voice-follow/shadow/diag');
+
 export const retrieveFilterOption = async (optionsObj, type) => {
   const idArray = Object.keys(optionsObj).filter(
     (option) => option.toLowerCase() !== 'all' && option.toLowerCase() !== 'others',
   );
-  const retrievedObj = await getFilterOption(type, idArray);
+  // The database may not be downloaded yet, or Realm may refuse a read-only open for a
+  // moment (seen on Windows as "Failed to open ... (0x2)"). The filter dropdown then
+  // offers only "all" instead of an unhandled rejection in the renderer.
+  let retrievedObj;
+  try {
+    retrievedObj = await getFilterOption(type, idArray);
+  } catch (e) {
+    diag(`filter options (${type}) unavailable: ${errText(e)}`);
+    retrievedObj = {};
+  }
   const valueObj = { ...retrievedObj };
 
   const finalArray = [

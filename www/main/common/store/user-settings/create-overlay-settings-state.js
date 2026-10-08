@@ -24,8 +24,7 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
       ipcRenderer.send('save-overlay-settings', JSON.stringify(state));
-
-      return state;
+      // Do not return the immer draft (easy-peasy/immer revokes it on finalize).
     });
   });
   return userSettingsState;

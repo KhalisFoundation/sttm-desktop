@@ -93,6 +93,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           },
         });
       }
+      // Do not return the immer draft (easy-peasy/immer revokes it on finalize).
     });
   });
   return userSettingsState;

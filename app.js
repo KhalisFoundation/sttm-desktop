@@ -39,6 +39,9 @@ const maxChangeLogSeenCount = 5;
 /* eslint-disable import/no-unresolved, import/extensions */
 const Store = require('./www/js/store');
 const {
+  registerRetrievalService,
+} = require('./www/js/addons/voice-follow/engine/retrieval/main-service');
+const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
 /* eslint-enable */
@@ -95,6 +98,41 @@ if (currentTheme === undefined) {
 }
 
 let mainWindow;
+const voiceFollowRetrieval = registerRetrievalService({
+  ipcMain,
+  userData: app.getPath('userData'),
+  isAllowed: (sender) =>
+    !!mainWindow && !mainWindow.isDestroyed() && sender === mainWindow.webContents,
+});
+app.once('will-quit', () => {
+  voiceFollowRetrieval.dispose().catch(() => {});
+});
+// Tester build: hold the quit up to 20 s to upload the session that just ended.
+// Anything going wrong here must never stop the app from quitting.
+let shadowFlushed = false;
+app.on('will-quit', (e) => {
+  if (shadowFlushed) return;
+  shadowFlushed = true;
+  e.preventDefault();
+  try {
+    // eslint-disable-next-line global-require
+    const shadowUploader = require('./www/js/addons/voice-follow/shadow/uploader');
+    // The second quit must come on a later turn of the event loop: a quit issued while
+    // this will-quit is still being dispatched (nothing left to upload resolves at once)
+    // is swallowed and the app stays open with no window. Whatever happens, exit.
+    const quitAgain = () => setTimeout(() => app.quit(), 50);
+    const hardExit = setTimeout(() => app.exit(0), 30000);
+    shadowUploader
+      .flush(path.join(app.getPath('userData'), 'voice-follow', 'shadow'), 20000)
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(hardExit);
+        quitAgain();
+      });
+  } catch (_) {
+    setTimeout(() => app.quit(), 50);
+  }
+});
 let viewerWindow = false;
 let projectionWindow = false;
 /** Embedded controller <webview> (in-app preview) — kept separate from external BrowserWindows */
@@ -1288,7 +1326,9 @@ app.on('ready', () => {
       mainWindow.webContents.send('userToken', token);
     }
     // Platform-specific app stores have their own update mechanism
-    // so only check if we're not in one
+    // so only check if we're not in one. The tester build never auto-updates: its updater
+    // points at the public sttm-desktop releases, and the next public release would replace
+    // the tester app (and its bundled model) with the standard one.
     if (!appstore && !isUnsupportedWindow) {
       checkForUpdates();
     }
@@ -1304,6 +1344,57 @@ app.on('ready', () => {
     syncViewerWindows();
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+
+  // Automated smoke test: `VF_SMOKE=1 electron .` (or `npm run smoke`).
+  // Launches the real app, waits for the renderer to settle, then checks
+  // whether the ErrorBoundary fallback tripped or the renderer logged errors,
+  // prints a machine-readable PASS/FAIL to stdout, and quits. Lets a crash be
+  // detected without a human watching the window.
+  if (process.env.VF_SMOKE) {
+    const rendererErrors = [];
+    mainWindow.webContents.on('console-message', (_e, level, message) => {
+      // level 3 === error
+      if (level >= 3) rendererErrors.push(message);
+    });
+    mainWindow.webContents.on('render-process-gone', (_e, details) => {
+      // eslint-disable-next-line no-console
+      console.log(`SMOKE_RESULT: FAIL renderer-gone ${JSON.stringify(details)}`);
+      app.exit(1);
+    });
+    mainWindow.webContents.on('did-finish-load', () => {
+      const waitMs = parseInt(process.env.VF_SMOKE_WAIT || '6000', 10);
+      setTimeout(() => {
+        mainWindow.webContents
+          .executeJavaScript(
+            `(function () {
+              const h = document.querySelector('h2');
+              const boundaryTripped = !!(h && /Render error/.test(h.textContent || ''));
+              const pre = document.querySelector('pre');
+              return { boundaryTripped, stack: pre ? pre.textContent : null };
+            })()`,
+          )
+          .then((r) => {
+            const ok = !r.boundaryTripped && rendererErrors.length === 0;
+            // eslint-disable-next-line no-console
+            console.log(`SMOKE_RESULT: ${ok ? 'PASS' : 'FAIL'}`);
+            if (r.boundaryTripped) {
+              // eslint-disable-next-line no-console
+              console.log(`SMOKE_BOUNDARY_STACK:\n${r.stack}`);
+            }
+            if (rendererErrors.length) {
+              // eslint-disable-next-line no-console
+              console.log(`SMOKE_CONSOLE_ERRORS:\n${rendererErrors.join('\n---\n')}`);
+            }
+            app.exit(ok ? 0 : 1);
+          })
+          .catch((err) => {
+            // eslint-disable-next-line no-console
+            console.log(`SMOKE_RESULT: FAIL eval-error ${err && err.message}`);
+            app.exit(1);
+          });
+      }, waitMs);
+    });
+  }
 
   if (!store.get('user-agent')) {
     store.set('user-agent', mainWindow.webContents.getUserAgent());
