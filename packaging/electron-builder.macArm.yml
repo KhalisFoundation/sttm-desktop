@@ -11,6 +11,8 @@ files:
   - "!**/*.map"
   - "!www/main/**/*.{js,jsx}"
   - "!www/assets/*.db"
+  - "!research${/*}"
+  - "!build-resources${/*}"
 
 asarUnpack:
   - node_modules/better-sqlite3/**/*
@@ -19,6 +21,9 @@ npmRebuild: false
 
 extraResources:
   - data.db
+  # Voice-Follow speech model (fetched into build-resources by the workflow before packaging)
+  - from: build-resources/voice-follow/model.int8.onnx
+    to: voice-follow/model.int8.onnx
   - from: www/assets
     to: assets
     filter:
@@ -46,10 +51,3 @@ mac:
   notarize:
     teamId:
 afterSign: "./notarize.js"
-# Voice-Follow: the speech model ships beside the app (fetched into build-resources before packaging)
-extraResources:
-  - from: "build-resources/voice-follow/model.int8.onnx"
-    to: "voice-follow/model.int8.onnx"
-files:
-  - "!research${/*}"
-  - "!build-resources${/*}"
