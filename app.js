@@ -1324,14 +1324,7 @@ app.on('ready', () => {
     // so only check if we're not in one. The tester build never auto-updates: its updater
     // points at the public sttm-desktop releases, and the next public release would replace
     // the tester app (and its bundled model) with the standard one.
-    let shadowBuild = false;
-    try {
-      // eslint-disable-next-line global-require
-      shadowBuild = !!require('./www/js/addons/voice-follow/shadow/config').SHADOW_BUILD;
-    } catch (_) {
-      shadowBuild = false;
-    }
-    if (!appstore && !isUnsupportedWindow && !shadowBuild) {
+    if (!appstore && !isUnsupportedWindow) {
       checkForUpdates();
     }
     // Show changelog if last version wasn't seen

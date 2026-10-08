@@ -141,7 +141,7 @@
     "uuid": "^9.0.1"
   },
   "build": {
-    "appId": "org.khalisfoundation.sttm.voice",
+    "appId": "org.khalisfoundation.sttm",
     "protocols": {
       "name": "SikhiToTheMax",
       "schemes": [
@@ -204,11 +204,9 @@
     },
     "afterSign": "./notarize.js",
     "nsis": {
-      "artifactName": "Voice-Sikhi-To-The-Max-Setup-${version}.${ext}",
-      "deleteAppDataOnUninstall": false,
-      "perMachine": true,
-      "shortcutName": "Voice-Sikhi-To-The-Max",
-      "uninstallDisplayName": "Voice-Sikhi-To-The-Max"
+      "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
+      "deleteAppDataOnUninstall": true,
+      "perMachine": true
     },
     "win": {
       "icon": "assets/STTM.ico",
@@ -228,13 +226,19 @@
       "target": "deb",
       "icon": "assets"
     },
-    "productName": "Voice-Sikhi-To-The-Max",
     "extraResources": [
+      "data.db",
       {
         "from": "build-resources/voice-follow/model.int8.onnx",
         "to": "voice-follow/model.int8.onnx"
       }
-    ]
+    ],
+    "publish": {
+      "provider": "s3",
+      "bucket": "sttm-releases",
+      "path": "${os}-${arch}",
+      "region": "us-west-2"
+    }
   },
   "husky": {
     "hooks": {

@@ -20,3 +20,10 @@ mac:
   notarize:
     teamId:
 afterSign: "./notarize.js"
+# Voice-Follow: the speech model ships beside the app (fetched into build-resources before packaging)
+extraResources:
+  - from: "build-resources/voice-follow/model.int8.onnx"
+    to: "voice-follow/model.int8.onnx"
+files:
+  - "!research${/*}"
+  - "!build-resources${/*}"
