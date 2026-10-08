@@ -3321,7 +3321,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
     )
     .slice(0, 3)
-    .map((b) => ({ ...b, line: b.line || (b.verse ? anvaad.unicode(b.verse) : '') }));
+    .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }));
 
   return (
     <>
@@ -3335,9 +3335,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               <span className="vf-grip">⠿</span>
               <span className="vf-heading-copy">
                 <span>Voice Follow</span>
-                <span className="vf-listening-label">
-                  {active && currentView ? judgeWord : microphoneLabel}
-                </span>
+                {!(active && currentView && judgeWord === 'Following') && (
+                  <span className="vf-listening-label">
+                    {active && currentView ? judgeWord : microphoneLabel}
+                  </span>
+                )}
               </span>
               {active && (
                 <span
@@ -3441,8 +3443,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           {active && (
             <div className="vf2-body">
               {showHeard && (
-                <div className="vf2-heard" lang="pa" title="What Voice-Follow is hearing">
-                  <span>{heard || '…'}</span>
+                <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
+                  <span className="vf2-heard-label">Hearing</span>
+                  <span className="vf2-heard-text" lang="pa">
+                    {heard || '…'}
+                  </span>
                 </div>
               )}
               <section
@@ -3459,9 +3464,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
                   <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
                   {currentView && lineNo != null && (
-                    <span className="vf2-lineno" title={`Line ${lineNo}`}>
-                      L{lineNo}
-                    </span>
+                    <span className="vf2-lineno">Line {lineNo}</span>
                   )}
                   {boardCur && <LivePct value={boardCur.pct} />}
                   {currentView && (

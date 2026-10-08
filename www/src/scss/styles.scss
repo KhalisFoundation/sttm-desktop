@@ -2288,20 +2288,33 @@ $vf2-yellow-bar: #f2c200;
 }
 
 .vf2-heard {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   margin: -4px 2px -2px;
   font-size: 12px;
   line-height: 1.4;
   color: $vf2-faint;
+  min-width: 0;
+}
+.vf2-heard-label {
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $vf2-faint;
+}
+.vf2-heard-text {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   direction: rtl;
   text-align: left;
+  unicode-bidi: plaintext;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22%);
   mask-image: linear-gradient(to right, transparent 0, #000 22%);
-  > span {
-    direction: ltr;
-    unicode-bidi: plaintext;
-  }
 }
 .vf-heard-toggle {
   opacity: 0.55;
