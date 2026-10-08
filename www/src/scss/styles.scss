@@ -2295,7 +2295,7 @@ $vf2-yellow-bar: #f2c200;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin: -4px 0 -2px 1px; // flush with the card edge below
+  margin: -4px 0 -2px 4px; // flush with the card edge below (border + radius)
   font-size: 12px;
   line-height: 1.4;
   color: $vf2-faint;
