@@ -1,8 +1,5 @@
 import { getFilterOption } from '../../../banidb/realm-search';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 export const retrieveFilterOption = async (optionsObj, type) => {
   const idArray = Object.keys(optionsObj).filter(

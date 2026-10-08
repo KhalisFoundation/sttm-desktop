@@ -17,7 +17,8 @@ import {
   copyToClipboard,
   intelligentNextVerse,
   sendToBaniController,
-  FLOWER_VERSE_ID,
+  ASA_DI_VAAR_BANI_ID,
+  isFlowerVerse,
 } from './utils';
 
 const baniLengthCols = {
@@ -89,12 +90,14 @@ export const ShabadText = ({
     setIsSundarGutkaBani,
   } = useStoreActions((actions) => actions.navigator);
 
+  const isAsaDiVaar = baniType === 'bani' && Number(shabadId) === ASA_DI_VAAR_BANI_ID;
+
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
     // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-    if (newTraversedVerse === FLOWER_VERSE_ID) {
+    if (isFlowerVerse(newTraversedVerse, isAsaDiVaar)) {
       return;
     }
     // activePaneId is null until first focus — treat null as "this pane is live"
@@ -186,7 +189,7 @@ export const ShabadText = ({
       filteredItems.length
     ) {
       updateTraversedVerse(filteredItems[0].verseId, 0);
-      scrollToVerse(filteredItems[0].verseId, filteredItems, virtuosoRef);
+      scrollToVerse(filteredItems[0].verseId, filteredItems, virtuosoRef, isAsaDiVaar);
     }
   }, [paneAttributes.baniOpenedAt]);
 
@@ -203,7 +206,7 @@ export const ShabadText = ({
         return;
       }
       setTimeout(() => {
-        scrollToVerse(initialVerseId, filteredItems, virtuosoRef);
+        scrollToVerse(initialVerseId, filteredItems, virtuosoRef, isAsaDiVaar);
       }, 100);
       const initialVerseIndex = filteredItems.findIndex(
         (verse) => verse.verseId === initialVerseId,
@@ -273,7 +276,7 @@ export const ShabadText = ({
       updateTraversedVerse(matched.verseId, baniVerseIndex);
       // Highlighting alone doesn't move the virtualized list — scroll the
       // presenter view to the matched verse so the display actually changes.
-      scrollToVerse(matched.verseId, filteredItems, virtuosoRef);
+      scrollToVerse(matched.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
     }
     // `filteredItems` is a dep so a verse that arrives after the bani finishes
     // loading (the transient `matchIdx = -1` case) is picked up on the next
@@ -315,7 +318,7 @@ export const ShabadText = ({
     ) {
       if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
         setActiveVerse({ [lineNumber - 1]: activeVerseId });
-        scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+        scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar);
       }
     }
   }, [
@@ -383,7 +386,7 @@ export const ShabadText = ({
     if (verseIndex >= 0) {
       // Jump straight there: a smooth scroll to a far-off verse left the list on
       // the old verse for a moment after the display had already changed.
-      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, 'auto');
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar, 'auto');
       updateTraversedVerse(activeVerseId, verseIndex);
     }
   }, [activeVerseId]);
@@ -409,7 +412,7 @@ export const ShabadText = ({
         if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
           let nextVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[nextVerseIndex]?.verseId === FLOWER_VERSE_ID) {
+          if (isFlowerVerse(filteredItems[nextVerseIndex]?.verseId, isAsaDiVaar)) {
             nextVerseIndex++;
           }
           if (nextVerseIndex < filteredItems.length) {
@@ -422,7 +425,7 @@ export const ShabadText = ({
         if (parseInt(activeVerseIndex, 10) > 0) {
           let prevVerseIndex = parseInt(activeVerseIndex, 10) - 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[prevVerseIndex]?.verseId === FLOWER_VERSE_ID) {
+          if (isFlowerVerse(filteredItems[prevVerseIndex]?.verseId, isAsaDiVaar)) {
             prevVerseIndex--;
           }
           if (prevVerseIndex >= 0) {
@@ -446,7 +449,7 @@ export const ShabadText = ({
         const nextVerse = getVerse('next');
         if (nextVerse) {
           updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
-          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         } else if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani) {
           setShortcuts({
             ...shortcuts,
@@ -463,7 +466,7 @@ export const ShabadText = ({
         const prevVerse = getVerse('prev');
         if (prevVerse) {
           updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
-          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
         setShortcuts({
           ...shortcuts,
@@ -482,7 +485,7 @@ export const ShabadText = ({
         });
         if (verse) {
           updateTraversedVerse(verse.verseId, verse.verseIndex);
-          scrollToVerse(verse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(verse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
         setShortcuts({
           ...shortcuts,
@@ -533,6 +536,7 @@ export const ShabadText = ({
         verse={verse}
         englishVerse={english}
         verseId={verseId}
+        isFlowerVerse={isFlowerVerse(verseId, isAsaDiVaar)}
         changeHomeVerse={updateHomeVerse}
         updateTraversedVerse={updateTraversedVerse}
       />

@@ -5,10 +5,10 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { classNames } from '../../../common/utils';
 import { IconButton } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from '../../../navigator/search/components/GurmukhiKeyboard';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Announcement = ({ isGurmukhi }) => {

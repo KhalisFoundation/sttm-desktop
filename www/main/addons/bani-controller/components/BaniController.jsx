@@ -23,13 +23,12 @@ import ConnectionSwitch from './ConnectionSwitch';
 import ZoomController from './ZoomController';
 import useSocketListeners from '../hooks/use-socket-listeners';
 import updateMultipane from '../../../navigator/search/utils/update-multipane';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
 const analytics = remote.getGlobal('analytics');
 const { tryConnection, onEnd } = shareSync;
-
-const { i18n } = remote.require('./app');
 
 const BaniController = ({ onScreenClose, className }) => {
   const title = 'Mobile device sync';

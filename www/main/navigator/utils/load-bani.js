@@ -1,9 +1,7 @@
 import Noty from 'noty';
 import banidb from '../../banidb';
+import { i18n } from '../../common/i18n';
 
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 export const loadBani = (baniId, baniLength) =>
   // mangalPosition was removed from arguments and filter
   // .filter(result => result.MangalPosition !== mangalPosition)

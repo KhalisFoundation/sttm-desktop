@@ -18,10 +18,10 @@ import {
 import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
+import { i18n } from '../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const main = remote.require('./app');
 
 const serializeState = (state) => {
