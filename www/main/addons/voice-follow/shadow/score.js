@@ -162,6 +162,7 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   // paused: busy computer (paused..resumed), mic down (mic_error..mic_restarted), asleep (gap).
   const paused = new Array(length).fill(false);
   const vfDown = new Array(length).fill(false); // hidden Voice-Follow could not run
+  const visible = new Array(length).fill(false); // the sevadaar was driving Voice-Follow
   const mark = (from, to, arr = paused) => {
     const a = arr;
     for (let k = Math.max(0, Math.floor(from)); k < Math.min(length, Math.ceil(to)); k += 1)
@@ -170,6 +171,7 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   let busyFrom = null;
   let micFrom = null;
   let downFrom = null;
+  let visFrom = null;
   [...events]
     .sort((a, b) => (a.t || 0) - (b.t || 0))
     .forEach((e) => {
@@ -189,11 +191,17 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
         mark(downFrom, e.t, vfDown);
         downFrom = null;
       }
+      if (e.type === 'vf_visible' && visFrom == null) visFrom = e.t;
+      if (e.type === 'vf_hidden' && visFrom != null) {
+        mark(visFrom, e.t, visible);
+        visFrom = null;
+      }
     });
+  if (visFrom != null) mark(visFrom, length, visible);
   if (busyFrom != null) mark(busyFrom, length);
   if (micFrom != null) mark(micFrom, length);
   if (downFrom != null) mark(downFrom, length, vfDown);
-  for (let k = 0; k < length; k += 1) if (vfDown[k]) paused[k] = true;
+  for (let k = 0; k < length; k += 1) if (vfDown[k] || visible[k]) paused[k] = true;
 
   const heard = (i) => {
     if (!haveActivity) return true;
@@ -239,6 +247,8 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   const sc = {
     seconds: length,
     vfDown: vfDown.filter(Boolean).length, // part of paused: Voice-Follow not running
+    visible: visible.filter(Boolean).length, // part of paused: the sevadaar drove Voice-Follow
+    overrides: humanEv.filter((h) => h.override).length, // sevadaar corrections in visible mode
     kirtan: 0,
     held: 0,
     idle: 0,

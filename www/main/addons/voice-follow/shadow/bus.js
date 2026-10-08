@@ -95,6 +95,15 @@ function end() {
 function human(label) {
   if (!S) return;
   S.human = { ...label, key: contentKey(label) };
+  // While the sevadaar drives Voice-Follow (visible mode) the screen changes are mostly
+  // Voice-Follow's own; one that differs from what it last showed is a sevadaar override.
+  if (S.visible) {
+    const sys = S.system || {};
+    const same =
+      contentKey(label) === contentKey(sys) && (label.verseId ?? null) === (sys.verseId ?? null);
+    writeLine('human.jsonl', { t: now(), ...label, override: !same });
+    return;
+  }
   writeLine('human.jsonl', { t: now(), ...label });
 }
 
@@ -143,6 +152,13 @@ function note(obj) {
   writeLine('events.jsonl', { t: now(), ...obj });
 }
 
+// The sevadaar started (true) or stopped (false) Voice-Follow from the panel.
+function setVisible(on) {
+  if (!S || !!S.visible === !!on) return;
+  S.visible = !!on;
+  writeLine('events.jsonl', { t: now(), type: on ? 'vf_visible' : 'vf_hidden' });
+}
+
 function setPaused(paused) {
   if (!S || S.paused === paused) return;
   S.paused = paused;
@@ -162,6 +178,7 @@ module.exports = {
   level,
   heard,
   setPaused,
+  setVisible,
   note,
   active,
   lastHeardAt,

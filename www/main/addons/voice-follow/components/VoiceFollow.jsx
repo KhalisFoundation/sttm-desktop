@@ -599,26 +599,42 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const sundarGutkaBaniId = useStoreState((state) => state.navigator.sundarGutkaBaniId);
   const baniLength = useStoreState((state) => state.userSettings.baniLength);
   const navActions = useStoreActions((actions) => actions.navigator);
-  const setActiveVerseId = SHADOW_BUILD ? shadowSetVerse : navActions.setActiveVerseId;
-  const setLineNumber = SHADOW_BUILD ? shadowNoop : navActions.setLineNumber;
-  const setMiscSlideText = SHADOW_BUILD ? shadowNoop : navActions.setMiscSlideText;
+  // Visible mode: the sevadaar pressed Start in the panel, so Voice-Follow drives the real
+  // screen. Until then a tester build follows in the shadow (nothing on screen). In visible
+  // mode each screen change is also sent to the shadow bus, so the session's system
+  // timeline continues and the sevadaar's own changes can be told apart as overrides.
+  const visibleRef = useRef(false);
+  const shadowing = () => SHADOW_BUILD && !visibleRef.current;
+  const mirror = (update) => {
+    if (SHADOW_BUILD) shadowBus.system(update);
+  };
+  const setActiveVerseId = (verseId) => {
+    if (shadowing()) return shadowSetVerse(verseId);
+    mirror({ verseId });
+    return navActions.setActiveVerseId(verseId);
+  };
+  const setLineNumber = (...a) => (shadowing() ? shadowNoop() : navActions.setLineNumber(...a));
+  const setMiscSlideText = (...a) =>
+    shadowing() ? shadowNoop() : navActions.setMiscSlideText(...a);
   // Rehras is followed at the long length: the user's Sundar Gutka length is raised while
   // Voice-Follow shows it and restored after. In shadow mode the real setting is never
   // touched (the Bani column hidden Voice-Follow loads comes from baniLengthFor(userLength())
   // and so still raises for Rehras on its own).
   const setBaniLength = useStoreActions((actions) => actions.userSettings.setBaniLength);
   const setBaniLengthRef = useRef(null);
-  setBaniLengthRef.current = SHADOW_BUILD ? shadowNoop : setBaniLength;
+  setBaniLengthRef.current = (...a) => (shadowing() ? shadowNoop() : setBaniLength(...a));
   // { prev }: the user's own Bani length while Voice-Follow has raised it for Rehras.
   const lengthOverrideRef = useRef(null);
   // Opening a Bani is the same four navigator actions the Sundar Gutka screen uses; in
   // shadow mode they become one system update ("bani:<id>" at a line), nothing on screen.
-  const setIsSundarGutkaBani = SHADOW_BUILD ? shadowNoop : navActions.setIsSundarGutkaBani;
-  const setSundarGutkaBaniId = SHADOW_BUILD ? shadowNoop : navActions.setSundarGutkaBaniId;
-  const setIsCeremonyBani = SHADOW_BUILD ? shadowNoop : navActions.setIsCeremonyBani;
-  const setSingleDisplayActiveTab = SHADOW_BUILD
-    ? shadowNoop
-    : navActions.setSingleDisplayActiveTab;
+  const setIsSundarGutkaBani = (...a) =>
+    shadowing() ? shadowNoop() : navActions.setIsSundarGutkaBani(...a);
+  const setSundarGutkaBaniId = (...a) =>
+    shadowing() ? shadowNoop() : navActions.setSundarGutkaBaniId(...a);
+  const setIsCeremonyBani = (...a) =>
+    shadowing() ? shadowNoop() : navActions.setIsCeremonyBani(...a);
+  const setSingleDisplayActiveTab = (...a) =>
+    shadowing() ? shadowNoop() : navActions.setSingleDisplayActiveTab(...a);
   // In shadow mode the slide Voice-Follow would put up is its own, never the sevadaar's.
   const shadowSlideRef = useRef(null);
   if (!shadowSlideRef.current) {
@@ -628,21 +644,33 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       shadowBus.system({ slide: visible ? true : null });
     };
   }
-  const setIsMiscSlide = SHADOW_BUILD ? shadowSlideRef.current : navActions.setIsMiscSlide;
+  const setIsMiscSlide = (visible) => {
+    if (shadowing()) return shadowSlideRef.current(visible);
+    mirror({ slide: visible ? true : null });
+    return navActions.setIsMiscSlide(visible);
+  };
   const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
   const setOverlayScreen = useStoreActions((actions) => actions.app.setOverlayScreen);
   // Proper "open this shabad" action (drives viewer/projector/history/socket).
   // Kept in a ref so the async detect->lock path always calls the latest one.
   const changeActiveShabad = useNewShabad();
   const openShabadRef = useRef(changeActiveShabad);
-  openShabadRef.current = SHADOW_BUILD ? shadowOpen : changeActiveShabad;
+  openShabadRef.current = (...a) => {
+    if (shadowing()) return shadowOpen(a[0], a[1]);
+    mirror({ shabadId: a[0], verseId: a[1] });
+    return changeActiveShabad(...a);
+  };
   // The navigator pane (bottom-left in Presentation) shows whatever its pane
   // attributes name; opening a Bani must update them too, exactly as the Sundar
   // Gutka screen does, or the pane keeps the old content and never highlights.
   // In shadow mode the pane is the sevadaar's: the Bani goes to the shadow bus instead.
   const updatePane = updateMultipane();
   const updatePaneRef = useRef(null);
-  updatePaneRef.current = SHADOW_BUILD ? shadowOpenBani : updatePane;
+  updatePaneRef.current = (...a) => {
+    if (shadowing()) return shadowOpenBani(...a);
+    mirror({ bani: a[1], shabadId: null, verseId: a[2] ?? null, slide: null });
+    return updatePane(...a);
+  };
 
   const [status, setStatus] = useState('idle'); // idle|connecting|listening|detecting|error|stopped
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
@@ -836,7 +864,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // never clear a misc slide the user opened themselves.
   const seekingRef = useRef(false);
   const isMiscSlideRef = useRef(false);
-  if (!SHADOW_BUILD) isMiscSlideRef.current = isMiscSlide;
+  if (!shadowing()) isMiscSlideRef.current = isMiscSlide;
   const ctxRef = useRef(null);
   const streamRef = useRef(null);
   const nodeRef = useRef(null);
@@ -3250,6 +3278,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     const check = () => {
       const st = shadowStateRef.current;
       const nowMs = Date.now();
+      // The sevadaar is driving Voice-Follow from the panel: no hidden run until they stop.
+      if (visibleRef.current) {
+        st.running = false;
+        return;
+      }
       // CPU load over the last 30 s (the check itself runs every 5 s so a session that
       // just started is followed quickly).
       let busy = null;
@@ -3312,7 +3345,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
   const listening = status === 'listening' || status === 'connecting';
   const detecting = status === 'detecting';
-  const active = listening || detecting; // a session (follow or detect) is running
+  const running = listening || detecting; // a session (follow or detect) is running
+  // In a tester build a run that the sevadaar did not start is the hidden shadow run: the
+  // panel shows it as idle, and Start hands the screen to Voice-Follow.
+  const hiddenRun = SHADOW_BUILD && running && !visibleRef.current;
+  const active = running && !hiddenRun;
   // The floating widget is present whenever the tool is opened OR a session is
   // running (like Zoom's share bar, which persists independently of any menu).
   const present = isOpen || active;
@@ -3406,10 +3443,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   );
 
   // Human-readable status line (avoids surfacing internal states like "idle").
-  const statusText =
+  let statusText =
     status === 'idle'
       ? 'Press Start for Gurbani Voice Follow'
       : `${STATUS_LABEL[status] || status}${detail ? ` · ${detail}` : ''}`;
+  if (hiddenRun || (SHADOW_BUILD && !active)) statusText = 'Press Start for Gurbani Voice Follow';
   // Short label for the collapsed pill.
   let pillText = STATUS_LABEL[status] || 'Voice-Follow';
   if (status === 'listening') pillText = `Line ${posLine == null ? '—' : posLine}`;
@@ -3419,8 +3457,23 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
   // Main button: Stop while a session runs, else Start. Autopilot is the default
   // hands-free experience; manual follow / one-shot detect are the fallbacks.
+  // Visible mode in a tester build: stop the hidden run, mark the session, and start for
+  // real; Stop hands the shadow back (the shadow state machine restarts the hidden run).
+  const takeOver = async () => {
+    shadowStateRef.current.running = false;
+    if (running) stop();
+    visibleRef.current = true;
+    shadowBus.setVisible(true);
+    await startAutopilot();
+  };
+  const release = () => {
+    stop();
+    visibleRef.current = false;
+    shadowBus.setVisible(false);
+  };
   let onMainClick = start;
-  if (active) onMainClick = stop;
+  if (SHADOW_BUILD) onMainClick = active ? release : takeOver;
+  else if (active) onMainClick = stop;
   else if (autopilot) onMainClick = startAutopilot;
   else if (autoDetect) onMainClick = startDetect;
   let mainLabel = 'Start';
@@ -3477,9 +3530,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     )
     .slice(0, 3)
     .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }));
-
-  // Tester builds: no panel, no pill. Voice-Follow only runs in the shadow.
-  if (SHADOW_BUILD) return null;
 
   return (
     <>
@@ -3779,7 +3829,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               {mainLabel}
             </button>
           </div>
-          {status !== 'listening' && !detecting && <div className="vf-status">{statusText}</div>}
+          {(hiddenRun || (status !== 'listening' && !detecting)) && (
+            <div className="vf-status">{statusText}</div>
+          )}
+          {SHADOW_BUILD && !active && (
+            <div className="vf-status vf-experimental-note">
+              Experimental: it can make mistakes, and you can stop it at any time.
+            </div>
+          )}
         </div>
       )}
 

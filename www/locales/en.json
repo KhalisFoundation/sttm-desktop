@@ -366,6 +366,8 @@
     "LIVE_FEED": "Live Feed Text Files",
     "OTHER_OPTIONS": "Other Options",
     "COLLECT_STATISTICS": "Collect Statistics",
+    "VOICE_FOLLOW_ENABLED": "Voice-Follow (experimental)",
+    "VOICE_FOLLOW_ENABLED_MSG": "Shows the Voice-Follow button. It listens to the kirtan and follows along on screen; it is experimental and can make mistakes",
     "SHADOW_RECORDING": "Voice-Follow Test Recording",
     "SHADOW_RECORDING_MSG": "Records the Gurdwara audio and what you show, and uploads it to help test Voice-Follow",
     "SHADOW_TESTER": "Voice-Follow Tester",
