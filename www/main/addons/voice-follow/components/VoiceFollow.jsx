@@ -17,6 +17,10 @@ const { Follower: AcousticFollower } = require('../engine/follower');
 const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
 const sessionLog = require('../engine/session-log');
+const { createBoard, mergeTranscript } = require('./liveBoard');
+const { installDemoAudio } = require('./devAudio');
+
+installDemoAudio(); // developer demos only (VF_DEMO_WAV); a no-op otherwise
 const shadowBus = require('../shadow/bus');
 const { diag } = require('../shadow/diag');
 const { SHADOW_BUILD, SHADOW_CPU_PAUSE, SHADOW_CPU_RESUME } = require('../shadow/config');
@@ -258,13 +262,17 @@ const PAATH_READ_BANIS = [21, 23, 2, 22]; // + Aarti: a shabad in both Sohila an
 // never locks. Pool the votes of a paath Bani's shabads (split over at least two)
 // into one candidate; a steady clear pooled lead locks its best shabad, and the
 // one-line paath rule then opens the Bani.
-const PAATH_POOL_BANIS = [4]; // Jaap Sahib
+const PAATH_POOL_BANIS = [4, AARTI_BANI]; // Jaap Sahib; Aarti (a medley of pieces)
 const PAATH_POOL_STABLE = 3; // decodes the pooled lead must hold
 // The same pooling on the full-text search (the first letters of Jaap's short words
 // are often misheard, so the vote above can stay empty): this many of the last
 // PAATH_POOL_WINDOW searches whose top line is a shabad of that Bani lock it.
 const PAATH_POOL_WINDOW = 8;
 const PAATH_POOL_HITS = 5;
+// Aarti needs fewer: its pieces are long Savaiye whose words score low when a whole hall
+// sings them, so the top line lands on an Aarti piece persistently but weakly. 4 of 8 at
+// the same score floor fires on no kirtan cold start (41 Level 2 clips) that 5 of 8 did not.
+const PAATH_POOL_HITS_BY_BANI = { [AARTI_BANI]: 4 };
 const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 // Rehras is followed at the long length by default: the long Rehras contains the short
 // one plus long readers' opening ("Har jug jug bhagat upaya" and its salok) and the extra
@@ -273,10 +281,15 @@ const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 const REHRAS_BANI = 21;
 const REHRAS_LENGTH = 'long';
 const LENGTH_ORDER = ['short', 'medium', 'long', 'extralong'];
-const baniLengthFor = (baniId, userLength) =>
-  baniId === REHRAS_BANI && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(REHRAS_LENGTH)
-    ? REHRAS_LENGTH
-    : userLength;
+// Aarti likewise is followed at the extra-long length: a sung Aarti (Renton) runs through
+// pieces the short list lacks (Kabir's Sorath "Bhookhe bhagat na keejai", the opening
+// Savaiya), and a Bani profile without those lines has nothing to show while they are sung.
+const AARTI_LENGTH = 'extralong';
+const BANI_MIN_LENGTH = { [REHRAS_BANI]: REHRAS_LENGTH, [AARTI_BANI]: AARTI_LENGTH };
+const baniLengthFor = (baniId, userLength) => {
+  const min = BANI_MIN_LENGTH[baniId];
+  return min && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(min) ? min : userLength;
+};
 // Of the long Rehras's extra shabads, only its opening (Har jug jug bhagat upaya and the
 // salok after it) may open Rehras by the reading rule: its closing saloks and pauris
 // (e.g. 1944) are sung as kirtan in their own right (Level 2 clip04).
@@ -309,21 +322,41 @@ function poolPaathVotes(ranked, index) {
   return { bani, sid: bestSid };
 }
 // The Bani in which `nextId` follows `prevId` most closely, in order; else null.
-function findBaniSequence(index, prevId, nextId) {
+// Two Banis can hold the same pair in order (the Savaiya and Dohra close both the long
+// Rehras and the Aarti): then the Bani that also holds the shabads shown just before
+// wins (`prefer`: bani -> how many recent shabads it contains), and failing that Aarti,
+// whose pieces are sung straight through, over Rehras, which the reading rule catches.
+function findBaniSequence(index, prevId, nextId, prefer = null) {
   const a = index.byShabad.get(prevId) || [];
   const b = index.byShabad.get(nextId) || [];
   let best = null;
   let bestGap = Infinity;
+  let bestPref = -1;
+  const rank = (bani) => ((prefer && prefer.get(bani)) || 0) + (bani === AARTI_BANI ? 0.5 : 0);
   a.forEach((x) =>
     b.forEach((y) => {
       const gap = y.pos - x.pos;
-      if (x.bani === y.bani && gap >= 1 && gap <= BANI_NEXT_MAX && gap < bestGap) {
+      if (x.bani !== y.bani || gap < 1 || gap > BANI_NEXT_MAX) return;
+      const pref = rank(x.bani);
+      if (gap < bestGap || (gap === bestGap && pref > bestPref)) {
         best = x.bani;
         bestGap = gap;
+        bestPref = pref;
       }
     }),
   );
   return best;
+}
+// Recently shown shabads (newest last), for the Bani preference above.
+const RECENT_SHABADS = 4;
+function baniPreference(index, recent) {
+  const prefer = new Map();
+  recent.forEach((sid) =>
+    (index.byShabad.get(sid) || []).forEach((x) =>
+      prefer.set(x.bani, (prefer.get(x.bani) || 0) + 1),
+    ),
+  );
+  return prefer;
 }
 const CORRECTION_SECONDS = 45; // audio kept before a sevadaar correction
 const RETURN_WINDOW_DECODES = 240; // ~2 min at the 0.5 s following hop
@@ -369,7 +402,12 @@ const BANI_CUR_SPAN = 8;
 // OLD shabad. Freeze entirely while a switch is being evaluated; otherwise move on
 // any reasonably confident frame. (Kept modest so a freshly-switched follower, which
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
-const UI_MOVE_CONF = 0.4; // follower confidence required to move the on-screen line
+const UI_MOVE_CONF = 0.4;
+const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
+const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
+const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
+const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
+const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
 
 // Two modes carried over from the web lab: Path (spoken paatth) and Kirtan
 // (sung). Both map to the karansea CTC + line decoder with the same tuned
@@ -465,6 +503,90 @@ const STATUS_LABEL = {
   stopped: 'Stopped',
 };
 
+// A live percentage: eases to each new calibrated value in ~0.2 s (the value itself updates
+// every decode, so the motion tracks real evidence), coloured by level.
+const pctLevel = (v) => {
+  if (v >= 0.8) return 'is-high';
+  if (v >= 0.4) return 'is-mid';
+  return 'is-low';
+};
+const fmtPct = (v) => `${Math.min(99.9, Math.max(0, v * 100)).toFixed(1)}%`;
+// Continuous colour for a percentage: red (0) through yellow (0.5) to green (1), so the
+// tint moves with the number instead of snapping between three fixed colours.
+const pctHue = (v) => {
+  const x = Math.min(1, Math.max(0, v));
+  return x <= 0.5 ? 4 + (48 - 4) * (x / 0.5) : 48 + (135 - 48) * ((x - 0.5) / 0.5);
+};
+const pctColor = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 42%)`;
+// Each card carries its percentage as CSS variables; the card style (wash / rail / clean,
+// chosen by the sevadar) decides how that shows. Colour lives in what moves, not in a box.
+const pctVars = (v) => ({ '--pc': pctColor(v), '--pct': `${Math.round(v * 1000) / 10}%` });
+// True while a value is still moving: drives the sheen that shows the bar is alive.
+const useMoving = (value) => {
+  const [moving, setMoving] = useState(false);
+  const prev = useRef(value);
+  useEffect(() => {
+    if (Math.abs(value - prev.current) >= 0.004) {
+      prev.current = value;
+      setMoving(true);
+      const t = setTimeout(() => setMoving(false), 1400);
+      return () => clearTimeout(t);
+    }
+    prev.current = value;
+    return undefined;
+  }, [value]);
+  return moving;
+};
+// A change rolls through the numbers in between (odometer style) rather than jumping:
+// the bigger the move, the longer the roll, so 33% -> 67% is seen counting up.
+const rollMs = (from, to) => 350 + 1800 * Math.min(1, Math.abs(to - from));
+const LivePct = ({ value }) => {
+  const [shown, setShown] = useState(value);
+  const shownRef = useRef(value);
+  useEffect(() => {
+    const from = shownRef.current;
+    const t0 = performance.now();
+    const dur = rollMs(from, value);
+    let raf = 0;
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      const v = from + (value - from) * (1 - (1 - k) ** 2);
+      shownRef.current = v;
+      setShown(v);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return (
+    <span className={`vf2-live-pct ${pctLevel(value)}`} style={{ color: pctColor(shown) }}>
+      {fmtPct(shown)}
+    </span>
+  );
+};
+LivePct.propTypes = { value: PropTypes.number.isRequired };
+const LiveBar = ({ value }) => {
+  const moving = useMoving(value);
+  const prev = useRef(value);
+  const dur = rollMs(prev.current, value);
+  useEffect(() => {
+    prev.current = value;
+  }, [value]);
+  return (
+    <div className="vf2-cand-track">
+      <span
+        className={`vf2-live-fill ${pctLevel(value)}${moving ? ' is-moving' : ''}`}
+        style={{
+          width: `${Math.round(value * 1000) / 10}%`,
+          background: pctColor(value),
+          transitionDuration: `${dur}ms, ${dur}ms`,
+        }}
+      />
+    </div>
+  );
+};
+LiveBar.propTypes = { value: PropTypes.number.isRequired };
+
 const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // Select the primitive directly rather than holding the whole navigator slice
   // object across renders — a slice reference can be an immer proxy that gets
@@ -543,6 +665,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const baniIndexRef = useRef(null); // { col, promise } shabad<->Bani index, built once per length
   const curBaniShabadsRef = useRef(null); // Set of shabads inside the Bani being followed
   const seqReadRef = useRef({ id: null, last: -1, lines: new Set(), fired: false }); // PAATH_READ_LINES
+  const recentShabadsRef = useRef([]); // last RECENT_SHABADS plain shabads shown (see baniPreference)
   const autopilotLockRef = useRef(null);
   // Settings > Other Options > "Help Improve Voice-Follow" (on by default): keep the
   // audio before a sevadaar correction, on this computer only.
@@ -607,6 +730,76 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // judge actually compares), wins = confirmation progress. Honest by design:
   // what the sevadar sees is exactly what decides a switch.
   const [liveCands, setLiveCands] = useState({ sCur: 0, items: [] });
+  // Live board: calibrated % for the current Shabad and every Shabad in contention, updated
+  // every decode (see liveBoard.js); and a rolling transcript of what the model hears.
+  const boardRef = useRef(null);
+  if (!boardRef.current) boardRef.current = createBoard();
+  const [board, setBoard] = useState([]);
+  const boardAtRef = useRef(0);
+  const publishBoard = useCallback((force = false) => {
+    const now = Date.now();
+    if (!force && now - boardAtRef.current < 180) return;
+    boardAtRef.current = now;
+    setBoard(boardRef.current.snapshot());
+  }, []);
+  const heardRef = useRef('');
+  const [heard, setHeard] = useState('');
+  const heardAtRef = useRef(0);
+  const [showHeard, setShowHeard] = useState(() => {
+    try {
+      return window.localStorage.getItem('vf-show-heard') !== '0';
+    } catch (_) {
+      return true;
+    }
+  });
+  const toggleHeard = useCallback(() => {
+    setShowHeard((v) => {
+      try {
+        window.localStorage.setItem('vf-show-heard', v ? '0' : '1');
+      } catch (_) {
+        /* preference only */
+      }
+      return !v;
+    });
+  }, []);
+  // The strip shows words, not noise: between lines the recognizer still emits lone letters
+  // from tabla, harmonium and room sound at low confidence (sung lines score ~0.93-0.99),
+  // so a hypothesis has to be confident and contain at least one real word to be shown,
+  // and the strip clears after a few seconds without one.
+  const heardClearRef = useRef(0);
+  // Heartbeat: the current card breathes once, slowly, on a decode that matched it well,
+  // at most every HEARTBEAT_MIN_MS so it reads as a pulse rather than a flicker.
+  const [beat, setBeat] = useState(0);
+  const beatAtRef = useRef(0);
+  const noteBeat = useCallback((score) => {
+    const now = Date.now();
+    if (score < HEARTBEAT_MIN_SCORE || now - beatAtRef.current < HEARTBEAT_MIN_MS) return;
+    beatAtRef.current = now;
+    setBeat(now);
+  }, []);
+  // Each decode covers the last few seconds of audio, so its final word or two is usually
+  // cut mid-word and gets re-spelt on the next decode. Those are shown lighter as "still
+  // hearing"; only words that were fully sung join the settled text.
+  const tentativeRef = useRef('');
+  const noteHeard = useCallback((text, confidence = 1) => {
+    const all = (text || '').split(/\s+/).filter(Boolean);
+    const words = all.filter((w) => w.length >= 3);
+    if (confidence < HEARD_MIN_CONF || !words.length) return;
+    const settled = all.slice(0, -HEARD_TENTATIVE_WORDS).join(' ');
+    tentativeRef.current = all.slice(-HEARD_TENTATIVE_WORDS).join(' ');
+    if (settled) heardRef.current = mergeTranscript(heardRef.current, settled);
+    const now = Date.now();
+    if (now - heardAtRef.current >= 200) {
+      heardAtRef.current = now;
+      setHeard(`${heardRef.current}\u0001${tentativeRef.current}`);
+    }
+    clearTimeout(heardClearRef.current);
+    heardClearRef.current = setTimeout(() => {
+      heardRef.current = '';
+      tentativeRef.current = '';
+      setHeard('');
+    }, HEARD_CLEAR_MS);
+  }, []);
   const [lineExpanded, setLineExpanded] = useState(true); // full pangti (wrapped) vs one line
   const liveSigRef = useRef('');
   const liveAtRef = useRef(0);
@@ -803,6 +996,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -995,6 +1190,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -1031,15 +1228,24 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const getBaniIndex = useCallback(() => {
     const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
     if (!baniIndexRef.current || baniIndexRef.current.col !== col) {
-      const rehrasCol = BANI_LENGTH_COLS[baniLengthFor(REHRAS_BANI, userLength())];
+      // Banis followed at a longer length than the user's (Rehras, Aarti) take their shabad
+      // list from that length, so sequence and copy rules see every piece they can follow.
+      const longer = Object.keys(BANI_MIN_LENGTH)
+        .map(Number)
+        .map((b) => [b, BANI_LENGTH_COLS[baniLengthFor(b, userLength())]])
+        .filter(([, c]) => c !== col);
+      const extraCols = [...new Set(longer.map(([, c]) => c))];
       const promise = Promise.all([
         banidb.loadBaniIndex(col),
-        rehrasCol === col ? null : banidb.loadBaniIndex(rehrasCol),
-      ]).then(([banis, rehrasBanis]) => {
+        ...extraCols.map((c) => banidb.loadBaniIndex(c)),
+      ]).then(([banis, ...extra]) => {
         // The user-length Rehras, kept for the reading rule (see REHRAS_READ_OPENING).
         const rehrasUser = new Set(banis[REHRAS_BANI] || []);
-        // eslint-disable-next-line no-param-reassign
-        if (rehrasBanis && rehrasBanis[REHRAS_BANI]) banis[REHRAS_BANI] = rehrasBanis[REHRAS_BANI];
+        longer.forEach(([b, c]) => {
+          const got = extra[extraCols.indexOf(c)];
+          // eslint-disable-next-line no-param-reassign
+          if (got && got[b]) banis[b] = got[b];
+        });
         const byShabad = new Map();
         Object.keys(banis).forEach((b) =>
           banis[b].forEach((sid, order) => {
@@ -1426,6 +1632,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         bsAdoptKeyRef.current = '';
         if (cand.shabadId !== currentShabadIdRef.current) {
           currentShabadIdRef.current = cand.shabadId;
+          if (typeof cand.shabadId === 'number') {
+            recentShabadsRef.current = [
+              ...recentShabadsRef.current.filter((x) => x !== cand.shabadId),
+              cand.shabadId,
+            ].slice(-RECENT_SHABADS);
+          }
           const wantLength = baniId != null ? baniLengthFor(baniId, userLength()) : null;
           if (wantLength && wantLength !== baniLengthRef.current) {
             if (!lengthOverrideRef.current) lengthOverrideRef.current = { prev: userLength() };
@@ -1546,7 +1758,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           currentShabadIdRef.current === cand.shabadId &&
           !lockingRef.current
         ) {
-          let bani = findBaniSequence(index, fromId, cand.shabadId);
+          const prefer = baniPreference(index, recentShabadsRef.current.slice(0, -1));
+          let bani = findBaniSequence(index, fromId, cand.shabadId, prefer);
           // The previous shabad may have been locked as the other Bani's copy of the
           // same Gurbani (Sohila's Gagan mai thaal before Aarti's next shabad).
           if (
@@ -1560,7 +1773,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               copies = null;
             }
             [...((copies && copies.values()) || [])].some((c) => {
-              bani = findBaniSequence(index, c, cand.shabadId);
+              bani = findBaniSequence(index, c, cand.shabadId, prefer);
               return bani != null;
             });
             if (
@@ -1707,7 +1920,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           memory.pool = [...(memory.pool || []), poolBani ?? null].slice(-PAATH_POOL_WINDOW);
           if (
             poolBani != null &&
-            memory.pool.filter((b) => b === poolBani).length >= PAATH_POOL_HITS
+            memory.pool.filter((b) => b === poolBani).length >=
+              (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS)
           ) {
             let poolProfile;
             try {
@@ -1846,6 +2060,51 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             );
             const rankedContext = [...tally.values()].sort((a, b) => b.score - a.score);
             const winner = rankedContext[0];
+            // Panel only: how far each lock route has got, so the box shows the Shabad
+            // that is actually being built toward, not just first-letter guesses.
+            {
+              const prog = new Map();
+              const bump = (id, verseId, p) => {
+                const cur = prog.get(id);
+                if (!cur || p > cur.p) prog.set(id, { p, verseId: verseId ?? cur?.verseId });
+              };
+              rankedContext.forEach((c) => {
+                const p =
+                  Math.min(c.count / 6, c.wins / 4) * (c.anchor || c.verses.size >= 2 ? 1 : 0.7);
+                bump(c.id, (leaders.find((l) => l.shabadId === c.id) || {}).verseId, p);
+              });
+              if (poolBani != null)
+                bump(
+                  top.shabadId,
+                  top.verseId,
+                  memory.pool.filter((b) => b === poolBani).length /
+                    (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS),
+                );
+              const agreeingNow = (memory.acousticVotes || []).filter(
+                (v) => v.id === top.shabadId,
+              ).length;
+              if (agreeingNow) bump(top.shabadId, top.verseId, agreeingNow / 3);
+              const items = [...prog.entries()]
+                .map(([id, v]) => ({ shabadId: id, verseId: v.verseId, pct: Math.min(0.95, v.p) }))
+                .sort((a, b) => b.pct - a.pct)
+                .slice(0, 3);
+              items.forEach((it) => {
+                if (boardRef.current.known(it.shabadId) || it.verseId == null) return;
+                banidb
+                  .getVerse(it.shabadId, it.verseId)
+                  .then((verse) => {
+                    if (verse)
+                      boardRef.current.remember({
+                        shabadId: it.shabadId,
+                        verseId: it.verseId,
+                        verse,
+                      });
+                  })
+                  .catch(() => {});
+              });
+              boardRef.current.progress(items, Date.now());
+              publishBoard();
+            }
             if (
               winner?.id === top.shabadId &&
               margin >= AP_LOCK_TEXT_MARGIN &&
@@ -2019,6 +2278,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         };
       });
       publishRanks(shortlist);
+      if (!(autopilotRef.current && phaseRef.current === 'following')) {
+        boardRef.current.search({ ranked, rows: rowByShabad });
+        publishBoard();
+      }
       // Don't surface the detect shortlist while following — it's background
       // switch-detection, not something the presenter should see or tap.
       if (!(autopilotRef.current && phaseRef.current === 'following')) setCands(shortlist);
@@ -2447,6 +2710,17 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             }
           }
           live.sort((a, b) => b.wins - a.wins || b.score - a.score);
+          // Board: every decode, the current Shabad's score and every challenger's score.
+          if (hypFull.length >= SWITCH_HYP_MIN) {
+            boardRef.current.follow({
+              now: Date.now(),
+              cur: currentShabadIdRef.current,
+              sCur: sCurFull,
+              cands: live,
+            });
+            noteBeat(sCurFull);
+          } else boardRef.current.hold(Date.now());
+          publishBoard();
           // Gate for the panel: only candidates that clear the judge's own
           // minimum match (the bar a win needs), and nothing at all while the
           // heard fragment is too thin to judge (silence, a breath, a pause) —
@@ -2638,7 +2912,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (!r || !recognizingRef.current) return;
         const out = await r.push(pcm);
         if (session !== sessionRef.current || recognizerRef.current !== r) return;
-        if (out && out.text) handleTranscript(out.text);
+        if (out && out.text) {
+          noteHeard(out.text, out.confidence);
+          handleTranscript(out.text);
+        }
       });
     } catch (e) {
       if (session !== sessionRef.current) return;
@@ -2682,6 +2959,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     setLiveCands({ sCur: 0, items: [] });
+    boardRef.current.reset();
+    setBoard([]);
     vetoRef.current = null;
     prevShabadRef.current = null;
     returnSlotRef.current = null;
@@ -2751,7 +3030,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         if (r) {
           const rout = await r.push(pcm);
           if (session !== sessionRef.current || recognizerRef.current !== r) return;
-          if (rout && rout.text) handleTranscript(rout.text);
+          if (rout && rout.text) {
+            noteHeard(rout.text, rout.confidence);
+            handleTranscript(rout.text);
+          }
         }
         // While following, also advance the follower for the live line/word cursor.
         if (phaseRef.current === 'following') {
@@ -2788,7 +3070,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           // Straight-through reading of a Rehras or Sohila shabad: open the Bani.
           const sid = currentShabadIdRef.current;
           if (seqReadRef.current.id !== sid) {
-            seqReadRef.current = { id: sid, last: -1, lines: new Set(), fired: false };
+            seqReadRef.current = {
+              id: sid,
+              last: -1,
+              lines: new Set(),
+              fired: false,
+              aarti: false,
+            };
           }
           const sr = seqReadRef.current;
           if (
@@ -2797,7 +3085,53 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             !sr.fired &&
             out.lineIndex !== sr.last
           ) {
-            if (out.lineIndex < sr.last) sr.lines = new Set();
+            if (out.lineIndex < sr.last) {
+              sr.lines = new Set();
+              // Sung, not read (a line came back): a shabad that is a copy of an Aarti piece
+              // (Sohila's Gagan mai thaal) is the Aarti being sung, so open the Aarti Bani at
+              // this line; from inside the Bani the next pieces follow without a new search.
+              if (!sr.aarti) {
+                sr.aarti = true;
+                const lineText = (curProfileRef.current?.rawLines || [])[out.lineIndex];
+                getBaniIndex()
+                  .then(async (index) => {
+                    const own = (index.byShabad.get(sid) || []).map((x) => x.bani);
+                    let copies = null;
+                    if (!own.includes(AARTI_BANI))
+                      copies = await paathCopies(sid, index).catch(() => null);
+                    const inAarti = own.includes(AARTI_BANI) || (copies && copies.has(AARTI_BANI));
+                    if (
+                      !inAarti ||
+                      !lineText ||
+                      session !== sessionRef.current ||
+                      !autopilotRef.current ||
+                      lockingRef.current ||
+                      currentShabadIdRef.current !== sid ||
+                      !autopilotLockRef.current
+                    ) {
+                      return;
+                    }
+                    // The Aarti row with this line's text (the copy's own verse id differs).
+                    const prof = await loadBaniProfile(AARTI_BANI);
+                    const want = vfNorm(anvaad.unicode(lineText));
+                    let at = prof.rawLines.findIndex((l) => vfNorm(anvaad.unicode(l)) === want);
+                    if (at < 0)
+                      at = prof.rawLines.findIndex(
+                        (l) => partialRatio(vfNorm(anvaad.unicode(l)), want) >= 90,
+                      );
+                    if (at < 0 || currentShabadIdRef.current !== sid || lockingRef.current) return;
+                    autopilotLockRef.current(
+                      {
+                        shabadId: `${BANI_KEY}${AARTI_BANI}`,
+                        verseId: prof.verses[at].verseId,
+                        verse: prof.rawLines[at],
+                      },
+                      { promote: true },
+                    );
+                  })
+                  .catch(() => {});
+              }
+            }
             sr.lines.add(out.lineIndex);
             sr.last = out.lineIndex;
             if (sr.lines.size >= PAATH_READ_LINES) {
@@ -3096,7 +3430,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
   let microphoneLabel = 'Ready';
   if (active) microphoneLabel = audioView.device ? 'Listening' : 'Preparing…';
-  const currentLabel = isMiscSlide ? 'Current Shabad · slide held' : 'Following this line';
+  const currentLabel = isMiscSlide ? 'Slide held' : 'Following';
   // The line the follower is on right now (the follower indexes the same line
   // list as the profile), falling back to the lock line until the first fix.
   const profLines = (curProfileRef.current && curProfileRef.current.displayLines) || null;
@@ -3107,13 +3441,16 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     (currentView && currentView.line) ||
     null;
   const lineNo = posIsCurrent ? pos.lineIndex + 1 : null;
+  // Option: preview the next lines once the app is sure of the Shabad (>= 95%).
+  let showNext = false;
+  try {
+    showNext = window.localStorage.getItem('vf-next-lines') === '1';
+  } catch (e) {
+    showNext = false;
+  }
   const liveItems = currentView ? liveCands.items : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
   const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
-  // Gated: only candidates the app is actually collecting wins for are listed.
-  const gatedItems = liveItems.filter(
-    (c) => !(liveLead && liveLead.wins >= 1 && c.shabadId === liveLead.shabadId),
-  );
   let changeLabel = 'Might be changing to';
   if (liveLead && liveLead.wins >= 2) changeLabel = 'Changing to';
   let judgeWord = 'Following';
@@ -3121,6 +3458,25 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   else if (liveLead && liveLead.wins >= 2) judgeWord = 'Confirming a change';
   else if (liveLead && liveLead.wins >= 1) judgeWord = 'Checking';
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
+  // Live board: the current Shabad's calibrated % and the others in contention.
+  const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
+  let cardStyle = 'rail';
+  try {
+    cardStyle = window.localStorage.getItem('vf-card-style') || 'rail';
+  } catch (e) {
+    cardStyle = 'rail';
+  }
+  const boardPct = (id) => {
+    const b = board.find((x) => x.shabadId === id);
+    return b ? b.pct : null;
+  };
+  const boardOthers = board
+    .filter((b) => b.role !== 'current' && !(currentView && b.shabadId === currentView.id))
+    .filter(
+      (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
+    )
+    .slice(0, 3)
+    .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }));
 
   // Tester builds: no panel, no pill. Voice-Follow only runs in the shadow.
   if (SHADOW_BUILD) return null;
@@ -3130,16 +3486,26 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       {/* Non-modal, draggable floating panel. No backdrop, so the Gurbani stays
           fully visible while you set up and sing. Drag it by the header. */}
       {panelVisible && (
-        <div ref={panelRef} data-vf-widget className="vf-panel" style={posOverride || undefined}>
+        <div
+          ref={panelRef}
+          data-vf-widget
+          data-vf-cards={cardStyle}
+          className="vf-panel"
+          style={posOverride || undefined}
+        >
           {!widgetPos && <span className="vf-caret" />}
           <div className="vf-header" onMouseDown={startDrag} title="Drag to move">
             <span className="vf-title">
               <span className="vf-grip">⠿</span>
               <span className="vf-heading-copy">
                 <span>Voice Follow</span>
-                <span className="vf-listening-label">
-                  {active && currentView ? judgeWord : microphoneLabel}
-                </span>
+                {(() => {
+                  const sub = active && currentView ? judgeWord : microphoneLabel;
+                  // The title line stays quiet in the normal states; it only speaks up when
+                  // something is in progress or needs attention.
+                  if (sub === 'Following' || sub === 'Listening' || sub === 'Ready') return null;
+                  return <span className="vf-listening-label">{sub}</span>;
+                })()}
               </span>
               {active && (
                 <span
@@ -3158,6 +3524,28 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               )}
             </span>
             <span className="vf-hdr-btns">
+              <button
+                type="button"
+                className={`vf-hdr-btn vf-heard-toggle${showHeard ? ' is-on' : ''}`}
+                title={showHeard ? 'Hide what Voice-Follow hears' : 'Show what Voice-Follow hears'}
+                aria-label={showHeard ? 'Hide transcript' : 'Show transcript'}
+                aria-pressed={showHeard}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={toggleHeard}
+              >
+                <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                  <path
+                    d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  />
+                  <circle cx="8" cy="8" r="2" fill="currentColor" />
+                  {!showHeard && (
+                    <path d="M2.5 13.5 13.5 2.5" stroke="currentColor" strokeWidth="1.4" />
+                  )}
+                </svg>
+              </button>
               <button
                 type="button"
                 className="vf-hdr-btn"
@@ -3220,13 +3608,31 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
           {active && (
             <div className="vf2-body">
-              <section className={`vf2-now${currentView ? ' is-following' : ' is-searching'}`}>
+              {showHeard && (
+                <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
+                  <span className="vf2-heard-label">Hearing</span>
+                  <span className="vf2-heard-text" lang="pa">
+                    {heard ? heard.split('\u0001')[0] : '…'}
+                    {heard && heard.split('\u0001')[1] && (
+                      <span className="vf2-heard-tentative"> {heard.split('\u0001')[1]}</span>
+                    )}
+                  </span>
+                </div>
+              )}
+              <section
+                key={beat}
+                className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
+                  boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
+                }${beat ? ' is-beat' : ''}`}
+                style={boardCur ? pctVars(boardCur.pct) : undefined}
+              >
                 <div className="vf2-label" aria-live="polite">
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
-                  {currentView ? currentLabel : 'Finding the Shabad'}
+                  <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
                   {currentView && lineNo != null && (
-                    <span className="vf2-lineno">line {lineNo}</span>
+                    <span className="vf2-lineno">Line {lineNo}</span>
                   )}
+                  {boardCur && <LivePct value={boardCur.pct} />}
                   {currentView && (
                     <button
                       type="button"
@@ -3254,15 +3660,36 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 >
                   {liveLine || 'Listening…'}
                 </div>
+                {showNext &&
+                  posIsCurrent &&
+                  profLines &&
+                  boardCur &&
+                  boardCur.pct >= 0.95 &&
+                  profLines.slice(pos.lineIndex + 1, pos.lineIndex + 3).map((l, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <div key={i} className="vf2-next-line" lang="pa">
+                      {l}
+                    </div>
+                  ))}
+                {boardCur && <LiveBar value={boardCur.pct} />}
               </section>
 
               {currentView && liveLead && liveLead.wins >= 1 && (
                 <section
-                  className={`vf2-change${liveLead.wins >= 2 ? ' is-confirming' : ''} is-tappable`}
+                  className={`vf2-change${liveLead.wins >= 2 ? ' is-confirming' : ''} is-tappable${
+                    boardPct(liveLead.shabadId) != null
+                      ? ` lvl-${pctLevel(boardPct(liveLead.shabadId))}`
+                      : ''
+                  }`}
                   aria-live="polite"
                   role="button"
                   tabIndex={0}
                   title="Tap to change to this Shabad now"
+                  style={
+                    boardPct(liveLead.shabadId) != null
+                      ? pctVars(boardPct(liveLead.shabadId))
+                      : undefined
+                  }
                   onClick={() => pickCandidate(liveLead)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
@@ -3271,89 +3698,76 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <div className="vf2-label">
                     <span className="vf2-dot is-seeking" />
                     {changeLabel}
-                    <span className="vf2-cand-pct">
-                      {Math.round((liveLead.score || 0) * 100)}% match
-                    </span>
+                    {boardPct(liveLead.shabadId) != null ? (
+                      <LivePct value={boardPct(liveLead.shabadId)} />
+                    ) : (
+                      <span className="vf2-cand-pct">
+                        {Math.round((liveLead.score || 0) * 100)}% match
+                      </span>
+                    )}
                   </div>
                   <div className="vf2-cand-line" lang="pa">
                     {liveLead.line || '…'}
                   </div>
-                  <div
-                    className="vf2-cand-track"
-                    role="meter"
-                    aria-label="Confirmation progress"
-                    aria-valuemin={0}
-                    aria-valuemax={liveLead.needed}
-                    aria-valuenow={Math.min(liveLead.wins, liveLead.needed)}
-                  >
-                    <span
-                      style={{
-                        width: `${(Math.min(liveLead.wins, liveLead.needed) / liveLead.needed) * 100}%`,
-                      }}
-                    />
-                  </div>
+                  {boardPct(liveLead.shabadId) != null && (
+                    <LiveBar value={boardPct(liveLead.shabadId)} />
+                  )}
                 </section>
               )}
-              {currentView && (
-                <details className="vf2-matches">
-                  <summary>
-                    <svg
-                      className="vf2-chevron"
-                      viewBox="0 0 10 10"
-                      width="10"
-                      height="10"
-                      aria-hidden="true"
+              <details className="vf2-matches" open>
+                <summary>
+                  <svg
+                    className="vf2-chevron"
+                    viewBox="0 0 10 10"
+                    width="10"
+                    height="10"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3.5 2 6.5 5 3.5 8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="vf2-summary-title">
+                    {currentView ? 'Possible New Shabad' : 'Possible Shabad'}
+                  </span>
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-count">{boardOthers.length}</span>
+                  )}
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-tap">
+                      {currentView ? 'tap to switch' : 'tap to open'}
+                    </span>
+                  )}
+                </summary>
+                <div className="vf2-next" aria-live="polite">
+                  {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
+                  {boardOthers.map((c) => (
+                    <button
+                      type="button"
+                      className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
+                      key={c.shabadId}
+                      style={pctVars(c.pct)}
+                      onClick={() => pickCandidate(c)}
+                      title={
+                        currentView ? 'Tap to change to this Shabad now' : 'Tap to open this Shabad'
+                      }
                     >
-                      <path
-                        d="M3.5 2 6.5 5 3.5 8"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span className="vf2-summary-title">Possible New Shabad</span>
-                    {gatedItems.length > 0 && (
-                      <span className="vf2-summary-count">{gatedItems.length}</span>
-                    )}
-                  </summary>
-                  <div className="vf2-next" aria-live="polite">
-                    {gatedItems.length === 0 && <div className="vf2-empty">None right now.</div>}
-                    {gatedItems.length > 0 && (
-                      <div className="vf2-next-hint">Tap a Shabad to switch to it</div>
-                    )}
-                    {gatedItems.map((c) => (
-                      <button
-                        type="button"
-                        className={`vf2-cand is-tappable ${c.wins >= 2 ? 'is-confirming' : 'is-checking'}`}
-                        key={c.shabadId}
-                        onClick={() => pickCandidate(c)}
-                        title="Tap to change to this Shabad now"
-                      >
-                        <div className="vf2-cand-row">
-                          <span className="vf2-cand-line" lang="pa">
-                            {c.line || '…'}
-                          </span>
-                          <span className="vf2-cand-pct">{Math.round((c.score || 0) * 100)}%</span>
-                        </div>
-                        <div
-                          className="vf2-cand-track"
-                          role="meter"
-                          aria-label="Confirmation progress"
-                          aria-valuemin={0}
-                          aria-valuemax={c.needed}
-                          aria-valuenow={Math.min(c.wins, c.needed)}
-                        >
-                          <span
-                            style={{ width: `${(Math.min(c.wins, c.needed) / c.needed) * 100}%` }}
-                          />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </details>
-              )}
+                      <div className="vf2-cand-row">
+                        <span className="vf2-cand-line" lang="pa">
+                          {c.line || '…'}
+                        </span>
+                        <LivePct value={c.pct} />
+                      </div>
+                      <LiveBar value={c.pct} />
+                    </button>
+                  ))}
+                </div>
+              </details>
             </div>
           )}
           <div className={`vf-compact-footer${active ? '' : ' is-idle'}`}>
