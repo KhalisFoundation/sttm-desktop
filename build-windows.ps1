@@ -76,11 +76,11 @@ node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json
 Write-Host "== Building the app"
 npm run build
 
-# The upload key is not in the source: inject it into the compiled config (VF_UPLOAD_KEY env var).
-if (-not $env:VF_UPLOAD_KEY) { throw "Set VF_UPLOAD_KEY (the S3 upload key) in this shell before building." }
+# The upload SAS is not in the source: npm run build's postbuild step injects it into the
+# compiled config from the VF_UPLOAD_SAS env var (set it in this shell before building).
+if (-not $env:VF_UPLOAD_SAS) { throw "Set VF_UPLOAD_SAS (the Azure upload SAS) in this shell before building." }
 $cfg = "www\js\addons\voice-follow\shadow\config.js"
-(Get-Content $cfg -Raw).Replace("__VF_UPLOAD_KEY__", $env:VF_UPLOAD_KEY) | Set-Content $cfg -NoNewline
-if (Select-String -Path $cfg -Pattern "__VF_UPLOAD_KEY__" -Quiet) { throw "upload key was not injected" }
+if (Select-String -Path $cfg -Pattern "__VF_UPLOAD_SAS__" -Quiet) { throw "upload SAS was not injected" }
 
 Write-Host "== Packaging the installer"
 npx electron-builder --win --x64 --publish never

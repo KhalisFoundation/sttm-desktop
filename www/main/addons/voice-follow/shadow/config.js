@@ -24,12 +24,12 @@ const SHADOW_HEARD_GRACE_MS = testMs('VF_TEST_HEARD_GRACE_MS', 2 * 60 * 1000);
 // resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
 const SHADOW_CPU_PAUSE = 0.9;
 const SHADOW_CPU_RESUME = 0.6;
-// Upload endpoint (API Gateway + Lambda issuing presigned S3 PUT URLs) and its key,
-// which only allows uploads into the sessions/ prefix. Filled in when the stack is up.
-const UPLOAD_ENDPOINT = 'https://3fpf1zwng1.execute-api.us-east-2.amazonaws.com';
-// The real key is never committed: the build replaces this placeholder in the compiled
-// file (build-shadow.sh / build-windows.ps1 from VF_UPLOAD_KEY, CI from a repository secret).
-const UPLOAD_KEY = '__VF_UPLOAD_KEY__';
+// Sessions upload straight to Khalis's Azure Blob container with a container SAS that only
+// allows create, write and list. The SAS is never committed: after `npm run build`,
+// packaging/inject-upload-sas.js replaces the placeholder in the compiled copy of this file
+// from the VF_UPLOAD_SAS environment variable (CI sets it from a repository secret).
+const UPLOAD_URL = 'https://banidb.blob.core.windows.net/voice-follow-training-data';
+const UPLOAD_SAS = '__VF_UPLOAD_SAS__';
 
 module.exports = {
   SHADOW_BUILD,
@@ -41,6 +41,6 @@ module.exports = {
   SHADOW_HEARD_GRACE_MS,
   SHADOW_CPU_PAUSE,
   SHADOW_CPU_RESUME,
-  UPLOAD_ENDPOINT,
-  UPLOAD_KEY,
+  UPLOAD_URL,
+  UPLOAD_SAS,
 };

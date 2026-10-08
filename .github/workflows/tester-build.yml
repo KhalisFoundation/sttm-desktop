@@ -1,8 +1,8 @@
 # Voice-Follow tester installers, built the way Khalis builds releases (see build-windows.yml
 # and build-mac.yml): same runner setup, same dependency install, same electron-builder
 # commands via the package.json scripts. Differences, on purpose: no code signing or
-# notarization, no publishing, the speech model is bundled, the upload key is injected from
-# a repository secret (VF_UPLOAD_KEY), and the installers are kept as workflow artifacts.
+# notarization, no publishing, the speech model is bundled, the Azure upload SAS is injected
+# from a repository secret (VF_UPLOAD_SAS), and the installers are kept as workflow artifacts.
 name: Tester build
 
 on:
@@ -74,19 +74,16 @@ jobs:
         shell: bash
         run: node -e 'const fs=require("fs");const p=JSON.parse(fs.readFileSync("package.json"));if(!p.build.files.includes("!research${/*}"))p.build.files.push("!research${/*}");fs.writeFileSync("package.json",JSON.stringify(p,null,2)+"\n")'
 
-      - name: Build (npm run build, as pack:* does)
-        shell: bash
-        run: npm run build
-
-      - name: Inject the upload key into the compiled config
+      - name: Build (npm run build, as pack:* does; postbuild injects the upload SAS)
         shell: bash
         env:
-          VF_UPLOAD_KEY: ${{ secrets.VF_UPLOAD_KEY }}
+          VF_UPLOAD_SAS: ${{ secrets.VF_UPLOAD_SAS }}
+          VF_REQUIRE_UPLOAD_SAS: '1'
         run: |
-          test -n "$VF_UPLOAD_KEY" || { echo "VF_UPLOAD_KEY secret is not set"; exit 1; }
+          test -n "$VF_UPLOAD_SAS" || { echo "VF_UPLOAD_SAS secret is not set"; exit 1; }
+          npm run build
           f=www/js/addons/voice-follow/shadow/config.js
-          node -e 'const fs=require("fs");const f=process.argv[1];const s=fs.readFileSync(f,"utf8");if(!s.includes("__VF_UPLOAD_KEY__"))process.exit(2);fs.writeFileSync(f,s.replace("__VF_UPLOAD_KEY__",process.env.VF_UPLOAD_KEY))' "$f"
-          grep -q "__VF_UPLOAD_KEY__" "$f" && exit 1 || echo "key injected"
+          grep -q "__VF_UPLOAD_SAS__" "$f" && { echo "upload SAS was not injected"; exit 1; } || echo "upload SAS present in the compiled config"
 
       # The electron-builder half of pack:win / pack:macArm, with publishing off, plus
       # npmRebuild=false: the postinstall (electron-builder install-app-deps) already built the
