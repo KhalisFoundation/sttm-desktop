@@ -377,7 +377,9 @@ const BANI_CUR_SPAN = 8;
 // OLD shabad. Freeze entirely while a switch is being evaluated; otherwise move on
 // any reasonably confident frame. (Kept modest so a freshly-switched follower, which
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
-const UI_MOVE_CONF = 0.4; // follower confidence required to move the on-screen line
+const UI_MOVE_CONF = 0.4;
+const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
+const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word // follower confidence required to move the on-screen line
 
 // Two modes carried over from the web lab: Path (spoken paatth) and Kirtan
 // (sung). Both map to the karansea CTC + line decoder with the same tuned
@@ -481,6 +483,31 @@ const pctLevel = (v) => {
   return 'is-low';
 };
 const fmtPct = (v) => `${Math.min(99.9, Math.max(0, v * 100)).toFixed(1)}%`;
+// Continuous colour for a percentage: red (0) through yellow (0.5) to green (1), so the
+// tint moves with the number instead of snapping between three fixed colours.
+const pctHue = (v) => {
+  const x = Math.min(1, Math.max(0, v));
+  return x <= 0.5 ? 4 + (48 - 4) * (x / 0.5) : 48 + (135 - 48) * ((x - 0.5) / 0.5);
+};
+const pctColor = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 42%)`;
+const pctTint = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 96%)`;
+const pctEdge = (v) => `hsl(${pctHue(v).toFixed(0)} 60% 70%)`;
+// True while a value is still moving: drives the sheen that shows the bar is alive.
+const useMoving = (value) => {
+  const [moving, setMoving] = useState(false);
+  const prev = useRef(value);
+  useEffect(() => {
+    if (Math.abs(value - prev.current) >= 0.004) {
+      prev.current = value;
+      setMoving(true);
+      const t = setTimeout(() => setMoving(false), 900);
+      return () => clearTimeout(t);
+    }
+    prev.current = value;
+    return undefined;
+  }, [value]);
+  return moving;
+};
 const LivePct = ({ value }) => {
   const [shown, setShown] = useState(value);
   const shownRef = useRef(value);
@@ -498,17 +525,24 @@ const LivePct = ({ value }) => {
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [value]);
-  return <span className={`vf2-live-pct ${pctLevel(value)}`}>{fmtPct(shown)}</span>;
+  return (
+    <span className={`vf2-live-pct ${pctLevel(value)}`} style={{ color: pctColor(shown) }}>
+      {fmtPct(shown)}
+    </span>
+  );
 };
 LivePct.propTypes = { value: PropTypes.number.isRequired };
-const LiveBar = ({ value }) => (
-  <div className="vf2-cand-track">
-    <span
-      className={`vf2-live-fill ${pctLevel(value)}`}
-      style={{ width: `${Math.round(value * 1000) / 10}%` }}
-    />
-  </div>
-);
+const LiveBar = ({ value }) => {
+  const moving = useMoving(value);
+  return (
+    <div className="vf2-cand-track">
+      <span
+        className={`vf2-live-fill ${pctLevel(value)}${moving ? ' is-moving' : ''}`}
+        style={{ width: `${Math.round(value * 1000) / 10}%`, background: pctColor(value) }}
+      />
+    </div>
+  );
+};
 LiveBar.propTypes = { value: PropTypes.number.isRequired };
 
 const VoiceFollow = ({ isOpen, onScreenClose }) => {
@@ -667,13 +701,25 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       return !v;
     });
   }, []);
-  const noteHeard = useCallback((text) => {
+  // The strip shows words, not noise: between lines the recognizer still emits lone letters
+  // from tabla, harmonium and room sound at low confidence (sung lines score ~0.93-0.99),
+  // so a hypothesis has to be confident and contain at least one real word to be shown,
+  // and the strip clears after a few seconds without one.
+  const heardClearRef = useRef(0);
+  const noteHeard = useCallback((text, confidence = 1) => {
+    const words = (text || '').split(/\s+/).filter((w) => w.length >= 3);
+    if (confidence < HEARD_MIN_CONF || !words.length) return;
     heardRef.current = mergeTranscript(heardRef.current, text);
     const now = Date.now();
     if (now - heardAtRef.current >= 200) {
       heardAtRef.current = now;
       setHeard(heardRef.current);
     }
+    clearTimeout(heardClearRef.current);
+    heardClearRef.current = setTimeout(() => {
+      heardRef.current = '';
+      setHeard('');
+    }, HEARD_CLEAR_MS);
   }, []);
   const [lineExpanded, setLineExpanded] = useState(true); // full pangti (wrapped) vs one line
   const liveSigRef = useRef('');
@@ -1923,6 +1969,51 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
             );
             const rankedContext = [...tally.values()].sort((a, b) => b.score - a.score);
             const winner = rankedContext[0];
+            // Panel only: how far each lock route has got, so the box shows the Shabad
+            // that is actually being built toward, not just first-letter guesses.
+            {
+              const prog = new Map();
+              const bump = (id, verseId, p) => {
+                const cur = prog.get(id);
+                if (!cur || p > cur.p) prog.set(id, { p, verseId: verseId ?? cur?.verseId });
+              };
+              rankedContext.forEach((c) => {
+                const p =
+                  Math.min(c.count / 6, c.wins / 4) * (c.anchor || c.verses.size >= 2 ? 1 : 0.7);
+                bump(c.id, (leaders.find((l) => l.shabadId === c.id) || {}).verseId, p);
+              });
+              if (poolBani != null)
+                bump(
+                  top.shabadId,
+                  top.verseId,
+                  memory.pool.filter((b) => b === poolBani).length /
+                    (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS),
+                );
+              const agreeingNow = (memory.acousticVotes || []).filter(
+                (v) => v.id === top.shabadId,
+              ).length;
+              if (agreeingNow) bump(top.shabadId, top.verseId, agreeingNow / 3);
+              const items = [...prog.entries()]
+                .map(([id, v]) => ({ shabadId: id, verseId: v.verseId, pct: Math.min(0.95, v.p) }))
+                .sort((a, b) => b.pct - a.pct)
+                .slice(0, 3);
+              items.forEach((it) => {
+                if (boardRef.current.known(it.shabadId) || it.verseId == null) return;
+                banidb
+                  .getVerse(it.shabadId, it.verseId)
+                  .then((verse) => {
+                    if (verse)
+                      boardRef.current.remember({
+                        shabadId: it.shabadId,
+                        verseId: it.verseId,
+                        verse,
+                      });
+                  })
+                  .catch(() => {});
+              });
+              boardRef.current.progress(items, Date.now());
+              publishBoard();
+            }
             if (
               winner?.id === top.shabadId &&
               margin >= AP_LOCK_TEXT_MARGIN &&
@@ -2730,7 +2821,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         const out = await r.push(pcm);
         if (session !== sessionRef.current || recognizerRef.current !== r) return;
         if (out && out.text) {
-          noteHeard(out.text);
+          noteHeard(out.text, out.confidence);
           handleTranscript(out.text);
         }
       });
@@ -2848,7 +2939,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           const rout = await r.push(pcm);
           if (session !== sessionRef.current || recognizerRef.current !== r) return;
           if (rout && rout.text) {
-            noteHeard(rout.text);
+            noteHeard(rout.text, rout.confidence);
             handleTranscript(rout.text);
           }
         }
@@ -3177,7 +3268,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
   let microphoneLabel = 'Ready';
   if (active) microphoneLabel = audioView.device ? 'Listening' : 'Preparing…';
-  const currentLabel = isMiscSlide ? 'Current Shabad · slide held' : 'Following this line';
+  const currentLabel = isMiscSlide ? 'Slide held' : 'Following';
   // The line the follower is on right now (the follower indexes the same line
   // list as the profile), falling back to the lock line until the first fix.
   const profLines = (curProfileRef.current && curProfileRef.current.displayLines) || null;
@@ -3212,7 +3303,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     return b ? b.pct : null;
   };
   const boardOthers = board
-    .filter((b) => b.role !== 'current')
+    .filter((b) => b.role !== 'current' && !(currentView && b.shabadId === currentView.id))
     .filter(
       (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
     )
@@ -3345,12 +3436,19 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
                   boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
                 }`}
+                style={
+                  boardCur
+                    ? { background: pctTint(boardCur.pct), borderColor: pctEdge(boardCur.pct) }
+                    : undefined
+                }
               >
                 <div className="vf2-label" aria-live="polite">
                   <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
-                  {currentView ? currentLabel : 'Finding the Shabad'}
+                  <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
                   {currentView && lineNo != null && (
-                    <span className="vf2-lineno">line {lineNo}</span>
+                    <span className="vf2-lineno" title={`Line ${lineNo}`}>
+                      L{lineNo}
+                    </span>
                   )}
                   {boardCur && <LivePct value={boardCur.pct} />}
                   {currentView && (
@@ -3405,6 +3503,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   role="button"
                   tabIndex={0}
                   title="Tap to change to this Shabad now"
+                  style={
+                    boardPct(liveLead.shabadId) != null
+                      ? {
+                          background: pctTint(boardPct(liveLead.shabadId)),
+                          borderColor: pctEdge(boardPct(liveLead.shabadId)),
+                        }
+                      : undefined
+                  }
                   onClick={() => pickCandidate(liveLead)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
@@ -3458,7 +3564,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
                   {boardOthers.length > 0 && (
                     <div className="vf2-next-hint">
-                      {currentView ? 'Tap a Shabad to switch to it' : 'Tap a Shabad to open it'}
+                      {currentView
+                        ? 'Tap a Shabad to switch to it'
+                        : 'Fills as the match builds · tap to open'}
                     </div>
                   )}
                   {boardOthers.map((c) => (
@@ -3466,6 +3574,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                       type="button"
                       className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
                       key={c.shabadId}
+                      style={{ background: pctTint(c.pct), borderColor: pctEdge(c.pct) }}
                       onClick={() => pickCandidate(c)}
                       title={
                         currentView ? 'Tap to change to this Shabad now' : 'Tap to open this Shabad'

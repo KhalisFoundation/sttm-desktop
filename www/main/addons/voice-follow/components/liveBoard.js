@@ -40,6 +40,8 @@ function createBoard(params = {}) {
   let current = null;
   let items = []; // [{ shabadId, pct, role }] newest computation
   let phase = 'idle';
+  let progressItems = []; // searching phase: lock progress per Shabad (see progress())
+  let progressAt = 0;
 
   const decay = (now) => {
     const gap = lastAt ? Math.max(1, Math.round((now - lastAt) / P.decodeMs)) : 1;
@@ -58,6 +60,7 @@ function createBoard(params = {}) {
       // A new current Shabad keeps the evidence it earned as a challenger.
       phase = 'following';
       current = cur;
+      progressItems = [];
     }
     decay(now);
     E.set(cur, (E.get(cur) || 0) + P.beta * sCur);
@@ -101,10 +104,27 @@ function createBoard(params = {}) {
     lastAt = now;
   }
 
-  // One searching-phase decode: ranked [[shabadId, votes], ...] (votes already decay).
-  function search({ ranked, rows }) {
+  // Searching phase, lock progress: how close each Shabad is to being chosen, from the
+  // same evidence the lock itself uses (full-text tally, paath text pool, acoustic votes).
+  // Shown as a fill that climbs toward the lock, so the pick never arrives from nowhere.
+  function progress(list, now) {
     phase = 'searching';
     current = null;
+    progressItems = list.filter((it) => it.pct >= 0.05).map((it) => ({ ...it, role: 'candidate' }));
+    progressAt = now;
+    if (progressItems.length) items = progressItems;
+  }
+  const known = (id) => meta.has(id);
+
+  // One searching-phase decode: ranked [[shabadId, votes], ...] (votes already decay).
+  // First-letter votes only fill the box while no lock route has evidence yet.
+  function search({ ranked, rows, now = Date.now() }) {
+    phase = 'searching';
+    current = null;
+    if (progressItems.length && now - progressAt < 4000) {
+      items = progressItems;
+      return;
+    }
     const top = ranked.slice(0, 3);
     const total = top.reduce((a, [, v]) => a + v, 0) + P.searchK;
     items = top.map(([sid, v]) => {
@@ -115,6 +135,8 @@ function createBoard(params = {}) {
   }
 
   function reset() {
+    progressItems = [];
+    progressAt = 0;
     E.clear();
     seen.clear();
     items = [];
@@ -129,14 +151,15 @@ function createBoard(params = {}) {
       .sort((a, b) => (b.role === 'current') - (a.role === 'current') || b.pct - a.pct);
   }
 
-  return { follow, hold, search, reset, snapshot, remember, params: P };
+  return { follow, hold, search, progress, known, reset, snapshot, remember, params: P };
 }
 
 // Rolling transcript: each decode returns the text of the last ~10 s of audio, so successive
 // hypotheses overlap. Append only the words past the longest overlap; keep the tail.
 function mergeTranscript(stream, text, keep = 16) {
-  const a = (stream || '').split(/\s+/).filter(Boolean);
-  const b = (text || '').split(/\s+/).filter(Boolean);
+  const real = (w) => /[\u0A05-\u0A39\u0A59-\u0A5E\u0A72-\u0A74]/.test(w);
+  const a = (stream || '').split(/\s+/).filter(real);
+  const b = (text || '').split(/\s+/).filter(real);
   if (!b.length) return stream || '';
   let best = 0;
   for (let k = Math.min(a.length, b.length); k > 0; k -= 1) {

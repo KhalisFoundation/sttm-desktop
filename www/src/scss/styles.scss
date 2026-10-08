@@ -1974,7 +1974,7 @@ $vf2-yellow: #c99700;
 $vf2-yellow-bar: #f2c200;
 
 .vf-panel {
-  width: 300px;
+  width: 340px;
   padding: 14px 16px 16px;
   border-radius: 18px;
   color: $vf2-ink;
@@ -2044,14 +2044,23 @@ $vf2-yellow-bar: #f2c200;
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  min-width: 0;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $vf2-muted;
 }
+.vf2-label-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .vf2-lineno,
 .vf2-cur-score {
+  flex: none;
   margin-left: auto;
   font-weight: 500;
   letter-spacing: 0;
@@ -2089,6 +2098,9 @@ $vf2-yellow-bar: #f2c200;
   border-radius: 14px;
   background: #fff;
   border: 1px solid $vf2-line;
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   &.is-following {
     border-color: rgba(67, 172, 106, 0.35);
@@ -2193,7 +2205,7 @@ $vf2-yellow-bar: #f2c200;
 }
 .vf2-cand-track {
   margin-top: 7px;
-  height: 3px;
+  height: 5px;
   border-radius: 2px;
   background: $vf2-line;
   overflow: hidden;
@@ -2207,6 +2219,7 @@ $vf2-yellow-bar: #f2c200;
 }
 // Live board: calibrated percentages that move with the evidence (red -> yellow -> green).
 .vf2-live-pct {
+  flex: none;
   margin-left: auto;
   font-size: 12px;
   font-weight: 700;
@@ -2231,9 +2244,24 @@ $vf2-yellow-bar: #f2c200;
   margin-top: 8px;
 }
 .vf2-live-fill {
+  position: relative;
+  overflow: hidden;
   transition:
-    width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background 0.25s ease !important;
+    width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.45s ease !important;
+  // A light sheen slides along the bar while its value is moving: evidence arriving.
+  &.is-moving::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: vf2-sheen 0.9s ease-out;
+  }
   &.is-low {
     background: $vf2-red !important;
   }
@@ -2403,6 +2431,7 @@ $vf2-yellow-bar: #f2c200;
 
 // Small −/+ box on the Now header to fold the line to one row and back.
 .vf2-fold {
+  flex: none;
   margin-left: 6px;
   width: 18px;
   height: 18px;
@@ -2440,6 +2469,14 @@ $vf2-yellow-bar: #f2c200;
   animation: vf2-ready 1.4s ease-in-out infinite;
   .vf2-dot.is-on {
     background: #2e9e5b;
+  }
+}
+@keyframes vf2-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
   }
 }
 // Card tint follows its own percentage, so colour and number always agree.
