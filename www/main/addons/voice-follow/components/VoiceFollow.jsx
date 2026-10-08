@@ -380,7 +380,9 @@ const BANI_CUR_SPAN = 8;
 const UI_MOVE_CONF = 0.4;
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
-const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter // follower confidence required to move the on-screen line
+const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
+const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
+const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
 
 // Two modes carried over from the web lab: Path (spoken paatth) and Kirtan
 // (sung). Both map to the karansea CTC + line decoder with the same tuned
@@ -721,6 +723,16 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // so a hypothesis has to be confident and contain at least one real word to be shown,
   // and the strip clears after a few seconds without one.
   const heardClearRef = useRef(0);
+  // Heartbeat: the current card breathes once, slowly, on a decode that matched it well,
+  // at most every HEARTBEAT_MIN_MS so it reads as a pulse rather than a flicker.
+  const [beat, setBeat] = useState(0);
+  const beatAtRef = useRef(0);
+  const noteBeat = useCallback((score) => {
+    const now = Date.now();
+    if (score < HEARTBEAT_MIN_SCORE || now - beatAtRef.current < HEARTBEAT_MIN_MS) return;
+    beatAtRef.current = now;
+    setBeat(now);
+  }, []);
   // Each decode covers the last few seconds of audio, so its final word or two is usually
   // cut mid-word and gets re-spelt on the next decode. Those are shown lighter as "still
   // hearing"; only words that were fully sung join the settled text.
@@ -2650,6 +2662,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               sCur: sCurFull,
               cands: live,
             });
+            noteBeat(sCurFull);
           } else boardRef.current.hold(Date.now());
           publishBoard();
           // Gate for the panel: only candidates that clear the judge's own
@@ -3321,6 +3334,24 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   if (isMiscSlide) judgeWord = 'Holding a separate slide';
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
+  // Words of the line on screen (normalised), so the Hearing strip can light up matches.
+  const wordKey = (w) => vfNorm(w).replace(/[\u0a3f\u0a41]$/, ''); // ignore a final short vowel
+  const lineWords = [
+    ...new Set(
+      (liveLine || '')
+        .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length >= 2)
+        .map(wordKey),
+    ),
+  ];
+  const heardLit = (w) => {
+    const k = wordKey(w);
+    if (k.length < 2) return false;
+    return lineWords.some(
+      (l) => l === k || (k.length >= 4 && (l.startsWith(k) || k.startsWith(l))),
+    );
+  };
   let cardStyle = 'rail';
   try {
     cardStyle = window.localStorage.getItem('vf-card-style') || 'rail';
@@ -3467,8 +3498,23 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               {showHeard && (
                 <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
                   <span className="vf2-heard-label">Hearing</span>
-                  <span className="vf2-heard-text" lang="pa">
-                    {heard ? heard.split('\u0001')[0] : '…'}
+                  <span
+                    className="vf2-heard-text"
+                    lang="pa"
+                    style={boardCur ? { '--pc': pctColor(boardCur.pct) } : undefined}
+                  >
+                    {heard
+                      ? heard
+                          .split('\u0001')[0]
+                          .split(' ')
+                          .map((w, i) => (
+                            // eslint-disable-next-line react/no-array-index-key
+                            <span key={i} className={heardLit(w) ? 'vf2-heard-lit' : ''}>
+                              {i ? ' ' : ''}
+                              {w}
+                            </span>
+                          ))
+                      : '…'}
                     {heard && heard.split('\u0001')[1] && (
                       <span className="vf2-heard-tentative"> {heard.split('\u0001')[1]}</span>
                     )}
@@ -3476,9 +3522,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 </div>
               )}
               <section
+                key={beat}
                 className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
                   boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
-                }`}
+                }${beat ? ' is-beat' : ''}`}
                 style={boardCur ? pctVars(boardCur.pct) : undefined}
               >
                 <div className="vf2-label" aria-live="polite">

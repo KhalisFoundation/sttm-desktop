@@ -2433,8 +2433,8 @@ $vf2-yellow-bar: #f2c200;
 .vf2-change {
   padding: 10px 12px 10px;
   border-radius: 12px;
-  background: #fff8ec;
-  border: 1px solid rgba(243, 156, 29, 0.35);
+  background: #fff;
+  border: 1px solid $vf2-line;
   animation: vf2-fade 0.28s ease-out;
   .vf2-cand-line {
     display: block;
@@ -2442,8 +2442,8 @@ $vf2-yellow-bar: #f2c200;
     font-size: 16px;
   }
   &.is-confirming {
-    background: #fff3dc;
-    border-color: $vf2-orange;
+    background: #fff;
+    border-color: $vf2-line;
   }
 }
 
@@ -2500,8 +2500,8 @@ $vf2-yellow-bar: #f2c200;
 // Card styles. Every scored card (current line, change, candidate) carries --pc (its colour)
 // and --pct (its percentage). The box itself stays white; the colour is in what moves.
 .vf-panel .vf2-now,
-.vf-panel .vf2-cand.is-tappable,
-.vf-panel .vf2-change.is-tappable {
+.vf-panel .vf2-cand,
+.vf-panel .vf2-change {
   position: relative;
   overflow: hidden;
   background: #fff;
@@ -2553,6 +2553,27 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 // clean: nothing on the card; colour only in the number and the bar.
+// Heartbeat: a slow, faint breath of the current card on a decode that matched well.
+.vf2-now.is-beat {
+  animation: vf2-beat 1.6s ease-in-out;
+}
+@keyframes vf2-beat {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.006);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+// Hearing: words that match the line on screen take its colour as they land.
+.vf2-heard-lit {
+  color: var(--pc, #2e9e5b);
+  font-weight: 500;
+  transition: color 0.4s ease;
+}
 .vf2-change .vf2-cand-pct {
   margin-left: auto;
 }
