@@ -3607,16 +3607,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   {boardOthers.length > 0 && (
                     <span className="vf2-summary-count">{boardOthers.length}</span>
                   )}
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-tap">
+                      {currentView ? 'tap to switch' : 'tap to open'}
+                    </span>
+                  )}
                 </summary>
                 <div className="vf2-next" aria-live="polite">
                   {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
-                  {boardOthers.length > 0 && (
-                    <div className="vf2-next-hint">
-                      {currentView
-                        ? 'Tap a Shabad to switch to it'
-                        : 'Fills as the match builds · tap to open'}
-                    </div>
-                  )}
                   {boardOthers.map((c) => (
                     <button
                       type="button"

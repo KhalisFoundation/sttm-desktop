@@ -2578,6 +2578,14 @@ $vf2-yellow-bar: #f2c200;
   transition: transform 0.2s ease;
 }
 // Count of candidates, as a small badge beside the title.
+.vf2-summary-tap {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: $vf2-faint;
+}
 .vf2-summary-count {
   display: inline-flex;
   align-items: center;
