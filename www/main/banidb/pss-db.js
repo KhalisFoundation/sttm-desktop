@@ -1,8 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const { ipcRenderer } = require('electron');
+const remote = require('@electron/remote');
 const Database = require('better-sqlite3');
 
-const DB_FILENAME = 'ai-translations.db';
+const { store } = remote.require('./app');
+
+const userDataPath = remote.app.getPath('userData');
 
 // Translation `type` values stored in the `ai_translations` table. These double
 // as the `translation-english-source` keys in configs/user-settings.json.
@@ -33,20 +37,43 @@ const cache = new Map();
 /**
  * Resolve the path to the translations database.
  *
- * In the packaged app the file is shipped via `extraResources` so that it lives
- * outside of app.asar – sqlite needs a real file on disk. In dev it is read
- * straight out of www/assets.
+ * The file is downloaded into userData next to the realm database (see
+ * downloadAiTranslationsDB in desktop_scripts.js). Each version gets its own
+ * file name, stored as `aiTranslationsFile`, so an update never has to replace
+ * a file another window still has open.
  *
- * @returns {string|null} Absolute path to the db file, or null if not found
+ * @returns {string|null} Absolute path to the db file, or null if not downloaded yet
  */
 const resolveDbPath = () => {
-  const candidates = [
-    path.join(process.resourcesPath || '', 'assets', DB_FILENAME),
-    path.resolve(__dirname, '../../assets', DB_FILENAME),
-  ];
+  const fileName = store.get('aiTranslationsFile');
+  if (!fileName) {
+    return null;
+  }
 
-  return candidates.find((candidate) => fs.existsSync(candidate)) || null;
+  const dbPath = path.resolve(userDataPath, fileName);
+  return fs.existsSync(dbPath) ? dbPath : null;
 };
+
+/**
+ * Drop the open handle and cached lookups, so the next lookup opens whichever
+ * database is current. Runs when a new version has been downloaded.
+ */
+const reset = () => {
+  if (db) {
+    try {
+      db.close();
+    } catch (err) {
+      /* eslint-disable-next-line no-console */
+      console.error('Failed to close AI translations database:', err.message);
+    }
+  }
+  db = null;
+  statement = null;
+  dbUnavailable = false;
+  cache.clear();
+};
+
+ipcRenderer.on('ai-translations-updated', reset);
 
 /**
  * Open the translations database. Called lazily on first lookup; the handle and
@@ -65,7 +92,7 @@ const getStatement = () => {
   try {
     const dbPath = resolveDbPath();
     if (!dbPath) {
-      throw new Error(`${DB_FILENAME} not found in assets`);
+      throw new Error('AI translations database has not been downloaded yet');
     }
 
     db = new Database(dbPath, { readonly: true, fileMustExist: true });
