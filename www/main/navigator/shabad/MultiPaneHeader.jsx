@@ -77,7 +77,7 @@ const MultiPaneHeader = ({ data }) => {
   }, [navigatorState.pane1, navigatorState.pane2, navigatorState.pane3]);
 
   const selectPaneOption = (event) => {
-    setPaneAttributes({ ...paneAttributes, content: event.target.value });
+    setPaneAttributes({ content: event.target.value });
   };
 
   return (

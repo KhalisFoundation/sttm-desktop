@@ -510,6 +510,8 @@
     "MARK_FAV": "Add to favorites",
     "UNMARK_FAV": "Remove from favorites",
     "FAV_BTN_TOOLTIP": "Add or remove the current displayed Shabad to your list of favorites. Your favorites are available under the tabs in the bottom right hand panel.",
-    "HIDE_BUTTON_TOOLTIP": "Hides the secondary screen when not needed. This will show the default desktop background on your secondary screen. Once hidden, you can unhide the STTM screen again by clicking the \"Show Display\" button which will appear here."
+    "HIDE_BUTTON_TOOLTIP": "Hides all external STTM screens (slide and second display) when not needed. Desktop background shows on those screens. Click \"Show Display\" to bring them back.",
+    "SWAP_DISPLAYS": "Swap Displays",
+    "SWAP_DISPLAYS_TOOLTIP": "Swap which external screen shows the full slide and which shows the second display. Only available when two external screens are connected."
   }
 }

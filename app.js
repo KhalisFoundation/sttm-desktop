@@ -30,6 +30,7 @@ const prodConfig = require('./config.prod.json');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
+const { styles } = require('./resetViewerStyles');
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -43,7 +44,6 @@ const {
 const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
-const { styles } = require('./resetViewerStyles');
 /* eslint-enable */
 
 const savedSettings = savedSettingsCamelCase();
@@ -134,6 +134,18 @@ app.on('will-quit', (e) => {
   }
 });
 let viewerWindow = false;
+let projectionWindow = false;
+/** Embedded controller <webview> (in-app preview) — kept separate from external BrowserWindows */
+let embeddedViewerWebContents = null;
+let projectionViewport = null;
+let projectionRange = null;
+/** WebContents of a Display 2 window that has loaded but is not yet projectionWindow. */
+let pendingProjectionWebContents = null;
+/** @type {{ channel: string, data: any } | null} Last IPC payload for classic Display 1 restore after recreate */
+let lastPresenterIpc = null;
+/** Pinned external display ids — never reassigned from getAllDisplays() order alone */
+let pinnedPresenterDisplayId = null;
+let pinnedProjectionDisplayId = null;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
@@ -202,7 +214,6 @@ const secondaryWindows = {
   },
 };
 let manualUpdate = false;
-const viewerWindowPos = {};
 let lastLine;
 
 function openSecondaryWindow(windowName) {
@@ -373,24 +384,217 @@ function deleteToken() {
   });
 }
 
-function checkForExternalDisplay() {
-  const electronScreen = electron.screen;
-  const displays = electronScreen.getAllDisplays();
-  let externalDisplay = null;
-  Object.keys(displays).forEach((i) => {
-    if (displays[i].bounds.x !== 0 || displays[i].bounds.y !== 0) {
-      externalDisplay = displays[i];
-    }
-  });
+let display2Connected = false;
 
-  if (externalDisplay) {
-    viewerWindowPos.x = externalDisplay.bounds.x + 50;
-    viewerWindowPos.y = externalDisplay.bounds.y + 50;
-    viewerWindowPos.w = externalDisplay.size.width;
-    viewerWindowPos.h = externalDisplay.size.height;
-    return true;
+function trackDisplay(action) {
+  if (!global.analytics) return;
+  global.analytics.trackEvent({
+    category: 'display',
+    action,
+    label: '',
+    value: '',
+  });
+}
+
+function getExternalDisplays() {
+  const primaryDisplayId = electron.screen.getPrimaryDisplay().id;
+  return electron.screen.getAllDisplays().filter((display) => display.id !== primaryDisplayId);
+}
+
+function trackDisplay2Connection() {
+  const connected = getExternalDisplays().length >= 2;
+  if (connected === display2Connected) return;
+  display2Connected = connected;
+  trackDisplay(connected ? 'display-2-connected' : 'display-2-disconnected');
+}
+
+/** Stable sort so first-time bootstrap is deterministic, not API enumeration order. */
+function sortDisplaysStable(displays) {
+  return displays.slice().sort((a, b) => {
+    if (a.bounds.x !== b.bounds.x) return a.bounds.x - b.bounds.x;
+    if (a.bounds.y !== b.bounds.y) return a.bounds.y - b.bounds.y;
+    return a.id - b.id;
+  });
+}
+
+/**
+ * Display 1 (classic slide) = one external, pinned by id.
+ * Display 2 (teleprompter) = optional second external, pinned by id.
+ * Controller stays on OS primary. Never thrash on getAllDisplays() index.
+ */
+function resolveDisplayRoles() {
+  const externals = sortDisplaysStable(getExternalDisplays());
+  const byId = new Map(externals.map((display) => [display.id, display]));
+
+  let presenterDisplay = null;
+  if (pinnedPresenterDisplayId != null && byId.has(pinnedPresenterDisplayId)) {
+    presenterDisplay = byId.get(pinnedPresenterDisplayId);
+  } else if (
+    viewerWindow &&
+    !viewerWindow.isDestroyed() &&
+    viewerWindow.displayId != null &&
+    byId.has(viewerWindow.displayId)
+  ) {
+    presenterDisplay = byId.get(viewerWindow.displayId);
+    pinnedPresenterDisplayId = presenterDisplay.id;
+  } else if (externals.length > 0) {
+    [presenterDisplay] = externals;
+    pinnedPresenterDisplayId = presenterDisplay.id;
+  } else {
+    pinnedPresenterDisplayId = null;
   }
-  return false;
+
+  const remaining = externals.filter(
+    (display) => !presenterDisplay || display.id !== presenterDisplay.id,
+  );
+  const remainingById = new Map(remaining.map((display) => [display.id, display]));
+
+  let projectionDisplay = null;
+  if (pinnedProjectionDisplayId != null && remainingById.has(pinnedProjectionDisplayId)) {
+    projectionDisplay = remainingById.get(pinnedProjectionDisplayId);
+  } else if (
+    projectionWindow &&
+    !projectionWindow.isDestroyed() &&
+    projectionWindow.displayId != null &&
+    remainingById.has(projectionWindow.displayId)
+  ) {
+    projectionDisplay = remainingById.get(projectionWindow.displayId);
+    pinnedProjectionDisplayId = projectionDisplay.id;
+  } else if (remaining.length > 0) {
+    [projectionDisplay] = remaining;
+    pinnedProjectionDisplayId = projectionDisplay.id;
+  } else {
+    pinnedProjectionDisplayId = null;
+  }
+
+  if (presenterDisplay) {
+    pinnedPresenterDisplayId = presenterDisplay.id;
+  }
+  if (projectionDisplay) {
+    pinnedProjectionDisplayId = projectionDisplay.id;
+  } else {
+    pinnedProjectionDisplayId = null;
+  }
+
+  return { presenterDisplay, projectionDisplay };
+}
+
+/**
+ * Same cover as upstream STTM desktop dev createViewer (D1 golden, no menu):
+ * show → setFullScreen(true) → focus controller.
+ * setBounds first so dual-external windows land on the correct display.
+ */
+function presentOnExternalDisplay(browserWindow, display) {
+  if (!browserWindow || browserWindow.isDestroyed() || !display) return;
+  const { x, y, width, height } = display.bounds;
+  try {
+    browserWindow.setBounds({ x, y, width, height }, false);
+    browserWindow.show();
+    browserWindow.setFullScreen(true);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.focus();
+    }
+  } catch (err) {
+    log.error(`[display] presentOnExternalDisplay failed: ${err.message}`);
+  }
+}
+
+/** Display 2 — identical fullscreen path as Display 1. */
+function coverProjectionDisplay(browserWindow, display) {
+  presentOnExternalDisplay(browserWindow, display);
+}
+
+// Pending placement timer per window, so a new move cancels the previous one
+const placeDisplayTimers = new WeakMap();
+
+function placeWindowOnDisplay(browserWindow, display) {
+  if (!browserWindow || browserWindow.isDestroyed() || !display) return;
+
+  clearTimeout(placeDisplayTimers.get(browserWindow));
+  placeDisplayTimers.delete(browserWindow);
+
+  const isProjection = browserWindow === projectionWindow;
+  let label = 'window';
+  if (browserWindow === viewerWindow) {
+    label = 'presenter';
+  } else if (isProjection) {
+    label = 'projection';
+  }
+  const { x, y, width, height } = display.bounds;
+  const targetId = display.id;
+  // eslint-disable-next-line no-param-reassign
+  browserWindow.displayId = targetId;
+
+  // Exit any FS mode so bounds can change, then re-apply the right cover.
+  try {
+    if (
+      typeof browserWindow.setSimpleFullScreen === 'function' &&
+      browserWindow.isSimpleFullScreen()
+    ) {
+      browserWindow.setSimpleFullScreen(false);
+    }
+    if (browserWindow.isFullScreen()) {
+      browserWindow.setFullScreen(false);
+    }
+    browserWindow.setAlwaysOnTop(false);
+  } catch (err) {
+    log.warn(`[display] ${label} pre-move exit failed: ${err.message}`);
+  }
+
+  const placeTimer = setTimeout(() => {
+    placeDisplayTimers.delete(browserWindow);
+    if (browserWindow.isDestroyed()) return;
+    if (isProjection) {
+      coverProjectionDisplay(browserWindow, display);
+    } else {
+      presentOnExternalDisplay(browserWindow, display);
+    }
+    // eslint-disable-next-line no-param-reassign
+    browserWindow.displayId = targetId;
+    const bounds = browserWindow.getBounds();
+    const onTarget =
+      Math.abs(bounds.x - x) < 80 &&
+      Math.abs(bounds.y - y) < 80 &&
+      Math.abs(bounds.width - width) < 80;
+    log.info(
+      `[display] ${label} → id=${targetId} target=(${x},${y} ${width}x${height}) ` +
+        `actual=(${bounds.x},${bounds.y} ${bounds.width}x${bounds.height}) ok=${onTarget}`,
+    );
+    if (!onTarget) {
+      setTimeout(() => {
+        if (browserWindow.isDestroyed()) return;
+        if (isProjection) {
+          coverProjectionDisplay(browserWindow, display);
+        } else {
+          presentOnExternalDisplay(browserWindow, display);
+        }
+        const retry = browserWindow.getBounds();
+        log.info(
+          `[display] ${label} retry actual=(${retry.x},${retry.y} ${retry.width}x${retry.height})`,
+        );
+      }, 100);
+    }
+  }, 50);
+  placeDisplayTimers.set(browserWindow, placeTimer);
+}
+
+function replayLastPresenterIpc(targetWindow) {
+  if (!targetWindow || targetWindow.isDestroyed() || !lastPresenterIpc) return;
+  targetWindow.webContents.send(lastPresenterIpc.channel, lastPresenterIpc.data);
+}
+
+function sendToViewerWindows(channel, ...args) {
+  [viewerWindow, projectionWindow].forEach((window) => {
+    if (window && !window.isDestroyed()) window.webContents.send(channel, ...args);
+  });
+  // Always keep the in-app controller preview in sync (single-monitor / Presentation).
+  if (embeddedViewerWebContents && !embeddedViewerWebContents.isDestroyed()) {
+    try {
+      embeddedViewerWebContents.send(channel, ...args);
+    } catch (err) {
+      log.warn(`[preview] Failed to send ${channel} to embedded webview: ${err.message}`);
+    }
+  }
 }
 
 function showChangelog() {
@@ -401,85 +605,459 @@ function showChangelog() {
   return lastSeen !== appVersion || (lastSeenCount < maxChangeLogSeenCount && !limitChangeLog);
 }
 
-function createViewer(ipcData) {
-  const isExternal = checkForExternalDisplay();
+function createViewer(ipcData, display) {
+  if (viewerWindow && !viewerWindow.isDestroyed()) return;
+  const targetDisplay = display || resolveDisplayRoles().presenterDisplay;
+  if (!targetDisplay) return;
 
-  if (isExternal) {
-    viewerWindow = new BrowserWindow({
-      width: 800,
-      height: 400,
-      x: viewerWindowPos.x,
-      y: viewerWindowPos.y,
-      autoHideMenuBar: true,
-      show: false,
-      titleBarStyle: 'hidden',
-      frame: false,
-      backgroundColor: '#000000',
-      webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true,
-        contextIsolation: false,
-        webviewTag: true,
-        nodeIntegrationInSubFrames: true,
-        nodeIntegrationInWorker: true,
-        media: true,
-      },
-    });
-    viewerWindow.loadURL(`file://${__dirname}/www/viewer.html`);
-    remote.enable(viewerWindow.webContents);
-    viewerWindow.webContents.on('did-finish-load', () => {
-      viewerWindow.webContents.insertCSS(styles);
-      viewerWindow.show();
-      const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send(
-        'external-display',
-        JSON.stringify({
-          width,
-          height,
-        }),
-      );
+  if (ipcData && ipcData.send) {
+    lastPresenterIpc = { channel: ipcData.send, data: ipcData.data };
+  }
+
+  const presenterWindow = new BrowserWindow({
+    width: targetDisplay.size.width,
+    height: targetDisplay.size.height,
+    x: targetDisplay.bounds.x,
+    y: targetDisplay.bounds.y,
+    autoHideMenuBar: true,
+    show: false,
+    titleBarStyle: 'hidden',
+    frame: false,
+    backgroundColor: '#000000',
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
+      webviewTag: true,
+      nodeIntegrationInSubFrames: true,
+      nodeIntegrationInWorker: true,
+      media: true,
+    },
+  });
+  viewerWindow = presenterWindow;
+  presenterWindow.displayId = targetDisplay.id;
+  pinnedPresenterDisplayId = targetDisplay.id;
+  // Do NOT assign global.webview here. That ref is reserved for the controller's
+  // embedded <webview> (set in ViewerContent). Overwriting it with the external
+  // BrowserWindow breaks in-app preview updates (update-viewer-setting).
+  presenterWindow.loadURL(`file://${__dirname}/www/viewer.html`);
+  remote.enable(presenterWindow.webContents);
+  // Upstream dev golden: insertCSS → show → focus → setFullScreen(true) → IPC
+  presenterWindow.webContents.on('did-finish-load', () => {
+    presenterWindow.webContents.insertCSS(styles);
+    presenterWindow.show();
+    const [width, height] = presenterWindow.getSize();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('external-display', JSON.stringify({ width, height }));
       mainWindow.focus();
       if (showChangelog() && secondaryWindows.changelogWindow.obj) {
         secondaryWindows.changelogWindow.obj.focus();
       }
-      viewerWindow.setFullScreen(true);
+    }
+    presenterWindow.setFullScreen(true);
 
-      viewerWindow.webContents.send('wc-webview-enabled');
-      global.webview = viewerWindow.webContents;
-      viewerWindow.webContents.send('update-settings');
+    presenterWindow.webContents.send('wc-webview-enabled');
+    presenterWindow.webContents.send('update-settings');
 
-      if (typeof ipcData !== 'undefined') {
-        viewerWindow.webContents.send(ipcData.send, ipcData.data);
-      }
-    });
-    viewerWindow.on('enter-full-screen', () => {
+    if (ipcData) {
+      presenterWindow.webContents.send(ipcData.send, ipcData.data);
+    } else {
+      replayLastPresenterIpc(presenterWindow);
+    }
+    // ShabadDeck renders from the store, not from show-line, and a swap starts it
+    // empty. Pull the current snapshot so the line + read ticks + home show at
+    // once instead of only after the next line change.
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('projection-state-request');
+    }
+  });
+  presenterWindow.on('enter-full-screen', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.focus();
       if (showChangelog() && secondaryWindows.changelogWindow.obj) {
         secondaryWindows.changelogWindow.obj.focus();
       }
-    });
-    viewerWindow.on('focus', () => {
-      // mainWindow.focus();
-    });
-    viewerWindow.on('closed', () => {
+    }
+  });
+  presenterWindow.on('closed', () => {
+    if (viewerWindow === presenterWindow) {
       viewerWindow = false;
+      // Keep global.webview — it points at the controller embedded preview, not this window.
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('remove-external-display');
       }
-    });
-    viewerWindow.on('resize', () => {
-      const [width, height] = viewerWindow.getSize();
-      mainWindow.webContents.send(
-        'external-display',
-        JSON.stringify({
-          width,
-          height,
-        }),
-      );
-    });
-  }
-  mainWindow.webContents.send('presenter-view');
+    }
+  });
+  presenterWindow.on('resize', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      const [width, height] = presenterWindow.getSize();
+      mainWindow.webContents.send('external-display', JSON.stringify({ width, height }));
+    }
+  });
 }
+
+function createProjection(display) {
+  if (!display || (projectionWindow && !projectionWindow.isDestroyed())) return;
+
+  const paneWindow = new BrowserWindow({
+    width: display.size.width,
+    height: display.size.height,
+    x: display.bounds.x,
+    y: display.bounds.y,
+    autoHideMenuBar: true,
+    show: false,
+    // Match createViewer (Display 1) so native FS covers menu bar the same way.
+    titleBarStyle: 'hidden',
+    frame: false,
+    backgroundColor: '#000000',
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
+      webviewTag: true,
+      nodeIntegrationInSubFrames: true,
+      nodeIntegrationInWorker: true,
+      media: true,
+    },
+  });
+  projectionWindow = paneWindow;
+  paneWindow.displayId = display.id;
+  pinnedProjectionDisplayId = display.id;
+  paneWindow.loadURL(`file://${__dirname}/www/viewer.html?paneProjection=1`);
+  // Keep a reference: paneWindow.webContents can't be read once the window is destroyed
+  const paneWebContents = paneWindow.webContents;
+  pendingProjectionWebContents = paneWebContents;
+  remote.enable(paneWindow.webContents);
+  paneWindow.webContents.on('did-fail-load', (_event, code, description, url) => {
+    log.error(`[projection] Load failed (${code}): ${description} ${url}`);
+  });
+  paneWindow.webContents.on('render-process-gone', (_event, details) => {
+    log.error(`[projection] Renderer exited: ${details.reason} ${details.exitCode}`);
+  });
+  paneWindow.webContents.on('did-finish-load', () => {
+    // Same golden path as createViewer / upstream D1 (no menu).
+    paneWindow.webContents.insertCSS(styles);
+    paneWindow.show();
+    paneWindow.setFullScreen(true);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.focus();
+    }
+    paneWindow.webContents.send('wc-webview-enabled');
+    // Recreate (swap) starts with an empty viewer store. Ask the controller for
+    // the current shabad/pane snapshot so Display 2 is not a blank white screen.
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('projection-state-request');
+    }
+  });
+  paneWindow.on('enter-full-screen', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.focus();
+    }
+  });
+  paneWindow.on('closed', () => {
+    if (pendingProjectionWebContents === paneWebContents) {
+      pendingProjectionWebContents = null;
+    }
+    if (projectionWindow === paneWindow) {
+      projectionWindow = false;
+    }
+  });
+}
+
+ipcMain.on('viewer-render-start', (event, url) => {
+  if (event.sender === projectionWindow?.webContents) {
+    log.info(`[projection] Viewer entry loaded: ${url}`);
+  }
+});
+
+ipcMain.on('viewer-boot-error', (event, message) => {
+  if (event.sender === projectionWindow?.webContents) {
+    log.error(`[projection] Viewer boot failed: ${message}`);
+  }
+});
+
+ipcMain.on('viewer-runtime-error', (event, message) => {
+  if (event.sender === projectionWindow?.webContents) {
+    log.error(`[projection] Viewer runtime failed: ${message}`);
+  }
+});
+
+ipcMain.on('projection-render-state', (event, state) => {
+  if (event.sender === projectionWindow?.webContents) {
+    log.info(`[projection] React state: ${JSON.stringify(state)}`);
+  }
+});
+
+/** Tell controller whether Swap Displays is available (2+ externals). */
+function notifyDualDisplayState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send('dual-display-state', {
+    canSwap: getExternalDisplays().length >= 2,
+  });
+}
+
+/**
+ * Reconcile classic (Display 1) + optional teleprompter (Display 2) windows.
+ * Prefer move-in-place over destroy/recreate so Display 1 does not blank.
+ * Call on display topology changes — not on every show-line.
+ * Swap uses swapDisplayRoles() instead (native FS move is broken on virtuals).
+ */
+function syncViewerWindows() {
+  const { presenterDisplay, projectionDisplay } = resolveDisplayRoles();
+
+  log.info(
+    `[display] sync roles presenter=${presenterDisplay ? presenterDisplay.id : 'none'} ` +
+      `projection=${projectionDisplay ? projectionDisplay.id : 'none'} ` +
+      `viewerWin=${viewerWindow && !viewerWindow.isDestroyed() ? viewerWindow.displayId : 'none'} ` +
+      `projWin=${projectionWindow && !projectionWindow.isDestroyed() ? projectionWindow.displayId : 'none'}`,
+  );
+
+  const movePresenter =
+    presenterDisplay &&
+    viewerWindow &&
+    !viewerWindow.isDestroyed() &&
+    viewerWindow.displayId !== presenterDisplay.id;
+  const moveProjection =
+    projectionDisplay &&
+    projectionWindow &&
+    !projectionWindow.isDestroyed() &&
+    projectionWindow.displayId !== projectionDisplay.id;
+
+  if (!presenterDisplay) {
+    if (viewerWindow && !viewerWindow.isDestroyed()) {
+      const previousPresenterWindow = viewerWindow;
+      viewerWindow = false;
+      previousPresenterWindow.close();
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('remove-external-display');
+      }
+    }
+  } else if (movePresenter) {
+    placeWindowOnDisplay(viewerWindow, presenterDisplay);
+  } else if (!viewerWindow || viewerWindow.isDestroyed()) {
+    createViewer(
+      lastPresenterIpc
+        ? { send: lastPresenterIpc.channel, data: lastPresenterIpc.data }
+        : undefined,
+      presenterDisplay,
+    );
+  }
+
+  if (!projectionDisplay) {
+    if (projectionWindow && !projectionWindow.isDestroyed()) {
+      const previousProjectionWindow = projectionWindow;
+      projectionWindow = false;
+      previousProjectionWindow.close();
+    }
+  } else if (moveProjection) {
+    const projWin = projectionWindow;
+    const projDisplay = projectionDisplay;
+    const delayMs = movePresenter ? 100 : 0;
+    setTimeout(() => {
+      if (!projWin || projWin.isDestroyed()) return;
+      placeWindowOnDisplay(projWin, projDisplay);
+    }, delayMs);
+  } else if (!projectionWindow || projectionWindow.isDestroyed()) {
+    createProjection(projectionDisplay);
+  }
+
+  notifyDualDisplayState();
+  trackDisplay2Connection();
+}
+
+/**
+ * Swap = flip pins, create NEW windows (same path as initial load), then close old.
+ * Do NOT: close-then-create (menu bar), or in-place loadURL (blank first swap).
+ */
+function swapDisplayRoles() {
+  const externals = sortDisplaysStable(getExternalDisplays());
+  if (externals.length < 2) {
+    log.warn(
+      `[display] swap ignored — need 2+ externals, got ${externals.length} ` +
+        `(ids=${externals.map((d) => d.id).join(',')})`,
+    );
+    notifyDualDisplayState();
+    return;
+  }
+
+  const previousPresenterId = pinnedPresenterDisplayId;
+  const previousProjectionId = pinnedProjectionDisplayId;
+
+  if (
+    previousPresenterId != null &&
+    previousProjectionId != null &&
+    previousPresenterId !== previousProjectionId
+  ) {
+    pinnedPresenterDisplayId = previousProjectionId;
+    pinnedProjectionDisplayId = previousPresenterId;
+  } else {
+    pinnedPresenterDisplayId = externals[1].id;
+    pinnedProjectionDisplayId = externals[0].id;
+  }
+
+  log.info(
+    `[display] swap pins ${previousPresenterId}/${previousProjectionId} → ` +
+      `${pinnedPresenterDisplayId}/${pinnedProjectionDisplayId}; ` +
+      `externals=${externals.map((d) => `${d.id}@(${d.bounds.x},${d.bounds.y})`).join(' ')}`,
+  );
+
+  const { presenterDisplay, projectionDisplay } = resolveDisplayRoles();
+  const presenterIpc = lastPresenterIpc
+    ? { send: lastPresenterIpc.channel, data: lastPresenterIpc.data }
+    : undefined;
+
+  const oldViewer = viewerWindow && !viewerWindow.isDestroyed() ? viewerWindow : null;
+  const oldProjection =
+    projectionWindow && !projectionWindow.isDestroyed() ? projectionWindow : null;
+
+  // Detach globals so create* can run; keep old windows alive until new ones are up.
+  viewerWindow = false;
+  projectionWindow = false;
+  if (oldViewer) {
+    oldViewer.removeAllListeners('closed');
+  }
+  if (oldProjection) {
+    oldProjection.removeAllListeners('closed');
+  }
+
+  if (presenterDisplay) {
+    createViewer(presenterIpc, presenterDisplay);
+  }
+  if (projectionDisplay) {
+    createProjection(projectionDisplay);
+  }
+  const createdViewer = viewerWindow;
+  const createdProjection = projectionWindow;
+
+  const closeOld = (win) => {
+    if (!win || win.isDestroyed()) return;
+    try {
+      win.close();
+    } catch (err) {
+      /* ignore */
+    }
+  };
+
+  // After old FS windows leave the displays, re-assert cover so macOS menu bar stays hidden.
+  const recoverFullscreenAfterSwap = () => {
+    setTimeout(() => {
+      if (viewerWindow && !viewerWindow.isDestroyed() && presenterDisplay) {
+        presentOnExternalDisplay(viewerWindow, presenterDisplay);
+      }
+      if (projectionWindow && !projectionWindow.isDestroyed() && projectionDisplay) {
+        coverProjectionDisplay(projectionWindow, projectionDisplay);
+      }
+    }, 50);
+  };
+
+  // Close previous pair after new windows finish their first load (FS already applied).
+  let pending = (presenterDisplay ? 1 : 0) + (projectionDisplay ? 1 : 0);
+  let settled = false;
+  let safetyTimer = null;
+  const finishSwap = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(safetyTimer);
+    closeOld(oldViewer);
+    closeOld(oldProjection);
+    recoverFullscreenAfterSwap();
+  };
+  const onNewReady = () => {
+    pending -= 1;
+    if (pending > 0) return;
+    finishSwap();
+  };
+
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
+    viewerWindow.webContents.once('did-finish-load', onNewReady);
+  }
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    projectionWindow.webContents.once('did-finish-load', onNewReady);
+  }
+  if (pending === 0) {
+    finishSwap();
+  }
+
+  // Safety: if load hangs, still tear down old windows and recover FS.
+  // Skip once both windows have loaded, or if a newer swap already replaced them.
+  safetyTimer = setTimeout(() => {
+    if (
+      (presenterDisplay && viewerWindow !== createdViewer) ||
+      (projectionDisplay && projectionWindow !== createdProjection)
+    ) {
+      return;
+    }
+    finishSwap();
+  }, 4000);
+
+  notifyDualDisplayState();
+}
+
+ipcMain.on('projection-state-request', (event) => {
+  const fromCurrentProjection =
+    projectionWindow &&
+    !projectionWindow.isDestroyed() &&
+    event.sender === projectionWindow.webContents;
+  const fromPendingProjection = event.sender === pendingProjectionWebContents;
+  if (
+    (!fromCurrentProjection && !fromPendingProjection) ||
+    !mainWindow ||
+    mainWindow.isDestroyed()
+  ) {
+    log.warn('[projection] Ignored state request from an unexpected renderer');
+    return;
+  }
+  log.info('[projection] State request received from display renderer');
+  mainWindow.webContents.send('projection-state-request');
+});
+
+ipcMain.on('projection-state-response', (event, state) => {
+  if (event.sender !== mainWindow?.webContents) {
+    log.warn('[projection] Ignored state response from an unexpected renderer');
+    return;
+  }
+  const target = projectionWindow && !projectionWindow.isDestroyed() ? projectionWindow : null;
+  const hasProjectionTarget =
+    target || (pendingProjectionWebContents && !pendingProjectionWebContents.isDestroyed());
+  const hasViewerTarget = viewerWindow && !viewerWindow.isDestroyed();
+  if (!hasProjectionTarget && !hasViewerTarget) {
+    log.warn('[projection] Ignored state response; no display window');
+    return;
+  }
+  const payload = {
+    ...state,
+    viewport: projectionViewport,
+    range: projectionRange,
+  };
+  log.info(`[projection] State response received; viewport=${Boolean(projectionViewport?.width)}`);
+  // Display 2 (pane projection) needs the scaled viewport; Display 1 (ShabadDeck)
+  // hydrates its store from the same snapshot so a swap isn't blank.
+  if (target) {
+    target.webContents.send('projection-state', payload);
+  } else if (pendingProjectionWebContents && !pendingProjectionWebContents.isDestroyed()) {
+    pendingProjectionWebContents.send('projection-state', payload);
+  }
+  if (hasViewerTarget) {
+    viewerWindow.webContents.send('projection-state', payload);
+  }
+});
+
+ipcMain.on('projection-viewport', (event, viewport) => {
+  if (event.sender !== mainWindow?.webContents) return;
+  projectionViewport = viewport;
+  log.info(`[projection] Source pane viewport ${viewport.width}x${viewport.height}`);
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    projectionWindow.webContents.send('projection-viewport', viewport);
+  }
+});
+
+ipcMain.on('projection-range', (event, range) => {
+  if (event.sender !== mainWindow?.webContents) return;
+  projectionRange = range;
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    projectionWindow.webContents.send('projection-range', range);
+  }
+});
 
 function writeFileCallback(err) {
   if (err) {
@@ -523,7 +1101,7 @@ const showLine = async (line, socket = io) => {
     socket.emit('show-line', payload);
   }
   const zoomToken = store.get('userPrefs.app.zoomToken');
-  if (zoomToken && line.Line.Unicode) {
+  if (zoomToken && line.Line && line.Line.Unicode) {
     try {
       await fetch(`${zoomToken}&seq=${seq}`, {
         method: 'POST',
@@ -659,6 +1237,8 @@ app.on('ready', () => {
     show: false,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
+    // Keep controller in Cmd+Tab / Dock (must not be a UIElement/accessory app).
+    skipTaskbar: false,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -669,6 +1249,22 @@ app.on('ready', () => {
       media: true,
     },
   });
+  // Dev + multi-display cover can leave the process as LSUIElement (no Cmd+Tab).
+  // Force normal app activation so controller shows in app switcher / Dock.
+  if (process.platform === 'darwin' && typeof app.setActivationPolicy === 'function') {
+    try {
+      app.setActivationPolicy('regular');
+    } catch (err) {
+      log.warn(`[app] setActivationPolicy failed: ${err.message}`);
+    }
+  }
+  if (process.platform === 'darwin' && app.dock && typeof app.dock.show === 'function') {
+    try {
+      app.dock.show();
+    } catch (err) {
+      log.warn(`[app] dock.show failed: ${err.message}`);
+    }
+  }
   const splash = new BrowserWindow({
     width: 600,
     height: 400,
@@ -693,17 +1289,33 @@ app.on('ready', () => {
   });
 
   mainWindow.webContents.on('dom-ready', () => {
-    if (checkForExternalDisplay()) {
+    const { presenterDisplay } = resolveDisplayRoles();
+    if (presenterDisplay) {
       mainWindow.webContents.send(
         'external-display',
         JSON.stringify({
-          width: viewerWindowPos.w,
-          height: viewerWindowPos.h,
+          width: presenterDisplay.size.width,
+          height: presenterDisplay.size.height,
         }),
       );
     }
     splash.close();
     mainWindow.show();
+    if (process.platform === 'darwin' && typeof app.setActivationPolicy === 'function') {
+      try {
+        app.setActivationPolicy('regular');
+      } catch (err) {
+        // ignore
+      }
+    }
+    if (process.platform === 'darwin' && app.dock && typeof app.dock.show === 'function') {
+      try {
+        app.dock.show();
+      } catch (err) {
+        // ignore
+      }
+    }
+    mainWindow.focus();
     const token = retrieveToken();
     if (token) {
       mainWindow.webContents.send('userToken', token);
@@ -731,9 +1343,7 @@ app.on('ready', () => {
         store.set('changelog-seen-count', 1);
       }
     }
-    if (!viewerWindow) {
-      createViewer();
-    }
+    syncViewerWindows();
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
 
@@ -794,22 +1404,26 @@ app.on('ready', () => {
 
   // Close all other windows if closing the main
   mainWindow.on('close', () => {
-    emptyOverlay();
-    if (viewerWindow && !viewerWindow.isDestroyed()) {
-      viewerWindow.close();
+    if (display2Connected) {
+      trackDisplay('display-2-disconnected');
+      display2Connected = false;
     }
+    emptyOverlay();
+    if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
+    if (projectionWindow && !projectionWindow.isDestroyed()) projectionWindow.close();
+    viewerWindow = false;
+    projectionWindow = false;
+    embeddedViewerWebContents = null;
+    global.webview = null;
     const changelogWindow = secondaryWindows.changelogWindow.obj;
     if (changelogWindow && !changelogWindow.isDestroyed()) {
       changelogWindow.close();
     }
   });
 
-  // When a display is connected, add a viewer window if it does not already exit
-  screens.on('display-added', () => {
-    if (!viewerWindow) {
-      createViewer();
-    }
-  });
+  screens.on('display-added', () => syncViewerWindows());
+  screens.on('display-removed', () => syncViewerWindows());
+  screens.on('display-metrics-changed', () => syncViewerWindows());
 
   globalShortcut.register('CommandOrControl+Shift+I', () => {
     if (mainWindow) {
@@ -836,11 +1450,15 @@ ipcMain.handle('send-to-bani-controller', async (event, data) => {
 
 ipcMain.on('enable-wc-webview', (event, data) => {
   const webViewWC = webContents.fromId(parseInt(data, 10));
+  if (!webViewWC || webViewWC.isDestroyed()) {
+    log.warn('[preview] enable-wc-webview: invalid webContents id');
+    return;
+  }
+  // Track controller embedded preview separately from external Display 1/2 windows.
+  embeddedViewerWebContents = webViewWC;
   remote.enable(webViewWC);
   webViewWC.send('wc-webview-enabled');
-  if (checkForExternalDisplay()) {
-    viewerWindow.send('wc-webview-enabled');
-  }
+  sendToViewerWindows('wc-webview-enabled');
 });
 
 ipcMain.on('cast-session-active', () => {
@@ -859,9 +1477,7 @@ ipcMain.on('checkForUpdates', checkForUpdates);
 ipcMain.on('quitAndInstall', () => autoUpdater.quitAndInstall());
 
 ipcMain.on('clear-apv', () => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('clear-apv');
-  }
+  sendToViewerWindows('clear-apv');
 });
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
@@ -880,18 +1496,39 @@ io.on('connection', (socket) => {
 });
 
 ipcMain.on('show-line', (event, arg) => {
-  lastLine = JSON.parse(arg);
-  showLine(JSON.parse(arg));
-  if (viewerWindow) {
-    viewerWindow.webContents.send('show-line', JSON.parse(arg));
-  } else {
-    createViewer({
-      send: 'show-line',
-      data: JSON.parse(arg),
-    });
+  const linePayload = JSON.parse(arg);
+  // paneSync messages are for Display 2 (pane projection) only — they carry no
+  // Line. They must not become the "last presenter line" (replayed to Display 1
+  // on swap/recreate) or feed/create the overlay, or the line display comes up
+  // blank after a swap until the next real line is picked.
+  const isPaneSync = linePayload && linePayload.paneSync === true;
+  if (!isPaneSync) {
+    lastLine = linePayload;
+    lastPresenterIpc = { channel: 'show-line', data: linePayload };
+    showLine(linePayload);
   }
-  if (JSON.parse(arg).live) {
-    createBroadcastFiles(JSON.parse(arg));
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
+    if (!isPaneSync) {
+      viewerWindow.webContents.send('show-line', linePayload);
+    }
+  } else if (!isPaneSync) {
+    createViewer({ send: 'show-line', data: linePayload });
+  }
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    projectionWindow.webContents.send('show-line', linePayload);
+  }
+  // In-app preview (single monitor): must receive show-line even when no external
+  // Display 1. It mirrors the overlay, so it skips Display-2-only paneSync.
+  if (!isPaneSync && embeddedViewerWebContents && !embeddedViewerWebContents.isDestroyed()) {
+    try {
+      embeddedViewerWebContents.send('show-line', linePayload);
+    } catch (err) {
+      log.warn(`[preview] show-line to embedded webview failed: ${err.message}`);
+    }
+  }
+  // Do not call syncViewerWindows() here — display order thrash was blanking Display 1.
+  if (linePayload.live) {
+    createBroadcastFiles(linePayload);
   }
 });
 
@@ -947,50 +1584,82 @@ ipcMain.on('show-text', (event, arg) => {
     showLine(textLine);
   }
 
-  if (viewerWindow) {
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
     viewerWindow.webContents.send('show-text', arg);
   } else {
-    createViewer({
-      send: 'show-text',
-      data: arg,
-    });
+    createViewer({ send: 'show-text', data: arg });
   }
+  lastPresenterIpc = { channel: 'show-text', data: arg };
   if (arg.live) {
     createBroadcastFiles(arg);
   }
 });
 
 ipcMain.on('toggle-viewer-window', (event, arg) => {
-  if (viewerWindow) {
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
     if (arg) {
-      viewerWindow.show();
+      const d =
+        electron.screen.getAllDisplays().find((disp) => disp.id === viewerWindow.displayId) ||
+        resolveDisplayRoles().presenterDisplay;
+      if (d) presentOnExternalDisplay(viewerWindow, d);
+      else viewerWindow.show();
     } else {
       viewerWindow.hide();
     }
   }
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    if (arg) {
+      const d =
+        electron.screen.getAllDisplays().find((disp) => disp.id === projectionWindow.displayId) ||
+        resolveDisplayRoles().projectionDisplay;
+      if (d) coverProjectionDisplay(projectionWindow, d);
+      else projectionWindow.show();
+    } else {
+      projectionWindow.hide();
+    }
+  }
+});
+
+ipcMain.on('swap-display-roles', () => {
+  trackDisplay('swap-display-used');
+  swapDisplayRoles();
+});
+
+ipcMain.on('dual-display-state-request', () => {
+  notifyDualDisplayState();
 });
 
 ipcMain.on('presenter-view', (event, arg) => {
-  if (viewerWindow) {
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
     if (!arg) {
       viewerWindow.hide();
     } else {
-      viewerWindow.show();
-      viewerWindow.setFullScreen(true);
+      const d =
+        electron.screen.getAllDisplays().find((disp) => disp.id === viewerWindow.displayId) ||
+        resolveDisplayRoles().presenterDisplay;
+      if (d) presentOnExternalDisplay(viewerWindow, d);
+      else viewerWindow.show();
+    }
+  }
+  if (projectionWindow && !projectionWindow.isDestroyed()) {
+    if (!arg) {
+      projectionWindow.hide();
+    } else {
+      const d =
+        electron.screen.getAllDisplays().find((disp) => disp.id === projectionWindow.displayId) ||
+        resolveDisplayRoles().projectionDisplay;
+      if (d) coverProjectionDisplay(projectionWindow, d);
+      else projectionWindow.show();
     }
   }
 });
 
 ipcMain.on('scroll-from-main', (event, arg) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('send-scroll', arg);
-  }
+  sendToViewerWindows('send-scroll', arg);
 });
 
 ipcMain.on('next-ang', (event, arg) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('show-ang', arg);
-  }
+  sendToViewerWindows('show-ang', arg);
   mainWindow.webContents.send('next-ang', arg);
 });
 
@@ -999,22 +1668,16 @@ ipcMain.on('scroll-pos', (event, arg) => {
 });
 
 ipcMain.on('update-settings', () => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('update-settings');
-  }
+  sendToViewerWindows('update-settings');
   mainWindow.webContents.send('sync-settings');
 });
 
 ipcMain.on('save-settings', (event, setting) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('save-settings', setting);
-  }
+  sendToViewerWindows('save-settings', setting);
 });
 
 ipcMain.on('update-viewer-setting', (event, setting) => {
-  if (viewerWindow) {
-    viewerWindow.webContents.send('update-viewer-setting', setting);
-  }
+  sendToViewerWindows('update-viewer-setting', setting);
 });
 
 ipcMain.on('update-global-setting', (event, setting) => {
