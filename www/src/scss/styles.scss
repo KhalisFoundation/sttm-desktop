@@ -2159,6 +2159,9 @@ $vf2-yellow-bar: #f2c200;
   gap: 8px;
 }
 .vf2-cand {
+  display: block;
+  width: 100%;
+  text-align: left;
   padding: 9px 12px 8px;
   border-radius: 12px;
   background: #fafafa;
@@ -2186,6 +2189,7 @@ $vf2-yellow-bar: #f2c200;
 .vf2-cand-line {
   flex: 1;
   min-width: 0;
+  text-align: left;
   font-size: 15px;
   line-height: 1.35;
   color: $vf2-ink;
@@ -2291,7 +2295,7 @@ $vf2-yellow-bar: #f2c200;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin: -4px 2px -2px;
+  margin: -4px 13px -2px;
   font-size: 12px;
   line-height: 1.4;
   color: $vf2-faint;
@@ -2313,8 +2317,6 @@ $vf2-yellow-bar: #f2c200;
   direction: rtl;
   text-align: left;
   unicode-bidi: plaintext;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22%);
-  mask-image: linear-gradient(to right, transparent 0, #000 22%);
 }
 .vf-heard-toggle {
   opacity: 0.55;
