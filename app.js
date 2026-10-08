@@ -560,6 +560,11 @@ function sendToViewerWindows(channel, ...args) {
 }
 
 function showChangelog() {
+  // Experimental builds don't have changelog entries of their own
+  if (appVersion.includes('experimental')) {
+    return false;
+  }
+
   const lastSeen = store.get('changelog-seen');
   const lastSeenCount = store.get('changelog-seen-count');
   const { limitChangeLog } = savedSettings;
