@@ -608,14 +608,24 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const mirror = (update) => {
     if (SHADOW_BUILD) shadowBus.system(update);
   };
-  const setActiveVerseId = (verseId) => {
-    if (shadowing()) return shadowSetVerse(verseId);
-    mirror({ verseId });
-    return navActions.setActiveVerseId(verseId);
-  };
-  const setLineNumber = (...a) => (shadowing() ? shadowNoop() : navActions.setLineNumber(...a));
-  const setMiscSlideText = (...a) =>
-    shadowing() ? shadowNoop() : navActions.setMiscSlideText(...a);
+  // Stable identities (useCallback): these feed other hooks' dependency lists, and a new
+  // function each render would re-run those effects (cleanup included) every render.
+  const setActiveVerseId = useCallback(
+    (verseId) => {
+      if (shadowing()) return shadowSetVerse(verseId);
+      mirror({ verseId });
+      return navActions.setActiveVerseId(verseId);
+    },
+    [navActions],
+  );
+  const setLineNumber = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setLineNumber(...a)),
+    [navActions],
+  );
+  const setMiscSlideText = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setMiscSlideText(...a)),
+    [navActions],
+  );
   // Rehras is followed at the long length: the user's Sundar Gutka length is raised while
   // Voice-Follow shows it and restored after. In shadow mode the real setting is never
   // touched (the Bani column hidden Voice-Follow loads comes from baniLengthFor(userLength())
@@ -627,14 +637,22 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const lengthOverrideRef = useRef(null);
   // Opening a Bani is the same four navigator actions the Sundar Gutka screen uses; in
   // shadow mode they become one system update ("bani:<id>" at a line), nothing on screen.
-  const setIsSundarGutkaBani = (...a) =>
-    shadowing() ? shadowNoop() : navActions.setIsSundarGutkaBani(...a);
-  const setSundarGutkaBaniId = (...a) =>
-    shadowing() ? shadowNoop() : navActions.setSundarGutkaBaniId(...a);
-  const setIsCeremonyBani = (...a) =>
-    shadowing() ? shadowNoop() : navActions.setIsCeremonyBani(...a);
-  const setSingleDisplayActiveTab = (...a) =>
-    shadowing() ? shadowNoop() : navActions.setSingleDisplayActiveTab(...a);
+  const setIsSundarGutkaBani = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setIsSundarGutkaBani(...a)),
+    [navActions],
+  );
+  const setSundarGutkaBaniId = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setSundarGutkaBaniId(...a)),
+    [navActions],
+  );
+  const setIsCeremonyBani = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setIsCeremonyBani(...a)),
+    [navActions],
+  );
+  const setSingleDisplayActiveTab = useCallback(
+    (...a) => (shadowing() ? shadowNoop() : navActions.setSingleDisplayActiveTab(...a)),
+    [navActions],
+  );
   // In shadow mode the slide Voice-Follow would put up is its own, never the sevadaar's.
   const shadowSlideRef = useRef(null);
   if (!shadowSlideRef.current) {
@@ -644,11 +662,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
       shadowBus.system({ slide: visible ? true : null });
     };
   }
-  const setIsMiscSlide = (visible) => {
-    if (shadowing()) return shadowSlideRef.current(visible);
-    mirror({ slide: visible ? true : null });
-    return navActions.setIsMiscSlide(visible);
-  };
+  const setIsMiscSlide = useCallback(
+    (visible) => {
+      if (shadowing()) return shadowSlideRef.current(visible);
+      mirror({ slide: visible ? true : null });
+      return navActions.setIsMiscSlide(visible);
+    },
+    [navActions],
+  );
   const isMiscSlide = useStoreState((state) => state.navigator.isMiscSlide);
   const setOverlayScreen = useStoreActions((actions) => actions.app.setOverlayScreen);
   // Proper "open this shabad" action (drives viewer/projector/history/socket).
