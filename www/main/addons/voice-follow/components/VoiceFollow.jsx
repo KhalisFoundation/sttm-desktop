@@ -807,9 +807,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   }, []);
   const micIdRef = useRef(micId);
   micIdRef.current = micId;
-  useEffect(() => {
-    refreshMics();
-  }, [refreshMics]);
+  // No device enumeration at start-up: it is asked of the audio service only when the mic
+  // menu opens or a microphone was opened, so a stuck audio device cannot stall the app
+  // for a sevadaar who never touches Voice-Follow.
   const levelHistRef = useRef([]); // [[ms, level]] over the last 10 s
   const deviceRef = useRef('');
   const [micMenu, setMicMenu] = useState(false);
