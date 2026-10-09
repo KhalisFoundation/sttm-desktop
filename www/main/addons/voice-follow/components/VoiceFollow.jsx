@@ -406,6 +406,7 @@ const UI_MOVE_CONF = 0.4;
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
 const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
+const HEARTBEAT = false; // the slow breath of the current card: off (not an agreed design)
 const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
 const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
 
@@ -822,7 +823,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const beatAtRef = useRef(0);
   const noteBeat = useCallback((score) => {
     const now = Date.now();
-    if (score < HEARTBEAT_MIN_SCORE || now - beatAtRef.current < HEARTBEAT_MIN_MS) return;
+    if (!HEARTBEAT || score < HEARTBEAT_MIN_SCORE || now - beatAtRef.current < HEARTBEAT_MIN_MS)
+      return;
     beatAtRef.current = now;
     setBeat(now);
   }, []);
@@ -3517,11 +3519,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     null;
   const lineNo = posIsCurrent ? pos.lineIndex + 1 : null;
   // Option: preview the next lines once the app is sure of the Shabad (>= 95%).
-  let showNext = false;
+  let showNext = true; // one faint next line under the current line, once sure (>= 95%)
   try {
-    showNext = window.localStorage.getItem('vf-next-lines') === '1';
+    showNext = window.localStorage.getItem('vf-next-lines') !== '0';
   } catch (e) {
-    showNext = false;
+    showNext = true;
   }
   const liveItems = currentView ? liveCands.items : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
@@ -3737,7 +3739,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   profLines &&
                   boardCur &&
                   boardCur.pct >= 0.95 &&
-                  profLines.slice(pos.lineIndex + 1, pos.lineIndex + 3).map((l, i) => (
+                  profLines.slice(pos.lineIndex + 1, pos.lineIndex + 2).map((l, i) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={i} className="vf2-next-line" lang="pa">
                       {l}
