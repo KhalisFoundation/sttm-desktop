@@ -404,6 +404,51 @@ const BANI_CUR_SPAN = 8;
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
 const UI_MOVE_CONF = 0.4;
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
+const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in candidate lines
+const MIC_QUIET_LEVEL = 0.02; // peak input level (0-1) below which the mic is "very quiet"
+const MIC_QUIET_AFTER_S = 10; // seconds of listening before the quiet warning can show
+// Recognizer spellings are loose: ignore a final short vowel, fold ਣ/ਨ and the nukta, and
+// count a word as matched when most of it agrees with a word of the line.
+const wordKey = (w) =>
+  engine
+    .norm(w)
+    .replace(/[\u0a3f\u0a41]$/, '')
+    .replace(/\u0a23/g, '\u0a28')
+    .replace(/\u0a3c/g, '');
+const commonPrefix = (a, b) => {
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i += 1;
+  return i;
+};
+const wordMatches = (k, l) =>
+  k.length >= 2 &&
+  (l === k || commonPrefix(k, l) >= Math.max(4, Math.ceil(0.7 * Math.min(k.length, l.length))));
+const lineWordsOf = (line) =>
+  (line || '')
+    .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+// A line with the heard words in bold, so a candidate shows why it is there.
+const MarkedLine = ({ line, keys }) => {
+  const words = lineWordsOf(line);
+  if (!keys.length || !words.length) return <>{line || '…'}</>;
+  return (
+    <>
+      {words.map((w, i) => {
+        const hit = keys.some((k) => wordMatches(k, wordKey(w)));
+        return (
+          // eslint-disable-next-line react/no-array-index-key
+          <span key={i} className={hit ? 'vf2-hl' : ''}>
+            {i ? ' ' : ''}
+            {w}
+          </span>
+        );
+      })}
+    </>
+  );
+};
+MarkedLine.propTypes = { line: PropTypes.string, keys: PropTypes.arrayOf(PropTypes.string) };
+MarkedLine.defaultProps = { line: '', keys: [] };
 const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
 const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
 const HEARTBEAT = false; // the slow breath of the current card: off (not an agreed design)
@@ -729,7 +774,43 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const [autoDetect, setAutoDetect] = useState(false); // blind: identify the shabad from audio, then follow (one-shot)
   // Acoustic text stays inside matching; only canonical BaniDB text is rendered.
   const [, setCands] = useState([]); // [{shabadId, verseId, verse, display, share}] shortlist
-  const [audioView, setAudioView] = useState({ seconds: 0, level: 0, device: '' });
+  const [audioView, setAudioView] = useState({ seconds: 0, level: 0, device: '', peak: 0 });
+  // Microphone choice (device id) and the list of inputs to pick from.
+  const [micId, setMicId] = useState(() => {
+    try {
+      return window.localStorage.getItem('vf-mic-id') || '';
+    } catch (_) {
+      return '';
+    }
+  });
+  const [micDevices, setMicDevices] = useState([]);
+  const refreshMics = useCallback(async () => {
+    try {
+      const all = await navigator.mediaDevices.enumerateDevices();
+      setMicDevices(
+        all
+          .filter((d) => d.kind === 'audioinput')
+          .map((d, i) => ({ id: d.deviceId, label: d.label || `Microphone ${i + 1}` })),
+      );
+    } catch (_) {
+      setMicDevices([]);
+    }
+  }, []);
+  const chooseMic = useCallback((id) => {
+    setMicId(id);
+    try {
+      if (id) window.localStorage.setItem('vf-mic-id', id);
+      else window.localStorage.removeItem('vf-mic-id');
+    } catch (_) {
+      /* preference only */
+    }
+  }, []);
+  const micIdRef = useRef(micId);
+  micIdRef.current = micId;
+  useEffect(() => {
+    refreshMics();
+  }, [refreshMics]);
+  const levelHistRef = useRef([]); // [[ms, level]] over the last 10 s
   const audioViewRef = useRef({ samples: 0, published: 0 });
   const [currentView, setCurrentView] = useState(null);
   const [, setRankedView] = useState([]);
@@ -832,10 +913,20 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // cut mid-word and gets re-spelt on the next decode. Those are shown lighter as "still
   // hearing"; only words that were fully sung join the settled text.
   const tentativeRef = useRef('');
+  const heardKeysRef = useRef([]); // recent heard words (keys) for marking candidate lines
+  const [heardKeys, setHeardKeys] = useState([]);
   const noteHeard = useCallback((text, confidence = 1) => {
     const all = (text || '').split(/\s+/).filter(Boolean);
     const words = all.filter((w) => w.length >= 3);
     if (confidence < HEARD_MIN_CONF || !words.length) return;
+    {
+      const keys = [...heardKeysRef.current];
+      all.map(wordKey).forEach((k) => {
+        if (k.length >= 2 && !keys.includes(k)) keys.push(k);
+      });
+      heardKeysRef.current = keys.slice(-HEARD_KEYS_KEEP);
+      setHeardKeys(heardKeysRef.current);
+    }
     const settled = all.slice(0, -HEARD_TENTATIVE_WORDS).join(' ');
     tentativeRef.current = all.slice(-HEARD_TENTATIVE_WORDS).join(' ');
     if (settled) heardRef.current = mergeTranscript(heardRef.current, settled);
@@ -848,7 +939,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     heardClearRef.current = setTimeout(() => {
       heardRef.current = '';
       tentativeRef.current = '';
+      heardKeysRef.current = [];
       setHeard('');
+      setHeardKeys([]);
     }, HEARD_CLEAR_MS);
   }, []);
   const [lineExpanded, setLineExpanded] = useState(true); // full pangti (wrapped) vs one line
@@ -974,9 +1067,20 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     const session = sessionRef.current;
     // Preserve the actual capture error; missing/busy devices are not all
     // permission denials. The caller handles it only for its current session.
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-    });
+    const base = { channelCount: 1, echoCancellation: false, noiseSuppression: false };
+    let stream;
+    if (micIdRef.current) {
+      // The chosen microphone; if it is gone (unplugged), fall back to the default one.
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { ...base, deviceId: { exact: micIdRef.current } },
+        });
+      } catch (_) {
+        stream = null;
+      }
+    }
+    if (!stream) stream = await navigator.mediaDevices.getUserMedia({ audio: base });
+    refreshMics();
     if (session !== sessionRef.current) {
       stream.getTracks().forEach((track) => track.stop());
       return null;
@@ -1010,10 +1114,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         for (let i = 0; i < pcm.length; i += 1) energy += pcm[i] * pcm[i];
         const rms = Math.sqrt(energy / (pcm.length || 1));
         capture.published = now;
+        const level = Math.min(1, rms * 8);
+        const hist = levelHistRef.current.filter((h) => now - h[0] <= 10000);
+        hist.push([now, level]);
+        levelHistRef.current = hist;
         setAudioView({
           seconds: Math.floor(capture.samples / ctx.sampleRate),
-          level: Math.min(1, rms * 8),
+          level,
           device,
+          peak: Math.max(...hist.map((h) => h[1])),
         });
       }
       chainRef.current = chainRef.current
@@ -1597,6 +1706,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         phaseRef.current = 'following';
         lastVerseRef.current = null;
         followerRef.current = follower;
+        // The panel shows the new Shabad's standing at once (a lock is strong evidence);
+        // the first following decode replaces this a moment later.
+        boardRef.current.follow({ now: Date.now(), cur: cand.shabadId, sCur: 0.5, cands: [] });
+        setBoard(boardRef.current.snapshot());
         if (
           isSwitch &&
           !opts.promote &&
@@ -3505,6 +3618,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   else if (autopilot) mainLabel = 'Start';
   else if (autoDetect) mainLabel = 'Start';
 
+  // Very little sound for a while: the kirtan is not reaching this microphone.
+  const micQuiet =
+    active && audioView.seconds >= MIC_QUIET_AFTER_S && (audioView.peak || 0) < MIC_QUIET_LEVEL;
   let microphoneLabel = 'Ready';
   if (active) microphoneLabel = audioView.device ? 'Listening' : 'Preparing…';
   const currentLabel = isMiscSlide ? 'Slide held' : 'Following';
@@ -3549,11 +3665,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   };
   const boardOthers = board
     .filter((b) => b.role !== 'current' && !(currentView && b.shabadId === currentView.id))
+    // While following, a challenger under 1% is the judge's scratch work, not a contender.
+    .filter((b) => !currentView || b.pct >= 0.01)
     .filter(
       (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
     )
-    .slice(0, 3)
-    .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }));
+    .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }))
+    // The same Gurbani under another id (a Bani copy of a Shabad) is not a different Shabad.
+    .filter((b) => !(liveLine && b.line && engine.norm(b.line) === engine.norm(liveLine)))
+    .slice(0, 3);
 
   return (
     <>
@@ -3580,6 +3700,11 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   if (sub === 'Following' || sub === 'Listening' || sub === 'Ready') return null;
                   return <span className="vf-listening-label">{sub}</span>;
                 })()}
+                {active && audioView.device && (
+                  <span className="vf-mic-name" title={audioView.device}>
+                    {audioView.device}
+                  </span>
+                )}
               </span>
               {active && (
                 <span
@@ -3658,7 +3783,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   </button>
                 ))}
               </div>
-
               <label
                 className="vf-toggle"
                 title="Identify the shabad from your voice, then follow it"
@@ -3672,6 +3796,13 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                 <span>Auto&#8288;-detect the shabad from my voice</span>
               </label>
             </>
+          )}
+
+          {active && micQuiet && (
+            <div className="vf-mic-quiet" role="alert">
+              The microphone is very quiet. Move it closer to the kirtan, or pick another one after
+              pressing Stop.
+            </div>
           )}
 
           {dlProgress != null && (
@@ -3781,7 +3912,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                     )}
                   </div>
                   <div className="vf2-cand-line" lang="pa">
-                    {liveLead.line || '…'}
+                    <MarkedLine line={liveLead.line} keys={heardKeys} />
                   </div>
                   {boardPct(liveLead.shabadId) != null && (
                     <LiveBar value={boardPct(liveLead.shabadId)} />
@@ -3833,7 +3964,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                     >
                       <div className="vf2-cand-row">
                         <span className="vf2-cand-line" lang="pa">
-                          {c.line || '…'}
+                          <MarkedLine line={c.line} keys={heardKeys} />
                         </span>
                         <LivePct value={c.pct} />
                       </div>
@@ -3856,10 +3987,25 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           {(hiddenRun || (status !== 'listening' && !detecting)) && (
             <div className="vf-status">{statusText}</div>
           )}
-          {SHADOW_BUILD && !active && (
-            <div className="vf-status vf-experimental-note">
-              Experimental: it can make mistakes, and you can stop it at any time.
-            </div>
+          {!active && (
+            <label className="vf-mic-pick" title="Which microphone Voice-Follow listens with">
+              <span>Microphone</span>
+              <select
+                value={micId}
+                disabled={active}
+                onFocus={refreshMics}
+                onChange={(e) => chooseMic(e.target.value)}
+              >
+                <option value="">System default</option>
+                {micDevices
+                  .filter((d) => d.id && d.id !== 'default')
+                  .map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.label}
+                    </option>
+                  ))}
+              </select>
+            </label>
           )}
         </div>
       )}

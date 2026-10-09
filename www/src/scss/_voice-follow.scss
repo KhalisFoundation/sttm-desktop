@@ -1,3 +1,13 @@
+// Toolbar button for Voice-Follow (the icon is an SVG in assets/img/icons).
+#toolbar-nav {
+  #tool-voice-follow {
+    background-image: url('../../assets/img/icons/voice-follow.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 62%;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Voice-Follow floating widget (addons/voice-follow)                 */
 /* ------------------------------------------------------------------ */
@@ -1420,5 +1430,50 @@ $vf2-yellow-bar: #f2c200;
   button:disabled {
     opacity: 0.5;
     cursor: default;
+  }
+}
+
+// Heard words that appear in a candidate line are bold: the line shows why it is listed.
+.vf2-hl {
+  font-weight: 700;
+}
+// Microphone: its name under the title (faint), a quiet warning, and the picker when idle.
+.vf-mic-name {
+  display: block;
+  max-width: 180px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #9a9a9a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vf-mic-quiet {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff4f4;
+  border: 1px solid rgba(214, 69, 69, 0.4);
+  color: #a33;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.vf-mic-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #6b6b6b;
+  select {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: 1px solid #ececec;
+    background: #fff;
+    color: #222;
   }
 }
