@@ -3490,6 +3490,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const release = () => {
     stop();
     visibleRef.current = false;
+    shadowStateRef.current.up = null; // so the hidden run's vf_up is logged again
     shadowBus.setVisible(false);
   };
   let onMainClick = start;
