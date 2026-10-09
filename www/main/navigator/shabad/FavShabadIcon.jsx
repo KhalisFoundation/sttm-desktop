@@ -58,7 +58,7 @@ const FavShabadIcon = ({ paneId }) => {
   }, [pane1, pane2, pane3, activeShabadId, activeVerseId]);
 
   useEffect(() => {
-    const index = favShabad.findIndex((element) => element.shabad_id === currentShabad);
+    const index = favShabad.findIndex((element) => element.shabadId === currentShabad);
     setFavShabadIndex(index);
   }, [favShabad, currentShabad]);
 
