@@ -1437,43 +1437,73 @@ $vf2-yellow-bar: #f2c200;
 .vf2-hl {
   font-weight: 700;
 }
-// Microphone: its name under the title (faint), a quiet warning, and the picker when idle.
-.vf-mic-name {
-  display: block;
-  max-width: 180px;
-  font-size: 11px;
-  font-weight: 400;
-  color: #9a9a9a;
-  white-space: nowrap;
+// Microphone control in the header: a short faint name and an icon; click to switch.
+.vf-mic-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.vf-mic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  padding: 0 4px;
+  color: #a3a3a3;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  &:hover,
+  &.is-open {
+    color: #555;
+  }
+  &.is-quiet {
+    color: #c9a227;
+  }
+}
+.vf-mic-short {
+  max-width: 84px;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
-.vf-mic-quiet {
-  margin: 0 0 10px;
-  padding: 8px 10px;
+.vf-mic-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 190px;
+  max-width: 260px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e6e6e6;
   border-radius: 10px;
-  background: #fff4f4;
-  border: 1px solid rgba(214, 69, 69, 0.4);
-  color: #a33;
-  font-size: 12px;
-  line-height: 1.35;
-}
-.vf-mic-pick {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 10px 0 0;
-  font-size: 12px;
-  color: #6b6b6b;
-  select {
-    flex: 1;
-    min-width: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  li {
+    margin: 0;
+  }
+  button {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: #333;
     font: inherit;
     font-size: 12px;
-    padding: 4px 6px;
-    border-radius: 8px;
-    border: 1px solid #ececec;
-    background: #fff;
-    color: #222;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    &:hover {
+      background: #f3f3f3;
+    }
+    &.is-on {
+      color: #111;
+      font-weight: 600;
+    }
   }
 }
