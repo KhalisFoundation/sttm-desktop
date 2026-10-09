@@ -917,6 +917,26 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const tentativeRef = useRef('');
   const heardKeysRef = useRef([]); // recent heard words (keys) for marking candidate lines
   const [heardKeys, setHeardKeys] = useState([]);
+  // First line of each Shabad the panel has listed (loaded once, kept for the run).
+  const firstLinesRef = useRef(new Map());
+  const [firstLines, setFirstLines] = useState(new Map());
+  const wantFirstLines = useCallback((ids) => {
+    const m = firstLinesRef.current;
+    ids.forEach((sid) => {
+      if (sid == null || m.has(sid)) return;
+      m.set(sid, '');
+      if (typeof sid === 'string' && sid.startsWith(BANI_KEY)) return; // a Bani keeps its line
+      banidb
+        .loadShabad(sid)
+        .then((rows) => {
+          const it = filterRequiredVerseItems(rows || []).find((x) => x && x.verse);
+          if (!it) return;
+          m.set(sid, anvaad.unicode(it.verse).trim());
+          setFirstLines(new Map(m));
+        })
+        .catch(() => {});
+    });
+  }, []);
   const noteHeard = useCallback((text, confidence = 1) => {
     const all = (text || '').split(/\s+/).filter(Boolean);
     const words = all.filter((w) => w.length >= 3);
@@ -3703,6 +3723,12 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   } catch (e) {
     showNext = true;
   }
+  useEffect(() => {
+    wantFirstLines([
+      ...board.map((b) => b.shabadId),
+      ...(liveCands.items || []).map((c) => c.shabadId),
+    ]);
+  }, [board, liveCands, wantFirstLines]);
   const liveItems = currentView ? liveCands.items : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
   const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
@@ -3725,6 +3751,18 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     const b = board.find((x) => x.shabadId === id);
     return b ? b.pct : null;
   };
+  // A candidate row names its Shabad by the Shabad's first line (fixed), not by whichever
+  // line happened to match last; the first line is what a sevadaar knows a Shabad by.
+  const nameLine = (b) =>
+    (firstLines.get(b.shabadId) || b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim();
+  const curFirst =
+    (curProfileRef.current && curProfileRef.current.displayLines
+      ? curProfileRef.current.displayLines[0]
+      : '') || '';
+  const sameAsCurrent = (line) =>
+    !!line &&
+    ((liveLine && engine.norm(line) === engine.norm(liveLine)) ||
+      (curFirst && engine.norm(line) === engine.norm(curFirst)));
   const boardOthers = board
     .filter((b) => b.role !== 'current' && !(currentView && b.shabadId === currentView.id))
     // While following, a challenger under 1% is the judge's scratch work, not a contender.
@@ -3732,10 +3770,16 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     .filter(
       (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
     )
-    .map((b) => ({ ...b, line: (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim() }))
+    // A Shabad that belongs to the Bani on screen is not a different Shabad either.
+    .filter(
+      (b) =>
+        !(currentView && curBaniShabadsRef.current && curBaniShabadsRef.current.has(b.shabadId)),
+    )
+    .map((b) => ({ ...b, line: nameLine(b) }))
     // The same Gurbani under another id (a Bani copy of a Shabad) is not a different Shabad.
-    .filter((b) => !(liveLine && b.line && engine.norm(b.line) === engine.norm(liveLine)))
+    .filter((b) => !(currentView && sameAsCurrent(b.line)))
     .slice(0, 3);
+  const leadLine = liveLead ? nameLine(liveLead) : '';
 
   return (
     <>
@@ -4013,7 +4057,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                     )}
                   </div>
                   <div className="vf2-cand-line" lang="pa">
-                    <MarkedLine line={liveLead.line} keys={heardKeys} />
+                    <MarkedLine line={leadLine} keys={heardKeys} />
                   </div>
                   {boardPct(liveLead.shabadId) != null && (
                     <LiveBar value={boardPct(liveLead.shabadId)} />
