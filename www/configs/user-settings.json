@@ -75,7 +75,7 @@
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["limit-change-log", "statistics", "improve-voice-follow", "shadow-recording"]
+      "settings": ["limit-change-log", "statistics", "voice-follow-enabled", "improve-voice-follow", "shadow-recording"]
     }
   },
   "settings": {
@@ -328,6 +328,12 @@
       "initialValue": true,
       "store": "userPrefs.app.analytics.collectStatistics"
     },
+    "voice-follow-enabled": {
+      "title": "VOICE_FOLLOW_ENABLED",
+      "dontApplyClass": true,
+      "initialValue": true,
+      "notes": "VOICE_FOLLOW_ENABLED_MSG"
+    },
     "shadow-recording": {
       "title": "SHADOW_RECORDING",
       "dontApplyClass": true,
@@ -336,6 +342,11 @@
     },
     "shadow-tester": {
       "title": "SHADOW_TESTER",
+      "dontApplyClass": true,
+      "initialValue": ""
+    },
+    "hf-token": {
+      "title": "HF_TOKEN",
       "dontApplyClass": true,
       "initialValue": ""
     },

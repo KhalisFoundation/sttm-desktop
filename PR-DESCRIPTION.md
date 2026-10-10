@@ -1,54 +1,49 @@
 ## Why
 
-Voice-Follow listens to the kirtan through the laptop microphone and follows along on screen. Before sevadaars see it, we want to know how well it does in real Gurdwaras. This PR adds it in a **hidden "shadow" mode**: it runs silently, records the audio and what the sevadaar shows by hand, scores itself against that, and uploads the result for the team to study. The sevadaar's experience does not change.
+#2226 added Voice-Follow to the experimental build as a hidden test mode. The team asked for it to be **visible and usable** by sevadaars, with a way to switch it off, while the background test recording keeps running when nobody is using it. This PR does that.
 
-## What's in it
+## What a sevadaar sees
 
-- **Voice-Follow MVP 8.6**, hidden. No button, no panel.
-- **Shadow recording.** On first launch a consent card asks for the tester's name and Gurdwara. Nothing is recorded or uploaded before it is accepted, and it can be switched off in Settings. Sessions start on their own when the sevadaar puts something on screen and stop after 8 idle minutes.
-- **Uploads go to Khalis's Azure storage** (the `voice-follow-training-data` container), straight from the app, using the access token Gauravjeet issued. Audio is about 14 MB per hour. Uploads resume after a restart or a dropped connection.
+- A **Voice-Follow button** in the sidebar and the Voice-Follow panel. Press Start and it listens to the kirtan and follows along on screen. Press Stop and it goes back to listening quietly for testing.
+- An **"Experimental"** note in the panel: it can make mistakes, and it can be stopped at any time.
+- Two switches in Settings: **Voice-Follow (experimental)** hides the button entirely, and **Voice-Follow Test Recording** turns the background recording off. Both are on by default.
 
-## One setup step
+## What the team gets
 
-The access token is not in the code. The build fills it in from a repository secret named **`VF_UPLOAD_SAS`**. Please add that secret to this repository (Settings → Secrets and variables → Actions) with the token. Without it the build still works, the app just won't upload.
+- **While nobody uses it**: exactly what #2226 collected. Hidden Voice-Follow scores itself against what the sevadaar shows, and the session uploads to Azure.
+- **While a sevadaar uses it**: Voice-Follow is driving the screen, so there is no human to score against. Instead the session records every time the sevadaar **overrides** it by changing the Shabad or line by hand. Those stretches are marked in the data and left out of the accuracy score, and the override count is in the score file.
 
-As before, the 184 MB speech model needs to be downloaded in the build pipeline before packaging. The URL and the step are in the tester-build workflow on `Arash2348/sttm-desktop`.
+## Also in this PR
+
+- The **8.7 engine**: Aarti is found and followed from any starting point (Renton Oct 5 recording: 93% → 99% right text; everything else unchanged on the Level 2 benchmark).
+- The **redesigned panel**: live percentages, the next Shabads in contention, and a line showing what it is hearing.
+- Voice-Follow and consent-card **styles** that the earlier merge had dropped.
 
 ## Test plan
 
-Run on 2026-10-08. CI build of this exact code is green on macOS and Windows: [run 37744089265](https://github.com/Arash2348/sttm-desktop/actions/runs/37744089265).
+Run on 2026-10-09 with the CI-built installer from this exact code.
 
-### 1. Fresh install, end to end, with the CI-built Mac installer
-
-🎬 **[Video, 5 min](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/azure-upload-e2e-installer.mp4)**
-
-| Step | What happens |
+| Step | Result |
 |---|---|
-| Install and open | Fresh machine state. The app downloads its database by itself; the speech model is bundled. |
-| Consent card | Enter a tester name and Gurdwara, accept. |
-| Put a Bani on screen | A session starts. A real Aarti recording plays as the microphone. |
-| Audio ends | The session stops on its own and every file appears in the Azure container (shown at the end of the video). Sizes read back from Azure match the laptop byte for byte. |
-| Inside the session | Hidden Voice-Follow found the Aarti and followed its lines, while the screen stayed on what the "sevadaar" chose. |
+| Fresh install, consent accepted | Button shows in the sidebar; background session starts at the first screen change and finds the Aarti in 8 s |
+| Open the panel during the background run | Shows idle with Start and the experimental note, not the hidden run |
+| Press Start | Hidden run stops, Voice-Follow takes the screen, follows line by line with live percentages |
+| Change the Shabad by hand while it runs | Logged as an override; the score counts it |
+| Press Stop | Hands back; the background run resumes on its own within 5 s |
+| Stop then Start again | Works; no stuck state |
+| Settings → Voice-Follow (experimental) off | Button disappears, setting saved; on brings it back |
+| Session ends | All files in the Azure container; visible stretch excluded from accuracy, overrides counted |
 
-![Consent card](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-consent.png)
+🎬 **[Video, 5 min](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/visible-mode-installer-e2e.mp4)**: the CI-built Mac installer, fresh install, every step above, Azure listing at the end.
 
-![Session running](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-following.png)
+![Consent card](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-visible-consent.png)
 
-![Azure container after the session](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-listing.png)
+![Panel idle while the background run is on](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-visible-hidden-idle.png)
 
-### 2. Same flow from source
+![Voice-Follow driving the screen after Start](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/shot-visible-visible-following.png)
 
-🎬 **[Video, 5 min](https://github.com/Arash2348/sttm-desktop/releases/download/test-videos-2026-10-08/azure-upload-e2e-dev-build.mp4)**. Same result.
-
-### 3. Also covered
-
-- Kill the app mid-session: the files upload at the next launch.
-- Lose the network: uploads resume within a minute of it coming back.
-- Switch the setting off: nothing is recorded.
-- Build checks pass, and the built app contains the token with no placeholder left behind.
+CI: both installers build green on the fork (Mac arm64, Windows): [run 37866346647](https://github.com/Arash2348/sttm-desktop/actions/runs/37866346647). Engine check: on the eight Oct 5 Aarti clips the merged code makes the same Shabad decisions at the same moments as 8.7.
 
 ## Merge notes
 
-Merged with the latest `experimental-release`; the three conflicts were resolved keeping both sides' intent.
-
-This build uses the standard app identity and publish settings, so the experimental channel's release script renames it, publishes it and auto-updates it like any other experimental build. The arm64 Mac config bundles the speech model.
+Includes the two fixes from #2232 (arm64 Mac config duplicate keys; Voice-Follow styles), so it merges clean whether #2232 goes in first or not. Up to date with `experimental-release` as of 63634a75.

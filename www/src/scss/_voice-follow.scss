@@ -1,3 +1,13 @@
+// Toolbar button for Voice-Follow (the icon is an SVG in assets/img/icons).
+#toolbar-nav {
+  #tool-voice-follow {
+    background-image: url('../../assets/img/icons/voice-follow.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 62%;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Voice-Follow floating widget (addons/voice-follow)                 */
 /* ------------------------------------------------------------------ */
@@ -713,9 +723,12 @@ $vf2-muted: #6b6b6b;
 $vf2-faint: #9a9a9a;
 $vf2-line: #ececec;
 $vf2-green: #43ac6a;
+$vf2-red: #d64545;
+$vf2-yellow: #c99700;
+$vf2-yellow-bar: #f2c200;
 
 .vf-panel {
-  width: 300px;
+  width: 340px;
   padding: 14px 16px 16px;
   border-radius: 18px;
   color: $vf2-ink;
@@ -785,14 +798,23 @@ $vf2-green: #43ac6a;
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  min-width: 0;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $vf2-muted;
 }
+.vf2-label-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .vf2-lineno,
 .vf2-cur-score {
+  flex: none;
   margin-left: auto;
   font-weight: 500;
   letter-spacing: 0;
@@ -830,6 +852,9 @@ $vf2-green: #43ac6a;
   border-radius: 14px;
   background: #fff;
   border: 1px solid $vf2-line;
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   &.is-following {
     border-color: rgba(67, 172, 106, 0.35);
@@ -888,6 +913,9 @@ $vf2-green: #43ac6a;
   gap: 8px;
 }
 .vf2-cand {
+  display: block;
+  width: 100%;
+  text-align: left;
   padding: 9px 12px 8px;
   border-radius: 12px;
   background: #fafafa;
@@ -915,6 +943,7 @@ $vf2-green: #43ac6a;
 .vf2-cand-line {
   flex: 1;
   min-width: 0;
+  text-align: left;
   font-size: 15px;
   line-height: 1.35;
   color: $vf2-ink;
@@ -934,7 +963,7 @@ $vf2-green: #43ac6a;
 }
 .vf2-cand-track {
   margin-top: 7px;
-  height: 3px;
+  height: 5px;
   border-radius: 2px;
   background: $vf2-line;
   overflow: hidden;
@@ -944,6 +973,123 @@ $vf2-green: #43ac6a;
     border-radius: 2px;
     background: $vf2-orange;
     transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+// Live board: calibrated percentages that move with the evidence (red -> yellow -> green).
+.vf2-live-pct {
+  flex: none;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease;
+  &.is-low {
+    color: $vf2-red;
+  }
+  &.is-mid {
+    color: $vf2-yellow;
+  }
+  &.is-high {
+    color: $vf2-green;
+  }
+}
+.vf2-cand-row .vf2-live-pct {
+  flex: none;
+}
+.vf2-now .vf2-cand-track {
+  margin-top: 8px;
+}
+.vf2-live-fill {
+  position: relative;
+  overflow: hidden;
+  transition:
+    width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.45s ease !important;
+  // A light sheen slides along the bar while its value is moving: evidence arriving.
+  &.is-moving::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: vf2-sheen 1.2s ease-out;
+  }
+  &.is-low {
+    background: $vf2-red !important;
+  }
+  &.is-mid {
+    background: $vf2-yellow-bar !important;
+  }
+  &.is-high {
+    background: $vf2-green !important;
+  }
+}
+// What the model hears: one faint line, newest words on the right, older ones fading out.
+.vf2-next-line {
+  margin-top: 4px;
+  font-size: 0.82em;
+  line-height: 1.35;
+  opacity: 0.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf2-next-line + .vf2-next-line {
+  opacity: 0.3;
+}
+
+.vf2-heard {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -4px 0 -2px 4px; // flush with the card edge below (border + radius)
+  font-size: 12px;
+  line-height: 1.4;
+  color: $vf2-faint;
+  min-width: 0;
+}
+.vf2-heard-label {
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $vf2-faint;
+}
+.vf2-heard-tentative {
+  opacity: 0.45;
+}
+.vf2-heard-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  direction: ltr;
+  text-align: left;
+  // Words run left to right. Once they overflow, the box is scrolled to its end (newest
+  // words in view) and the oldest fade out on the left.
+  &.is-overflowing {
+    mask-image: linear-gradient(to right, transparent 0, #000 36px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 36px);
+  }
+}
+.vf2-heard-tentative {
+  margin-left: 0.35em;
+}
+.vf-heard-toggle {
+  opacity: 0.55;
+  &.is-on {
+    opacity: 1;
+  }
+  svg {
+    display: block;
   }
 }
 .vf2-cand-meta {
@@ -1008,7 +1154,7 @@ $vf2-green: #43ac6a;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 9px 12px;
+    padding: 9px 12px 9px 18px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -1049,8 +1195,8 @@ $vf2-green: #43ac6a;
 .vf2-change {
   padding: 10px 12px 10px;
   border-radius: 12px;
-  background: #fff8ec;
-  border: 1px solid rgba(243, 156, 29, 0.35);
+  background: #fff;
+  border: 1px solid $vf2-line;
   animation: vf2-fade 0.28s ease-out;
   .vf2-cand-line {
     display: block;
@@ -1058,13 +1204,14 @@ $vf2-green: #43ac6a;
     font-size: 16px;
   }
   &.is-confirming {
-    background: #fff3dc;
-    border-color: $vf2-orange;
+    background: #fff;
+    border-color: $vf2-line;
   }
 }
 
 // Small −/+ box on the Now header to fold the line to one row and back.
 .vf2-fold {
+  flex: none;
   margin-left: 6px;
   width: 18px;
   height: 18px;
@@ -1104,6 +1251,89 @@ $vf2-green: #43ac6a;
     background: #2e9e5b;
   }
 }
+@keyframes vf2-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+// Card styles. Every scored card (current line, change, candidate) carries --pc (its colour)
+// and --pct (its percentage). The box itself stays white; the colour is in what moves.
+.vf-panel .vf2-now,
+.vf-panel .vf2-cand,
+.vf-panel .vf2-change {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border-color: $vf2-line;
+  animation: none;
+  transform: none;
+  > * {
+    position: relative;
+  }
+}
+// wash: a faint tinted fill spreads across the card from the left as the % climbs.
+.vf-panel[data-vf-cards='wash'] {
+  .vf2-now::before,
+  .vf2-cand.is-tappable::before,
+  .vf2-change.is-tappable::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--pct, 0%);
+    background: var(--pc, transparent);
+    opacity: 0.11;
+    transition:
+      width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.6s ease;
+  }
+}
+// rail: a thin rail on the left edge fills bottom-to-top with the colour. It is the only
+// indicator on the card: no bar under the text.
+.vf-panel[data-vf-cards='rail'] {
+  .vf2-cand-track {
+    display: none;
+  }
+  .vf2-now,
+  .vf2-cand.is-tappable,
+  .vf2-change.is-tappable {
+    padding-left: 18px;
+  }
+  .vf2-now::before,
+  .vf2-cand.is-tappable::before,
+  .vf2-change.is-tappable::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    height: var(--pct, 0%);
+    background: var(--pc, transparent);
+    transition:
+      height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.6s ease;
+  }
+}
+// clean: nothing on the card; colour only in the number and the bar.
+// Heartbeat: a slow, faint breath of the current card on a decode that matched well.
+.vf2-now.is-beat {
+  animation: vf2-beat 1.6s ease-in-out;
+}
+@keyframes vf2-beat {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.006);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .vf2-change .vf2-cand-pct {
   margin-left: auto;
 }
@@ -1114,6 +1344,14 @@ $vf2-green: #43ac6a;
   transition: transform 0.2s ease;
 }
 // Count of candidates, as a small badge beside the title.
+.vf2-summary-tap {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: $vf2-faint;
+}
 .vf2-summary-count {
   display: inline-flex;
   align-items: center;
@@ -1142,8 +1380,6 @@ $vf2-green: #43ac6a;
   font-weight: 400;
   color: $vf2-faint;
 }
-
-// Tester build: first-launch screen (addons/voice-follow/shadow/ShadowCollector.jsx).
 .shadow-consent {
   position: fixed;
   inset: 0;
@@ -1202,5 +1438,66 @@ $vf2-green: #43ac6a;
   button:disabled {
     opacity: 0.5;
     cursor: default;
+  }
+}
+
+// Heard words that appear in a candidate line are bold: the line shows why it is listed.
+.vf2-hl {
+  font-weight: 700;
+}
+// Header geometry: the title never wraps (it clips first), the buttons never shrink or
+// wrap, and the level meter sits beside the title with room between its bars.
+.vf-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.vf-heading-copy {
+  min-width: 0;
+  overflow: hidden;
+}
+.vf-heading-copy > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vf-hdr-btns {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+.vf-mic-bars {
+  flex: 0 0 auto;
+  gap: 4px;
+  margin: 0 6px 0 10px;
+}
+.vf-mic-bars > span {
+  width: 3px;
+  min-height: 4px;
+}
+
+// One-tap rating after Stop.
+.vf-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b6b6b;
+  span {
+    flex: 1;
+  }
+  button {
+    border: 1px solid #ececec;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    &:hover {
+      background: #f5f5f5;
+    }
   }
 }

@@ -6,6 +6,7 @@
 // offline benchmark runs. Nothing here touches the screen.
 const fs = require('fs');
 const path = require('path');
+const { SHADOW_SOUND_LEVEL } = require('./config');
 const { contentKey, scoreDir, C } = require('./score');
 
 const SAVE_S = 30;
@@ -77,6 +78,8 @@ function begin(dir, t0) {
     lastSave: 0,
     lastTick: 0,
     lastHeardAt: null,
+    lastSoundAt: null,
+    vfUpAt: null,
     recentLevel: 0,
     act: { sec: 0, level: 0, letters: 0, text: '' },
     timer: setInterval(tick, 1000),
@@ -95,6 +98,15 @@ function end() {
 function human(label) {
   if (!S) return;
   S.human = { ...label, key: contentKey(label) };
+  // While the sevadaar drives Voice-Follow (visible mode) the screen changes are mostly
+  // Voice-Follow's own; one that differs from what it last showed is a sevadaar override.
+  if (S.visible) {
+    const sys = S.system || {};
+    const same =
+      contentKey(label) === contentKey(sys) && (label.verseId ?? null) === (sys.verseId ?? null);
+    writeLine('human.jsonl', { t: now(), ...label, override: !same });
+    return;
+  }
   writeLine('human.jsonl', { t: now(), ...label });
 }
 
@@ -118,6 +130,7 @@ function system(update) {
 function level(rms) {
   if (!S) return;
   if (rms > S.act.level) S.act.level = rms;
+  if (rms >= SHADOW_SOUND_LEVEL) S.lastSoundAt = Date.now();
   // Loudness over the last few seconds (recognition lags the audio a little).
   S.recentLevel = Math.max(rms, (S.recentLevel || 0) * 0.94);
 }
@@ -140,7 +153,16 @@ function heard(text) {
 
 // A health or status event from the hidden Voice-Follow (vf_up / vf_down).
 function note(obj) {
+  // When the hidden Voice-Follow came up (it can recognise words from then on).
+  if (S && obj && obj.type === 'vf_up' && S.vfUpAt == null) S.vfUpAt = Date.now();
   writeLine('events.jsonl', { t: now(), ...obj });
+}
+
+// The sevadaar started (true) or stopped (false) Voice-Follow from the panel.
+function setVisible(on) {
+  if (!S || !!S.visible === !!on) return;
+  S.visible = !!on;
+  writeLine('events.jsonl', { t: now(), type: on ? 'vf_visible' : 'vf_hidden' });
 }
 
 function setPaused(paused) {
@@ -152,6 +174,8 @@ function setPaused(paused) {
 const active = () => !!S;
 // When words were last heard (ms since epoch), or null.
 const lastHeardAt = () => (S ? S.lastHeardAt || null : null);
+const lastSoundAt = () => (S ? S.lastSoundAt || null : null);
+const vfUpAt = () => (S ? S.vfUpAt || null : null);
 const sessionDir = () => (S ? S.dir : null);
 
 module.exports = {
@@ -162,9 +186,12 @@ module.exports = {
   level,
   heard,
   setPaused,
+  setVisible,
   note,
   active,
   lastHeardAt,
+  lastSoundAt,
+  vfUpAt,
   sessionDir,
   contentKey,
 };

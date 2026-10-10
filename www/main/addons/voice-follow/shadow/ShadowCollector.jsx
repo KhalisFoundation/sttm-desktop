@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { SHADOW_BUILD, SHADOW_AUDIO_BPS, SHADOW_SLICE_MS, SHADOW_SEGMENT_MS } from './config';
+import { SHADOW_BUILD, SHADOW_SEGMENT_MS, SHADOW_DISCARD_COOLDOWN_MS } from './config';
 
 const fs = require('fs');
 const os = require('os');
@@ -8,11 +8,17 @@ const path = require('path');
 const remote = require('@electron/remote');
 const bus = require('./bus');
 const uploader = require('./uploader');
+const hf = require('./hf');
+const { HF_TOKEN } = require('./config');
 const service = require('./service');
+const listener = require('./listener');
+const pcm = require('./pcm');
+const storage = require('./storage');
 const { logDir } = require('../engine/session-log');
 
 // One folder per app session under <userData>/voice-follow/shadow/<id>/:
-//   audio-000.webm ... - what the microphone heard, one file per SHADOW_SEGMENT_MS
+//   audio-000.wav ...  - what the microphone heard (16 kHz mono WAV), one per SHADOW_SEGMENT_MS
+//   audio-pre.wav      - up to 2 min from before the session started (listener.js)
 //   human.jsonl        - what the sevadaar put on screen (the human label)
 //   activity.jsonl     - per second: microphone loudness and letters heard
 //   system.jsonl       - what Voice-Follow would have shown (shadow mode)
@@ -123,6 +129,47 @@ const labelOf = (nav) => ({
 
 // The registration is a user setting, and settings become body class names at startup,
 // so it is stored URL-encoded (no spaces). Older installs stored plain JSON.
+// Where this laptop is, for the team to tell the Gurdwara from the data when the name was
+// left blank: computer name, user, OS, time zone, locale, and the public IP (city level),
+// looked up once per run.
+const machineName = () => {
+  try {
+    return os.hostname().replace(/\.local$/i, '') || 'laptop';
+  } catch (_) {
+    return 'laptop';
+  }
+};
+const publicIpRef = { value: null, asked: false };
+const lookupPublicIp = () => {
+  if (publicIpRef.asked) return;
+  publicIpRef.asked = true;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 4000);
+  fetch('https://api.ipify.org?format=json', { signal: ctl.signal })
+    .then((r) => r.json())
+    .then((j) => {
+      publicIpRef.value = (j && j.ip) || null;
+    })
+    .catch(() => {})
+    .finally(() => clearTimeout(timer));
+};
+const machineFacts = () => {
+  let user = '';
+  try {
+    user = os.userInfo().username;
+  } catch (_) {
+    user = '';
+  }
+  return {
+    host: machineName(),
+    user,
+    os: `${process.platform} ${os.release()}`,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+    locale: navigator.language || '',
+    publicIp: publicIpRef.value,
+  };
+};
+
 const readTester = (raw) => {
   if (!raw) return {};
   try {
@@ -139,10 +186,13 @@ const packTester = (t) => encodeURIComponent(JSON.stringify(t));
 
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
-  const { shadowRecording, shadowTester } = useStoreState((state) => state.userSettings);
+  const { shadowRecording, shadowTester, hfToken } = useStoreState((state) => state.userSettings);
   const { setShadowRecording, setShadowTester } = useStoreActions(
     (actions) => actions.userSettings,
   );
+  // The Hugging Face write token: baked in at build (VF_HF_TOKEN), or a saved setting.
+  const hfTokenRef = useRef('');
+  hfTokenRef.current = (hfToken || '').trim() || (HF_TOKEN.startsWith('__') ? '' : HF_TOKEN);
   const tester = readTester(shadowTester);
   const [name, setName] = useState(tester.name || '');
   const [gurdwara, setGurdwara] = useState(tester.gurdwara || '');
@@ -153,13 +203,22 @@ const ShadowCollector = () => {
   const lastChangeRef = useRef(Date.now());
   const [restarts, setRestarts] = useState(0);
   const startingRef = useRef(false); // waiting for the microphone (e.g. the permission prompt)
+  const preRollRef = useRef(null); // audio from before the session, handed over by the listener
+  const discardRef = useRef(false); // the session turned out to be noise: delete, do not upload
+  const lastDiscardRef = useRef(0); // when the last noise session was thrown away
 
+  useEffect(() => {
+    if (SHADOW_BUILD) lookupPublicIp();
+  }, []);
   const enabled = SHADOW_BUILD && !!tester.name && shadowRecording !== false;
 
   // The uploader runs from the moment a registered tester opens the app, so a session left
   // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
   useEffect(() => {
-    if (enabled) uploader.start(shadowRoot(), tester);
+    if (enabled) {
+      uploader.start(shadowRoot(), tester, { hfOn: () => !!hfTokenRef.current, log: diag });
+      hf.start(shadowRoot(), () => hfTokenRef.current, diag);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -169,6 +228,44 @@ const ShadowCollector = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shadowTester]);
   const recording = enabled && active;
+
+  // Begin a session now (not from a screen change): the room started sounding, or the
+  // sevadaar pressed Start in Voice-Follow. Whatever the listener heard just before comes
+  // along as the session's opening audio.
+  const beginNow = (reason) => {
+    if (!enabled || active) return;
+    if (!storage.canStart(shadowRoot())) {
+      diag('storage: disk nearly full, not starting a recording');
+      return;
+    }
+    // Right after a noise session was thrown away, sound alone waits a while.
+    if (reason === 'sound' && Date.now() - lastDiscardRef.current < SHADOW_DISCARD_COOLDOWN_MS) {
+      return;
+    }
+    preRollRef.current = listener.takePreRoll();
+    startReasonRef.current = reason;
+    lastChangeRef.current = Date.now();
+    setActive(true);
+  };
+  const beginNowRef = useRef(beginNow);
+  beginNowRef.current = beginNow;
+
+  // With no session running, the listener watches the room so unattended kirtan is collected.
+  useEffect(() => {
+    if (!enabled || active) {
+      listener.stop();
+      return undefined;
+    }
+    listener.start(() => beginNowRef.current('sound')).catch((e) => diag(`listener: ${e.message}`));
+    return () => listener.stop();
+  }, [enabled, active]);
+
+  // Pressing Start in Voice-Follow begins a session at once, so its search is recorded too.
+  useEffect(() => {
+    const onStart = () => beginNowRef.current('voice-follow start');
+    window.addEventListener('vf-shadow-start', onStart);
+    return () => window.removeEventListener('vf-shadow-start', onStart);
+  }, []);
 
   useEffect(() => {
     if (!recording) return undefined;
@@ -186,11 +283,24 @@ const ShadowCollector = () => {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
-        const id = new Date().toISOString().replace(/[:.]/g, '-');
+        // The audio from just before (the listener's pre-roll) opens the session, so the
+        // session clock starts that much earlier and every timeline lines up with it.
+        const pre = preRollRef.current;
+        preRollRef.current = null;
+        const startedAt = Date.now();
+        const t0 = startedAt - (pre ? Math.round(pre.seconds * 1000) : 0);
+        const id = new Date(t0).toISOString().replace(/[:.]/g, '-');
         const dir = path.join(shadowRoot(), id);
         fs.mkdirSync(dir, { recursive: true });
-        const t0 = Date.now();
-        const s = { dir, t0, stream, recorder: null, seg: 0 };
+        if (pre) {
+          try {
+            fs.writeFileSync(path.join(dir, 'audio-pre.wav'), listener.wavBytes(pre));
+          } catch (_) {
+            /* never disturb the sevadaar */
+          }
+        }
+        discardRef.current = false;
+        const s = { dir, t0, startedAt, stream, recorder: null, seg: 0 };
         sessionRef.current = s;
         startingRef.current = false;
         fs.writeFileSync(
@@ -199,12 +309,14 @@ const ShadowCollector = () => {
             {
               id,
               tester: readTester(shadowTester),
+              machine: machineFacts(),
               startedAt: new Date(t0).toISOString(),
               app: remote.app.getVersion(),
               build: 'mvp-8.6c-shadow',
               platform: process.platform,
               microphone: stream.getAudioTracks()[0]?.label || '',
               startedBy: startReasonRef.current,
+              preRollSeconds: pre ? Math.round(pre.seconds * 10) / 10 : 0,
             },
             null,
             1,
@@ -212,6 +324,7 @@ const ShadowCollector = () => {
         );
         bus.begin(dir, t0);
         bus.note({ type: 'session_start', reason: startReasonRef.current });
+        if (pre) bus.note({ type: 'pre_roll', file: 'audio-pre.wav', seconds: pre.seconds });
         bus.human(labelOf(nav));
         const event = (obj) => {
           try {
@@ -243,31 +356,26 @@ const ShadowCollector = () => {
         const startSegment = () => {
           const n = s.seg;
           s.seg += 1; // a failed start never reuses a file name
-          const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.webm`);
-          const rec = new MediaRecorder(s.stream, {
-            mimeType: 'audio/webm;codecs=opus',
-            audioBitsPerSecond: SHADOW_AUDIO_BPS,
-          });
-          event({ type: 'audio_segment', file: path.basename(file) });
-          rec.ondataavailable = async (e) => {
-            if (!e.data || !e.data.size) return;
-            try {
-              fs.appendFileSync(file, Buffer.from(await e.data.arrayBuffer()));
-            } catch (_) {
-              /* never disturb the sevadaar */
-            }
-          };
-          rec.onstop = () => uploader.enqueue(dir, path.basename(file));
-          rec.start(SHADOW_SLICE_MS);
+          const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.wav`);
+          // Uncompressed 16 kHz mono WAV, as the team's recorder captures training audio.
+          const rec = pcm.record(s.stream, file);
           s.recorder = rec;
+          s.recFile = file;
+          event({ type: 'audio_segment', file: path.basename(file), rate: rec.rate });
           s.stream.getAudioTracks().forEach((t) => t.addEventListener('ended', onEnded));
+        };
+        const endSegment = () => {
+          if (!s.recorder) return;
+          s.recorder.stop();
+          s.recorder = null;
+          if (s.recFile) uploader.enqueue(dir, path.basename(s.recFile));
         };
         let rotating = false;
         const rotate = async () => {
           if (rotating || stopped) return;
           rotating = true;
           try {
-            if (s.recorder && s.recorder.state !== 'inactive') s.recorder.stop();
+            endSegment();
           } catch (_) {
             /* already stopped */
           }
@@ -339,7 +447,8 @@ const ShadowCollector = () => {
       sessionRef.current = null;
       if (!s) return;
       try {
-        if (s.recorder && s.recorder.state !== 'inactive') s.recorder.stop();
+        if (s.recorder) s.recorder.stop();
+        s.recorder = null;
       } catch (_) {
         /* already stopped */
       }
@@ -349,6 +458,16 @@ const ShadowCollector = () => {
         /* already gone */
       }
       bus.end();
+      if (discardRef.current) {
+        discardRef.current = false;
+        try {
+          fs.rmSync(s.dir, { recursive: true, force: true });
+          diag(`discarded ${path.basename(s.dir)}: the room started it and no words were heard`);
+        } catch (_) {
+          /* ignore */
+        }
+        return;
+      }
       if (quitting !== true) uploader.enqueueSession(s.dir);
     };
     const onUnload = () => stop(true);
@@ -366,13 +485,36 @@ const ShadowCollector = () => {
   useEffect(() => {
     if (!recording) return undefined;
     const timer = setInterval(() => {
+      const s = sessionRef.current;
+      if (storage.mustStop(shadowRoot())) {
+        bus.note({ type: 'session_stop', reason: 'disk_low' });
+        setActive(false);
+        return;
+      }
       const reason = service.stopReason({
         now: Date.now(),
+        startedAt: s ? s.startedAt : Date.now(),
+        startedBy: startReasonRef.current,
         lastChangeAt: lastChangeRef.current,
         lastHeardAt: bus.lastHeardAt(),
+        lastSoundAt: bus.lastSoundAt(),
+        vfUpAt: bus.vfUpAt(),
       });
       if (!reason) return;
       bus.note({ type: 'session_stop', reason });
+      if (
+        reason === 'no_words' ||
+        service.discardOnStop({
+          now: Date.now(),
+          startedAt: s ? s.startedAt : Date.now(),
+          startedBy: startReasonRef.current,
+          lastHeardAt: bus.lastHeardAt(),
+          vfUpAt: bus.vfUpAt(),
+        })
+      ) {
+        discardRef.current = true;
+        lastDiscardRef.current = Date.now();
+      }
       setActive(false);
     }, 20000);
     return () => clearInterval(timer);
@@ -407,7 +549,7 @@ const ShadowCollector = () => {
     const prev = prevKeyRef.current;
     prevKeyRef.current = key;
     if (sessionRef.current) bus.human(label);
-    if (enabled && !active && service.shouldStart(prev, key)) {
+    if (enabled && !active && service.shouldStart(prev, key) && storage.canStart(shadowRoot())) {
       let what = 'cleared';
       if (bus.contentKey(label)) what = bus.contentKey(label);
       else if (label.slide) what = 'slide';
@@ -426,12 +568,11 @@ const ShadowCollector = () => {
   return (
     <div className="shadow-consent">
       <div className="shadow-consent-card">
-        <h2>Voice-Follow test build</h2>
+        <h2>Voice-Follow experimental build</h2>
         <p>
-          Thank you for helping. While you use this app as normal, it records the Gurdwara audio and
-          which Shabad and line you show, and quietly checks how Voice-Follow would have done.
-          Recordings are uploaded to the Voice-Follow team only. You can stop at any time in
-          Settings.
+          This build records the kirtan audio and what is shown on screen, and sends it to the
+          Voice-Follow team to make Voice-Follow better. Nothing else is collected. You can turn
+          this off any time in Settings.
         </p>
         <label htmlFor="shadow-name">
           Your name
@@ -443,7 +584,7 @@ const ShadowCollector = () => {
           />
         </label>
         <label htmlFor="shadow-gurdwara">
-          Gurdwara
+          Gurdwara (optional)
           <input
             id="shadow-gurdwara"
             className="disable-kb-shortcuts"
@@ -460,14 +601,15 @@ const ShadowCollector = () => {
               setShadowTester(
                 packTester({
                   name: name.trim(),
-                  gurdwara: gurdwara.trim(),
+                  // Blank Gurdwara: the computer name stands in, so sessions still group.
+                  gurdwara: gurdwara.trim() || machineName(),
                   id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
                 }),
               );
               setShadowRecording(true);
             }}
           >
-            I agree, start
+            I agree, continue
           </button>
         </div>
       </div>

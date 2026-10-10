@@ -49,6 +49,10 @@ const C = {
   LISTEN_MIN_S: 20,
   LISTEN_JOIN_S: 3,
   GAP_S: 5, // the live clock jumping this far means the computer slept
+  // Visible use (the sevadaar drives Voice-Follow): a decision is judged by what they do next.
+  VERDICT_S: 20, // a manual change this soon after a Voice-Follow decision is a correction
+  ABANDON_S: 60, // Stop this soon after Start means they gave up on it
+  RECOVER_S: 60, // after a correction, Voice-Follow is "back" if it moves again within this
 };
 
 function readJsonl(file) {
@@ -75,6 +79,86 @@ function contentKey(l) {
   if (l.ceremony != null) return `ceremony:${l.ceremony}`;
   if (l.shabadId != null) return `shabad:${l.shabadId}`;
   return null;
+}
+
+// How good Voice-Follow was while the sevadaar was using it (visible mode). There is no
+// human timeline to score against then, so every decision Voice-Follow made (a screen change
+// it drove) gets a verdict from what the sevadaar did next:
+//   accepted       - no manual change for VERDICT_S
+//   corrected      - the sevadaar moved to a different Shabad within VERDICT_S (the failure)
+//   lineCorrected  - same Shabad, a different line, within VERDICT_S
+// Plus: picked (a candidate tapped in the panel: right but slow), abandoned (Stop within
+// ABANDON_S of Start), time to the first lock after each Start, recovery after each
+// correction, and the one-tap rating given at Stop.
+function visibleUse(humanEv, events) {
+  const ev = [...events].sort((a, b) => (a.t || 0) - (b.t || 0));
+  const stretches = [];
+  let from = null;
+  ev.forEach((e) => {
+    if (e.type === 'vf_visible' && from == null) from = e.t;
+    if (e.type === 'vf_hidden' && from != null) {
+      stretches.push([from, e.t]);
+      from = null;
+    }
+  });
+  if (from != null) stretches.push([from, Infinity]);
+  const inVisible = (t) => stretches.some(([a, b]) => t >= a && t <= b);
+  const human = [...humanEv].sort((a, b) => (a.t || 0) - (b.t || 0));
+  const verseOf = (l) => (l && l.verseId != null ? l.verseId : null);
+  const decisions = [];
+  const corrections = [];
+  human.forEach((h, i) => {
+    if (h.override !== false || !inVisible(h.t)) return; // only Voice-Follow's own changes
+    let verdict = 'accepted';
+    for (let j = i + 1; j < human.length; j += 1) {
+      const n = human[j];
+      if (n.t - h.t > C.VERDICT_S) break;
+      if (n.override === true) {
+        const sameShabad = contentKey(n) === contentKey(h);
+        verdict = sameShabad && verseOf(n) !== verseOf(h) ? 'lineCorrected' : 'corrected';
+        if (verdict === 'corrected') {
+          // recovery: Voice-Follow moving again on its own after the correction
+          const next = human.slice(j + 1).find((x) => x.override === false);
+          corrections.push({
+            t: Math.round(n.t * 10) / 10,
+            from: contentKey(h),
+            to: contentKey(n),
+            delayS: Math.round((n.t - h.t) * 10) / 10,
+            recoveredS:
+              next && next.t - n.t <= C.RECOVER_S ? Math.round((next.t - n.t) * 10) / 10 : null,
+          });
+        }
+        break;
+      }
+      if (n.override === false) break; // Voice-Follow moved on first: this one stood
+    }
+    decisions.push({ t: Math.round(h.t * 10) / 10, key: contentKey(h), verdict });
+  });
+  const count = (v) => decisions.filter((d) => d.verdict === v).length;
+  const timeToLockS = stretches.map(([a, b]) => {
+    const first = human.find((h) => h.override === false && h.t >= a && h.t <= b);
+    return first ? Math.round((first.t - a) * 10) / 10 : null;
+  });
+  const abandoned = stretches.filter(([a, b]) => b !== Infinity && b - a < C.ABANDON_S).length;
+  const picked = ev.filter((e) => e.type === 'vf_pick').length;
+  const ratings = ev.filter((e) => e.type === 'rating');
+  const rating = ratings.length ? ratings[ratings.length - 1].value : null;
+  const accepted = count('accepted');
+  const corrected = count('corrected');
+  return {
+    stretches: stretches.length,
+    decisions: decisions.length,
+    accepted,
+    corrected,
+    lineCorrected: count('lineCorrected'),
+    acceptedPct:
+      accepted + corrected ? Math.round((100 * accepted) / (accepted + corrected)) : null,
+    picked,
+    abandoned,
+    timeToLockS,
+    corrections,
+    rating,
+  };
 }
 
 // Step function: the label in force at each whole second. System updates are partial.
@@ -162,6 +246,7 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   // paused: busy computer (paused..resumed), mic down (mic_error..mic_restarted), asleep (gap).
   const paused = new Array(length).fill(false);
   const vfDown = new Array(length).fill(false); // hidden Voice-Follow could not run
+  const visible = new Array(length).fill(false); // the sevadaar was driving Voice-Follow
   const mark = (from, to, arr = paused) => {
     const a = arr;
     for (let k = Math.max(0, Math.floor(from)); k < Math.min(length, Math.ceil(to)); k += 1)
@@ -170,6 +255,7 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   let busyFrom = null;
   let micFrom = null;
   let downFrom = null;
+  let visFrom = null;
   [...events]
     .sort((a, b) => (a.t || 0) - (b.t || 0))
     .forEach((e) => {
@@ -189,11 +275,17 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
         mark(downFrom, e.t, vfDown);
         downFrom = null;
       }
+      if (e.type === 'vf_visible' && visFrom == null) visFrom = e.t;
+      if (e.type === 'vf_hidden' && visFrom != null) {
+        mark(visFrom, e.t, visible);
+        visFrom = null;
+      }
     });
+  if (visFrom != null) mark(visFrom, length, visible);
   if (busyFrom != null) mark(busyFrom, length);
   if (micFrom != null) mark(micFrom, length);
   if (downFrom != null) mark(downFrom, length, vfDown);
-  for (let k = 0; k < length; k += 1) if (vfDown[k]) paused[k] = true;
+  for (let k = 0; k < length; k += 1) if (vfDown[k] || visible[k]) paused[k] = true;
 
   const heard = (i) => {
     if (!haveActivity) return true;
@@ -239,6 +331,9 @@ function scoreTimelines({ human: humanEv, system: systemEv, activity, events, fi
   const sc = {
     seconds: length,
     vfDown: vfDown.filter(Boolean).length, // part of paused: Voice-Follow not running
+    visible: visible.filter(Boolean).length, // part of paused: the sevadaar drove Voice-Follow
+    overrides: humanEv.filter((h) => h.override).length, // sevadaar corrections in visible mode
+    visibleUse: visibleUse(humanEv, events), // how it did while the sevadaar used it
     kirtan: 0,
     held: 0,
     idle: 0,
@@ -523,7 +618,7 @@ function scoreDir(dir, fixes = []) {
   };
 }
 
-module.exports = { C, contentKey, scoreTimelines, scoreDir, summarize };
+module.exports = { C, contentKey, scoreTimelines, scoreDir, summarize, visibleUse };
 
 if (require.main === module) {
   // node score.js <session dir> [fixes.json]
