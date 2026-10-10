@@ -144,6 +144,8 @@ const ShadowCollector = () => {
     (actions) => actions.userSettings,
   );
   const tester = readTester(shadowTester);
+  const [name, setName] = useState(tester.name || '');
+  const [gurdwara, setGurdwara] = useState(tester.gurdwara || '');
   const sessionRef = useRef(null);
   // A session runs only while the sevadaar is working (see service.js).
   const [active, setActive] = useState(false);
@@ -420,48 +422,52 @@ const ShadowCollector = () => {
 
   if (!SHADOW_BUILD || tester.name) return null;
 
-  // First launch only: one tap. The laptop is identified by its computer name; nothing to type.
-  const machine = () => {
-    try {
-      return os.hostname().replace(/\.local$/i, '') || 'laptop';
-    } catch (_) {
-      return 'laptop';
-    }
-  };
+  // First launch only: who is testing (to group sessions), and the agreement.
   return (
     <div className="shadow-consent">
       <div className="shadow-consent-card">
-        <h2>Help improve Voice-Follow</h2>
+        <h2>Voice-Follow test build</h2>
         <p>
-          This build records the kirtan audio and what is shown on screen, and sends it to the
-          Voice-Follow team. Nothing else is collected. You can turn this off any time in Settings.
+          Thank you for helping. While you use this app as normal, it records the Gurdwara audio and
+          which Shabad and line you show, and quietly checks how Voice-Follow would have done.
+          Recordings are uploaded to the Voice-Follow team only. You can stop at any time in
+          Settings.
         </p>
+        <label htmlFor="shadow-name">
+          Your name
+          <input
+            id="shadow-name"
+            className="disable-kb-shortcuts"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
+        <label htmlFor="shadow-gurdwara">
+          Gurdwara
+          <input
+            id="shadow-gurdwara"
+            className="disable-kb-shortcuts"
+            value={gurdwara}
+            onChange={(e) => setGurdwara(e.target.value)}
+          />
+        </label>
         <div className="shadow-consent-actions">
           <button
             type="button"
-            className="shadow-consent-no"
-            onClick={() => {
-              setShadowTester(packTester({ name: machine(), gurdwara: '', id: 'off' }));
-              setShadowRecording(false);
-            }}
-          >
-            Not now
-          </button>
-          <button
-            type="button"
             className="shadow-consent-yes"
+            disabled={!name.trim()}
             onClick={() => {
               setShadowTester(
                 packTester({
-                  name: machine(),
-                  gurdwara: '',
+                  name: name.trim(),
+                  gurdwara: gurdwara.trim(),
                   id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
                 }),
               );
               setShadowRecording(true);
             }}
           >
-            OK
+            I agree, start
           </button>
         </div>
       </div>
