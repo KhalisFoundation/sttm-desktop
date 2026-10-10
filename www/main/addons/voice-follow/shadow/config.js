@@ -30,6 +30,12 @@ const SHADOW_CPU_RESUME = 0.6;
 // from the VF_UPLOAD_SAS environment variable (CI sets it from a repository secret).
 const UPLOAD_URL = 'https://banidb.blob.core.windows.net/voice-follow-training-data';
 const UPLOAD_SAS = '__VF_UPLOAD_SAS__';
+// A second copy of every session goes to Hugging Face in the team's recording layout
+// (hf.js). The write token is entered on the first-launch card (kept in the app's settings)
+// or, if Khalis chooses, injected at build time like the SAS (VF_HF_TOKEN).
+const HF_NAMESPACE = 'khalisfoundation';
+const HF_DATASET_TYPE = 'kirtan';
+const HF_TOKEN = '__VF_HF_TOKEN__';
 
 module.exports = {
   SHADOW_BUILD,
@@ -43,4 +49,7 @@ module.exports = {
   SHADOW_CPU_RESUME,
   UPLOAD_URL,
   UPLOAD_SAS,
+  HF_NAMESPACE,
+  HF_DATASET_TYPE,
+  HF_TOKEN,
 };

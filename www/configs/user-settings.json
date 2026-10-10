@@ -345,6 +345,11 @@
       "dontApplyClass": true,
       "initialValue": ""
     },
+    "hf-token": {
+      "title": "HF_TOKEN",
+      "dontApplyClass": true,
+      "initialValue": ""
+    },
     "improve-voice-follow": {
       "title": "IMPROVE_VOICE_FOLLOW",
       "initialValue": true,
