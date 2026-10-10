@@ -43,10 +43,12 @@ async function decode(file) {
 // Writes <dir>/<name>.wav from the session's audio-NNN.webm files, in order. Returns the
 // duration in seconds. A segment that will not decode (a crash mid-write) is skipped.
 async function sessionToWav(dir, name) {
-  const segs = fs
-    .readdirSync(dir)
-    .filter((f) => /^audio-\d+\.webm$/.test(f))
-    .sort();
+  const files = fs.readdirSync(dir);
+  // The pre-roll (audio from before the session started) comes first.
+  const segs = [
+    ...files.filter((f) => f === 'audio-pre.wav'),
+    ...files.filter((f) => /^audio-\d+\.webm$/.test(f)).sort(),
+  ];
   const out = path.join(dir, `${name}.wav`);
   const fd = fs.openSync(`${out}.part`, 'w');
   let samples = 0;

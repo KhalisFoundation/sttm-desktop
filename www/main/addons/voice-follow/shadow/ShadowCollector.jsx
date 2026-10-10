@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { SHADOW_BUILD, SHADOW_AUDIO_BPS, SHADOW_SLICE_MS, SHADOW_SEGMENT_MS } from './config';
+import {
+  SHADOW_BUILD,
+  SHADOW_AUDIO_BPS,
+  SHADOW_SLICE_MS,
+  SHADOW_SEGMENT_MS,
+  SHADOW_DISCARD_COOLDOWN_MS,
+} from './config';
 
 const fs = require('fs');
 const os = require('os');
@@ -11,6 +17,7 @@ const uploader = require('./uploader');
 const hf = require('./hf');
 const { HF_TOKEN } = require('./config');
 const service = require('./service');
+const listener = require('./listener');
 const { logDir } = require('../engine/session-log');
 
 // One folder per app session under <userData>/voice-follow/shadow/<id>/:
@@ -199,6 +206,9 @@ const ShadowCollector = () => {
   const lastChangeRef = useRef(Date.now());
   const [restarts, setRestarts] = useState(0);
   const startingRef = useRef(false); // waiting for the microphone (e.g. the permission prompt)
+  const preRollRef = useRef(null); // audio from before the session, handed over by the listener
+  const discardRef = useRef(false); // the session turned out to be noise: delete, do not upload
+  const lastDiscardRef = useRef(0); // when the last noise session was thrown away
 
   useEffect(() => {
     if (SHADOW_BUILD) lookupPublicIp();
@@ -222,6 +232,40 @@ const ShadowCollector = () => {
   }, [shadowTester]);
   const recording = enabled && active;
 
+  // Begin a session now (not from a screen change): the room started sounding, or the
+  // sevadaar pressed Start in Voice-Follow. Whatever the listener heard just before comes
+  // along as the session's opening audio.
+  const beginNow = (reason) => {
+    if (!enabled || active) return;
+    // Right after a noise session was thrown away, sound alone waits a while.
+    if (reason === 'sound' && Date.now() - lastDiscardRef.current < SHADOW_DISCARD_COOLDOWN_MS) {
+      return;
+    }
+    preRollRef.current = listener.takePreRoll();
+    startReasonRef.current = reason;
+    lastChangeRef.current = Date.now();
+    setActive(true);
+  };
+  const beginNowRef = useRef(beginNow);
+  beginNowRef.current = beginNow;
+
+  // With no session running, the listener watches the room so unattended kirtan is collected.
+  useEffect(() => {
+    if (!enabled || active) {
+      listener.stop();
+      return undefined;
+    }
+    listener.start(() => beginNowRef.current('sound')).catch((e) => diag(`listener: ${e.message}`));
+    return () => listener.stop();
+  }, [enabled, active]);
+
+  // Pressing Start in Voice-Follow begins a session at once, so its search is recorded too.
+  useEffect(() => {
+    const onStart = () => beginNowRef.current('voice-follow start');
+    window.addEventListener('vf-shadow-start', onStart);
+    return () => window.removeEventListener('vf-shadow-start', onStart);
+  }, []);
+
   useEffect(() => {
     if (!recording) return undefined;
     let stopped = false;
@@ -238,11 +282,24 @@ const ShadowCollector = () => {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
-        const id = new Date().toISOString().replace(/[:.]/g, '-');
+        // The audio from just before (the listener's pre-roll) opens the session, so the
+        // session clock starts that much earlier and every timeline lines up with it.
+        const pre = preRollRef.current;
+        preRollRef.current = null;
+        const startedAt = Date.now();
+        const t0 = startedAt - (pre ? Math.round(pre.seconds * 1000) : 0);
+        const id = new Date(t0).toISOString().replace(/[:.]/g, '-');
         const dir = path.join(shadowRoot(), id);
         fs.mkdirSync(dir, { recursive: true });
-        const t0 = Date.now();
-        const s = { dir, t0, stream, recorder: null, seg: 0 };
+        if (pre) {
+          try {
+            fs.writeFileSync(path.join(dir, 'audio-pre.wav'), listener.wavBytes(pre));
+          } catch (_) {
+            /* never disturb the sevadaar */
+          }
+        }
+        discardRef.current = false;
+        const s = { dir, t0, startedAt, stream, recorder: null, seg: 0 };
         sessionRef.current = s;
         startingRef.current = false;
         fs.writeFileSync(
@@ -258,6 +315,7 @@ const ShadowCollector = () => {
               platform: process.platform,
               microphone: stream.getAudioTracks()[0]?.label || '',
               startedBy: startReasonRef.current,
+              preRollSeconds: pre ? Math.round(pre.seconds * 10) / 10 : 0,
             },
             null,
             1,
@@ -265,6 +323,7 @@ const ShadowCollector = () => {
         );
         bus.begin(dir, t0);
         bus.note({ type: 'session_start', reason: startReasonRef.current });
+        if (pre) bus.note({ type: 'pre_roll', file: 'audio-pre.wav', seconds: pre.seconds });
         bus.human(labelOf(nav));
         const event = (obj) => {
           try {
@@ -402,6 +461,16 @@ const ShadowCollector = () => {
         /* already gone */
       }
       bus.end();
+      if (discardRef.current) {
+        discardRef.current = false;
+        try {
+          fs.rmSync(s.dir, { recursive: true, force: true });
+          diag(`discarded ${path.basename(s.dir)}: the room started it and no words were heard`);
+        } catch (_) {
+          /* ignore */
+        }
+        return;
+      }
       if (quitting !== true) uploader.enqueueSession(s.dir);
     };
     const onUnload = () => stop(true);
@@ -419,13 +488,31 @@ const ShadowCollector = () => {
   useEffect(() => {
     if (!recording) return undefined;
     const timer = setInterval(() => {
+      const s = sessionRef.current;
       const reason = service.stopReason({
         now: Date.now(),
+        startedAt: s ? s.startedAt : Date.now(),
+        startedBy: startReasonRef.current,
         lastChangeAt: lastChangeRef.current,
         lastHeardAt: bus.lastHeardAt(),
+        lastSoundAt: bus.lastSoundAt(),
+        vfUpAt: bus.vfUpAt(),
       });
       if (!reason) return;
       bus.note({ type: 'session_stop', reason });
+      if (
+        reason === 'no_words' ||
+        service.discardOnStop({
+          now: Date.now(),
+          startedAt: s ? s.startedAt : Date.now(),
+          startedBy: startReasonRef.current,
+          lastHeardAt: bus.lastHeardAt(),
+          vfUpAt: bus.vfUpAt(),
+        })
+      ) {
+        discardRef.current = true;
+        lastDiscardRef.current = Date.now();
+      }
       setActive(false);
     }, 20000);
     return () => clearInterval(timer);

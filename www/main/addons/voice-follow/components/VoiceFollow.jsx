@@ -3561,6 +3561,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     shadowStateRef.current.running = false;
     if (running) stop();
     visibleRef.current = true;
+    // A shadow session starts now if none is running, so this whole run is recorded.
+    window.dispatchEvent(new CustomEvent('vf-shadow-start'));
     shadowBus.setVisible(true);
     await startAutopilot();
   };

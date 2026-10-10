@@ -20,6 +20,25 @@ const testMs = (name, ms) =>
 const SHADOW_IDLE_STOP_MS = testMs('VF_TEST_IDLE_STOP_MS', 8 * 60 * 1000);
 const SHADOW_IDLE_HARD_STOP_MS = testMs('VF_TEST_IDLE_HARD_STOP_MS', 20 * 60 * 1000);
 const SHADOW_HEARD_GRACE_MS = testMs('VF_TEST_HEARD_GRACE_MS', 2 * 60 * 1000);
+// Kirtan in the room starts a session even when nobody touches the laptop (listener.js):
+// the room counts as sounding when loudness (RMS) stays above SHADOW_SOUND_LEVEL for
+// SHADOW_SOUND_SHARE of SHADOW_SOUND_WINDOW_MS. A fan or an empty hall is ~0.001-0.003;
+// a sound system through a laptop mic is well above 0.01.
+const SHADOW_SOUND_LEVEL = 0.006;
+const SHADOW_SOUND_WINDOW_MS = testMs('VF_TEST_SOUND_WINDOW_MS', 40 * 1000);
+const SHADOW_SOUND_SHARE = 0.75;
+// Every session begins with up to this much of the audio from before it started.
+const SHADOW_PRE_ROLL_S = 120;
+// A session ends once the room has been quiet (no sound and no words) this long and the
+// screen has not changed for SHADOW_CHANGE_GRACE_MS. While kirtan plays it never ends.
+const SHADOW_QUIET_STOP_MS = testMs('VF_TEST_QUIET_STOP_MS', 5 * 60 * 1000);
+const SHADOW_CHANGE_GRACE_MS = testMs('VF_TEST_CHANGE_GRACE_MS', 2 * 60 * 1000);
+// A session the room started (no sevadaar) where Voice-Follow was listening this long and
+// recognised no words at all is noise, not kirtan: it is discarded, not uploaded.
+const SHADOW_EMPTY_GATE_MS = testMs('VF_TEST_EMPTY_GATE_MS', 3 * 60 * 1000);
+// After such a discard, sound alone does not start another session for this long (a
+// screen change or Start still does), so a loud fan cannot keep restarting sessions.
+const SHADOW_DISCARD_COOLDOWN_MS = testMs('VF_TEST_DISCARD_COOLDOWN_MS', 5 * 60 * 1000);
 // Shadow scoring pauses while the computer is this busy (1-minute load per core) and
 // resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
 const SHADOW_CPU_PAUSE = 0.9;
@@ -45,6 +64,14 @@ module.exports = {
   SHADOW_IDLE_STOP_MS,
   SHADOW_IDLE_HARD_STOP_MS,
   SHADOW_HEARD_GRACE_MS,
+  SHADOW_SOUND_LEVEL,
+  SHADOW_SOUND_WINDOW_MS,
+  SHADOW_SOUND_SHARE,
+  SHADOW_PRE_ROLL_S,
+  SHADOW_QUIET_STOP_MS,
+  SHADOW_CHANGE_GRACE_MS,
+  SHADOW_EMPTY_GATE_MS,
+  SHADOW_DISCARD_COOLDOWN_MS,
   SHADOW_CPU_PAUSE,
   SHADOW_CPU_RESUME,
   UPLOAD_URL,

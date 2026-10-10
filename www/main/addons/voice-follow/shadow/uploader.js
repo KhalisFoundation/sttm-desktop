@@ -25,6 +25,7 @@ const LIVE_FILES = [
 ];
 const TYPES = {
   '.webm': 'audio/webm',
+  '.wav': 'audio/wav',
   '.json': 'application/json',
   '.jsonl': 'application/x-ndjson',
 };
