@@ -3634,6 +3634,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   };
   // A candidate row shows the pangti the engine heard being sung, wherever it falls in
   // the Shabad, so the sevadaar can recognise it at once (as the 8.6 panel did).
+  // Nothing heard for a few seconds (the hearing strip has cleared): no candidates, no change.
+  const hearingNow = heardKeys.length > 0;
   const nameLine = (b) => (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim();
   const curFirst =
     (curProfileRef.current && curProfileRef.current.displayLines
@@ -3658,16 +3660,24 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     .map((b) => ({ ...b, line: nameLine(b) }))
     // A candidate with no pangti to show yet is not listed (never an empty "…" row).
     .filter((b) => !!b.line)
+    .filter(() => hearingNow)
     // The same Gurbani under another id (a Bani copy of a Shabad) is not a different Shabad.
     .filter((b) => !(currentView && sameAsCurrent(b.line)))
     .slice(0, 3);
   const leadLine = liveLead ? nameLine(liveLead) : '';
+  // The change card's percentage: the live board's, else the judge's own match score.
+  let leadPct = 0;
+  if (liveLead) {
+    const onBoard = boardPct(liveLead.shabadId);
+    leadPct = onBoard != null ? onBoard : liveLead.score || 0;
+  }
   // A change in progress is the one thing to look at: the candidate list hides under it.
   // The same Gurbani under another id is not a change.
   const changing = !!(
     currentView &&
     liveLead &&
     liveLead.wins >= 1 &&
+    hearingNow &&
     leadLine &&
     !sameAsCurrent(leadLine)
   );
@@ -3868,20 +3878,14 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
               {changing && (
                 <section
-                  className={`vf2-change${liveLead.wins >= 2 ? ' is-confirming' : ''} is-tappable${
-                    boardPct(liveLead.shabadId) != null
-                      ? ` lvl-${pctLevel(boardPct(liveLead.shabadId))}`
-                      : ''
-                  }`}
+                  className={`vf2-change${
+                    liveLead.wins >= 2 ? ' is-confirming' : ''
+                  } is-tappable lvl-${pctLevel(leadPct)}`}
                   aria-live="polite"
                   role="button"
                   tabIndex={0}
                   title="Tap to change to this Shabad now"
-                  style={
-                    boardPct(liveLead.shabadId) != null
-                      ? pctVars(boardPct(liveLead.shabadId))
-                      : undefined
-                  }
+                  style={pctVars(leadPct)}
                   onClick={() => pickCandidate(liveLead)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
@@ -3890,80 +3894,68 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                   <div className="vf2-label">
                     <span className="vf2-dot is-seeking" />
                     {changeLabel}
-                    {boardPct(liveLead.shabadId) != null ? (
-                      <LivePct value={boardPct(liveLead.shabadId)} />
-                    ) : (
-                      <span className="vf2-cand-pct">
-                        {Math.round((liveLead.score || 0) * 100)}% match
-                      </span>
-                    )}
+                    <LivePct value={leadPct} />
                   </div>
                   <div className="vf2-cand-line" lang="pa">
                     <MarkedLine line={leadLine} keys={heardKeys} />
                   </div>
-                  {boardPct(liveLead.shabadId) != null && (
-                    <LiveBar value={boardPct(liveLead.shabadId)} />
-                  )}
+                  <LiveBar value={leadPct} />
                 </section>
               )}
-              {!changing && (
-                <details className="vf2-matches" open>
-                  <summary>
-                    <svg
-                      className="vf2-chevron"
-                      viewBox="0 0 10 10"
-                      width="10"
-                      height="10"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M3.5 2 6.5 5 3.5 8"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span className="vf2-summary-title">
-                      {currentView ? 'Possible New Shabad' : 'Possible Shabad'}
+              <details className="vf2-matches" open>
+                <summary>
+                  <svg
+                    className="vf2-chevron"
+                    viewBox="0 0 10 10"
+                    width="10"
+                    height="10"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3.5 2 6.5 5 3.5 8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="vf2-summary-title">
+                    {currentView ? 'Possible New Shabad' : 'Possible Shabad'}
+                  </span>
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-count">{boardOthers.length}</span>
+                  )}
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-summary-tap">
+                      {currentView ? 'tap to switch' : 'tap to open'}
                     </span>
-                    {boardOthers.length > 0 && (
-                      <span className="vf2-summary-count">{boardOthers.length}</span>
-                    )}
-                    {boardOthers.length > 0 && (
-                      <span className="vf2-summary-tap">
-                        {currentView ? 'tap to switch' : 'tap to open'}
-                      </span>
-                    )}
-                  </summary>
-                  <div className="vf2-next" aria-live="polite">
-                    {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
-                    {boardOthers.map((c) => (
-                      <button
-                        type="button"
-                        className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
-                        key={c.shabadId}
-                        style={pctVars(c.pct)}
-                        onClick={() => pickCandidate(c)}
-                        title={
-                          currentView
-                            ? 'Tap to change to this Shabad now'
-                            : 'Tap to open this Shabad'
-                        }
-                      >
-                        <div className="vf2-cand-row">
-                          <span className="vf2-cand-line" lang="pa">
-                            <MarkedLine line={c.line} keys={heardKeys} />
-                          </span>
-                          <LivePct value={c.pct} />
-                        </div>
-                        <LiveBar value={c.pct} />
-                      </button>
-                    ))}
-                  </div>
-                </details>
-              )}
+                  )}
+                </summary>
+                <div className="vf2-next" aria-live="polite">
+                  {boardOthers.length === 0 && <div className="vf2-empty">None right now.</div>}
+                  {boardOthers.map((c) => (
+                    <button
+                      type="button"
+                      className={`vf2-cand is-tappable lvl-${pctLevel(c.pct)}`}
+                      key={c.shabadId}
+                      style={pctVars(c.pct)}
+                      onClick={() => pickCandidate(c)}
+                      title={
+                        currentView ? 'Tap to change to this Shabad now' : 'Tap to open this Shabad'
+                      }
+                    >
+                      <div className="vf2-cand-row">
+                        <span className="vf2-cand-line" lang="pa">
+                          <MarkedLine line={c.line} keys={heardKeys} />
+                        </span>
+                        <LivePct value={c.pct} />
+                      </div>
+                      <LiveBar value={c.pct} />
+                    </button>
+                  ))}
+                </div>
+              </details>
             </div>
           )}
           <div className={`vf-compact-footer${active ? '' : ' is-idle'}`}>
