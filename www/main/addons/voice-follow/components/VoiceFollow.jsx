@@ -3778,7 +3778,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
                       return (
                         <>
                           <span className="vf2-heard-settled">
-                            {tail.length ? tail.join(' ') : '…'}
+                            {tail.length ? tail.join(' ') : !tentative && '…'}
                           </span>
                           {tentative && <span className="vf2-heard-tentative">{tentative}</span>}
                         </>
