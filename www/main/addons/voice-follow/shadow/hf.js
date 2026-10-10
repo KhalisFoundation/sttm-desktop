@@ -291,11 +291,10 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
   return repo;
 }
 
-// A finished session is ready once Azure has its score (the session is over and scored).
-const ready = (dir) => {
-  const done = readJson(path.join(dir, 'uploaded.json'), {});
-  return !!done['score.json'] && !fs.existsSync(path.join(dir, 'hf-pushed.json'));
-};
+// A session is ready once it is over and scored (score.json written) and not yet pushed.
+// It does not wait for Azure: the two copies are independent.
+const ready = (dir) =>
+  fs.existsSync(path.join(dir, 'score.json')) && !fs.existsSync(path.join(dir, 'hf-pushed.json'));
 
 async function drain() {
   const token = (tokenFn() || '').trim();
