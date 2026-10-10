@@ -426,12 +426,11 @@ const ShadowCollector = () => {
   return (
     <div className="shadow-consent">
       <div className="shadow-consent-card">
-        <h2>Voice-Follow test build</h2>
+        <h2>Voice-Follow experimental build</h2>
         <p>
-          Thank you for helping. While you use this app as normal, it records the Gurdwara audio and
-          which Shabad and line you show, and quietly checks how Voice-Follow would have done.
-          Recordings are uploaded to the Voice-Follow team only. You can stop at any time in
-          Settings.
+          This build records the kirtan audio and what is shown on screen, and sends it to the
+          Voice-Follow team to make Voice-Follow better. Nothing else is collected. You can turn
+          this off any time in Settings.
         </p>
         <label htmlFor="shadow-name">
           Your name
@@ -467,7 +466,7 @@ const ShadowCollector = () => {
               setShadowRecording(true);
             }}
           >
-            I agree, start
+            I agree, continue
           </button>
         </div>
       </div>
