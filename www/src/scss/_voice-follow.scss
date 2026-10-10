@@ -1071,9 +1071,17 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  direction: rtl;
+  direction: ltr;
   text-align: left;
-  unicode-bidi: plaintext;
+  // Words run left to right. Once they overflow, the box is scrolled to its end (newest
+  // words in view) and the oldest fade out on the left.
+  &.is-overflowing {
+    mask-image: linear-gradient(to right, transparent 0, #000 36px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 36px);
+  }
+}
+.vf2-heard-tentative {
+  margin-left: 0.35em;
 }
 .vf-heard-toggle {
   opacity: 0.55;

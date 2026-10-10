@@ -449,6 +449,7 @@ MarkedLine.propTypes = { line: PropTypes.string, keys: PropTypes.arrayOf(PropTyp
 MarkedLine.defaultProps = { line: '', keys: [] };
 const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
 const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
+const HEARD_SHOW_WORDS = 10; // the strip shows this many settled words, newest always in view
 const HEARTBEAT = false; // the slow breath of the current card: off (not an agreed design)
 const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
 const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
@@ -875,8 +876,16 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // cut mid-word and gets re-spelt on the next decode. Those are shown lighter as "still
   // hearing"; only words that were fully sung join the settled text.
   const tentativeRef = useRef('');
+  const heardBoxRef = useRef(null); // the hearing strip: scrolled to its end when it overflows
   const heardKeysRef = useRef([]); // recent heard words (keys) for marking candidate lines
   const [heardKeys, setHeardKeys] = useState([]);
+  useEffect(() => {
+    const el = heardBoxRef.current;
+    if (!el) return;
+    const over = el.scrollWidth > el.clientWidth + 1;
+    el.scrollLeft = over ? el.scrollWidth : 0;
+    el.classList.toggle('is-overflowing', over);
+  }, [heard]);
   const noteHeard = useCallback((text, confidence = 1) => {
     const all = (text || '').split(/\s+/).filter(Boolean);
     const words = all.filter((w) => w.length >= 3);
@@ -3761,11 +3770,20 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               {showHeard && (
                 <div className="vf2-heard" title="The words Voice-Follow is hearing right now">
                   <span className="vf2-heard-label">Hearing</span>
-                  <span className="vf2-heard-text" lang="pa">
-                    {heard ? heard.split('\u0001')[0] : '…'}
-                    {heard && heard.split('\u0001')[1] && (
-                      <span className="vf2-heard-tentative"> {heard.split('\u0001')[1]}</span>
-                    )}
+                  <span className="vf2-heard-text" lang="pa" ref={heardBoxRef}>
+                    {(() => {
+                      // A rolling window: only the last few settled words, newest kept in view.
+                      const [settled, tentative] = heard ? heard.split('\u0001') : ['', ''];
+                      const tail = settled.split(/\s+/).filter(Boolean).slice(-HEARD_SHOW_WORDS);
+                      return (
+                        <>
+                          <span className="vf2-heard-settled">
+                            {tail.length ? tail.join(' ') : '…'}
+                          </span>
+                          {tentative && <span className="vf2-heard-tentative">{tentative}</span>}
+                        </>
+                      );
+                    })()}
                   </span>
                 </div>
               )}
