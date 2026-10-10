@@ -1476,3 +1476,28 @@ $vf2-yellow-bar: #f2c200;
   width: 3px;
   min-height: 4px;
 }
+
+// One-tap rating after Stop.
+.vf-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b6b6b;
+  span {
+    flex: 1;
+  }
+  button {
+    border: 1px solid #ececec;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}

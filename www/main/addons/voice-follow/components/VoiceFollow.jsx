@@ -450,6 +450,7 @@ MarkedLine.defaultProps = { line: '', keys: [] };
 const HEARD_CLEAR_MS = 5000; // strip empties after this long without a confident word
 const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: shown lighter
 const HEARD_SHOW_WORDS = 10; // the strip shows this many settled words, newest always in view
+const RATING_ASK_MS = 20000; // after Stop, the one-tap rating stays for this long
 const HEARTBEAT = false; // the slow breath of the current card: off (not an agreed design)
 const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
 const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
@@ -877,6 +878,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // hearing"; only words that were fully sung join the settled text.
   const tentativeRef = useRef('');
   const heardBoxRef = useRef(null); // the hearing strip: scrolled to its end when it overflows
+  const [askRating, setAskRating] = useState(false); // one-tap rating offered after Stop
+  const ratingTimerRef = useRef(null);
   const heardKeysRef = useRef([]); // recent heard words (keys) for marking candidate lines
   const [heardKeys, setHeardKeys] = useState([]);
   useEffect(() => {
@@ -1922,6 +1925,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const pickCandidate = useCallback(
     async (c) => {
       if (!c || c.shabadId == null || lockingRef.current) return;
+      if (SHADOW_BUILD && visibleRef.current)
+        shadowBus.note({ type: 'vf_pick', shabadId: c.shabadId });
       let verse = c.verse || null;
       try {
         if (!verse && c.verseId != null) verse = await banidb.getVerse(c.shabadId, c.verseId);
@@ -3551,6 +3556,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   // Visible mode in a tester build: stop the hidden run, mark the session, and start for
   // real; Stop hands the shadow back (the shadow state machine restarts the hidden run).
   const takeOver = async () => {
+    clearTimeout(ratingTimerRef.current);
+    setAskRating(false);
     shadowStateRef.current.running = false;
     if (running) stop();
     visibleRef.current = true;
@@ -3562,6 +3569,15 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     visibleRef.current = false;
     shadowStateRef.current.up = null; // so the hidden run's vf_up is logged again
     shadowBus.setVisible(false);
+    // One tap of feedback, offered briefly after Stop.
+    setAskRating(true);
+    clearTimeout(ratingTimerRef.current);
+    ratingTimerRef.current = setTimeout(() => setAskRating(false), RATING_ASK_MS);
+  };
+  const rate = (value) => {
+    shadowBus.note({ type: 'rating', value });
+    clearTimeout(ratingTimerRef.current);
+    setAskRating(false);
   };
   let onMainClick = start;
   if (SHADOW_BUILD) onMainClick = active ? release : takeOver;
@@ -3953,6 +3969,22 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
           </div>
           {(hiddenRun || (status !== 'listening' && !detecting)) && (
             <div className="vf-status">{statusText}</div>
+          )}
+          {SHADOW_BUILD && !active && askRating && (
+            <div className="vf-rate" role="group" aria-label="How did Voice-Follow do?">
+              <span>How did Voice-Follow do?</span>
+              <button type="button" onClick={() => rate('up')} title="Good" aria-label="Good">
+                👍
+              </button>
+              <button
+                type="button"
+                onClick={() => rate('down')}
+                title="Not good"
+                aria-label="Not good"
+              >
+                👎
+              </button>
+            </div>
           )}
         </div>
       )}
