@@ -51,7 +51,12 @@ async function start(onSound) {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
   });
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  let ctx;
+  try {
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: RATE });
+  } catch (_) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+  }
   const src = ctx.createMediaStreamSource(stream);
   // ScriptProcessor is enough for a loudness meter plus a ring buffer.
   const node = ctx.createScriptProcessor(4096, 1, 1);

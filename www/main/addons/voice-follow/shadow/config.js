@@ -39,6 +39,10 @@ const SHADOW_EMPTY_GATE_MS = testMs('VF_TEST_EMPTY_GATE_MS', 3 * 60 * 1000);
 // After such a discard, sound alone does not start another session for this long (a
 // screen change or Start still does), so a loud fan cannot keep restarting sessions.
 const SHADOW_DISCARD_COOLDOWN_MS = testMs('VF_TEST_DISCARD_COOLDOWN_MS', 5 * 60 * 1000);
+// Disk safety (storage.js). Audio is uncompressed 16 kHz mono (~115 MB per hour).
+const SHADOW_KEEP_BYTES = 8e9; // local recordings kept for a missing HF key, at most
+const SHADOW_MIN_FREE_START_BYTES = 3e9; // no new session below this much free disk
+const SHADOW_MIN_FREE_RUN_BYTES = 1.5e9; // a running session stops below this
 // Shadow scoring pauses while the computer is this busy (1-minute load per core) and
 // resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
 const SHADOW_CPU_PAUSE = 0.9;
@@ -72,6 +76,9 @@ module.exports = {
   SHADOW_CHANGE_GRACE_MS,
   SHADOW_EMPTY_GATE_MS,
   SHADOW_DISCARD_COOLDOWN_MS,
+  SHADOW_KEEP_BYTES,
+  SHADOW_MIN_FREE_START_BYTES,
+  SHADOW_MIN_FREE_RUN_BYTES,
   SHADOW_CPU_PAUSE,
   SHADOW_CPU_RESUME,
   UPLOAD_URL,

@@ -1,12 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import {
-  SHADOW_BUILD,
-  SHADOW_AUDIO_BPS,
-  SHADOW_SLICE_MS,
-  SHADOW_SEGMENT_MS,
-  SHADOW_DISCARD_COOLDOWN_MS,
-} from './config';
+import { SHADOW_BUILD, SHADOW_SEGMENT_MS, SHADOW_DISCARD_COOLDOWN_MS } from './config';
 
 const fs = require('fs');
 const os = require('os');
@@ -18,10 +12,13 @@ const hf = require('./hf');
 const { HF_TOKEN } = require('./config');
 const service = require('./service');
 const listener = require('./listener');
+const pcm = require('./pcm');
+const storage = require('./storage');
 const { logDir } = require('../engine/session-log');
 
 // One folder per app session under <userData>/voice-follow/shadow/<id>/:
-//   audio-000.webm ... - what the microphone heard, one file per SHADOW_SEGMENT_MS
+//   audio-000.wav ...  - what the microphone heard (16 kHz mono WAV), one per SHADOW_SEGMENT_MS
+//   audio-pre.wav      - up to 2 min from before the session started (listener.js)
 //   human.jsonl        - what the sevadaar put on screen (the human label)
 //   activity.jsonl     - per second: microphone loudness and letters heard
 //   system.jsonl       - what Voice-Follow would have shown (shadow mode)
@@ -219,7 +216,7 @@ const ShadowCollector = () => {
   // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
   useEffect(() => {
     if (enabled) {
-      uploader.start(shadowRoot(), tester);
+      uploader.start(shadowRoot(), tester, { hfOn: () => !!hfTokenRef.current, log: diag });
       hf.start(shadowRoot(), () => hfTokenRef.current, diag);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -237,6 +234,10 @@ const ShadowCollector = () => {
   // along as the session's opening audio.
   const beginNow = (reason) => {
     if (!enabled || active) return;
+    if (!storage.canStart(shadowRoot())) {
+      diag('storage: disk nearly full, not starting a recording');
+      return;
+    }
     // Right after a noise session was thrown away, sound alone waits a while.
     if (reason === 'sound' && Date.now() - lastDiscardRef.current < SHADOW_DISCARD_COOLDOWN_MS) {
       return;
@@ -355,31 +356,26 @@ const ShadowCollector = () => {
         const startSegment = () => {
           const n = s.seg;
           s.seg += 1; // a failed start never reuses a file name
-          const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.webm`);
-          const rec = new MediaRecorder(s.stream, {
-            mimeType: 'audio/webm;codecs=opus',
-            audioBitsPerSecond: SHADOW_AUDIO_BPS,
-          });
-          event({ type: 'audio_segment', file: path.basename(file) });
-          rec.ondataavailable = async (e) => {
-            if (!e.data || !e.data.size) return;
-            try {
-              fs.appendFileSync(file, Buffer.from(await e.data.arrayBuffer()));
-            } catch (_) {
-              /* never disturb the sevadaar */
-            }
-          };
-          rec.onstop = () => uploader.enqueue(dir, path.basename(file));
-          rec.start(SHADOW_SLICE_MS);
+          const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.wav`);
+          // Uncompressed 16 kHz mono WAV, as the team's recorder captures training audio.
+          const rec = pcm.record(s.stream, file);
           s.recorder = rec;
+          s.recFile = file;
+          event({ type: 'audio_segment', file: path.basename(file), rate: rec.rate });
           s.stream.getAudioTracks().forEach((t) => t.addEventListener('ended', onEnded));
+        };
+        const endSegment = () => {
+          if (!s.recorder) return;
+          s.recorder.stop();
+          s.recorder = null;
+          if (s.recFile) uploader.enqueue(dir, path.basename(s.recFile));
         };
         let rotating = false;
         const rotate = async () => {
           if (rotating || stopped) return;
           rotating = true;
           try {
-            if (s.recorder && s.recorder.state !== 'inactive') s.recorder.stop();
+            endSegment();
           } catch (_) {
             /* already stopped */
           }
@@ -451,7 +447,8 @@ const ShadowCollector = () => {
       sessionRef.current = null;
       if (!s) return;
       try {
-        if (s.recorder && s.recorder.state !== 'inactive') s.recorder.stop();
+        if (s.recorder) s.recorder.stop();
+        s.recorder = null;
       } catch (_) {
         /* already stopped */
       }
@@ -489,6 +486,11 @@ const ShadowCollector = () => {
     if (!recording) return undefined;
     const timer = setInterval(() => {
       const s = sessionRef.current;
+      if (storage.mustStop(shadowRoot())) {
+        bus.note({ type: 'session_stop', reason: 'disk_low' });
+        setActive(false);
+        return;
+      }
       const reason = service.stopReason({
         now: Date.now(),
         startedAt: s ? s.startedAt : Date.now(),
@@ -547,7 +549,7 @@ const ShadowCollector = () => {
     const prev = prevKeyRef.current;
     prevKeyRef.current = key;
     if (sessionRef.current) bus.human(label);
-    if (enabled && !active && service.shouldStart(prev, key)) {
+    if (enabled && !active && service.shouldStart(prev, key) && storage.canStart(shadowRoot())) {
       let what = 'cleared';
       if (bus.contentKey(label)) what = bus.contentKey(label);
       else if (label.slide) what = 'slide';

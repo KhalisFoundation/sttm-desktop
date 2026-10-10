@@ -40,16 +40,29 @@ async function decode(file) {
   return out;
 }
 
-// Writes <dir>/<name>.wav from the session's audio-NNN.webm files, in order. Returns the
-// duration in seconds. A segment that will not decode (a crash mid-write) is skipped.
-async function sessionToWav(dir, name) {
+// The PCM samples of a WAV segment at 16 kHz: copied as they are when the file is already
+// 16 kHz mono 16-bit (what pcm.js writes), decoded and resampled otherwise.
+async function wavPcm(file) {
+  const raw = fs.readFileSync(file);
+  const rate = raw.length >= 44 ? raw.readUInt32LE(24) : 0;
+  const ch = raw.length >= 44 ? raw.readUInt16LE(22) : 0;
+  const bits = raw.length >= 44 ? raw.readUInt16LE(34) : 0;
+  if (rate === RATE && ch === 1 && bits === 16) {
+    const body = raw.subarray(44);
+    return body.subarray(0, body.length - (body.length % 2)); // header sizes may lag a crash
+  }
+  return decode(file);
+}
+
+// Writes `out` (a 16 kHz mono WAV) from the session's audio: the pre-roll first, then the
+// segments in order (WAV, or WebM from older builds). Returns the duration in seconds. A
+// segment that will not read (a crash mid-write) is skipped.
+async function sessionToWav(dir, out) {
   const files = fs.readdirSync(dir);
-  // The pre-roll (audio from before the session started) comes first.
   const segs = [
     ...files.filter((f) => f === 'audio-pre.wav'),
-    ...files.filter((f) => /^audio-\d+\.webm$/.test(f)).sort(),
+    ...files.filter((f) => /^audio-\d+\.(webm|wav)$/.test(f)).sort(),
   ];
-  const out = path.join(dir, `${name}.wav`);
   const fd = fs.openSync(`${out}.part`, 'w');
   let samples = 0;
   try {
@@ -58,8 +71,9 @@ async function sessionToWav(dir, name) {
     for (const f of segs) {
       let pcm = null;
       try {
+        const read = f.endsWith('.wav') ? wavPcm : decode;
         // eslint-disable-next-line no-await-in-loop
-        pcm = await decode(path.join(dir, f));
+        pcm = await read(path.join(dir, f));
       } catch (_) {
         pcm = null;
       }

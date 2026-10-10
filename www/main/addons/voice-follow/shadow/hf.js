@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { HF_NAMESPACE, HF_DATASET_TYPE } = require('./config');
+const { HF_NAMESPACE } = require('./config');
 const { sessionToWav, RATE } = require('./wav');
 const { parquetWrite, ByteWriter } = require('./vendor/hyparquet-writer');
 
@@ -65,7 +65,7 @@ const collectionOf = (name) =>
     .split(/\s+/)
     .join('_');
 
-const readme = ({ timestamp, collection, duration }) => `---
+const readme = ({ timestamp, collection, duration, datasetType }) => `---
 license: cc-by-4.0
 tags:
   - audio
@@ -74,7 +74,7 @@ collection: ${collection}
 duration: ${duration.toFixed(2)}
 video_title: "STTM Desktop Recording ${timestamp}"
 text_source: verse_dataset
-dataset_type: ${HF_DATASET_TYPE}
+dataset_type: ${datasetType}
 approved_count: 0
 total_segments: 0
 auto_approved_count: 0
@@ -98,7 +98,7 @@ Audio captured from STTM Desktop (Voice-Follow experimental build).
 | File | Description |
 |------|-------------|
 | verse_timestamps.csv | verseId,timestamp_seconds rows |
-| sttm/ | Voice-Follow: the WAV and CSV as push_sttm_desktop_recording.py takes them, session timelines, score |
+| sttm/ | Voice-Follow: the CSV as push_sttm_desktop_recording.py takes it, session timelines, score |
 `;
 
 // The parquet shard datasets' push_to_hub writes for Dataset.from_dict({source_url, audio,
@@ -141,6 +141,21 @@ function parquetShard(wavFile, timestamp, duration) {
   });
   return Buffer.from(writer.getBuffer());
 }
+
+// paath when a Bani (Nitnem, Sukhmani Sahib, Rehras...) was on screen for most of the time
+// Gurbani was shown, kirtan otherwise: the same two labels the team's recorder offers.
+const datasetTypeOf = (dir) => {
+  const rows = readJsonl(path.join(dir, 'human.jsonl'));
+  let bani = 0;
+  let other = 0;
+  rows.forEach((h, i) => {
+    const next = rows[i + 1];
+    const span = next ? Math.max(0, Number(next.t) - Number(h.t)) : 0;
+    if (h.bani != null) bani += span;
+    else if (h.shabadId != null || h.ceremony != null) other += span;
+  });
+  return bani > other ? 'paath' : 'kirtan';
+};
 
 // verseId,timestamp_seconds: every verse the sevadaar had on screen, when it went up.
 const verseCsv = (dir) => {
@@ -281,19 +296,25 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
   const timestamp = path.basename(dir);
   const session = readJson(path.join(dir, 'session.json'), {});
   const collection = collectionOf((session.tester || {}).gurdwara);
-  const wavFile = path.join(dir, `${timestamp}.wav`);
+  // Build files live in <dir>/hf/ (never uploaded to Azure; removed once pushed).
+  const out = path.join(dir, 'hf');
+  fs.mkdirSync(out, { recursive: true });
+  const wavFile = path.join(out, `${timestamp}.wav`);
   const duration = fs.existsSync(wavFile)
     ? (fs.statSync(wavFile).size - 44) / 2 / RATE
-    : await sessionToWav(dir, timestamp);
+    : await sessionToWav(dir, wavFile);
   if (!(duration > 1)) throw new Error('no audio to push');
-  const csv = verseCsv(dir);
-  fs.writeFileSync(path.join(dir, `${timestamp}.csv`), csv);
-  fs.writeFileSync(path.join(dir, 'README.md'), readme({ timestamp, collection, duration }));
-  const shard = path.join(dir, 'train-00000-of-00001.parquet');
+  const datasetType = datasetTypeOf(dir);
+  fs.writeFileSync(path.join(out, `${timestamp}.csv`), verseCsv(dir));
+  fs.writeFileSync(
+    path.join(out, 'README.md'),
+    readme({ timestamp, collection, duration, datasetType }),
+  );
+  const shard = path.join(out, 'train-00000-of-00001.parquet');
   if (!fs.existsSync(shard)) fs.writeFileSync(shard, parquetShard(wavFile, timestamp, duration));
   const repo = `${namespace}/sttm_desktop_${timestamp.replace(/-/g, '_')}`;
   const entry = (file, p) => {
-    const full = path.join(dir, file);
+    const full = fs.existsSync(path.join(out, file)) ? path.join(out, file) : path.join(dir, file);
     const { size } = fs.statSync(full);
     const fd = fs.openSync(full, 'r');
     const sample = Buffer.alloc(Math.min(512, size));
@@ -305,7 +326,6 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
     entry('train-00000-of-00001.parquet', 'data/train-00000-of-00001.parquet'),
     entry(`${timestamp}.csv`, 'verse_timestamps.csv'),
     entry('README.md', 'README.md'),
-    entry(`${timestamp}.wav`, `sttm/${timestamp}.wav`),
     entry(`${timestamp}.csv`, `sttm/${timestamp}.csv`),
     ...[
       'session.json',
@@ -327,7 +347,7 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
   );
   fs.writeFileSync(
     path.join(dir, 'hf-pushed.json'),
-    JSON.stringify({ repo, duration, at: new Date().toISOString() }, null, 1),
+    JSON.stringify({ repo, duration, datasetType, at: new Date().toISOString() }, null, 1),
   );
   return repo;
 }
