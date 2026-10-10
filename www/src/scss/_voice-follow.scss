@@ -1507,3 +1507,30 @@ $vf2-yellow-bar: #f2c200;
     }
   }
 }
+
+// Header geometry: the title never wraps, the buttons never shrink or wrap, the meter breathes.
+.vf-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+.vf-heading-copy > span:first-child {
+  white-space: nowrap;
+}
+.vf-hdr-btns {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+.vf-mic-short {
+  max-width: 76px;
+}
+.vf-mic-bars {
+  gap: 4px;
+  margin-left: 8px;
+  margin-right: 2px;
+}
+.vf-mic-bars > span {
+  width: 3px;
+  min-height: 4px;
+}

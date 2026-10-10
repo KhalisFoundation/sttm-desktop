@@ -917,45 +917,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const tentativeRef = useRef('');
   const heardKeysRef = useRef([]); // recent heard words (keys) for marking candidate lines
   const [heardKeys, setHeardKeys] = useState([]);
-  // First line of each Shabad the panel has listed (loaded once, kept for the run).
-  const firstLinesRef = useRef(new Map());
-  const [firstLines, setFirstLines] = useState(new Map());
-  const wantFirstLines = useCallback((ids) => {
-    const m = firstLinesRef.current;
-    ids.forEach((sid) => {
-      if (sid == null || m.has(sid)) return;
-      m.set(sid, '');
-      const isBani = typeof sid === 'string' && sid.startsWith(BANI_KEY);
-      (isBani
-        ? // A Bani is named by its name (Sukhmani Sahib, Chaupai Sahib), not by a line.
-          banidb
-            .loadBani(Number(sid.slice(BANI_KEY.length)), BANI_LENGTH_COLS.short)
-            .then((rows) => {
-              const named = (rows || []).find((r) => r && r.Bani && r.Bani.Gurmukhi);
-              if (named) return [`${anvaad.unicode(named.Bani.Gurmukhi).trim()} ॥`];
-              return (rows || [])
-                .map((r) => r && (r.Verse || r.Custom || r))
-                .filter((r) => r && r.Gurmukhi)
-                .map((r) => anvaad.unicode(r.Gurmukhi).trim());
-            })
-        : banidb.loadShabad(sid).then((rows) =>
-            filterRequiredVerseItems(rows || [])
-              .filter((x) => x && x.verse)
-              .map((x) => anvaad.unicode(x.verse).trim()),
-          )
-      )
-        .then((lines) => {
-          // The naming line is the first line of Gurbani, not the heading (raag, mahala).
-          const isHeading = (l) =>
-            !/॥/.test(l) && (/ਮਹਲਾ|ਮਃ|ਘਰੁ|ਰਾਗੁ|ੴ|ਸਲੋਕ|ਪਉੜੀ/.test(l) || l.split(/\s+/).length <= 4);
-          const line = lines.find((l) => !isHeading(l)) || lines[0];
-          if (!line) return;
-          m.set(sid, line);
-          setFirstLines(new Map(m));
-        })
-        .catch(() => {});
-    });
-  }, []);
   const noteHeard = useCallback((text, confidence = 1) => {
     const all = (text || '').split(/\s+/).filter(Boolean);
     const words = all.filter((w) => w.length >= 3);
@@ -3713,6 +3674,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     if (/^MediaStream/.test(full)) full = 'Test audio';
     if (!full) full = micId ? 'Microphone' : 'Default mic';
     const short = full
+      .replace(/^(default|communications)\s*-\s*/i, '') // Chromium's "Default - <device>"
       .replace(/\(.*?\)/g, '')
       .replace(/\b(microphone|mic|input|audio)\b/gi, '')
       .trim()
@@ -3740,12 +3702,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   } catch (e) {
     showNext = true;
   }
-  useEffect(() => {
-    wantFirstLines([
-      ...board.map((b) => b.shabadId),
-      ...(liveCands.items || []).map((c) => c.shabadId),
-    ]);
-  }, [board, liveCands, wantFirstLines]);
   // Challengers to display: never the Shabad on screen itself (under any id) nor a
   // member of the Bani on screen.
   const liveItems = currentView
@@ -3771,10 +3727,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     const b = board.find((x) => x.shabadId === id);
     return b ? b.pct : null;
   };
-  // A candidate row names its Shabad by the Shabad's first line (fixed), not by whichever
-  // line happened to match last; the first line is what a sevadaar knows a Shabad by.
-  const nameLine = (b) =>
-    (firstLines.get(b.shabadId) || b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim();
+  // A candidate row shows the pangti the engine heard being sung, wherever it falls in
+  // the Shabad, so the sevadaar can recognise it at once (as the 8.6 panel did).
+  const nameLine = (b) => (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).trim();
   const curFirst =
     (curProfileRef.current && curProfileRef.current.displayLines
       ? curProfileRef.current.displayLines[0]
