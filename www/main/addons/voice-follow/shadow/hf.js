@@ -106,10 +106,11 @@ const verseCsv = (dir) => {
 };
 
 async function api(token, url, init = {}) {
-  const r = await fetch(url, {
-    ...init,
-    headers: { authorization: `Bearer ${token}`, ...(init.headers || {}) },
-  });
+  // An action's own headers win (a signed LFS step brings its own authorization);
+  // Headers is case-insensitive, so the token is never sent twice.
+  const headers = new Headers(init.headers || {});
+  if (!headers.has('authorization')) headers.set('authorization', `Bearer ${token}`);
+  const r = await fetch(url, { ...init, headers });
   if (!r.ok && r.status !== 409)
     throw new Error(
       `${init.method || 'GET'} ${url} -> ${r.status} ${(await r.text()).slice(0, 200)}`,
