@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { SHADOW_BUILD, SHADOW_AUDIO_BPS, SHADOW_SLICE_MS, SHADOW_SEGMENT_MS } from './config';
 
@@ -123,46 +123,6 @@ const labelOf = (nav) => ({
 
 // The registration is a user setting, and settings become body class names at startup,
 // so it is stored URL-encoded (no spaces). Older installs stored plain JSON.
-// Where this laptop is: enough for the team to tell the Gurdwara from the data (computer
-// name, user, time zone, locale) plus the public IP address (city level), looked up once.
-const machineName = () => {
-  try {
-    return os.hostname().replace(/\.local$/i, '') || 'laptop';
-  } catch (_) {
-    return 'laptop';
-  }
-};
-const publicIpRef = { value: null, asked: false };
-const machineFacts = () => {
-  let user = '';
-  try {
-    user = os.userInfo().username;
-  } catch (_) {
-    user = '';
-  }
-  return {
-    host: machineName(),
-    user,
-    os: `${process.platform} ${os.release()}`,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
-    locale: navigator.language || '',
-    publicIp: publicIpRef.value,
-  };
-};
-const lookupPublicIp = () => {
-  if (publicIpRef.asked) return;
-  publicIpRef.asked = true;
-  const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), 4000);
-  fetch('https://api.ipify.org?format=json', { signal: ctl.signal })
-    .then((r) => r.json())
-    .then((j) => {
-      publicIpRef.value = (j && j.ip) || null;
-    })
-    .catch(() => {})
-    .finally(() => clearTimeout(timer));
-};
-
 const readTester = (raw) => {
   if (!raw) return {};
   try {
@@ -180,7 +140,9 @@ const packTester = (t) => encodeURIComponent(JSON.stringify(t));
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
   const { shadowRecording, shadowTester } = useStoreState((state) => state.userSettings);
-  const { setShadowTester } = useStoreActions((actions) => actions.userSettings);
+  const { setShadowRecording, setShadowTester } = useStoreActions(
+    (actions) => actions.userSettings,
+  );
   const tester = readTester(shadowTester);
   const sessionRef = useRef(null);
   // A session runs only while the sevadaar is working (see service.js).
@@ -190,21 +152,6 @@ const ShadowCollector = () => {
   const [restarts, setRestarts] = useState(0);
   const startingRef = useRef(false); // waiting for the microphone (e.g. the permission prompt)
 
-  // First launch: the laptop registers itself (computer name), nothing is asked. Recording
-  // can be switched off in Settings.
-  useEffect(() => {
-    if (SHADOW_BUILD && !tester.name) {
-      setShadowTester(
-        packTester({
-          name: machineName(),
-          gurdwara: '',
-          id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-        }),
-      );
-    }
-    if (SHADOW_BUILD) lookupPublicIp();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const enabled = SHADOW_BUILD && !!tester.name && shadowRecording !== false;
 
   // The uploader runs from the moment a registered tester opens the app, so a session left
@@ -250,7 +197,6 @@ const ShadowCollector = () => {
             {
               id,
               tester: readTester(shadowTester),
-              machine: machineFacts(),
               startedAt: new Date(t0).toISOString(),
               app: remote.app.getVersion(),
               build: 'mvp-8.6c-shadow',
@@ -472,7 +418,55 @@ const ShadowCollector = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  return null;
+  if (!SHADOW_BUILD || tester.name) return null;
+
+  // First launch only: one tap. The laptop is identified by its computer name; nothing to type.
+  const machine = () => {
+    try {
+      return os.hostname().replace(/\.local$/i, '') || 'laptop';
+    } catch (_) {
+      return 'laptop';
+    }
+  };
+  return (
+    <div className="shadow-consent">
+      <div className="shadow-consent-card">
+        <h2>Help improve Voice-Follow</h2>
+        <p>
+          This build records the kirtan audio and what is shown on screen, and sends it to the
+          Voice-Follow team. Nothing else is collected. You can turn this off any time in Settings.
+        </p>
+        <div className="shadow-consent-actions">
+          <button
+            type="button"
+            className="shadow-consent-no"
+            onClick={() => {
+              setShadowTester(packTester({ name: machine(), gurdwara: '', id: 'off' }));
+              setShadowRecording(false);
+            }}
+          >
+            Not now
+          </button>
+          <button
+            type="button"
+            className="shadow-consent-yes"
+            onClick={() => {
+              setShadowTester(
+                packTester({
+                  name: machine(),
+                  gurdwara: '',
+                  id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+                }),
+              );
+              setShadowRecording(true);
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ShadowCollector;
