@@ -205,6 +205,44 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
  * loadShabad(2776);
  * // => [{ Gurmukhi: 'jo gurisK guru syvdy sy puMn prwxI ]', ID: 31057 },...]
  */
+/**
+ * One full scan of every Verse's first-letter encoding, for the Voice-Follow
+ * autopilot acoustic backstop (a cheap whole-field screen before text
+ * rescoring). Returns [{ shabadId, verseId, fl }] in verse-ID order, where fl
+ * is the plain-ascii first-letter string decoded from FirstLetterStr — the
+ * same alphabet the detector's toAsciiFirstLetters produces, so the two can
+ * be compared directly with an LCS overlap. Runs once per autopilot session;
+ * callers concatenate per shabad and cache the Map.
+ */
+const loadFirstLetterIndex = () =>
+  new Promise((resolve, reject) => {
+    if (!initialized) {
+      init();
+    }
+    Realm.open(realmConfig)
+      .then((realm) => {
+        const out = [];
+        const rows = realm.objects('Verse').sorted('ID');
+        for (let i = 0; i < rows.length; i += 1) {
+          try {
+            const r = rows[i];
+            const sh = r.Shabads && r.Shabads[0] ? r.Shabads[0].ShabadID : null;
+            if (sh == null || !r.FirstLetterStr) continue; // eslint-disable-line no-continue
+            const fl = String(r.FirstLetterStr)
+              .split(',')
+              .filter((c) => c !== '')
+              .map((c) => String.fromCharCode(parseInt(c, 10)))
+              .join('');
+            if (fl) out.push({ shabadId: sh, verseId: r.ID, fl });
+          } catch (_) {
+            /* skip malformed rows; the screen degrades, nothing breaks */
+          }
+        }
+        resolve(out);
+      })
+      .catch(reject);
+  });
+
 const loadShabad = (ShabadID) =>
   new Promise((resolve, reject) => {
     if (!initialized) {
@@ -511,6 +549,7 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
+  loadFirstLetterIndex,
   loadBanis,
   loadBani,
   loadCeremony,
