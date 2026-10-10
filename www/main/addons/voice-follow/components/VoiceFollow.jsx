@@ -429,7 +429,7 @@ const lineWordsOf = (line) =>
 // A line with the heard words in bold, so a candidate shows why it is there.
 const MarkedLine = ({ line, keys }) => {
   const words = lineWordsOf(line);
-  if (!keys.length || !words.length) return <>{line || '…'}</>;
+  if (!keys.length || !words.length) return <>{line}</>;
   return (
     <>
       {words.map((w, i) => {
@@ -3656,13 +3656,21 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         !(currentView && curBaniShabadsRef.current && curBaniShabadsRef.current.has(b.shabadId)),
     )
     .map((b) => ({ ...b, line: nameLine(b) }))
+    // A candidate with no pangti to show yet is not listed (never an empty "…" row).
+    .filter((b) => !!b.line)
     // The same Gurbani under another id (a Bani copy of a Shabad) is not a different Shabad.
     .filter((b) => !(currentView && sameAsCurrent(b.line)))
     .slice(0, 3);
   const leadLine = liveLead ? nameLine(liveLead) : '';
   // A change in progress is the one thing to look at: the candidate list hides under it.
   // The same Gurbani under another id is not a change.
-  const changing = !!(currentView && liveLead && liveLead.wins >= 1 && !sameAsCurrent(leadLine));
+  const changing = !!(
+    currentView &&
+    liveLead &&
+    liveLead.wins >= 1 &&
+    leadLine &&
+    !sameAsCurrent(leadLine)
+  );
 
   return (
     <>
