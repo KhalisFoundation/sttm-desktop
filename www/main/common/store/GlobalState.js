@@ -57,28 +57,24 @@ const GlobalState = createStore({
     quickTools: false,
     paddingTools: false,
     setPadding: action((state, payload) => {
-      if (global.webview) {
-        global.webview.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            payload,
-            actionName: 'setPadding',
-            settingType: 'viewerSettings',
-          }),
-        );
-      }
-
-      if (global.platform) {
-        global.platform.ipc.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            payload,
-            actionName: 'setPadding',
-            settingType: 'viewerSettings',
-          }),
-        );
-      }
+      // Apply locally, then push out to the other window only.
+      // Sending both webview.send and ipc.send here loops forever:
+      // presenter click -> controller setPadding -> ipc -> presenter
+      // update-viewer-setting -> controller setPadding -> ipc ...
+      // which freezes the app as soon as a padding control is clicked.
+      // Do not return the immer draft.
       state.containerPadding[payload.type] = payload.value;
+
+      const message = JSON.stringify({
+        payload,
+        actionName: 'setPadding',
+        settingType: 'viewerSettings',
+      });
+      if (global.webview) {
+        global.webview.send('update-viewer-setting', message);
+      } else if (global.platform) {
+        global.platform.ipc.send('update-viewer-setting', message);
+      }
     }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
