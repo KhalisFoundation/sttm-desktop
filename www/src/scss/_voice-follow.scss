@@ -1437,98 +1437,32 @@ $vf2-yellow-bar: #f2c200;
 .vf2-hl {
   font-weight: 700;
 }
-// Microphone control in the header: a short faint name and an icon; click to switch.
-.vf-mic-wrap {
-  position: relative;
-  display: inline-flex;
-}
-.vf-mic-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  width: auto;
-  padding: 0 4px;
-  color: #a3a3a3;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  &:hover,
-  &.is-open {
-    color: #555;
-  }
-  &.is-quiet {
-    color: #c9a227;
-  }
-}
-.vf-mic-short {
-  max-width: 84px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.vf-mic-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 20;
-  min-width: 190px;
-  max-width: 260px;
-  margin: 0;
-  padding: 4px;
-  list-style: none;
-  background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  li {
-    margin: 0;
-  }
-  button {
-    display: block;
-    width: 100%;
-    padding: 6px 10px;
-    border: 0;
-    border-radius: 7px;
-    background: none;
-    color: #333;
-    font: inherit;
-    font-size: 12px;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-    &:hover {
-      background: #f3f3f3;
-    }
-    &.is-on {
-      color: #111;
-      font-weight: 600;
-    }
-  }
-}
-
-// Header geometry: the title never wraps, the buttons never shrink or wrap, the meter breathes.
+// Header geometry: the title never wraps (it clips first), the buttons never shrink or
+// wrap, and the level meter sits beside the title with room between its bars.
 .vf-title {
   flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
+  overflow: hidden;
+}
+.vf-heading-copy {
+  min-width: 0;
+  overflow: hidden;
 }
 .vf-heading-copy > span:first-child {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .vf-hdr-btns {
   flex: 0 0 auto;
   flex-wrap: nowrap;
   gap: 4px;
 }
-.vf-mic-short {
-  max-width: 76px;
-}
 .vf-mic-bars {
+  flex: 0 0 auto;
   gap: 4px;
-  margin-left: 8px;
-  margin-right: 2px;
+  margin: 0 6px 0 10px;
 }
 .vf-mic-bars > span {
   width: 3px;

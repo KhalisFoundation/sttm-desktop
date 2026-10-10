@@ -405,8 +405,6 @@ const BANI_CUR_SPAN = 8;
 const UI_MOVE_CONF = 0.4;
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in candidate lines
-const MIC_QUIET_LEVEL = 0.02; // peak input level (0-1) below which the mic is "very quiet"
-const MIC_QUIET_AFTER_S = 10; // seconds of listening before the quiet warning can show
 // Recognizer spellings are loose: ignore a final short vowel, fold ਣ/ਨ and the nukta, and
 // count a word as matched when most of it agrees with a word of the line.
 const wordKey = (w) =>
@@ -774,45 +772,7 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   const [autoDetect, setAutoDetect] = useState(false); // blind: identify the shabad from audio, then follow (one-shot)
   // Acoustic text stays inside matching; only canonical BaniDB text is rendered.
   const [, setCands] = useState([]); // [{shabadId, verseId, verse, display, share}] shortlist
-  const [audioView, setAudioView] = useState({ seconds: 0, level: 0, device: '', peak: 0 });
-  // Microphone choice (device id) and the list of inputs to pick from.
-  const [micId, setMicId] = useState(() => {
-    try {
-      return window.localStorage.getItem('vf-mic-id') || '';
-    } catch (_) {
-      return '';
-    }
-  });
-  const [micDevices, setMicDevices] = useState([]);
-  const refreshMics = useCallback(async () => {
-    try {
-      const all = await navigator.mediaDevices.enumerateDevices();
-      setMicDevices(
-        all
-          .filter((d) => d.kind === 'audioinput')
-          .map((d, i) => ({ id: d.deviceId, label: d.label || `Microphone ${i + 1}` })),
-      );
-    } catch (_) {
-      setMicDevices([]);
-    }
-  }, []);
-  const chooseMic = useCallback((id) => {
-    setMicId(id);
-    try {
-      if (id) window.localStorage.setItem('vf-mic-id', id);
-      else window.localStorage.removeItem('vf-mic-id');
-    } catch (_) {
-      /* preference only */
-    }
-  }, []);
-  const micIdRef = useRef(micId);
-  micIdRef.current = micId;
-  // No device enumeration at start-up: it is asked of the audio service only when the mic
-  // menu opens or a microphone was opened, so a stuck audio device cannot stall the app
-  // for a sevadaar who never touches Voice-Follow.
-  const levelHistRef = useRef([]); // [[ms, level]] over the last 10 s
-  const deviceRef = useRef('');
-  const [micMenu, setMicMenu] = useState(false);
+  const [audioView, setAudioView] = useState({ seconds: 0, level: 0, device: '' });
   const audioViewRef = useRef({ samples: 0, published: 0 });
   const [currentView, setCurrentView] = useState(null);
   const [, setRankedView] = useState([]);
@@ -1061,50 +1021,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
 
   useEffect(() => () => cleanup(), [cleanup]);
 
-  // Switch the microphone while running: a new stream feeds the same worklet, so the
-  // engine never notices (no restart, no lost lock).
-  const swapMic = useCallback(
-    async (id) => {
-      chooseMic(id);
-      setMicMenu(false);
-      const ctx = ctxRef.current;
-      const node = nodeRef.current;
-      if (!ctx || !node) return;
-      const audio = { channelCount: 1, echoCancellation: false, noiseSuppression: false };
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: id ? { ...audio, deviceId: { exact: id } } : audio,
-        });
-      } catch (_) {
-        return; // the old microphone keeps going
-      }
-      if (ctxRef.current !== ctx) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-      const old = streamRef.current;
-      const oldSrc = srcRef.current;
-      const src = ctx.createMediaStreamSource(stream);
-      src.connect(node);
-      if (oldSrc) oldSrc.disconnect();
-      if (old) old.getTracks().forEach((t) => t.stop());
-      streamRef.current = stream;
-      srcRef.current = src;
-      deviceRef.current = stream.getAudioTracks?.()[0]?.label || 'Microphone';
-      levelHistRef.current = [];
-      setAudioView((v) => ({ ...v, device: deviceRef.current, peak: 0 }));
-      refreshMics();
-    },
-    [chooseMic, refreshMics],
-  );
-  useEffect(() => {
-    if (!micMenu) return undefined;
-    const close = () => setMicMenu(false);
-    window.addEventListener('mousedown', close);
-    return () => window.removeEventListener('mousedown', close);
-  }, [micMenu]);
-
   // Shared mic + worklet pipeline. Resolves the AudioContext sample rate, then
   // streams raw Float32 PCM chunks to `onChunk` (awaited serially so we never run
   // two inferences on the same ONNX session concurrently). Returns the sample
@@ -1113,20 +1029,9 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     const session = sessionRef.current;
     // Preserve the actual capture error; missing/busy devices are not all
     // permission denials. The caller handles it only for its current session.
-    const base = { channelCount: 1, echoCancellation: false, noiseSuppression: false };
-    let stream;
-    if (micIdRef.current) {
-      // The chosen microphone; if it is gone (unplugged), fall back to the default one.
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { ...base, deviceId: { exact: micIdRef.current } },
-        });
-      } catch (_) {
-        stream = null;
-      }
-    }
-    if (!stream) stream = await navigator.mediaDevices.getUserMedia({ audio: base });
-    refreshMics();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
+    });
     if (session !== sessionRef.current) {
       stream.getTracks().forEach((track) => track.stop());
       return null;
@@ -1136,8 +1041,8 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
     rankedViewRef.current = 0;
     setRankedView([]);
     setCurrentView(null);
-    deviceRef.current = stream.getAudioTracks?.()[0]?.label || 'Microphone';
-    setAudioView({ seconds: 0, level: 0, device: deviceRef.current, peak: 0 });
+    const device = stream.getAudioTracks?.()[0]?.label || 'Microphone';
+    setAudioView({ seconds: 0, level: 0, device });
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     ctxRef.current = ctx;
     const url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
@@ -1160,15 +1065,10 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
         for (let i = 0; i < pcm.length; i += 1) energy += pcm[i] * pcm[i];
         const rms = Math.sqrt(energy / (pcm.length || 1));
         capture.published = now;
-        const level = Math.min(1, rms * 8);
-        const hist = levelHistRef.current.filter((h) => now - h[0] <= 10000);
-        hist.push([now, level]);
-        levelHistRef.current = hist;
         setAudioView({
           seconds: Math.floor(capture.samples / ctx.sampleRate),
-          level,
-          device: deviceRef.current,
-          peak: Math.max(...hist.map((h) => h[1])),
+          level: Math.min(1, rms * 8),
+          device,
         });
       }
       chainRef.current = chainRef.current
@@ -3664,26 +3564,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
   else if (autopilot) mainLabel = 'Start';
   else if (autoDetect) mainLabel = 'Start';
 
-  // Very little sound for a while: the kirtan is not reaching this microphone.
-  const micQuiet =
-    active && audioView.seconds >= MIC_QUIET_AFTER_S && (audioView.peak || 0) < MIC_QUIET_LEVEL;
-  // The microphone's name, short for the header: the chosen input (or the live one).
-  const micLabel = (() => {
-    const chosen = micDevices.find((d) => d.id === micId);
-    let full = (active && audioView.device) || (chosen && chosen.label) || '';
-    if (/^MediaStream/.test(full)) full = 'Test audio';
-    if (!full) full = micId ? 'Microphone' : 'Default mic';
-    const short = full
-      .replace(/^(default|communications)\s*-\s*/i, '') // Chromium's "Default - <device>"
-      .replace(/\(.*?\)/g, '')
-      .replace(/\b(microphone|mic|input|audio)\b/gi, '')
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .join(' ')
-      .slice(0, 14);
-    return { full, short: short || 'Mic' };
-  })();
   const currentLabel = isMiscSlide ? 'Slide held' : 'Following';
   // The line the follower is on right now (the follower indexes the same line
   // list as the profile), falling back to the lock line until the first fix.
@@ -3795,57 +3675,6 @@ const VoiceFollow = ({ isOpen, onScreenClose }) => {
               )}
             </span>
             <span className="vf-hdr-btns">
-              <span className="vf-mic-wrap" onMouseDown={(e) => e.stopPropagation()}>
-                <button
-                  type="button"
-                  className={`vf-hdr-btn vf-mic-btn${micQuiet ? ' is-quiet' : ''}${
-                    micMenu ? ' is-open' : ''
-                  }`}
-                  title={micQuiet ? `${micLabel.full}: very quiet` : micLabel.full}
-                  aria-label="Microphone"
-                  aria-haspopup="listbox"
-                  aria-expanded={micMenu}
-                  onClick={() => {
-                    refreshMics();
-                    setMicMenu((o) => !o);
-                  }}
-                >
-                  <span className="vf-mic-short">{micLabel.short}</span>
-                  <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-                    <rect x="5.5" y="1.5" width="5" height="8" rx="2.5" fill="currentColor" />
-                    <path
-                      d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5M5.5 14.5h5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.3"
-                      strokeLinecap="round"
-                    />
-                    {micQuiet && (
-                      <path d="M2.5 13.5 13.5 2.5" stroke="currentColor" strokeWidth="1.3" />
-                    )}
-                  </svg>
-                </button>
-                {micMenu && (
-                  <ul className="vf-mic-menu" role="listbox" aria-label="Microphones">
-                    {[
-                      { id: '', label: 'System default' },
-                      ...micDevices.filter((d) => d.id && d.id !== 'default'),
-                    ].map((d) => (
-                      <li key={d.id || 'default'} role="none">
-                        <button
-                          type="button"
-                          role="option"
-                          aria-selected={d.id === micId}
-                          className={d.id === micId ? 'is-on' : ''}
-                          onClick={() => swapMic(d.id)}
-                        >
-                          {d.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </span>
               <button
                 type="button"
                 className={`vf-hdr-btn vf-heard-toggle${showHeard ? ' is-on' : ''}`}
