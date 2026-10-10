@@ -1,11 +1,14 @@
-// Second copy of every finished session on Hugging Face, in the layout the team's other
-// recordings use (Jaspal's scripts/push_sttm_desktop_recording.py): one private dataset
-// repo per recording, <namespace>/sttm_desktop_<timestamp>, holding the 16 kHz mono WAV,
-// verse_timestamps.csv (verseId,timestamp_seconds) and a README with the same front
-// matter. The WAV is also kept as <timestamp>.wav next to <timestamp>.csv, which is exactly
-// the folder that script takes, so it can re-pack a recording into its parquet shard at
-// any time. metadata.csv makes `load_dataset(repo)` give the same columns (audio,
-// source_url, duration). Our own timelines and score go under sttm/.
+// Second copy of every finished session on Hugging Face, exactly as the team's other
+// recordings are stored (Jaspal's scripts/push_sttm_desktop_recording.py): one private
+// dataset repo per recording, <namespace>/sttm_desktop_<timestamp>, with
+//   data/train-00000-of-00001.parquet  the one-row shard datasets' push_to_hub writes
+//                                      (source_url, audio{bytes,path} at 16 kHz, duration,
+//                                      with the "huggingface" features metadata)
+//   verse_timestamps.csv               verseId,timestamp_seconds
+//   README.md                          the same front matter
+// so `load_dataset(repo)` gives the same columns as every other recording. Everything of
+// ours goes under sttm/ (the WAV and CSV as that script takes them, our timelines, the
+// score), where datasets does not look.
 //
 // Uploads use the Hub's own HTTP API (preupload, git-lfs batch, one commit): no extra
 // package, nothing spawned. A session is pushed once its Azure upload is complete; the
@@ -15,6 +18,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { HF_NAMESPACE, HF_DATASET_TYPE } = require('./config');
 const { sessionToWav, RATE } = require('./wav');
+const { parquetWrite, ByteWriter } = require('./vendor/hyparquet-writer');
 
 const HUB = 'https://huggingface.co';
 const TICK_MS = 2 * 60 * 1000;
@@ -94,10 +98,49 @@ Audio captured from STTM Desktop (Voice-Follow experimental build).
 | File | Description |
 |------|-------------|
 | verse_timestamps.csv | verseId,timestamp_seconds rows |
-| ${timestamp}.wav, ${timestamp}.csv | the recording and its timestamps, as push_sttm_desktop_recording.py takes them |
-| metadata.csv | audio folder metadata (audio, source_url, duration) |
-| sttm/ | Voice-Follow session timelines and score |
+| sttm/ | Voice-Follow: the WAV and CSV as push_sttm_desktop_recording.py takes them, session timelines, score |
 `;
+
+// The parquet shard datasets' push_to_hub writes for Dataset.from_dict({source_url, audio,
+// duration}).cast_column('audio', Audio(16000)): one row, the audio bytes embedded, and the
+// "huggingface" key-value metadata that makes load_dataset decode the column as Audio.
+function parquetShard(wavFile, timestamp, duration) {
+  const wav = fs.readFileSync(wavFile);
+  const features = {
+    info: {
+      features: {
+        source_url: { dtype: 'string', _type: 'Value' },
+        audio: { sampling_rate: RATE, _type: 'Audio' },
+        duration: { dtype: 'float64', _type: 'Value' },
+      },
+    },
+  };
+  const writer = new ByteWriter();
+  parquetWrite({
+    writer,
+    columnData: [
+      { name: 'source_url', data: [`local://sttm-desktop/recordings/${timestamp}`] },
+      { name: 'audio', data: [{ bytes: new Uint8Array(wav), path: `${timestamp}.wav` }] },
+      { name: 'duration', data: [duration] },
+    ],
+    schema: [
+      { name: 'schema', num_children: 3 },
+      {
+        name: 'source_url',
+        type: 'BYTE_ARRAY',
+        converted_type: 'UTF8',
+        repetition_type: 'OPTIONAL',
+      },
+      { name: 'audio', repetition_type: 'OPTIONAL', num_children: 2 },
+      { name: 'bytes', type: 'BYTE_ARRAY', repetition_type: 'OPTIONAL' },
+      { name: 'path', type: 'BYTE_ARRAY', converted_type: 'UTF8', repetition_type: 'OPTIONAL' },
+      { name: 'duration', type: 'DOUBLE', repetition_type: 'OPTIONAL' },
+    ],
+    kvMetadata: [{ key: 'huggingface', value: JSON.stringify(features) }],
+    codec: 'UNCOMPRESSED',
+  });
+  return Buffer.from(writer.getBuffer());
+}
 
 // verseId,timestamp_seconds: every verse the sevadaar had on screen, when it went up.
 const verseCsv = (dir) => {
@@ -246,10 +289,8 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
   const csv = verseCsv(dir);
   fs.writeFileSync(path.join(dir, `${timestamp}.csv`), csv);
   fs.writeFileSync(path.join(dir, 'README.md'), readme({ timestamp, collection, duration }));
-  fs.writeFileSync(
-    path.join(dir, 'metadata.csv'),
-    `file_name,source_url,duration\n${timestamp}.wav,local://sttm-desktop/recordings/${timestamp},${duration.toFixed(3)}\n`,
-  );
+  const shard = path.join(dir, 'train-00000-of-00001.parquet');
+  if (!fs.existsSync(shard)) fs.writeFileSync(shard, parquetShard(wavFile, timestamp, duration));
   const repo = `${namespace}/sttm_desktop_${timestamp.replace(/-/g, '_')}`;
   const entry = (file, p) => {
     const full = path.join(dir, file);
@@ -261,11 +302,11 @@ async function pushSession(dir, token, namespace = HF_NAMESPACE) {
     return { file: full, path: p, size, sample };
   };
   const files = [
-    entry(`${timestamp}.wav`, `${timestamp}.wav`),
-    entry(`${timestamp}.csv`, `${timestamp}.csv`),
+    entry('train-00000-of-00001.parquet', 'data/train-00000-of-00001.parquet'),
     entry(`${timestamp}.csv`, 'verse_timestamps.csv'),
-    entry('metadata.csv', 'metadata.csv'),
     entry('README.md', 'README.md'),
+    entry(`${timestamp}.wav`, `sttm/${timestamp}.wav`),
+    entry(`${timestamp}.csv`, `sttm/${timestamp}.csv`),
     ...[
       'session.json',
       'score.json',

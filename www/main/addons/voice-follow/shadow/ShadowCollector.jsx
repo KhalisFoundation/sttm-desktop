@@ -183,11 +183,10 @@ const packTester = (t) => encodeURIComponent(JSON.stringify(t));
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
   const { shadowRecording, shadowTester, hfToken } = useStoreState((state) => state.userSettings);
-  const { setShadowRecording, setShadowTester, setHfToken } = useStoreActions(
+  const { setShadowRecording, setShadowTester } = useStoreActions(
     (actions) => actions.userSettings,
   );
-  const [hfTokenInput, setHfTokenInput] = useState('');
-  // The Hugging Face write token: the one entered on the card, else one baked in at build.
+  // The Hugging Face write token: baked in at build (VF_HF_TOKEN), or a saved setting.
   const hfTokenRef = useRef('');
   hfTokenRef.current = (hfToken || '').trim() || (HF_TOKEN.startsWith('__') ? '' : HF_TOKEN);
   const tester = readTester(shadowTester);
@@ -504,16 +503,6 @@ const ShadowCollector = () => {
             onChange={(e) => setGurdwara(e.target.value)}
           />
         </label>
-        <label htmlFor="shadow-hf-token">
-          Hugging Face token (optional, from the Voice-Follow team)
-          <input
-            id="shadow-hf-token"
-            className="disable-kb-shortcuts"
-            type="password"
-            value={hfTokenInput}
-            onChange={(e) => setHfTokenInput(e.target.value)}
-          />
-        </label>
         <div className="shadow-consent-actions">
           <button
             type="button"
@@ -528,7 +517,6 @@ const ShadowCollector = () => {
                   id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
                 }),
               );
-              if (hfTokenInput.trim()) setHfToken(hfTokenInput.trim());
               setShadowRecording(true);
             }}
           >
