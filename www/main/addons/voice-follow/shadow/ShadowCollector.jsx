@@ -125,6 +125,47 @@ const labelOf = (nav) => ({
 
 // The registration is a user setting, and settings become body class names at startup,
 // so it is stored URL-encoded (no spaces). Older installs stored plain JSON.
+// Where this laptop is, for the team to tell the Gurdwara from the data when the name was
+// left blank: computer name, user, OS, time zone, locale, and the public IP (city level),
+// looked up once per run.
+const machineName = () => {
+  try {
+    return os.hostname().replace(/\.local$/i, '') || 'laptop';
+  } catch (_) {
+    return 'laptop';
+  }
+};
+const publicIpRef = { value: null, asked: false };
+const lookupPublicIp = () => {
+  if (publicIpRef.asked) return;
+  publicIpRef.asked = true;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 4000);
+  fetch('https://api.ipify.org?format=json', { signal: ctl.signal })
+    .then((r) => r.json())
+    .then((j) => {
+      publicIpRef.value = (j && j.ip) || null;
+    })
+    .catch(() => {})
+    .finally(() => clearTimeout(timer));
+};
+const machineFacts = () => {
+  let user = '';
+  try {
+    user = os.userInfo().username;
+  } catch (_) {
+    user = '';
+  }
+  return {
+    host: machineName(),
+    user,
+    os: `${process.platform} ${os.release()}`,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+    locale: navigator.language || '',
+    publicIp: publicIpRef.value,
+  };
+};
+
 const readTester = (raw) => {
   if (!raw) return {};
   try {
@@ -160,6 +201,9 @@ const ShadowCollector = () => {
   const [restarts, setRestarts] = useState(0);
   const startingRef = useRef(false); // waiting for the microphone (e.g. the permission prompt)
 
+  useEffect(() => {
+    if (SHADOW_BUILD) lookupPublicIp();
+  }, []);
   const enabled = SHADOW_BUILD && !!tester.name && shadowRecording !== false;
 
   // The uploader runs from the moment a registered tester opens the app, so a session left
@@ -208,6 +252,7 @@ const ShadowCollector = () => {
             {
               id,
               tester: readTester(shadowTester),
+              machine: machineFacts(),
               startedAt: new Date(t0).toISOString(),
               app: remote.app.getVersion(),
               build: 'mvp-8.6c-shadow',
@@ -451,7 +496,7 @@ const ShadowCollector = () => {
           />
         </label>
         <label htmlFor="shadow-gurdwara">
-          Gurdwara
+          Gurdwara (optional)
           <input
             id="shadow-gurdwara"
             className="disable-kb-shortcuts"
@@ -478,7 +523,8 @@ const ShadowCollector = () => {
               setShadowTester(
                 packTester({
                   name: name.trim(),
-                  gurdwara: gurdwara.trim(),
+                  // Blank Gurdwara: the computer name stands in, so sessions still group.
+                  gurdwara: gurdwara.trim() || machineName(),
                   id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
                 }),
               );
