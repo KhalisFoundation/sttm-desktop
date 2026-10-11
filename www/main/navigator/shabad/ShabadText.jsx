@@ -169,6 +169,13 @@ export const ShabadText = ({
   };
 
   useEffect(() => {
+    if (!shabadId) {
+      setFilteredItems([]);
+      setRawVerses([]);
+      setActiveVerse({});
+      loadedShabadIdRef.current = null;
+      return;
+    }
     if (baniType === 'shabad') {
       loadShabad(shabadId).then(setVerseList);
     } else if (baniType === 'bani') {

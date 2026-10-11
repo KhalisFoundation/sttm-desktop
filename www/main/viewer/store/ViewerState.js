@@ -187,6 +187,15 @@ if (isPaneProjection) {
           navigatorActions.setIsCeremonyBani(false);
           navigatorActions.setActiveShabadId(payload.pane.activeShabad);
         }
+      } else if (payload.paneCleared) {
+        // Manual clear of the live pane. Drop the ids the projected list follows,
+        // or Display 2 keeps showing the shabad that was just cleared.
+        navigatorActions.setIsSundarGutkaBani(false);
+        navigatorActions.setIsCeremonyBani(false);
+        navigatorActions.setSundarGutkaBaniId(null);
+        navigatorActions.setCeremonyId(null);
+        navigatorActions.setActiveShabadId(null);
+        navigatorActions.setActiveVerseId(null);
       }
       const versesRead = payload.pane.versesRead ? [...payload.pane.versesRead] : [];
       // Ticks + home render from these scalars on Display 2 (plain values, so no

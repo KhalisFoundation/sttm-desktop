@@ -29,6 +29,7 @@
   "sundarGutkaBaniId": null,
   "ceremonyId": null,
   "isCeremonyBani": false,
+  "paneCleared": null,
   "singleDisplayActiveTab": "search",
   "shortcuts": {
     "openWaheguruSlide": false,

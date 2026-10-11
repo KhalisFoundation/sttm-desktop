@@ -65,6 +65,7 @@ const Launchpad = () => {
     isCeremonyBani,
     sundarGutkaBaniId,
     ceremonyId,
+    paneCleared,
   } = navigatorState;
 
   useEffect(() => {
@@ -75,7 +76,9 @@ const Launchpad = () => {
     const nav = projectionStateRef.current && projectionStateRef.current.navigator;
     if (!nav) return;
     const pane = nav[`pane${nav.activePaneId}`];
-    if (!pane || !pane.activeShabad) return;
+    if (!pane) return;
+    // A cleared live pane has no shabad. Still push it, or Display 2 keeps the old list.
+    if (!pane.activeShabad && !nav.paneCleared) return;
     ipcRenderer.send(
       'show-line',
       JSON.stringify({
@@ -87,6 +90,7 @@ const Launchpad = () => {
         isCeremonyBani: nav.isCeremonyBani,
         sundarGutkaBaniId: nav.sundarGutkaBaniId,
         ceremonyId: nav.ceremonyId,
+        paneCleared: nav.paneCleared || null,
         pane: pane
           ? {
               content: pane.content,
@@ -107,6 +111,7 @@ const Launchpad = () => {
     isCeremonyBani,
     sundarGutkaBaniId,
     ceremonyId,
+    paneCleared,
   ]);
 
   useEffect(() => {

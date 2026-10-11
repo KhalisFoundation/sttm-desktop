@@ -63,31 +63,20 @@ const GlobalState = createStore({
     quickTools: false,
     paddingTools: false,
     setPadding: action((state, payload) => {
+      state.containerPadding[payload.type] = payload.value;
+      const message = JSON.stringify({
+        payload,
+        actionName: 'setPadding',
+        settingType: 'viewerSettings',
+      });
+
+      // The embedded preview and external displays use separate update routes.
       if (global.webview) {
-        global.webview.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            payload,
-            actionName: 'setPadding',
-            settingType: 'viewerSettings',
-          }),
-        );
+        global.webview.send('update-viewer-setting', message);
       }
-
       if (global.platform) {
-        global.platform.ipc.send(
-          'update-viewer-setting',
-          JSON.stringify({
-            payload,
-            actionName: 'setPadding',
-            settingType: 'viewerSettings',
-          }),
-        );
+        global.platform.ipc.send('update-viewer-setting', message);
       }
-      const newState = state;
-      newState.containerPadding[payload.type] = payload.value;
-
-      return newState;
     }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
