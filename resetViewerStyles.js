@@ -173,6 +173,9 @@ body.viewer-pane-projection #root,
 .pane-projection-stage .shabad-pane-active {
   background-color: rgba(0, 120, 215, 0.18) !important;
 }
+.pane-projection-stage .shabad-pane-active .verse-content {
+  font-weight: 700 !important;
+}
 `;
 
 module.exports = { styles };

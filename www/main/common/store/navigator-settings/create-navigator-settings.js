@@ -65,7 +65,6 @@ const createNavigatorSettingsState = (settingsSchema) => {
           }),
         );
       }
-
       // NOTE: do NOT `return state` here. easy-peasy actions run inside immer;
       // returning the draft makes immer treat it as the replacement state, then
       // revokes it once the action finalizes. Any later read of the navigator

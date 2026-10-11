@@ -25,7 +25,6 @@ const LIVE_FILES = [
 ];
 const TYPES = {
   '.webm': 'audio/webm',
-  '.wav': 'audio/wav',
   '.json': 'application/json',
   '.jsonl': 'application/x-ndjson',
 };
@@ -35,8 +34,6 @@ let rootTester = null; // the registered tester, for files that live outside a s
 let timer = null;
 let busy = false;
 let lastLive = 0;
-let hfOn = () => false; // set by start(): whether a Hugging Face key is configured
-let log = () => {};
 const queue = []; // [{ dir, file }]
 
 const readJson = (f, d) => {
@@ -110,12 +107,10 @@ function scanPending() {
     const done = readJson(path.join(dir, 'uploaded.json'), {});
     fs.readdirSync(dir).forEach((file) => {
       if (file === 'uploaded.json') return;
-      const st = fs.statSync(path.join(dir, file));
-      if (!st.isFile()) return; // hf/ holds Hugging Face build files, not session data
-      const { size } = st;
+      const { size } = fs.statSync(path.join(dir, file));
       const live = require('./bus').sessionDir() === dir; // eslint-disable-line global-require
       // The live session's current audio segment is still being written: skip it.
-      if (live && /^audio-\d+\.(webm|wav)$/.test(file)) return;
+      if (live && file.endsWith('.webm')) return;
       if (live && LIVE_FILES.includes(file)) return;
       if (done[file] !== size) enqueue(dir, file);
     });
@@ -142,32 +137,20 @@ async function drain() {
   } finally {
     busy = false;
   }
-  try {
-    const bus = require('./bus'); // eslint-disable-line global-require
-    // eslint-disable-next-line global-require
-    require('./storage').sweep(root, bus.sessionDir(), hfOn(), log);
-  } catch (_) {
-    /* never disturb the sevadaar */
-  }
 }
 
 // A session just ended: queue everything in it.
 function enqueueSession(dir) {
   try {
-    fs.readdirSync(dir).forEach((f) => {
-      if (f === 'uploaded.json') return;
-      if (fs.statSync(path.join(dir, f)).isFile()) enqueue(dir, f);
-    });
+    fs.readdirSync(dir).forEach((f) => f !== 'uploaded.json' && enqueue(dir, f));
   } catch (_) {
     /* ignore */
   }
   drain();
 }
 
-function start(shadowRoot, tester, opts = {}) {
+function start(shadowRoot, tester) {
   root = shadowRoot;
-  if (opts.hfOn) hfOn = opts.hfOn;
-  if (opts.log) log = opts.log;
   rootTester = tester || rootTester;
   if (timer) return;
   scanPending();

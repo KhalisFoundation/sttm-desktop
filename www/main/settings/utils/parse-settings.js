@@ -60,3 +60,13 @@ const settingsObjGenerator = () => {
 export const settingsObj = settingsObjGenerator();
 
 export const settingsNavObj = filterObject(categories, 'type', 'title');
+
+const baniIndex = Object.keys(settingsNavObj).indexOf('bani-and-languages');
+if (baniIndex !== -1) {
+  const entries = Object.entries(settingsNavObj);
+  entries.splice(baniIndex + 1, 0, ['recording-settings', { title: 'RECORDING_SETTINGS', type: 'title' }]);
+  Object.keys(settingsNavObj).forEach((key) => delete settingsNavObj[key]);
+  entries.forEach(([key, value]) => {
+    settingsNavObj[key] = value;
+  });
+}
