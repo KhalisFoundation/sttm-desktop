@@ -512,6 +512,8 @@
   "SHABAD_PANE": {
     "SHOW_DISPLAY": "Show Display",
     "HIDE_SCREEN": "Hide Display",
+    "CLEAR_TELEPROMPTER": "Clear",
+    "CLEAR_TELEPROMPTER_TOOLTIP": "Clears the teleprompter.",
     "MARK_FAV": "Add to favorites",
     "UNMARK_FAV": "Remove from favorites",
     "FAV_BTN_TOOLTIP": "Add or remove the current displayed Shabad to your list of favorites. Your favorites are available under the tabs in the bottom right hand panel.",
