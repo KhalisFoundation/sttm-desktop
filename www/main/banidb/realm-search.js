@@ -37,7 +37,111 @@ const init = () => {
   }
 };
 
-const hasBindiCharacter = (charCode) => CONSTS.BINDI_CHARS[charCode] || false;
+// First-letter search follows banidb-api (api/controllers/shabads.js and
+// api/lib/searchOperators.js), so the app and the website return the same
+// lines for the same query.
+const SEARCH_OPERATORS = ['+', '-', '*', '"', "'"];
+// A run of anything but + and -, with the + or - that leads it.
+// eslint-disable-next-line no-control-regex
+const SEPARATE_AT_PLUS_OR_MINUS = /[+-]?[\x00-\x2A\x2C\x2E-\x7F]+/g;
+
+// Each letter as a comma and its three-digit char code; operators stay as typed.
+const toCharCodeQuery = (letters) =>
+  Array.from(letters, (letter) =>
+    SEARCH_OPERATORS.includes(letter) ? letter : `,${`${letter.charCodeAt(0)}`.padStart(3, '0')}`,
+  ).join('');
+
+// The same letters with every one that has a bindi form swapped for it.
+const toBindiQuery = (charCodeQuery) =>
+  Object.entries(CONSTS.BINDI_CHARS).reduce(
+    (bindiQuery, [charCode, bindiCharCode]) => bindiQuery.replaceAll(charCode, bindiCharCode),
+    charCodeQuery,
+  );
+
+/**
+ * The Realm condition for a first-letter search.
+ *
+ * Plain letters match from the start of the line (or anywhere), in either
+ * their plain or their bindi spelling. With operators, `*` stands for any
+ * letters, `+` joins parts that must all be there and `-` leads a part that
+ * must not be.
+ */
+const firstLetterCondition = (letters, isStartSearch) => {
+  const charCodeQuery = toCharCodeQuery(letters);
+
+  if (!SEARCH_OPERATORS.some((searchOperator) => charCodeQuery.includes(searchOperator))) {
+    const operator = isStartSearch ? 'BEGINSWITH' : 'CONTAINS';
+    const bindiQuery = toBindiQuery(charCodeQuery);
+    const condition = `FirstLetterStr ${operator} '${charCodeQuery}'`;
+    return bindiQuery === charCodeQuery
+      ? condition
+      : `(${condition} OR FirstLetterStr ${operator} '${bindiQuery}')`;
+  }
+
+  const matches = charCodeQuery.match(SEPARATE_AT_PLUS_OR_MINUS) || [];
+  const conditions = [];
+  matches.forEach((match) => {
+    const pattern = match.replace(/\*+/g, '*').replace(/["']+/g, '');
+    if (isStartSearch && matches.length === 1 && !match.includes('+') && !match.includes('-')) {
+      conditions.push(`FirstLetterStr LIKE '${pattern}*'`);
+    } else if (!pattern.includes('-')) {
+      conditions.push(`FirstLetterStr LIKE '*${pattern.replace(/\++/g, '')}*'`);
+    } else {
+      conditions.push(`NOT FirstLetterStr LIKE '*${pattern.replace(/-+/g, '')}*'`);
+    }
+  });
+
+  // Only quotes, or nothing the pattern above picks up.
+  return conditions.length
+    ? `(${conditions.join(' AND ')})`
+    : `FirstLetterStr LIKE '${charCodeQuery.replace(/["']+/g, '')}'`;
+};
+
+const lowestShabadId = (verse) =>
+  verse.Shabads.reduce(
+    (lowest, { ShabadID }) => (ShabadID < lowest ? ShabadID : lowest),
+    Number.MAX_SAFE_INTEGER,
+  );
+
+/**
+ * First-letter results in banidb-api's order: shortest lines first for one or
+ * two letters, then by shabad. Lines of one shabad stay in reading order.
+ *
+ * Realm can't sort by ShabadID (a line links to a list of shabads), so that
+ * part is done here. For one or two letters only the shortest lines are read:
+ * Realm sorts by length, and reading stops once whole length groups fill the
+ * page.
+ */
+const sortFirstLetterResults = (rows, byLength, howManyRows) => {
+  let verses;
+  if (byLength) {
+    verses = [];
+    const byLengthRows = rows.sorted('FirstLetterLen');
+    for (let i = 0, len = byLengthRows.length; i < len; i += 1) {
+      const verse = byLengthRows[i];
+      if (
+        verses.length >= howManyRows &&
+        verse.FirstLetterLen !== verses[verses.length - 1].FirstLetterLen
+      ) {
+        break;
+      }
+      verses.push(verse);
+    }
+  } else {
+    verses = Array.from(rows);
+  }
+
+  return verses
+    .map((verse) => ({
+      verse,
+      length: byLength ? verse.FirstLetterLen : 0,
+      shabadId: lowestShabadId(verse),
+      id: verse.ID,
+    }))
+    .sort((a, b) => a.length - b.length || a.shabadId - b.shabadId || a.id - b.id)
+    .slice(0, howManyRows)
+    .map(({ verse }) => verse);
+};
 
 /**
  * Retrieve lines matching queries
@@ -63,51 +167,17 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
     const saniQuery = searchQuery.trim().replace("'", "\\'");
     // default source for ang search to GURU_GRANTH_SAHIB
     let angSearchSourceId = CONSTS.SOURCE_TYPES.GURU_GRANTH_SAHIB;
-    const order = [];
+    let isFirstLetterSearch = false;
+    let sortByLength = false;
     let howManyRows = resultRows;
     switch (searchType) {
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS: // First letter start
       case CONSTS.SEARCH_TYPES.FIRST_LETTERS_ANYWHERE: {
         // First letter anywhere
-        searchCol = 'FirstLetterStr';
-        let operator = searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? 'BEGINSWITH' : 'CONTAINS';
-        let isWildChar = false;
-        for (let x = 0, len = saniQuery.length; x < len; x += 1) {
-          let charCode = saniQuery.charCodeAt(x);
-          if (charCode < 100) {
-            charCode = `0${charCode}`;
-          }
-          if (charCode === '042') {
-            isWildChar = true;
-            dbQuery += ',*';
-            operator = 'LIKE';
-          } else {
-            dbQuery += `,${charCode}`;
-          }
-        }
-
-        let replaced = '';
-        let newQuery = '';
-        const dbQueryArray = dbQuery.split(',');
-        dbQueryArray.forEach((charCode) => {
-          const bindiCharCode = hasBindiCharacter(charCode);
-          if (bindiCharCode) {
-            newQuery = dbQuery.replaceAll(charCode, bindiCharCode);
-          }
-        });
-        if (newQuery) {
-          replaced = `OR ${searchCol} ${operator} '${newQuery}'`;
-        }
-
-        if (isWildChar) {
-          dbQuery =
-            searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS ? `${dbQuery}*` : `*${dbQuery}*`;
-        }
-        // In brackets, so the source filter below applies to both spellings.
-        condition = `(${searchCol} ${operator} '${dbQuery}' ${replaced})`;
-        // Shortest lines first for one or two letters; otherwise in database
-        // order, so Guru Granth Sahib comes before the other sources.
-        order.push(saniQuery.length < 3 ? 'FirstLetterLen' : 'ID');
+        const letters = searchQuery.replace(/\s+/g, '');
+        condition = firstLetterCondition(letters, searchType === CONSTS.SEARCH_TYPES.FIRST_LETTERS);
+        isFirstLetterSearch = true;
+        sortByLength = letters.length < 3;
         if (searchSource !== 'all') {
           condition += ` AND Source.SourceID = '${searchSource}'`;
         }
@@ -183,11 +253,14 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
       default:
         break;
     }
-    const orderArray = Array.from(order, (el) => [el, false]);
     Realm.open(realmConfig)
       .then((realm) => {
-        const rows = realm.objects('Verse').filtered(condition).sorted(orderArray);
-        resolve(rows.slice(0, howManyRows));
+        const rows = realm.objects('Verse').filtered(condition);
+        resolve(
+          isFirstLetterSearch
+            ? sortFirstLetterResults(rows, sortByLength, howManyRows)
+            : rows.slice(0, howManyRows),
+        );
       })
       .catch((e) => {
         /* eslint-disable-next-line no-console */
