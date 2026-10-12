@@ -2,10 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay } from '../../../common/sttm-ui';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 const LockScreen = ({ onScreenClose }) => (
   <Overlay onScreenClose={onScreenClose}>

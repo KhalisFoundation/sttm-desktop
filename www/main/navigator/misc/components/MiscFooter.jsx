@@ -4,10 +4,10 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { uploadImage } from '../../../settings/utils/theme-bg-uploader';
 import { classNames } from '../../../common/utils';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 export const MiscFooter = ({ waheguruSlide, moolMantraSlide, blankSlide, anandSahibBhog }) => {

@@ -4,10 +4,7 @@ import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import classNames from '../../common/utils/classnames';
 import { addToFav, fetchFavShabad, removeFromFav } from '../misc/utils';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const FavShabadIcon = ({ paneId }) => {
   const [isLoading, setLoading] = useState(false);
@@ -61,7 +58,7 @@ const FavShabadIcon = ({ paneId }) => {
   }, [pane1, pane2, pane3, activeShabadId, activeVerseId]);
 
   useEffect(() => {
-    const index = favShabad.findIndex((element) => element.shabad_id === currentShabad);
+    const index = favShabad.findIndex((element) => element.shabadId === currentShabad);
     setFavShabadIndex(index);
   }, [favShabad, currentShabad]);
 

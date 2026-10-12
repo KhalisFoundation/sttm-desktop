@@ -4,10 +4,9 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
 import insertSlide from '../../../common/constants/slidedb';
 import tingle from '../../../../assets/js/vendor/tingle';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 const { gurus } = insertSlide.dropdownStrings;

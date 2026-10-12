@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../i18n';
 
 const MultipaneDropdown = ({
   paneSelectorActive,

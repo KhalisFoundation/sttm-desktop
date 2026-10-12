@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { shell } from 'electron';
 import { ZOOM_LINK } from '../../../common/constants';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { store, i18n } = remote.require('./app');
+const { store } = remote.require('./app');
 
 const ZoomController = () => {
   const [showSaveBtn, setShowSaveBtn] = useState(false);

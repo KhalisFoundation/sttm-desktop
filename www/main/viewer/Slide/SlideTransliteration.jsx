@@ -33,9 +33,22 @@ const SlideTransliteration = ({ getFontSize, gurmukhiString, lang, position }) =
 
   const customStyle = getFontSize(fontSizes[position]);
 
+  const scriptClass = {
+    'transliteration-punjabi': 'shahmukhi',
+    'transliteration-hindi': 'devanagari',
+  }[lang];
+
+  const langAttr = {
+    'transliteration-english': 'en',
+    'transliteration-punjabi': 'pa-Arab',
+    'transliteration-hindi': 'hi',
+  }[lang];
+
+  const className = ['slide-transliteration', scriptClass].filter(Boolean).join(' ');
+
   return (
     transliterationString && (
-      <div className={`slide-transliteration`} style={customStyle}>
+      <div className={className} style={customStyle} lang={langAttr}>
         {transliterationString}
       </div>
     )

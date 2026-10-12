@@ -1,9 +1,6 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import updateMultipane from '../utils/update-multipane';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 export const useNewShabad = () => {
   const {

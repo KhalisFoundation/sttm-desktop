@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import banidb from '../../../common/constants/banidb';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 
@@ -21,7 +22,6 @@ function SearchHeader() {
     };
   }, []);
 
-  const { i18n } = remote.require('./app');
   const gurmukhiSearchText = banidb.GURMUKHI_SEARCH_TEXTS;
   const gurmukhiSearchTypes = Object.keys(gurmukhiSearchText);
   const englishSearchText = banidb.ENGLISH_SEARCH_TEXTS;

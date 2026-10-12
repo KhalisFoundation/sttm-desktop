@@ -6,3 +6,4 @@ export { default as loadBani } from './load-bani';
 export { default as loadCeremony } from './load-ceremony';
 export { default as loadShabad } from './load-shabad';
 export { default as loadVerse } from './load-verse';
+export { getControllerFontSizes, getFontSizeSlot } from './controller-font-sizes';

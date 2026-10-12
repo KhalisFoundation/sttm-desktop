@@ -1,9 +1,6 @@
 import Noty from 'noty';
 import banidb from '../../banidb';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 export const searchShabads = (searchQuery, searchType, searchSource, howManyRows) =>
   banidb

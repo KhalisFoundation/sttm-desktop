@@ -1,5 +1,6 @@
 import { action } from 'easy-peasy';
 import { convertToCamelCase } from '../../utils';
+import { getControllerFontSizes } from '../../../addons/bani-controller/utils/controller-font-sizes';
 
 // can we change them to import?
 const fs = require('fs');
@@ -70,12 +71,7 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
         global.controller[settingKey](payload);
       }
 
-      const fontSizes = {
-        gurbani: parseInt(savedSettings['gurbani-font-size'], 10),
-        translation: parseInt(savedSettings['translation-font-size'], 10),
-        teeka: parseInt(savedSettings['teeka-font-size'], 10),
-        transliteration: parseInt(savedSettings['transliteration-font-size'], 10),
-      };
+      const fontSizes = getControllerFontSizes(global.getUserSettings);
 
       if (window.socket !== undefined && window.socket !== null) {
         window.socket.emit('data', {

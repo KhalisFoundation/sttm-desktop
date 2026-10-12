@@ -7,10 +7,7 @@ import { shell } from 'electron';
 import { fetchFavShabad, removeFromFav } from '../utils';
 import banidb from '../../../banidb';
 import { SP_API } from '../../../common/constants/api-urls';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 export const FavoritePane = ({ className, paneId }) => {
   const {
@@ -71,7 +68,7 @@ export const FavoritePane = ({ className, paneId }) => {
 
   const deleteFromFav = (inputElement) => {
     const favShabadIndex = favShabad.findIndex(
-      (element) => element.shabad_id === inputElement.shabadId,
+      (element) => element.shabadId === inputElement.shabadId,
     );
     removeFromFav(inputElement.shabadId, userToken);
 
@@ -143,7 +140,7 @@ export const FavoritePane = ({ className, paneId }) => {
   useEffect(() => {
     const fetchData = async () => {
       const promises = favShabad.map(async (element) => {
-        const elementDate = new Date(element.created_at);
+        const elementDate = new Date(element.createdAt);
         const dateString = elementDate.toLocaleDateString('en-us', {
           day: 'numeric',
           year: 'numeric',
@@ -153,12 +150,12 @@ export const FavoritePane = ({ className, paneId }) => {
           hour: 'numeric',
           minute: 'numeric',
         });
-        const row = await banidb.getVerse(element.shabad_id, element.verse_id);
+        const row = await banidb.getVerse(element.shabadId, element.verseId);
         return {
           date: dateString,
           time: timeString,
-          shabadId: element.shabad_id,
-          verseId: element.verse_id,
+          shabadId: element.shabadId,
+          verseId: element.verseId,
           verse: row,
           id: element.id,
         };
