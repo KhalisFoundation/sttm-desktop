@@ -7,14 +7,11 @@ const { SHADOW_BUILD } = require('../../addons/voice-follow/shadow/config');
 
 const Toolbar = () => {
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
-  const { voiceFollowEnabled } = useStoreState((state) => state.userSettings);
-  // Voice-Follow can be switched off in Settings; in tester builds it still follows in the
-  // shadow (addons/voice-follow/shadow) whether or not the button is shown.
-  const showVoiceFollow = voiceFollowEnabled !== false || !SHADOW_BUILD;
+  // Tester builds hide Voice-Follow: it runs silently in the shadow (addons/voice-follow/shadow).
   const toolbarTop = [
     'sunder-gutka',
     'ceremonies',
-    ...(showVoiceFollow ? ['voice-follow'] : []),
+    ...(SHADOW_BUILD ? [] : ['voice-follow']),
     'announcement',
   ];
   const toolbarBottom = ['sync-button', 'lock-screen', 'auth-dialog', 'settings'];

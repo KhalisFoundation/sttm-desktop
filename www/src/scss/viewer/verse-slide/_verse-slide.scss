@@ -133,15 +133,10 @@
 .slide-paddingtools {
   font-size: 12px;
   font-weight: bold;
-  height: 100%;
   position: fixed;
   width: 18%;
   max-width: 150px;
   z-index: 20;
-
-  .single-display-mode & {
-    height: calc(100% - 56px);
-  }
 
   &.hide-quicktools {
     left: -18%;
@@ -150,6 +145,9 @@
 
 .slide-paddingtools {
   right: 0;
+  // Size to the header (and the open body), not the whole slide. A 100%
+  // fixed box left an invisible hit target over the top-right of the bani.
+  height: auto;
 
   &.hide-tool {
     left: -18%;
@@ -169,7 +167,6 @@
     background-color: $extra-light-grey;
     display: flex;
     flex-direction: column;
-    height: 95%;
     opacity: 0.9;
     padding: 8px;
   }

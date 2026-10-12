@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
+import { useRecordingState } from '../../common/hooks';
 import {
   changeHomeVerse,
   changeVerse,
@@ -48,6 +49,7 @@ export const ShabadText = ({
   const listScrollRef = useRef(null);
   // Id of the shabad/bani whose verses are currently in filteredItems.
   const loadedShabadIdRef = useRef(null);
+  const isRecording = useRecordingState();
 
   const {
     activeVerseId,
@@ -136,6 +138,9 @@ export const ShabadText = ({
       activeShabadId,
       paneAttributes,
     });
+    if (isRecording) {
+      ipcRenderer.send('recording-event', { event: 'verse', verseId: newTraversedVerse });
+    }
   };
 
   const updateHomeVerse = (verseIndex) => {
