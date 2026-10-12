@@ -6,12 +6,15 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "== Node version (must be 18.x)"; node -v
+# The install folder and %APPDATA% folder are both named after productName.
+$appName = (Get-Content package.json -Raw | ConvertFrom-Json).productName
+Write-Host "== App name: $appName"
 if (-not (Test-Path "build-resources\voice-follow\model.int8.onnx")) {
   # The speech model (184 MB) is bundled into the installer. Copy it from an installed tester app
   # (per-user install under LocalAppData, or an all-users install under Program Files):
   $candidates = @(
-    "$env:LOCALAPPDATA\Programs\Voice-Sikhi-To-The-Max\resources\voice-follow\model.int8.onnx",
-    "$env:ProgramFiles\Voice-Sikhi-To-The-Max\resources\voice-follow\model.int8.onnx"
+    "$env:LOCALAPPDATA\Programs\$appName\resources\voice-follow\model.int8.onnx",
+    "$env:ProgramFiles\$appName\resources\voice-follow\model.int8.onnx"
   )
   $installed = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
   if ($installed) {
@@ -89,5 +92,5 @@ git checkout package.json
 $exe = Get-ChildItem builds\*.exe | Sort-Object LastWriteTime | Select-Object -Last 1
 Write-Host "== DONE: $($exe.FullName) ($([math]::Round($exe.Length/1MB)) MB)"
 Write-Host "   Checks: the installer must contain resources\voice-follow\model.int8.onnx and run on a PC"
-Write-Host "   that never had the app: search works, and %APPDATA%\Voice-Sikhi-To-The-Max\voice-follow\shadow\errors.log"
+Write-Host "   that never had the app: search works, and %APPDATA%\$appName\voice-follow\shadow\errors.log"
 Write-Host "   shows 'startup ... db query: ok'."
