@@ -430,23 +430,29 @@ const lineWordsOf = (line) =>
     .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
     .split(/\s+/)
     .filter(Boolean);
+// Gurbani is shown in the app's Gurmukhi font (the .gurmukhi class), which is ASCII-encoded.
+// The engine works in Unicode, so text is converted only for display.
+const toAkhar = (uni) => (uni ? anvaad.unicode(uni, true) : '');
+// Gurbani in the app's Gurmukhi font.
+const Gurmukhi = ({ text }) => <span className="gurmukhi">{toAkhar(text)}</span>;
+Gurmukhi.propTypes = { text: PropTypes.string };
 // A line with the heard words in bold, so a candidate shows why it is there.
 const MarkedLine = ({ line, keys }) => {
   const words = lineWordsOf(line);
-  if (!keys.length || !words.length) return <>{line}</>;
+  if (!keys.length || !words.length) return <Gurmukhi text={line} />;
   return (
-    <>
+    <span className="gurmukhi">
       {words.map((w, i) => {
         const hit = keys.some((k) => wordMatches(k, wordKey(w)));
         return (
           // eslint-disable-next-line react/no-array-index-key
           <span key={i} className={hit ? 'vf2-hl' : ''}>
             {i ? ' ' : ''}
-            {w}
+            {toAkhar(w)}
           </span>
         );
       })}
-    </>
+    </span>
   );
 };
 MarkedLine.propTypes = { line: PropTypes.string, keys: PropTypes.arrayOf(PropTypes.string) };
@@ -3681,13 +3687,15 @@ const VoiceFollow = () => {
   const heardStrip = (() => {
     // A rolling window: only the last few settled words, newest kept in view.
     const [settled, tentative] = heard ? heard.split('\u0001') : ['', ''];
-    // One run of text: the newest words are as strong as the rest, and the oldest fade
-    // into the waveform (see .vf-ap-heard in _voice-follow.scss).
+    // One run of text beside the waveform: the newest words at full strength, the oldest
+    // faded (see .vf-ap-heard in _voice-follow.scss).
     const words = [...settled.split(/\s+/).filter(Boolean).slice(-HEARD_SHOW_WORDS), tentative]
       .filter(Boolean)
       .join(' ');
-    return (
-      words || <span className="vf2-heard-placeholder">{i18n.t('VOICE_FOLLOW.LISTENING')}</span>
+    return words ? (
+      <Gurmukhi text={words} />
+    ) : (
+      <span className="vf2-heard-placeholder">{i18n.t('VOICE_FOLLOW.LISTENING')}</span>
     );
   })();
 
@@ -3806,7 +3814,6 @@ const VoiceFollow = () => {
             </div>
             <div
               className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
-              lang="pa"
               key={liveLine || 'none'}
               role="button"
               tabIndex={0}
@@ -3816,7 +3823,7 @@ const VoiceFollow = () => {
                 if (e.key === 'Enter' || e.key === ' ') setLineExpanded((v) => !v);
               }}
             >
-              {liveLine || 'Listening…'}
+              {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
             </div>
             {showNext &&
               posIsCurrent &&
@@ -3825,9 +3832,9 @@ const VoiceFollow = () => {
               boardCur.pct >= 0.95 &&
               profLines.slice(pos.lineIndex + 1, pos.lineIndex + 2).map((l, i) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <div key={i} className="vf2-next-line" lang="pa">
+                <div key={i} className="vf2-next-line">
                   <span className="vf2-next-label">{i18n.t('VOICE_FOLLOW.NEXT')} · </span>
-                  {l}
+                  <Gurmukhi text={l} />
                 </div>
               ))}
             {boardCur && <LiveBar value={boardCur.pct} />}
@@ -3853,7 +3860,7 @@ const VoiceFollow = () => {
                 {changeLabel}
                 <LivePct value={leadPct} />
               </div>
-              <div className="vf2-cand-line" lang="pa">
+              <div className="vf2-cand-line">
                 <MarkedLine line={leadLine} keys={heardKeys} />
               </div>
               <LiveBar value={leadPct} />
@@ -3874,7 +3881,7 @@ const VoiceFollow = () => {
             )}
             {boardOthers.map((c, i) => (
               <div className="vf2-shabad-row" key={c.shabadId}>
-                <span className="vf2-cand-line" lang="pa">
+                <span className="vf2-cand-line">
                   <MarkedLine line={c.line} keys={heardKeys} />
                 </span>
                 <LiveBar value={c.pct} />
@@ -3913,7 +3920,7 @@ const VoiceFollow = () => {
               barColor="currentColor"
               className="vf-ap-wave"
             />
-            <span className="vf2-heard-text" lang="pa" ref={heardBoxRef}>
+            <span className="vf2-heard-text" ref={heardBoxRef}>
               {heardStrip}
             </span>
           </div>
