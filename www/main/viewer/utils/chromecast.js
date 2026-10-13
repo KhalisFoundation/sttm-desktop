@@ -62,6 +62,7 @@ const getSanitizedViewer = () => {
     ? document.querySelector('#viewer-container').cloneNode(true)
     : '';
   viewerHtml.querySelector('.viewer-logo')?.remove();
+  viewerHtml.querySelector('.shabad-info__logo')?.remove();
   viewerHtml.querySelector('.slide-quicktools')?.remove();
   viewerHtml.querySelector('.slide-paddingtools')?.remove();
   viewerHtml.querySelector('video')?.remove();
