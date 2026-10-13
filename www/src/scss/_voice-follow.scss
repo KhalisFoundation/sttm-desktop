@@ -524,9 +524,18 @@ $vf2-yellow-bar: #f2c200;
   min-height: 0;
   overflow-y: auto;
   padding: 16px 20px;
+  // English text in the app's own font; Gurbani is in .gurmukhi spans (the app's
+  // Gurmukhi font, set in controller.scss).
+  font-family: $body-font-family;
   font-size: 13px;
   line-height: 1.45;
   color: var(--vf-ink);
+
+  button,
+  select,
+  input {
+    font-family: inherit;
+  }
 
   &.is-idle {
     align-items: center;
@@ -819,11 +828,11 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 .vf2-next-label {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-family: $body-font-family;
 }
 
-// Bottom bar while running (40px, like the tab bar above): a small live waveform with
-// what it hears running over it, the oldest words fading into the bars, and Stop.
+// Bottom bar while running (40px, like the tab bar above): a small live waveform, then
+// what it hears (the oldest words faded, the newest at full strength), and Stop.
 .vf-ap-bar {
   flex: none;
   display: flex;
@@ -842,28 +851,23 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   height: 100%;
 
+  gap: 12px;
+
   .vf2-heard-text,
   .vf2-heard-text.is-overflowing {
-    position: relative;
-    z-index: 1;
-    padding-left: 64px;
     font-size: 14px;
     color: var(--vf-ink);
-    opacity: 0.45;
-    mask-image: linear-gradient(to right, transparent 40px, #000 150px);
-    -webkit-mask-image: linear-gradient(to right, transparent 40px, #000 150px);
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0, #000 45%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0, #000 45%);
   }
   .vf2-heard-placeholder {
     color: var(--vf-faint);
   }
 }
 .vf-ap-bar .vf-ap-wave {
-  position: absolute;
-  top: 50%;
-  left: 0;
+  flex: none;
   width: 120px;
   height: 20px;
-  transform: translateY(-50%);
   color: var(--vf-faint);
   opacity: 0.8;
   pointer-events: none;
