@@ -93,6 +93,16 @@
     }
   }
 
+  .search-pane-tabs {
+    .search-pane-tab {
+      color: $grey;
+    }
+
+    .search-pane-tab-active {
+      color: $white;
+    }
+  }
+
   .misc-pane {
     .misc-header {
       a {
@@ -111,6 +121,16 @@
 
   .pane-content {
     background-color: $bg-alt;
+  }
+
+  .vf-autopilot {
+    --vf-card: #{rgba($white, 0.05)};
+    --vf-surface: #{rgba($white, 0.03)};
+    --vf-ink: #{$text-bright};
+    --vf-on-ink: #{$bg-alt};
+    --vf-muted: #{$text-base};
+    --vf-faint: #{$text-dim};
+    --vf-line: #{rgba($white, 0.12)};
   }
 
   .viewer-pane {

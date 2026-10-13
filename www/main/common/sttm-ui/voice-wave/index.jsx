@@ -10,6 +10,13 @@ export const VoiceWave = ({
   barColor = '#666',
   barWidth = 3,
   barGap = 2,
+  // Voice search stops itself after 15 s; pass null to keep listening.
+  autoStopSeconds = 15,
+  showDuration = true,
+  placeholder = 'Click mic to start recording',
+  // Stretch the bars over the parent (width/height then only set the bar count and shape).
+  fill = false,
+  className = '',
 }) => {
   const animationRef = useRef();
   const analyserRef = useRef(null);
@@ -66,7 +73,7 @@ export const VoiceWave = ({
         setDuration(
           `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
         );
-        if (seconds === 15) {
+        if (autoStopSeconds != null && seconds === autoStopSeconds && handleMicClick) {
           handleMicClick();
         }
       }
@@ -83,7 +90,7 @@ export const VoiceWave = ({
       }
       audioContext.close();
     };
-  }, [stream, isRecording, width, barWidth, barGap]);
+  }, [stream, isRecording, width, barWidth, barGap, autoStopSeconds]);
 
   const renderBars = () =>
     bars.map((value, index) => {
@@ -104,20 +111,33 @@ export const VoiceWave = ({
       );
     });
 
+  const size = fill ? undefined : { width, height };
+
   if (!isRecording || bars.length === 0) {
     return (
-      <div className="waveform__container" style={{ width, height }}>
-        <span className="waveform__placeholder">Click mic to start recording</span>
+      <div className={`waveform__container ${className}`.trim()} style={size}>
+        {placeholder && <span className="waveform__placeholder">{placeholder}</span>}
       </div>
     );
   }
 
   return (
-    <div className="waveform" style={{ width, height }}>
-      <div className="waveform__duration">{duration}</div>
-      <svg className="waveform__svg" width={width - 50} height={height}>
-        {renderBars()}
-      </svg>
+    <div className={`waveform${fill ? ' waveform--fill' : ''} ${className}`.trim()} style={size}>
+      {showDuration && <div className="waveform__duration">{duration}</div>}
+      {fill ? (
+        <svg
+          className="waveform__svg"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          {renderBars()}
+        </svg>
+      ) : (
+        <svg className="waveform__svg" width={width - 50} height={height}>
+          {renderBars()}
+        </svg>
+      )}
     </div>
   );
 };
@@ -125,10 +145,15 @@ export const VoiceWave = ({
 VoiceWave.propTypes = {
   stream: PropTypes.instanceOf(MediaStream),
   isRecording: PropTypes.bool.isRequired,
-  handleMicClick: PropTypes.func.isRequired,
+  handleMicClick: PropTypes.func,
   width: PropTypes.number,
   height: PropTypes.number,
   barColor: PropTypes.string,
   barWidth: PropTypes.number,
   barGap: PropTypes.number,
+  autoStopSeconds: PropTypes.number,
+  showDuration: PropTypes.bool,
+  placeholder: PropTypes.string,
+  fill: PropTypes.bool,
+  className: PropTypes.string,
 };

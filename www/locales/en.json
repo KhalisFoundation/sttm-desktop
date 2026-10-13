@@ -520,5 +520,29 @@
     "HIDE_BUTTON_TOOLTIP": "Hides all external STTM screens (slide and second display) when not needed. Desktop background shows on those screens. Click \"Show Display\" to bring them back.",
     "SWAP_DISPLAYS": "Swap Displays",
     "SWAP_DISPLAYS_TOOLTIP": "Swap which external screen shows the full slide and which shows the second display. Only available when two external screens are connected."
+  },
+  "VOICE_FOLLOW": {
+    "START_TITLE": "Start Autopilot",
+    "START_DESC": "Listens to the kirtan and follows the shabad on display.",
+    "LISTENING_THROUGH": "Listening through",
+    "DEFAULT_MIC": "Default microphone",
+    "CHOOSE_MIC": "Choose the microphone Autopilot listens through",
+    "MIC_DENIED_TITLE": "Microphone access needed",
+    "MIC_DENIED_DESC_MAC": "Allow microphone access in System Settings → Privacy & Security, then try again.",
+    "MIC_DENIED_DESC_WIN": "Allow microphone access in Settings → Privacy & security → Microphone, then try again.",
+    "MIC_DENIED_DESC": "Allow microphone access in your system settings, then try again.",
+    "OPEN_SETTINGS": "Open Settings",
+    "TRY_AGAIN": "Try again",
+    "LISTENING": "Listening…",
+    "HEARING_TIP": "The words Voice-Follow is hearing right now",
+    "STOP": "Stop Voice Follow",
+    "NEXT": "Next",
+    "POSSIBLE_NEW": "Possible new Shabads",
+    "POSSIBLE": "Possible Shabads",
+    "NONE_NOW": "None right now.",
+    "SWITCH": "Switch",
+    "SWITCH_TIP": "Change to this Shabad now",
+    "OPEN": "Open",
+    "OPEN_TIP": "Open this Shabad"
   }
 }
