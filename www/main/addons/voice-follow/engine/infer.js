@@ -16,9 +16,15 @@ function resampleTo16k(pcm, inSr) {
   const out = new Float32Array(n);
   const last = pcm.length - 1;
   for (let k = 0; k < n; k++) {
-    const x = (k * pcm.length) / n;      // linspace(0,len,n,endpoint=False)
-    if (x <= 0) { out[k] = pcm[0]; continue; }
-    if (x >= last) { out[k] = pcm[last]; continue; }
+    const x = (k * pcm.length) / n; // linspace(0,len,n,endpoint=False)
+    if (x <= 0) {
+      out[k] = pcm[0];
+      continue;
+    }
+    if (x >= last) {
+      out[k] = pcm[last];
+      continue;
+    }
     const i0 = Math.floor(x);
     const frac = x - i0;
     out[k] = pcm[i0] * (1 - frac) + pcm[i0 + 1] * frac;
@@ -27,7 +33,28 @@ function resampleTo16k(pcm, inSr) {
 }
 
 class Infer {
-  constructor(sess, vocab) { this.sess = sess; this.vocab = vocab; }
+  constructor(sess, vocab) {
+    this.sess = sess;
+    this.vocab = vocab;
+    // Wall ms of each model pass since perfStats() last read them (session health).
+    this.perf = { ms: [], since: Date.now() };
+  }
+
+  // Inference timing since the last call: windows decoded, median/max ms per window,
+  // windows per second of wall time. Resets the record.
+  perfStats() {
+    const { ms, since } = this.perf;
+    const now = Date.now();
+    this.perf = { ms: [], since: now };
+    const sorted = [...ms].sort((a, b) => a - b);
+    const span = Math.max(0.001, (now - since) / 1000);
+    return {
+      windows: ms.length,
+      medianMs: sorted.length ? Math.round(sorted[Math.floor(sorted.length / 2)]) : null,
+      maxMs: sorted.length ? Math.round(sorted[sorted.length - 1]) : null,
+      windowsPerSec: Math.round((ms.length / span) * 100) / 100,
+    };
+  }
 
   static async create(modelPath, vocab = VOCAB) {
     // ONNX Runtime defaults to one spinning thread per core (9.9 cores busy on a 20-core PC
@@ -52,7 +79,9 @@ class Infer {
       audio: new ort.Tensor('float32', buf, [1, buf.length]),
       audio_len: new ort.Tensor('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
     };
+    const t0 = Date.now();
     const out = await this.sess.run(feeds);
+    if (this.perf.ms.length < 100000) this.perf.ms.push(Date.now() - t0);
     const lp = out.log_probs;
     const [, , C] = lp.dims;
     const frames = Number(out.out_len.data[0]);
@@ -63,11 +92,15 @@ class Infer {
     const ids = [];
     let prev = -1;
     for (let t = 0; t < frames; t++) {
-      let best = 0, bestv = -Infinity;
+      let best = 0;
+      let bestv = -Infinity;
       const off = t * C;
       for (let c = 0; c < C; c++) {
         const v = data[off + c];
-        if (v > bestv) { bestv = v; best = c; }
+        if (v > bestv) {
+          bestv = v;
+          best = c;
+        }
       }
       if (best !== prev && best !== BLANK) ids.push(best);
       prev = best;
