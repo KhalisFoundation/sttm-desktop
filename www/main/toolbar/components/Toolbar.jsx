@@ -3,20 +3,9 @@ import { useStoreState } from 'easy-peasy';
 
 import ToolbarItem from './ToolbarItem';
 
-const { SHADOW_BUILD } = require('../../addons/voice-follow/shadow/config');
-
 const Toolbar = () => {
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
-  const { voiceFollowEnabled } = useStoreState((state) => state.userSettings);
-  // Voice-Follow can be switched off in Settings; in tester builds it still follows in the
-  // shadow (addons/voice-follow/shadow) whether or not the button is shown.
-  const showVoiceFollow = voiceFollowEnabled !== false || !SHADOW_BUILD;
-  const toolbarTop = [
-    'sunder-gutka',
-    'ceremonies',
-    ...(showVoiceFollow ? ['voice-follow'] : []),
-    'announcement',
-  ];
+  const toolbarTop = ['sunder-gutka', 'ceremonies', 'announcement'];
   const toolbarBottom = ['sync-button', 'lock-screen', 'auth-dialog', 'settings'];
 
   return (

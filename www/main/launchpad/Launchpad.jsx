@@ -268,7 +268,6 @@ const Launchpad = () => {
   const isSettingsOverlay = overlayScreen === 'settings';
   const isAuthDialog = overlayScreen === 'auth-dialog';
   const isAnnouncement = overlayScreen === 'announcement';
-  const isVoiceFollowOverlay = overlayScreen === 'voice-follow';
   const isSingleDisplayMode = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
 
   return (
@@ -289,7 +288,7 @@ const Launchpad = () => {
         <InputContext.Provider value={ref}>
           <Navigator />
         </InputContext.Provider>
-        <VoiceFollow isOpen={isVoiceFollowOverlay} onScreenClose={onScreenClose} />
+        <VoiceFollow />
       </div>
     </>
   );

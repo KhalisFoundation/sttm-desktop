@@ -197,6 +197,7 @@ async function createDriver({
         return { useNewShabad: () => (shabadId, verseId) => emit('shabad', { shabadId, verseId }) };
       if (id.endsWith('/utils/load-bani')) return { loadBani: async () => [] };
       if (id.endsWith('/constants/slidedb')) return { slideStrings: { waheguru: '' } };
+      if (id.endsWith('/common/i18n')) return { i18n: { t: (key) => key } };
       if (id === '../engine') return engine;
       if (id === '../engine/retrieval/renderer-client') {
         // Headless behavior replay uses the exact index through an asynchronous

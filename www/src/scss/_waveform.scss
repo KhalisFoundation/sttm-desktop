@@ -36,6 +36,18 @@
   &__svg {
     overflow: visible;
   }
+
+  // Stretched over its parent (the autopilot "hearing" strip).
+  &--fill {
+    width: 100%;
+    height: 100%;
+
+    .waveform__svg {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  }
 }
 
 .waveform-container {

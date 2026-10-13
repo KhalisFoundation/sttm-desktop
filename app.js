@@ -1693,6 +1693,20 @@ ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });
 
+// Voice-Follow's start screen: the system microphone permission, read without asking.
+// 'denied'/'restricted' show the "Microphone access needed" screen; 'unknown' where the
+// system has no such setting (Linux).
+ipcMain.handle('voice-follow:mic-access', () => {
+  try {
+    if ((platform === 'darwin' || platform === 'win32') && systemPreferences.getMediaAccessStatus) {
+      return systemPreferences.getMediaAccessStatus('microphone');
+    }
+  } catch (error) {
+    // Fall through: the screen then relies on the capture error instead.
+  }
+  return 'unknown';
+});
+
 ipcMain.on('get-media-access-status', async (event, mediaType) => {
   try {
     // macOS-specific API

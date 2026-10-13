@@ -115,6 +115,16 @@
     background-color: $statusbar-bg;
   }
 
+  .search-pane-tabs {
+    .search-pane-tab {
+      color: $grey;
+    }
+
+    .search-pane-tab-active {
+      color: $dark-grey;
+    }
+  }
+
   .misc-pane {
     .misc-header {
       a {

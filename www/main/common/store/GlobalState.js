@@ -22,6 +22,10 @@ const GlobalState = createStore({
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
     userToken: '',
+    // Search pane tab: false = Search, true = Voice-Follow Autopilot.
+    autopilotEnabled: false,
+    // A Voice-Follow session is running (shown on the Autopilot tab).
+    autopilotLive: false,
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
     }),
@@ -30,6 +34,12 @@ const GlobalState = createStore({
     }),
     setUserToken: action((state, payload) => {
       state.userToken = payload;
+    }),
+    setAutopilotEnabled: action((state, payload) => {
+      state.autopilotEnabled = !!payload;
+    }),
+    setAutopilotLive: action((state, payload) => {
+      state.autopilotLive = !!payload;
     }),
   },
   baniController: {

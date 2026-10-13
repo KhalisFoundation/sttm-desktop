@@ -1,721 +1,9 @@
-// Toolbar button for Voice-Follow (the icon is an SVG in assets/img/icons).
-#toolbar-nav {
-  #tool-voice-follow {
-    background-image: url('../../assets/img/icons/voice-follow.svg');
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: auto 62%;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Voice-Follow floating widget (addons/voice-follow)                 */
-/* ------------------------------------------------------------------ */
-$vf-accent: #5b73ff;
-$vf-accent-2: #3d5afe;
-$vf-glass: linear-gradient(160deg, rgba(34, 36, 47, 0.94), rgba(19, 20, 27, 0.96));
-
-@keyframes vf-in {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes vf-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.55);
-  }
-  70% {
-    box-shadow: 0 0 0 7px rgba(46, 204, 113, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
-  }
-}
-
-.vf-panel {
-  position: fixed;
-  top: 88px;
-  left: 56px;
-  z-index: 100000;
-  width: 252px;
-  padding: 16px 16px 18px;
-  border-radius: 16px;
-  color: #f3f4f8;
-  font:
-    13px/1.45 -apple-system,
-    'Segoe UI',
-    sans-serif;
-  background: $vf-glass;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  animation: vf-in 0.16s ease-out;
-}
-
-.vf-caret {
-  position: absolute;
-  left: -7px;
-  top: 22px;
-  width: 0;
-  height: 0;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid rgba(34, 36, 47, 0.94);
-}
-
-.vf-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  cursor: move;
-  user-select: none;
-}
-
-.vf-title {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.2px;
-}
-
-.vf-grip {
-  margin-right: 8px;
-  opacity: 0.35;
-  font-size: 12px;
-  letter-spacing: -1px;
-}
-
-.vf-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  margin-right: 8px;
-  display: inline-block;
-  flex: 0 0 auto;
-
-  &.is-live {
-    animation: vf-pulse 1.6s infinite;
-  }
-}
-
-.vf-tag {
-  margin-left: 8px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #fff;
-  background: rgba(91, 115, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-
-.vf-hdr-btns {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.vf-hdr-btn {
-  border: none;
-  background: transparent;
-  color: #9aa0ad;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-  padding: 3px 7px;
-  border-radius: 7px;
-  transition:
-    background 0.12s,
-    color 0.12s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.09);
-    color: #fff;
-  }
-}
-
-.vf-modes {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-  padding: 4px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.vf-mode {
-  flex: 1;
-  padding: 7px 4px;
-  font-size: 11px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: transparent;
-  color: #aab0bd;
-  transition:
-    background 0.14s,
-    color 0.14s,
-    box-shadow 0.14s;
-
-  &:hover:not(:disabled):not(.is-active) {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  &.is-active {
-    color: #fff;
-    background: linear-gradient(135deg, $vf-accent, $vf-accent-2);
-    box-shadow: 0 3px 12px rgba(61, 90, 254, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-}
-
-.vf-main {
-  width: 100%;
-  padding: 11px;
-  border: none;
-  border-radius: 11px;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.2px;
-  cursor: pointer;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.15s ease,
-    filter 0.15s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &.is-start {
-    background: linear-gradient(135deg, #2ecc71, #23a85a);
-    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
-  }
-
-  &.is-stop {
-    background: linear-gradient(135deg, #ff5a5f, #e0393f);
-    box-shadow: 0 4px 16px rgba(224, 57, 63, 0.4);
-  }
-}
-
-.vf-status {
-  margin-top: 12px;
-  font-size: 12px;
-  opacity: 0.78;
-  line-height: 1.4;
-  word-break: break-word;
-}
-
-.vf-dl {
-  margin-top: 10px;
-  height: 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-
-  .vf-dl-bar {
-    display: block;
-    height: 100%;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #5b73ff, #8a5bff);
-    transition: width 0.2s ease;
-  }
-}
-
-.vf-stats {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.035);
-  overflow: hidden;
-}
-
-.vf-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 7px 4px;
-
-  & + & {
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
-  }
-}
-
-.vf-stat-val {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.82);
-  font-variant-numeric: tabular-nums;
-}
-
-.vf-stat-label {
-  font-size: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  opacity: 0.45;
-}
-
-.vf-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0 0 12px;
-  padding: 9px 11px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-  cursor: pointer;
-  user-select: none;
-  transition:
-    background 0.12s,
-    color 0.12s;
-
-  input {
-    flex: none;
-    width: 15px;
-    height: 15px;
-    margin: 0;
-    accent-color: $vf-accent;
-    cursor: pointer;
-  }
-
-  &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  input:disabled {
-    cursor: default;
-  }
-
-  &:has(input:disabled) {
-    opacity: 0.5;
-    cursor: default;
-  }
-}
-
-.vf-toggle-primary {
-  background: rgba($vf-accent, 0.14);
-  color: #fff;
-  font-weight: 600;
-  border: 1px solid rgba($vf-accent, 0.4);
-
-  &:hover {
-    background: rgba($vf-accent, 0.2);
-  }
-}
-
-.vf-detect {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.vf-detect-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.vf-detect-spin {
-  flex: none;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  border: 2px solid rgba(91, 115, 255, 0.25);
-  border-top-color: $vf-accent;
-  animation: vf-spin 0.7s linear infinite;
-}
-
-.vf-detect-text {
-  word-break: break-word;
-}
-
-.vf-raw {
-  font-size: 12px;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.45);
-  font-style: italic;
-  word-break: break-word;
-}
-
-.vf-heard {
-  padding: 7px 10px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 15px;
-  line-height: 1.3;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.9);
-  word-break: break-word;
-  direction: ltr;
-}
-
-.vf-cands {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.vf-cand {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.045);
-  color: rgba(255, 255, 255, 0.85);
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  transition: background 0.12s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.09);
-  }
-
-  &.is-leader {
-    box-shadow: inset 0 0 0 1px rgba(91, 115, 255, 0.5);
-  }
-}
-
-.vf-cand-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, rgba(91, 115, 255, 0.28), rgba(91, 115, 255, 0.1));
-  z-index: 0;
-  transition: width 0.25s ease;
-}
-
-.vf-cand-line {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  min-width: 0;
-  font-size: 15px;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.vf-cand-pct {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  font-size: 10px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-// Autopilot following: background switch-detection visibility.
-.vf-follow {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.vf-follow-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.vf-follow-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #27ae60;
-  box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.5);
-  animation: vf-pulse 1.6s ease-out infinite;
-}
-
-.vf-follow-text {
-  word-break: break-word;
-}
-
-.vf-switch {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 9px 11px;
-  border-radius: 10px;
-  background: rgba(243, 156, 18, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(243, 156, 18, 0.35);
-}
-
-.vf-switch-head {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  color: rgba(243, 156, 18, 0.95);
-}
-
-.vf-switch-line {
-  font-size: 15px;
-  line-height: 1.25;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.vf-switch-scores {
-  display: flex;
-  gap: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.vf-switch-score {
-  &.is-cand {
-    color: rgba(243, 156, 18, 0.95);
-  }
-
-  &.is-cur {
-    color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.vf-switch-bar-wrap {
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.vf-switch-bar {
-  display: block;
-  height: 100%;
-  background: $vf-accent;
-  transition: width 0.2s ease;
-}
-
-@keyframes vf-pulse {
-  to {
-    box-shadow: 0 0 0 7px rgba(39, 174, 96, 0);
-  }
-}
-
-@keyframes vf-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.vf-pill {
-  position: fixed;
-  bottom: 20px;
-  left: 56px;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  color: #f3f4f8;
-  font:
-    600 12px/1 -apple-system,
-    'Segoe UI',
-    sans-serif;
-  font-variant-numeric: tabular-nums;
-  background: $vf-glass;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
-  animation: vf-in 0.16s ease-out;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.15s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 9px 28px rgba(0, 0, 0, 0.55);
-  }
-}
-
-// Compact Voice Follow overview. Candidate colors never change projection policy.
-.vf-panel {
-  width: 290px;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
-}
-.vf-compact-content {
-  padding: 6px 0;
-}
-.vf-section-label {
-  font-size: 12px;
-  color: #c2ccdc;
-  margin-bottom: 5px;
-}
-.vf-canonical-line {
-  font-size: 17px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-.vf-explanation {
-  font-size: 12px;
-  line-height: 1.5;
-  color: #c2ccdc;
-}
-.vf-heading-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.vf-listening-label {
-  font-size: 11px;
-  font-weight: 400;
-  color: #c2ccdc;
-}
-.vf-mic-bars {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 22px;
-  margin-left: 8px;
-}
-.vf-mic-bars > span {
-  display: block;
-  width: 3px;
-  border-radius: 2px;
-  background: #78bca7;
-  transition: height 0.2s linear;
-}
-.vf-other-matches {
-  margin-top: 12px;
-}
-.vf-other-matches summary {
-  font-size: 12px;
-  color: #c2ccdc;
-  cursor: pointer;
-  padding: 6px 0;
-}
-.vf-compact-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
-}
-.vf-compact-footer.is-idle {
-  justify-content: center;
-}
-.vf-compact-footer .vf-main {
-  width: auto;
-  margin: 0;
-  padding: 9px 12px;
-}
-.vf-match-card {
-  margin-top: 7px;
-  padding: 9px 11px;
-  border-radius: 9px;
-  background: linear-gradient(115deg, #24324d, #1c2539);
-  box-shadow: inset 0 0 0 1px rgba(137, 166, 220, 0.12);
-}
-.vf-match-meta {
-  margin-bottom: 3px;
-  color: #c8d7ef;
-  font-size: 11px;
-}
-.vf-current-shabad {
-  padding: 8px 10px;
-  border-left: 2px solid transparent;
-}
-.vf-current-shabad.is-following {
-  border-left-color: #78bca7;
-  background: linear-gradient(90deg, rgba(70, 139, 113, 0.13), transparent);
-}
-.vf-current-shabad.is-following .vf-section-label {
-  color: #a1d5c0;
-}
-.vf-change-preview {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(243, 156, 18, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(243, 156, 18, 0.3);
-}
-.vf-change-preview .vf-section-label {
-  color: #f0c582;
-}
-.vf-change-track {
-  margin-top: 9px;
-  height: 4px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.09);
-}
-.vf-change-track > span {
-  display: block;
-  height: 100%;
-  background: #6c82ff;
-  transition: width 0.25s ease;
-}
-.vf-current-shabad .vf-canonical-line,
-.vf-change-preview .vf-canonical-line {
-  color: #fff;
-}
-@media (prefers-reduced-motion: reduce) {
-  .vf-mic-bars > span,
-  .vf-change-track > span {
-    transition: none;
-  }
-}
-
 // ---------------------------------------------------------------------------
-// Voice-Follow panel, redesign (2026-09): the sevadar's control card.
+// Voice-Follow cards (2026-09): the sevadar's view of what is being followed.
 // Matches the controller's own palette (white card, #222 text, STTM orange
 // accent) instead of a dark glass sheet. Layout: Now (the line being followed)
-// -> Might change to (the judge's live candidates with honest scores) -> one
-// button. Motion is kept to fades and short slides so nothing jumps.
+// -> Might change to (the judge's live candidates with honest scores). Motion is
+// kept to fades and short slides so nothing jumps.
 // ---------------------------------------------------------------------------
 $vf2-orange: #f39c1d;
 $vf2-ink: #222;
@@ -727,66 +15,24 @@ $vf2-red: #d64545;
 $vf2-yellow: #c99700;
 $vf2-yellow-bar: #f2c200;
 
-.vf-panel {
-  width: 340px;
-  padding: 14px 16px 16px;
-  border-radius: 18px;
-  color: $vf2-ink;
-  font:
-    13px/1.45 -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Helvetica,
-    Arial,
-    sans-serif;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.22),
-    0 1px 0 rgba(255, 255, 255, 0.6) inset;
-  backdrop-filter: blur(18px) saturate(1.3);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
-}
-.vf-caret {
-  border-bottom-color: rgba(255, 255, 255, 0.94);
-}
-.vf-header {
-  color: $vf2-ink;
-  margin-bottom: 10px;
-}
-.vf-title,
-.vf-heading-copy {
-  color: $vf2-ink;
-}
-.vf-grip {
-  color: $vf2-faint;
-}
-.vf-listening-label {
-  color: $vf2-muted;
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-.vf-mic-bars > span {
-  background: $vf2-green;
-}
-.vf-hdr-btn {
-  color: $vf2-muted;
-  background: transparent;
-  border: 0;
-  &:hover {
-    color: $vf2-ink;
-    background: rgba(0, 0, 0, 0.05);
-  }
-}
 .vf-dl {
+  height: 6px;
+  border-radius: 6px;
   background: $vf2-line;
+  overflow: hidden;
   .vf-dl-bar {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
     background: $vf2-orange;
+    transition: width 0.2s ease;
   }
 }
 .vf-status {
+  font-size: 12px;
+  line-height: 1.4;
   color: $vf2-muted;
+  word-break: break-word;
 }
 
 .vf2-body {
@@ -811,16 +57,6 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.vf2-lineno,
-.vf2-cur-score {
-  flex: none;
-  margin-left: auto;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: $vf2-faint;
-  font-variant-numeric: tabular-nums;
 }
 .vf2-dot {
   width: 7px;
@@ -906,40 +142,7 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 
-// Might change to: the judge's live candidates.
-.vf2-next {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.vf2-cand {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 9px 12px 8px;
-  border-radius: 12px;
-  background: #fafafa;
-  border: 1px solid $vf2-line;
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.25s ease;
-  animation: vf2-fade 0.28s ease-out;
-  &.is-checking {
-    background: #fff8ec;
-    border-color: rgba(243, 156, 29, 0.35);
-  }
-  &.is-confirming {
-    background: #fff3dc;
-    border-color: $vf2-orange;
-    transform: translateY(-1px);
-  }
-}
-.vf2-cand-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
+// Candidate pangti (change card and the Possible new Shabads rows).
 .vf2-cand-line {
   flex: 1;
   min-width: 0;
@@ -994,9 +197,6 @@ $vf2-yellow-bar: #f2c200;
   &.is-high {
     color: $vf2-green;
   }
-}
-.vf2-cand-row .vf2-live-pct {
-  flex: none;
 }
 .vf2-now .vf2-cand-track {
   margin-top: 8px;
@@ -1083,108 +283,12 @@ $vf2-yellow-bar: #f2c200;
 .vf2-heard-tentative {
   margin-left: 0.35em;
 }
-.vf-heard-toggle {
-  opacity: 0.55;
-  &.is-on {
-    opacity: 1;
-  }
-  svg {
-    display: block;
-  }
-}
 .vf2-cand-meta {
   margin-top: 5px;
   font-size: 11px;
   color: $vf2-faint;
 }
 
-// One button.
-.vf-compact-footer {
-  margin-top: 12px;
-  .vf-main {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 0;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    transition:
-      transform 0.12s ease,
-      box-shadow 0.12s ease,
-      background 0.2s ease;
-    &.is-start {
-      color: #fff;
-      background: $vf2-orange;
-      box-shadow: 0 6px 16px rgba(243, 156, 29, 0.35);
-    }
-    &.is-stop {
-      color: #fff;
-      background: #e0393f;
-      box-shadow: none;
-    }
-    &:hover {
-      transform: translateY(-1px);
-    }
-    &:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-  }
-}
-
-// Collapsed pill.
-.vf-pill {
-  color: $vf2-ink;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-// Possible matches: collapsed by default, one calm row to open it.
-.vf2-matches {
-  border-radius: 12px;
-  border: 1px solid $vf2-line;
-  background: #fafafa;
-  > summary {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 12px 9px 18px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: $vf2-muted;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    &::-webkit-details-marker {
-      display: none;
-    }
-  }
-  &[open] > summary .vf2-chevron {
-    transform: rotate(90deg);
-  }
-  .vf2-next {
-    padding: 0 8px 8px;
-  }
-  .vf2-cand {
-    background: #fff;
-  }
-}
-.vf2-summary-hint {
-  margin-left: auto;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: $vf2-faint;
-  font-variant-numeric: tabular-nums;
-}
 .vf2-empty {
   padding: 4px 6px 2px;
   font-size: 12px;
@@ -1209,40 +313,7 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 
-// Small −/+ box on the Now header to fold the line to one row and back.
-.vf2-fold {
-  flex: none;
-  margin-left: 6px;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border-radius: 5px;
-  border: 1px solid $vf2-line;
-  background: #fff;
-  color: $vf2-muted;
-  font:
-    600 13px/16px -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Helvetica,
-    Arial,
-    sans-serif;
-  cursor: pointer;
-  flex: 0 0 auto;
-  &:hover {
-    color: $vf2-ink;
-    border-color: #d5d5d5;
-  }
-}
-.vf2-lineno + .vf2-fold {
-  margin-left: 8px;
-}
-.vf2-label .vf2-fold:only-of-type:not(.vf2-lineno ~ .vf2-fold) {
-  margin-left: auto;
-}
-
 // --- Sevadaar assist: Auto / Ask me, and tappable candidates ---------------
-.vf2-cand.is-tappable,
 .vf2-change.is-tappable {
   background: #eefbf0;
   border-color: #2e9e5b;
@@ -1261,9 +332,8 @@ $vf2-yellow-bar: #f2c200;
 }
 // Card styles. Every scored card (current line, change, candidate) carries --pc (its colour)
 // and --pct (its percentage). The box itself stays white; the colour is in what moves.
-.vf-panel .vf2-now,
-.vf-panel .vf2-cand,
-.vf-panel .vf2-change {
+.vf-autopilot .vf2-now,
+.vf-autopilot .vf2-change {
   position: relative;
   overflow: hidden;
   background: #fff;
@@ -1275,9 +345,8 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 // wash: a faint tinted fill spreads across the card from the left as the % climbs.
-.vf-panel[data-vf-cards='wash'] {
+.vf-autopilot[data-vf-cards='wash'] {
   .vf2-now::before,
-  .vf2-cand.is-tappable::before,
   .vf2-change.is-tappable::before {
     content: '';
     position: absolute;
@@ -1294,17 +363,15 @@ $vf2-yellow-bar: #f2c200;
 }
 // rail: a thin rail on the left edge fills bottom-to-top with the colour. It is the only
 // indicator on the card: no bar under the text.
-.vf-panel[data-vf-cards='rail'] {
+.vf-autopilot[data-vf-cards='rail'] {
   .vf2-cand-track {
     display: none;
   }
   .vf2-now,
-  .vf2-cand.is-tappable,
   .vf2-change.is-tappable {
     padding-left: 18px;
   }
   .vf2-now::before,
-  .vf2-cand.is-tappable::before,
   .vf2-change.is-tappable::before {
     content: '';
     position: absolute;
@@ -1336,49 +403,6 @@ $vf2-yellow-bar: #f2c200;
 }
 .vf2-change .vf2-cand-pct {
   margin-left: auto;
-}
-// Chevron: an SVG so it stays crisp and centred on the text line.
-.vf2-chevron {
-  flex: none;
-  color: $vf2-faint;
-  transition: transform 0.2s ease;
-}
-// Count of candidates, as a small badge beside the title.
-.vf2-summary-tap {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: $vf2-faint;
-}
-.vf2-summary-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.06);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: $vf2-muted;
-  font-variant-numeric: tabular-nums;
-}
-// Header never overflows the card: the title may truncate, nothing else grows.
-.vf2-summary-title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-// Hint lives inside the open list, on its own line, so it never crowds the header.
-.vf2-next-hint {
-  padding: 0 4px 6px;
-  font-size: 11px;
-  font-weight: 400;
-  color: $vf2-faint;
 }
 .shadow-consent {
   position: fixed;
@@ -1445,38 +469,6 @@ $vf2-yellow-bar: #f2c200;
 .vf2-hl {
   font-weight: 700;
 }
-// Header geometry: the title never wraps (it clips first), the buttons never shrink or
-// wrap, and the level meter sits beside the title with room between its bars.
-.vf-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.vf-heading-copy {
-  min-width: 0;
-  overflow: hidden;
-}
-.vf-heading-copy > span:first-child {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.vf-hdr-btns {
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-  gap: 4px;
-}
-.vf-mic-bars {
-  flex: 0 0 auto;
-  gap: 4px;
-  margin: 0 6px 0 10px;
-}
-.vf-mic-bars > span {
-  width: 3px;
-  min-height: 4px;
-}
-
 // One-tap rating after Stop.
 .vf-rate {
   display: flex;
@@ -1499,5 +491,460 @@ $vf2-yellow-bar: #f2c200;
     &:hover {
       background: #f5f5f5;
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Autopilot tab of the search pane. Colours come
+// from the variables below so the cards follow the theme (dark themes override
+// them in themes/helpers/_dark-base.scss).
+// ---------------------------------------------------------------------------
+// The slot fills the pane exactly: the cards scroll inside it and the hearing bar stays
+// pinned at the bottom.
+.vf-autopilot-slot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.vf-autopilot {
+  --vf-card: #fff;
+  --vf-surface: #fafafa;
+  --vf-ink: #{$vf2-ink};
+  --vf-on-ink: #fff;
+  --vf-muted: #{$vf2-muted};
+  --vf-faint: #{$vf2-faint};
+  --vf-line: #{$vf2-line};
+  --vf-accent: #{darken($vf2-orange, 12%)};
+
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--vf-ink);
+
+  &.is-idle {
+    align-items: center;
+    justify-content: center;
+  }
+  &.is-active {
+    padding: 0;
+    overflow: hidden;
+
+    > .vf2-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px 20px;
+
+      // Cards keep their full height and the body scrolls: a card with overflow:hidden
+      // would otherwise be squeezed and lose its bottom (the next verse, the bar).
+      > * {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .vf2-now,
+  .vf2-change {
+    background: var(--vf-card);
+    border-color: var(--vf-line);
+  }
+  .vf2-line,
+  .vf2-cand-line {
+    color: var(--vf-ink);
+  }
+  .vf2-label,
+  .vf-status {
+    color: var(--vf-muted);
+  }
+  .vf2-empty {
+    color: var(--vf-faint);
+  }
+  .vf2-cand-track,
+  .vf-dl {
+    background: var(--vf-line);
+  }
+}
+
+// Idle: one large mic to start, what Autopilot does, and the microphone it listens through.
+.vf-ap-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+
+  .vf-dl {
+    width: 100%;
+  }
+}
+.vf-ap-mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 30px;
+  background: $vf2-orange;
+  box-shadow: 0 6px 22px rgba(243, 156, 29, 0.35);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 26px rgba(243, 156, 29, 0.45);
+  }
+  &:active {
+    transform: none;
+    box-shadow: none;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 4px;
+  }
+}
+.vf-ap-start-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vf-ap-start-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--vf-ink);
+}
+.vf-ap-start-desc {
+  max-width: 280px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--vf-muted);
+}
+// Microphone blocked by the system: a crossed-out mic in a dashed ring, and two actions.
+.vf-ap-mic-off {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border: 2px dashed rgba(127, 127, 127, 0.35);
+  border-radius: 50%;
+  background: rgba(127, 127, 127, 0.08);
+  color: var(--vf-faint);
+  font-size: 30px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 40px;
+    border-radius: 2px;
+    background: $vf2-red;
+    transform: rotate(-45deg);
+  }
+}
+.vf-ap-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  .vf2-switch {
+    padding: 7px 16px;
+  }
+}
+// "Listening through [ mic name ▾ ]": a native select dressed as a soft pill.
+.vf-ap-source {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--vf-muted);
+}
+.vf-ap-source-pick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border-radius: 8px;
+  background: rgba(127, 127, 127, 0.12);
+
+  > i {
+    position: absolute;
+    left: 11px;
+    font-size: 13px;
+    pointer-events: none;
+  }
+  &::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    font-size: 10px;
+    pointer-events: none;
+  }
+  select {
+    max-width: 260px;
+    padding: 6px 26px 6px 28px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vf-muted);
+    font: inherit;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &:disabled {
+      padding-right: 12px;
+      opacity: 1;
+      cursor: default;
+    }
+    &:focus-visible {
+      outline: 2px solid rgba(243, 156, 29, 0.5);
+      outline-offset: 2px;
+    }
+  }
+  &:has(select:disabled)::after {
+    display: none;
+  }
+}
+
+// Possible new Shabads: one plain card, a row per Shabad with its match and a Switch button.
+.vf2-shabads {
+  border: 1px solid var(--vf-line);
+  border-radius: 12px;
+  background: var(--vf-card);
+  overflow: hidden;
+
+  .vf2-empty {
+    padding: 0 16px 12px;
+  }
+}
+.vf2-shabads-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 16px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.vf2-shabads-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--vf-accent);
+}
+.vf2-shabads-count {
+  color: var(--vf-faint);
+  font-variant-numeric: tabular-nums;
+}
+.vf2-shabad-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--vf-line);
+  animation: vf2-fade 0.28s ease-out;
+
+  .vf2-cand-line {
+    font-size: 16px;
+  }
+  // One calm colour for every candidate: the number says how strong it is.
+  .vf-autopilot & .vf2-cand-track {
+    display: block;
+    flex: none;
+    width: 96px;
+    height: 5px;
+    margin-top: 0;
+    border-radius: 3px;
+  }
+  .vf2-live-fill {
+    background: $vf2-orange !important;
+  }
+  .vf2-live-pct {
+    min-width: 3.4em;
+    margin-left: 0;
+    font-size: 15px;
+    text-align: right;
+    color: var(--vf-accent) !important;
+  }
+}
+.vf2-switch {
+  flex: none;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vf-ink);
+  background: rgba(127, 127, 127, 0.14);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(127, 127, 127, 0.24);
+  }
+  &.is-primary {
+    color: var(--vf-on-ink);
+    background: var(--vf-ink);
+    &:hover {
+      opacity: 0.88;
+    }
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 2px;
+  }
+}
+.vf2-next-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+// Bottom bar while running (40px, like the tab bar above): a small live waveform with
+// what it hears running over it, the oldest words fading into the bars, and Stop.
+.vf-ap-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 8px 0 16px;
+  border-top: 1px solid var(--vf-line);
+  background: rgba(127, 127, 127, 0.07);
+}
+.vf-ap-heard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+
+  .vf2-heard-text,
+  .vf2-heard-text.is-overflowing {
+    position: relative;
+    z-index: 1;
+    padding-left: 64px;
+    font-size: 14px;
+    color: var(--vf-ink);
+    opacity: 0.45;
+    mask-image: linear-gradient(to right, transparent 40px, #000 150px);
+    -webkit-mask-image: linear-gradient(to right, transparent 40px, #000 150px);
+  }
+  .vf2-heard-placeholder {
+    color: var(--vf-faint);
+  }
+}
+.vf-ap-bar .vf-ap-wave {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 120px;
+  height: 20px;
+  transform: translateY(-50%);
+  color: var(--vf-faint);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.vf-ap-stop {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 10px;
+  background: #e0393f;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: none;
+  }
+}
+
+// Search | Autopilot tabs above the search pane (same look as the misc pane's tabs).
+.search-pane.has-tabs {
+  display: flex;
+  flex-direction: column;
+
+  > .pane {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+}
+.search-pane-tabs {
+  flex: none;
+  width: 100%;
+  padding: 0;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.18);
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+.search-pane-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+  padding: 0 14px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid transparent;
+
+  i {
+    font-size: 13px;
+  }
+  .audio-capture-icon {
+    flex: none;
+  }
+  &.search-pane-tab-active {
+    border-bottom-color: $vf2-orange;
+  }
+}
+.search-pane-tab-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $vf2-green;
+  animation: vf2-live 1.6s ease-out infinite;
+}
+@keyframes vf2-live {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 172, 106, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(67, 172, 106, 0);
   }
 }
