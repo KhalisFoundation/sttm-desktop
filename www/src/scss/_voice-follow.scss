@@ -232,13 +232,71 @@ $vf2-yellow-bar: #f2c200;
 }
 // What the model hears: one faint line, newest words on the right, older ones fading out.
 .vf2-next-line {
-  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  min-width: 0;
   font-size: 0.82em;
   line-height: 1.35;
-  opacity: 0.45;
+  color: var(--vf-ink);
+  opacity: 0.62; // darker than before, still clearly below the current pangti
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+// The next pangti and Stop share one row under the current pangti.
+.vf2-next-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  .vf2-next-line {
+    flex: 1;
+    font-size: 15px;
+  }
+}
+// A thin grey bar marks the next pangti (instead of a "Next" label).
+.vf2-next-mark {
+  flex: none;
+  width: 3px;
+  height: 1.05em;
+  margin-right: 10px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.35;
+}
+.vf2-stop {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  font-family: $body-font-family;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  background: #d64541;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease;
+  .fa {
+    font-size: 9px;
+  }
+  &:hover {
+    background: #c63a36;
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: none;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(214, 69, 65, 0.45);
+    outline-offset: 2px;
+  }
 }
 
 .vf2-next-line + .vf2-next-line {
@@ -839,7 +897,7 @@ $vf2-yellow-bar: #f2c200;
   align-items: center;
   gap: 12px;
   height: 40px;
-  padding: 0 8px 0 16px;
+  padding: 0 12px 0 16px;
   border-top: 1px solid var(--vf-line);
   background: rgba(127, 127, 127, 0.07);
 }
@@ -853,12 +911,18 @@ $vf2-yellow-bar: #f2c200;
 
   gap: 12px;
 
-  .vf2-heard-text,
-  .vf2-heard-text.is-overflowing {
+  // The heard Gurbani stays at full strength beside the wave (it used to fade to 30% over
+  // its left half, so the words next to the wave looked lost in it). Only once the words
+  // overflow do the oldest fade out over a short edge.
+  .vf2-heard-text {
     font-size: 14px;
     color: var(--vf-ink);
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0, #000 45%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0, #000 45%);
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .vf2-heard-text.is-overflowing {
+    mask-image: linear-gradient(to right, transparent 0, #000 28px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px);
   }
   .vf2-heard-placeholder {
     color: var(--vf-faint);
@@ -871,6 +935,60 @@ $vf2-yellow-bar: #f2c200;
   color: var(--vf-faint);
   opacity: 0.8;
   pointer-events: none;
+}
+// Volume label at the right of the bottom bar: no sound (red), low (amber), good (green),
+// great (dark green), with three small level bars.
+.vf-ap-vol {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: $body-font-family;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  &.is-none {
+    color: #b8322a;
+    background: rgba(214, 69, 65, 0.14);
+  }
+  &.is-low {
+    color: #9a6a00;
+    background: rgba(240, 180, 40, 0.2);
+  }
+  &.is-good {
+    color: #3f8a24;
+    background: rgba(107, 191, 59, 0.16);
+  }
+  &.is-great {
+    color: #1f5f12;
+    background: rgba(47, 125, 30, 0.2);
+  }
+}
+.vf-ap-vol-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  i {
+    display: block;
+    width: 3px;
+    border-radius: 1px;
+    background: currentColor;
+    opacity: 0.25;
+    &.is-on {
+      opacity: 1;
+    }
+    &:nth-child(1) {
+      height: 5px;
+    }
+    &:nth-child(2) {
+      height: 8px;
+    }
+    &:nth-child(3) {
+      height: 11px;
+    }
+  }
 }
 .vf-ap-stop {
   display: flex;
