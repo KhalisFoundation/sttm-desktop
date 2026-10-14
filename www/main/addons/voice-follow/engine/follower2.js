@@ -14,6 +14,7 @@
 // for several windows. Same streaming contract as the v1 Follower: push(pcm) returns
 // { verseIndex, verseId, lineIndex, wordIndex, confidence } or null.
 const { resampleTo16k, SR } = require('./infer');
+const pace = require('./pace');
 const { spoken } = require('./spoken');
 
 // Tuned on research/follower-bench at a 0.125 s listening step; ships at 0.25 s, the same
@@ -92,6 +93,12 @@ class FollowerV2 {
   constructor(infer, lines, opts = {}) {
     this.infer = infer;
     this.c = { ...DEFAULTS, ...(SUNG_BANIS[opts.baniId] || {}), ...opts };
+    this.base = this.c; // the profile as configured; this.c is its tier-scaled copy
+    this.sung = !!SUNG_BANIS[opts.baniId]; // sung Banis keep the full window in every tier
+    // A read Bani: the only following the performance tiers apply to. Aarti (Bani 22) is sung like
+    // kirtan, so it never gets the tiers even when it follows on this follower.
+    this.readBani = !this.sung && Number(opts.baniId) !== 22;
+    this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
     // Stream of letters; lineAt[k] = line of letter k; lineStart[i] = first letter.
@@ -417,8 +424,30 @@ class FollowerV2 {
     return { verseIndex: -1, verseId: null, lineIndex: null, wordIndex: -1, confidence: 0 };
   }
 
+  // The profile for a hop `scale` times the configured one: every dwell counted in windows
+  // is divided by it (never below 1 window), so a slower tier confirms moves after the
+  // same wall-clock time. scale 1 = the profile itself.
+  scaled(scale) {
+    if (scale === 1) return this.base;
+    const c = { ...this.base };
+    [
+      'skipDwell',
+      'backDwell',
+      'backDwell1',
+      'jumpDwell',
+      'lockDwell',
+      'releaseHops',
+      'noMatchHops',
+      'catchHops',
+    ].forEach((k) => {
+      if (c[k]) c[k] = Math.max(1, Math.round(c[k] / scale));
+    });
+    return c;
+  }
+
   async push(pcm) {
     const res = resampleTo16k(pcm, this.inputSr);
+    this.win = Math.floor(pace.windowS(this.sung ? 'follower' : 'paath', this.base.windowS) * SR);
     if (res.length) {
       let merged = new Float32Array(this.buf.length + res.length);
       merged.set(this.buf, 0);
@@ -427,7 +456,15 @@ class FollowerV2 {
       this.buf = merged;
       this.acc += res.length;
     }
-    if (this.acc < this.hop || this.buf.length < SR) return null;
+    // Performance tier: a longer hop, with the window-counted dwells scaled so they keep
+    // their wall-clock meaning (see scaled()).
+    const hopS = pace.hopS('follower', this.base.hopS);
+    if (hopS !== this.hopS) {
+      this.hopS = hopS;
+      this.hop = Math.floor(hopS * SR);
+      this.c = this.scaled(hopS / this.base.hopS);
+    }
+    if ((this.acc < this.hop && !pace.onBeat(pcm)) || this.buf.length < SR) return null;
     this.acc = 0;
     const emis = await this.infer.emissions(this.buf);
     const h = [...simplify(this.infer.decode(this.infer.greedy(emis)))];

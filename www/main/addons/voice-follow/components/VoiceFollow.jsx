@@ -994,6 +994,7 @@ const VoiceFollow = () => {
   const chainRef = useRef(Promise.resolve()); // serialize async inference per chunk
   // Audio captured but not yet handed to the engines (see AUDIO_BACKLOG_S).
   const backlogRef = useRef({ chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 });
+  const paceOffRef = useRef(null); // unsubscribes this session's tier-step listener
   const sessionRef = useRef(0); // invalidates asynchronous work after cleanup/restart
   const transcriptSeqRef = useRef(0);
   const transcriptAbortRef = useRef(null);
@@ -1231,6 +1232,9 @@ const VoiceFollow = () => {
     recognizerRef.current = null;
     chainRef.current = Promise.resolve();
     backlogRef.current = { chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 };
+    paceOffRef.current?.();
+    paceOffRef.current = null;
+    if (engine.pace) engine.pace.setScoped(false);
     // Take down our seeking slide if we put one up; never touch the user's own.
     if (seekingRef.current) {
       seekingRef.current = false;
@@ -1296,6 +1300,24 @@ const VoiceFollow = () => {
     const backlog = { chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 };
     backlogRef.current = backlog;
     let draining = false;
+    // Performance tier (engine/pace): the session log carries the tier the self-test chose
+    // and every live step, so the fleet report shows what each computer runs at.
+    const pace = engine.pace || null;
+    const notePace = (fields) => {
+      sessionLog.logEvent('perf_tier', fields);
+      if (SHADOW_BUILD && shadowBus.active()) shadowBus.note({ type: 'perf_tier', ...fields });
+    };
+    if (pace) {
+      notePace({ reason: 'start', ...pace.describe() });
+      paceOffRef.current?.();
+      paceOffRef.current = pace.onStep((ev) => {
+        if (session !== sessionRef.current) return;
+        notePace(ev);
+      });
+    }
+    // Past the bound (1 s; the lowest tier halves it) every chunk still waiting goes in
+    // one push (see AUDIO_BACKLOG_S).
+    const backlogBoundS = () => (pace ? pace.backlogBoundS() : AUDIO_BACKLOG_S);
     // Chunks wait here until the engines are free; one loop feeds them in order. Under
     // the bound each chunk is pushed on its own, exactly as the microphone delivered it;
     // past it everything waiting goes in one push (see AUDIO_BACKLOG_S).
@@ -1304,7 +1326,7 @@ const VoiceFollow = () => {
       try {
         while (backlog.chunks.length && session === sessionRef.current) {
           let pcm;
-          if (backlog.samples > AUDIO_BACKLOG_S * ctx.sampleRate) {
+          if (backlog.samples > backlogBoundS() * ctx.sampleRate) {
             const seconds = backlog.samples / ctx.sampleRate;
             pcm = new Float32Array(backlog.samples);
             let at = 0;
@@ -1338,6 +1360,8 @@ const VoiceFollow = () => {
           } catch (_) {
             /* one bad chunk must not stop the microphone */
           }
+          // Still behind after the push: step the tier down; clear headroom: back up.
+          if (pace) pace.observe(backlog.samples / ctx.sampleRate);
         }
       } finally {
         draining = false;
@@ -3480,6 +3504,12 @@ const VoiceFollow = () => {
     try {
       sampleRate = await startAudio(async (pcm) => {
         if (!autopilotRef.current) return;
+        // Performance tiers only while the paath follower follows a read Bani (engine/pace).
+        if (engine.pace) {
+          engine.pace.setScoped(
+            phaseRef.current === 'following' && !!(followerRef.current && followerRef.current.readBani),
+          );
+        }
         {
           const sr = sampleRateRef.current || 48000;
           if (!ringRef.current || ringRef.current.sampleRate !== sr) {
@@ -3733,6 +3763,7 @@ const VoiceFollow = () => {
           shadowBus.note({
             type: 'perf',
             ...perf,
+            ...(engine.pace ? engine.pace.describe() : {}),
             backlogSec: Math.round(b.seconds * 100) / 100,
             backlogPeak: Math.round(b.peak * 100) / 100,
             merges: b.merges,
