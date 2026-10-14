@@ -24,15 +24,12 @@ const GlobalState = createStore({
     userToken: '',
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
-      return state;
     }),
     setListeners: action((state, listenersState) => {
       state.isListeners = listenersState;
-      return state;
     }),
     setUserToken: action((state, payload) => {
       state.userToken = payload;
-      return state;
     }),
   },
   baniController: {
@@ -41,15 +38,12 @@ const GlobalState = createStore({
     isConnected: false,
     setAdminPin: action((state, adminPin) => {
       state.adminPin = adminPin;
-      return state;
     }),
     setCode: action((state, code) => {
       state.code = code;
-      return state;
     }),
     setConnection: action((state, connectionState) => {
       state.isConnected = connectionState;
-      return state;
     }),
   },
   navigator: createNavigatorSettingsState(navigatorSettings),
@@ -84,10 +78,7 @@ const GlobalState = createStore({
           }),
         );
       }
-      const newState = state;
-      newState.containerPadding[payload.type] = payload.value;
-
-      return newState;
+      state.containerPadding[payload.type] = payload.value;
     }),
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),

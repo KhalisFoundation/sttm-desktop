@@ -5,7 +5,7 @@ import ToolbarItem from './ToolbarItem';
 
 const Toolbar = () => {
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
-  const toolbarTop = ['sunder-gutka', 'ceremonies', 'announcement'];
+  const toolbarTop = ['sunder-gutka', 'ceremonies', 'voice-follow', 'announcement'];
   const toolbarBottom = ['sync-button', 'lock-screen', 'auth-dialog', 'settings'];
 
   return (

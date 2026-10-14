@@ -20,8 +20,7 @@ const createOverlayActions = () => {
           settingType: 'baniOverlay',
         }),
       );
-
-      return state;
+      // Do not return the immer draft (easy-peasy/immer revokes it on finalize).
     });
   });
   return overlayActions;

@@ -97,13 +97,13 @@ const BaniController = ({ onScreenClose, className }) => {
     }
   };
 
-  const remoteSyncInit = async () => {
+  const remoteSyncInit = async (silent = false) => {
     setFetchingCode(true);
 
     // 1. check onlineValue
     const onlineValue = await isOnline();
     if (onlineValue) {
-      const newCode = await tryConnection();
+      const newCode = await tryConnection(silent);
 
       if (newCode) {
         const newAdminPin = Math.floor(1000 + Math.random() * 8999);
@@ -120,14 +120,18 @@ const BaniController = ({ onScreenClose, className }) => {
           action: 'syncStarted',
         });
       } else {
-        showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
+        // Don't nag with a modal on the automatic startup attempt (staging API
+        // is often unreachable in dev); only surface errors for user-initiated sync.
+        if (!silent) {
+          showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'));
+        }
         analytics.trackEvent({
           category: 'sync',
           action: i18n.t('TOOLBAR.SYNC_CONTROLLER.CODE_ERR'),
           label: 'error',
         });
       }
-    } else {
+    } else if (!silent) {
       showSyncError(i18n.t('TOOLBAR.SYNC_CONTROLLER.INTERNET_ERR'));
     }
 
@@ -164,7 +168,8 @@ const BaniController = ({ onScreenClose, className }) => {
   };
 
   useEffect(() => {
-    syncToggle(true);
+    // Automatic startup connect — stay silent if the sync server is unreachable.
+    remoteSyncInit(true);
   }, []);
 
   useEffect(() => {
