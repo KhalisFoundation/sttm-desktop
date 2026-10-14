@@ -1537,15 +1537,13 @@ const VoiceFollow = () => {
 
     if (session !== sessionRef.current) return;
     try {
-      // Paath (a read Bani) uses the position follower; Shabads (kirtan) and Aarti, which is
-      // sung like kirtan, the line follower.
-      const follower =
-        isBani && Number(sundarGutkaBaniId) !== AARTI_BANI
-          ? await engine.createPaathFollower(verses, {
-              inputSr: sampleRate,
-              baniId: sundarGutkaBaniId,
-            })
-          : await engine.createFollower(verses, { inputSr: sampleRate });
+      // Paath (a Bani) uses the position follower; Shabads (kirtan) the line follower.
+      const follower = isBani
+        ? await engine.createPaathFollower(verses, {
+            inputSr: sampleRate,
+            baniId: sundarGutkaBaniId,
+          })
+        : await engine.createFollower(verses, { inputSr: sampleRate });
       if (session !== sessionRef.current) return;
       followerRef.current = follower;
     } catch (e) {
@@ -1946,10 +1944,9 @@ const VoiceFollow = () => {
 
         let follower;
         try {
-          // Paath (a read Bani) uses the position follower; Shabads (kirtan) and Aarti, which
-          // is sung like kirtan, the line follower.
+          // Paath (a Bani) uses the position follower; Shabads (kirtan) the line follower.
           follower =
-            baniId != null && Number(baniId) !== AARTI_BANI
+            baniId != null
               ? await engine.createPaathFollower(profile.verses, {
                   inputSr: sampleRateRef.current,
                   baniId,
