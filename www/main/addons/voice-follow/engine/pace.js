@@ -114,7 +114,8 @@ const fits = (tier, passMs, max = LOAD_MAX) =>
 
 function describe() {
   return {
-    tier: current().name,
+    tier: TIERS[state.tier].name, // the tier this computer runs a read Bani at
+    active: current().name, // what runs right now (fast outside a read Bani)
     passMs: livePassMs() == null ? null : Math.round(livePassMs()),
     selfTestMs: state.passMs == null ? null : Math.round(state.passMs),
     steps: state.steps,
