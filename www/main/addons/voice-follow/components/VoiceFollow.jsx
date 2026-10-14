@@ -453,6 +453,18 @@ const BANI_CUR_SPAN = 8;
 // any reasonably confident frame. (Kept modest so a freshly-switched follower, which
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
 const UI_MOVE_CONF = 0.4;
+// Volume label lines (mic loudness as rms of the raw signal, 0..1; no gain control is applied):
+// below SILENT = no sound, below GOOD = low, below GREAT = good, above = great.
+// The label reads the louder moments (80th percentile of 250 ms windows over the last 4 s),
+// so pauses between lines don't pull it down. Set from bench recordings while singing: the
+// home laptop test that followed well ~0.009 (good), Fremont laptop mic 0.03-0.19, Renton
+// hall feed 0.06-0.5 (good to great).
+const VOL_SILENT_RMS = 0.0005; // about -66 dBFS: nothing reaches the app (needs 8 s of it)
+const VOL_GOOD_RMS = 0.004; // about -48 dBFS: below this the mic is too quiet
+const VOL_GREAT_RMS = 0.1; // about -20 dBFS: a strong, clear feed
+const VOL_LEVEL_WINDOWS = 16; // 4 s of 250 ms windows for low / good / great
+const VOL_SILENT_WINDOWS = 32; // 8 s of silence before "No sound" (a pause is not a dead mic)
+const VOL_ORDER = ['none', 'low', 'good', 'great'];
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in candidate lines
 // Recognizer spellings are loose: ignore a final short vowel, fold ਣ/ਨ and the nukta, and
@@ -967,7 +979,8 @@ const VoiceFollow = () => {
   const [autoDetect] = useState(false); // blind: identify the shabad from audio, then follow (one-shot)
   // Acoustic text stays inside matching; only canonical BaniDB text is rendered.
   const [, setCands] = useState([]); // [{shabadId, verseId, verse, display, share}] shortlist
-  const [, setAudioView] = useState({ seconds: 0, level: 0, device: '' });
+  const [, setAudioView] = useState({ seconds: 0, level: 0, rms: 0, peak: 0, device: '' });
+  const volumeRef = useRef({ hist: [], state: 'good' }); // the last ~2 s of mic levels for the volume label
   const audioViewRef = useRef({ samples: 0, published: 0 });
   const [currentView, setCurrentView] = useState(null);
   const [, setRankedView] = useState([]);
@@ -1280,12 +1293,13 @@ const VoiceFollow = () => {
       return null;
     }
     streamRef.current = stream;
-    audioViewRef.current = { samples: 0, published: 0 };
+    audioViewRef.current = { samples: 0, published: 0, energy: 0, n: 0, peak: 0 };
     rankedViewRef.current = 0;
     setRankedView([]);
     setCurrentView(null);
     const device = stream.getAudioTracks?.()[0]?.label || 'Microphone';
-    setAudioView({ seconds: 0, level: 0, device });
+    setAudioView({ seconds: 0, level: 0, rms: 0, peak: 0, device });
+    volumeRef.current = { hist: [], state: 'good' };
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     ctxRef.current = ctx;
     const url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
@@ -1373,14 +1387,29 @@ const VoiceFollow = () => {
       const capture = audioViewRef.current;
       capture.samples += pcm.length;
       const now = Date.now();
+      // The volume label measures the whole 250 ms window: loudness (rms) and the peak.
+      for (let i = 0; i < pcm.length; i += 1) {
+        const v = pcm[i];
+        capture.energy = (capture.energy || 0) + v * v;
+        const a = v < 0 ? -v : v;
+        if (a > (capture.peak || 0)) capture.peak = a;
+      }
+      capture.n = (capture.n || 0) + pcm.length;
       if (now - capture.published >= 250) {
-        let energy = 0;
-        for (let i = 0; i < pcm.length; i += 1) energy += pcm[i] * pcm[i];
-        const rms = Math.sqrt(energy / (pcm.length || 1));
+        const rms = Math.sqrt((capture.energy || 0) / (capture.n || 1));
+        const peak = capture.peak || 0;
+        capture.energy = 0;
+        capture.n = 0;
+        capture.peak = 0;
         capture.published = now;
+        const volHist = volumeRef.current.hist;
+        volHist.push(rms);
+        if (volHist.length > VOL_SILENT_WINDOWS) volHist.shift();
         setAudioView({
           seconds: Math.floor(capture.samples / ctx.sampleRate),
           level: Math.min(1, rms * 8),
+          rms,
+          peak,
           device,
         });
       }
@@ -3507,7 +3536,8 @@ const VoiceFollow = () => {
         // Performance tiers only while the paath follower follows a read Bani (engine/pace).
         if (engine.pace) {
           engine.pace.setScoped(
-            phaseRef.current === 'following' && !!(followerRef.current && followerRef.current.readBani),
+            phaseRef.current === 'following' &&
+              !!(followerRef.current && followerRef.current.readBani),
           );
         }
         {
@@ -3991,6 +4021,65 @@ const VoiceFollow = () => {
   } catch (e) {
     showNext = true;
   }
+  // The next pangti: from the follower's position, else the line after the one on screen.
+  let nextLine = null;
+  if (showNext && currentView && profLines) {
+    let at = posIsCurrent ? pos.lineIndex : -1;
+    if (at < 0 && liveLine) at = profLines.findIndex((l) => l === liveLine);
+    if (at >= 0 && at + 1 < profLines.length) nextLine = profLines[at + 1] || null;
+  }
+  // Volume label: no sound (red), low (amber), good (green), great (dark green), with a
+  // little hysteresis so it doesn't flicker (see VOL_* above).
+  const vol = volumeRef.current;
+  const p80 = (xs) => {
+    const sorted = [...xs].sort((a, b) => a - b);
+    return sorted.length ? sorted[Math.floor(0.8 * (sorted.length - 1))] : 0;
+  };
+  const rmsMid = p80(vol.hist.slice(-VOL_LEVEL_WINDOWS));
+  const deadMic = vol.hist.length >= VOL_SILENT_WINDOWS && p80(vol.hist) < VOL_SILENT_RMS;
+  // Hysteresis: to move up a level the loudness must clear the line by 25%.
+  const over = (line, level) => {
+    const climbing = VOL_ORDER.indexOf(vol.state) < VOL_ORDER.indexOf(level);
+    return rmsMid >= (climbing ? line * 1.25 : line);
+  };
+  // Dropping from good needs the whole last 8 s to be quiet, so a pause doesn't flash amber.
+  const wasGood = vol.state === 'good' || vol.state === 'great';
+  let volState = vol.state;
+  if (vol.hist.length >= 4) {
+    if (over(VOL_GREAT_RMS, 'great')) volState = 'great';
+    else if (over(VOL_GOOD_RMS, 'good') || (wasGood && p80(vol.hist) >= VOL_GOOD_RMS)) {
+      volState = 'good';
+    } else if (deadMic) volState = 'none';
+    else if (rmsMid >= VOL_SILENT_RMS || vol.state !== 'none') volState = 'low';
+  }
+  vol.state = volState;
+  const volBars = VOL_ORDER.indexOf(volState);
+  const volumeLabel = (
+    <span
+      className={`vf-ap-vol is-${volState}`}
+      role="status"
+      title={i18n.t('VOICE_FOLLOW.VOL_TIP')}
+    >
+      <span className="vf-ap-vol-bars" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <i key={i} className={i < volBars ? 'is-on' : ''} />
+        ))}
+      </span>
+      {i18n.t(`VOICE_FOLLOW.VOL_${volState.toUpperCase()}`)}
+    </span>
+  );
+  const stopButton = (
+    <button
+      type="button"
+      className="vf2-stop"
+      onClick={onMainClick}
+      title={i18n.t('VOICE_FOLLOW.STOP')}
+      aria-label={i18n.t('VOICE_FOLLOW.STOP')}
+    >
+      <i className="fa fa-stop" aria-hidden="true" />
+      {i18n.t('VOICE_FOLLOW.STOP_SHORT')}
+    </button>
+  );
   // Challengers to display: never the Shabad on screen itself (under any id) nor a
   // member of the Bani on screen.
   const liveItems = currentView
@@ -4207,18 +4296,19 @@ const VoiceFollow = () => {
             >
               {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
             </div>
-            {showNext &&
-              posIsCurrent &&
-              profLines &&
-              boardCur &&
-              boardCur.pct >= 0.95 &&
-              profLines.slice(pos.lineIndex + 1, pos.lineIndex + 2).map((l, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={i} className="vf2-next-line">
-                  <span className="vf2-next-label">{i18n.t('VOICE_FOLLOW.NEXT')} · </span>
-                  <Gurmukhi text={l} />
+            {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
+                sits near the top of the panel without adding a line. */}
+            <div className="vf2-next-row">
+              {nextLine ? (
+                <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
+                  <span className="vf2-next-mark" aria-hidden="true" />
+                  <Gurmukhi text={nextLine} />
                 </div>
-              ))}
+              ) : (
+                <span className="vf2-next-line is-empty" />
+              )}
+              {stopButton}
+            </div>
             {boardCur && <LiveBar value={boardCur.pct} />}
           </section>
 
@@ -4306,15 +4396,7 @@ const VoiceFollow = () => {
               {heardStrip}
             </span>
           </div>
-          <button
-            type="button"
-            className="vf-ap-stop"
-            onClick={onMainClick}
-            title={i18n.t('VOICE_FOLLOW.STOP')}
-            aria-label={i18n.t('VOICE_FOLLOW.STOP')}
-          >
-            <i className="fa fa-stop" aria-hidden="true" />
-          </button>
+          {volumeLabel}
         </div>
       )}
     </div>
