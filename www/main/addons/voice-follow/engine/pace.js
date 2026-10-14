@@ -171,20 +171,6 @@ function onBeat(pcm) {
   return current().aligned && pcm === beat;
 }
 
-// ~1-2 s when the model loads: median pass time on 4 s windows of noise (the model's cost
-// does not depend on the audio), the first passes discarded as warm-up. Picks the fastest
-// tier that fits. Goes through infer.emissions so a benchmark's slowed engine is seen too.
-async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
-  if (state.selfTest) return state.selfTest;
-  try {
-    return await measure(infer, passes, warm);
-  } catch (e) {
-    // The self-test must never keep the engine from becoming ready: stay on the current tier.
-    state.selfTest = { error: String((e && e.message) || e), tier: current().name };
-    return state.selfTest;
-  }
-}
-
 async function measure(infer, passes, warm) {
   const SR = 16000;
   let seed = 12345;
@@ -214,6 +200,20 @@ async function measure(infer, passes, warm) {
   state.selfTest = { passMs: Math.round(state.passMs), tier: TIERS[pick].name };
   setTier(pick, 'self-test');
   return state.selfTest;
+}
+
+// ~1-2 s when the model loads: median pass time on 4 s windows of noise (the model's cost
+// does not depend on the audio), the first passes discarded as warm-up. Picks the fastest
+// tier that fits. Goes through infer.emissions so a benchmark's slowed engine is seen too.
+async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
+  if (state.selfTest) return state.selfTest;
+  try {
+    return await measure(infer, passes, warm);
+  } catch (e) {
+    // The self-test must never keep the engine from becoming ready: stay on the current tier.
+    state.selfTest = { error: String((e && e.message) || e), tier: current().name };
+    return state.selfTest;
+  }
 }
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
