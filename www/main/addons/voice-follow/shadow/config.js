@@ -59,9 +59,16 @@ const UPLOAD_SAS = '__VF_UPLOAD_SAS__';
 const HF_NAMESPACE = 'khalisfoundation';
 const HF_DATASET_TYPE = 'kirtan';
 const HF_TOKEN = '__VF_HF_TOKEN__';
+// Which Voice-Follow release produced a session. VF_FEATURE_VERSION is bumped with every merged
+// Voice-Follow PR (MVP numbering); VF_BUILD_COMMIT is the exact commit, injected after
+// `npm run build` by packaging/inject-upload-sas.js (CI: GITHUB_SHA; local: git HEAD).
+const VF_FEATURE_VERSION = '9.0.1';
+const VF_BUILD_COMMIT = '__VF_BUILD_COMMIT__';
 
 module.exports = {
   SHADOW_BUILD,
+  VF_FEATURE_VERSION,
+  VF_BUILD_COMMIT,
   SHADOW_AUDIO_BPS,
   SHADOW_SLICE_MS,
   SHADOW_SEGMENT_MS,

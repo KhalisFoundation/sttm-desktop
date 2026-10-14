@@ -23,7 +23,27 @@ if (!fs.existsSync(file)) {
   console.log(`inject-upload-sas: ${file} not found (no shadow build in this tree), skipping`);
   process.exit(0);
 }
-const src = fs.readFileSync(file, 'utf8');
+let src = fs.readFileSync(file, 'utf8');
+// Stamp the exact build commit so every uploaded session says which release made it.
+// Independent of the SAS: done even for dev builds.
+if (src.includes('__VF_BUILD_COMMIT__')) {
+  let commit = (process.env.GITHUB_SHA || '').trim();
+  if (!commit) {
+    try {
+      commit = require('child_process')
+        .execSync('git rev-parse HEAD', { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'] })
+        .toString()
+        .trim();
+    } catch (e) {
+      commit = '';
+    }
+  }
+  if (/^[0-9a-f]{7,40}$/.test(commit)) {
+    src = src.replace('__VF_BUILD_COMMIT__', commit.slice(0, 12));
+    fs.writeFileSync(file, src);
+    console.log(`inject-upload-sas: build commit ${commit.slice(0, 12)} stamped`);
+  }
+}
 if (!sas) {
   if (process.env.VF_REQUIRE_UPLOAD_SAS === '1') {
     console.error('inject-upload-sas: VF_UPLOAD_SAS is not set and VF_REQUIRE_UPLOAD_SAS=1');
