@@ -7,8 +7,8 @@
 //
 //   fast  follower every 0.25 s, recognizer every 0.5 s, each on its own clock (6 passes / s)
 //   sync  the same, but the follower decodes on the recognizer's beat: both see the same
-//         window, which the model runs once (Infer memo), and the following windows are
-//         2.5 s instead of 4 (the pass costs 0.6x) -> 2.5 pass-equivalents / s
+//         window, which the model runs once (Infer memo) -> 4 passes / s; a READ Bani's paath
+//         follower uses 2.5 s windows (0.6x the cost, faster to move) -> 4.5 equivalents / s
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
 //
@@ -36,8 +36,10 @@ const TIERS = [
     followerHopS: 0.25,
     recognizerHopS: 0.5,
     aligned: true,
-    windowS: 2.5, // following windows (model cost is linear in the window: 0.6x a 4 s pass)
-    passesPerS: 2.5,
+    windowS: 2.5, // read-Bani paath follower windows (model cost is linear in the window: 0.6x)
+    // Kirtan / sung Banis: 4 passes / s (4 s windows shared by recognizer and follower). A read
+    // Bani: recognizer 4 s x 2 + paath follower 2.5 s x 4 = 4.5 pass-equivalents / s.
+    passesPerS: 4,
     backlogBoundS: 1.0,
   },
   {
@@ -153,9 +155,12 @@ function backlogBoundS() {
 
 // Window for an engine (seconds): its own, unless the experiment above shortens the
 // following windows (<= 4 s; the 10 s searching window is never touched) in an aligned tier.
+// Only the paath follower on a READ Bani takes the shorter window: the recognizer (search and
+// the following-phase switch test), the kirtan line follower and sung Banis (Aarti, Asa di
+// Vaar) keep their own windows — shorter ones cost them switches and lines (PR 2243 check).
 function windowS(kind, ownWindowS) {
   const t = current();
-  if (!t.aligned || ownWindowS > 4) return ownWindowS;
+  if (kind !== 'paath' || !t.aligned || ownWindowS > 4) return ownWindowS;
   return FOLLOW_WINDOW_S || t.windowS || ownWindowS;
 }
 

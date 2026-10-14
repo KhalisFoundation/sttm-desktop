@@ -94,6 +94,7 @@ class FollowerV2 {
     this.infer = infer;
     this.c = { ...DEFAULTS, ...(SUNG_BANIS[opts.baniId] || {}), ...opts };
     this.base = this.c; // the profile as configured; this.c is its tier-scaled copy
+    this.sung = !!SUNG_BANIS[opts.baniId]; // sung Banis keep the full window in every tier
     this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
@@ -443,7 +444,7 @@ class FollowerV2 {
 
   async push(pcm) {
     const res = resampleTo16k(pcm, this.inputSr);
-    this.win = Math.floor(pace.windowS('follower', this.base.windowS) * SR);
+    this.win = Math.floor(pace.windowS(this.sung ? 'follower' : 'paath', this.base.windowS) * SR);
     if (res.length) {
       let merged = new Float32Array(this.buf.length + res.length);
       merged.set(this.buf, 0);
