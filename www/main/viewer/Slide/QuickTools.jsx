@@ -7,7 +7,7 @@ import { i18n } from '../../common/i18n';
 
 global.platform = require('../../desktop_scripts');
 
-const QuickTools = ({ isMiscSlide, baniOptions }) => {
+const QuickTools = ({ isMiscSlide, baniOptions, hasEnglish, hasTranslation, hasTransliteration, hasTeeka }) => {
   const userSettings = useStoreState((state) => state.userSettings);
 
   const { quickToolsOpen } = useStoreState((state) => state.viewerSettings);
@@ -62,7 +62,10 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
     const maxFontSize = 20;
     const minFontSize = 1;
 
-    if (index > 0) {
+    if (toolname === 'english') {
+      stateName = `english${action}`;
+      actionName = `setEnglish${action}`;
+    } else if (index > 0) {
       stateName = `content${index}${action}`;
       actionName = `setContent${index}${action}`;
     } else {
@@ -78,7 +81,7 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
       payload = currentFontSize > minFontSize ? currentFontSize - 1 : minFontSize;
     } else if (name === 'plus') {
       payload = currentFontSize < maxFontSize ? currentFontSize + 1 : maxFontSize;
-    }
+    }  
 
     // If payload does not change, return null to prevent unnecessary state updates
     if (payload === userSettings[stateName]) {
@@ -101,7 +104,7 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
   };
 
   const hide = (name, toolName) =>
-    name === 'visibility' && ['gurbani', 'announcements'].includes(toolName)
+    name === 'visibility' && ['gurbani', 'announcements', 'english'].includes(toolName)
       ? 'quicktool-icons-hidden'
       : '';
 
@@ -132,12 +135,17 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
   }, [isMiscSlide]);
 
   useEffect(() => {
-    setBaniOrder(['gurbani', userSettings.content1, userSettings.content2, userSettings.content3]);
-  }, [userSettings.content1, userSettings.content2, userSettings.content3]);
+    const baseOrder = ['gurbani', userSettings.content1, userSettings.content2, userSettings.content3];
+    if (hasEnglish) baseOrder.push('english');
+    setBaniOrder(baseOrder);
+  }, [userSettings.content1, userSettings.content2, userSettings.content3, hasEnglish]);
 
   const handleQuickTools = (order, index) => {
     if (order === 'gurbani' || order === 'announcements') {
       return <div>{dropdownLabel(order)}</div>;
+    }
+    if (order === 'english') {
+      return <div>Instructions</div>;
     }
 
     const markup = baniOptions.map(
@@ -189,12 +197,22 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
       </div>
       {quickToolsOpen && (
         <div className={`quicktool-body quicktool-${isMiscSlide ? 'announcement' : 'gurbani'}`}>
-          {baniOrder.map((order, index) => (
-            <div key={`item-${index}`} className="quicktool-item">
-              {handleQuickTools(order, index)}
-              <div className="quicktool-icons">{bakeIcons(order, index, quickToolsModifiers)}</div>
-            </div>
-          ))}
+          {baniOrder.map((order, index) => {
+            const shouldShow =
+              order === 'gurbani' ||
+              order === 'announcements' ||
+              (order === 'english' && hasEnglish) ||
+              (order.includes('translation') && hasTranslation) ||
+              (order.includes('teeka') && hasTeeka) ||
+              (order.includes('transliteration') && hasTransliteration);
+            if (!shouldShow) return null;
+            return (
+              <div key={`item-${index}`} className="quicktool-item">
+                {handleQuickTools(order, index)}
+                <div className="quicktool-icons">{bakeIcons(order, index, quickToolsModifiers)}</div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -204,6 +222,10 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
 QuickTools.propTypes = {
   isMiscSlide: PropTypes.bool,
   baniOptions: PropTypes.array,
+  hasEnglish: PropTypes.bool,
+  hasTranslation: PropTypes.bool,
+  hasTransliteration: PropTypes.bool,
+  hasTeeka: PropTypes.bool,
 };
 
 export default QuickTools;
