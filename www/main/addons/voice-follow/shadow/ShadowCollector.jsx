@@ -9,7 +9,7 @@ const remote = require('@electron/remote');
 const bus = require('./bus');
 const uploader = require('./uploader');
 const hf = require('./hf');
-const { HF_TOKEN } = require('./config');
+const { HF_TOKEN, VF_FEATURE_VERSION, VF_BUILD_COMMIT } = require('./config');
 const service = require('./service');
 const listener = require('./listener');
 const pcm = require('./pcm');
@@ -316,7 +316,11 @@ const ShadowCollector = () => {
               machine: machineFacts(),
               startedAt: new Date(t0).toISOString(),
               app: remote.app.getVersion(),
-              build: 'mvp-8.6c-shadow',
+              build: `vf-${VF_FEATURE_VERSION}`,
+              feature: {
+                version: VF_FEATURE_VERSION,
+                commit: VF_BUILD_COMMIT.startsWith('__') ? 'dev' : VF_BUILD_COMMIT,
+              },
               platform: process.platform,
               microphone: stream.getAudioTracks()[0]?.label || '',
               startedBy: startReasonRef.current,
