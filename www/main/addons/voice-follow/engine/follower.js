@@ -1,6 +1,7 @@
 // JS port of karansea_engine.py KaranseaEngine: streaming CTC + online
 // token-passing line decoder + CTC word alignment. Mirrors push().
 const { resampleTo16k, norm, SR, BLANK } = require('./infer');
+const pace = require('./pace');
 const { partialRatio, partialRatioAlignment } = require('./fuzz');
 
 const NEG = -1e30;
@@ -172,6 +173,7 @@ class Follower {
   async push(pcm) {
     const c = this.c;
     const res = resampleTo16k(pcm, this.inputSr);
+    this.win = Math.floor(pace.windowS('follower', c.windowS) * SR); // performance tier
     if (res.length) {
       let merged = new Float32Array(this.buf.length + res.length);
       merged.set(this.buf, 0); merged.set(res, this.buf.length);
@@ -179,7 +181,8 @@ class Follower {
       this.buf = merged;
       this.acc += res.length;
     }
-    if (this.acc < this.hop || this.buf.length < SR) return null;
+    this.hop = Math.floor(pace.hopS('follower', c.hopS) * SR); // performance tier
+    if ((this.acc < this.hop && !pace.onBeat(pcm)) || this.buf.length < SR) return null;
     this.acc = 0;
 
     const emis0 = await this.infer.emissions(this.buf);

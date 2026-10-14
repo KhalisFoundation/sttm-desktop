@@ -18,6 +18,7 @@ const { FollowerV2 } = require('./follower2');
 const NITNEM = require('./assets/nitnem-lines');
 const { partialRatio } = require('./fuzz');
 const modelManager = require('./model-manager');
+const pace = require('./pace');
 
 let inferPromise = null; // shared session (load the model once)
 let sp = null; // tokenizer is cheap + stateless, share it too
@@ -30,6 +31,8 @@ async function ready(onProgress) {
     inferPromise = (async () => {
       const modelPath = await modelManager.ensureModel(onProgress);
       loadedInfer = await Infer.create(modelPath);
+      // ~1-2 s: pick the performance tier this computer can keep up with (see pace).
+      await pace.selfTest(loadedInfer);
       return loadedInfer;
     })();
     // If loading fails, clear the cache so a later call can retry.
@@ -81,6 +84,8 @@ module.exports = {
   createRecognizer,
   createFollower,
   createPaathFollower,
+  // Performance tiers (self-test, live stepping, tier for the session log).
+  pace,
   // Text helpers reused by the supervisor for acoustic switch-scoring: `norm`
   // strips whitespace/punctuation the way the follower does, and `partialRatio`
   // is the same fuzzy matcher, so a shabad scored here is comparable to the
