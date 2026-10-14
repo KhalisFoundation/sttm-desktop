@@ -95,7 +95,9 @@ class FollowerV2 {
     this.c = { ...DEFAULTS, ...(SUNG_BANIS[opts.baniId] || {}), ...opts };
     this.base = this.c; // the profile as configured; this.c is its tier-scaled copy
     this.sung = !!SUNG_BANIS[opts.baniId]; // sung Banis keep the full window in every tier
-    this.readBani = !this.sung; // a read Bani: the only following the performance tiers apply to
+    // A read Bani: the only following the performance tiers apply to. Aarti (Bani 22) is sung like
+    // kirtan, so it never gets the tiers even when it follows on this follower.
+    this.readBani = !this.sung && Number(opts.baniId) !== 22;
     this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
