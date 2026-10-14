@@ -1234,6 +1234,7 @@ const VoiceFollow = () => {
     backlogRef.current = { chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 };
     paceOffRef.current?.();
     paceOffRef.current = null;
+    if (engine.pace) engine.pace.setScoped(false);
     // Take down our seeking slide if we put one up; never touch the user's own.
     if (seekingRef.current) {
       seekingRef.current = false;
@@ -3506,6 +3507,12 @@ const VoiceFollow = () => {
     try {
       sampleRate = await startAudio(async (pcm) => {
         if (!autopilotRef.current) return;
+        // Performance tiers only while the paath follower follows a read Bani (engine/pace).
+        if (engine.pace) {
+          engine.pace.setScoped(
+            phaseRef.current === 'following' && !!(followerRef.current && followerRef.current.readBani),
+          );
+        }
         {
           const sr = sampleRateRef.current || 48000;
           if (!ringRef.current || ringRef.current.sampleRate !== sr) {

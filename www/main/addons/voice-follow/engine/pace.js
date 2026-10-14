@@ -7,8 +7,8 @@
 //
 //   fast  follower every 0.25 s, recognizer every 0.5 s, each on its own clock (6 passes / s)
 //   sync  the same, but the follower decodes on the recognizer's beat: both see the same
-//         window, which the model runs once (Infer memo) -> 4 passes / s; a READ Bani's paath
-//         follower uses 2.5 s windows (0.6x the cost, faster to move) -> 4.5 equivalents / s
+//         window, which the model runs once (Infer memo), on 2.5 s windows (0.6x the cost)
+//         -> 2.5 pass-equivalents / s. Tiers apply only while a READ Bani is followed.
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
 //
@@ -37,9 +37,7 @@ const TIERS = [
     recognizerHopS: 0.5,
     aligned: true,
     windowS: 2.5, // read-Bani paath follower windows (model cost is linear in the window: 0.6x)
-    // Kirtan / sung Banis: 4 passes / s (4 s windows shared by recognizer and follower). A read
-    // Bani: recognizer 4 s x 2 + paath follower 2.5 s x 4 = 4.5 pass-equivalents / s.
-    passesPerS: 4,
+    passesPerS: 2.5, // 4 passes / s on 2.5 s windows shared by recognizer and paath follower
     backlogBoundS: 1.0,
   },
   {
@@ -77,6 +75,7 @@ const state = {
   headroomSince: null,
   steppedAt: 0,
   steps: 0,
+  scoped: false, // see current()
   selfTest: null,
   blockedUntil: {}, // tier index -> ms: left because of backlog, do not re-enter before
   listeners: new Set(),
@@ -94,7 +93,17 @@ const FOLLOW_WINDOW_S = Number(process.env.VF_FOLLOW_WINDOW_S || 0) || null;
   }
 }
 
-const current = () => TIERS[state.tier];
+// Scope: the tiers apply only while the paath follower follows a READ Bani (the component
+// says so per audio chunk). Searching, kirtan Shabads and sung Banis always run the fast tier =
+// the code path without tiers (the bounded audio queue still protects a slow PC there).
+const current = () => (state.scoped ? TIERS[state.tier] : TIERS[0]);
+function setScoped(on) {
+  state.scoped = !!on;
+  if (!state.scoped) {
+    state.behindSince = null;
+    state.headroomSince = null;
+  }
+}
 const median = (a) => {
   const s = [...a].sort((x, y) => x - y);
   return s.length ? s[Math.floor(s.length / 2)] : null;
@@ -155,12 +164,11 @@ function backlogBoundS() {
 
 // Window for an engine (seconds): its own, unless the experiment above shortens the
 // following windows (<= 4 s; the 10 s searching window is never touched) in an aligned tier.
-// Only the paath follower on a READ Bani takes the shorter window: the recognizer (search and
-// the following-phase switch test), the kirtan line follower and sung Banis (Aarti, Asa di
-// Vaar) keep their own windows — shorter ones cost them switches and lines (PR 2243 check).
+// The tiers are in scope only while a READ Bani is followed (see current()); there the
+// recognizer and the paath follower share the shorter window, so one pass answers both.
 function windowS(kind, ownWindowS) {
   const t = current();
-  if (kind !== 'paath' || !t.aligned || ownWindowS > 4) return ownWindowS;
+  if (kind === 'follower' || !t.aligned || ownWindowS > 4) return ownWindowS;
   return FOLLOW_WINDOW_S || t.windowS || ownWindowS;
 }
 
@@ -223,7 +231,7 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
-  if (state.pinned != null) return null;
+  if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
   const held = nowMs - state.steppedAt < HOLD_MS;
   if (backlogSec > BEHIND_S) {
@@ -258,6 +266,7 @@ module.exports = {
   current,
   describe,
   notePass,
+  setScoped,
   hopS,
   backlogBoundS,
   windowS,
