@@ -26,6 +26,9 @@ const GlobalState = createStore({
     autopilotEnabled: false,
     // A Voice-Follow session is running (shown on the Autopilot tab).
     autopilotLive: false,
+    // Tester build: what the background recorder is doing with the microphone, for the
+    // "Recording audio" chip ('off' | 'listening' | 'recording'; shadow/ShadowCollector.jsx).
+    shadowMicState: 'off',
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
     }),
@@ -40,6 +43,9 @@ const GlobalState = createStore({
     }),
     setAutopilotLive: action((state, payload) => {
       state.autopilotLive = !!payload;
+    }),
+    setShadowMicState: action((state, payload) => {
+      state.shadowMicState = payload || 'off';
     }),
   },
   baniController: {

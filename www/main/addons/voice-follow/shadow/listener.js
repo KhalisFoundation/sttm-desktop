@@ -15,8 +15,12 @@ const RATE = 16000;
 const TICK_MS = 500; // one loudness reading per half second
 
 let st = null; // { stream, ctx, node, src, ring, ringPos, ringFull, ticks, timer, onSound }
+// Bumped by every start() and stop(): a start() still waiting for the microphone when
+// stop() is called (recording turned off) must not open the ear afterwards.
+let gen = 0;
 
 function stop() {
+  gen += 1;
   if (!st) return;
   const s = st;
   st = null;
@@ -48,9 +52,15 @@ function takePreRoll() {
 
 async function start(onSound) {
   if (st) return;
+  gen += 1;
+  const mine = gen;
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
   });
+  if (mine !== gen || st) {
+    stream.getTracks().forEach((t) => t.stop());
+    return;
+  }
   let ctx;
   try {
     ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: RATE });

@@ -10,6 +10,10 @@ const { SHADOW_SOUND_LEVEL } = require('./config');
 const { contentKey, scoreDir, C } = require('./score');
 
 const SAVE_S = 30;
+// One screen change by the app is several store actions, and the screen label is read after
+// each of them. For this long after an app change, a label part-way between the app's old
+// and new screen (each part one or the other) is that change in progress, not the sevadaar.
+const SETTLE_MS = 1000;
 
 const blankLabel = () => ({ key: null, verseId: null });
 let S = null; // current session
@@ -74,6 +78,8 @@ function begin(dir, t0) {
     t0,
     human: blankLabel(),
     system: blankLabel(),
+    prevSystem: blankLabel(),
+    systemAt: 0,
     paused: false,
     lastSave: 0,
     lastTick: 0,
@@ -102,9 +108,33 @@ function human(label) {
   // Voice-Follow's own; one that differs from what it last showed is a sevadaar override.
   if (S.visible) {
     const sys = S.system || {};
-    const same =
-      contentKey(label) === contentKey(sys) && (label.verseId ?? null) === (sys.verseId ?? null);
-    writeLine('human.jsonl', { t: now(), ...label, override: !same });
+    const verse = label.verseId ?? null;
+    const same = contentKey(label) === contentKey(sys) && verse === (sys.verseId ?? null);
+    // The store took the app's slide down itself (the Shabad pane does that for every line it
+    // shows): the app's own content and line, so the app's change, and the slide is gone.
+    const unslid =
+      !same &&
+      sys.slide &&
+      !label.slide &&
+      contentKey(label) === contentKey({ ...sys, slide: null }) &&
+      verse === (sys.verseId ?? null);
+    if (unslid) S.system = { ...sys, slide: null };
+    // Part-way through the app's own change: the content and the line are each the app's
+    // old or new one. A line the app never showed is still the sevadaar's.
+    const prev = S.prevSystem || {};
+    const keys = [sys, prev].flatMap((l) => [contentKey(l), contentKey({ ...l, slide: null })]);
+    const transit =
+      !same &&
+      !unslid &&
+      Date.now() - (S.systemAt || 0) <= SETTLE_MS &&
+      [sys.verseId ?? null, prev.verseId ?? null].includes(verse) &&
+      (keys.includes(contentKey(label)) ||
+        contentKey(label) === contentKey({ shabadId: label.shabadId }));
+    if (transit) {
+      writeLine('human.jsonl', { t: now(), ...label, transit: true });
+      return;
+    }
+    writeLine('human.jsonl', { t: now(), ...label, override: !(same || unslid) });
     return;
   }
   writeLine('human.jsonl', { t: now(), ...label });
@@ -114,6 +144,8 @@ function human(label) {
 function system(update) {
   if (!S) return;
   const next = { ...S.system, ...update };
+  S.prevSystem = S.system;
+  S.systemAt = Date.now();
   if (update.shabadId != null) {
     next.slide = null;
     next.bani = null;

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { SHADOW_BUILD, SHADOW_SEGMENT_MS, SHADOW_DISCARD_COOLDOWN_MS } from './config';
+import { ShortNotice } from './RecordingNotice';
 
 const fs = require('fs');
 const os = require('os');
@@ -187,13 +188,19 @@ const readTester = (raw) => {
   }
 };
 const packTester = (t) => encodeURIComponent(JSON.stringify(t));
+// Bump when the first-launch notice changes in substance, so every tester reads it again once.
+const NOTICE_VERSION = 1;
 
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
-  const { shadowRecording, shadowTester, hfToken } = useStoreState((state) => state.userSettings);
-  const { setShadowRecording, setShadowTester } = useStoreActions(
+  const { shadowRecording, shadowTester, shadowNotice, hfToken } = useStoreState(
+    (state) => state.userSettings,
+  );
+  const { setShadowRecording, setShadowTester, setShadowNotice } = useStoreActions(
     (actions) => actions.userSettings,
   );
+  // For the "Recording audio" chip in the workspace bar (RecordingNotice.jsx).
+  const { setShadowMicState } = useStoreActions((actions) => actions.app);
   // The Hugging Face write token: baked in at build (VF_HF_TOKEN), or a saved setting.
   const hfTokenRef = useRef('');
   hfTokenRef.current = (hfToken || '').trim() || (HF_TOKEN.startsWith('__') ? '' : HF_TOKEN);
@@ -211,10 +218,10 @@ const ShadowCollector = () => {
   const discardRef = useRef(false); // the session turned out to be noise: delete, do not upload
   const lastDiscardRef = useRef(0); // when the last noise session was thrown away
 
-  useEffect(() => {
-    if (SHADOW_BUILD) lookupPublicIp();
-  }, []);
   const enabled = SHADOW_BUILD && !!tester.name && shadowRecording !== false;
+  useEffect(() => {
+    if (enabled) lookupPublicIp();
+  }, [enabled]);
 
   // The uploader runs from the moment a registered tester opens the app, so a session left
   // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
@@ -223,6 +230,13 @@ const ShadowCollector = () => {
       uploader.start(shadowRoot(), tester, { hfOn: () => !!hfTokenRef.current, log: diag });
       hf.start(shadowRoot(), () => hfTokenRef.current, diag);
     }
+    // Recording turned off (Settings, the chip or the first-launch card): stop sending now.
+    // This cleanup runs before the session's below, so the session that just ended is not
+    // queued either; it stays on disk and goes once recording is turned back on.
+    return () => {
+      uploader.stop();
+      hf.stop();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -258,11 +272,24 @@ const ShadowCollector = () => {
   useEffect(() => {
     if (!enabled || active) {
       listener.stop();
+      if (!enabled) setShadowMicState('off');
       return undefined;
     }
-    listener.start(() => beginNowRef.current('sound')).catch((e) => diag(`listener: ${e.message}`));
-    return () => listener.stop();
-  }, [enabled, active]);
+    let live = true;
+    listener
+      .start(() => beginNowRef.current('sound'))
+      .then(() => {
+        if (live && listener.running()) setShadowMicState('listening');
+      })
+      .catch((e) => {
+        diag(`listener: ${e.message}`);
+        if (live) setShadowMicState('off');
+      });
+    return () => {
+      live = false;
+      listener.stop();
+    };
+  }, [enabled, active, setShadowMicState]);
 
   // Pressing Start in Voice-Follow begins a session at once, so its search is recorded too.
   useEffect(() => {
@@ -307,6 +334,7 @@ const ShadowCollector = () => {
         const s = { dir, t0, startedAt, stream, recorder: null, seg: 0 };
         sessionRef.current = s;
         startingRef.current = false;
+        setShadowMicState('recording');
         fs.writeFileSync(
           path.join(dir, 'session.json'),
           JSON.stringify(
@@ -428,6 +456,7 @@ const ShadowCollector = () => {
         }, 20000);
       } catch (e) {
         startingRef.current = false;
+        setShadowMicState('off');
         try {
           fs.mkdirSync(shadowRoot(), { recursive: true });
           fs.appendFileSync(
@@ -454,6 +483,7 @@ const ShadowCollector = () => {
       const s = sessionRef.current;
       sessionRef.current = null;
       if (!s) return;
+      setShadowMicState('off');
       try {
         if (s.recorder) s.recorder.stop();
         s.recorder = null;
@@ -570,54 +600,79 @@ const ShadowCollector = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  if (!SHADOW_BUILD || tester.name) return null;
+  // First launch (and once more whenever NOTICE_VERSION is bumped): what is recorded, and
+  // a real choice. Registering (name, Gurdwara) is how sessions are grouped, so OK needs a
+  // name; "Turn off recording" needs nothing. If recording is later turned back on without
+  // a registration, the card comes back to ask for the name.
+  const registered = !!tester.name;
+  const noticeSeen = Number(shadowNotice) >= NOTICE_VERSION;
+  if (!SHADOW_BUILD || shadowRecording === false || (registered && noticeSeen)) return null;
 
-  // First launch only: who is testing (to group sessions), and the agreement.
   return (
     <div className="shadow-consent">
-      <div className="shadow-consent-card">
-        <h2>Voice-Follow experimental build</h2>
-        <p>
-          This build records the kirtan audio and what is shown on screen, and sends it to the
-          Voice-Follow team to make Voice-Follow better. Nothing else is collected. You can turn
-          this off any time in Settings.
+      <div className="shadow-consent-card" role="dialog" aria-labelledby="shadow-consent-title">
+        <div className="shadow-consent-icon" aria-hidden="true">
+          <i className="fa fa-microphone" />
+        </div>
+        <h2 id="shadow-consent-title">Voice Autopilot records audio</h2>
+        <ShortNotice />
+        <p className="shadow-consent-more">
+          Click the &quot;Recording audio&quot; label at the top of STTM any time for the full
+          details.
         </p>
-        <label htmlFor="shadow-name">
-          Your name
-          <input
-            id="shadow-name"
-            className="disable-kb-shortcuts"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label htmlFor="shadow-gurdwara">
-          Gurdwara (optional)
-          <input
-            id="shadow-gurdwara"
-            className="disable-kb-shortcuts"
-            value={gurdwara}
-            onChange={(e) => setGurdwara(e.target.value)}
-          />
-        </label>
+        {!registered && (
+          <>
+            <label htmlFor="shadow-name">
+              Your name
+              <input
+                id="shadow-name"
+                className="disable-kb-shortcuts"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </label>
+            <label htmlFor="shadow-gurdwara">
+              Gurdwara (optional)
+              <input
+                id="shadow-gurdwara"
+                className="disable-kb-shortcuts"
+                value={gurdwara}
+                onChange={(e) => setGurdwara(e.target.value)}
+              />
+            </label>
+          </>
+        )}
         <div className="shadow-consent-actions">
           <button
             type="button"
-            className="shadow-consent-yes"
-            disabled={!name.trim()}
+            className="shadow-consent-off"
             onClick={() => {
-              setShadowTester(
-                packTester({
-                  name: name.trim(),
-                  // Blank Gurdwara: the computer name stands in, so sessions still group.
-                  gurdwara: gurdwara.trim() || machineName(),
-                  id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-                }),
-              );
+              setShadowNotice(NOTICE_VERSION);
+              setShadowRecording(false);
+            }}
+          >
+            Turn off recording
+          </button>
+          <button
+            type="button"
+            className="shadow-consent-yes"
+            disabled={!registered && !name.trim()}
+            onClick={() => {
+              if (!registered) {
+                setShadowTester(
+                  packTester({
+                    name: name.trim(),
+                    // Blank Gurdwara: the computer name stands in, so sessions still group.
+                    gurdwara: gurdwara.trim() || machineName(),
+                    id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+                  }),
+                );
+              }
+              setShadowNotice(NOTICE_VERSION);
               setShadowRecording(true);
             }}
           >
-            I agree, continue
+            OK
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { updateViewerScale } from '../../viewer/utils';
 import ExperimentalBadge from '../../common/sttm-ui/experimental-badge';
 import { i18n } from '../../common/i18n';
+import { RecordingChip } from '../../addons/voice-follow/shadow/RecordingNotice';
 
 const remote = require('@electron/remote');
 
@@ -14,6 +15,16 @@ const WorkspaceBar = () => {
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
   const { minimizedBySingleDisplay } = useStoreState((state) => state.navigator);
   const { setCurrentWorkspace } = useStoreActions((state) => state.userSettings);
+  const { setOverlayScreen } = useStoreActions((actions) => actions.app);
+
+  // The recording chip's link: open Settings at Other Options (Voice Autopilot recording).
+  const openRecordingSetting = () => {
+    setOverlayScreen('settings');
+    setTimeout(() => {
+      const el = document.getElementById('shadow-recording');
+      if (el) el.scrollIntoView({ block: 'center' });
+    }, 300);
+  };
 
   const presenterIdentifier = i18n.t('WORKSPACES.PRESENTER');
   const singleDisplayIdentifier = i18n.t('WORKSPACES.SINGLE_DISPLAY');
@@ -54,6 +65,7 @@ const WorkspaceBar = () => {
           <span className="workspace-name"> {workspace} </span>
         </div>
       ))}
+      <RecordingChip onOpenSettings={openRecordingSetting} />
       <ExperimentalBadge className="workspace-experimental-badge" />
     </div>
   );

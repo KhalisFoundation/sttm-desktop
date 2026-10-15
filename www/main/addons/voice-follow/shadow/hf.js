@@ -29,6 +29,8 @@ let timer = null;
 let busy = false;
 let tokenFn = () => '';
 let log = () => {};
+// Recording was turned off (Settings): nothing more is pushed until start() again.
+let stopped = false;
 
 const readJson = (f, d) => {
   try {
@@ -359,7 +361,7 @@ const ready = (dir) =>
 
 async function drain() {
   const token = (tokenFn() || '').trim();
-  if (busy || !root || !token || !fs.existsSync(root)) return;
+  if (stopped || busy || !root || !token || !fs.existsSync(root)) return;
   busy = true;
   try {
     const bus = require('./bus'); // eslint-disable-line global-require
@@ -370,6 +372,7 @@ async function drain() {
       .sort();
     // eslint-disable-next-line no-restricted-syntax
     for (const dir of dirs) {
+      if (stopped) break;
       try {
         // eslint-disable-next-line no-await-in-loop
         const repo = await pushSession(dir, token);
@@ -385,6 +388,7 @@ async function drain() {
 }
 
 function start(shadowRoot, getToken, logger) {
+  stopped = false;
   root = shadowRoot;
   tokenFn = getToken || tokenFn;
   log = logger || log;
@@ -393,4 +397,11 @@ function start(shadowRoot, getToken, logger) {
   timer = setInterval(drain, TICK_MS);
 }
 
-module.exports = { start, drain, pushSession, verseCsv, collectionOf };
+// Recording turned off: stop the timer; a push already under way finishes, no new one starts.
+function stop() {
+  stopped = true;
+  clearInterval(timer);
+  timer = null;
+}
+
+module.exports = { start, stop, drain, pushSession, verseCsv, collectionOf };

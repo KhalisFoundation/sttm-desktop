@@ -38,6 +38,9 @@ let lastLive = 0;
 let hfOn = () => false; // set by start(): whether a Hugging Face key is configured
 let log = () => {};
 const queue = []; // [{ dir, file }]
+// Recording was turned off (Settings): nothing more is sent until start() again. A file
+// already being sent finishes; nothing else is queued or sent, even at quit.
+let stopped = false;
 
 const readJson = (f, d) => {
   try {
@@ -88,6 +91,7 @@ async function putFile(dir, file) {
 }
 
 function enqueue(dir, file) {
+  if (stopped) return;
   if (!queue.some((q) => q.dir === dir && q.file === file)) queue.push({ dir, file });
 }
 
@@ -123,7 +127,7 @@ function scanPending() {
 }
 
 async function drain() {
-  if (busy) return;
+  if (busy || stopped) return;
   busy = true;
   try {
     const bus = require('./bus'); // eslint-disable-line global-require
@@ -131,7 +135,7 @@ async function drain() {
       lastLive = Date.now();
       LIVE_FILES.forEach((f) => enqueue(bus.sessionDir(), f));
     }
-    while (queue.length) {
+    while (queue.length && !stopped) {
       const { dir, file } = queue[0];
       // eslint-disable-next-line no-await-in-loop
       await putFile(dir, file);
@@ -165,6 +169,7 @@ function enqueueSession(dir) {
 }
 
 function start(shadowRoot, tester, opts = {}) {
+  stopped = false;
   root = shadowRoot;
   if (opts.hfOn) hfOn = opts.hfOn;
   if (opts.log) log = opts.log;
@@ -191,4 +196,12 @@ async function flush(shadowRoot, ms) {
   ]);
 }
 
-module.exports = { start, enqueue, enqueueSession, flush };
+// Recording turned off: stop the timer and forget the queue (files stay on this computer).
+function stop() {
+  stopped = true;
+  clearInterval(timer);
+  timer = null;
+  queue.length = 0;
+}
+
+module.exports = { start, stop, enqueue, enqueueSession, flush };

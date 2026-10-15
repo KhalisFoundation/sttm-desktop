@@ -58,6 +58,27 @@ class Follower {
     this.visited = new Set();
     this.wiLine = null;
     this.maxWi = -1;
+    // Bound here: test wrappers built with Object.create(follower) must still move THIS
+    // follower, not set fields on the wrapper.
+    this.seek = this.seek.bind(this);
+  }
+
+  // The sevadaar moved the screen to `line`: follow on from there. The line memory is
+  // reset with it, or the old line's banked score pulls the cursor straight back.
+  seek(line) {
+    if (!Number.isInteger(line) || line < 0 || line >= this.linesNorm.length) return false;
+    this.score = new Float64Array(this.linesNorm.length).fill(-this.c.jumpCost);
+    this.score[line] = 0;
+    this.cur = line;
+    this.challenger = null;
+    this.dwell = 0;
+    this.initCand = null;
+    this.initCount = 0;
+    this.miss = 0;
+    this.visited.add(line);
+    this.wiLine = null;
+    this.maxWi = -1;
+    return true;
   }
 
   _greedy(emis) { return this.infer.greedy(emis); }

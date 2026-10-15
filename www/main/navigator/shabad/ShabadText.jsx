@@ -21,6 +21,8 @@ import {
   isFlowerVerse,
 } from './utils';
 
+const { listScrollAction } = require('../../addons/voice-follow/components/autopilotScreen');
+
 const baniLengthCols = {
   short: 'existsSGPC',
   medium: 'existsMedium',
@@ -48,6 +50,12 @@ export const ShabadText = ({
   const listScrollRef = useRef(null);
   // Id of the shabad/bani whose verses are currently in filteredItems.
   const loadedShabadIdRef = useRef(null);
+  // The sevadaar's own scrolling of this list (controller only): while Autopilot moves the
+  // line, a recent scroll keeps their view where it is (see listScrollAction).
+  const userScrollAtRef = useRef(0);
+  const visibleRangeRef = useRef(null);
+  const positionItemsRef = useRef(null);
+  const autopilotLive = useStoreState((state) => state.app.autopilotLive);
 
   const {
     activeVerseId,
@@ -91,6 +99,24 @@ export const ShabadText = ({
   } = useStoreActions((actions) => actions.navigator);
 
   const isAsaDiVaar = baniType === 'bani' && Number(shabadId) === ASA_DI_VAAR_BANI_ID;
+
+  // Scroll the list to a line Autopilot (or a controller) selected, unless the sevadaar is
+  // looking around the list by hand (then only the highlight moves).
+  const followToVerse = (verseId, items, behavior) => {
+    const action = listScrollAction({
+      autopilotLive,
+      lastUserScrollAt: userScrollAtRef.current,
+      now: Date.now(),
+      activeIndex: items.findIndex((v) => v.verseId === verseId),
+      range: visibleRangeRef.current,
+    });
+    if (action === 'keep') return;
+    if (action === 'resume') userScrollAtRef.current = 0;
+    scrollToVerse(verseId, items, virtuosoRef, isAsaDiVaar, behavior);
+  };
+  const markUserScroll = () => {
+    userScrollAtRef.current = Date.now();
+  };
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
@@ -260,6 +286,8 @@ export const ShabadText = ({
     // change — the display would then stay stuck on the opening verse. Position
     // drives it regardless. id-match remains the fallback for shabad and native
     // (mobile) controllers, which send a crossPlatformId but no line position.
+    const sameList = positionItemsRef.current === filteredItems;
+    positionItemsRef.current = filteredItems;
     const isPosition = baniType === 'bani' || baniType === 'ceremony';
     const positionIndex = lineNumber != null ? lineNumber - 1 : -1;
     const hasValidPosition =
@@ -283,7 +311,9 @@ export const ShabadText = ({
       updateTraversedVerse(matched.verseId, baniVerseIndex);
       // Highlighting alone doesn't move the virtualized list — scroll the
       // presenter view to the matched verse so the display actually changes.
-      scrollToVerse(matched.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
+      // A line move in the list already open respects the sevadaar's own scrolling.
+      if (sameList) followToVerse(matched.verseId, filteredItems);
+      else scrollToVerse(matched.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
     }
     // `filteredItems` is a dep so a verse that arrives after the bani finishes
     // loading (the transient `matchIdx = -1` case) is picked up on the next
@@ -325,7 +355,7 @@ export const ShabadText = ({
     ) {
       if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
         setActiveVerse({ [lineNumber - 1]: activeVerseId });
-        scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar);
+        followToVerse(activeVerseId, filteredItems);
       }
     }
   }, [
@@ -393,7 +423,7 @@ export const ShabadText = ({
     if (verseIndex >= 0) {
       // Jump straight there: a smooth scroll to a far-off verse left the list on
       // the old verse for a moment after the display had already changed.
-      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar, 'auto');
+      followToVerse(activeVerseId, filteredItems, 'auto');
       updateTraversedVerse(activeVerseId, verseIndex);
     }
   }, [activeVerseId]);
@@ -552,7 +582,20 @@ export const ShabadText = ({
 
   return (
     <div className="shabad-list">
-      <div className="verse-block" ref={isProjection ? listScrollRef : undefined}>
+      <div
+        className="verse-block"
+        ref={isProjection ? listScrollRef : undefined}
+        onWheel={isProjection ? undefined : markUserScroll}
+        onTouchMove={isProjection ? undefined : markUserScroll}
+        onPointerDown={
+          isProjection
+            ? undefined
+            : (e) => {
+                // A press on the list's scrollbar (beyond its content width) drags it.
+                if (e.nativeEvent.offsetX >= e.target.clientWidth) markUserScroll();
+              }
+        }
+      >
         {isProjection ? (
           // Full list on Display 2 — every row is in the DOM (no Virtuoso windowing).
           // Controller keeps Virtuoso for performance; projection needs last lines reachable.
@@ -570,6 +613,7 @@ export const ShabadText = ({
             ref={virtuosoRef}
             totalCount={filteredItems.length}
             rangeChanged={(range) => {
+              visibleRangeRef.current = range;
               if (projectionSource && !isProjection) {
                 ipcRenderer.send('projection-range', { paneId: currentPane, ...range });
               }

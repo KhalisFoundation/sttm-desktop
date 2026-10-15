@@ -11,7 +11,7 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
-    "test:unit": "node --test www/main/addons/voice-follow/components/ && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
+    "test:unit": "node --test www/main/addons/voice-follow/components/ www/main/addons/voice-follow/shadow/bus.test.js && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "smoke": "npm run build:local && cross-env VF_SMOKE=1 electron .",
     "debug": "npm run build:local && cross-env NODE_ENV=development electron . --remote-debugging-port=9222",
@@ -187,7 +187,7 @@
       "hardenedRuntime": true,
       "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}",
       "extendInfo": {
-        "NSMicrophoneUsageDescription": "Please give us access to your microphone for voice search",
+        "NSMicrophoneUsageDescription": "STTM uses the microphone for voice search and Voice Autopilot",
         "NSCameraUsageDescription": "Please give us access to your camera",
         "com.apple.security.device.audio-input": true,
         "com.apple.security.device.camera": true
