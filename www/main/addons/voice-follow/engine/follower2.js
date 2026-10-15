@@ -171,6 +171,22 @@ class FollowerV2 {
       this.cur = Math.min(opts.startLine, lines.length - 1);
     }
     this.tick = 0;
+    // Bound here: test wrappers built with Object.create(follower) must still move THIS
+    // follower, not set fields on the wrapper.
+    this.seek = this.seek.bind(this);
+  }
+
+  // The sevadaar moved the screen to `line`: follow on from there.
+  seek(line) {
+    if (!Number.isInteger(line) || line < 0 || line >= this.lineStart.length) return false;
+    this.cur = line;
+    this.lastCur = line;
+    this.cand = null;
+    this.ahead = 0;
+    this.noMatch = 0;
+    this.foreign = 0;
+    this.lastEnd = -1;
+    return true;
   }
 
   // Best end position in text[a..b] for an alignment that ends at the end of the heard

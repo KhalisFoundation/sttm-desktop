@@ -83,6 +83,7 @@ function createBoard(params = {}) {
         shabadId: k,
         pct: sigmoid(a * logit(ex[i] / S) + b),
         role: k === cur ? 'current' : 'candidate',
+        at: seen.get(k), // when it was last scored (the candidate list holds cards from this)
       };
     });
     // Each role is calibrated on its own, so during a change the current card and a challenger
@@ -110,7 +111,9 @@ function createBoard(params = {}) {
   function progress(list, now) {
     phase = 'searching';
     current = null;
-    progressItems = list.filter((it) => it.pct >= 0.05).map((it) => ({ ...it, role: 'candidate' }));
+    progressItems = list
+      .filter((it) => it.pct >= 0.05)
+      .map((it) => ({ ...it, role: 'candidate', at: now }));
     progressAt = now;
     if (progressItems.length) items = progressItems;
   }
@@ -130,7 +133,7 @@ function createBoard(params = {}) {
     items = top.map(([sid, v]) => {
       const row = rows && rows.get ? rows.get(sid) : null;
       if (row) remember({ shabadId: sid, verseId: row.verseId, verse: row.verse });
-      return { shabadId: sid, pct: v / total, role: 'candidate' };
+      return { shabadId: sid, pct: v / total, role: 'candidate', at: now };
     });
   }
 

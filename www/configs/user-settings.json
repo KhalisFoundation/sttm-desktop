@@ -340,6 +340,11 @@
       "initialValue": true,
       "notes": "SHADOW_RECORDING_MSG"
     },
+    "shadow-notice": {
+      "title": "SHADOW_NOTICE",
+      "dontApplyClass": true,
+      "initialValue": 0
+    },
     "shadow-tester": {
       "title": "SHADOW_TESTER",
       "dontApplyClass": true,

@@ -50,7 +50,7 @@ const SearchPane = ({ className }) => {
             onClick={() => setAutopilotEnabled(true)}
           >
             <AudioCaptureIcon />
-            <span>Autopilot</span>
+            <span>Voice Autopilot</span>
             {autopilotLive && <span className="search-pane-tab-live" title="Listening" />}
           </a>
         </div>

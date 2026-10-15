@@ -113,6 +113,13 @@ let shadowFlushed = false;
 app.on('will-quit', (e) => {
   if (shadowFlushed) return;
   shadowFlushed = true;
+  // Voice Autopilot recording turned off in Settings: nothing is uploaded, not even at quit.
+  // (Read fresh: the sevadaar may have switched it off during this run.)
+  try {
+    if (savedSettingsCamelCase().shadowRecording === false) return;
+  } catch (_) {
+    /* unreadable settings: fall through to the usual flush */
+  }
   e.preventDefault();
   try {
     // eslint-disable-next-line global-require
