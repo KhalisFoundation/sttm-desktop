@@ -68,7 +68,7 @@
     "prettier": "^3.0.3",
     "pretty-quick": "^4.2.2",
     "semver": "^7.5.4",
-    "simple-git": "^3.20.0",
+    "simple-git": "^3.32.3",
     "spectron": "^19.0.0",
     "ssh2": "^1.11.0",
     "stylelint": "^14.9.1",
