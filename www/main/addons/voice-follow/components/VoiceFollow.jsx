@@ -3198,6 +3198,124 @@ const VoiceFollow = () => {
           }
         }
       }
+      // --- Fragment confirm (fragmentConfirm.js): short pieces of the next pangti, scored
+      // against every Shabad on the board; the panel shows the weight rising. ---
+      if (
+        PANKTI_FRAGMENT_CONFIRM > 0 &&
+        autopilotRef.current &&
+        phaseRef.current === 'following' &&
+        !lockingRef.current &&
+        currentShabadIdRef.current != null &&
+        baniIdOf(currentShabadIdRef.current) == null
+      ) {
+        // Runs here, before the first-letter gate below: a piece of one or two words (the case
+        // that matters: a slow pangti heard in 5-9 letter pieces) never reaches the judge.
+        const curId = currentShabadIdRef.current;
+        const hypFull = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+        {
+          const fr = fragRef.current;
+          if (fr.cur !== curId || fr.session !== session) {
+            fr.cur = curId;
+            fr.session = session;
+            fr.store = new Map();
+          }
+          fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
+          const nowMs = Date.now();
+          const change = shelfRef.current.changeCard(nowMs);
+          const ids = [];
+          const addId = (id, role) => {
+            if (id == null || id === curId || ids.some((x) => x.id === id)) return;
+            if (vetoRef.current && vetoRef.current.id === id) return;
+            if (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id)) return;
+            if (knownSame(curId, id)) return;
+            ids.push({ id, role });
+          };
+          if (change) addId(change.shabadId, 'change');
+          boardRef.current
+            .evidenceSnapshot(nowMs)
+            .slice(0, PC_FRAGMENT_CANDS)
+            .forEach((e) => addId(e.shabadId, 'list'));
+          [switchCandRef.current, backstopRef.current, returnSlotRef.current].forEach(
+            (slot) => slot && addId(slot.shabadId, 'list'),
+          );
+          const cands = [];
+          let loads = 0;
+          ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
+            const prof = lineCacheRef.current.get(id);
+            if (prof && prof.linesNorm) cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+            else if (!lineCacheRef.current.has(id) && loads < 2) {
+              loads += 1;
+              if (lineCacheRef.current.size >= BACKSTOP_CACHE_MAX) {
+                const oldest = lineCacheRef.current.keys().next();
+                if (!oldest.done) lineCacheRef.current.delete(oldest.value);
+              }
+              const cache = lineCacheRef.current;
+              const pendingProfile = {};
+              cache.set(id, pendingProfile);
+              loadShabadProfile(id)
+                .then((q) => {
+                  if (
+                    session === sessionRef.current &&
+                    cache === lineCacheRef.current &&
+                    cache.get(id) === pendingProfile
+                  )
+                    cache.set(id, q);
+                })
+                .catch(() => {
+                  if (cache.get(id) === pendingProfile) cache.delete(id);
+                });
+            }
+          });
+          const r = fragStep(
+            fr.store,
+            { hyp: hypFull, cur: { linesNorm: curLinesNormRef.current }, cands },
+            partialRatio,
+            PC_FRAGMENT,
+          );
+          if (r.hits.length) {
+            const named = r.hits.map((h) => {
+              const c = cands.find((x) => x.id === h.id);
+              const v = (c && c.prof.verses[h.index]) || {};
+              return {
+                shabadId: h.id,
+                verseId: v.verseId,
+                line: (c && c.prof.displayLines[h.index]) || '',
+                score: h.s,
+              };
+            });
+            boardRef.current.fragments({ now: nowMs, cur: curId, sCur: r.sCur, cands: named });
+            sessionLog.logEvent('pc_fragment', {
+              session: sessionIdRef.current,
+              cur: curId,
+              heard: hypFull.length,
+              hits: r.hits.map((h) => ({ id: h.id, index: h.index, s: +h.s.toFixed(2), w: h.w })),
+              ready: r.ready,
+            });
+          }
+          if (
+            r.ready &&
+            !lockingRef.current &&
+            session === sessionRef.current &&
+            recognizingRef.current &&
+            phaseRef.current === 'following' &&
+            currentShabadIdRef.current === curId
+          ) {
+            const c = cands.find((x) => x.id === r.ready.id);
+            const v = (c && c.prof.verses[r.ready.index]) || {};
+            if (v.verseId) {
+              if (SHADOW_BUILD) diag(`vf fragment confirm -> ${r.ready.id}`);
+              fr.store = new Map();
+              await autopilotLock({
+                shabadId: r.ready.id,
+                verseId: v.verseId,
+                verse: c.prof.displayLines[r.ready.index],
+              });
+              return;
+            }
+          }
+        }
+      }
+
       // Search uses ASCII-font first letters (the DB's FirstLetterStr encoding).
       // The recognizer's unverified text is never a display or canonical source.
       const fl = toAsciiFirstLetters(text);
@@ -3765,104 +3883,6 @@ const VoiceFollow = () => {
               }
             }
           } else if (returnSlotRef.current) returnSlotRef.current = null;
-        }
-
-        // --- Fragment confirm (fragmentConfirm.js): short pieces of the next pangti, scored
-        // against every Shabad on the board; the panel shows the weight rising. ---
-        if (PANKTI_FRAGMENT_CONFIRM > 0 && baniIdOf(curId) == null) {
-          const fr = fragRef.current;
-          if (fr.cur !== curId || fr.session !== session) {
-            fr.cur = curId;
-            fr.session = session;
-            fr.store = new Map();
-          }
-          fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
-          const nowMs = Date.now();
-          const change = shelfRef.current.changeCard(nowMs);
-          const ids = [];
-          const addId = (id, role) => {
-            if (id == null || id === curId || ids.some((x) => x.id === id)) return;
-            if (vetoRef.current && vetoRef.current.id === id) return;
-            if (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id)) return;
-            if (knownSame(curId, id)) return;
-            ids.push({ id, role });
-          };
-          if (change) addId(change.shabadId, 'change');
-          boardRef.current
-            .evidenceSnapshot(nowMs)
-            .slice(0, PC_FRAGMENT_CANDS)
-            .forEach((e) => addId(e.shabadId, 'list'));
-          [switchCandRef.current, backstopRef.current, returnSlotRef.current].forEach(
-            (slot) => slot && addId(slot.shabadId, 'list'),
-          );
-          const cands = [];
-          let loads = 0;
-          ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
-            const prof = lineCacheRef.current.get(id);
-            if (prof && prof.linesNorm) cands.push({ id, role, linesNorm: prof.linesNorm, prof });
-            else if (!lineCacheRef.current.has(id) && loads < 2) {
-              loads += 1;
-              if (lineCacheRef.current.size >= BACKSTOP_CACHE_MAX) {
-                const oldest = lineCacheRef.current.keys().next();
-                if (!oldest.done) lineCacheRef.current.delete(oldest.value);
-              }
-              const cache = lineCacheRef.current;
-              const pendingProfile = {};
-              cache.set(id, pendingProfile);
-              loadShabadProfile(id)
-                .then((q) => {
-                  if (
-                    session === sessionRef.current &&
-                    cache === lineCacheRef.current &&
-                    cache.get(id) === pendingProfile
-                  )
-                    cache.set(id, q);
-                })
-                .catch(() => {
-                  if (cache.get(id) === pendingProfile) cache.delete(id);
-                });
-            }
-          });
-          const r = fragStep(
-            fr.store,
-            { hyp: hypFull, cur: { linesNorm: curLinesNormRef.current }, cands },
-            partialRatio,
-            PC_FRAGMENT,
-          );
-          if (r.hits.length) {
-            const named = r.hits.map((h) => {
-              const c = cands.find((x) => x.id === h.id);
-              const v = (c && c.prof.verses[h.index]) || {};
-              return {
-                shabadId: h.id,
-                verseId: v.verseId,
-                line: (c && c.prof.displayLines[h.index]) || '',
-                score: h.s,
-              };
-            });
-            boardRef.current.fragments({ now: nowMs, cur: curId, sCur: sCurFull, cands: named });
-            sessionLog.logEvent('pc_fragment', {
-              session: sessionIdRef.current,
-              cur: curId,
-              heard: hypFull.length,
-              hits: r.hits.map((h) => ({ id: h.id, index: h.index, s: +h.s.toFixed(2), w: h.w })),
-              ready: r.ready,
-            });
-          }
-          if (r.ready && !lockingRef.current) {
-            const c = cands.find((x) => x.id === r.ready.id);
-            const v = (c && c.prof.verses[r.ready.index]) || {};
-            if (v.verseId) {
-              if (SHADOW_BUILD) diag(`vf fragment confirm -> ${r.ready.id}`);
-              fr.store = new Map();
-              await autopilotLock({
-                shabadId: r.ready.id,
-                verseId: v.verseId,
-                verse: c.prof.displayLines[r.ready.index],
-              });
-              return;
-            }
-          }
         }
 
         // --- Panel feed: every candidate the judge scored this decode. ---
