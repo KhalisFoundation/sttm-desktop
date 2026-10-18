@@ -71,6 +71,13 @@ describe('fragment confirm', () => {
     assert.equal(r.hits.length, 0);
   });
 
+  it('a short piece must be found verbatim in the pangti; a longer one may differ a little', () => {
+    const s = new Map();
+    assert.equal(run(s, 'ਵੇਭਲੀ').hits.length, 0); // 5 letters, fits pangti 1 at 0.8 by chance
+    assert.equal(run(s, 'ਦੂਜਾਣ').hits.length, 1); // 5 letters, verbatim in pangti 2
+    assert.equal(run(s, 'ਭਲੀਜੇਚੁਕੀਸ').hits.length, 1); // 10 letters, one letter off
+  });
+
   it('pieces shorter than five letters are ignored', () => {
     const s = new Map();
     assert.equal(run(s, 'ਭਲੀ').hits.length, 0);
