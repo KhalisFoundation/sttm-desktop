@@ -4164,6 +4164,16 @@ const VoiceFollow = () => {
       }
     }
     if (running) stop();
+    // Clear what the hidden run left in the panel before it becomes visible: otherwise the
+    // panel showed the hidden run's Shabad and candidates for a moment (a tall card that then
+    // shrank to "Finding") until the new run's microphone start cleared them.
+    setCurrentView(null);
+    setPos(null);
+    rankedViewRef.current = 0;
+    setRankedView([]);
+    setLiveCands({ sCur: 0, items: [] });
+    setBoard([]);
+    resetShelf();
     visibleRef.current = true;
     // A shadow session starts now if none is running, so this whole run is recorded.
     window.dispatchEvent(new CustomEvent('vf-shadow-start'));
