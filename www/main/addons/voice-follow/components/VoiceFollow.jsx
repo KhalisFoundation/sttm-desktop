@@ -68,6 +68,7 @@ const { screenTakenByCeremony } = require('./autopilotScreen');
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
+const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
 
 // maxLineScore lives in ./switchPolicy (same implementation, unit-tested there)
 // so the benchmarked length-penalty math is shared, not duplicated.
@@ -300,6 +301,30 @@ const PC_FOLLOW_UNIQUE = 0;
 // holds the count (no win, no loss). 0 = off.
 const PANKTI_SHARED_HOLD = 0;
 const PC_SHARED_HOLD_MARGIN = 0.05;
+// Fragment confirm (fragmentConfirm.js; owner, Oct 18: "if it's any of the options it should increase
+// the weight of that option"): while following, every short piece heard (>= PC_FRAGMENT.minLetters
+// letters) is matched against the pangtis of each Shabad on the board (the "Changing to" card and
+// the Possible new Shabads list, at most PC_FRAGMENT_CANDS of them). A piece that fits a pangti of
+// a board Shabad at >= minScore and beats the Shabad on screen by >= minMargin adds weight to it
+// (little when the pangti also fits another board Shabad; nothing when it fits the Shabad on
+// screen); the panel's evidence bars show the weight rising. The "Changing to" Shabad confirms
+// (the screen switches) on 2 different pangtis, a listed one on 3. Pauses freeze the weights.
+// Additive: the acoustic switch judge and Pankti Cumulation (switch) are unchanged. 0 = off.
+const PANKTI_FRAGMENT_CONFIRM = 0;
+const PC_FRAGMENT_CANDS = 5;
+const PC_FRAGMENT = {
+  minLetters: 5,
+  minScore: 0.8,
+  minMargin: 0.25,
+  sharedW: 0.2,
+  repeat: 0.15,
+  cap: 1.5,
+  tauS: 90,
+  distinctChange: 2,
+  distinctList: 3,
+  lock: 1.6,
+  minLineLetters: 8,
+};
 // Mool Mantar home (ported from cycle 12): the Mool Mantar begins dozens of shabads, so
 // it ties exactly and never locks, leaving nothing on screen. After this many distinct
 // heard fragments that tie between Japji's Mool Mantar and other shabads, show Japji's
@@ -1117,6 +1142,7 @@ const VoiceFollow = () => {
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
   const vetoRef = useRef(null); // { id, left }: shabad a tap just left, and judged decodes remaining
   const kfSwitchRef = useRef({ cur: null, session: null, store: new Map(), last: '' }); // PANKTI_CUMULATION_SWITCH
+  const fragRef = useRef({ cur: null, session: null, store: new Map() }); // PANKTI_FRAGMENT_CONFIRM
   const baniLengthRef = useRef('short');
   baniLengthRef.current = baniLength;
   // The user's own length (what they chose), even while Rehras has it raised (by this run,
@@ -3739,6 +3765,104 @@ const VoiceFollow = () => {
               }
             }
           } else if (returnSlotRef.current) returnSlotRef.current = null;
+        }
+
+        // --- Fragment confirm (fragmentConfirm.js): short pieces of the next pangti, scored
+        // against every Shabad on the board; the panel shows the weight rising. ---
+        if (PANKTI_FRAGMENT_CONFIRM > 0 && baniIdOf(curId) == null) {
+          const fr = fragRef.current;
+          if (fr.cur !== curId || fr.session !== session) {
+            fr.cur = curId;
+            fr.session = session;
+            fr.store = new Map();
+          }
+          fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
+          const nowMs = Date.now();
+          const change = shelfRef.current.changeCard(nowMs);
+          const ids = [];
+          const addId = (id, role) => {
+            if (id == null || id === curId || ids.some((x) => x.id === id)) return;
+            if (vetoRef.current && vetoRef.current.id === id) return;
+            if (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id)) return;
+            if (knownSame(curId, id)) return;
+            ids.push({ id, role });
+          };
+          if (change) addId(change.shabadId, 'change');
+          boardRef.current
+            .evidenceSnapshot(nowMs)
+            .slice(0, PC_FRAGMENT_CANDS)
+            .forEach((e) => addId(e.shabadId, 'list'));
+          [switchCandRef.current, backstopRef.current, returnSlotRef.current].forEach(
+            (slot) => slot && addId(slot.shabadId, 'list'),
+          );
+          const cands = [];
+          let loads = 0;
+          ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
+            const prof = lineCacheRef.current.get(id);
+            if (prof && prof.linesNorm) cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+            else if (!lineCacheRef.current.has(id) && loads < 2) {
+              loads += 1;
+              if (lineCacheRef.current.size >= BACKSTOP_CACHE_MAX) {
+                const oldest = lineCacheRef.current.keys().next();
+                if (!oldest.done) lineCacheRef.current.delete(oldest.value);
+              }
+              const cache = lineCacheRef.current;
+              const pendingProfile = {};
+              cache.set(id, pendingProfile);
+              loadShabadProfile(id)
+                .then((q) => {
+                  if (
+                    session === sessionRef.current &&
+                    cache === lineCacheRef.current &&
+                    cache.get(id) === pendingProfile
+                  )
+                    cache.set(id, q);
+                })
+                .catch(() => {
+                  if (cache.get(id) === pendingProfile) cache.delete(id);
+                });
+            }
+          });
+          const r = fragStep(
+            fr.store,
+            { hyp: hypFull, cur: { linesNorm: curLinesNormRef.current }, cands },
+            partialRatio,
+            PC_FRAGMENT,
+          );
+          if (r.hits.length) {
+            const named = r.hits.map((h) => {
+              const c = cands.find((x) => x.id === h.id);
+              const v = (c && c.prof.verses[h.index]) || {};
+              return {
+                shabadId: h.id,
+                verseId: v.verseId,
+                line: (c && c.prof.displayLines[h.index]) || '',
+                score: h.s,
+              };
+            });
+            boardRef.current.fragments({ now: nowMs, cur: curId, sCur: sCurFull, cands: named });
+            sessionLog.logEvent('pc_fragment', {
+              session: sessionIdRef.current,
+              cur: curId,
+              heard: hypFull.length,
+              hits: r.hits.map((h) => ({ id: h.id, index: h.index, s: +h.s.toFixed(2), w: h.w })),
+              ready: r.ready,
+            });
+          }
+          if (r.ready && !lockingRef.current) {
+            const c = cands.find((x) => x.id === r.ready.id);
+            const v = (c && c.prof.verses[r.ready.index]) || {};
+            if (v.verseId) {
+              if (SHADOW_BUILD) diag(`vf fragment confirm -> ${r.ready.id}`);
+              fr.store = new Map();
+              await autopilotLock({
+                shabadId: r.ready.id,
+                verseId: v.verseId,
+                verse: c.prof.displayLines[r.ready.index],
+              });
+              return;
+            }
+          }
         }
 
         // --- Panel feed: every candidate the judge scored this decode. ---
