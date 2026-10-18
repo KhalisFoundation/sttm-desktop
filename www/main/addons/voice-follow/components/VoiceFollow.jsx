@@ -305,7 +305,8 @@ const PC_SHARED_HOLD_MARGIN = 0.05;
 // the weight of that option"): while following, every short piece heard (>= PC_FRAGMENT.minLetters
 // letters) is matched against the pangtis of each Shabad on the board (the "Changing to" card and
 // the Possible new Shabads list, at most PC_FRAGMENT_CANDS of them). A piece that fits a pangti of
-// a board Shabad at >= minScore and beats the Shabad on screen by >= minMargin adds weight to it
+// a board Shabad at >= minScore (verbatim when shorter than shortLetters) and beats the Shabad on
+// screen by >= minMargin adds weight to it
 // (little when the pangti also fits another board Shabad; nothing when it fits the Shabad on
 // screen); the panel's evidence bars show the weight rising. The "Changing to" Shabad confirms
 // (the screen switches) on 2 different pangtis, a listed one on 3. Pauses freeze the weights.
@@ -315,6 +316,8 @@ const PC_FRAGMENT_CANDS = 5;
 const PC_FRAGMENT = {
   minLetters: 5,
   minScore: 0.8,
+  shortLetters: 8,
+  shortScore: 1.0,
   minMargin: 0.25,
   sharedW: 0.2,
   repeat: 0.15,

@@ -10,6 +10,8 @@
 // >= `minScore` and beats the best pangti of the Shabad on screen by >= `minMargin` adds weight to X.
 //   - a pangti unique to X adds full weight; a pangti that also fits another board candidate adds
 //     `sharedW` (little);
+//   - a piece shorter than `shortLetters` letters must be found verbatim in the pangti (`shortScore`):
+//     a 5-letter piece fits some pangti of most Shabads at 0.8 by chance;
 //   - a piece that fits the Shabad on screen too (its best pangti >= minScore) adds nothing;
 //   - the same pangti again only tops up by `repeat`: different pangtis are what count;
 //   - the weights fade with a time constant of `tauS` seconds of SUNG audio; a quiet decode freezes
@@ -21,6 +23,8 @@
 const DEFAULTS = {
   minLetters: 5,
   minScore: 0.8,
+  shortLetters: 8, // a piece shorter than this must be found verbatim in the pangti (fit 1.0) ...
+  shortScore: 1.0, // ... (a 5-letter piece fits some pangti of most Shabads at 0.8 by chance)
   minMargin: 0.25,
   sharedW: 0.2,
   repeat: 0.15,
@@ -74,9 +78,10 @@ function step(store, { hyp, cur, cands }, ratio, cfg = DEFAULTS) {
   const sCur = cur ? bestPangti(hyp, cur.linesNorm, ratio, cfg).s : 0;
   out.sCur = sCur;
   if (sCur >= cfg.minScore) return out; // fits the Shabad on screen too: no evidence either way
+  const need = hyp.length < cfg.shortLetters ? cfg.shortScore : cfg.minScore;
   const fits = cands
     .map((c) => ({ c, m: bestPangti(hyp, c.linesNorm, ratio, cfg) }))
-    .filter(({ m }) => m.index >= 0 && m.s >= cfg.minScore && m.s - sCur >= cfg.minMargin);
+    .filter(({ m }) => m.index >= 0 && m.s >= need && m.s - sCur >= cfg.minMargin);
   fits.forEach(({ c, m }) => {
     const shared = fits.some((o) => o.c.id !== c.id);
     const w = shared ? cfg.sharedW : 1;
