@@ -92,11 +92,11 @@ export const RecordingChip = ({ onOpenSettings }) => {
         onClick={() => setOpen(!open)}
       >
         <span className="shadow-rec-dot" />
-        {recording ? 'Recording audio' : 'Mic on'}
+        {recording ? 'Recording Audio' : 'Mic On'}
       </button>
       {open && (
         <div className="shadow-rec-pop" role="dialog" aria-label="Voice Autopilot recording">
-          <h4>{recording ? 'Recording audio' : 'Mic on, waiting for a program'}</h4>
+          <h4>{recording ? 'Recording Audio' : 'Mic On, waiting for a program'}</h4>
           <ShortNotice />
           <button
             type="button"
