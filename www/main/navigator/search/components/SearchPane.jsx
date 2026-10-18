@@ -8,6 +8,7 @@ import SearchHeader from './SearchHeader';
 import { classNames } from '../../../common/utils';
 import { setAutopilotSlot } from '../../../addons/voice-follow/components/autopilotSlot';
 import AudioCaptureIcon from '../../../addons/voice-follow/components/AudioCaptureIcon';
+import AutopilotIntro from '../../../addons/voice-follow/components/AutopilotIntro';
 
 const { SHADOW_BUILD } = require('../../../addons/voice-follow/shadow/config');
 
@@ -52,6 +53,7 @@ const SearchPane = ({ className }) => {
             <AudioCaptureIcon />
             <span>Voice Autopilot</span>
             {autopilotLive && <span className="search-pane-tab-live" title="Listening" />}
+            {!isAutopilot && <AutopilotIntro onStart={() => setAutopilotEnabled(true)} />}
           </a>
         </div>
       )}
