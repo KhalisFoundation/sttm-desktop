@@ -312,7 +312,7 @@ const PC_SHARED_HOLD_MARGIN = 0.05;
 // nominated by the full-text search, below) confirms on 2 different pangtis, a listed one on 3.
 // Pauses freeze the weights.
 // Additive: the acoustic switch judge and Pankti Cumulation (switch) are unchanged. 0 = off.
-const PANKTI_FRAGMENT_CONFIRM = 0;
+const PANKTI_FRAGMENT_CONFIRM = 1;
 const PC_FRAGMENT_CANDS = 6;
 const PC_FRAGMENT_CACHE = 12; // candidate line profiles kept for this rule (its own cache: the judge's is untouched)
 // A heard line of PC_SWITCH_MIN_LETTERS+ letters whose top Shabad over all Gurbani leads the next by
