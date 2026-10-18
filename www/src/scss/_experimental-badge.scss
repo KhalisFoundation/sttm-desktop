@@ -17,14 +17,26 @@
   white-space: nowrap;
 }
 
-.workspace-bar .workspace-experimental-badge {
-  cursor: help;
+// Right end of the workspace bar: the Voice Autopilot recording chip, then this badge, with a gap so
+// they never overlap. The bar styles every div as a tab, so the group undoes that.
+.workspace-bar .workspace-bar-right {
+  align-items: center;
+  cursor: default;
+  display: flex;
+  gap: 16px;
   height: auto;
   min-width: 0;
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 20;
+}
+
+.workspace-bar .workspace-experimental-badge {
+  cursor: help;
+  height: auto;
+  min-width: 0;
 }
 
 // Top-right of the external viewer window: the logo sits bottom-left and autoplay bottom-right.

@@ -65,8 +65,11 @@ const WorkspaceBar = () => {
           <span className="workspace-name"> {workspace} </span>
         </div>
       ))}
-      <RecordingChip onOpenSettings={openRecordingSetting} />
-      <ExperimentalBadge className="workspace-experimental-badge" />
+      {/* Right end of the bar: recording chip, then the Experimental badge, side by side */}
+      <div className="workspace-bar-right">
+        <RecordingChip onOpenSettings={openRecordingSetting} />
+        <ExperimentalBadge className="workspace-experimental-badge" />
+      </div>
     </div>
   );
 };

@@ -594,10 +594,7 @@ $vf2-yellow-bar: #f2c200;
 // of the window buttons and the navigator sidebar. The bar styles every div as a 200px tab, so
 // the chip and its popover undo that.
 .workspace-bar .shadow-rec {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   height: auto;
   min-width: 0;
   line-height: normal;
