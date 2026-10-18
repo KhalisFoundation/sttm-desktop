@@ -6,9 +6,11 @@
 // kept to fades and short slides so nothing jumps.
 // ---------------------------------------------------------------------------
 $vf2-orange: #f39c1d;
-$vf2-ink: #222;
-$vf2-muted: #6b6b6b;
-$vf2-faint: #9a9a9a;
+// Text meets WCAG AA (4.5:1) on the white card: ink 18.9:1, muted 6.7:1, faint 5.1:1.
+$vf2-ink: #111;
+$vf2-muted: #5c5c5c;
+$vf2-faint: #6e6e6e;
+$vf2-amber-text: #9a5a00; // orange text on white (5.5:1); the orange itself is 2.2:1
 $vf2-line: #ececec;
 $vf2-green: #43ac6a;
 $vf2-red: #d64545;
@@ -47,7 +49,7 @@ $vf2-yellow-bar: #f2c200;
   white-space: nowrap;
   min-width: 0;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $vf2-muted;
@@ -211,7 +213,7 @@ $vf2-yellow-bar: #f2c200;
 }
 .vf2-cand-pct {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: $vf2-muted;
   font-variant-numeric: tabular-nums;
   .is-checking &,
@@ -235,6 +237,8 @@ $vf2-yellow-bar: #f2c200;
 }
 // Live board: calibrated percentages that move with the evidence (red -> yellow -> green).
 .vf2-live-pct {
+  // Hue from the value (red -> yellow -> green); lightness kept dark enough for AA text.
+  color: #{'hsl(var(--pt-h, 4) 80% 28%)'};
   flex: none;
   margin-left: auto;
   font-size: 12px;
@@ -243,15 +247,6 @@ $vf2-yellow-bar: #f2c200;
   text-transform: none;
   font-variant-numeric: tabular-nums;
   transition: color 0.25s ease;
-  &.is-low {
-    color: $vf2-red;
-  }
-  &.is-mid {
-    color: $vf2-yellow;
-  }
-  &.is-high {
-    color: $vf2-green;
-  }
 }
 .vf2-now .vf2-cand-track {
   margin-top: 8px;
@@ -292,11 +287,25 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   font-size: 0.82em;
   line-height: 1.35;
-  color: var(--vf-ink);
-  opacity: 0.62; // darker than before, still clearly below the current pangti
+  color: var(--vf-muted); // AA in both themes, still clearly below the current pangti
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+// Last pangti of the Shabad: the next-pangti row says so, quietly, in the same place.
+.vf2-next-line.is-end {
+  font-family: $body-font-family;
+  font-size: 12px !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vf-faint);
+  animation: vf2-fade 0.28s ease-out;
+  > .vf2-next-mark {
+    height: 3px;
+    width: 14px;
+    border-radius: 2px;
+  }
 }
 // The next pangti and Stop share one row under the current pangti.
 .vf2-next-row {
@@ -350,7 +359,7 @@ $vf2-yellow-bar: #f2c200;
   color: #fff;
   font-family: $body-font-family;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   background: #d64541;
   cursor: pointer;
@@ -390,7 +399,7 @@ $vf2-yellow-bar: #f2c200;
 .vf2-heard-label {
   flex: none;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: $vf2-faint;
@@ -516,6 +525,57 @@ $vf2-yellow-bar: #f2c200;
       height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
       background 0.6s ease;
   }
+}
+// "Changing to": an amber rail on the left edge, like the Following card's, in the colour of
+// its dot. The rail fills bottom-to-top with the progress toward the switch (each winning
+// decode is a step), so a Shabad is seen building up to being chosen. Same in every style.
+.vf-autopilot .vf2-change.is-changing {
+  padding-left: 18px;
+  cursor: pointer;
+  border-color: rgba(243, 156, 29, 0.45);
+  transition: border-color 0.4s ease;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+  }
+  &::before {
+    top: 0;
+    background: rgba(243, 156, 29, 0.2);
+  }
+  &::after {
+    height: var(--prog, 6%);
+    background: $vf2-orange;
+    transition:
+      height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.4s ease;
+  }
+  &.is-confirming {
+    border-color: $vf2-orange;
+  }
+  // The judge let go a moment ago: the card waits briefly before it goes back to the list.
+  &.is-held::after {
+    opacity: 0.55;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 2px;
+  }
+}
+// The change card and the list share one box so cards can glide between them (FlipScope).
+.vf2-flip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  > * {
+    flex-shrink: 0;
+  }
+}
+.vf2-shabad-row {
+  will-change: transform;
 }
 // clean: nothing on the card; colour only in the number and the bar.
 // Heartbeat: a slow, faint breath of the current card on a decode that matched well.
@@ -800,7 +860,8 @@ $vf2-yellow-bar: #f2c200;
   --vf-muted: #{$vf2-muted};
   --vf-faint: #{$vf2-faint};
   --vf-line: #{$vf2-line};
-  --vf-accent: #{darken($vf2-orange, 12%)};
+  --vf-accent: #{$vf2-amber-text};
+  --vf-amber: #{$vf2-orange};
 
   display: flex;
   flex-direction: column;
@@ -1060,11 +1121,20 @@ $vf2-yellow-bar: #f2c200;
   padding: 9px 16px;
   border-top: 1px solid var(--vf-line);
   animation: vf2-fade 0.28s ease-out;
-  transition: opacity 0.6s ease;
+  transition: color 0.6s ease;
 
-  // No new match for a while: the card stays (still tappable) but fades before it goes.
+  // No new match for a while: the card stays (still tappable) and fades before it goes.
+  // The text only steps down to the muted colour (still AA); the bar and % dim.
   &.is-fading {
-    opacity: 0.45;
+    .vf2-cand-line {
+      color: var(--vf-muted);
+    }
+    .vf2-live-fill {
+      opacity: 0.45;
+    }
+    .vf2-live-pct {
+      color: var(--vf-muted) !important;
+    }
   }
 
   .vf2-cand-line {
@@ -1081,6 +1151,15 @@ $vf2-yellow-bar: #f2c200;
   }
   .vf2-live-fill {
     background: $vf2-orange !important;
+    transition:
+      width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.6s ease !important;
+  }
+  // The bar: how close the Shabad is to being chosen.
+  .vf2-prog {
+    flex: none;
+    display: flex;
+    align-items: center;
   }
   .vf2-live-pct {
     min-width: 3.4em;
@@ -1096,7 +1175,7 @@ $vf2-yellow-bar: #f2c200;
   border: 0;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--vf-ink);
   background: rgba(127, 127, 127, 0.14);
   cursor: pointer;
@@ -1179,7 +1258,7 @@ $vf2-yellow-bar: #f2c200;
   border-radius: 12px;
   font-family: $body-font-family;
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   &.is-none {
     color: #b8322a;
@@ -1434,6 +1513,232 @@ $vf2-yellow-bar: #f2c200;
 .dark-theme .search-pane-tab .vf-intro-later {
   background: #444;
   color: #ddd;
+// Shabad-level evidence on a card: the pangtis heard from that Shabad as chips (filled = heard
+// clearly, half = weakly), and one bar toward the switch with a tick at the switch line.
+.vf2-row-main,
+.vf2-change-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 0.35em;
+}
+.vf2-change-main {
+  margin-top: 0.3em;
+}
+.vf2-chips {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45em;
+  font-size: 1em;
+  line-height: 1;
+}
+.vf2-chip {
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  border-radius: 50%;
+  border: 2px solid $vf2-orange;
+  animation: vf2-chip-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  &.is-clear {
+    background: $vf2-orange;
+  }
+  &.is-weak {
+    background: linear-gradient(90deg, $vf2-orange 50%, transparent 50%);
+  }
+  // matched only faintly so far: an outline, so the Shabad is seen early without claiming much
+  &.is-faint {
+    background: transparent;
+  }
+}
+.vf2-chips-more {
+  font-size: 0.75em;
+  font-weight: 700;
+  color: var(--vf-muted);
+}
+@keyframes vf2-chip-in {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.vf2-ev-bar {
+  position: relative;
+  flex: none;
+  width: 140px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--vf-line);
+  overflow: visible;
+  .vf2-ev-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 4px;
+    background: rgba(243, 156, 29, 0.7);
+    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  &.is-over .vf2-ev-fill {
+    background: $vf2-orange;
+  }
+  .vf2-ev-tick {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: var(--vf-muted);
+  }
+}
+.vf2-shabad-row.has-ev {
+  transition: none;
+}
+
+// ---------------------------------------------------------------------------
+// Scale with the panel (2026-10). The Autopilot tab is often a large part of the screen and
+// the cards used only its top third: every size below follows the panel's width and height
+// (container query units on the running panel), between a floor that keeps a small laptop
+// panel as it was and a ceiling for a very large one. Sizes depend only on the panel, never
+// on what is listed, so nothing jumps when candidates come and go; the Following card keeps
+// one height for the same reason, and that height grows with the panel.
+// ---------------------------------------------------------------------------
+.vf-autopilot.is-active {
+  container-type: size;
+
+  > .vf2-body {
+    gap: clamp(12px, 2.2cqh, 22px);
+    padding: clamp(16px, 2.6cqh, 28px) clamp(16px, 2.2cqw, 30px);
+  }
+  .vf2-flip {
+    gap: clamp(12px, 2.2cqh, 22px);
+  }
+  .vf2-label {
+    gap: 0.55em;
+    font-size: clamp(11px, #{'min(1.2cqw, 2.4cqh)'}, 15px);
+  }
+  .vf2-dot {
+    width: 0.65em;
+    height: 0.65em;
+  }
+  .vf2-label .vf2-live-pct {
+    font-size: clamp(12px, #{'min(1.7cqw, 3.4cqh)'}, 22px);
+  }
+
+  // Following: the current pangti about twice as large on a big panel.
+  // The card is a column: the pangti takes the free height, centred, so a taller card only
+  // adds air around it. With nothing else to show, the card grows to use the panel (eased,
+  // the text keeps its size); it eases back when a candidate appears.
+  .vf2-now {
+    display: flex;
+    flex-direction: column;
+    min-height: clamp(0px, 30cqh, 340px);
+    padding: clamp(12px, 2.6cqh, 26px) clamp(14px, 2cqw, 28px);
+    transition:
+      min-height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+      border-color 0.45s ease;
+    > .vf2-line {
+      flex: 1 0 auto;
+      display: flex;
+      align-items: center;
+    }
+  }
+  > .vf2-body.is-quiet .vf2-now {
+    min-height: clamp(0px, 56cqh, 640px);
+  }
+  &[data-vf-cards='rail'] .vf2-now {
+    padding-left: clamp(18px, 2.4cqw, 32px);
+  }
+  &[data-vf-cards='rail'] .vf2-now::before {
+    width: clamp(5px, 0.6cqw, 8px);
+  }
+  .vf2-line {
+    margin-top: 0.3em;
+    font-size: clamp(20px, #{'min(4cqw, 7.5cqh)'}, 46px);
+    line-height: 1.3;
+  }
+  .vf2-next-row {
+    gap: 0.9em;
+    margin-top: 0.35em;
+    .vf2-next-line {
+      font-size: clamp(15px, #{'min(2.5cqw, 4.6cqh)'}, 28px);
+    }
+    .vf2-next-line.is-end {
+      font-size: clamp(12px, #{'min(1.3cqw, 2.5cqh)'}, 15px) !important;
+    }
+  }
+  .vf2-stop {
+    font-size: clamp(12.5px, #{'min(1.4cqw, 2.8cqh)'}, 17px);
+    padding: 0.42em 1.05em;
+    border-radius: 1.2em;
+    .fa {
+      font-size: 0.72em;
+    }
+  }
+
+  // Changing to
+  .vf2-change {
+    padding: clamp(10px, 2cqh, 20px) clamp(12px, 1.8cqw, 24px);
+  }
+  .vf2-change.is-changing {
+    padding-left: clamp(18px, 2.4cqw, 32px);
+    &::before,
+    &::after {
+      width: clamp(5px, 0.6cqw, 8px);
+    }
+  }
+  .vf2-change .vf2-cand-line {
+    font-size: clamp(16px, #{'min(2.9cqw, 5.2cqh)'}, 32px);
+    margin-top: 0.3em;
+  }
+
+  // Possible new Shabads
+  .vf2-shabads-head {
+    padding: clamp(12px, 2cqh, 18px) clamp(16px, 2cqw, 26px) clamp(10px, 1.6cqh, 14px);
+    font-size: clamp(11px, #{'min(1.2cqw, 2.3cqh)'}, 14px);
+  }
+  .vf2-shabads .vf2-empty {
+    padding: 0 clamp(16px, 2cqw, 26px) clamp(12px, 2cqh, 18px);
+    font-size: clamp(12px, #{'min(1.4cqw, 2.7cqh)'}, 16px);
+  }
+  .vf2-shabad-row {
+    gap: clamp(14px, 1.6cqw, 22px);
+    padding: clamp(7px, 1.3cqh, 14px) clamp(16px, 2cqw, 26px);
+    .vf2-cand-line {
+      font-size: clamp(16px, #{'min(2.2cqw, 3.9cqh)'}, 26px);
+    }
+    .vf2-cand-track {
+      width: clamp(96px, 11cqw, 180px);
+      height: clamp(5px, 1cqh, 8px);
+    }
+    .vf2-live-pct {
+      font-size: clamp(15px, #{'min(1.8cqw, 3.3cqh)'}, 21px);
+    }
+    .vf2-switch {
+      font-size: clamp(14px, #{'min(1.4cqw, 2.7cqh)'}, 17px);
+      padding: 0.45em 1.15em;
+    }
+  }
+
+  // What it hears, in the bottom bar
+  .vf-ap-heard .vf2-heard-text {
+    font-size: clamp(14px, #{'min(1.6cqw, 3cqh)'}, 20px);
+  }
+
+  .vf2-shabad-row .vf2-chips,
+  .vf2-change .vf2-chips {
+    font-size: clamp(12px, #{'min(1.4cqw, 2.6cqh)'}, 17px);
+  }
+  .vf2-shabad-row .vf2-ev-bar {
+    width: clamp(110px, 13cqw, 220px);
+    height: clamp(7px, 1.3cqh, 11px);
+  }
 }
 
 // "Check this computer" (HwCheck.jsx): one quiet line under the mic picker, idle panel only.

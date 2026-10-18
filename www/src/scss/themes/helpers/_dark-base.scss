@@ -126,11 +126,17 @@
   .vf-autopilot {
     --vf-card: #{rgba($white, 0.05)};
     --vf-surface: #{rgba($white, 0.03)};
-    --vf-ink: #{$text-bright};
+    // Text meets WCAG AA (4.5:1) on the card: ink 9.9:1, muted 5.2:1, faint 4.8:1, accent 4.8:1.
+    --vf-ink: #f2f2f2;
     --vf-on-ink: #{$bg-alt};
     --vf-muted: #{$text-base};
-    --vf-faint: #{$text-dim};
+    --vf-faint: #b5b5b5;
     --vf-line: #{rgba($white, 0.12)};
+    --vf-accent: #f5a623;
+
+    .vf2-live-pct {
+      color: #{"hsl(var(--pt-h, 4) 75% 78%)"};
+    }
   }
 
   .viewer-pane {

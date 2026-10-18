@@ -10,6 +10,7 @@ const {
   bestLineMatch,
   orderFreeLineScore,
   sameGurbani,
+  switchConfirmNeeded,
 } = require('./switchPolicy');
 // Shipped tuning, read from VoiceFollow.jsx so tests track the app's config.
 const { CFG, CONFIRM, HOLD } = require('./switchPolicy.config');
@@ -283,5 +284,22 @@ describe('sameGurbani', () => {
     ];
     assert.equal(sameGurbani(aarti, other), false);
     assert.equal(sameGurbani(aarti, []), false);
+  });
+});
+
+describe('switchConfirmNeeded (BANI_END_EXIT)', () => {
+  const base = { isBani: true, cursor: 229, nLines: 230, decisive: true };
+  it('is off at 0: the confirm count is unchanged', () => {
+    assert.equal(switchConfirmNeeded(base, 0, 3), 3);
+  });
+  it('a decisive win on the last pangtis of a Bani needs 2', () => {
+    assert.equal(switchConfirmNeeded(base, 2, 3), 2);
+    assert.equal(switchConfirmNeeded({ ...base, cursor: 228 }, 2, 3), 2);
+  });
+  it('not before the end, not for a Shabad, not for a borderline win, not with no cursor', () => {
+    assert.equal(switchConfirmNeeded({ ...base, cursor: 227 }, 2, 3), 3);
+    assert.equal(switchConfirmNeeded({ ...base, isBani: false }, 2, 3), 3);
+    assert.equal(switchConfirmNeeded({ ...base, decisive: false }, 2, 3), 3);
+    assert.equal(switchConfirmNeeded({ ...base, cursor: null }, 2, 3), 3);
   });
 });
