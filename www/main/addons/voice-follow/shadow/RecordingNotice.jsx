@@ -40,24 +40,16 @@ export const NoticeText = () => (
 // The short version for the first-launch card; the chip's popover keeps the full text.
 export const ShortNotice = () => (
   <div className="shadow-notice-text">
-    <p>This test version of STTM records audio to make Voice Autopilot better.</p>
+    <p>This test build records to make Voice Autopilot better:</p>
     <ul>
-      <li>
-        <b>Recorded:</b> microphone sound during a program, even when Voice Autopilot is not in use;
-        what is on screen; and what Voice Autopilot heard.
-      </li>
-      <li>
-        <b>Also saved:</b> your name and Gurdwara, computer details, and an approximate location
-        from the internet address.
-      </li>
-      <li>
-        <b>Where:</b> sent to Khalis Foundation&apos;s secure storage, to improve Voice Autopilot.
-      </li>
-      <li>
-        <b>To turn off:</b> {SETTING_PATH}. Recording and sending stop at once; anything not yet
-        sent stays on this computer.
-      </li>
+      <li>the microphone during a program, even with Voice Autopilot off</li>
+      <li>what is on screen and what Voice Autopilot heard</li>
+      <li>your name, Gurdwara, computer details and approximate location</li>
     </ul>
+    <p>Sent to Khalis Foundation&apos;s secure storage.</p>
+    <p>
+      Turn off any time: <b>{SETTING_PATH}</b>
+    </p>
   </div>
 );
 
@@ -68,6 +60,7 @@ export const RecordingChip = ({ onOpenSettings }) => {
   const micState = useStoreState((state) => state.app.shadowMicState);
   const { setShadowRecording } = useStoreActions((actions) => actions.userSettings);
   const [open, setOpen] = useState(false);
+  const [more, setMore] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -103,12 +96,17 @@ export const RecordingChip = ({ onOpenSettings }) => {
       </button>
       {open && (
         <div className="shadow-rec-pop" role="dialog" aria-label="Voice Autopilot recording">
-          <h4>
-            {recording
-              ? 'Voice Autopilot is recording audio'
-              : 'Voice Autopilot is listening for a program'}
-          </h4>
-          <NoticeText />
+          <h4>{recording ? 'Recording audio' : 'Mic on, waiting for a program'}</h4>
+          <ShortNotice />
+          <button
+            type="button"
+            className="shadow-rec-more"
+            aria-expanded={more}
+            onClick={() => setMore(!more)}
+          >
+            {more ? 'Hide details' : 'More details'}
+          </button>
+          {more && <NoticeText />}
           <div className="shadow-rec-actions">
             <button
               type="button"

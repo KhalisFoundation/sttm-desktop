@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import Pane from '../../../common/sttm-ui/pane/Pane';
@@ -15,6 +15,17 @@ const { SHADOW_BUILD } = require('../../../addons/voice-follow/shadow/config');
 // Autopilot tab: Voice-Follow renders its live view into this slot (see autopilotSlot.js).
 const AutopilotContent = () => <div className="vf-autopilot-slot" ref={setAutopilotSlot} />;
 
+// The label shimmers whenever the Autopilot tab is not the open one; the NEW chip shows only until the
+// tab is first opened.
+const TAB_SEEN_KEY = 'vfTabSeen';
+const readTabSeen = () => {
+  try {
+    return window.localStorage.getItem(TAB_SEEN_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+};
+
 const SearchPane = ({ className }) => {
   const { autopilotEnabled, autopilotLive } = useStoreState((state) => state.app);
   const { setAutopilotEnabled } = useStoreActions((actions) => actions.app);
@@ -23,6 +34,17 @@ const SearchPane = ({ className }) => {
   // shadow (addons/voice-follow/shadow) whether or not the tab is shown.
   const showAutopilot = voiceFollowEnabled !== false || !SHADOW_BUILD;
   const isAutopilot = showAutopilot && autopilotEnabled;
+  const [tabSeen, setTabSeen] = useState(readTabSeen);
+  useEffect(() => {
+    if (!isAutopilot || tabSeen) return;
+    setTabSeen(true);
+    try {
+      window.localStorage.setItem(TAB_SEEN_KEY, '1');
+    } catch (_) {
+      // private storage: the look simply returns next launch
+    }
+  }, [isAutopilot, tabSeen]);
+  const isNew = !isAutopilot && !tabSeen;
 
   return (
     <div
@@ -47,11 +69,17 @@ const SearchPane = ({ className }) => {
           <a
             role="tab"
             aria-selected={isAutopilot}
-            className={classNames('search-pane-tab', isAutopilot && 'search-pane-tab-active')}
+            className={classNames(
+              'search-pane-tab',
+              isAutopilot && 'search-pane-tab-active',
+              !isAutopilot && 'vf-tab-shimmer',
+              isNew && 'vf-tab-new',
+            )}
             onClick={() => setAutopilotEnabled(true)}
           >
             <AudioCaptureIcon />
-            <span>Voice Autopilot</span>
+            <span className="vf-tab-label">Voice Autopilot</span>
+            {isNew && <span className="vf-tab-chip">New</span>}
             {autopilotLive && <span className="search-pane-tab-live" title="Listening" />}
             {!isAutopilot && <AutopilotIntro onStart={() => setAutopilotEnabled(true)} />}
           </a>

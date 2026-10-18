@@ -590,11 +590,12 @@ $vf2-yellow-bar: #f2c200;
     margin-bottom: 3px;
   }
 }
-// "Recording audio" / "Mic on" chip at the left of the workspace bar (controller only).
-// The bar styles every div as a 200px tab, so the chip and its popover undo that.
+// "Recording audio" / "Mic on" chip at the right of the workspace bar (controller only), clear
+// of the window buttons and the navigator sidebar. The bar styles every div as a 200px tab, so
+// the chip and its popover undo that.
 .workspace-bar .shadow-rec {
   position: absolute;
-  left: 12px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   height: auto;
@@ -647,8 +648,8 @@ $vf2-yellow-bar: #f2c200;
 .workspace-bar .shadow-rec .shadow-rec-pop {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
-  width: 420px;
+  right: 0;
+  width: 360px;
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 80px);
   overflow-y: auto;
@@ -662,6 +663,16 @@ $vf2-yellow-bar: #f2c200;
   h4 {
     margin: 0 0 8px;
     font-size: 14px;
+  }
+  .shadow-rec-more {
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #0b2a5b;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 .workspace-bar .shadow-rec .shadow-rec-actions {
@@ -1237,6 +1248,65 @@ $vf2-yellow-bar: #f2c200;
   70%,
   100% {
     box-shadow: 0 0 0 6px rgba(67, 172, 106, 0);
+  }
+}
+
+// Voice Autopilot tab while Search is open: a soft Kesari light passes across the label (always), and
+// until the tab is first opened a small NEW chip pings gently (vfTabSeen in SearchPane.jsx).
+.search-pane-tab.vf-tab-shimmer {
+  .audio-capture-icon {
+    color: #e8702a;
+  }
+  .vf-tab-label {
+    background: linear-gradient(100deg, currentColor 40%, #e8702a 50%, currentColor 60%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: vf-tab-shine 3.2s ease-in-out infinite;
+  }
+}
+.vf-tab-chip {
+  position: relative;
+  padding: 1px 7px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #e8702a, #d65a12);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 15px;
+  text-transform: uppercase;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    animation: vf-tab-ping 2.6s ease-out infinite;
+  }
+}
+@keyframes vf-tab-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  60%,
+  100% {
+    background-position: -50% 0;
+  }
+}
+@keyframes vf-tab-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(232, 112, 42, 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 7px rgba(232, 112, 42, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-pane-tab.vf-tab-shimmer .vf-tab-label,
+  .vf-tab-chip::after {
+    animation: none;
   }
 }
 
