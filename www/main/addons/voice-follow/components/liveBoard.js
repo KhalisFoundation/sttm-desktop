@@ -127,6 +127,14 @@ function createBoard(params = {}) {
     });
   }
 
+  // Fragment confirm hits (fragmentConfirm.js): pangtis of board Shabads heard in short pieces,
+  // so their evidence bars rise with the weight the switch rule gives them.
+  function fragments({ now, cur, sCur, cands = [] }) {
+    if (phase !== 'following' || current !== cur) return;
+    evidence.add({ now, cur, sCur, cands });
+    cands.forEach(remember);
+  }
+
   // While a session holds the current Shabad but nobody is singing: no new evidence.
   function hold(now) {
     if (phase !== 'following') return;
@@ -196,6 +204,7 @@ function createBoard(params = {}) {
 
   return {
     follow,
+    fragments,
     hold,
     search,
     progress,
