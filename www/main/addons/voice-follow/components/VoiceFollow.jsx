@@ -3279,7 +3279,9 @@ const VoiceFollow = () => {
           const change = shelfRef.current.changeCard(nowMs);
           const ids = [];
           const addId = (id, role) => {
-            if (id == null || id === curId || ids.some((x) => x.id === id)) return;
+            // Shabads only: a Bani card ('bani:<id>') has no Shabad profile to load, and a string id
+            // crashes the Realm query (the 10.0.3 crash on 30 GAB recordings).
+            if (!Number.isSafeInteger(id) || id === curId || ids.some((x) => x.id === id)) return;
             if (vetoRef.current && vetoRef.current.id === id) return;
             if (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id)) return;
             if (knownSame(curId, id)) return;
