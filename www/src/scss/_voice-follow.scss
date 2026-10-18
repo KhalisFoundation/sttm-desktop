@@ -1239,3 +1239,77 @@ $vf2-yellow-bar: #f2c200;
     box-shadow: 0 0 0 6px rgba(67, 172, 106, 0);
   }
 }
+
+// First-launch callout anchored under the Voice Autopilot tab (AutopilotIntro.jsx)
+.search-pane-tab {
+  .vf-intro {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    z-index: 30;
+    width: 320px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #fff;
+    color: #222;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), 0 0 0 2px $vf2-orange;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: normal;
+  }
+  .vf-intro-arrow {
+    position: absolute;
+    top: -8px;
+    left: 28px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-left: 2px solid $vf2-orange;
+    border-top: 2px solid $vf2-orange;
+    transform: rotate(45deg);
+  }
+  .vf-intro-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .vf-intro-desc {
+    color: #444;
+    margin-bottom: 12px;
+  }
+  .vf-intro-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .vf-intro-start,
+  .vf-intro-later {
+    font: inherit;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 0;
+    cursor: pointer;
+  }
+  .vf-intro-start {
+    background: $vf2-orange;
+    color: #222;
+  }
+  .vf-intro-later {
+    background: #eee;
+    color: #444;
+  }
+}
+.dark-theme .search-pane-tab .vf-intro,
+.dark-theme .search-pane-tab .vf-intro-arrow {
+  background: #2a2a2a;
+  color: #eee;
+}
+.dark-theme .search-pane-tab .vf-intro-desc {
+  color: #ccc;
+}
+.dark-theme .search-pane-tab .vf-intro-later {
+  background: #444;
+  color: #ddd;
+}

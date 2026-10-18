@@ -524,6 +524,10 @@
   },
   "VOICE_FOLLOW": {
     "START_TITLE": "Start Voice Autopilot",
+    "INTRO_TITLE": "New: Voice Autopilot",
+    "INTRO_DESC": "It listens to the kirtan and keeps the right Shabad and pangti on screen for you.",
+    "INTRO_START": "Start",
+    "INTRO_LATER": "Not now",
     "START_DESC": "Listens to the kirtan and follows the shabad on display.",
     "LISTENING_THROUGH": "Listening through",
     "DEFAULT_MIC": "Default microphone",
