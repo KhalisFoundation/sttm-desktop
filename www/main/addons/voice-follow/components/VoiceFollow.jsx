@@ -321,6 +321,13 @@ const PC_FRAGMENT_CACHE = 12; // candidate line profiles kept for this rule (its
 // scored yet, and the owner's case (2879) was nominated this way 3 s before its card appeared.
 const PC_FRAGMENT_NOMINATE_MARGIN = 0.15;
 const PC_FRAGMENT_NOMINATE_S = 30;
+// Judge assist: when the switch judge's contender had a verbatim fragment hit (a pangti unique to
+// it, not fitting the Shabad on screen) within the last PC_FRAGMENT_ASSIST_S seconds, one winning
+// decode fewer commits the switch (owner's Oct 17 test: a correct confirm shifted the judge's
+// timing so 4814 and 2727 stopped at 2 wins). 0 = off. PC_FRAGMENT_GAP_S: at most one fragment
+// confirm this often.
+const PC_FRAGMENT_ASSIST_S = 6;
+const PC_FRAGMENT_GAP_S = 8;
 const PC_FRAGMENT = {
   minLetters: 5,
   minScore: 0.8,
@@ -1153,7 +1160,15 @@ const VoiceFollow = () => {
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
   const vetoRef = useRef(null); // { id, left }: shabad a tap just left, and judged decodes remaining
   const kfSwitchRef = useRef({ cur: null, session: null, store: new Map(), last: '' }); // PANKTI_CUMULATION_SWITCH
-  const fragRef = useRef({ cur: null, session: null, store: new Map(), top: null, searched: '' }); // PANKTI_FRAGMENT_CONFIRM
+  const fragRef = useRef({
+    cur: null,
+    session: null,
+    store: new Map(),
+    top: null,
+    searched: '',
+    recent: new Map(),
+    lastConfirm: 0,
+  }); // PANKTI_FRAGMENT_CONFIRM
   const fragCacheRef = useRef(new Map()); // shabadId -> profile (PANKTI_FRAGMENT_CONFIRM's own line cache)
   const baniLengthRef = useRef('short');
   baniLengthRef.current = baniLength;
@@ -3232,6 +3247,7 @@ const VoiceFollow = () => {
             fr.cur = curId;
             fr.session = session;
             fr.store = new Map();
+            fr.recent = new Map();
           }
           fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
           const nowMs = Date.now();
@@ -3320,6 +3336,9 @@ const VoiceFollow = () => {
             PC_FRAGMENT,
           );
           if (r.hits.length) {
+            r.hits.forEach((h) => {
+              if (h.w >= 1) fr.recent.set(h.id, { at: nowMs, index: h.index });
+            });
             const named = r.hits.map((h) => {
               const c = cands.find((x) => x.id === h.id);
               const v = (c && c.prof.verses[h.index]) || {};
@@ -3341,6 +3360,7 @@ const VoiceFollow = () => {
           }
           if (
             r.ready &&
+            nowMs - fr.lastConfirm >= PC_FRAGMENT_GAP_S * 1000 &&
             !lockingRef.current &&
             session === sessionRef.current &&
             recognizingRef.current &&
@@ -3352,6 +3372,7 @@ const VoiceFollow = () => {
             if (v.verseId) {
               if (SHADOW_BUILD) diag(`vf fragment confirm -> ${r.ready.id}`);
               fr.store = new Map();
+              fr.lastConfirm = nowMs;
               await autopilotLock({
                 shabadId: r.ready.id,
                 verseId: v.verseId,
@@ -3717,7 +3738,12 @@ const VoiceFollow = () => {
             BANI_END_EXIT,
             SWITCH_CONFIRM,
           );
-          return slot.wins >= needed;
+          const fragHit =
+            PANKTI_FRAGMENT_CONFIRM > 0 && PC_FRAGMENT_ASSIST_S > 0
+              ? fragRef.current.recent.get(slot.shabadId)
+              : null;
+          const assisted = !!fragHit && Date.now() - fragHit.at <= PC_FRAGMENT_ASSIST_S * 1000;
+          return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
         };
         const decaySlot = (slot) => {
           slot.wins = Math.max(0, slot.wins - 1); // eslint-disable-line no-param-reassign
