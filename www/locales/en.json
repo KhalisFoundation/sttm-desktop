@@ -550,6 +550,9 @@
     "SWITCH": "Switch",
     "SWITCH_TIP": "Change to this Shabad now",
     "OPEN": "Open",
-    "OPEN_TIP": "Open this Shabad"
+    "OPEN_TIP": "Open this Shabad",
+    "PROGRESS_TIP": "How close this Shabad is to being shown",
+    "END_OF_SHABAD": "End of Shabad",
+    "END_OF_BANI": "End of Bani"
   }
 }
