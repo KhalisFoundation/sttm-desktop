@@ -65,12 +65,14 @@ function totalOf(lines) {
 /**
  * One heard piece. hyp = normalized heard text; cur = { linesNorm } of the Shabad on screen;
  * cands = [{ id, linesNorm, role: 'change' | 'list' }]. ratio = partialRatio(a, b) -> 0..100.
- * Returns { hits: [{ id, index, s, w }], ready: { id, index } | null }.
+ * Returns { hits: [{ id, index, s, w }], ready: { id, index } | null, sCur } (sCur = the Shabad on
+ * screen's best pangti for this piece).
  */
 function step(store, { hyp, cur, cands }, ratio, cfg = DEFAULTS) {
-  const out = { hits: [], ready: null };
+  const out = { hits: [], ready: null, sCur: 0 };
   if (!hyp || hyp.length < cfg.minLetters) return out;
   const sCur = cur ? bestPangti(hyp, cur.linesNorm, ratio, cfg).s : 0;
+  out.sCur = sCur;
   if (sCur >= cfg.minScore) return out; // fits the Shabad on screen too: no evidence either way
   const fits = cands
     .map((c) => ({ c, m: bestPangti(hyp, c.linesNorm, ratio, cfg) }))
