@@ -308,11 +308,19 @@ const PC_SHARED_HOLD_MARGIN = 0.05;
 // a board Shabad at >= minScore (verbatim when shorter than shortLetters) and beats the Shabad on
 // screen by >= minMargin adds weight to it
 // (little when the pangti also fits another board Shabad; nothing when it fits the Shabad on
-// screen); the panel's evidence bars show the weight rising. The "Changing to" Shabad confirms
-// (the screen switches) on 2 different pangtis, a listed one on 3. Pauses freeze the weights.
+// screen); the panel's evidence bars show the weight rising. The "Changing to" Shabad (or one just
+// nominated by the full-text search, below) confirms on 2 different pangtis, a listed one on 3.
+// Pauses freeze the weights.
 // Additive: the acoustic switch judge and Pankti Cumulation (switch) are unchanged. 0 = off.
 const PANKTI_FRAGMENT_CONFIRM = 0;
-const PC_FRAGMENT_CANDS = 5;
+const PC_FRAGMENT_CANDS = 6;
+const PC_FRAGMENT_CACHE = 12; // candidate line profiles kept for this rule (its own cache: the judge's is untouched)
+// A heard line of PC_SWITCH_MIN_LETTERS+ letters whose top Shabad over all Gurbani leads the next by
+// this much nominates that Shabad as a candidate for PC_FRAGMENT_NOMINATE_S seconds, counted like the
+// "Changing to" card (2 different pangtis): the board is slow to list a Shabad the judge has not
+// scored yet, and the owner's case (2879) was nominated this way 3 s before its card appeared.
+const PC_FRAGMENT_NOMINATE_MARGIN = 0.15;
+const PC_FRAGMENT_NOMINATE_S = 30;
 const PC_FRAGMENT = {
   minLetters: 5,
   minScore: 0.8,
@@ -1145,7 +1153,8 @@ const VoiceFollow = () => {
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
   const vetoRef = useRef(null); // { id, left }: shabad a tap just left, and judged decodes remaining
   const kfSwitchRef = useRef({ cur: null, session: null, store: new Map(), last: '' }); // PANKTI_CUMULATION_SWITCH
-  const fragRef = useRef({ cur: null, session: null, store: new Map() }); // PANKTI_FRAGMENT_CONFIRM
+  const fragRef = useRef({ cur: null, session: null, store: new Map(), top: null, searched: '' }); // PANKTI_FRAGMENT_CONFIRM
+  const fragCacheRef = useRef(new Map()); // shabadId -> profile (PANKTI_FRAGMENT_CONFIRM's own line cache)
   const baniLengthRef = useRef('short');
   baniLengthRef.current = baniLength;
   // The user's own length (what they chose), even while Rehras has it raised (by this run,
@@ -3140,6 +3149,8 @@ const VoiceFollow = () => {
             const ctl = new AbortController();
             let found = await searchCanonicalText(text, 4, ctl.signal);
             if (found && DUP_AWARE_LOCK) found = await distinctLeaders(found, 2);
+            ks.found = found;
+            ks.foundHyp = kfHeard;
             const kfStale = () =>
               session !== sessionRef.current ||
               !recognizingRef.current ||
@@ -3224,6 +3235,31 @@ const VoiceFollow = () => {
           }
           fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
           const nowMs = Date.now();
+          // Nominate the top Shabad of the full-text search for a long enough piece (reusing
+          // Pankti Cumulation (switch)'s search of this decode when it ran).
+          const heardAll = vfNorm(text);
+          if (heardAll.length >= PC_SWITCH_MIN_LETTERS && heardAll !== fr.searched) {
+            fr.searched = heardAll;
+            const ks = kfSwitchRef.current;
+            let found = ks.foundHyp === heardAll ? ks.found : null;
+            if (!found) {
+              const ctl = new AbortController();
+              found = await searchCanonicalText(text, 4, ctl.signal);
+              if (found && DUP_AWARE_LOCK) found = await distinctLeaders(found, 2);
+              if (
+                session !== sessionRef.current ||
+                !recognizingRef.current ||
+                phaseRef.current !== 'following' ||
+                lockingRef.current ||
+                currentShabadIdRef.current !== curId
+              )
+                return;
+            }
+            const f0 = found?.[0];
+            const margin = f0 ? f0.score - (found[1]?.score || 0) : 0;
+            if (f0 && f0.shabadId !== curId && margin >= PC_FRAGMENT_NOMINATE_MARGIN)
+              fr.top = { id: f0.shabadId, at: nowMs };
+          }
           const change = shelfRef.current.changeCard(nowMs);
           const ids = [];
           const addId = (id, role) => {
@@ -3234,6 +3270,16 @@ const VoiceFollow = () => {
             ids.push({ id, role });
           };
           if (change) addId(change.shabadId, 'change');
+          if (fr.top && nowMs - fr.top.at <= PC_FRAGMENT_NOMINATE_S * 1000)
+            addId(fr.top.id, 'change');
+          // Shabads already carrying weight from earlier pieces stay candidates while it lasts.
+          fr.store.forEach((lines, id) => {
+            let w = 0;
+            lines.forEach((x) => {
+              w += x;
+            });
+            if (w >= 0.3) addId(id, 'list');
+          });
           boardRef.current
             .evidenceSnapshot(nowMs)
             .slice(0, PC_FRAGMENT_CANDS)
@@ -3243,29 +3289,27 @@ const VoiceFollow = () => {
           );
           const cands = [];
           let loads = 0;
+          const fc = fragCacheRef.current;
           ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
-            const prof = lineCacheRef.current.get(id);
+            const prof =
+              (fc.get(id) && fc.get(id).linesNorm ? fc.get(id) : null) ||
+              lineCacheRef.current.get(id);
             if (prof && prof.linesNorm) cands.push({ id, role, linesNorm: prof.linesNorm, prof });
-            else if (!lineCacheRef.current.has(id) && loads < 2) {
+            else if (!fc.has(id) && loads < 2) {
               loads += 1;
-              if (lineCacheRef.current.size >= BACKSTOP_CACHE_MAX) {
-                const oldest = lineCacheRef.current.keys().next();
-                if (!oldest.done) lineCacheRef.current.delete(oldest.value);
+              if (fc.size >= PC_FRAGMENT_CACHE) {
+                const oldest = fc.keys().next();
+                if (!oldest.done) fc.delete(oldest.value);
               }
-              const cache = lineCacheRef.current;
               const pendingProfile = {};
-              cache.set(id, pendingProfile);
+              fc.set(id, pendingProfile);
               loadShabadProfile(id)
                 .then((q) => {
-                  if (
-                    session === sessionRef.current &&
-                    cache === lineCacheRef.current &&
-                    cache.get(id) === pendingProfile
-                  )
-                    cache.set(id, q);
+                  if (session === sessionRef.current && fc.get(id) === pendingProfile)
+                    fc.set(id, q);
                 })
                 .catch(() => {
-                  if (cache.get(id) === pendingProfile) cache.delete(id);
+                  if (fc.get(id) === pendingProfile) fc.delete(id);
                 });
             }
           });
