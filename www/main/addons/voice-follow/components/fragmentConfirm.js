@@ -78,10 +78,10 @@ function step(store, { hyp, cur, cands }, ratio, cfg = DEFAULTS) {
   const sCur = cur ? bestPangti(hyp, cur.linesNorm, ratio, cfg).s : 0;
   out.sCur = sCur;
   if (sCur >= cfg.minScore) return out; // fits the Shabad on screen too: no evidence either way
-  const need = hyp.length < cfg.shortLetters ? cfg.shortScore : cfg.minScore;
+  const fitMin = hyp.length < cfg.shortLetters ? cfg.shortScore : cfg.minScore;
   const fits = cands
     .map((c) => ({ c, m: bestPangti(hyp, c.linesNorm, ratio, cfg) }))
-    .filter(({ m }) => m.index >= 0 && m.s >= need && m.s - sCur >= cfg.minMargin);
+    .filter(({ m }) => m.index >= 0 && m.s >= fitMin && m.s - sCur >= cfg.minMargin);
   fits.forEach(({ c, m }) => {
     const shared = fits.some((o) => o.c.id !== c.id);
     const w = shared ? cfg.sharedW : 1;
