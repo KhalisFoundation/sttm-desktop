@@ -1,3 +1,29 @@
+files:
+  - "**/*"
+  - "!assets${/*}"
+  - "!builds${/*}"
+  - "!**/scss${/*}"
+  - "!packaging${/*}"
+  - "!test${/*}"
+  - "!www/node_modules${/*}"
+  - "!www/package.json"
+  - "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}"
+  - "!**/*.map"
+  - "!www/main/**/*.{js,jsx}"
+  - "!www/assets/*.db"
+
+asarUnpack:
+  - node_modules/better-sqlite3/**/*
+
+npmRebuild: false
+
+extraResources:
+  - data.db
+  - from: www/assets
+    to: assets
+    filter:
+      - "*.db"
+
 publish:
   provider: s3
   bucket: sttm-releases
