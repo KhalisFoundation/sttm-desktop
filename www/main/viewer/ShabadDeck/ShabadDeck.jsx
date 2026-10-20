@@ -163,6 +163,13 @@ function ShabadDeck() {
   const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
   const showsShabadInfo = shabadInfoDetails.length > 0;
 
+  // The bar comes and goes on its own (once the details load, and when the
+  // "Show for n seconds" time is up), not only on a line change, so recast then.
+  const shabadInfoKey = shabadInfoDetails.join('|');
+  useEffect(() => {
+    global.platform.ipc.send('cast-to-receiver');
+  }, [shabadInfoKey]);
+
   useEffect(() => {
     let currentShabad = activeShabadId;
     if (!currentShabad) {

@@ -56,6 +56,38 @@ const onError = (message) => {
   }
 };
 
+// The receiver (sttm-chromecast) has its own stylesheet, which doesn't know
+// some of ours: the shabad info bar, and the Devanagari and Shahmukhi text that
+// shouldn't be bold. Those rules are taken from ours and sent along with the
+// slide. The info bar's are scoped under #viewer-container here; the scope is
+// dropped so they work in the receiver's own container.
+const RECEIVER_MISSING_RULES =
+  /shabad-info|shabad-deck--with-info|\.slide-(translation|transliteration)\.(devanagari|shahmukhi)/;
+
+// Rules only the receiver needs: its .shabad-deck has a bottom padding that
+// would leave a gap under the info bar.
+const RECEIVER_ONLY_CSS = '.shabad-deck--with-info { padding-bottom: 0; }';
+
+let receiverCss = null;
+const getReceiverCss = () => {
+  if (receiverCss === null) {
+    receiverCss = Array.from(document.styleSheets)
+      .flatMap((sheet) => {
+        try {
+          return Array.from(sheet.cssRules);
+        } catch (e) {
+          return [];
+        }
+      })
+      .map((rule) => rule.cssText)
+      .filter((cssText) => RECEIVER_MISSING_RULES.test(cssText))
+      .map((cssText) => cssText.replace(/#viewer-container\s+/g, ''))
+      .concat(RECEIVER_ONLY_CSS)
+      .join('\n');
+  }
+  return receiverCss;
+};
+
 // Removes quicktools, paddingtools, and svg from clonedNode of viewer
 const getSanitizedViewer = () => {
   const viewerHtml = document.querySelector('#viewer-container')
@@ -69,12 +101,19 @@ const getSanitizedViewer = () => {
   viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
   viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
 
+  const hasShabadInfo = !!viewerHtml.querySelector('.shabad-info');
   const slideWrapper = viewerHtml.querySelector('#viewer-container-slide-wrapper');
   if (slideWrapper) {
     slideWrapper.style.width = '100%';
-    slideWrapper.style.height = '100%';
+    // With the info bar, the slide takes the height left above it instead.
+    if (!hasShabadInfo) {
+      slideWrapper.style.height = '100%';
+    }
     slideWrapper.style.padding = '0';
   }
+  const style = document.createElement('style');
+  style.textContent = getReceiverCss();
+  viewerHtml.prepend(style);
   return viewerHtml.innerHTML;
 };
 
