@@ -5,10 +5,10 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
 import { settings } from '../../../configs/user-settings.json';
+import { i18n } from '../../common/i18n';
 
 const remote = require('@electron/remote');
 
-const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {

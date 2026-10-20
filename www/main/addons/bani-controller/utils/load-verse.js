@@ -10,6 +10,8 @@ const loadVerse = (crossPlatformId, lineCount) => {
   if (currentVerse) {
     currentVerse.click();
   } else {
+    // Verse not in the DOM yet (or id mismatch) — defer via the GlobalState
+    // selector so it's clicked once it renders.
     store.set('GlobalState', {
       currentVerseSelector: `[data-cp-id = "${crossPlatformId}"]`,
     });

@@ -12,6 +12,7 @@ const ShabadVerse = ({
   verse,
   englishVerse,
   verseId,
+  isFlowerVerse,
 }) => {
   const loadActiveClass = (verseObj, currentVerseId, verseIndex) =>
     Object.keys(verseObj).map((verseKey) => {
@@ -37,7 +38,7 @@ const ShabadVerse = ({
       </span>
       {verse ? (
         <span
-          className={`gurmukhi verse-content ${verseId === 61 ? 'flower-verse' : ''}`}
+          className={`gurmukhi verse-content ${isFlowerVerse ? 'flower-verse' : ''}`}
           onClick={() => {
             updateTraversedVerse(verseId, lineNumber);
           }}
@@ -73,6 +74,7 @@ ShabadVerse.propTypes = {
   verse: PropTypes.string,
   englishVerse: PropTypes.string,
   verseId: PropTypes.number,
+  isFlowerVerse: PropTypes.bool,
 };
 
 export default ShabadVerse;

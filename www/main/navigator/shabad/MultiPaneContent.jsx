@@ -5,10 +5,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { ShabadText } from './ShabadText';
 import { FavoritePane, HistoryPane } from '../misc/components';
 import { useSlides } from '../../common/hooks';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;

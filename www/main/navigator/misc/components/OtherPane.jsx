@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
 import { dailyHukamnama } from '../../utils';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 

@@ -4,10 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import FavShabadIcon from './FavShabadIcon';
 import ArrowIcon from './ArrowIcon';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const MultiPaneHeader = ({ data }) => {
   const paneId = data.multiPaneId;

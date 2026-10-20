@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '../../common/i18n';
 
-const remote = require('@electron/remote');
 const copy = require('copy-to-clipboard');
-
-const { i18n } = remote.require('./app');
 
 export const CopyToClipboard = ({ url }) => {
   const [copied, setCopied] = React.useState(false);
@@ -27,11 +25,7 @@ export const CopyToClipboard = ({ url }) => {
           readOnly={true}
           value={url}
         />
-        <span
-          className="export-btn"
-          onClick={handleCopy}
-          onMouseLeave={() => setCopied(false)}
-        >
+        <span className="export-btn" onClick={handleCopy} onMouseLeave={() => setCopied(false)}>
           <i className="fa fa-files-o cp-icon"></i>
         </span>
         <span className="tooltip">
@@ -41,8 +35,6 @@ export const CopyToClipboard = ({ url }) => {
     </div>
   );
 };
-
-
 
 CopyToClipboard.propTypes = {
   url: PropTypes.string,

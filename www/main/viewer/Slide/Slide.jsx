@@ -9,7 +9,30 @@ import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
 
+const aiTranslationDB = require('../../banidb/pss-db');
+
 global.platform = require('../../desktop_scripts');
+
+/**
+ * Parse translations JSON and, when the selected English source is served by
+ * the AI translations database, inject that source's text under its own key
+ * (e.g. translations.en.pss) so SlideTranslation can read it as usual.
+ */
+const getTranslationsWithPSS = (verseObj, source) => {
+  const translations = JSON.parse(verseObj.Translations);
+  if (!aiTranslationDB.isAiSource(source)) {
+    return translations;
+  }
+
+  const translationText = aiTranslationDB.getTranslation(verseObj.ID, source);
+  if (translationText) {
+    if (!translations.en) {
+      translations.en = {};
+    }
+    translations.en[source] = translationText;
+  }
+  return translations;
+};
 
 const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }) => {
   const {
@@ -28,6 +51,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
     content3Visibility,
     akhandpatt,
     slideTransitions,
+    translationEnglishSource,
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
@@ -108,7 +132,7 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
             verseObj.Translations && (
               <SlideTranslation
                 getFontSize={getFontSize}
-                translationObj={JSON.parse(verseObj.Translations)}
+                translationObj={getTranslationsWithPSS(verseObj, translationEnglishSource)}
                 key={`line-${index}`}
                 lang={content}
                 position={index}
@@ -142,6 +166,9 @@ const Slide = React.memo(({ verseObj, nextLineObj, isMiscSlide, updateVerseRef }
     content2Visibility,
     content3Visibility,
     verseObj,
+    // the AI sources are injected per source, so the markup has to be rebuilt
+    // when the selection changes and not only when the verse does
+    translationEnglishSource,
   ]);
 
   return isMiscSlide ? (

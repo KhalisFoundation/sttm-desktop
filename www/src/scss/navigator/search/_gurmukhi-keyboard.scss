@@ -1,6 +1,8 @@
 .gurmukhi-keyboard {
   border-top: none;
   border-radius: 2px;
+  // Keep every key row; the search results shrink (and scroll) instead.
+  flex-shrink: 0;
   box-shadow: 0 2px 2px 0 $transparent-black, 0 0 0 1px $transparent-light-black;
   overflow: hidden;
   position: relative;

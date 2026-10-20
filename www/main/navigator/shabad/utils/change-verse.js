@@ -11,12 +11,20 @@ export const udpateHistory = (
     currentHistoryObj.continueFrom = newTraversedVerse;
     if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
       currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
-      setPaneAttributes({
-        ...paneAttributes,
-        activeVerse: newTraversedVerse,
-        versesRead: currentHistoryObj.versesRead,
-      });
     }
+  }
+  // The list's ticks are the verses read since the shabad was opened, so add this
+  // one to them. Copying the shabad's whole history in brought back every verse
+  // ever read at once, and only on a never-read verse.
+  const versesRead = paneAttributes.versesRead || [];
+  if (paneAttributes.activeVerse !== newTraversedVerse || !versesRead.includes(newTraversedVerse)) {
+    setPaneAttributes({
+      ...paneAttributes,
+      activeVerse: newTraversedVerse,
+      versesRead: versesRead.includes(newTraversedVerse)
+        ? versesRead
+        : [...versesRead, newTraversedVerse],
+    });
   }
 };
 
@@ -108,13 +116,20 @@ export const sendToBaniController = (
     if (!crossPlatformId) {
       baniVerse = activeShabad.find((obj) => obj.verseId === newTraversedVerse);
     }
+    // The verse's 1-based position. Bani and ceremony verse ids don't share
+    // a space with the web controller's (ceremony rows have Realm-local ids
+    // and no crossPlatformId), so the web finds the verse by its position,
+    // as the desktop does for the controller's lineCount.
+    const verseIndex = activeShabad.findIndex((obj) => obj.verseId === newTraversedVerse);
+    const lineCount = verseIndex >= 0 ? verseIndex + 1 : undefined;
     if (isSundarGutkaBani && sundarGutkaBaniId) {
       window.socket.emit('data', {
         host: 'sttm-desktop',
         type: 'bani',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        highlight: crossPlatformId || baniVerse?.crossPlatformId,
+        lineCount,
         baniLength,
         // mangalPosition,
         verseChange: false,
@@ -125,7 +140,8 @@ export const sendToBaniController = (
         type: 'ceremony',
         id: paneAttributes.activeShabad,
         shabadid: paneAttributes.activeShabad, // @deprecated
-        highlight: crossPlatformId || baniVerse.crossPlatformId,
+        highlight: crossPlatformId || baniVerse?.crossPlatformId,
+        lineCount,
         verseChange: false,
       });
     } else if (activeShabadId) {

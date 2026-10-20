@@ -15,3 +15,5 @@ www/js/
 .env
 venv/
 dist/
+# AI translations database, downloaded at runtime from Azure
+www/assets/ai-translations.*

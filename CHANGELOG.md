@@ -1,5 +1,15 @@
 ## New Updates
 
+### 9.3.3 - ਊਨਾ Release _October 27, 2026_
+
+#### New Features and Improvements
+- **Shabad Info**: The viewer can now show the shabad's source, Ang, writer and raag below the Gurbani.
+- **New Translations**: Added two new English translation sources: Prof Sahib Singh, and Prof Sahib Singh - Short.
+- **Search & Navigation**: More accurate first-letter and full-word search results, plus fixes that keep the Bani Controller and Navigator in sync.
+
+**We would love to hear from you if there's a feature you've been waiting for. Send us your feedback at [sttm.co/feedback](https://www.sttm.co/feedback).**
+</br>
+
 ### 9.3.2 - ਊਨਾ Release _March 02, 2026_
 
 #### Bug Fixes and Improvements

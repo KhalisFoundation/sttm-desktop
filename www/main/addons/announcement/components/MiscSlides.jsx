@@ -3,10 +3,7 @@ import { useStoreState } from 'easy-peasy';
 
 import { useSlides } from '../../../common/hooks';
 import { MultipaneDropdown } from '../../../common/sttm-ui';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../../common/i18n';
 
 const MiscSlides = () => {
   const {

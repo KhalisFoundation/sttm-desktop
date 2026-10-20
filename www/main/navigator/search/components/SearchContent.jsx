@@ -20,11 +20,11 @@ import {
 } from '../../../common/sttm-ui';
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
+import { i18n } from '../../../common/i18n';
 
 const remote = require('@electron/remote');
 const prodConfig = require('../../../../../config.prod.json');
 
-const { i18n } = remote.require('./app');
 const analytics = remote.getGlobal('analytics');
 
 const SearchContent = () => {

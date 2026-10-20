@@ -17,7 +17,8 @@ import {
   copyToClipboard,
   intelligentNextVerse,
   sendToBaniController,
-  FLOWER_VERSE_ID,
+  ASA_DI_VAAR_BANI_ID,
+  isFlowerVerse,
 } from './utils';
 
 const baniLengthCols = {
@@ -42,6 +43,8 @@ export const ShabadText = ({
 
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
+  // Id of the shabad/bani whose verses are currently in filteredItems.
+  const loadedShabadIdRef = useRef(null);
 
   const {
     activeVerseId,
@@ -56,6 +59,7 @@ export const ShabadText = ({
     activePaneId,
     shortcuts,
     lineNumber,
+    savedCrossPlatformId,
   } = useStoreState((state) => state.navigator);
 
   const { baniLength, liveFeed, autoplayDelay, autoplayToggle, intelligentSpacebar, akhandpatt } =
@@ -72,15 +76,16 @@ export const ShabadText = ({
     setCeremonyId,
     setIsCeremonyBani,
     setIsSundarGutkaBani,
-    savedCrossPlatformId,
   } = useStoreActions((actions) => actions.navigator);
+
+  const isAsaDiVaar = baniType === 'bani' && Number(shabadId) === ASA_DI_VAAR_BANI_ID;
 
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
     }
     // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-    if (newTraversedVerse === FLOWER_VERSE_ID) {
+    if (isFlowerVerse(newTraversedVerse, isAsaDiVaar)) {
       return;
     }
     if (activePaneId !== currentPane) {
@@ -134,6 +139,7 @@ export const ShabadText = ({
         initialVerseId,
       );
       const filtered = filterRequiredVerseItems(verseList);
+      loadedShabadIdRef.current = shabadId;
       setFilteredItems(filtered);
       const resumeVerseId = paneAttributes?.activeVerse || filtered[0].verseId;
       if (filtered.length > 0) {
@@ -157,10 +163,25 @@ export const ShabadText = ({
     }
   }, [shabadId, baniType, baniLength]);
 
+  // Re-opening the bani that is already loaded (from Sundar Gutka) doesn't
+  // change shabadId, so nothing reloads. Restart it from the first verse here.
+  // A different bani is still loading, so setVerseList handles that case.
+  useEffect(() => {
+    if (
+      paneAttributes.baniOpenedAt &&
+      baniType === 'bani' &&
+      loadedShabadIdRef.current === shabadId &&
+      filteredItems.length
+    ) {
+      updateTraversedVerse(filteredItems[0].verseId, 0);
+      scrollToVerse(filteredItems[0].verseId, filteredItems, virtuosoRef, isAsaDiVaar);
+    }
+  }, [paneAttributes.baniOpenedAt]);
+
   useEffect(() => {
     if (filteredItems.length) {
       setTimeout(() => {
-        scrollToVerse(initialVerseId, filteredItems, virtuosoRef);
+        scrollToVerse(initialVerseId, filteredItems, virtuosoRef, isAsaDiVaar);
       }, 100);
       const initialVerseIndex = filteredItems.findIndex(
         (verse) => verse.verseId === initialVerseId,
@@ -180,13 +201,53 @@ export const ShabadText = ({
   }, [filteredItems]);
 
   useEffect(() => {
-    const baniVerseIndex = filteredItems.findIndex(
-      (obj) => obj.crossPlatformId === savedCrossPlatformId,
-    );
-    if (baniVerseIndex >= 0) {
-      updateTraversedVerse(filteredItems[baniVerseIndex].ID, baniVerseIndex);
+    // Bani/ceremony verse sync from a controller.
+    // Index-based sync for bani/ceremony. The web controller and desktop load
+    // the same bani/ceremony, so their verse lists share order and count — but
+    // the verse *ids* live in different spaces (ceremonies carry Realm-local
+    // IDs with no crossPlatformID; banis differ too), so id matching is
+    // unreliable. Select purely by the 1-based line position the controller
+    // sends (recorded as lineNumber).
+    //
+    // Deliberately NOT gated on savedCrossPlatformId: the web's verseId can
+    // collide with the loaded verse's id across the two id spaces (e.g. Gur
+    // Mantar: activeVerseId 2 == the clicked verse's web verseId 2), which
+    // stops the handler from ever setting savedCrossPlatformId on the first
+    // change — the display would then stay stuck on the opening verse. Position
+    // drives it regardless. id-match remains the fallback for shabad and native
+    // (mobile) controllers, which send a crossPlatformId but no line position.
+    const isPosition = baniType === 'bani' || baniType === 'ceremony';
+    const positionIndex = lineNumber != null ? lineNumber - 1 : -1;
+    const hasValidPosition =
+      isPosition && positionIndex >= 0 && positionIndex < filteredItems.length;
+    let baniVerseIndex = -1;
+    if (hasValidPosition) {
+      baniVerseIndex = positionIndex;
+    } else if (savedCrossPlatformId != null) {
+      baniVerseIndex = filteredItems.findIndex(
+        (obj) =>
+          obj.crossPlatformId === savedCrossPlatformId || obj.verseId === savedCrossPlatformId,
+      );
     }
-  }, [savedCrossPlatformId]);
+    if (baniVerseIndex >= 0) {
+      const matched = filteredItems[baniVerseIndex];
+      // Pass `verseId` (the verse's real id), NOT `ID` (the filtered array
+      // index). `activeVerseId` drives `filterOverlayVerseItems(rawVerses, …)`
+      // for the projected `show-line`, which matches `obj.ID === activeVerseId`
+      // — with the array index it matched nothing and projected an empty verse,
+      // so the display never moved for controller-driven bani/ceremony changes.
+      updateTraversedVerse(matched.verseId, baniVerseIndex);
+      // Highlighting alone doesn't move the virtualized list — scroll the
+      // presenter view to the matched verse so the display actually changes.
+      scrollToVerse(matched.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
+    }
+    // `filteredItems` is a dep so a verse that arrives after the bani finishes
+    // loading (the transient `matchIdx = -1` case) is picked up on the next
+    // render. Safe because a new bani clears savedCrossPlatformId to null (guard
+    // above), so this never re-applies a stale verse to a freshly-loaded bani.
+    // `lineNumber` is a dep so a ceremony verse change that only moves the line
+    // position (same savedCrossPlatformId space) still re-resolves by position.
+  }, [savedCrossPlatformId, filteredItems, lineNumber]);
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
@@ -204,10 +265,27 @@ export const ShabadText = ({
     ) {
       if (lineNumber !== null && filteredItems[lineNumber - 1]?.verseId === activeVerseId) {
         setActiveVerse({ [lineNumber - 1]: activeVerseId });
-        scrollToVerse(activeVerseId, filteredItems, virtuosoRef);
+        scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar);
       }
     }
   }, [rawVerses, activeShabadId, activeVerseId, sundarGutkaBaniId, ceremonyId]);
+
+  useEffect(() => {
+    // Picking another verse of the shabad that's already open (e.g. searching a
+    // different line of it) changes activeVerseId without reloading the list, so
+    // the list's own position (activeVerse, which the arrow keys move from) stayed
+    // on the old verse. Move it as if that verse had been clicked.
+    if (baniType !== 'shabad' || isSundarGutkaBani || isCeremonyBani) return;
+    if (activeShabadId !== shabadId || loadedShabadIdRef.current !== shabadId) return;
+    if (Object.values(activeVerse).includes(activeVerseId)) return;
+    const verseIndex = filteredItems.findIndex(({ verseId }) => verseId === activeVerseId);
+    if (verseIndex >= 0) {
+      // Jump straight there: a smooth scroll to a far-off verse left the list on
+      // the old verse for a moment after the display had already changed.
+      scrollToVerse(activeVerseId, filteredItems, virtuosoRef, isAsaDiVaar, 'auto');
+      updateTraversedVerse(activeVerseId, verseIndex);
+    }
+  }, [activeVerseId]);
 
   const getVerse = (direction) => {
     let verseIndex = null;
@@ -216,7 +294,7 @@ export const ShabadText = ({
         if (filteredItems.length - 1 > parseInt(activeVerseIndex, 10)) {
           let nextVerseIndex = parseInt(activeVerseIndex, 10) + 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[nextVerseIndex].verseId === FLOWER_VERSE_ID) {
+          if (isFlowerVerse(filteredItems[nextVerseIndex].verseId, isAsaDiVaar)) {
             nextVerseIndex++;
           }
           verseIndex = nextVerseIndex;
@@ -227,7 +305,7 @@ export const ShabadText = ({
         if (parseInt(activeVerseIndex, 10) > 0) {
           let prevVerseIndex = parseInt(activeVerseIndex, 10) - 1;
           // Ignoring flower verse to avoid unwanted scroll during asa di vaar
-          if (filteredItems[prevVerseIndex].verseId === FLOWER_VERSE_ID) {
+          if (isFlowerVerse(filteredItems[prevVerseIndex].verseId, isAsaDiVaar)) {
             prevVerseIndex--;
           }
           verseIndex = prevVerseIndex;
@@ -247,7 +325,7 @@ export const ShabadText = ({
         const nextVerse = getVerse('next');
         if (nextVerse) {
           updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
-          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         } else if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani) {
           setShortcuts({
             ...shortcuts,
@@ -264,7 +342,7 @@ export const ShabadText = ({
         const prevVerse = getVerse('prev');
         if (prevVerse) {
           updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
-          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
         setShortcuts({
           ...shortcuts,
@@ -283,7 +361,7 @@ export const ShabadText = ({
         });
         if (verse) {
           updateTraversedVerse(verse.verseId, verse.verseIndex);
-          scrollToVerse(verse.verseId, filteredItems, virtuosoRef);
+          scrollToVerse(verse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
         setShortcuts({
           ...shortcuts,
@@ -336,6 +414,7 @@ export const ShabadText = ({
                 verse={verse}
                 englishVerse={english}
                 verseId={verseId}
+                isFlowerVerse={isFlowerVerse(verseId, isAsaDiVaar)}
                 changeHomeVerse={updateHomeVerse}
                 updateTraversedVerse={updateTraversedVerse}
               />

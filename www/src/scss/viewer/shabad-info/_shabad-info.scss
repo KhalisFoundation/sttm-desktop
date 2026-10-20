@@ -1,0 +1,67 @@
+// Shabad info: a bar under the slide with the logo and the shabad's source,
+// Ang, writer and raag. It's only on screen while the details are showing.
+// Scoped under #viewer-container to win over the container's own styles.
+$shabad-info-logo-width: 100px;
+
+#viewer-container {
+  // The slide takes the height left above the bar, so the bar never covers or
+  // cuts its text.
+  .shabad-deck--with-info {
+    display: flex;
+    flex-direction: column;
+
+    #viewer-container-slide-wrapper {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+      // A slide with more than fits stops at the bar, as it would at the
+      // bottom of the screen, instead of spilling over it.
+      overflow: hidden;
+    }
+  }
+
+  .shabad-info {
+    align-items: center;
+    background-color: rgba(128, 128, 128, 0.12);
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: 46px;
+    // Room for the logo on the left, and the same on the right to keep the
+    // details centred.
+    padding: 0.8vh calc(#{$shabad-info-logo-width} + 24px);
+    position: relative;
+    z-index: 5;
+
+    &__logo {
+      fill: $grey;
+      left: 12px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: $shabad-info-logo-width;
+    }
+
+    &__text {
+      animation: shabad-info-fade-in 0.6s ease;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .shabad-info__detail + .shabad-info__detail::before {
+      content: '•';
+      margin: 0 0.8em;
+      opacity: 0.5;
+    }
+  }
+}
+
+@keyframes shabad-info-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

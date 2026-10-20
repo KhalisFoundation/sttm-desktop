@@ -14,12 +14,15 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
+import { ShabadInfo } from '../Slide/ShabadInfo';
+import { useShabadInfo } from '../hooks/use-shabad-info';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
+import { i18n } from '../../common/i18n';
 
 const os = require('os');
 const remote = require('@electron/remote');
+const aiTranslationDB = require('../../banidb/pss-db');
 
-const { i18n } = remote.require('./app');
 const platform = os.platform();
 
 const themes = require('../../../configs/themes.json');
@@ -121,6 +124,19 @@ function ShabadDeck() {
     try {
       const translations = JSON.parse(activeVerse[0].Translations);
 
+      // Inject the AI translation when one of its sources is selected, so the
+      // English option's visibility is computed from the text actually shown
+      if (aiTranslationDB.isAiSource(translationEnglishSource)) {
+        const translationText = aiTranslationDB.getTranslation(
+          activeVerse[0].ID,
+          translationEnglishSource,
+        );
+        if (translationText) {
+          if (!translations.en) translations.en = {};
+          translations.en[translationEnglishSource] = translationText;
+        }
+      }
+
       const visibilityMap = {
         'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
         'translation-english': translations?.en?.[translationEnglishSource]?.length,
@@ -141,6 +157,19 @@ function ShabadDeck() {
 
   const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
+  // Shabad info is only shown for shabads (banis and ceremonies mix Angs), and
+  // only while there's something to show; otherwise the display is unchanged.
+  const isShabad = !isMiscSlide && !isSundarGutkaBani && !isCeremonyBani;
+  const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
+  const showsShabadInfo = shabadInfoDetails.length > 0;
+
+  // The bar comes and goes on its own (once the details load, and when the
+  // "Show for n seconds" time is up), not only on a line change, so recast then.
+  const shabadInfoKey = shabadInfoDetails.join('|');
+  useEffect(() => {
+    global.platform.ipc.send('cast-to-receiver');
+  }, [shabadInfoKey]);
+
   useEffect(() => {
     let currentShabad = activeShabadId;
     if (!currentShabad) {
@@ -153,7 +182,12 @@ function ShabadDeck() {
         currentShabad = pane3.activeShabad;
       }
     }
-    if (!isMiscSlide && activeVerseId) {
+    // A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
+    // aren't verse ids, so looking them up in the pane's "shabad" (the bani
+    // id) showed that shabad's verses instead, e.g. Japji Sahib's for Gur
+    // Mantar (bani 1 → shabad 1).
+    const isShabadShown = !isSundarGutkaBani && !isCeremonyBani;
+    if (!isMiscSlide && activeVerseId && isShabadShown) {
       if (akhandpatt) {
         loadShabad(currentShabad, activeVerseId).then((verses) => setActiveVerse(verses));
       } else {
@@ -280,7 +314,7 @@ function ShabadDeck() {
         settingType: 'navigator',
       }),
     );
-  }, [activeVerse, setFilteredBaniOptions]);
+  }, [activeVerse, setFilteredBaniOptions, translationEnglishSource, teekaSource]);
 
   return (
     <>
@@ -300,6 +334,8 @@ function ShabadDeck() {
           akhandpatt && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
+          // The info bar sits under the slide, which shrinks to make room.
+          showsShabadInfo && 'shabad-deck--with-info',
         )}
         style={applyTheme()}
       >
@@ -331,8 +367,15 @@ function ShabadDeck() {
             <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
           )}
         </div>
+        {showsShabadInfo ? (
+          <ShabadInfo
+            details={shabadInfoDetails}
+            color={getCurrentThemeInstance()['translation-color']}
+          />
+        ) : null}
       </div>
-      <ViewerIcon className="viewer-logo" />
+      {/* The info bar carries the logo while it's shown. */}
+      {!showsShabadInfo && <ViewerIcon className="viewer-logo" />}
     </>
   );
 }

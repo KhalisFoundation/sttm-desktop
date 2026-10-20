@@ -7,10 +7,7 @@ import ViewerPane from './viewer/ViewerPane';
 import { Pane } from '../common/sttm-ui/pane';
 import { singleDisplayContent, singleDisplayFooter, singleDisplayHeader } from './single-display';
 import { useSlides } from '../common/hooks';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../common/i18n';
 
 const Navigator = () => {
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
@@ -72,13 +69,7 @@ const Navigator = () => {
 
   return (
     <>
-      <div
-        className={
-          isCurrentWorkSpaceSingleDisplay
-            ? 'single-display-viewer'
-            : 'navigator-row'
-        }
-      >
+      <div className={isCurrentWorkSpaceSingleDisplay ? 'single-display-viewer' : 'navigator-row'}>
         {!isCurrentWorkSpaceSingleDisplay && <SearchPane />}
         <ViewerPane />
       </div>

@@ -1,9 +1,8 @@
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import insertSlide from '../constants/slidedb';
+import { i18n } from '../i18n';
 
 const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
 
 const analytics = remote.getGlobal('analytics');
 

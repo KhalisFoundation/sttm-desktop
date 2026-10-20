@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { DEFAULT_OVERLAY } from '../../common/constants';
-
-const remote = require('@electron/remote');
-
-const { i18n } = remote.require('./app');
+import { i18n } from '../../common/i18n';
 
 const ToolbarItem = ({ itemName }) => {
   const { overlayScreen, userToken } = useStoreState((state) => state.app);
