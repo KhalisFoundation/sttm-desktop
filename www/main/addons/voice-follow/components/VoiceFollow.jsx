@@ -3803,8 +3803,7 @@ const VoiceFollow = () => {
             Date.now() - fragRef.current.since < PC_FRAGMENT_COOLDOWN_S * 1000
           )
             assisted = false;
-          if (assisted && slot.wins === Math.max(1, needed - 1))
-            return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
+          return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
         };
         const decaySlot = (slot) => {
           slot.wins = Math.max(0, slot.wins - 1); // eslint-disable-line no-param-reassign
