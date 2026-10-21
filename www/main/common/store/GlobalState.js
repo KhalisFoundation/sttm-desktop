@@ -22,6 +22,13 @@ const GlobalState = createStore({
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
     userToken: '',
+    // Voice Autopilot: Autopilot tab open (never in this build: the tab is not shown) and a
+    // session running. Read and set by addons/voice-follow/components/VoiceFollow.jsx.
+    autopilotEnabled: false,
+    autopilotLive: false,
+    // Voice Autopilot collector: what it is doing with the microphone ('off' | 'listening' |
+    // 'recording'), for the Sharing indicator (shadow/RecordingNotice.jsx).
+    shadowMicState: 'off',
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
       return state;
@@ -33,6 +40,15 @@ const GlobalState = createStore({
     setUserToken: action((state, payload) => {
       state.userToken = payload;
       return state;
+    }),
+    setAutopilotEnabled: action((state, payload) => {
+      state.autopilotEnabled = !!payload;
+    }),
+    setAutopilotLive: action((state, payload) => {
+      state.autopilotLive = !!payload;
+    }),
+    setShadowMicState: action((state, payload) => {
+      state.shadowMicState = payload || 'off';
     }),
   },
   baniController: {

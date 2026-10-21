@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { i18n } from '../../../common/i18n';
+import { SharingIndicator } from '../../../addons/voice-follow/shadow/RecordingNotice';
 
 const SearchFooter = () => {
   const { searchShabadsCount, pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
@@ -15,6 +16,7 @@ const SearchFooter = () => {
       <span className="search-footer-span2">Sri Dasam Granth</span>
       <span className="search-footer-span3">Amrit Keertan</span>
       <span className="search-footer-span4">Other</span>
+      <SharingIndicator />
       <span>{searchShabadsCount ? `${searchShabadsCount} Results` : ''}</span>
       {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') && (
         <div className="default-pane-switcher">

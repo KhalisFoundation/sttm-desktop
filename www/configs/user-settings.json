@@ -87,7 +87,7 @@
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["limit-change-log", "statistics"]
+      "settings": ["limit-change-log", "statistics", "collector-level"]
     }
   },
   "settings": {
@@ -377,6 +377,49 @@
       "title": "COLLECT_STATISTICS",
       "initialValue": true,
       "store": "userPrefs.app.analytics.collectStatistics"
+    },
+    "shadow-recording": {
+      "title": "SHADOW_RECORDING",
+      "dontApplyClass": true,
+      "initialValue": false,
+      "notes": "SHADOW_RECORDING_MSG"
+    },
+    "collector-level": {
+      "title": "COLLECTOR_LEVEL",
+      "type": "dropdown",
+      "dontApplyClass": true,
+      "options": {
+        "off": "COLLECTOR_OFF",
+        "labels": "COLLECTOR_LABELS",
+        "audio": "COLLECTOR_AUDIO"
+      },
+      "initialValue": "labels",
+      "notes": "COLLECTOR_LEVEL_MSG"
+    },
+    "install-id": {
+      "title": "INSTALL_ID",
+      "dontApplyClass": true,
+      "initialValue": ""
+    },
+    "shadow-notice": {
+      "title": "SHADOW_NOTICE",
+      "dontApplyClass": true,
+      "initialValue": 0
+    },
+    "shadow-tester": {
+      "title": "SHADOW_TESTER",
+      "dontApplyClass": true,
+      "initialValue": ""
+    },
+    "hf-token": {
+      "title": "HF_TOKEN",
+      "dontApplyClass": true,
+      "initialValue": ""
+    },
+    "improve-voice-follow": {
+      "title": "IMPROVE_VOICE_FOLLOW",
+      "initialValue": true,
+      "notes": "IMPROVE_VOICE_FOLLOW_MSG"
     },
     "theme": {
       "title": "THEME",

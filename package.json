@@ -11,8 +11,10 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
+    "test:unit": "node --test www/main/addons/voice-follow/components/ www/main/addons/voice-follow/shadow/ && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
+    "postbuild": "node packaging/inject-upload-sas.js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
     "pack:macArm": "npm run build && npm run rebuild-sqlite && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",
@@ -33,7 +35,8 @@
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
     "rebuild-sqlite": "cross-env npm_config_build_from_source=true electron-rebuild -f --only better-sqlite3",
-    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite"
+    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite",
+    "test:voice-follow": "node --test test/voice-follow/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -115,6 +118,7 @@
     "node-fetch-progress": "^1.0.2",
     "node-gyp": "^9.4.0",
     "noty": "^3.2.0-beta",
+    "onnxruntime-node": "^1.18.0",
     "portfinder": "1.0.32",
     "prop-types": "^15.8.1",
     "qrcode": "^1.5.3",
@@ -157,6 +161,7 @@
       "!**/{.eslintignore,.eslintrc,.gitmodules,.htmlhintrc,.stylelintrc,.travis.yml,appveyor.yml,data.db,id_rsa.enc,README,STTM.provisionprofile}",
       "!**/*.map",
       "!www/main/**/*.{js,jsx}",
+      "!build-resources${/*}",
       "!www/assets/*.db"
     ],
     "asarUnpack": [
@@ -164,7 +169,11 @@
     ],
     "npmRebuild": false,
     "extraResources": [
-      "data.db"
+      "data.db",
+      {
+        "from": "build-resources/voice-follow/model.int8.onnx",
+        "to": "voice-follow/model.int8.onnx"
+      }
     ],
     "directories": {
       "buildResources": "assets",
@@ -186,7 +195,7 @@
       "hardenedRuntime": true,
       "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}",
       "extendInfo": {
-        "NSMicrophoneUsageDescription": "Please give us access to your microphone for voice search",
+        "NSMicrophoneUsageDescription": "STTM uses the microphone for voice search and Voice Autopilot",
         "NSCameraUsageDescription": "Please give us access to your camera",
         "com.apple.security.device.audio-input": true,
         "com.apple.security.device.camera": true

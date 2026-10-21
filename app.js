@@ -38,6 +38,9 @@ const maxChangeLogSeenCount = 5;
 /* eslint-disable import/no-unresolved, import/extensions */
 const Store = require('./www/js/store');
 const {
+  registerRetrievalService,
+} = require('./www/js/addons/voice-follow/engine/retrieval/main-service');
+const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
 const { styles } = require('./resetViewerStyles');
@@ -95,6 +98,49 @@ if (currentTheme === undefined) {
 }
 
 let mainWindow;
+// Voice Autopilot: the Shabad retrieval index runs outside the renderer (main-service.js).
+const voiceFollowRetrieval = registerRetrievalService({
+  ipcMain,
+  userData: app.getPath('userData'),
+  isAllowed: (sender) =>
+    !!mainWindow && !mainWindow.isDestroyed() && sender === mainWindow.webContents,
+});
+app.once('will-quit', () => {
+  voiceFollowRetrieval.dispose().catch(() => {});
+});
+// Voice Autopilot collector: hold the quit up to 20 s to upload the session that just ended.
+// Anything going wrong here must never stop the app from quitting.
+let shadowFlushed = false;
+app.on('will-quit', (e) => {
+  if (shadowFlushed) return;
+  shadowFlushed = true;
+  // Sharing turned off in Settings: nothing is uploaded, not even at quit.
+  // (Read fresh: it may have been switched off during this run.)
+  try {
+    if (savedSettingsCamelCase().shadowRecording === false) return;
+  } catch (_) {
+    /* unreadable settings: fall through to the usual flush */
+  }
+  e.preventDefault();
+  try {
+    // eslint-disable-next-line global-require, import/no-unresolved, import/extensions
+    const shadowUploader = require('./www/js/addons/voice-follow/shadow/uploader');
+    // The second quit must come on a later turn of the event loop: a quit issued while
+    // this will-quit is still being dispatched (nothing left to upload resolves at once)
+    // is swallowed and the app stays open with no window. Whatever happens, exit.
+    const quitAgain = () => setTimeout(() => app.quit(), 50);
+    const hardExit = setTimeout(() => app.exit(0), 30000);
+    shadowUploader
+      .flush(path.join(app.getPath('userData'), 'voice-follow', 'shadow'), 20000)
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(hardExit);
+        quitAgain();
+      });
+  } catch (_) {
+    setTimeout(() => app.quit(), 50);
+  }
+});
 let viewerWindow = false;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
@@ -932,6 +978,25 @@ ipcMain.on('update-global-setting', (event, setting) => {
 
 ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
+});
+
+// Voice Autopilot collector: is a viewer window up (this STTM is presenting)? The
+// collector only records while presenting (shadow/presenting.js).
+ipcMain.handle('voice-follow:presenting', () => ({
+  viewerOpen: !!(viewerWindow && !viewerWindow.isDestroyed() && viewerWindow.isVisible()),
+}));
+
+// Voice Autopilot: the system microphone permission, read without asking.
+// 'unknown' where the system has no such setting (Linux).
+ipcMain.handle('voice-follow:mic-access', () => {
+  try {
+    if ((platform === 'darwin' || platform === 'win32') && systemPreferences.getMediaAccessStatus) {
+      return systemPreferences.getMediaAccessStatus('microphone');
+    }
+  } catch (error) {
+    // Fall through: the caller then relies on the capture error instead.
+  }
+  return 'unknown';
 });
 
 ipcMain.on('get-media-access-status', async (event, mediaType) => {

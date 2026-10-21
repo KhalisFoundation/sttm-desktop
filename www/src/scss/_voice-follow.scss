@@ -1,0 +1,1438 @@
+// ---------------------------------------------------------------------------
+// Voice-Follow cards (2026-09): the sevadar's view of what is being followed.
+// Matches the controller's own palette (white card, #222 text, STTM orange
+// accent) instead of a dark glass sheet. Layout: Now (the line being followed)
+// -> Might change to (the judge's live candidates with honest scores). Motion is
+// kept to fades and short slides so nothing jumps.
+// ---------------------------------------------------------------------------
+$vf2-orange: #f39c1d;
+$vf2-ink: #222;
+$vf2-muted: #6b6b6b;
+$vf2-faint: #9a9a9a;
+$vf2-line: #ececec;
+$vf2-green: #43ac6a;
+$vf2-red: #d64545;
+$vf2-yellow: #c99700;
+$vf2-yellow-bar: #f2c200;
+
+.vf-dl {
+  height: 6px;
+  border-radius: 6px;
+  background: $vf2-line;
+  overflow: hidden;
+  .vf-dl-bar {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+    background: $vf2-orange;
+    transition: width 0.2s ease;
+  }
+}
+.vf-status {
+  font-size: 12px;
+  line-height: 1.4;
+  color: $vf2-muted;
+  word-break: break-word;
+}
+
+.vf2-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vf2-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $vf2-muted;
+}
+.vf2-label-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vf2-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $vf2-faint;
+  &.is-on {
+    background: $vf2-green;
+    box-shadow: 0 0 0 3px rgba(67, 172, 106, 0.18);
+  }
+  &.is-seeking {
+    background: $vf2-orange;
+    animation: vf2-breathe 1.4s ease-in-out infinite;
+  }
+}
+@keyframes vf2-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(243, 156, 29, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(243, 156, 29, 0);
+  }
+}
+
+// Now: the line being followed.
+.vf2-now {
+  padding: 12px 14px 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid $vf2-line;
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  &.is-following {
+    border-color: rgba(67, 172, 106, 0.35);
+  }
+  &.is-searching .vf2-line {
+    color: $vf2-muted;
+    font-size: 15px;
+  }
+}
+.vf2-line {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.35;
+  color: $vf2-ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  animation: vf2-fade 0.28s ease-out;
+  &.is-expanded {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+.vf2-opening {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: $vf2-faint;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes vf2-fade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// Candidate pangti (change card and the Possible new Shabads rows).
+.vf2-cand-line {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.35;
+  color: $vf2-ink;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vf2-cand-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: $vf2-muted;
+  font-variant-numeric: tabular-nums;
+  .is-checking &,
+  .is-confirming & {
+    color: $vf2-orange;
+  }
+}
+.vf2-cand-track {
+  margin-top: 7px;
+  height: 5px;
+  border-radius: 2px;
+  background: $vf2-line;
+  overflow: hidden;
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    background: $vf2-orange;
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+// Live board: calibrated percentages that move with the evidence (red -> yellow -> green).
+.vf2-live-pct {
+  flex: none;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease;
+  &.is-low {
+    color: $vf2-red;
+  }
+  &.is-mid {
+    color: $vf2-yellow;
+  }
+  &.is-high {
+    color: $vf2-green;
+  }
+}
+.vf2-now .vf2-cand-track {
+  margin-top: 8px;
+}
+.vf2-live-fill {
+  position: relative;
+  overflow: hidden;
+  transition:
+    width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.45s ease !important;
+  // A light sheen slides along the bar while its value is moving: evidence arriving.
+  &.is-moving::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: vf2-sheen 1.2s ease-out;
+  }
+  &.is-low {
+    background: $vf2-red !important;
+  }
+  &.is-mid {
+    background: $vf2-yellow-bar !important;
+  }
+  &.is-high {
+    background: $vf2-green !important;
+  }
+}
+// What the model hears: one faint line, newest words on the right, older ones fading out.
+.vf2-next-line {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font-size: 0.82em;
+  line-height: 1.35;
+  color: var(--vf-ink);
+  opacity: 0.62; // darker than before, still clearly below the current pangti
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+// The next pangti and Stop share one row under the current pangti.
+.vf2-next-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  .vf2-next-line {
+    flex: 1;
+    font-size: 15px;
+    // The row is a flex box, so text-overflow on it never applies: the pangti span
+    // itself ellipsizes (otherwise a long pangti was cut off mid-word at Stop).
+    > .gurmukhi {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+// Full-line mode (the default): the next pangti wraps too, so it is shown whole.
+.vf2-line.is-expanded + .vf2-next-row .vf2-next-line {
+  align-items: flex-start;
+  white-space: normal;
+  > .gurmukhi {
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
+  > .vf2-next-mark {
+    margin-top: 0.15em;
+  }
+}
+// A thin grey bar marks the next pangti (instead of a "Next" label).
+.vf2-next-mark {
+  flex: none;
+  width: 3px;
+  height: 1.05em;
+  margin-right: 10px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.35;
+}
+.vf2-stop {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  font-family: $body-font-family;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  background: #d64541;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease;
+  .fa {
+    font-size: 9px;
+  }
+  &:hover {
+    background: #c63a36;
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: none;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(214, 69, 65, 0.45);
+    outline-offset: 2px;
+  }
+}
+
+.vf2-next-line + .vf2-next-line {
+  opacity: 0.3;
+}
+
+.vf2-heard {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -4px 0 -2px 4px; // flush with the card edge below (border + radius)
+  font-size: 12px;
+  line-height: 1.4;
+  color: $vf2-faint;
+  min-width: 0;
+}
+.vf2-heard-label {
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $vf2-faint;
+}
+.vf2-heard-tentative {
+  opacity: 0.45;
+}
+.vf2-heard-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  direction: ltr;
+  text-align: left;
+  // Words run left to right. Once they overflow, the box is scrolled to its end (newest
+  // words in view) and the oldest fade out on the left.
+  &.is-overflowing {
+    mask-image: linear-gradient(to right, transparent 0, #000 36px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 36px);
+  }
+}
+.vf2-heard-tentative {
+  margin-left: 0.35em;
+}
+.vf2-cand-meta {
+  margin-top: 5px;
+  font-size: 11px;
+  color: $vf2-faint;
+}
+
+.vf2-empty {
+  padding: 4px 6px 2px;
+  font-size: 12px;
+  color: $vf2-faint;
+}
+
+// One card, only while a change is being confirmed.
+.vf2-change {
+  padding: 10px 12px 10px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid $vf2-line;
+  animation: vf2-fade 0.28s ease-out;
+  .vf2-cand-line {
+    display: block;
+    margin-top: 5px;
+    font-size: 16px;
+  }
+  &.is-confirming {
+    background: #fff;
+    border-color: $vf2-line;
+  }
+}
+
+// --- Sevadaar assist: Auto / Ask me, and tappable candidates ---------------
+.vf2-change.is-tappable {
+  background: #eefbf0;
+  border-color: #2e9e5b;
+  animation: vf2-ready 1.4s ease-in-out infinite;
+  .vf2-dot.is-on {
+    background: #2e9e5b;
+  }
+}
+@keyframes vf2-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+// Card styles. Every scored card (current line, change, candidate) carries --pc (its colour)
+// and --pct (its percentage). The box itself stays white; the colour is in what moves.
+.vf-autopilot .vf2-now,
+.vf-autopilot .vf2-change {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border-color: $vf2-line;
+  animation: none;
+  transform: none;
+  > * {
+    position: relative;
+  }
+}
+// wash: a faint tinted fill spreads across the card from the left as the % climbs.
+.vf-autopilot[data-vf-cards='wash'] {
+  .vf2-now::before,
+  .vf2-change.is-tappable::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--pct, 0%);
+    background: var(--pc, transparent);
+    opacity: 0.11;
+    transition:
+      width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.6s ease;
+  }
+}
+// rail: a thin rail on the left edge fills bottom-to-top with the colour. It is the only
+// indicator on the card: no bar under the text.
+.vf-autopilot[data-vf-cards='rail'] {
+  .vf2-cand-track {
+    display: none;
+  }
+  .vf2-now,
+  .vf2-change.is-tappable {
+    padding-left: 18px;
+  }
+  .vf2-now::before,
+  .vf2-change.is-tappable::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    height: var(--pct, 0%);
+    background: var(--pc, transparent);
+    transition:
+      height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.6s ease;
+  }
+}
+// clean: nothing on the card; colour only in the number and the bar.
+// Heartbeat: a slow, faint breath of the current card on a decode that matched well.
+.vf2-now.is-beat {
+  animation: vf2-beat 1.6s ease-in-out;
+}
+@keyframes vf2-beat {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.006);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.vf2-change .vf2-cand-pct {
+  margin-left: auto;
+}
+.shadow-consent {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+.shadow-consent-card {
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  padding: 24px;
+  border-radius: 10px;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+  p {
+    margin: 0 0 16px;
+    line-height: 1.45;
+    font-size: 14px;
+  }
+  label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  input {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+}
+.shadow-consent-card {
+  width: 520px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+.shadow-consent-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+  button {
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 6px;
+    background: #e8702a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .shadow-consent-off {
+    margin-right: auto;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+  }
+  .shadow-consent-audio {
+    border: 1px solid #e8702a;
+    background: #fff;
+    color: #b8560f;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+.shadow-consent-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #fdf0e7;
+  color: #e8702a;
+  font-size: 22px;
+}
+.shadow-consent-card h2 {
+  text-align: center;
+}
+.shadow-consent-card .shadow-consent-more {
+  margin: 0 0 14px;
+  color: #6b6b6b;
+  font-size: 12px;
+}
+// The recording notice text (first-launch card and the chip's popover share it).
+.shadow-notice-text {
+  font-size: 13px;
+  line-height: 1.45;
+  p {
+    margin: 0 0 10px;
+    font-size: 13px;
+  }
+  ul {
+    margin: 0 0 10px;
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+}
+// "Recording audio" / "Mic on" chip at the right of the workspace bar (controller only), clear
+// of the window buttons and the navigator sidebar. The bar styles every div as a 200px tab, so
+// the chip and its popover undo that.
+.workspace-bar .shadow-rec {
+  position: relative;
+  height: auto;
+  min-width: 0;
+  line-height: normal;
+  text-align: left;
+  cursor: default;
+  z-index: 20;
+  div {
+    height: auto;
+    min-width: 0;
+    text-align: left;
+    cursor: default;
+  }
+}
+.shadow-rec-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 1px solid #ddd;
+  border-radius: 11px;
+  background: #f2f2f2;
+  color: #555;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  cursor: pointer;
+  &.is-recording {
+    border-color: #f3c1c1;
+    background: #fdecec;
+    color: #b42318;
+  }
+}
+.shadow-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9a9a9a;
+  .is-recording & {
+    background: #d92d20;
+  }
+}
+// The bar is its own stacking context (z-index 2), level with the panes below it; lift it
+// while the popover is open so the popover is drawn over them.
+.workspace-bar:has(.shadow-rec-pop) {
+  z-index: 1000;
+}
+.workspace-bar .shadow-rec .shadow-rec-pop,
+.search-footer .shadow-share .shadow-rec-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  padding: 14px 16px;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  font-weight: normal;
+  h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+  .shadow-rec-more {
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #0b2a5b;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+.workspace-bar .shadow-rec .shadow-rec-actions,
+.search-footer .shadow-share .shadow-rec-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+  button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .shadow-rec-off {
+    border-color: #e8702a;
+    background: #e8702a;
+    color: #fff;
+  }
+}
+
+// Heard words that appear in a candidate line are bold: the line shows why it is listed.
+.vf2-hl {
+  font-weight: 700;
+}
+// One-tap rating after Stop.
+.vf-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b6b6b;
+  span {
+    flex: 1;
+  }
+  button {
+    border: 1px solid #ececec;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Autopilot tab of the search pane. Colours come
+// from the variables below so the cards follow the theme (dark themes override
+// them in themes/helpers/_dark-base.scss).
+// ---------------------------------------------------------------------------
+// The slot fills the pane exactly: the cards scroll inside it and the hearing bar stays
+// pinned at the bottom.
+.vf-autopilot-slot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.vf-autopilot {
+  --vf-card: #fff;
+  --vf-surface: #fafafa;
+  --vf-ink: #{$vf2-ink};
+  --vf-on-ink: #fff;
+  --vf-muted: #{$vf2-muted};
+  --vf-faint: #{$vf2-faint};
+  --vf-line: #{$vf2-line};
+  --vf-accent: #{darken($vf2-orange, 12%)};
+
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+  // English text in the app's own font; Gurbani is in .gurmukhi spans (the app's
+  // Gurmukhi font, set in controller.scss).
+  font-family: $body-font-family;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--vf-ink);
+
+  button,
+  select,
+  input {
+    font-family: inherit;
+  }
+
+  &.is-idle {
+    align-items: center;
+    justify-content: center;
+  }
+  &.is-active {
+    padding: 0;
+    overflow: hidden;
+
+    > .vf2-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px 20px;
+
+      // Cards keep their full height and the body scrolls: a card with overflow:hidden
+      // would otherwise be squeezed and lose its bottom (the next verse, the bar).
+      > * {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .vf2-now,
+  .vf2-change {
+    background: var(--vf-card);
+    border-color: var(--vf-line);
+  }
+  .vf2-line,
+  .vf2-cand-line {
+    color: var(--vf-ink);
+  }
+  .vf2-label,
+  .vf-status {
+    color: var(--vf-muted);
+  }
+  .vf2-empty {
+    color: var(--vf-faint);
+  }
+  .vf2-cand-track,
+  .vf-dl {
+    background: var(--vf-line);
+  }
+}
+
+// Idle: one large mic to start, what Autopilot does, and the microphone it listens through.
+.vf-ap-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+
+  .vf-dl {
+    width: 100%;
+  }
+}
+.vf-ap-mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 30px;
+  background: $vf2-orange;
+  box-shadow: 0 6px 22px rgba(243, 156, 29, 0.35);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 26px rgba(243, 156, 29, 0.45);
+  }
+  &:active {
+    transform: none;
+    box-shadow: none;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 4px;
+  }
+}
+.vf-ap-start-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vf-ap-start-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--vf-ink);
+}
+.vf-ap-start-desc {
+  max-width: 280px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--vf-muted);
+}
+// Microphone blocked by the system: a crossed-out mic in a dashed ring, and two actions.
+.vf-ap-mic-off {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border: 2px dashed rgba(127, 127, 127, 0.35);
+  border-radius: 50%;
+  background: rgba(127, 127, 127, 0.08);
+  color: var(--vf-faint);
+  font-size: 30px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 40px;
+    border-radius: 2px;
+    background: $vf2-red;
+    transform: rotate(-45deg);
+  }
+}
+.vf-ap-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  .vf2-switch {
+    padding: 7px 16px;
+  }
+}
+// "Listening through [ mic name ▾ ]": a native select dressed as a soft pill.
+.vf-ap-source {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--vf-muted);
+}
+.vf-ap-source-pick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border-radius: 8px;
+  background: rgba(127, 127, 127, 0.12);
+
+  > i {
+    position: absolute;
+    left: 11px;
+    font-size: 13px;
+    pointer-events: none;
+  }
+  &::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    font-size: 10px;
+    pointer-events: none;
+  }
+  select {
+    max-width: 260px;
+    padding: 6px 26px 6px 28px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vf-muted);
+    font: inherit;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &:disabled {
+      padding-right: 12px;
+      opacity: 1;
+      cursor: default;
+    }
+    &:focus-visible {
+      outline: 2px solid rgba(243, 156, 29, 0.5);
+      outline-offset: 2px;
+    }
+  }
+  &:has(select:disabled)::after {
+    display: none;
+  }
+}
+
+// Possible new Shabads: one plain card, a row per Shabad with its match and a Switch button.
+.vf2-shabads {
+  border: 1px solid var(--vf-line);
+  border-radius: 12px;
+  background: var(--vf-card);
+  overflow: hidden;
+
+  .vf2-empty {
+    padding: 0 16px 12px;
+  }
+}
+.vf2-shabads-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 16px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.vf2-shabads-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--vf-accent);
+}
+.vf2-shabads-count {
+  color: var(--vf-faint);
+  font-variant-numeric: tabular-nums;
+}
+.vf2-shabad-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--vf-line);
+  animation: vf2-fade 0.28s ease-out;
+  transition: opacity 0.6s ease;
+
+  // No new match for a while: the card stays (still tappable) but fades before it goes.
+  &.is-fading {
+    opacity: 0.45;
+  }
+
+  .vf2-cand-line {
+    font-size: 16px;
+  }
+  // One calm colour for every candidate: the number says how strong it is.
+  .vf-autopilot & .vf2-cand-track {
+    display: block;
+    flex: none;
+    width: 96px;
+    height: 5px;
+    margin-top: 0;
+    border-radius: 3px;
+  }
+  .vf2-live-fill {
+    background: $vf2-orange !important;
+  }
+  .vf2-live-pct {
+    min-width: 3.4em;
+    margin-left: 0;
+    font-size: 15px;
+    text-align: right;
+    color: var(--vf-accent) !important;
+  }
+}
+.vf2-switch {
+  flex: none;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vf-ink);
+  background: rgba(127, 127, 127, 0.14);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(127, 127, 127, 0.24);
+  }
+  &.is-primary {
+    color: var(--vf-on-ink);
+    background: var(--vf-ink);
+    &:hover {
+      opacity: 0.88;
+    }
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(243, 156, 29, 0.5);
+    outline-offset: 2px;
+  }
+}
+.vf2-next-label {
+  font-family: $body-font-family;
+}
+
+// Bottom bar while running (40px, like the tab bar above): a small live waveform, then
+// what it hears (the oldest words faded, the newest at full strength), and Stop.
+.vf-ap-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 12px 0 16px;
+  border-top: 1px solid var(--vf-line);
+  background: rgba(127, 127, 127, 0.07);
+}
+.vf-ap-heard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+
+  gap: 12px;
+
+  // The heard Gurbani stays at full strength beside the wave (it used to fade to 30% over
+  // its left half, so the words next to the wave looked lost in it). Only once the words
+  // overflow do the oldest fade out over a short edge.
+  .vf2-heard-text {
+    font-size: 14px;
+    color: var(--vf-ink);
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .vf2-heard-text.is-overflowing {
+    mask-image: linear-gradient(to right, transparent 0, #000 28px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px);
+  }
+  .vf2-heard-placeholder {
+    color: var(--vf-faint);
+  }
+}
+.vf-ap-bar .vf-ap-wave {
+  flex: none;
+  width: 120px;
+  height: 20px;
+  color: var(--vf-faint);
+  opacity: 0.8;
+  pointer-events: none;
+}
+// Volume label at the right of the bottom bar: no sound (red), low (amber), good (green),
+// great (dark green), with three small level bars.
+.vf-ap-vol {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: $body-font-family;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  &.is-none {
+    color: #b8322a;
+    background: rgba(214, 69, 65, 0.14);
+  }
+  &.is-low {
+    color: #9a6a00;
+    background: rgba(240, 180, 40, 0.2);
+  }
+  &.is-good {
+    color: #3f8a24;
+    background: rgba(107, 191, 59, 0.16);
+  }
+  &.is-great {
+    color: #1f5f12;
+    background: rgba(47, 125, 30, 0.2);
+  }
+}
+.vf-ap-vol-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  i {
+    display: block;
+    width: 3px;
+    border-radius: 1px;
+    background: currentColor;
+    opacity: 0.25;
+    &.is-on {
+      opacity: 1;
+    }
+    &:nth-child(1) {
+      height: 5px;
+    }
+    &:nth-child(2) {
+      height: 8px;
+    }
+    &:nth-child(3) {
+      height: 11px;
+    }
+  }
+}
+.vf-ap-stop {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 10px;
+  background: #e0393f;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: none;
+  }
+}
+
+// Search | Autopilot tabs above the search pane (same look as the misc pane's tabs).
+.search-pane.has-tabs {
+  display: flex;
+  flex-direction: column;
+
+  > .pane {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+}
+.search-pane-tabs {
+  flex: none;
+  width: 100%;
+  padding: 0;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.18);
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+.search-pane-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+  padding: 0 14px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid transparent;
+
+  i {
+    font-size: 13px;
+  }
+  .audio-capture-icon {
+    flex: none;
+  }
+  &.search-pane-tab-active {
+    border-bottom-color: $vf2-orange;
+  }
+}
+.search-pane-tab-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $vf2-green;
+  animation: vf2-live 1.6s ease-out infinite;
+}
+@keyframes vf2-live {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 172, 106, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(67, 172, 106, 0);
+  }
+}
+
+// Voice Autopilot tab while Search is open: a soft Kesari light passes across the label (always), and
+// until the tab is first opened a small NEW chip pings gently (vfTabSeen in SearchPane.jsx).
+.search-pane-tab.vf-tab-shimmer {
+  .audio-capture-icon {
+    color: #e8702a;
+  }
+  .vf-tab-label {
+    background: linear-gradient(100deg, currentColor 40%, #e8702a 50%, currentColor 60%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: vf-tab-shine 3.2s ease-in-out infinite;
+  }
+}
+.vf-tab-chip {
+  position: relative;
+  padding: 1px 7px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #e8702a, #d65a12);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 15px;
+  text-transform: uppercase;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    animation: vf-tab-ping 2.6s ease-out infinite;
+  }
+}
+@keyframes vf-tab-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  60%,
+  100% {
+    background-position: -50% 0;
+  }
+}
+@keyframes vf-tab-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(232, 112, 42, 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 7px rgba(232, 112, 42, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-pane-tab.vf-tab-shimmer .vf-tab-label,
+  .vf-tab-chip::after {
+    animation: none;
+  }
+}
+
+// First-launch callout anchored under the Voice Autopilot tab (AutopilotIntro.jsx)
+.search-pane-tab {
+  .vf-intro {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    z-index: 30;
+    width: 320px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #fff;
+    color: #222;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), 0 0 0 2px $vf2-orange;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: normal;
+  }
+  .vf-intro-arrow {
+    position: absolute;
+    top: -8px;
+    left: 28px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-left: 2px solid $vf2-orange;
+    border-top: 2px solid $vf2-orange;
+    transform: rotate(45deg);
+  }
+  .vf-intro-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .vf-intro-desc {
+    color: #444;
+    margin-bottom: 12px;
+  }
+  .vf-intro-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .vf-intro-start,
+  .vf-intro-later {
+    font: inherit;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 0;
+    cursor: pointer;
+  }
+  .vf-intro-start {
+    background: $vf2-orange;
+    color: #222;
+  }
+  .vf-intro-later {
+    background: #eee;
+    color: #444;
+  }
+}
+.dark-theme .search-pane-tab .vf-intro,
+.dark-theme .search-pane-tab .vf-intro-arrow {
+  background: #2a2a2a;
+  color: #eee;
+}
+.dark-theme .search-pane-tab .vf-intro-desc {
+  color: #ccc;
+}
+.dark-theme .search-pane-tab .vf-intro-later {
+  background: #444;
+  color: #ddd;
+}
+
+// Prod collector: the quiet "Sharing" indicator in the search footer, after the source names.
+// A dot and one word; grey while idle, Kesari while a session is being shared.
+.search-footer .shadow-share {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  z-index: 20;
+  .shadow-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 6px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: #8a8a8a;
+    font-size: 12px;
+    line-height: 16px;
+    cursor: pointer;
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+  }
+  .shadow-share-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #b5b5b5;
+  }
+  &.is-sharing {
+    .shadow-share-btn {
+      color: #e8702a;
+      font-weight: 600;
+    }
+    .shadow-share-dot {
+      background: #e8702a;
+      box-shadow: 0 0 0 3px rgba(232, 112, 42, 0.18);
+    }
+  }
+  // The popover opens upwards from the footer, which sits at the bottom of the search pane.
+  .shadow-rec-pop {
+    top: auto;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: auto;
+  }
+}

@@ -13,6 +13,7 @@ import {
   LockScreen,
   AuthDialog,
   Announcement,
+  VoiceFollow,
 } from '../addons';
 import { Settings } from '../settings/';
 
@@ -206,6 +207,8 @@ const Launchpad = () => {
         <InputContext.Provider value={ref}>
           <Navigator />
         </InputContext.Provider>
+        {/* Voice Autopilot hidden run for the collector: renders nothing (no Autopilot tab). */}
+        <VoiceFollow />
       </div>
     </>
   );
