@@ -326,8 +326,14 @@ const PC_FRAGMENT_NOMINATE_S = 30;
 // decode fewer commits the switch (owner's Oct 17 test: a correct confirm shifted the judge's
 // timing so 4814 and 2727 stopped at 2 wins). 0 = off. PC_FRAGMENT_GAP_S: at most one fragment
 // confirm this often.
-const PC_FRAGMENT_ASSIST_S = 6;
+const PC_FRAGMENT_ASSIST_S = 0;
 const PC_FRAGMENT_GAP_S = 8;
+// EXPERIMENT gates (GAB-Hard, Oct 18), 0 = off:
+const PC_FRAGMENT_FRESH_S = 20; // a confirm counts only pangtis hit within this many seconds
+const PC_FRAGMENT_RETURN = 0; // the Shabad just left confirms on 2 pangtis (like "Changing to")
+const PC_FRAGMENT_COOLDOWN_S = 0; // no fragment confirm / judge assist this soon after a Shabad change
+const PC_FRAGMENT_ASSIST_MIN_LETTERS = 0; // judge assist only from a hit piece this long
+const PC_FRAGMENT_MIN_LETTERS_CONFIRM = 0; // the piece that completes a confirm must be this long
 const PC_FRAGMENT = {
   minLetters: 5,
   minScore: 0.8,
@@ -1168,6 +1174,8 @@ const VoiceFollow = () => {
     searched: '',
     recent: new Map(),
     lastConfirm: 0,
+    hitAt: new Map(),
+    since: 0,
   }); // PANKTI_FRAGMENT_CONFIRM
   const fragCacheRef = useRef(new Map()); // shabadId -> profile (PANKTI_FRAGMENT_CONFIRM's own line cache)
   const baniLengthRef = useRef('short');
@@ -3248,6 +3256,8 @@ const VoiceFollow = () => {
             fr.session = session;
             fr.store = new Map();
             fr.recent = new Map();
+            fr.hitAt = new Map();
+            fr.since = Date.now();
           }
           fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
           const nowMs = Date.now();
@@ -3273,8 +3283,9 @@ const VoiceFollow = () => {
             }
             const f0 = found?.[0];
             const margin = f0 ? f0.score - (found[1]?.score || 0) : 0;
-            if (f0 && f0.shabadId !== curId && margin >= PC_FRAGMENT_NOMINATE_MARGIN)
+            if (f0 && f0.shabadId !== curId && margin >= PC_FRAGMENT_NOMINATE_MARGIN) {
               fr.top = { id: f0.shabadId, at: nowMs };
+            }
           }
           const change = shelfRef.current.changeCard(nowMs);
           const ids = [];
@@ -3302,6 +3313,8 @@ const VoiceFollow = () => {
             .evidenceSnapshot(nowMs)
             .slice(0, PC_FRAGMENT_CANDS)
             .forEach((e) => addId(e.shabadId, 'list'));
+          if (PC_FRAGMENT_RETURN > 0 && prevShabadRef.current)
+            addId(prevShabadRef.current.id, 'change');
           [switchCandRef.current, backstopRef.current, returnSlotRef.current].forEach(
             (slot) => slot && addId(slot.shabadId, 'list'),
           );
@@ -3339,7 +3352,9 @@ const VoiceFollow = () => {
           );
           if (r.hits.length) {
             r.hits.forEach((h) => {
-              if (h.w >= 1) fr.recent.set(h.id, { at: nowMs, index: h.index });
+              if (h.w >= 1) fr.recent.set(h.id, { at: nowMs, index: h.index, len: hypFull.length });
+              if (!fr.hitAt.has(h.id)) fr.hitAt.set(h.id, new Map());
+              fr.hitAt.get(h.id).set(h.index, nowMs);
             });
             const named = r.hits.map((h) => {
               const c = cands.find((x) => x.id === h.id);
@@ -3360,8 +3375,39 @@ const VoiceFollow = () => {
               ready: r.ready,
             });
           }
+          let gate = null;
+          if (r.ready) {
+            const rc = cands.find((x) => x.id === r.ready.id);
+            const need =
+              rc && rc.role === 'change' ? PC_FRAGMENT.distinctChange : PC_FRAGMENT.distinctList;
+            if (PC_FRAGMENT_FRESH_S > 0) {
+              const ha = fr.hitAt.get(r.ready.id);
+              let fresh = 0;
+              (fr.store.get(r.ready.id) || new Map()).forEach((w, i) => {
+                if (w >= 0.3 && ha && ha.get(i) >= nowMs - PC_FRAGMENT_FRESH_S * 1000) fresh += 1;
+              });
+              if (fresh < need) gate = 'fresh';
+            }
+            if (PC_FRAGMENT_COOLDOWN_S > 0 && nowMs - fr.since < PC_FRAGMENT_COOLDOWN_S * 1000)
+              gate = gate || 'cooldown';
+            if (
+              PC_FRAGMENT_MIN_LETTERS_CONFIRM > 0 &&
+              hypFull.length < PC_FRAGMENT_MIN_LETTERS_CONFIRM
+            )
+              gate = gate || 'letters';
+            const lines = fr.store.get(r.ready.id);
+            const dump = [];
+            if (lines)
+              lines.forEach((w, i) => {
+                const ha = fr.hitAt.get(r.ready.id);
+                dump.push(
+                  `${i}:${w.toFixed(2)}@${ha && ha.get(i) ? ((nowMs - ha.get(i)) / 1000).toFixed(1) : '?'}s`,
+                );
+              });
+          }
           if (
             r.ready &&
+            !gate &&
             nowMs - fr.lastConfirm >= PC_FRAGMENT_GAP_S * 1000 &&
             !lockingRef.current &&
             session === sessionRef.current &&
@@ -3744,8 +3790,21 @@ const VoiceFollow = () => {
             PANKTI_FRAGMENT_CONFIRM > 0 && PC_FRAGMENT_ASSIST_S > 0
               ? fragRef.current.recent.get(slot.shabadId)
               : null;
-          const assisted = !!fragHit && Date.now() - fragHit.at <= PC_FRAGMENT_ASSIST_S * 1000;
-          return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
+          let assisted = !!fragHit && Date.now() - fragHit.at <= PC_FRAGMENT_ASSIST_S * 1000;
+          if (
+            assisted &&
+            PC_FRAGMENT_ASSIST_MIN_LETTERS > 0 &&
+            (fragHit.len || 0) < PC_FRAGMENT_ASSIST_MIN_LETTERS
+          )
+            assisted = false;
+          if (
+            assisted &&
+            PC_FRAGMENT_COOLDOWN_S > 0 &&
+            Date.now() - fragRef.current.since < PC_FRAGMENT_COOLDOWN_S * 1000
+          )
+            assisted = false;
+          if (assisted && slot.wins === Math.max(1, needed - 1))
+            return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
         };
         const decaySlot = (slot) => {
           slot.wins = Math.max(0, slot.wins - 1); // eslint-disable-line no-param-reassign
