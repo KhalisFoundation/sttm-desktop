@@ -313,8 +313,8 @@ ${comparisonMarker}`,
             locking: lockingRef.current, votes: [...detectVotesRef.current.entries()],
             vote: switchCandRef.current && { id: switchCandRef.current.shabadId, wins: switchCandRef.current.wins, score: switchCandRef.current.lastScore },
             backstop: backstopRef.current && { id: backstopRef.current.shabadId, wins: backstopRef.current.wins, score: backstopRef.current.lastScore },
-            cacheSize: lineCacheRef.current.size, indexSize: flIndexRef.current?.size || 0,
-            retrievalReady: !!flIndexRef.current,
+            cacheSize: lineCacheRef.current.size, indexSize: warmIndex.get()?.size || 0,
+            retrievalReady: !!warmIndex.get(),
             seeking: seekingRef.current, cursor: curCursorRef.current }) });
         ${marker}`,
       );

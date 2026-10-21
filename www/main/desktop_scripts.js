@@ -187,6 +187,8 @@ module.exports = {
                           localStorage.setItem('isDbDownloaded', true);
                           diag(`db: ready (${fs.statSync(dbPath).size} bytes)`);
                           module.exports.initDB();
+                          // Voice Autopilot rebuilds its retrieval index from the new database.
+                          window.dispatchEvent(new CustomEvent('sttm-database-updated'));
                           // Delete old DBs
                           // TODO: Update to check if directory and use fs.rmdir
                           // TODO: Add sttmdesktop.realm.management

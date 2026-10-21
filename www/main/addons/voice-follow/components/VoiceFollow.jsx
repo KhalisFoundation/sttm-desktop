@@ -20,6 +20,7 @@ const engine = require('../engine');
 const { Follower: AcousticFollower } = require('../engine/follower');
 const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
+const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
@@ -30,6 +31,8 @@ const shadowBus = require('../shadow/bus');
 const { diag } = require('../shadow/diag');
 const { SHADOW_BUILD, SHADOW_CPU_PAUSE, SHADOW_CPU_RESUME } = require('../shadow/config');
 const os = require('os'); // eslint-disable-line import/order
+const fs = require('fs'); // eslint-disable-line import/order
+const path = require('path'); // eslint-disable-line import/order
 
 // Shadow mode (tester builds): Voice-Follow runs with no panel and never touches the
 // screen; each thing it would show goes to the shadow bus, which scores it live against
@@ -51,6 +54,91 @@ const cpuSample = () =>
     },
     { idle: 0, total: 0 },
   );
+
+// Warm model: load the speech model (ONNX session + the ~1-2 s performance self-test) in
+// the background once per window, after the index is up or when the Autopilot tab is first
+// shown, so Start never pays it. Idle priority, and not while the computer is busy (same
+// bar as the hidden run's CPU guard). Only a model that is already on disk is loaded: the
+// 184 MB download stays with the first Start (tester builds bundle the file).
+const WARM_MODEL_DELAY_MS = 2000;
+// A busy computer gets up to a minute of grace, then the model loads anyway (a Start would
+// load it in the foreground otherwise). os.cpus() can read as fully busy inside a sandboxed
+// renderer, so the guard delays the load; it never cancels it.
+const WARM_MODEL_BUSY_RETRY_MS = 30000;
+const WARM_MODEL_BUSY_RETRIES = 2;
+let modelWarm = 'idle'; // 'idle' | 'scheduled' | 'done'
+const atIdle = (fn) => {
+  if (typeof window !== 'undefined' && window.requestIdleCallback) {
+    window.requestIdleCallback(fn, { timeout: 5000 });
+  } else {
+    setTimeout(fn, 0);
+  }
+};
+const warmModel = (delayMs = WARM_MODEL_DELAY_MS) => {
+  if (modelWarm !== 'idle') return;
+  if (!engine.isReady() || (engine.isLoaded && engine.isLoaded())) return;
+  modelWarm = 'scheduled';
+  const attempt = (tries) => {
+    const a = cpuSample();
+    setTimeout(() => {
+      const b = cpuSample();
+      const dt = b.total - a.total;
+      const busy = dt > 0 ? 1 - (b.idle - a.idle) / dt : 0;
+      if (busy > SHADOW_CPU_PAUSE && tries < WARM_MODEL_BUSY_RETRIES) {
+        setTimeout(() => attempt(tries + 1), WARM_MODEL_BUSY_RETRY_MS);
+        return;
+      }
+      atIdle(() => {
+        const t0 = Date.now();
+        engine.ready().then(
+          () => {
+            modelWarm = 'done';
+            diag(`vf model warm in ${Date.now() - t0} ms (cpu busy ${Math.round(busy * 100)}%)`);
+          },
+          (e) => {
+            modelWarm = 'idle'; // Start will try again and show the error itself
+            diag(`vf model warm failed: ${(e && e.message) || e}`);
+          },
+        );
+      });
+    }, 1000);
+  };
+  setTimeout(() => attempt(0), delayMs);
+};
+
+// One warm retrieval index per window (warmIndex.js): built once the Gurbani database is
+// ready, kept across Start/Stop, rebuilt only when the database changes or a build failed.
+// The build time goes to errors.log so a slow machine shows in a tester's data.
+const warmIndex = createWarmIndex({
+  create: () => createRendererRetrieval(ipcRenderer),
+  onReady: ({ ms, rows }) => {
+    diag(`vf retrieval index ready in ${ms} ms (${rows} pangtis)`);
+    if (SHADOW_BUILD && shadowBus.active()) shadowBus.note({ type: 'vf_retrieval_ready', ms });
+    warmModel();
+  },
+  onError: (error, { ms }) => {
+    const message = (error && error.message) || String(error);
+    diag(`vf retrieval prepare failed after ${ms} ms: ${message}`);
+    if (SHADOW_BUILD && shadowBus.active()) {
+      shadowBus.note({ type: 'vf_retrieval_failed', stage: 'prepare', error: message });
+    }
+    warmModel();
+  },
+});
+// The index worker reads these two files (engine/retrieval/read-corpus.js). Until the first
+// database download has put them in place there is nothing to build; the download's
+// 'sttm-database-updated' event (desktop_scripts.js) starts the build then.
+const DATABASE_FILES = ['sttmdesktop-evergreen-v2.realm', 'realm-schema-evergreen.json'];
+const databaseFilesPresent = () => {
+  try {
+    // eslint-disable-next-line global-require
+    const dir = require('@electron/remote').app.getPath('userData');
+    return DATABASE_FILES.every((f) => fs.existsSync(path.join(dir, f)));
+  } catch (_) {
+    return true; // outside Electron (tests): let the build itself decide
+  }
+};
+const WARM_INDEX_DELAY_MS = 1500; // after the window's first paint
 
 const { norm: vfNorm, partialRatio } = engine;
 
@@ -1012,6 +1100,11 @@ const VoiceFollow = () => {
   // The search pane's Autopilot tab hands us a node to render the live view into; the
   // session itself keeps running here whichever tab is showing.
   const autopilotSlot = useAutopilotSlot();
+  // The Autopilot tab is on screen: the sevadaar may press Start soon, so warm the model now
+  // (a no-op once it is loaded; the index build at launch usually got here first).
+  useEffect(() => {
+    if (autopilotSlot) warmModel(0);
+  }, [autopilotSlot]);
   const setAutopilotLive = useStoreActions((actions) => actions.app.setAutopilotLive);
 
   const followerRef = useRef(null); // Follower (track a known shabad/bani)
@@ -1023,7 +1116,6 @@ const VoiceFollow = () => {
   const sessionRef = useRef(0); // invalidates asynchronous work after cleanup/restart
   const transcriptSeqRef = useRef(0);
   const transcriptAbortRef = useRef(null);
-  const retrievalOwnerRef = useRef(null);
   // Autopilot: one continuous session that detects, follows, and auto-switches
   // shabads hands-free. phaseRef gates which engine each audio chunk feeds.
   const autopilotRef = useRef(false);
@@ -1210,14 +1302,12 @@ const VoiceFollow = () => {
   // Acoustic backstop contender (same shape + display/lastScore/committed):
   // the best line-text match across the screened shabad field.
   const backstopRef = useRef(null);
-  // Read-only canonical retrieval service, isolated from the renderer process.
-  const flIndexRef = useRef(null); // ready retrieval client
-  const flIndexLoadingRef = useRef(null); // in-flight index promise
+  // Read-only canonical retrieval service, isolated from the renderer process (warmIndex).
+  const runStartedAtRef = useRef(Date.now()); // when the current run began (retry gate)
   const lineCacheRef = useRef(new Map()); // shabadId -> { linesNorm, verses } | null (loading)
   const bsWinsRef = useRef(new Map()); // backstop wins banked per shabadId (survives screen flap)
   const sameGurbaniRef = useRef(new Map()); // 'a:b' -> Promise<boolean> (DUP_AWARE_LOCK)
   const bsAdoptKeyRef = useRef(''); // last screened field we ran adoption against
-  const flIndexFailAtRef = useRef(0); // last index-build failure (backoff clock)
   // Seeking slide: while a switch evaluation is genuinely live (a contender is
   // beating the current shabad), the projector shows the Waheguru slide instead
   // of a possibly-wrong shabad. seekingRef tracks whether WE put it up, so we
@@ -1325,13 +1415,10 @@ const VoiceFollow = () => {
     transcriptSeqRef.current += 1;
     transcriptAbortRef.current?.abort();
     transcriptAbortRef.current = null;
-    const retrieval = retrievalOwnerRef.current;
-    retrievalOwnerRef.current = null;
-    flIndexRef.current = null;
-    flIndexLoadingRef.current = null;
-    flIndexFailAtRef.current = 0;
+    // The retrieval index is per window (warmIndex), never torn down with a run: a new run
+    // only resets the retry gate so a build that failed earlier is tried again at once.
+    runStartedAtRef.current = Date.now();
     lineCacheRef.current = new Map();
-    if (retrieval) retrieval.dispose().catch(() => {});
     // Detach the worklet handler first so no in-flight chunk pushes into a
     // torn-down engine session.
     if (nodeRef.current) {
@@ -2024,42 +2111,16 @@ const VoiceFollow = () => {
     [isSameGurbani],
   );
 
-  // Prepare independently of audio inference. A failed service backs off;
-  // obsolete preparation cannot publish into a restarted microphone session.
+  // The warm per-window index (usually ready long before Start). A build that failed
+  // during this run is retried a minute later; a new Start retries it at once.
   const ensureFlIndex = useCallback(() => {
-    if (flIndexRef.current) return Promise.resolve(flIndexRef.current);
-    if (flIndexLoadingRef.current) return flIndexLoadingRef.current;
-    if (flIndexFailAtRef.current && Date.now() - flIndexFailAtRef.current < 60000) {
+    const warm = warmIndex.get();
+    if (warm) return Promise.resolve(warm);
+    const failedAt = warmIndex.failedAt();
+    if (failedAt > runStartedAtRef.current && Date.now() - failedAt < 60000) {
       return Promise.resolve(null);
     }
-    const session = sessionRef.current;
-    const client = createRendererRetrieval(ipcRenderer);
-    retrievalOwnerRef.current = client;
-    const p = client.ready
-      .then(() => {
-        if (session !== sessionRef.current || retrievalOwnerRef.current !== client) return null;
-        flIndexRef.current = client;
-        return client;
-      })
-      .catch((error) => {
-        if (session === sessionRef.current && retrievalOwnerRef.current === client) {
-          flIndexFailAtRef.current = Date.now();
-          retrievalOwnerRef.current = null;
-        }
-        client.dispose().catch(() => {});
-        // Diagnostics only: a tester's events.jsonl and errors.log say why no shabad came.
-        if (SHADOW_BUILD) {
-          const message = (error && error.message) || String(error);
-          shadowBus.note({ type: 'vf_retrieval_failed', stage: 'prepare', error: message });
-          diag(`vf retrieval prepare failed: ${message}`);
-        }
-        return null;
-      });
-    flIndexLoadingRef.current = p;
-    p.then(() => {
-      if (flIndexLoadingRef.current === p) flIndexLoadingRef.current = null;
-    });
-    return p;
+    return warmIndex.ensure();
   }, []);
 
   const searchCanonicalText = useCallback(
@@ -2069,14 +2130,12 @@ const VoiceFollow = () => {
       try {
         return await client.search(text, cap, { signal });
       } catch (error) {
-        if (error.name !== 'AbortError' && retrievalOwnerRef.current === client) {
-          retrievalOwnerRef.current = null;
-          flIndexRef.current = null;
-          flIndexFailAtRef.current = Date.now();
-          client.dispose().catch(() => {});
-          if (SHADOW_BUILD) {
+        if (error.name !== 'AbortError') {
+          // The worker is gone (timeout, crash): let it go so the next call rebuilds.
+          warmIndex.fail(client);
+          diag(`vf retrieval search failed: ${error.message}`);
+          if (SHADOW_BUILD && shadowBus.active()) {
             shadowBus.note({ type: 'vf_retrieval_failed', stage: 'search', error: error.message });
-            diag(`vf retrieval search failed: ${error.message}`);
           }
         }
         return null;
@@ -2084,6 +2143,30 @@ const VoiceFollow = () => {
     },
     [ensureFlIndex],
   );
+
+  // Build the index as soon as the window is up and the database is there (long before the
+  // first Start), rebuild it after a database update, release it when the window goes.
+  useEffect(() => {
+    if (!ipcRenderer || !ipcRenderer.invoke || typeof window === 'undefined') return undefined;
+    let timer = null;
+    const warm = () => {
+      if (databaseFilesPresent()) warmIndex.ensure();
+    };
+    const onDatabase = () => {
+      warmIndex.reset();
+      clearTimeout(timer);
+      timer = setTimeout(warm, 1000);
+    };
+    const onUnload = () => warmIndex.reset();
+    timer = setTimeout(warm, WARM_INDEX_DELAY_MS);
+    window.addEventListener('sttm-database-updated', onDatabase);
+    window.addEventListener('beforeunload', onUnload);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('sttm-database-updated', onDatabase);
+      window.removeEventListener('beforeunload', onUnload);
+    };
+  }, []);
 
   // A confident, stable shabad emerged — either the FIRST one (initial lock) or a
   // DIFFERENT one that has WON the acoustic switch test while following. Build a
