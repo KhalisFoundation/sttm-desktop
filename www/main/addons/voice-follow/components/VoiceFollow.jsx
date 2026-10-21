@@ -614,9 +614,6 @@ const cardLine = (b) => (b.line || (b.verse ? anvaad.unicode(b.verse) : '')).tri
 const HEARD_TENTATIVE_WORDS = 2; // the tail of a decode is still being sung: not merged until it settles
 const HEARD_SHOW_WORDS = 10; // the strip shows this many settled words, newest always in view
 const RATING_ASK_MS = 20000; // after Stop, the one-tap rating stays for this long
-// Start while the hidden run is following: its Shabad goes straight on screen when the panel
-// (calibrated posterior) is at least this sure of it; otherwise Start searches afresh.
-const ADOPT_MIN_PCT = 0.9;
 const HEARTBEAT = false; // the slow breath of the current card: off (not an agreed design)
 const HEARTBEAT_MIN_SCORE = 0.5; // current-line match score that counts as a beat
 const HEARTBEAT_MIN_MS = 2400; // slow pulse: one breath at most this often // follower confidence required to move the on-screen line
@@ -1304,6 +1301,7 @@ const VoiceFollow = () => {
   const backstopRef = useRef(null);
   // Read-only canonical retrieval service, isolated from the renderer process (warmIndex).
   const runStartedAtRef = useRef(Date.now()); // when the current run began (retry gate)
+  const startInFlightRef = useRef(null); // the Start being set up right now, if any
   const lineCacheRef = useRef(new Map()); // shabadId -> { linesNorm, verses } | null (loading)
   const bsWinsRef = useRef(new Map()); // backstop wins banked per shabadId (survives screen flap)
   const sameGurbaniRef = useRef(new Map()); // 'a:b' -> Promise<boolean> (DUP_AWARE_LOCK)
@@ -1326,6 +1324,9 @@ const VoiceFollow = () => {
   micIdRef.current = micId;
   // The system has blocked the microphone: the start screen asks for access instead.
   const [micDenied, setMicDenied] = useState(false);
+  // The live microphone stream as state, so the hearing meter draws from the first second
+  // of a run (a ref alone would wait for the next unrelated re-render).
+  const [micStream, setMicStream] = useState(null);
   // Read the system permission. Returns true when it is blocked. An unknown answer
   // (Linux, or no IPC) leaves the current state alone: a capture error decides then.
   const checkMicAccess = useCallback(async () => {
@@ -1418,6 +1419,7 @@ const VoiceFollow = () => {
     // The retrieval index is per window (warmIndex), never torn down with a run: a new run
     // only resets the retry gate so a build that failed earlier is tried again at once.
     runStartedAtRef.current = Date.now();
+    startInFlightRef.current = null;
     lineCacheRef.current = new Map();
     // Detach the worklet handler first so no in-flight chunk pushes into a
     // torn-down engine session.
@@ -1450,6 +1452,7 @@ const VoiceFollow = () => {
     }
     ctxRef.current = null;
     streamRef.current = null;
+    setMicStream(null);
     nodeRef.current = null;
     srcRef.current = null;
     followerRef.current = null;
@@ -1504,6 +1507,7 @@ const VoiceFollow = () => {
       return null;
     }
     streamRef.current = stream;
+    setMicStream(stream);
     audioViewRef.current = { samples: 0, published: 0, energy: 0, n: 0, peak: 0 };
     rankedViewRef.current = 0;
     setRankedView([]);
@@ -3686,7 +3690,7 @@ const VoiceFollow = () => {
   // follow it, and when the singer moves to a different shabad (the follower
   // releases), automatically find and project the next one — no clicks, no
   // confirmations, no person needed at the computer.
-  const startAutopilot = useCallback(async () => {
+  const runAutopilot = useCallback(async () => {
     cleanup();
     const session = sessionRef.current;
     autopilotRef.current = true;
@@ -3995,6 +3999,16 @@ const VoiceFollow = () => {
     setActiveVerseId,
     setLineNumber,
   ]);
+  // One start in flight at a time: a Start that arrives while a run (hidden or from the
+  // panel) is still initialising joins it instead of racing it. Stop clears it (cleanup).
+  const startAutopilot = useCallback(() => {
+    if (startInFlightRef.current) return startInFlightRef.current;
+    const p = runAutopilot().finally(() => {
+      if (startInFlightRef.current === p) startInFlightRef.current = null;
+    });
+    startInFlightRef.current = p;
+    return p;
+  }, [runAutopilot]);
 
   // While listening, if the presenter switches to a different shabad or bani (via
   // any menu — search, history, favorites, arrows, bani picker), re-attach to the
@@ -4231,22 +4245,25 @@ const VoiceFollow = () => {
     clearTimeout(ratingTimerRef.current);
     setAskRating(false);
     shadowStateRef.current.running = false;
-    // The hidden run is already listening: keep it (its evidence, its recognizer, its
-    // retrieval index) instead of restarting from nothing. Restarting threw away a lock
-    // the hidden run had made seconds earlier and sent every Start back to a cold search.
-    if (hiddenRun && autopilotRef.current && !lockingRef.current) {
+    // A hidden run exists (starting, searching, locking or following): adopt it in every
+    // phase and keep its evidence, recognizer and index. Never restart the pipeline: the
+    // restart threw away a lock made seconds earlier, cancelled the first run's index
+    // build and sent every Start back to a cold search. A lock still committing simply
+    // finishes on the real screen now that the run is visible.
+    // Read the refs, not the rendered `hiddenRun`: a hidden run that began since the last
+    // render (the shadow check runs every 5 s) must be adopted too, not raced.
+    const live =
+      SHADOW_BUILD && !visibleRef.current && (autopilotRef.current || recognizerRef.current);
+    if (live) {
       const following = phaseRef.current === 'following' && currentShabadIdRef.current != null;
-      const cur = following ? boardRef.current.snapshot().find((b) => b.role === 'current') : null;
-      if (!following || (cur && cur.pct >= ADOPT_MIN_PCT)) {
-        visibleRef.current = true;
-        window.dispatchEvent(new CustomEvent('vf-shadow-start'));
-        shadowBus.setVisible(true);
-        if (following) projectCurrent();
-        setVisTick((n) => n + 1);
-        return;
-      }
+      visibleRef.current = true;
+      window.dispatchEvent(new CustomEvent('vf-shadow-start'));
+      shadowBus.setVisible(true);
+      if (following) projectCurrent();
+      setVisTick((n) => n + 1);
+      return;
     }
-    if (running) stop();
+    if (running || autopilotRef.current || recognizingRef.current) stop();
     // Clear what the hidden run left in the panel before it becomes visible: otherwise the
     // panel showed the hidden run's Shabad and candidates for a moment (a tall card that then
     // shrank to "Finding") until the new run's microphone start cleared them.
@@ -4623,7 +4640,9 @@ const VoiceFollow = () => {
               )}
             </div>
             {boardOthers.length === 0 && (
-              <div className="vf2-empty">{i18n.t('VOICE_FOLLOW.NONE_NOW')}</div>
+              <div className="vf2-empty">
+                {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
+              </div>
             )}
             {boardOthers.map((c, i) => (
               <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
@@ -4653,7 +4672,7 @@ const VoiceFollow = () => {
         <div className="vf-ap-bar">
           <div className="vf-ap-heard" title={i18n.t('VOICE_FOLLOW.HEARING_TIP')}>
             <VoiceWave
-              stream={streamRef.current}
+              stream={micStream}
               isRecording={active}
               autoStopSeconds={null}
               showDuration={false}
