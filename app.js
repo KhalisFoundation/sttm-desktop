@@ -1677,8 +1677,85 @@ ipcMain.on('update-settings', () => {
   mainWindow.webContents.send('sync-settings');
 });
 
-// A new AI translations database was downloaded; every window reopens it
+// AI translations (Prof Sahib Singh) live in a SQLite file downloaded into
+// userData (see downloadAiTranslationsDB in desktop_scripts.js; the current
+// file name is stored as `aiTranslationsFile`). The better-sqlite3 native addon
+// must only be loaded here in the main process: loading it inside a renderer
+// (the viewer webview / viewer window) crashes that process with SIGSEGV in
+// Database::JS_prepare. Renderers look translations up over sync IPC instead
+// (www/main/banidb/pss-db.js).
+let aiTranslationsDb = null;
+let aiTranslationsStatement = null;
+let aiTranslationsUnavailable = false;
+
+const resetAiTranslationsDb = () => {
+  if (aiTranslationsDb) {
+    try {
+      aiTranslationsDb.close();
+    } catch (err) {
+      log.error('Failed to close AI translations database:', err.message);
+    }
+  }
+  aiTranslationsDb = null;
+  aiTranslationsStatement = null;
+  aiTranslationsUnavailable = false;
+};
+
+const getAiTranslationsStatement = () => {
+  if (aiTranslationsStatement || aiTranslationsUnavailable) {
+    return aiTranslationsStatement;
+  }
+
+  try {
+    const fileName = store.get('aiTranslationsFile');
+    if (!fileName) {
+      throw new Error('AI translations database has not been downloaded yet');
+    }
+    const dbPath = path.resolve(app.getPath('userData'), fileName);
+    if (!fs.existsSync(dbPath)) {
+      throw new Error(`AI translations database is missing: ${dbPath}`);
+    }
+
+    // Required lazily so a missing/incompatible native build never breaks startup
+    /* eslint-disable-next-line global-require */
+    const Database = require('better-sqlite3');
+    aiTranslationsDb = new Database(dbPath, { readonly: true, fileMustExist: true });
+    aiTranslationsStatement = aiTranslationsDb.prepare(
+      'SELECT translation_text AS text FROM ai_translations WHERE verse_id = ? AND type = ?',
+    );
+  } catch (err) {
+    aiTranslationsUnavailable = true;
+    aiTranslationsStatement = null;
+    log.error('Failed to open AI translations database:', err.message);
+  }
+
+  return aiTranslationsStatement;
+};
+
+const getAiTranslation = (verseId, type) => {
+  const lookup = getAiTranslationsStatement();
+  if (!lookup) {
+    return null;
+  }
+  try {
+    const row = lookup.get(verseId, type);
+    return (row && row.text) || null;
+  } catch (err) {
+    log.error('AI translation lookup failed:', err.message);
+    return null;
+  }
+};
+
+// Synchronous so Slide / ShabadDeck can resolve the text during render
+ipcMain.on('get-ai-translation', (event, verseId, type) => {
+  // eslint-disable-next-line no-param-reassign
+  event.returnValue = getAiTranslation(verseId, type);
+});
+
+// A new AI translations database was downloaded; reopen it here and let every
+// window drop its cached lookups
 ipcMain.on('ai-translations-updated', () => {
+  resetAiTranslationsDb();
   BrowserWindow.getAllWindows().forEach((win) => {
     win.webContents.send('ai-translations-updated');
   });
