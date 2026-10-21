@@ -171,7 +171,7 @@ const readTester = (raw) => {
 };
 const packTester = (t) => encodeURIComponent(JSON.stringify(t));
 // Bump when the first-launch notice changes in substance, so every tester reads it again once.
-const NOTICE_VERSION = 1;
+const NOTICE_VERSION = 2;
 
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
@@ -205,7 +205,7 @@ const ShadowCollector = () => {
   const hfTokenRef = useRef('');
   hfTokenRef.current = (hfToken || '').trim() || (HF_TOKEN.startsWith('__') ? '' : HF_TOKEN);
   const tester = readTester(shadowTester);
-  const [name, setName] = useState(tester.name || '');
+  const [details, setDetails] = useState(false);
   const [gurdwara, setGurdwara] = useState(tester.gurdwara || '');
   const sessionRef = useRef(null);
   // A session runs only while the sevadaar is working (see service.js).
@@ -700,40 +700,58 @@ const ShadowCollector = () => {
     [key],
   );
 
-  // First launch (and once more whenever NOTICE_VERSION is bumped): what is recorded, and
-  // a real choice. Registering (name, Gurdwara) is how sessions are grouped, so OK needs a
-  // name; "Turn off recording" needs nothing. If recording is later turned back on without
-  // a registration, the card comes back to ask for the name.
-  // Prod collector: the name is optional; the Gurdwara is how sessions are grouped.
+  // First launch (and once more whenever NOTICE_VERSION is bumped): a slim, non-blocking bar at
+  // the top asks once. Nothing is collected until "Allow"; Allow = labels + audio (the setting's
+  // default), "No thanks" = off. STTM stays fully usable while the bar is showing.
   const registered = !!tester.id;
   if (!SHADOW_BUILD || level === 'off' || (registered && noticeSeen)) return null;
 
+  const allow = () => {
+    if (!registered) {
+      setShadowTester(
+        packTester({
+          name: '',
+          gurdwara: gurdwara.trim(),
+          id: tester.id || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+        }),
+      );
+    }
+    setShadowNotice(NOTICE_VERSION);
+  };
+  const deny = () => {
+    setShadowNotice(NOTICE_VERSION);
+    setCollectorLevel('off');
+  };
+
   return (
-    <div className="shadow-consent">
-      <div className="shadow-consent-card" role="dialog" aria-labelledby="shadow-consent-title">
-        <div className="shadow-consent-icon" aria-hidden="true">
-          <i className="fa fa-microphone" />
-        </div>
-        <h2 id="shadow-consent-title">
-          {audioOn ? 'Help improve Voice Autopilot: audio' : 'Help improve Voice Autopilot'}
-        </h2>
-        <ShortNotice audio={audioOn} />
-        <p className="shadow-consent-more">
-          Click &quot;Sharing&quot; at the bottom of the search pane any time for the full details.
-        </p>
-        {!registered && (
-          <>
-            <label htmlFor="shadow-name">
-              Your name (optional)
-              <input
-                id="shadow-name"
-                className="disable-kb-shortcuts"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
+    <div className="shadow-ask" role="region" aria-label="Help improve Shabad search">
+      <div className="shadow-ask-row">
+        <i className="fa fa-microphone shadow-ask-icon" aria-hidden="true" />
+        <span className="shadow-ask-text">
+          Help improve Shabad search? Share diwan audio and the pangtis on screen with Khalis
+          Foundation.
+        </span>
+        <button
+          type="button"
+          className="shadow-ask-link"
+          aria-expanded={details}
+          onClick={() => setDetails(!details)}
+        >
+          {details ? 'Less' : 'Details'}
+        </button>
+        <button type="button" className="shadow-ask-no" onClick={deny}>
+          No thanks
+        </button>
+        <button type="button" className="shadow-ask-yes" onClick={allow}>
+          Allow
+        </button>
+      </div>
+      {details && (
+        <div className="shadow-ask-details">
+          <ShortNotice audio />
+          {!registered && (
             <label htmlFor="shadow-gurdwara">
-              Gurdwara
+              Gurdwara Sahib (optional)
               <input
                 id="shadow-gurdwara"
                 className="disable-kb-shortcuts"
@@ -741,42 +759,9 @@ const ShadowCollector = () => {
                 onChange={(e) => setGurdwara(e.target.value)}
               />
             </label>
-          </>
-        )}
-        <div className="shadow-consent-actions">
-          <button
-            type="button"
-            className="shadow-consent-off"
-            onClick={() => {
-              setShadowNotice(NOTICE_VERSION);
-              setCollectorLevel('off');
-            }}
-          >
-            Turn off sharing
-          </button>
-          <button
-            type="button"
-            className="shadow-consent-yes"
-            disabled={!registered && !gurdwara.trim()}
-            onClick={() => {
-              if (!registered) {
-                setShadowTester(
-                  packTester({
-                    name: name.trim(),
-                    gurdwara: gurdwara.trim(),
-                    id:
-                      tester.id ||
-                      `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-                  }),
-                );
-              }
-              setShadowNotice(NOTICE_VERSION);
-            }}
-          >
-            OK
-          </button>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

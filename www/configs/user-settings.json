@@ -390,10 +390,9 @@
       "dontApplyClass": true,
       "options": {
         "off": "COLLECTOR_OFF",
-        "labels": "COLLECTOR_LABELS",
         "audio": "COLLECTOR_AUDIO"
       },
-      "initialValue": "labels",
+      "initialValue": "audio",
       "notes": "COLLECTOR_LEVEL_MSG"
     },
     "install-id": {

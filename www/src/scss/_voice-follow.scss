@@ -1436,3 +1436,84 @@ $vf2-yellow-bar: #f2c200;
     right: auto;
   }
 }
+
+// Shadower first-launch ask: a slim bar at the top, never a modal. STTM stays usable.
+.shadow-ask {
+  position: fixed;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 6px 8px 6px 12px;
+  border-radius: 8px;
+  background: #1f2a44;
+  color: #f3f4f7;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  line-height: 1.35;
+}
+.shadow-ask-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.shadow-ask-icon {
+  color: #f2a65a;
+}
+.shadow-ask-text {
+  min-width: 0;
+}
+.shadow-ask-row button {
+  flex: none;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.shadow-ask-link {
+  background: transparent;
+  color: #b9c3d9;
+  text-decoration: underline;
+  padding: 5px 4px;
+}
+.shadow-ask-no {
+  background: transparent;
+  color: #f3f4f7;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+.shadow-ask-yes {
+  background: #e8702a;
+  color: #fff;
+}
+.shadow-ask-details {
+  max-width: 560px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  ul {
+    margin: 4px 0 8px 18px;
+    padding: 0;
+  }
+  p {
+    margin: 4px 0;
+  }
+  label {
+    display: block;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  input {
+    display: block;
+    width: 260px;
+    margin-top: 4px;
+    padding: 5px 8px;
+    border: 1px solid #55607a;
+    border-radius: 5px;
+    background: #2a3654;
+    color: #fff;
+  }
+}

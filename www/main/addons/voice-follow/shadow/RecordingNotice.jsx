@@ -46,9 +46,9 @@ export const ShortNotice = ({ audio = true }) => (
   <div className="shadow-notice-text">
     <p>To make Voice Autopilot better, STTM shares:</p>
     <ul>
-      {audio && <li>the microphone during a program, even with Voice Autopilot off</li>}
+      {audio && <li>the microphone during a diwan, even with Voice Autopilot off</li>}
       <li>what is on screen (Shabad or Bani, pangti) and what Voice Autopilot heard</li>
-      <li>your Gurdwara, a random install id and basic computer details (no name or address)</li>
+      <li>your Gurdwara Sahib (if given), a random install id and basic computer details (no name or address)</li>
     </ul>
     <p>Sent to Khalis Foundation&apos;s secure storage.</p>
     <p>
