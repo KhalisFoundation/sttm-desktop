@@ -726,24 +726,22 @@ const ShadowCollector = () => {
   return (
     <div className="shadow-ask" role="region" aria-label="Help improve Shabad search">
       <div className="shadow-ask-row">
-        <i className="fa fa-microphone shadow-ask-icon" aria-hidden="true" />
-        <span className="shadow-ask-text">
-          Help improve Shabad search? Share diwan audio and the pangtis on screen with Khalis
-          Foundation.
-        </span>
+        <span className="shadow-ask-text">Share diwan audio to improve Shabad search?</span>
         <button
           type="button"
-          className="shadow-ask-link"
+          className="shadow-ask-info"
+          title="What is shared"
+          aria-label="What is shared"
           aria-expanded={details}
           onClick={() => setDetails(!details)}
         >
-          {details ? 'Less' : 'Details'}
-        </button>
-        <button type="button" className="shadow-ask-no" onClick={deny}>
-          No thanks
+          <i className="fa fa-info-circle" aria-hidden="true" />
         </button>
         <button type="button" className="shadow-ask-yes" onClick={allow}>
           Allow
+        </button>
+        <button type="button" className="shadow-ask-no" onClick={deny}>
+          No
         </button>
       </div>
       {details && (
