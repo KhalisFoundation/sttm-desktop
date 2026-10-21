@@ -110,6 +110,66 @@ class ShadowPcm extends AudioWorkletProcessor {
 registerProcessor('shadow-pcm', ShadowPcm);
 `;
 
+// Feeds `src` to onChunk(frame, samples) from the audio thread (AudioWorklet). `frame` is the
+// audio-clock frame of the first sample. If the worklet cannot load, falls back to the old
+// main-thread ScriptProcessor (frame = null) and says so in errors.log once. `tag` names the
+// user in errors.log. Returns { stop() }, which disconnects and ends the worklet.
+function capture(ctx, src, tag, onChunk) {
+  let node = null;
+  let open = true;
+  const chunk = guard(`${tag}.chunk`, onChunk);
+  const useScriptProcessor = () => {
+    node = ctx.createScriptProcessor(4096, 1, 1);
+    node.onaudioprocess = (e) => {
+      if (open) chunk(null, e.inputBuffer.getChannelData(0));
+    };
+    src.connect(node);
+    node.connect(ctx.destination); // runs only while connected; its output is silent
+  };
+  const useWorklet = async () => {
+    const url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
+    try {
+      await ctx.audioWorklet.addModule(url);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+    if (!open) return;
+    node = new AudioWorkletNode(ctx, 'shadow-pcm', {
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      channelCount: 1,
+      channelCountMode: 'explicit',
+    });
+    node.port.onmessage = (e) => {
+      if (open) chunk(e.data.frame, e.data.pcm);
+    };
+    src.connect(node);
+    node.connect(ctx.destination); // keeps the graph pulling; its output is silent
+  };
+  if (ctx.audioWorklet && typeof AudioWorkletNode === 'function') {
+    useWorklet().catch((e) => {
+      diag(`${tag}: AudioWorklet failed, using ScriptProcessor: ${(e && e.message) || e}`);
+      if (open && !node) useScriptProcessor();
+    });
+  } else {
+    diag(`${tag}: AudioWorklet unavailable, using ScriptProcessor`);
+    useScriptProcessor();
+  }
+  return {
+    stop() {
+      if (!open) return;
+      open = false;
+      try {
+        if (node && node.port) node.port.postMessage('stop');
+        src.disconnect();
+        if (node) node.disconnect();
+      } catch (_) {
+        /* already gone */
+      }
+    },
+  };
+}
+
 // Starts writing `stream` to `file`. Returns { stop() } (stop finalises the header).
 function record(stream, file) {
   let ctx;
@@ -125,7 +185,6 @@ function record(stream, file) {
   let samples = 0;
   let lastHeader = 0;
   let open = true;
-  let node = null;
   const write = (bufs) => {
     try {
       bufs.forEach((b) => {
@@ -140,58 +199,18 @@ function record(stream, file) {
       /* disk full or file gone: the session's own checks deal with it */
     }
   };
-  // The old path: main-thread callback. Only used when the worklet will not load.
-  const useScriptProcessor = () => {
-    node = ctx.createScriptProcessor(4096, 1, 1);
-    node.onaudioprocess = (e) => {
-      if (open) write([toInt16(e.inputBuffer.getChannelData(0))]);
-    };
-    src.connect(node);
-    node.connect(ctx.destination); // runs only while connected; its output is silent
-  };
   const asm = assembler(rate);
-  const useWorklet = async () => {
-    const url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
-    try {
-      await ctx.audioWorklet.addModule(url);
-    } finally {
-      URL.revokeObjectURL(url);
-    }
+  const cap = capture(ctx, src, 'pcm', (frame, x) => {
     if (!open) return;
-    node = new AudioWorkletNode(ctx, 'shadow-pcm', {
-      numberOfInputs: 1,
-      numberOfOutputs: 1,
-      channelCount: 1,
-      channelCountMode: 'explicit',
-    });
-    node.port.onmessage = guard('pcm.chunk', (e) => {
-      if (open) write(asm.push(e.data.frame, e.data.pcm));
-    });
-    src.connect(node);
-    node.connect(ctx.destination); // keeps the graph pulling; its output is silent
-  };
-  if (ctx.audioWorklet && typeof AudioWorkletNode === 'function') {
-    useWorklet().catch((e) => {
-      diag(`pcm: AudioWorklet failed, using ScriptProcessor: ${(e && e.message) || e}`);
-      if (open && !node) useScriptProcessor();
-    });
-  } else {
-    diag('pcm: AudioWorklet unavailable, using ScriptProcessor');
-    useScriptProcessor();
-  }
+    write(frame === null ? [toInt16(x)] : asm.push(frame, x));
+  });
   return {
     rate,
     stats: asm.stats, // holes padded / overlaps trimmed (worklet path); expected to stay 0
     stop() {
       if (!open) return;
       open = false;
-      try {
-        if (node && node.port) node.port.postMessage('stop');
-        src.disconnect();
-        if (node) node.disconnect();
-      } catch (_) {
-        /* already gone */
-      }
+      cap.stop();
       try {
         fs.writeSync(fd, header(samples, rate), 0, 44, 0);
         fs.closeSync(fd);
@@ -203,4 +222,4 @@ function record(stream, file) {
   };
 }
 
-module.exports = { record, header, RATE, toInt16, assembler, WORKLET_SRC };
+module.exports = { record, capture, header, RATE, toInt16, assembler, WORKLET_SRC };

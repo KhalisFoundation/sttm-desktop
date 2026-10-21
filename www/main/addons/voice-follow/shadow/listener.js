@@ -11,11 +11,12 @@ const {
   SHADOW_PRE_ROLL_S,
 } = require('./config');
 const { guard } = require('./diag');
+const { capture } = require('./pcm');
 
 const RATE = 16000;
 const TICK_MS = 500; // one loudness reading per half second
 
-let st = null; // { stream, ctx, node, src, ring, ringPos, ringFull, ticks, timer, onSound }
+let st = null; // { stream, ctx, cap, ring, ringPos, ringFull, ticks, timer, onSound }
 // Bumped by every start() and stop(): a start() still waiting for the microphone when
 // stop() is called (recording turned off) must not open the ear afterwards.
 let gen = 0;
@@ -26,12 +27,7 @@ function stop() {
   const s = st;
   st = null;
   clearInterval(s.timer);
-  try {
-    s.src.disconnect();
-    s.node.disconnect();
-  } catch (_) {
-    /* already gone */
-  }
+  s.cap.stop();
   try {
     s.stream.getTracks().forEach((t) => t.stop());
   } catch (_) {
@@ -51,6 +47,40 @@ function takePreRoll() {
   return out.length ? { pcm: out, rate: RATE, seconds: out.length / RATE } : null;
 }
 
+// One captured chunk into the loudness sums and the 16 kHz pre-roll ring. `frame` is the
+// audio-clock frame of x[0] (null on the ScriptProcessor fallback): a hole is filled with
+// silence and an overlap skipped, so the pre-roll keeps real time. Pure; exported for tests.
+/* eslint-disable no-param-reassign */ // feed() updates the ear's state in place
+function feed(s, frame, x, step) {
+  let from = 0;
+  if (frame !== null && s.next !== null) {
+    if (frame > s.next) {
+      // Silence for the hole (at most one ring's worth: older audio would be overwritten).
+      const hole = Math.min(frame - s.next, Math.ceil(s.ring.length * step));
+      feed(s, null, new Float32Array(hole), step);
+    } else if (frame < s.next) from = Math.min(x.length, s.next - frame);
+  }
+  if (frame !== null) s.next = Math.max(s.next === null ? 0 : s.next, frame + x.length);
+  if (from >= x.length) return;
+  const y = from ? x.subarray(from) : x;
+  for (let i = 0; i < y.length; i += 1) {
+    s.sumSq += y[i] * y[i];
+    s.n += 1;
+  }
+  // Downsample by picking every step-th sample (speech band only; this is pre-roll audio).
+  for (s.acc; s.acc < y.length; s.acc += step) {
+    const v = Math.max(-1, Math.min(1, y[Math.floor(s.acc)]));
+    s.ring[s.ringPos] = v < 0 ? v * 32768 : v * 32767;
+    s.ringPos += 1;
+    if (s.ringPos >= s.ring.length) {
+      s.ringPos = 0;
+      s.ringFull = true;
+    }
+  }
+  s.acc -= y.length;
+}
+/* eslint-enable no-param-reassign */
+
 async function start(onSound) {
   if (st) return;
   gen += 1;
@@ -69,45 +99,24 @@ async function start(onSound) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
   }
   const src = ctx.createMediaStreamSource(stream);
-  // ScriptProcessor is enough for a loudness meter plus a ring buffer.
-  const node = ctx.createScriptProcessor(4096, 1, 1);
-  const ring = new Int16Array(Math.round(SHADOW_PRE_ROLL_S * RATE));
   const s = {
     stream,
     ctx,
-    src,
-    node,
-    ring,
+    cap: null,
+    ring: new Int16Array(Math.round(SHADOW_PRE_ROLL_S * RATE)),
     ringPos: 0,
     ringFull: false,
     acc: 0, // resampling phase
+    next: null, // audio-clock frame expected next (worklet path)
     sumSq: 0,
     n: 0,
     ticks: [], // [ms, loud?]
     timer: null,
     onSound,
   };
+  // Captured on the audio thread (pcm.js), so UI stalls cannot drop or repeat pre-roll audio.
   const step = ctx.sampleRate / RATE;
-  node.onaudioprocess = guard('listener.audio', (e) => {
-    const x = e.inputBuffer.getChannelData(0);
-    for (let i = 0; i < x.length; i += 1) {
-      s.sumSq += x[i] * x[i];
-      s.n += 1;
-    }
-    // Downsample by picking every step-th sample (speech band only; this is pre-roll audio).
-    for (s.acc; s.acc < x.length; s.acc += step) {
-      const v = Math.max(-1, Math.min(1, x[Math.floor(s.acc)]));
-      s.ring[s.ringPos] = v < 0 ? v * 32768 : v * 32767;
-      s.ringPos += 1;
-      if (s.ringPos >= s.ring.length) {
-        s.ringPos = 0;
-        s.ringFull = true;
-      }
-    }
-    s.acc -= x.length;
-  });
-  src.connect(node);
-  node.connect(ctx.destination); // a ScriptProcessor only runs while connected; output is silent
+  s.cap = capture(ctx, src, 'listener', (frame, x) => feed(s, frame, x, step));
   s.timer = setInterval(
     guard('listener.tick', () => {
       const rms = s.n ? Math.sqrt(s.sumSq / s.n) : 0;
@@ -161,4 +170,5 @@ module.exports = {
   takePreRoll: guard('listener.takePreRoll', takePreRoll, null),
   running,
   wavBytes,
+  feed,
 };
