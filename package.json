@@ -29,7 +29,7 @@
     "build-css": "run-p build-css:*",
     "build-css:main": "node-sass --output-style compressed --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css",
     "build-css:obs": "node-sass --output-style compressed --include-path www/src/scss/obs www/src/scss/obs/styles.scss www/obs/bundle.css",
-    "build-js": "rm -rf www/js & babel ./www/main -d ./www/js",
+    "build-js": "rm -rf www/js & babel ./www/main -d ./www/js --ignore \"**/*.test.js\"",
     "build-js:sm": "rm -rf www/js & babel ./www/main -d ./www/js --source-maps",
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",

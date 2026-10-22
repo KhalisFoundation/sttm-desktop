@@ -68,12 +68,5 @@ if (/['\\\n\r]/.test(sas)) {
   console.error('inject-upload-sas: the SAS contains characters that cannot be injected');
   process.exit(3);
 }
-let out = src.replace(PLACEHOLDER, sas);
-// Optional: a Hugging Face write token for the second copy (never required).
-const hf = (process.env.VF_HF_TOKEN || '').trim();
-if (hf && !/['\\\n\r]/.test(hf) && out.includes('__VF_HF_TOKEN__')) {
-  out = out.replace('__VF_HF_TOKEN__', hf);
-  console.log('inject-upload-sas: Hugging Face token injected');
-}
-fs.writeFileSync(file, out);
+fs.writeFileSync(file, src.replace(PLACEHOLDER, sas));
 console.log('inject-upload-sas: upload SAS injected');

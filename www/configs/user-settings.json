@@ -410,11 +410,6 @@
       "dontApplyClass": true,
       "initialValue": ""
     },
-    "hf-token": {
-      "title": "HF_TOKEN",
-      "dontApplyClass": true,
-      "initialValue": ""
-    },
     "theme": {
       "title": "THEME",
       "initialValue": "light-theme"

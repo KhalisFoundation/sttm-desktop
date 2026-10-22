@@ -378,7 +378,6 @@
     "LIVE_FEED": "Live Feed Text Files",
     "OTHER_OPTIONS": "Other Options",
     "COLLECT_STATISTICS": "Collect Statistics",
-    "HF_TOKEN": "Hugging Face token",
     "SHADOW_RECORDING": "Voice Autopilot recording",
     "SHADOW_RECORDING_MSG": "Records the sound in the hall and what is on screen, even when Voice Autopilot is not in use, and sends it to Khalis Foundation to make Voice Autopilot better. Off stops recording and sending at once",
     "SHADOW_TESTER": "Voice Autopilot tester",

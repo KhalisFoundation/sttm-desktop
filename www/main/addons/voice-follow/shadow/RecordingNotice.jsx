@@ -6,7 +6,7 @@ import CollectorBoundary from './Boundary';
 // What the tester build records, said once on first launch (ShadowCollector.jsx) and again
 // whenever the sevadaar clicks the "Recording audio" chip in the workspace bar. One text
 // for both, so they can never drift apart. Keep it true to ShadowCollector.jsx (what is
-// saved: session.json, machineFacts) and uploader.js / hf.js (what turning it off stops).
+// saved: session.json, machineFacts) and uploader.js (what turning it off stops).
 export const SETTING_PATH = 'Settings › Other Options › Help improve Shabad search';
 
 export const NoticeText = ({ audio = true }) => (

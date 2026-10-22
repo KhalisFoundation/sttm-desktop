@@ -17,10 +17,7 @@ const remote = require('@electron/remote');
 const { ipcRenderer } = require('electron');
 const bus = require('./bus');
 const uploader = require('./uploader');
-// Hugging Face copy (on-device dataset build): PROD_INFERENCE builds only, never loaded in prod.
-// eslint-disable-next-line global-require
-const hf = PROD_INFERENCE ? require('./hf') : { start() {}, stop() {} };
-const { HF_TOKEN, VF_FEATURE_VERSION, VF_BUILD_COMMIT, COLLECTOR_VERSION } = require('./config');
+const { VF_FEATURE_VERSION, VF_BUILD_COMMIT, COLLECTOR_VERSION } = require('./config');
 const service = require('./service');
 const listener = require('./listener');
 const pcm = require('./pcm');
@@ -33,7 +30,7 @@ const { guard } = require('./diag');
 //   audio-000.wav ...  - what the microphone heard (16 kHz mono WAV), one per SHADOW_SEGMENT_MS
 //   audio-pre.wav      - up to 2 min from before the session started (listener.js)
 //   human.jsonl        - what the sevadaar put on screen (the human label)
-//   verses.csv         - the pangtis shown as verseId,timestamp_seconds (HF recording layout)
+//   verses.csv         - the pangtis shown as verseId,timestamp_seconds (the team's HF recording layout)
 //   activity.jsonl     - per second: microphone loudness (and letters heard, PROD_INFERENCE)
 //   system.jsonl       - what Voice-Follow would have shown (PROD_INFERENCE builds only)
 //   events.jsonl       - session start/stop, audio segments and their clock anchors, pauses
@@ -188,7 +185,6 @@ const ShadowCollector = () => {
     shadowRecording,
     shadowTester,
     shadowNotice,
-    hfToken,
     collectorLevel,
     installId,
     currentWorkspace,
@@ -210,9 +206,6 @@ const ShadowCollector = () => {
   }, [audioOn]);
   // For the "Recording audio" chip in the workspace bar (RecordingNotice.jsx).
   const { setShadowMicState } = useStoreActions((actions) => actions.app);
-  // The Hugging Face write token: baked in at build (VF_HF_TOKEN), or a saved setting.
-  const hfTokenRef = useRef('');
-  hfTokenRef.current = (hfToken || '').trim() || (HF_TOKEN.startsWith('__') ? '' : HF_TOKEN);
   const tester = readTester(shadowTester);
   const [details, setDetails] = useState(false);
   const [gurdwara, setGurdwara] = useState(tester.gurdwara || '');
@@ -292,18 +285,13 @@ const ShadowCollector = () => {
   // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
   useEffect(() => {
     if (enabled) {
-      uploader.start(shadowRoot(), tester, {
-        hfOn: () => PROD_INFERENCE && !!hfTokenRef.current,
-        log: diag,
-      });
-      hf.start(shadowRoot(), () => hfTokenRef.current, diag);
+      uploader.start(shadowRoot(), tester, { log: diag });
     }
     // Recording turned off (Settings, the chip or the first-launch card): stop sending now.
     // This cleanup runs before the session's below, so the session that just ended is not
     // queued either; it stays on disk and goes once recording is turned back on.
     return () => {
       uploader.stop();
-      hf.stop();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);

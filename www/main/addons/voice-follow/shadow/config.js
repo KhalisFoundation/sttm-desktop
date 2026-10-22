@@ -83,12 +83,6 @@ const COLLECTOR_CONFIG_URL = `${UPLOAD_URL}/collector/config.json`;
 const COLLECTOR_CONFIG_EVERY_MS = 60 * 60 * 1000;
 // A cached server answer is trusted this long when the server cannot be reached (prod build).
 const COLLECTOR_CONFIG_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
-// A second copy of every session goes to Hugging Face in the team's recording layout
-// (hf.js; PROD_INFERENCE builds only: the prod build makes no datasets on the computer).
-// The write token is a saved setting or injected at build time like the SAS (VF_HF_TOKEN).
-const HF_NAMESPACE = 'khalisfoundation';
-const HF_DATASET_TYPE = 'kirtan';
-const HF_TOKEN = '__VF_HF_TOKEN__';
 // Which Voice-Follow release produced a session. VF_FEATURE_VERSION is bumped with every merged
 // Voice-Follow PR (MVP numbering); VF_BUILD_COMMIT is the exact commit, injected after
 // `npm run build` by packaging/inject-upload-sas.js (CI: GITHUB_SHA; local: git HEAD).
@@ -128,7 +122,4 @@ module.exports = {
   SHADOW_CPU_RESUME,
   UPLOAD_URL,
   UPLOAD_SAS,
-  HF_NAMESPACE,
-  HF_DATASET_TYPE,
-  HF_TOKEN,
 };
