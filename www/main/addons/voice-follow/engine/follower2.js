@@ -64,6 +64,17 @@ const DEFAULTS = {
   // compound. 0 = off.
   catchHops: 4,
   catchScore: 0.5, // ...each of those windows matching at least this well (per letter)
+  // Akhand Paath (opts.anticipate, set only for a reading window of Sri Guru Granth Sahib Ji
+  // read Ang after Ang): the next pangti is almost certain, so it goes up as the current
+  // one's last letters are heard (they are decoded a moment after they are said, so the
+  // change lands in the reader's breath pause), not after the next one's first letters.
+  // Off (false) everywhere else: Banis and Shabads follow exactly as before.
+  anticipate: false,
+  antLetters: 0, // letters of the current pangti still unheard when the next one goes up
+  antScore: 0.5, // ...with the match at least this good (per heard letter)
+  antShort: 10, // a pangti this short (letters) needs no earlier fix inside it first
+  antTail: 6, // after an early change, the old pangti's last letters still heard = still here
+  antBackDwell: 2, // ...while its earlier letters (the reader went back to it) = back after this
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
@@ -171,9 +182,12 @@ class FollowerV2 {
       this.cur = Math.min(opts.startLine, lines.length - 1);
     }
     this.tick = 0;
+    this.ant = null; // Akhand Paath: the pangti left early for the next one (see anticipate)
+    this.prog = { line: null, mid: false }; // a fix inside the current pangti before its end
     // Bound here: test wrappers built with Object.create(follower) must still move THIS
     // follower, not set fields on the wrapper.
     this.seek = this.seek.bind(this);
+    this.adopt = this.adopt.bind(this);
   }
 
   // The sevadaar moved the screen to `line`: follow on from there.
@@ -186,7 +200,42 @@ class FollowerV2 {
     this.noMatch = 0;
     this.foreign = 0;
     this.lastEnd = -1;
+    this.ant = null;
     return true;
+  }
+
+  // Akhand Paath: carry on from another follower over the same audio (the reading window
+  // moved on to the next Shabads): the same audio buffer and listening clock, so no second
+  // of audio is lost and no window is decoded twice, at pangti `line` of this text.
+  // `antLine`: the pangti of this text left early for `line` (see anticipate), or null.
+  adopt(prev, line, antLine = null) {
+    if (!prev || !Number.isInteger(line) || line < 0 || line >= this.lineStart.length) return false;
+    if (prev.buf) this.buf = prev.buf;
+    if (Number.isFinite(prev.acc)) this.acc = prev.acc;
+    if (Number.isFinite(prev.hopS) && prev.hopS !== this.hopS) {
+      this.hopS = prev.hopS;
+      this.hop = Math.floor(prev.hopS * SR);
+      this.c = this.scaled(prev.hopS / this.base.hopS);
+    }
+    if (Number.isFinite(prev.tick)) this.tick = prev.tick;
+    this.cur = line;
+    this.lastCur = line;
+    this.cand = null;
+    this.ahead = 0;
+    this.noMatch = 0;
+    this.foreign = 0;
+    this.lastEnd = -1;
+    this.ant = Number.isInteger(antLine) && antLine >= 0 ? antLine : null;
+    this.prog = { line, mid: !!(prev.prog && prev.prog.mid && prev.cur != null) };
+    return true;
+  }
+
+  // The next pangti that has something to say (a row with no letters is skipped), or -1.
+  nextSaid(line) {
+    for (let k = line + 1; k < this.lineStart.length; k += 1) {
+      if (this.lineEnd[k] >= this.lineStart[k]) return k;
+    }
+    return -1;
   }
 
   // Best end position in text[a..b] for an alignment that ends at the end of the heard
@@ -352,6 +401,7 @@ class FollowerV2 {
     ) {
       const line = this.lineAt[G.end];
       if (this.confirm(line, c.jumpDwell)) {
+        this.ant = null;
         this.cur = line;
         this.noMatch = 0;
         this.cand = null;
@@ -374,9 +424,22 @@ class FollowerV2 {
       line -= 1;
       while (line > this.cur && this.lineEnd[line] < this.lineStart[line]) line -= 1;
     }
+    if (c.anticipate && this.ant != null) {
+      const at = this.lineAt[Lc.end];
+      // After an early change the pangti just left is still in the window: its last
+      // letters say nothing new (the reader is in the breath pause, or about to start).
+      if (at === this.ant && line < this.cur && Lc.end >= this.lineEnd[this.ant] - c.antTail) {
+        line = this.cur;
+      }
+      if (at === this.cur) this.ant = null; // the new pangti is being heard: it stands
+    }
     if (line === this.cur) {
       this.cand = null;
       this.foreign = 0;
+      if (c.anticipate) {
+        const nx = this.anticipateFrom(Lc);
+        if (nx >= 0) return this.out(nx, Lc.score);
+      }
       return this.out(line, Lc.score, Lc.end);
     }
     if (Lc.score - bg() < c.moveMargin) {
@@ -404,13 +467,43 @@ class FollowerV2 {
       return null;
     }
     // A one-line step back (a flicker between neighbours) may need longer than a real repeat.
-    if (this.confirm(line, line === this.cur - 1 && c.backDwell1 ? c.backDwell1 : c.backDwell)) {
+    // Back to a pangti left early (Akhand Paath): the reader is reading it again, follow soon.
+    let need = line === this.cur - 1 && c.backDwell1 ? c.backDwell1 : c.backDwell;
+    if (c.anticipate && this.ant != null && line === this.ant) need = c.antBackDwell;
+    if (this.confirm(line, need)) {
+      this.ant = null;
       this.cur = line;
       this.noMatch = 0;
       this.cand = null;
       return this.out(line, Lc.score, Lc.end);
     }
     return null;
+  }
+
+  // Akhand Paath (opts.anticipate): the local match Lc ends inside the current pangti.
+  // Once only its last antLetters letters are unheard (and it was really being read: a fix
+  // inside it earlier, unless it is a short one), the next pangti goes up. Returns that
+  // pangti, or -1 (stay).
+  anticipateFrom(Lc) {
+    const { c } = this;
+    const { cur } = this;
+    if (this.prog.line !== cur) this.prog = { line: cur, mid: false };
+    if (this.lineAt[Lc.end] !== cur || Lc.score < c.antScore) return -1;
+    const s = this.lineStart[cur];
+    const e = this.lineEnd[cur];
+    const len = e - s + 1;
+    if (e - Lc.end > c.antLetters) {
+      if (Lc.end - s + 1 >= Math.min(3, len)) this.prog.mid = true;
+      return -1;
+    }
+    if (!this.prog.mid && len > c.antShort) return -1;
+    const nx = this.nextSaid(cur);
+    if (nx < 0) return -1;
+    this.ant = cur;
+    this.cur = nx;
+    this.prog = { line: nx, mid: false };
+    this.noMatch = 0;
+    return nx;
   }
 
   // Nothing here fits: if other Gurbani keeps fitting better, stop showing a line.
@@ -420,6 +513,7 @@ class FollowerV2 {
       if (this.noMatch >= this.c.noMatchHops) {
         this.lastCur = this.cur;
         this.cur = null;
+        this.ant = null;
         this.cand = null;
         this.foreign = 0;
         this.noMatch = 0;
@@ -434,6 +528,7 @@ class FollowerV2 {
     if (this.foreign < this.c.releaseHops) return null;
     this.lastCur = this.cur;
     this.cur = null;
+    this.ant = null;
     this.cand = null;
     this.foreign = 0;
     this.noMatch = 0;
@@ -455,6 +550,7 @@ class FollowerV2 {
       'releaseHops',
       'noMatchHops',
       'catchHops',
+      'antBackDwell',
     ].forEach((k) => {
       if (c[k]) c[k] = Math.max(1, Math.round(c[k] / scale));
     });
