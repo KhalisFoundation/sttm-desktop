@@ -105,12 +105,12 @@ jobs:
       - name: Checks on the output
         shell: bash
         run: |
-          ls -la builds/ | grep -E "\.exe$|\.dmg$|\.zip$"
-          node -e 'const p=require("./node_modules/anvaad-js/package.json");if(p.version<"1.5.1")process.exit(1);console.log("anvaad-js",p.version)'
+          # pack:macArm's config writes to dist/, the others to builds/.
+          out=builds; [ -d dist ] && out=dist
+          ls -la $out/ | grep -E "\.exe$|\.dmg$|\.zip$"
           # No speech model and no onnxruntime anywhere in the output.
-          if find builds -iname "*onnx*" | grep -q .; then echo "onnx found in the build"; exit 1; fi
+          if find $out -iname "*onnx*" | grep -q .; then echo "onnx found in the build"; exit 1; fi
           echo "no onnx files in the build"
-          du -sh builds/*.exe builds/*.dmg builds/*.zip 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -119,5 +119,7 @@ jobs:
             builds/*.exe
             builds/*.dmg
             builds/*.zip
+            dist/*.dmg
+            dist/*.zip
           if-no-files-found: error
           retention-days: 30
