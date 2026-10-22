@@ -7,25 +7,25 @@ import CollectorBoundary from './Boundary';
 // whenever the sevadaar clicks the "Recording audio" chip in the workspace bar. One text
 // for both, so they can never drift apart. Keep it true to ShadowCollector.jsx (what is
 // saved: session.json, machineFacts) and uploader.js / hf.js (what turning it off stops).
-export const SETTING_PATH = 'Settings › Other Options › Help improve Voice Autopilot';
+export const SETTING_PATH = 'Settings › Other Options › Help improve Shabad search';
 
 export const NoticeText = ({ audio = true }) => (
   <div className="shadow-notice-text">
-    <p>To make Voice Autopilot better, STTM shares with Khalis Foundation:</p>
+    <p>To improve Shabad search, STTM shares with Khalis Foundation:</p>
     <ul>
       {audio && (
         <li>
           sound from the microphone while a program is going on (from when there is kirtan in the
-          room or you change what is on screen), <b>even when Voice Autopilot is not in use</b>
+          room or you change what is on screen), <b>without you pressing anything</b>
         </li>
       )}
-      <li>what is shown on screen (which Shabad or Bani, and which pangti)</li>
-      <li>what Voice Autopilot heard, and what it would have shown</li>
+      <li>what is shown on screen (which Shabad or Bani, and which pangti), and when</li>
     </ul>
     <p>
       It also saves the Gurdwara (and name, if you enter one), a random id for this install, the
-      computer&apos;s operating system, processor, time zone and language, the microphone&apos;s
-      name, and a log of app errors. No computer name, login name or internet address.
+      computer&apos;s operating system, processor, memory, time zone and language, the
+      microphone&apos;s name, and a log of app errors. No computer name, login name or internet
+      address.
     </p>
     <p>
       While STTM is open, the microphone stays on to notice when a program starts; the last 2
@@ -44,11 +44,14 @@ export const NoticeText = ({ audio = true }) => (
 // The short version for the first-launch card; the chip's popover keeps the full text.
 export const ShortNotice = ({ audio = true }) => (
   <div className="shadow-notice-text">
-    <p>To make Voice Autopilot better, STTM shares:</p>
+    <p>To improve Shabad search, STTM shares:</p>
     <ul>
-      {audio && <li>the microphone during a diwan, even with Voice Autopilot off</li>}
-      <li>what is on screen (Shabad or Bani, pangti) and what Voice Autopilot heard</li>
-      <li>your Gurdwara Sahib (if given), a random install id and basic computer details (no name or address)</li>
+      {audio && <li>the microphone during a diwan, automatically</li>}
+      <li>what is on screen (Shabad or Bani, pangti) and when</li>
+      <li>
+        your Gurdwara Sahib (if given), a random install id and basic computer details (no name or
+        address)
+      </li>
     </ul>
     <p>Sent to Khalis Foundation&apos;s secure storage.</p>
     <p>
@@ -76,7 +79,7 @@ const useCloseOnOutside = (open, setOpen, ref) => {
   }, [open, setOpen, ref]);
 };
 
-// Settings > Other Options > Help improve Voice Autopilot, scrolled into view.
+// Settings > Other Options > Help improve Shabad search, scrolled into view.
 const useOpenSharingSetting = () => {
   const { setOverlayScreen } = useStoreActions((actions) => actions.app);
   return () => {
@@ -95,7 +98,7 @@ const SharingPopover = ({ title, audio, onClose }) => {
   const { setCollectorLevel } = useStoreActions((actions) => actions.userSettings);
   const openSetting = useOpenSharingSetting();
   return (
-    <div className="shadow-rec-pop" role="dialog" aria-label="Voice Autopilot sharing">
+    <div className="shadow-rec-pop" role="dialog" aria-label="Shabad search sharing">
       <h4>{title}</h4>
       <ShortNotice audio={audio} />
       <button

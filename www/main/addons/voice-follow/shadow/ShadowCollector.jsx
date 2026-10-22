@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { SHADOW_BUILD, SHADOW_SEGMENT_MS, SHADOW_DISCARD_COOLDOWN_MS } from './config';
+import {
+  SHADOW_BUILD,
+  PROD_INFERENCE,
+  SHADOW_SEGMENT_MS,
+  SHADOW_DISCARD_COOLDOWN_MS,
+} from './config';
 import { ShortNotice } from './RecordingNotice';
 import CollectorBoundary from './Boundary';
 import { i18n } from '../../../common/i18n';
@@ -12,7 +17,9 @@ const remote = require('@electron/remote');
 const { ipcRenderer } = require('electron');
 const bus = require('./bus');
 const uploader = require('./uploader');
-const hf = require('./hf');
+// Hugging Face copy (on-device dataset build): PROD_INFERENCE builds only, never loaded in prod.
+// eslint-disable-next-line global-require
+const hf = PROD_INFERENCE ? require('./hf') : { start() {}, stop() {} };
 const { HF_TOKEN, VF_FEATURE_VERSION, VF_BUILD_COMMIT, COLLECTOR_VERSION } = require('./config');
 const service = require('./service');
 const listener = require('./listener');
@@ -20,19 +27,22 @@ const pcm = require('./pcm');
 const storage = require('./storage');
 const presenting = require('./presenting');
 const remoteConfig = require('./remote');
-const { logDir } = require('../engine/session-log');
 const { guard } = require('./diag');
 
 // One folder per app session under <userData>/voice-follow/shadow/<id>/:
 //   audio-000.wav ...  - what the microphone heard (16 kHz mono WAV), one per SHADOW_SEGMENT_MS
 //   audio-pre.wav      - up to 2 min from before the session started (listener.js)
 //   human.jsonl        - what the sevadaar put on screen (the human label)
-//   activity.jsonl     - per second: microphone loudness and letters heard
-//   system.jsonl       - what Voice-Follow would have shown (shadow mode)
-//   events.jsonl       - matches, pauses, audio segment boundaries
-//   score.json         - live agreement totals, rewritten every 30 s
-//   session.json       - tester, app version, microphone, start time
-const shadowRoot = () => path.join(logDir(), 'shadow');
+//   verses.csv         - the pangtis shown as verseId,timestamp_seconds (HF recording layout)
+//   activity.jsonl     - per second: microphone loudness (and letters heard, PROD_INFERENCE)
+//   system.jsonl       - what Voice-Follow would have shown (PROD_INFERENCE builds only)
+//   events.jsonl       - session start/stop, audio segments and their clock anchors, pauses
+//   score.json         - prod: a small summary (minutes, screen changes); PROD_INFERENCE:
+//                        live agreement totals. Rewritten every 30 s
+//   session.json       - install, app version, machine, microphone, start time (t0)
+// Every `t` in these files is seconds since t0; each audio file's sample 0 is placed on that
+// clock by its audio_anchor event (or, for audio-pre.wav, ends at the pre_roll event's t).
+const shadowRoot = () => path.join(remote.app.getPath('userData'), 'voice-follow', 'shadow');
 
 // Diagnostics for machines we cannot see: a startup health line (platform, database,
 // model, a real database query) and any renderer error go to errors.log, which uploads
@@ -67,14 +77,11 @@ if (SHADOW_BUILD && typeof window !== 'undefined' && !window.shadowDiagOn) {
       const ud = remote.app.getPath('userData');
       const db = path.join(ud, 'sttmdesktop-evergreen-v2.realm');
       const size = fs.existsSync(db) ? fs.statSync(db).size : 0;
-      const model = fs.existsSync(
-        path.join(process.resourcesPath || '', 'voice-follow', 'model.int8.onnx'),
-      );
       diag(
         `${tag}: ${process.platform} ${os.arch()} app ${remote.app.getVersion()} electron ${process.versions.electron} ` +
           `cpus ${os.cpus().length} (${(os.cpus()[0] || {}).model || '?'} ${(os.cpus()[0] || {}).speed || 0}MHz) ` +
           `mem ${Math.round(os.totalmem() / 1e9)}GB db ${size} bytes ` +
-          `isDbDownloaded=${localStorage.getItem('isDbDownloaded')} model=${model}`,
+          `isDbDownloaded=${localStorage.getItem('isDbDownloaded')}`,
       );
       if (!size) diag(`${tag} db query: skipped, database not downloaded yet`);
       else
@@ -150,9 +157,11 @@ const newInstallId = () => {
 const machineFacts = (installId) => ({
   installId: installId || '',
   os: `${process.platform} ${os.release()}`,
+  arch: os.arch(),
   cpus: os.cpus().length,
   cpuModel: (os.cpus()[0] || {}).model || '',
   cpuMhz: (os.cpus()[0] || {}).speed || 0,
+  memGB: Math.round(os.totalmem() / 1e8) / 10,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
   locale: navigator.language || '',
 });
@@ -283,7 +292,10 @@ const ShadowCollector = () => {
   // on disk by a crash or a killed app reaches S3 even if the sevadaar never records again.
   useEffect(() => {
     if (enabled) {
-      uploader.start(shadowRoot(), tester, { hfOn: () => !!hfTokenRef.current, log: diag });
+      uploader.start(shadowRoot(), tester, {
+        hfOn: () => PROD_INFERENCE && !!hfTokenRef.current,
+        log: diag,
+      });
       hf.start(shadowRoot(), () => hfTokenRef.current, diag);
     }
     // Recording turned off (Settings, the chip or the first-launch card): stop sending now.
@@ -322,6 +334,10 @@ const ShadowCollector = () => {
     presentingOffSinceRef.current = null;
     setActive(true);
   });
+  // Gurbani screen changes this session, counting the one that started it.
+  const gurbaniSoFar = () =>
+    bus.gurbaniChanges() +
+    (/^screen: (shabad|bani|ceremony):/.test(startReasonRef.current) ? 1 : 0);
   const beginNowRef = useRef(beginNow);
   beginNowRef.current = beginNow;
 
@@ -376,7 +392,8 @@ const ShadowCollector = () => {
         const pre = preRollRef.current;
         preRollRef.current = null;
         const startedAt = Date.now();
-        const t0 = startedAt - (pre ? Math.round(pre.seconds * 1000) : 0);
+        // The pre-roll ended when the listener handed it over (pre.endedAt): it spans t0..that.
+        const t0 = pre ? (pre.endedAt || startedAt) - Math.round(pre.seconds * 1000) : startedAt;
         const id = new Date(t0).toISOString().replace(/[:.]/g, '-');
         const dir = path.join(shadowRoot(), id);
         fs.mkdirSync(dir, { recursive: true });
@@ -403,6 +420,8 @@ const ShadowCollector = () => {
               collector: COLLECTOR_VERSION,
               sharing: level,
               startedAt: new Date(t0).toISOString(),
+              t0,
+              inference: PROD_INFERENCE,
               app: remote.app.getVersion(),
               build: `vf-${VF_FEATURE_VERSION}`,
               feature: {
@@ -422,7 +441,12 @@ const ShadowCollector = () => {
         bus.begin(dir, t0);
         bus.note({ type: 'session_start', reason: startReasonRef.current });
         if (pre && audioOn)
-          bus.note({ type: 'pre_roll', file: 'audio-pre.wav', seconds: pre.seconds });
+          bus.note({
+            type: 'pre_roll',
+            file: 'audio-pre.wav',
+            seconds: pre.seconds,
+            endsAt: Math.round(((pre.endedAt || startedAt) - t0) / 10) / 100,
+          });
         bus.human(labelOf(nav));
         const event = (obj) => {
           try {
@@ -462,10 +486,14 @@ const ShadowCollector = () => {
           s.seg += 1; // a failed start never reuses a file name
           const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.wav`);
           // Uncompressed 16 kHz mono WAV, as the team's recorder captures training audio.
-          const rec = pcm.record(s.stream, file);
+          const name = path.basename(file);
+          // audio_anchor: where sample 0 of this file sits on the session clock (seconds).
+          const rec = pcm.record(s.stream, file, (at, via) =>
+            event({ type: 'audio_anchor', file: name, start: (at - t0) / 1000, via }),
+          );
           s.recorder = rec;
           s.recFile = file;
-          event({ type: 'audio_segment', file: path.basename(file), rate: rec.rate });
+          event({ type: 'audio_segment', file: name, rate: rec.rate });
           s.stream.getAudioTracks().forEach((t) => t.addEventListener('ended', onEnded));
         };
         const endSegment = () => {
@@ -566,12 +594,29 @@ const ShadowCollector = () => {
       } catch (_) {
         /* already gone */
       }
+      // Prod build: however the session ends (quiet, display off, disk, sharing turned off,
+      // quit), a short one in which no Gurbani was shown is thrown away (service.js).
+      if (
+        !PROD_INFERENCE &&
+        service.discardOnStop({
+          now: Date.now(),
+          startedAt: s.startedAt,
+          gurbaniChanges: gurbaniSoFar(),
+        })
+      ) {
+        discardRef.current = true;
+        lastDiscardRef.current = Date.now();
+      }
       bus.end();
       if (discardRef.current) {
         discardRef.current = false;
         try {
           fs.rmSync(s.dir, { recursive: true, force: true });
-          diag(`discarded ${path.basename(s.dir)}: the room started it and no words were heard`);
+          diag(
+            PROD_INFERENCE
+              ? `discarded ${path.basename(s.dir)}: the room started it and no words were heard`
+              : `discarded ${path.basename(s.dir)}: short, and no Gurbani was shown`,
+          );
         } catch (_) {
           /* ignore */
         }
@@ -633,6 +678,7 @@ const ShadowCollector = () => {
             startedBy: startReasonRef.current,
             lastHeardAt: bus.lastHeardAt(),
             vfUpAt: bus.vfUpAt(),
+            gurbaniChanges: gurbaniSoFar(),
           })
         ) {
           discardRef.current = true;

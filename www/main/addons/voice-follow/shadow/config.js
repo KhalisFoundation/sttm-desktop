@@ -1,12 +1,14 @@
-// Shadow data collection: the tester build handed to sangat members.
-// It hides the Voice-Follow panel and runs Voice-Follow silently ("shadow mode") next to
-// the sevadaar, who works by hand. What the sevadaar shows is the human label; what
-// Voice-Follow would have shown is scored against it live (bus.js), and the audio and
-// both timelines upload to the team's private bucket (uploader.js).
+// Shadower: collects diwan audio and what the sevadaar puts on screen, fully automatically
+// (the sevadaar does nothing new), and uploads both to Khalis's private storage (uploader.js).
+// What the sevadaar shows is the human label for that audio.
 const SHADOW_BUILD = true;
-// Prod data collector prototype (vf-prod-collector): the Voice Autopilot tab and its
-// first-launch callout stay hidden unless Settings > Voice Autopilot is turned on; the hidden
-// run and self-score carry on as in the tester build. Sharing is opt-in (collector-level).
+// PROD build (Oct 22 decision): no speech model on the Gurdwara Sahib's computer. Nothing here
+// loads a model or onnxruntime, there is no hidden Autopilot run and no live scoring; speech
+// recognition, error rates and datasets are made offline, server-side, from the uploads.
+// The experimental build (vf-prod-collector) sets this true and keeps the hidden run + score.
+const PROD_INFERENCE = false;
+// Prod data collector: no Voice Autopilot UI. Sharing is asked once (the consent pill) and set
+// in Settings (collector-level).
 const PROD_COLLECTOR = true;
 const COLLECTOR_VERSION = 'proto-1';
 // TODO(prod): replace the baked container SAS with a signed-URL endpoint before this ships.
@@ -46,7 +48,12 @@ const SHADOW_CHANGE_GRACE_MS = testMs(
 );
 // A session the room started (no sevadaar) where Voice-Follow was listening this long and
 // recognised no words at all is noise, not kirtan: it is discarded, not uploaded.
+// (Only with PROD_INFERENCE; the prod build has no words to go by.)
 const SHADOW_EMPTY_GATE_MS = testMs('VF_TEST_EMPTY_GATE_MS', 3 * 60 * 1000);
+// Prod build: a session in which the sevadaar showed no Gurbani at all (no Shabad, Bani or
+// pangti change) and that lasted under this long is discarded, not uploaded. Anything longer
+// is kept even without a screen change (unattended kirtan); offline jobs filter the rest.
+const SHADOW_SHORT_DISCARD_MS = testMs('VF_TEST_SHORT_DISCARD_MS', 5 * 60 * 1000);
 // After such a discard, sound alone does not start another session for this long (a
 // screen change or Start still does), so a loud fan cannot keep restarting sessions.
 const SHADOW_DISCARD_COOLDOWN_MS = testMs('VF_TEST_DISCARD_COOLDOWN_MS', 5 * 60 * 1000);
@@ -57,8 +64,8 @@ const SHADOW_MIN_FREE_RUN_BYTES = 1.5e9; // a running session stops below this
 // Prod collector: the whole session store stays under this; over it, the oldest sessions
 // that are already uploaded are deleted whole (storage.js capStore).
 const SHADOW_STORE_CAP_BYTES = 2e9;
-// Shadow scoring pauses while the computer is this busy (1-minute load per core) and
-// resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
+// Shadow scoring (PROD_INFERENCE only) pauses while the computer is this busy (1-minute load
+// per core) and resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
 const SHADOW_CPU_PAUSE = 0.9;
 const SHADOW_CPU_RESUME = 0.6;
 // Sessions upload straight to Khalis's Azure Blob container with a container SAS that only
@@ -77,8 +84,8 @@ const COLLECTOR_CONFIG_EVERY_MS = 60 * 60 * 1000;
 // A cached server answer is trusted this long when the server cannot be reached (prod build).
 const COLLECTOR_CONFIG_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 // A second copy of every session goes to Hugging Face in the team's recording layout
-// (hf.js). The write token is entered on the first-launch card (kept in the app's settings)
-// or, if Khalis chooses, injected at build time like the SAS (VF_HF_TOKEN).
+// (hf.js; PROD_INFERENCE builds only: the prod build makes no datasets on the computer).
+// The write token is a saved setting or injected at build time like the SAS (VF_HF_TOKEN).
 const HF_NAMESPACE = 'khalisfoundation';
 const HF_DATASET_TYPE = 'kirtan';
 const HF_TOKEN = '__VF_HF_TOKEN__';
@@ -90,6 +97,7 @@ const VF_BUILD_COMMIT = '__VF_BUILD_COMMIT__';
 
 module.exports = {
   SHADOW_BUILD,
+  PROD_INFERENCE,
   PROD_COLLECTOR,
   COLLECTOR_VERSION,
   VF_FEATURE_VERSION,
@@ -107,6 +115,7 @@ module.exports = {
   SHADOW_QUIET_STOP_MS,
   SHADOW_CHANGE_GRACE_MS,
   SHADOW_EMPTY_GATE_MS,
+  SHADOW_SHORT_DISCARD_MS,
   SHADOW_DISCARD_COOLDOWN_MS,
   SHADOW_KEEP_BYTES,
   SHADOW_MIN_FREE_START_BYTES,

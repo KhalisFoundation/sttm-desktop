@@ -43,8 +43,10 @@ function takePreRoll() {
   const out = ringFull
     ? Int16Array.from([...ring.subarray(ringPos), ...ring.subarray(0, ringPos)])
     : ring.slice(0, ringPos);
+  // The pre-roll's last sample is now: the session clock is anchored to this.
+  const endedAt = Date.now();
   stop();
-  return out.length ? { pcm: out, rate: RATE, seconds: out.length / RATE } : null;
+  return out.length ? { pcm: out, rate: RATE, seconds: out.length / RATE, endedAt } : null;
 }
 
 // One captured chunk into the loudness sums and the 16 kHz pre-roll ring. `frame` is the

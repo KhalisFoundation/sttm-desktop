@@ -3,7 +3,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { toInt16, assembler, WORKLET_SRC } = require('./pcm');
+const { toInt16, assembler, frameZeroAt, WORKLET_SRC } = require('./pcm');
 
 const ramp = (from, n) => Float32Array.from({ length: n }, (_, i) => ((from + i) % 1000) / 1000);
 const joined = (bufs) => Buffer.concat(bufs);
@@ -75,5 +75,35 @@ describe('shadow pcm: chunk assembly', () => {
       0,
     );
     assert.equal(name, 'shadow-pcm');
+  });
+});
+
+describe('shadow pcm: audio clock anchor (same clock as human.jsonl)', () => {
+  it('frame 0 is placed in wall-clock time from the context timestamp', () => {
+    const ctx = { getOutputTimestamp: () => ({ contextTime: 2.5, performanceTime: 10000 }) };
+    const perf = { timeOrigin: 1e12 };
+    assert.equal(frameZeroAt(ctx, perf), 1e12 + 10000 - 2500);
+  });
+
+  it('no timestamp (or a throwing one) gives null, never an error', () => {
+    assert.equal(frameZeroAt({}, { timeOrigin: 1 }), null);
+    assert.equal(
+      frameZeroAt(
+        { getOutputTimestamp: () => ({ contextTime: 0, performanceTime: 0 }) },
+        { timeOrigin: 1 },
+      ),
+      null,
+    );
+    assert.equal(
+      frameZeroAt(
+        {
+          getOutputTimestamp: () => {
+            throw new Error('x');
+          },
+        },
+        { timeOrigin: 1 },
+      ),
+      null,
+    );
   });
 });

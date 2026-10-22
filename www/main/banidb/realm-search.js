@@ -551,80 +551,10 @@ const loadBani = (BaniID, BaniLength) =>
     Realm.open(realmConfig)
       .then((realm) => {
         const condition = `Bani.ID == ${BaniID} AND ${BaniLength} == true`;
-        // Always answer, even with no rows: a Bani with nothing at this length
-        // used to leave the promise pending forever, silently stalling callers.
-        resolve(realm.objects('Banis_Shabad').filtered(condition).sorted('Seq'));
-      })
-      .catch(reject);
-  });
-
-/**
- * One full scan of every Verse's first-letter encoding, for the Voice-Follow
- * autopilot acoustic backstop (a cheap whole-field screen before text
- * rescoring). Returns [{ shabadId, verseId, fl }] in verse-ID order, where fl
- * is the plain-ascii first-letter string decoded from FirstLetterStr — the
- * same alphabet the detector's toAsciiFirstLetters produces, so the two can
- * be compared directly with an LCS overlap. Runs once per autopilot session;
- * callers concatenate per shabad and cache the Map.
- */
-const loadFirstLetterIndex = () =>
-  new Promise((resolve, reject) => {
-    if (!initialized) {
-      init();
-    }
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const out = [];
-        const rows = realm.objects('Verse').sorted('ID');
-        for (let i = 0; i < rows.length; i += 1) {
-          try {
-            const r = rows[i];
-            const sh = r.Shabads && r.Shabads[0] ? r.Shabads[0].ShabadID : null;
-            if (sh == null || !r.FirstLetterStr) continue; // eslint-disable-line no-continue
-            const fl = String(r.FirstLetterStr)
-              .split(',')
-              .filter((c) => c !== '')
-              .map((c) => String.fromCharCode(parseInt(c, 10)))
-              .join('');
-            if (fl) out.push({ shabadId: sh, verseId: r.ID, fl });
-          } catch (_) {
-            /* skip malformed rows; the screen degrades, nothing breaks */
-          }
+        const rows = realm.objects('Banis_Shabad').filtered(condition).sorted('Seq');
+        if (rows.length > 0) {
+          resolve(rows);
         }
-        resolve(out);
-      })
-      .catch(reject);
-  });
-
-/**
- * Index of every Bani's shabads, in recitation order, for one Bani length.
- * Voice-Follow uses it to recognise a Bani being recited (two of its shabads
- * heard in order) and follow the whole Bani instead of shabad by shabad.
- *
- * @param {string} BaniLength The length column, e.g. "existsSGPC"
- * @returns {object} { [baniId]: [shabadId, ...] } distinct shabads in Seq order
- * @example
- *
- * loadBaniIndex("existsSGPC");
- * // => { 21: [2046, 2047, ...], 23: [...], ... }
- */
-const loadBaniIndex = (BaniLength) =>
-  new Promise((resolve, reject) => {
-    if (!initialized) {
-      init();
-    }
-    Realm.open(realmConfig)
-      .then((realm) => {
-        const rows = realm.objects('Banis_Shabad').filtered(`${BaniLength} == true`).sorted('Seq');
-        const index = {};
-        rows.forEach((row) => {
-          const baniId = row.Bani && row.Bani.ID;
-          const shabadId = row.Shabad && row.Shabad.ShabadID;
-          if (baniId == null || shabadId == null) return;
-          const list = index[baniId] || (index[baniId] = []);
-          if (list[list.length - 1] !== shabadId) list.push(shabadId);
-        });
-        resolve(index);
       })
       .catch(reject);
   });
@@ -891,10 +821,8 @@ module.exports = {
   CONSTS,
   query,
   loadShabad,
-  loadFirstLetterIndex,
   loadBanis,
   loadBani,
-  loadBaniIndex,
   loadCeremony,
   loadCeremonies,
   getAng,

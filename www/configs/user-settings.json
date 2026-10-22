@@ -415,11 +415,6 @@
       "dontApplyClass": true,
       "initialValue": ""
     },
-    "improve-voice-follow": {
-      "title": "IMPROVE_VOICE_FOLLOW",
-      "initialValue": true,
-      "notes": "IMPROVE_VOICE_FOLLOW_MSG"
-    },
     "theme": {
       "title": "THEME",
       "initialValue": "light-theme"

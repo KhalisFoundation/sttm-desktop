@@ -20,6 +20,7 @@ const LIVE_FILES = [
   'session.json',
   'score.json',
   'human.jsonl',
+  'verses.csv',
   'system.jsonl',
   'activity.jsonl',
   'events.jsonl',
@@ -29,6 +30,7 @@ const TYPES = {
   '.wav': 'audio/wav',
   '.json': 'application/json',
   '.jsonl': 'application/x-ndjson',
+  '.csv': 'text/csv',
 };
 
 let root = null;

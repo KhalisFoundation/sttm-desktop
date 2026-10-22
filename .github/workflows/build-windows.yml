@@ -21,7 +21,7 @@ jobs:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       AUDIO_TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
       AUDIO_TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}
-      # Voice Autopilot collector uploads (Azure Blob SAS); injected after npm run build. Optional:
+      # Shadower (prod data collector) uploads (Azure Blob SAS); injected after npm run build. Optional:
       # without it the build still succeeds and the app simply does not upload sessions.
       VF_UPLOAD_SAS: ${{ secrets.VF_UPLOAD_SAS }}
     steps:
@@ -70,15 +70,6 @@ jobs:
         run: |
           npm install -g npm@9.8.1
           npm install --legacy-peer-deps
-
-      - name: Speech model (Voice Autopilot, bundled into the installer)
-        shell: bash
-        run: |
-          mkdir -p build-resources/voice-follow
-          curl -L --retry 3 -o build-resources/voice-follow/model.int8.onnx \
-            "https://huggingface.co/karansea/indicconformer-stt-pa-ctc-shabad-preview/resolve/main/model.int8.onnx?download=true"
-          SIZE=$(wc -c < build-resources/voice-follow/model.int8.onnx | tr -d ' ')
-          echo "model bytes: $SIZE"; test "$SIZE" -gt 180000000
 
       - name: Build for ${{ matrix.arch }}
         run: |

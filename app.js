@@ -38,9 +38,6 @@ const maxChangeLogSeenCount = 5;
 /* eslint-disable import/no-unresolved, import/extensions */
 const Store = require('./www/js/store');
 const {
-  registerRetrievalService,
-} = require('./www/js/addons/voice-follow/engine/retrieval/main-service');
-const {
   savedSettingsCamelCase,
 } = require('./www/js/common/store/user-settings/get-saved-user-settings');
 const { styles } = require('./resetViewerStyles');
@@ -98,17 +95,7 @@ if (currentTheme === undefined) {
 }
 
 let mainWindow;
-// Voice Autopilot: the Shabad retrieval index runs outside the renderer (main-service.js).
-const voiceFollowRetrieval = registerRetrievalService({
-  ipcMain,
-  userData: app.getPath('userData'),
-  isAllowed: (sender) =>
-    !!mainWindow && !mainWindow.isDestroyed() && sender === mainWindow.webContents,
-});
-app.once('will-quit', () => {
-  voiceFollowRetrieval.dispose().catch(() => {});
-});
-// Voice Autopilot collector: hold the quit up to 20 s to upload the session that just ended.
+// Shadower (prod data collector): hold the quit up to 20 s to upload the session that just ended.
 // Anything going wrong here must never stop the app from quitting.
 let shadowFlushed = false;
 app.on('will-quit', (e) => {
@@ -980,24 +967,11 @@ ipcMain.on('set-user-setting', (event, settingChanger) => {
   mainWindow.webContents.send('set-user-setting', settingChanger);
 });
 
-// Voice Autopilot collector: is a viewer window up (this STTM is presenting)? The
+// Shadower (prod data collector): is a viewer window up (this STTM is presenting)? The
 // collector only records while presenting (shadow/presenting.js).
 ipcMain.handle('voice-follow:presenting', () => ({
   viewerOpen: !!(viewerWindow && !viewerWindow.isDestroyed() && viewerWindow.isVisible()),
 }));
-
-// Voice Autopilot: the system microphone permission, read without asking.
-// 'unknown' where the system has no such setting (Linux).
-ipcMain.handle('voice-follow:mic-access', () => {
-  try {
-    if ((platform === 'darwin' || platform === 'win32') && systemPreferences.getMediaAccessStatus) {
-      return systemPreferences.getMediaAccessStatus('microphone');
-    }
-  } catch (error) {
-    // Fall through: the caller then relies on the capture error instead.
-  }
-  return 'unknown';
-});
 
 ipcMain.on('get-media-access-status', async (event, mediaType) => {
   try {

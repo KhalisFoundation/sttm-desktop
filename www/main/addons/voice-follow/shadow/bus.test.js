@@ -79,3 +79,57 @@ describe('shadow bus: overrides in visible mode', () => {
     );
   });
 });
+
+describe('shadow bus: prod summary, Gurbani changes and verses.csv', () => {
+  let dir;
+  beforeEach(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vf-bus-prod-'));
+    bus.begin(dir, Date.now());
+  });
+  afterEach(() => {
+    bus.end();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('the opening screen is not a change; Shabad and pangti changes are Gurbani changes', () => {
+    bus.human(label(1, 10)); // the screen the session opened on
+    assert.equal(bus.gurbaniChanges(), 0);
+    bus.human(label(1, 11)); // next pangti
+    bus.human(label(2, 20)); // another Shabad
+    bus.human(label(2, 20, true)); // a slide: a change, but no Gurbani
+    assert.equal(bus.gurbaniChanges(), 2);
+  });
+
+  it('a slide or a cleared screen alone is no Gurbani change', () => {
+    bus.human(label(null, null));
+    bus.human(label(null, null, 'Waheguru'));
+    bus.human(label(null, null));
+    assert.equal(bus.gurbaniChanges(), 0);
+  });
+
+  it('verses.csv has one row per pangti shown, on the session clock', () => {
+    bus.human(label(1, 10));
+    bus.human(label(1, 10)); // same pangti again: no new row
+    bus.human(label(1, 11));
+    bus.human(label(null, null, 'Waheguru'));
+    const rows = fs.readFileSync(path.join(dir, 'verses.csv'), 'utf8').trim().split('\n');
+    assert.equal(rows[0], 'verseId,timestamp_seconds');
+    assert.deepEqual(
+      rows.slice(1).map((r) => r.split(',')[0]),
+      ['10', '11', ''],
+    );
+    rows.slice(1).forEach((r) => assert.match(r.split(',')[1], /^\d+\.\d{3}$/));
+  });
+
+  it('score.json is a small summary, and there is no system timeline', () => {
+    bus.human(label(1, 10));
+    bus.human(label(1, 11));
+    bus.end();
+    const score = JSON.parse(fs.readFileSync(path.join(dir, 'score.json'), 'utf8'));
+    assert.equal(score.prod, true);
+    assert.equal(score.gurbaniChanges, 1);
+    assert.equal(score.screenChanges, 1);
+    assert.equal(typeof score.minutesRecorded, 'number');
+    assert.equal(fs.existsSync(path.join(dir, 'system.jsonl')), false);
+  });
+});

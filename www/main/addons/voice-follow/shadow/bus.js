@@ -1,12 +1,18 @@
-// Shadow bus: the two timelines of a shadow session, written as they happen.
+// Shadow bus: the timelines of a shadow session, written as they happen.
 //   human  - what the sevadaar put on screen (the label), from ShadowCollector
-//   system - what Voice-Follow would have shown, from VoiceFollow in shadow mode
-//   activity / events - loudness and words heard each second; pauses, sleep gaps
-// The live score is score.js run on these same files every SAVE_S, the exact code the
-// offline benchmark runs. Nothing here touches the screen.
+//   verses.csv - the same pangti changes as verseId,timestamp_seconds (the layout of the
+//            team's HF recordings, push_sttm_desktop_recording.py / KhalisFoundation#2223)
+//   system - what Voice-Follow would have shown (PROD_INFERENCE builds only)
+//   activity / events - loudness (and, with PROD_INFERENCE, words heard) each second;
+//            pauses, sleep gaps, audio anchors
+// Every `t` is seconds since the session clock t0 (ms since epoch, session.json startedAt),
+// the same clock the audio files are anchored to (events.jsonl audio_anchor).
+// PROD_INFERENCE: the live score is score.js run on these same files every SAVE_S, the exact
+// code the offline benchmark runs. Prod: score.json is only a small summary (minutes recorded,
+// screen changes) so uploads still show something. Nothing here touches the screen.
 const fs = require('fs');
 const path = require('path');
-const { SHADOW_SOUND_LEVEL } = require('./config');
+const { SHADOW_SOUND_LEVEL, PROD_INFERENCE } = require('./config');
 const { contentKey, scoreDir, C } = require('./score');
 const { guard } = require('./diag');
 
@@ -29,11 +35,22 @@ const writeLine = (file, obj) => {
   }
 };
 
+// Prod build: what score.json holds instead of a score.
+const summary = () => ({
+  prod: true,
+  minutesRecorded: Math.round((now() / 60) * 10) / 10,
+  screenChanges: S.changes,
+  gurbaniChanges: S.gurbaniChanges,
+});
+
 function save() {
   if (!S) return;
   try {
-    const r = scoreDir(S.dir);
-    delete r.segments;
+    let r;
+    if (PROD_INFERENCE) {
+      r = scoreDir(S.dir);
+      delete r.segments;
+    } else r = summary();
     fs.writeFileSync(
       path.join(S.dir, 'score.json'),
       JSON.stringify({ updatedAt: new Date().toISOString(), ...r }, null, 1),
@@ -47,12 +64,9 @@ function flushActivity(upTo) {
   // One line per finished second: loudest level (RMS 0-1), most letters heard, and the
   // longest recognised text (offline review compares it with each shabad's words).
   while (S.act.sec < upTo) {
-    writeLine('activity.jsonl', {
-      t: S.act.sec,
-      level: Math.round(S.act.level * 1000) / 1000,
-      letters: S.act.letters,
-      text: S.act.text,
-    });
+    const line = { t: S.act.sec, level: Math.round(S.act.level * 1000) / 1000 };
+    if (PROD_INFERENCE) Object.assign(line, { letters: S.act.letters, text: S.act.text });
+    writeLine('activity.jsonl', line);
     S.act = { sec: S.act.sec + 1, level: 0, letters: 0, text: '' };
   }
 }
@@ -88,6 +102,9 @@ function begin(dir, t0) {
     lastSoundAt: null,
     vfUpAt: null,
     recentLevel: 0,
+    changes: 0, // screen changes during the session (any label change)
+    gurbaniChanges: 0, // of those, ones that show Gurbani: a new Shabad, Bani or pangti
+    lastVerse: undefined, // last verseId written to verses.csv
     act: { sec: 0, level: 0, letters: 0, text: '' },
     timer: setInterval(guard('bus.tick', tick), 1000),
   };
@@ -101,10 +118,40 @@ function end() {
   S = null;
 }
 
+// Screen-change counts (the prod discard rule and summary) and verses.csv. The first call of
+// a session is the screen it opened on, not a change.
+function track(label) {
+  const prev = S.human;
+  const key = contentKey(label);
+  const verse = label.verseId ?? null;
+  if (S.labelled) {
+    const changed =
+      key !== prev.key || verse !== (prev.verseId ?? null) || !!label.slide !== !!prev.slide;
+    if (changed) S.changes += 1;
+    if (changed && key && (key !== prev.key || verse !== (prev.verseId ?? null))) {
+      S.gurbaniChanges += 1;
+    }
+  }
+  S.labelled = true;
+  S.human = { ...label, key };
+  // verses.csv: one row per pangti shown (blank verseId: no pangti on screen).
+  const csvVerse = key ? verse : null;
+  if (csvVerse !== S.lastVerse) {
+    S.lastVerse = csvVerse;
+    try {
+      const file = path.join(S.dir, 'verses.csv');
+      if (!fs.existsSync(file)) fs.writeFileSync(file, 'verseId,timestamp_seconds\n');
+      fs.appendFileSync(file, `${csvVerse ?? ''},${now().toFixed(3)}\n`);
+    } catch (_) {
+      /* never disturb the sevadaar */
+    }
+  }
+}
+
 // The sevadaar's screen changed (full label: shabadId, verseId, bani, ceremony, slide).
 function human(label) {
   if (!S) return;
-  S.human = { ...label, key: contentKey(label) };
+  track(label);
   // While the sevadaar drives Voice-Follow (visible mode) the screen changes are mostly
   // Voice-Follow's own; one that differs from what it last showed is a sevadaar override.
   if (S.visible) {
@@ -218,6 +265,8 @@ const active = () => !!S;
 const lastHeardAt = () => (S ? S.lastHeardAt || null : null);
 const lastSoundAt = () => (S ? S.lastSoundAt || null : null);
 const vfUpAt = () => (S ? S.vfUpAt || null : null);
+// Gurbani screen changes so far this session (prod discard rule, service.discardOnStop).
+const gurbaniChanges = () => (S ? S.gurbaniChanges : 0);
 const sessionDir = () => (S ? S.dir : null);
 
 // Every entry point is guarded (diag.js): a fault is logged, never thrown at the caller.
@@ -236,6 +285,7 @@ module.exports = {
   lastHeardAt,
   lastSoundAt,
   vfUpAt,
+  gurbaniChanges,
   sessionDir,
   contentKey,
 };

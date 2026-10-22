@@ -170,8 +170,22 @@ function capture(ctx, src, tag, onChunk) {
   };
 }
 
+// When (ms since epoch) frame 0 of `ctx`'s audio clock was, from the context's own pairing of
+// audio time with performance time; null if the browser cannot say. Pure; exported for tests.
+function frameZeroAt(ctx, perf = typeof performance !== 'undefined' ? performance : null) {
+  try {
+    const ts = ctx.getOutputTimestamp && ctx.getOutputTimestamp();
+    if (!ts || !perf || !Number.isFinite(ts.performanceTime) || !ts.performanceTime) return null;
+    return perf.timeOrigin + ts.performanceTime - ts.contextTime * 1000;
+  } catch (_) {
+    return null;
+  }
+}
+
 // Starts writing `stream` to `file`. Returns { stop() } (stop finalises the header).
-function record(stream, file) {
+// onAnchor(ms), called once when the first audio arrives: when (ms since epoch) sample 0 of
+// the file was heard, so the file lines up with human.jsonl / verses.csv (same wall clock).
+function record(stream, file, onAnchor) {
   let ctx;
   try {
     ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: RATE });
@@ -200,12 +214,24 @@ function record(stream, file) {
     }
   };
   const asm = assembler(rate);
+  let anchored = false;
+  const anchor = (frame, x) => {
+    anchored = true;
+    if (!onAnchor) return;
+    // Worklet: sample 0 of the file is audio-clock frame 0. ScriptProcessor fallback: the
+    // first buffer just ended, so sample 0 was its length ago.
+    const at =
+      frame === null ? Date.now() - (x.length / rate) * 1000 : (frameZeroAt(ctx) ?? Date.now());
+    onAnchor(Math.round(at), frame === null ? 'buffer' : 'audio-clock');
+  };
   const cap = capture(ctx, src, 'pcm', (frame, x) => {
     if (!open) return;
+    if (!anchored) anchor(frame, x);
     write(frame === null ? [toInt16(x)] : asm.push(frame, x));
   });
   return {
     rate,
+    samples: () => samples,
     stats: asm.stats, // holes padded / overlaps trimmed (worklet path); expected to stay 0
     stop() {
       if (!open) return;
@@ -222,4 +248,4 @@ function record(stream, file) {
   };
 }
 
-module.exports = { record, capture, header, RATE, toInt16, assembler, WORKLET_SRC };
+module.exports = { record, capture, header, frameZeroAt, RATE, toInt16, assembler, WORKLET_SRC };
