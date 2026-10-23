@@ -17,6 +17,10 @@ const SETTLE_MS = 1000;
 
 const blankLabel = () => ({ key: null, verseId: null });
 let S = null; // current session
+// Whether Voice Autopilot is on screen, kept across sessions: Start often fires before the
+// session it starts exists (and a new session can begin while Autopilot is already on screen),
+// so a session must start from this, not from a setVisible call it never saw.
+let visibleNow = false;
 
 const now = () => (S ? (Date.now() - S.t0) / 1000 : 0);
 const writeLine = (file, obj) => {
@@ -89,7 +93,9 @@ function begin(dir, t0) {
     recentLevel: 0,
     act: { sec: 0, level: 0, letters: 0, text: '' },
     timer: setInterval(tick, 1000),
+    visible: visibleNow,
   };
+  if (visibleNow) writeLine('events.jsonl', { t: 0, type: 'vf_visible', at: 'session_start' });
 }
 
 function end() {
@@ -192,6 +198,7 @@ function note(obj) {
 
 // The sevadaar started (true) or stopped (false) Voice-Follow from the panel.
 function setVisible(on) {
+  visibleNow = !!on;
   if (!S || !!S.visible === !!on) return;
   S.visible = !!on;
   writeLine('events.jsonl', { t: now(), type: on ? 'vf_visible' : 'vf_hidden' });
