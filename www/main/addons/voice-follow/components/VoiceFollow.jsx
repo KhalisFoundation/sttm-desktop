@@ -2474,7 +2474,10 @@ const VoiceFollow = () => {
               inputSr: sampleRateRef.current,
               startLine: at,
               startAt: true,
-              akhand: true, // engine/pace Akhand Paath listening (fast tier only)
+              // engine/pace Akhand Paath listening: every 0.125 s where the computer has room
+              // (dwells counted at this step), else the tier's step.
+              akhand: true,
+              hopS: 0.125,
             });
             if (followerRef.current && at >= 0) follower.adopt(followerRef.current, at);
           } else
@@ -2867,6 +2870,7 @@ const VoiceFollow = () => {
         const follower = await engine.createPaathFollower(profile.verses, {
           inputSr: sampleRateRef.current,
           akhand: true,
+          hopS: 0.125,
         });
         if (currentShabadIdRef.current === sid && followerRef.current === f) {
           seqNextRef.current = { sid, profile, follower, from: f };

@@ -1,8 +1,12 @@
-// Akhand Paath listening schedule (engine/pace): only when flagged, scoped and in the fast
-// tier; every other mode keeps the tier's own schedule. Run: node --test <this file>
+// Akhand Paath listening schedule (engine/pace): only when flagged and a read text is being
+// followed; every other mode keeps the tier's own schedule. Run: node --test <this file>
 const { describe, it, afterEach } = require('node:test');
 const assert = require('node:assert');
 const pace = require('../engine/pace');
+
+const passes = (ms) => {
+  for (let i = 0; i < 5; i += 1) pace.notePass(ms, 4 * 16000);
+};
 
 describe('pace Akhand Paath schedule', () => {
   afterEach(() => {
@@ -11,30 +15,33 @@ describe('pace Akhand Paath schedule', () => {
   });
   it('changes nothing unless Akhand Paath is flagged', () => {
     pace.setScoped(true);
-    assert.equal(pace.hopS('akhand', 0.25), 0.25);
+    passes(40);
+    assert.equal(pace.hopS('akhand', 0.125), 0.25);
     assert.equal(pace.windowS('akhand', 4), 4);
     assert.equal(pace.hopS('recognizer', 0.5), 0.5);
     assert.equal(pace.hopS('follower', 0.25), 0.25);
   });
-  it('listens twice as often on a shorter window, the recognizer half as often', () => {
+  it('fast computer: reading follower every 0.125 s, recognizer once a second', () => {
     pace.setScoped(true);
     pace.setAkhand(true);
-    assert.equal(pace.hopS('akhand', 0.25), 0.125);
-    assert.equal(pace.windowS('akhand', 4), 2.5);
+    passes(40); // 9 passes/s x 40 ms = 0.36 load
+    assert.equal(pace.hopS('akhand', 0.125), 0.125);
+    assert.equal(pace.windowS('akhand', 4), 4);
     assert.equal(pace.hopS('recognizer', 0.5), 1);
-    // other followers and texts are untouched
-    assert.equal(pace.hopS('follower', 0.25), 0.25);
-    assert.equal(pace.windowS('paath', 4), 4);
+    assert.equal(pace.hopS('follower', 0.25), 0.25); // other followers untouched
   });
-  it('keeps the same model work as the fast tier', () => {
-    const { AKHAND } = pace;
-    const work = ((1 / AKHAND.followerHopS) * AKHAND.windowS) / 4 + 1 / AKHAND.recognizerHopS;
-    assert.ok(work <= 6, `akhand passes/s (4 s equivalent) ${work}`);
+  it('busy computer: tier step for the follower, still a slower recognizer', () => {
+    pace.setScoped(true);
+    pace.setAkhand(true);
+    passes(150); // 9 x 150 ms = 1.35 load: no room
+    assert.equal(pace.hopS('akhand', 0.125), 0.25);
+    assert.equal(pace.hopS('recognizer', 0.5), 1);
   });
   it('is off when nothing read is being followed', () => {
     pace.setAkhand(true);
     pace.setScoped(false);
-    assert.equal(pace.hopS('akhand', 0.25), 0.25);
+    passes(40);
+    assert.equal(pace.hopS('akhand', 0.125), 0.25);
     assert.equal(pace.hopS('recognizer', 0.5), 0.5);
   });
 });
