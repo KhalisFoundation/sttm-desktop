@@ -64,6 +64,11 @@ const DEFAULTS = {
   // compound. 0 = off.
   catchHops: 4,
   catchScore: 0.5, // ...each of those windows matching at least this well (per letter)
+  // Akhand Paath only (opts.akhand): entering the next pangti once the current one's end was
+  // heard (within akhEndSlack letters of it).
+  akhEnterLetters: 1,
+  akhEnterGain: 3,
+  akhEndSlack: 2,
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
@@ -389,11 +394,20 @@ class FollowerV2 {
     }
     this.noMatch = 0; // something here matched
     let line = this.lineAt[Lc.end];
-    // Only the first letters of the next line heard: not enough yet.
+    // Only the first letters of the next line heard: not enough yet. Akhand Paath
+    // (opts.akhand): once the current pangti's end has been heard, the very next pangti
+    // needs only akhEnterLetters of its own (read Ang after Ang, it is almost certain).
+    const endHeard =
+      c.akhand &&
+      line === this.cur + 1 &&
+      this.lastEnd >= 0 &&
+      this.lineAt[this.lastEnd] === this.cur &&
+      this.lastEnd >= this.lineEnd[this.cur] - c.akhEndSlack;
+    const needLetters = endHeard ? c.akhEnterLetters : c.enterLetters;
+    const needGain = endHeard ? c.akhEnterGain : c.enterGain;
     if (
       line > this.cur &&
-      (Lc.end - this.lineStart[line] + 1 < c.enterLetters ||
-        this.gainOver(Lc, line - 1) < c.enterGain)
+      (Lc.end - this.lineStart[line] + 1 < needLetters || this.gainOver(Lc, line - 1) < needGain)
     ) {
       line -= 1;
       while (line > this.cur && this.lineEnd[line] < this.lineStart[line]) line -= 1;
