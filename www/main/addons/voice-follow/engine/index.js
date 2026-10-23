@@ -48,6 +48,11 @@ function isReady() {
   return modelManager.isReady();
 }
 
+// The ONNX session is up (ready() has completed once): a Start pays no model load.
+function isLoaded() {
+  return !!loadedInfer;
+}
+
 // Model-pass timing since the last call (null until the session is loaded); see Infer.
 function perfStats() {
   return loadedInfer ? loadedInfer.perfStats() : null;
@@ -80,6 +85,7 @@ async function createPaathFollower(lines, opts = {}) {
 module.exports = {
   ready,
   isReady,
+  isLoaded,
   perfStats,
   createRecognizer,
   createFollower,
