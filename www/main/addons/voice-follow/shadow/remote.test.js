@@ -30,3 +30,17 @@ describe('tester build switch', () => {
     assert.equal(enabledFrom({ enabled: false }, 'a', false), false);
   });
 });
+
+describe('remote: where the server switch lives', () => {
+  const config = require('./config'); // eslint-disable-line global-require
+
+  it('is the shadower-config file on GitHub, separate from the upload container', () => {
+    assert.equal(
+      config.COLLECTOR_CONFIG_URL,
+      'https://raw.githubusercontent.com/Arash2348/sttm-desktop/shadower-config/shadower/config.json',
+    );
+    assert.ok(!config.COLLECTOR_CONFIG_URL.startsWith(config.UPLOAD_URL));
+    assert.equal(config.UPLOAD_CONTAINER, 'shadower-prod');
+    assert.ok(config.UPLOAD_URL.endsWith(`/${config.UPLOAD_CONTAINER}`));
+  });
+});

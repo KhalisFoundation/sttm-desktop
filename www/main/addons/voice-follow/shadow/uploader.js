@@ -1,6 +1,6 @@
-// Uploads shadow sessions to the Voice-Follow training-data container on Khalis's Azure
-// Blob storage. Each file is PUT straight to the container with a SAS that allows only
-// create, write and list, under raw/<gurdwara>/<tester name>/<date>/<session>/<file>, so
+// Uploads shadow sessions to the collector container (config.js UPLOAD_CONTAINER) on Khalis's
+// Azure Blob storage. Each file is PUT straight to the container with a SAS that allows only
+// create and write (nothing here lists or reads), under raw/<gurdwara>/<tester name>/<date>/<session>/<file>, so
 // the folders can be browsed by people. Each session folder keeps uploaded.json
 // (file -> size uploaded), so a restart, a sleep or Gurdwara Wi-Fi dropping out just resumes
 // later. Live files (score, timelines) are re-sent every LIVE_EVERY_MS while the service is

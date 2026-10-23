@@ -68,18 +68,24 @@ const SHADOW_STORE_CAP_BYTES = 2e9;
 // per core) and resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
 const SHADOW_CPU_PAUSE = 0.9;
 const SHADOW_CPU_RESUME = 0.6;
-// Sessions upload straight to Khalis's Azure Blob container with a container SAS that only
-// allows create, write and list. The SAS is never committed: after `npm run build`,
-// packaging/inject-upload-sas.js replaces the placeholder in the compiled copy of this file
-// from the VF_UPLOAD_SAS environment variable (CI sets it from a repository secret).
-const UPLOAD_URL = 'https://banidb.blob.core.windows.net/voice-follow-training-data';
-// TODO(prod): UPLOAD_SAS goes away. The prod collector will ask a signed-URL endpoint for a
-// short-lived PUT URL per file (uploader.putFile is the one place that builds the URL).
+// Sessions upload straight to Khalis's Azure Blob storage, into UPLOAD_CONTAINER, with a
+// container SAS that allows only create and write (uploader.js only ever PUTs). Prod uploads go
+// to the private `shadower-prod` container; swap the name here when its key arrives. The SAS is
+// never committed: after `npm run build`, packaging/inject-upload-sas.js replaces the
+// placeholder in the compiled copy of this file from the VF_UPLOAD_SAS environment variable
+// (CI sets it from a repository secret). Without it the build simply does not upload.
+const UPLOAD_ACCOUNT_URL = 'https://banidb.blob.core.windows.net';
+const UPLOAD_CONTAINER = 'shadower-prod';
+const UPLOAD_URL = `${UPLOAD_ACCOUNT_URL}/${UPLOAD_CONTAINER}`;
+// TODO(prod): UPLOAD_SAS may go away for a signed-URL endpoint that hands out a short-lived PUT
+// URL per file (uploader.putFile is the one place that builds the URL).
 const UPLOAD_SAS = '__VF_UPLOAD_SAS__';
-// Remote kill-switch (remote.js): a tiny JSON fetched at launch and hourly; {"enabled": false}
-// keeps the collector idle everywhere without a release. Placeholder path on the same
-// container until the real config location exists.
-const COLLECTOR_CONFIG_URL = `${UPLOAD_URL}/collector/config.json`;
+// Server switch (remote.js): a tiny JSON fetched at launch and hourly. Hosted on GitHub, on the
+// orphan branch `shadower-config` of the fork (schema in its README.md), independent of the
+// upload container and its key. GitHub's CDN caches it for ~5 min, so a change reaches every
+// install within about an hour. {"enabled": false} (the default there) keeps everyone idle.
+const COLLECTOR_CONFIG_URL =
+  'https://raw.githubusercontent.com/Arash2348/sttm-desktop/shadower-config/shadower/config.json';
 const COLLECTOR_CONFIG_EVERY_MS = 60 * 60 * 1000;
 // A cached server answer is trusted this long when the server cannot be reached (prod build).
 const COLLECTOR_CONFIG_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -120,6 +126,7 @@ module.exports = {
   COLLECTOR_CONFIG_MAX_AGE_MS,
   SHADOW_CPU_PAUSE,
   SHADOW_CPU_RESUME,
+  UPLOAD_CONTAINER,
   UPLOAD_URL,
   UPLOAD_SAS,
 };
