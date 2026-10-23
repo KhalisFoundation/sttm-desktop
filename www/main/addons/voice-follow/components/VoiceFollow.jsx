@@ -399,7 +399,9 @@ const AKHAND_SECTION_BANIS = new Set([
   ...Array.from({ length: 17 }, (_, i) => 91 + i), // 91-107: Vaars
 ]);
 const PAATH_SEQ_BACKS = 2; // moves back of 2+ pangtis that end it (kirtan returns; a reader rarely does)
-const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 } };
+const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 }, back: null };
+const PAATH_SEQ_BACK_FIXES = 4; // confident fixes in the Shabad just left...
+const PAATH_SEQ_BACK_MS = 3000; // ...over at least this long: go back to it
 // A move back of two pangtis or more from `prev` (the last line followed) to `line`.
 const prev2Back = (prev, line) => prev != null && line < prev - 1;
 // Rehras, Sohila, and Japji (whose opening shabad starts with the Mool Mantar, which
@@ -1141,8 +1143,8 @@ const VoiceFollow = () => {
   const seqNextRef = useRef(null);
   // Akhand Paath detection per plain Shabad (see seqDetectRef), and the Shabad before it.
   const seqPaceRef = useRef({ id: null });
-  // Was Shabad `sid` (just followed) read in order at a reading pace (or only just begun,
-  // nothing coming back)? (seqPaceRef record)
+  // Was Shabad `sid` (just followed) read in order at a measured reading pace (at least
+  // PAATH_SEQ_PACE_LINES pangtis, nothing coming back)? (seqPaceRef record)
   const readAtPaceRef = useRef(null);
   readAtPaceRef.current = (sid) => {
     const cur = seqPaceRef.current;
@@ -1625,7 +1627,10 @@ const VoiceFollow = () => {
     backlogRef.current = { chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 };
     paceOffRef.current?.();
     paceOffRef.current = null;
-    if (engine.pace) engine.pace.setScoped(false);
+    if (engine.pace) {
+      engine.pace.setScoped(false);
+      if (engine.pace.setAkhand) engine.pace.setAkhand(false);
+    }
     // Take down our seeking slide if we put one up; never touch the user's own.
     if (seekingRef.current) {
       seekingRef.current = false;
@@ -2436,13 +2441,9 @@ const VoiceFollow = () => {
 
         let profile;
         // Akhand Paath: any lock that is not the reading window itself (a judge switch, a
-        // tap, a Bani) ends Akhand Paath following, unless it is inside the window.
+        // tap, a Bani) ends Akhand Paath following.
         const seqWindow = !!opts.window && baniId == null && typeof cand.shabadId === 'number';
-        if (
-          paathSeqRef.current.on &&
-          !seqWindow &&
-          !(curBaniShabadsRef.current && curBaniShabadsRef.current.has(cand.shabadId))
-        ) {
+        if (paathSeqRef.current.on && !seqWindow) {
           paathSeqRef.current = { ...PAATH_SEQ_OFF };
           seqNextRef.current = null;
         }
@@ -2959,7 +2960,8 @@ const VoiceFollow = () => {
     }
     if (sq.eligible !== true) return;
     const n = (prof.verses || []).length;
-    if (sq.lines.size < PAATH_SEQ_LINES && out.lineIndex < n - 1) return;
+    // (Never on a short Shabad's last row alone: a short Shabad sung straight through once.)
+    if (sq.lines.size < PAATH_SEQ_LINES || !n) return;
     // Reading pace: words of the lines finished per second (kirtan sung straight through
     // is slower), or simply a long run of lines in order.
     const { seen } = sq;
@@ -4054,7 +4056,12 @@ const VoiceFollow = () => {
           // (never cover the user's own slide), and only once per evaluation.
           // (Akhand Paath following: the reading is being followed pangti by pangti; a real
           // move away still switches at SWITCH_CONFIRM, without the slide in between.)
-          const seqFollowing = paathSeqRef.current.on && !!curProfileRef.current?.window;
+          // (Only once the reading has crossed into a next Shabad: a single Shabad read
+          // straight through, such as a Hukamnama, keeps the slide and freeze as before.)
+          const seqFollowing =
+            paathSeqRef.current.on &&
+            paathSeqRef.current.streak >= 1 &&
+            !!curProfileRef.current?.window;
           if (
             leadSlot.wins >= 2 &&
             !seekingRef.current &&
@@ -4262,6 +4269,7 @@ const VoiceFollow = () => {
             engine.pace.setAkhand(
               phaseRef.current === 'following' &&
                 paathSeqRef.current.on &&
+                paathSeqRef.current.streak >= 1 &&
                 !!(curProfileRef.current && curProfileRef.current.window),
             );
           }
@@ -4338,8 +4346,38 @@ const VoiceFollow = () => {
               const curSid = currentShabadIdRef.current;
               const vs = prof.verseShabad.get(out.verseId);
               if (vs != null && vs !== curSid) {
-                // The previous Shabad's last pangti still heard, or an unsure fix: hold.
-                if (vs < curSid || out.confidence < UI_MOVE_CONF) return;
+                if (out.confidence < UI_MOVE_CONF) return;
+                if (vs < curSid) {
+                  // The previous Shabad's last pangti still heard: hold. If it keeps being
+                  // heard (the reading went back, or the crossing was wrong), go back to it.
+                  const nowB = Date.now();
+                  ps.back =
+                    ps.back && ps.back.sid === vs
+                      ? { sid: vs, n: ps.back.n + 1, since: ps.back.since }
+                      : { sid: vs, n: 1, since: nowB };
+                  if (
+                    ps.back.n >= PAATH_SEQ_BACK_FIXES &&
+                    nowB - ps.back.since >= PAATH_SEQ_BACK_MS
+                  ) {
+                    const verse = (prof.rawLines || [])[out.lineIndex];
+                    paathSeqRef.current = { ...PAATH_SEQ_OFF };
+                    seqNextRef.current = null;
+                    sessionLog.logEvent('paath_seq_off', {
+                      session: sessionIdRef.current,
+                      shabadId: curSid,
+                      why: 'previous',
+                      to: vs,
+                    });
+                    if (verse && autopilotLockRef.current && !lockingRef.current) {
+                      autopilotLockRef.current(
+                        { shabadId: vs, verseId: out.verseId, verse },
+                        { promote: true },
+                      );
+                    }
+                  }
+                  return;
+                }
+                ps.back = null;
                 const prev = curCursorPrevRef.current;
                 const stepped =
                   prev != null &&
@@ -4358,7 +4396,9 @@ const VoiceFollow = () => {
                   : ps.cross.n >= PAATH_SEQ_SKIP && held >= PAATH_SEQ_SKIP_MS;
                 // Open it on a plain step over the boundary, or once the fix has stayed
                 // there; one stray fix on a look-alike pangti opens nothing.
-                if (!((stepped && isNext) || stayed)) return;
+                // The first crossing of a reading must stay (a Hukamnama or read-through that
+                // simply ends never opens the next Shabad on one look-alike fix).
+                if (!((stepped && isNext && ps.streak >= 1) || stayed)) return;
                 seqCrossRef.current(vs, out);
               } else if (vs === curSid && out.confidence >= UI_MOVE_CONF) {
                 ps.cross = { sid: null, n: 0 };
@@ -4385,7 +4425,11 @@ const VoiceFollow = () => {
           const evaluatingSwitch =
             switchCandRef.current &&
             switchCandRef.current.wins >= 1 &&
-            !(paathSeqRef.current.on && curProfileRef.current?.window);
+            !(
+              paathSeqRef.current.on &&
+              paathSeqRef.current.streak >= 1 &&
+              curProfileRef.current?.window
+            );
           if (evaluatingSwitch || out.confidence < UI_MOVE_CONF) return;
           // Just after a sevadaar line move, their pangti stands unless the follower moves
           // on to the next one or clearly insists on another (lineRespect.js). No hold:
