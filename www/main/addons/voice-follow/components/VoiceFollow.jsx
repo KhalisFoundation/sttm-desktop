@@ -4482,6 +4482,8 @@ const VoiceFollow = () => {
   };
   const rate = (value) => {
     shadowBus.note({ type: 'rating', value });
+    // Anonymous thumbs up/down for everyone (the session note above only reaches testers who share recordings).
+    vfAnalytics.track('vf_rating', { label: value === 'up' ? 'up' : 'down' });
     clearTimeout(ratingTimerRef.current);
     setAskRating(false);
   };
