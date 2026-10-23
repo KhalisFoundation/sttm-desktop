@@ -64,6 +64,11 @@ const DEFAULTS = {
   // compound. 0 = off.
   catchHops: 4,
   catchScore: 0.5, // ...each of those windows matching at least this well (per letter)
+  // Akhand Paath only (opts.akhand): entering the next pangti once the current one's end was
+  // heard (within akhEndSlack letters of it).
+  akhEnterLetters: 1,
+  akhEnterGain: 3,
+  akhEndSlack: 2,
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
@@ -174,11 +179,35 @@ class FollowerV2 {
     // Bound here: test wrappers built with Object.create(follower) must still move THIS
     // follower, not set fields on the wrapper.
     this.seek = this.seek.bind(this);
+    this.adopt = this.adopt.bind(this);
   }
 
   // The sevadaar moved the screen to `line`: follow on from there.
   seek(line) {
     if (!Number.isInteger(line) || line < 0 || line >= this.lineStart.length) return false;
+    this.cur = line;
+    this.lastCur = line;
+    this.cand = null;
+    this.ahead = 0;
+    this.noMatch = 0;
+    this.foreign = 0;
+    this.lastEnd = -1;
+    return true;
+  }
+
+  // Akhand Paath: carry on from another follower over the same audio (the reading window
+  // moved on to the next Shabads): the same audio buffer and listening clock, so no second
+  // of audio is lost and no window is decoded twice, at pangti `line` of this text.
+  adopt(prev, line) {
+    if (!prev || !Number.isInteger(line) || line < 0 || line >= this.lineStart.length) return false;
+    if (prev.buf) this.buf = prev.buf;
+    if (Number.isFinite(prev.acc)) this.acc = prev.acc;
+    if (Number.isFinite(prev.hopS) && prev.hopS !== this.hopS) {
+      this.hopS = prev.hopS;
+      this.hop = Math.floor(prev.hopS * SR);
+      this.c = this.scaled(prev.hopS / this.base.hopS);
+    }
+    if (Number.isFinite(prev.tick)) this.tick = prev.tick;
     this.cur = line;
     this.lastCur = line;
     this.cand = null;
@@ -365,11 +394,20 @@ class FollowerV2 {
     }
     this.noMatch = 0; // something here matched
     let line = this.lineAt[Lc.end];
-    // Only the first letters of the next line heard: not enough yet.
+    // Only the first letters of the next line heard: not enough yet. Akhand Paath
+    // (opts.akhand): once the current pangti's end has been heard, the very next pangti
+    // needs only akhEnterLetters of its own (read Ang after Ang, it is almost certain).
+    const endHeard =
+      c.akhand &&
+      line === this.cur + 1 &&
+      this.lastEnd >= 0 &&
+      this.lineAt[this.lastEnd] === this.cur &&
+      this.lastEnd >= this.lineEnd[this.cur] - c.akhEndSlack;
+    const needLetters = endHeard ? c.akhEnterLetters : c.enterLetters;
+    const needGain = endHeard ? c.akhEnterGain : c.enterGain;
     if (
       line > this.cur &&
-      (Lc.end - this.lineStart[line] + 1 < c.enterLetters ||
-        this.gainOver(Lc, line - 1) < c.enterGain)
+      (Lc.end - this.lineStart[line] + 1 < needLetters || this.gainOver(Lc, line - 1) < needGain)
     ) {
       line -= 1;
       while (line > this.cur && this.lineEnd[line] < this.lineStart[line]) line -= 1;
@@ -463,7 +501,8 @@ class FollowerV2 {
 
   async push(pcm) {
     const res = resampleTo16k(pcm, this.inputSr);
-    this.win = Math.floor(pace.windowS(this.sung ? 'follower' : 'paath', this.base.windowS) * SR);
+    const kind = this.c.akhand ? 'akhand' : 'paath';
+    this.win = Math.floor(pace.windowS(this.sung ? 'follower' : kind, this.base.windowS) * SR);
     if (res.length) {
       let merged = new Float32Array(this.buf.length + res.length);
       merged.set(this.buf, 0);
@@ -474,7 +513,7 @@ class FollowerV2 {
     }
     // Performance tier: a longer hop, with the window-counted dwells scaled so they keep
     // their wall-clock meaning (see scaled()).
-    const hopS = pace.hopS('follower', this.base.hopS);
+    const hopS = pace.hopS(this.c.akhand ? 'akhand' : 'follower', this.base.hopS);
     if (hopS !== this.hopS) {
       this.hopS = hopS;
       this.hop = Math.floor(hopS * SR);

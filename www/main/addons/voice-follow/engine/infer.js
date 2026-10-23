@@ -3,6 +3,7 @@ const ort = require('onnxruntime-node');
 const VOCAB = require('./assets/vocab'); // id -> piece
 const pace = require('./pace');
 
+const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_MS || 0) : 0;
 const SR = 16000;
 const BLANK = 256;
 
@@ -101,6 +102,13 @@ class Infer {
     }
     const t0 = Date.now();
     const out = await this.run(buf);
+    // Scripted end-to-end tests only (VF_TEST_WAV is the microphone): VF_TEST_PASS_MS adds this
+    // much time per 4 s window, to run a fast computer at a slower one's measured speed.
+    if (TEST_PASS_MS > 0) {
+      await new Promise((r) => {
+        setTimeout(r, (TEST_PASS_MS * buf.length) / (4 * 16000));
+      });
+    }
     const ms = Date.now() - t0;
     if (this.perf.ms.length < 100000) this.perf.ms.push(ms);
     pace.notePass(ms, buf.length);

@@ -57,6 +57,13 @@ const TIERS = [
     backlogBoundS: 0.5,
   },
 ];
+// Akhand Paath (Sri Guru Granth Sahib Ji read Ang after Ang; the component says so per audio
+// chunk, see setAkhand). Every tier: the switch judge's recognizer listens once a second
+// (less model work, so less audio backlog; leaving the reading is still caught). A computer
+// in the fast tier with room for it (passesPerS at its live pass time): the reading follower
+// listens every 0.125 s on its usual 4 s window (replays: median lag 0.40 -> 0.29 s, pangti
+// accuracy no lower; a 2.5 s window cost accuracy). Otherwise the tier's own follower step.
+const AKHAND = { followerHopS: 0.125, recognizerHopS: 1.0, passesPerS: 9 };
 const LOAD_MAX = 0.8; // a tier fits when passes/s x pass seconds stays under this
 const LOAD_UP = 0.7; // ...and stepping back up into it needs this much headroom
 const RETRY_MS = 300000; // a tier left because the audio backed up is not re-entered for 5 min
@@ -76,6 +83,7 @@ const state = {
   steppedAt: 0,
   steps: 0,
   scoped: false, // see current()
+  akhand: false, // Akhand Paath being followed (see setAkhand)
   selfTest: null,
   blockedUntil: {}, // tier index -> ms: left because of backlog, do not re-enter before
   listeners: new Set(),
@@ -97,6 +105,13 @@ const FOLLOW_WINDOW_S = Number(process.env.VF_FOLLOW_WINDOW_S || 0) || null;
 // says so per audio chunk). Searching, kirtan Shabads and sung Banis always run the fast tier =
 // the code path without tiers (the bounded audio queue still protects a slow PC there).
 const current = () => (state.scoped ? TIERS[state.tier] : TIERS[0]);
+// Akhand Paath fast listening: only while scoped (a read text is followed), flagged by the
+// component, and only in the fast tier (a slower tier keeps its schedule and its safety).
+const akhandOn = () => !!(state.scoped && state.akhand);
+const akhandFast = () => akhandOn() && current().name === 'fast' && fits(AKHAND, livePassMs()); // eslint-disable-line no-use-before-define
+function setAkhand(on) {
+  state.akhand = !!on;
+}
 function setScoped(on) {
   state.scoped = !!on;
   if (!state.scoped) {
@@ -115,7 +130,7 @@ const fits = (tier, passMs, max = LOAD_MAX) =>
 function describe() {
   return {
     tier: TIERS[state.tier].name, // the tier this computer runs a read Bani at
-    active: current().name, // what runs right now (fast outside a read Bani)
+    active: akhandFast() ? 'akhand' : current().name, // what runs now (fast outside a read Bani)
     passMs: livePassMs() == null ? null : Math.round(livePassMs()),
     selfTestMs: state.passMs == null ? null : Math.round(state.passMs),
     steps: state.steps,
@@ -154,6 +169,10 @@ function notePass(ms, samples) {
 
 // Hop for an engine: its own hop, or the tier's when that is longer.
 function hopS(kind, ownHopS) {
+  if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('follower', ownHopS);
+  if (kind === 'recognizer' && akhandOn()) {
+    return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
+  }
   const t = current();
   const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
   return Math.max(ownHopS, tierHop);
@@ -168,6 +187,7 @@ function backlogBoundS() {
 // The tiers are in scope only while a READ Bani is followed (see current()); there the
 // recognizer and the paath follower share the shorter window, so one pass answers both.
 function windowS(kind, ownWindowS) {
+  if (kind === 'akhand') return windowS('paath', ownWindowS);
   const t = current();
   if (kind === 'follower' || !t.aligned || ownWindowS > 4) return ownWindowS;
   return FOLLOW_WINDOW_S || t.windowS || ownWindowS;
@@ -268,6 +288,8 @@ module.exports = {
   describe,
   notePass,
   setScoped,
+  setAkhand,
+  AKHAND,
   hopS,
   backlogBoundS,
   windowS,
