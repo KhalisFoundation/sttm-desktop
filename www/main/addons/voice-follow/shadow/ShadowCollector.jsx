@@ -16,6 +16,7 @@ const listener = require('./listener');
 const pcm = require('./pcm');
 const storage = require('./storage');
 const { logDir } = require('../engine/session-log');
+const { vfAnalytics } = require('../components/vfAnalytics');
 
 // One folder per app session under <userData>/voice-follow/shadow/<id>/:
 //   audio-000.wav ...  - what the microphone heard (16 kHz mono WAV), one per SHADOW_SEGMENT_MS
@@ -193,9 +194,10 @@ const NOTICE_VERSION = 1;
 
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
-  const { shadowRecording, shadowTester, shadowNotice, hfToken } = useStoreState(
-    (state) => state.userSettings,
-  );
+  const { shadowRecording, shadowTester, shadowNotice, hfToken, voiceFollowEnabled, statistics } =
+    useStoreState((state) => state.userSettings);
+  // Anonymous usage events (vfAnalytics.js) honour STTM's "Collect statistics" setting.
+  vfAnalytics.setAllowed(statistics);
   const { setShadowRecording, setShadowTester, setShadowNotice } = useStoreActions(
     (actions) => actions.userSettings,
   );
@@ -606,6 +608,32 @@ const ShadowCollector = () => {
   // a registration, the card comes back to ask for the name.
   const registered = !!tester.name;
   const noticeSeen = Number(shadowNotice) >= NOTICE_VERSION;
+  const cardShown = SHADOW_BUILD && shadowRecording !== false && !(registered && noticeSeen);
+  const cardShownRef = useRef(cardShown);
+  cardShownRef.current = cardShown;
+  // The card was open when STTM closed: neither answer was given.
+  useEffect(() => {
+    const onUnload = () => {
+      if (cardShownRef.current) {
+        vfAnalytics.once('recording_choice', 'vf_recording_choice', { label: 'dismissed' });
+      }
+    };
+    window.addEventListener('beforeunload', onUnload);
+    return () => window.removeEventListener('beforeunload', onUnload);
+  }, []);
+  // Voice Autopilot on or off (Settings, which also shows/hides the Autopilot tab): the state
+  // once per launch as a baseline, then each change.
+  const autopilotOn = voiceFollowEnabled !== false || !SHADOW_BUILD;
+  const autopilotOnRef = useRef(null);
+  useEffect(() => {
+    const onOff = autopilotOn ? 'on' : 'off';
+    if (autopilotOnRef.current === null) {
+      vfAnalytics.once('autopilot_state', 'vf_autopilot_state', { label: onOff });
+    } else if (autopilotOnRef.current !== autopilotOn) {
+      vfAnalytics.track('vf_autopilot_setting', { label: onOff });
+    }
+    autopilotOnRef.current = autopilotOn;
+  }, [autopilotOn]);
   if (!SHADOW_BUILD || shadowRecording === false || (registered && noticeSeen)) return null;
 
   return (
@@ -647,6 +675,7 @@ const ShadowCollector = () => {
             type="button"
             className="shadow-consent-off"
             onClick={() => {
+              vfAnalytics.once('recording_choice', 'vf_recording_choice', { label: 'declined' });
               setShadowNotice(NOTICE_VERSION);
               setShadowRecording(false);
             }}
@@ -668,6 +697,9 @@ const ShadowCollector = () => {
                   }),
                 );
               }
+              vfAnalytics.once('recording_choice', 'vf_recording_choice', {
+                label: 'registered',
+              });
               setShadowNotice(NOTICE_VERSION);
               setShadowRecording(true);
             }}
