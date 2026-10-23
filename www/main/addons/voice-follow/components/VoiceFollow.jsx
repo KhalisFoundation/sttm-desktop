@@ -370,9 +370,9 @@ const PAATH_READ_LINES = 3;
 // Akhand Paath (Sri Guru Granth Sahib Ji read Ang after Ang, Akhand or Sehaj Paath): a
 // plain Shabad of no Bani read straight through, line after line, at a reading pace. From
 // then on the paath follower carries a reading window: this Shabad and the next ones of
-// Sri Guru Granth Sahib Ji (consecutive ids), shows each next pangti as the current one's
-// last letters are heard (follower2 `anticipate`), and crossing into the next Shabad opens
-// it on the spot (no search, no judge, no new follower: the window moves on underneath).
+// Sri Guru Granth Sahib Ji (consecutive ids), listens on engine/pace's Akhand Paath schedule
+// (twice as often, same model work), and crossing into the next Shabad opens it on the spot
+// (no search, no judge, no new follower: the window moves on underneath).
 // No button. Ends on a judge switch outside the window, on lines coming back (sung, not
 // read), and on Stop. Nothing else changes: Banis, kirtan and sung Bani never enter it.
 const PAATH_SEQ_LINES = 6; // distinct lines read in order before Akhand Paath following starts
@@ -1150,8 +1150,8 @@ const VoiceFollow = () => {
     if (cur && cur.id === sid) sq = cur;
     else if (cur && cur.prev && cur.prev.id === sid) sq = cur.prev;
     if (!sq || sq.sung || !sq.seen || !sq.seen.length) return false;
-    // Only just reached (one pangti heard): no pace yet, and nothing came back.
-    if (sq.seen.length < PAATH_SEQ_PACE_LINES) return true;
+    // Too little heard to tell a reading from a Shabad being sung: not a reading.
+    if (sq.seen.length < PAATH_SEQ_PACE_LINES) return false;
     const span = (sq.seen[sq.seen.length - 1].t - sq.seen[0].t) / 1000;
     const words = sq.seen.slice(0, -1).reduce((m, x) => m + x.words, 0);
     return span > 0 && words / span >= PAATH_SEQ_WPS;
@@ -2467,14 +2467,14 @@ const VoiceFollow = () => {
           // Paath (a Bani) uses the position follower; Shabads (kirtan) the line follower.
           if (seqWindow) {
             // Akhand Paath: the position follower over the reading window, from the line
-            // being read, anticipating each next pangti; it carries on with the audio the
+            // being read, on the Akhand Paath listening schedule; it carries on with the audio the
             // follower before it already holds (no second of listening lost).
             const at = profile.verses.findIndex((v) => v.verseId === cand.verseId);
             follower = await engine.createPaathFollower(profile.verses, {
               inputSr: sampleRateRef.current,
               startLine: at,
               startAt: true,
-              anticipate: true,
+              akhand: true, // engine/pace Akhand Paath listening (fast tier only)
             });
             if (followerRef.current && at >= 0) follower.adopt(followerRef.current, at);
           } else
@@ -2866,7 +2866,7 @@ const VoiceFollow = () => {
         // switch judge nor leave the follower lost.)
         const follower = await engine.createPaathFollower(profile.verses, {
           inputSr: sampleRateRef.current,
-          anticipate: true,
+          akhand: true,
         });
         if (currentShabadIdRef.current === sid && followerRef.current === f) {
           seqNextRef.current = { sid, profile, follower, from: f };
@@ -4253,6 +4253,14 @@ const VoiceFollow = () => {
             phaseRef.current === 'following' &&
               !!(followerRef.current && followerRef.current.readBani),
           );
+          // Akhand Paath being followed (the reading window): its listening schedule.
+          if (engine.pace.setAkhand) {
+            engine.pace.setAkhand(
+              phaseRef.current === 'following' &&
+                paathSeqRef.current.on &&
+                !!(curProfileRef.current && curProfileRef.current.window),
+            );
+          }
         }
         {
           const sr = sampleRateRef.current || 48000;
@@ -4290,7 +4298,7 @@ const VoiceFollow = () => {
                   ? nx.profile.verses.findIndex((v) => v.verseId === f.verseIds[line])
                   : -1;
               const line = idxOf(f.cur);
-              if (line >= 0 && nx.follower.adopt(f, line, idxOf(f.ant))) {
+              if (line >= 0 && nx.follower.adopt(f, line)) {
                 seqNextRef.current = null;
                 followerRef.current = nx.follower;
                 curProfileRef.current = nx.profile;
