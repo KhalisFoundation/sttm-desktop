@@ -25,6 +25,7 @@ const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
 const { installDemoAudio } = require('./devAudio');
+const { vfAnalytics, createRunStats } = require('./vfAnalytics');
 
 installDemoAudio(); // developer demos only (VF_DEMO_WAV); a no-op otherwise
 const shadowBus = require('../shadow/bus');
@@ -119,6 +120,7 @@ const warmIndex = createWarmIndex({
   onError: (error, { ms }) => {
     const message = (error && error.message) || String(error);
     diag(`vf retrieval prepare failed after ${ms} ms: ${message}`);
+    vfAnalytics.error('retrieval_prepare_failed');
     if (SHADOW_BUILD && shadowBus.active()) {
       shadowBus.note({ type: 'vf_retrieval_failed', stage: 'prepare', error: message });
     }
@@ -893,12 +895,45 @@ const VoiceFollow = () => {
   // timeline continues and the sevadaar's own changes can be told apart as overrides.
   const visibleRef = useRef(false);
   const shadowing = () => SHADOW_BUILD && !visibleRef.current;
+  // Anonymous usage counts for a run the sevadaar started with Start (vfAnalytics.js), and
+  // what is on screen: the app's own last write vs. what the store shows, so the sevadaar's
+  // own Shabad and pangti changes can be told apart from Autopilot's.
+  const vfRunRef = useRef(null); // createRunStats() while a visible run lasts
+  const vfScreenRef = useRef({
+    appKey: null,
+    appVerse: null,
+    appAt: 0,
+    prevKey: null,
+    tapUntil: 0,
+  });
+  // The app wrote to the screen (mirror below): an Autopilot change, unless a card was just tapped.
+  const vfAppWrote = (update) => {
+    const sc = vfScreenRef.current;
+    const t = Date.now();
+    let key = sc.appKey;
+    if (update.bani != null) key = `${BANI_KEY}${update.bani}`;
+    else if (update.shabadId != null) key = String(update.shabadId);
+    const verse = update.verseId != null ? update.verseId : null;
+    if (key === sc.appKey && (verse == null || verse === sc.appVerse)) return; // a slide, a repeat
+    const change = key !== sc.appKey ? 'shabad' : 'pangti';
+    if (key !== sc.appKey) sc.prevKey = sc.appKey;
+    sc.appKey = key;
+    if (verse != null) sc.appVerse = verse;
+    sc.appAt = t;
+    const r = vfRunRef.current;
+    if (r && !shadowing() && t >= sc.tapUntil) r.auto(change);
+  };
   // Every line the app itself puts on screen passes through mirror(), so it is tagged here:
   // any other change of the screen line is the sevadaar's (see lineRespect.js).
   const lineRespectRef = useRef(null);
   if (!lineRespectRef.current) lineRespectRef.current = createLineRespect();
   const mirror = (update) => {
     if (update.verseId != null) lineRespectRef.current.appWrote(update.verseId, Date.now());
+    try {
+      vfAppWrote(update);
+    } catch (_) {
+      /* usage counts never get in the way of the screen */
+    }
     if (SHADOW_BUILD) shadowBus.system(update);
   };
   // Stable identities (useCallback): these feed other hooks' dependency lists, and a new
@@ -1073,6 +1108,76 @@ const VoiceFollow = () => {
   const sessionIdRef = useRef(null);
   const sessionStartRef = useRef(0);
   const lastAutoDecisionRef = useRef(0);
+  // Anonymous usage events (vfAnalytics.js) for a run the sevadaar started with Start (never
+  // the hidden run): start, first Shabad/Bani on screen, stop, a summary (and a heartbeat
+  // every 15 min). STTM's "Collect statistics" setting turns them off.
+  const collectStatistics = useStoreState((state) => state.userSettings.statistics);
+  vfAnalytics.setAllowed(collectStatistics);
+  const vfPressesRef = useRef(0); // Start/Stop presses since launch
+  const vfRunReady = () => {
+    const r = vfRunRef.current;
+    if (!r || r.state.started) return;
+    r.state.started = true;
+    vfAnalytics.track('vf_autopilot_start', {
+      label: r.state.how,
+      value: Date.now() - r.state.at,
+    });
+  };
+  const vfRunLock = (id, kind) => {
+    const r = vfRunRef.current;
+    if (!r || id == null) return;
+    const isBani = String(id).startsWith(BANI_KEY);
+    if (kind === 'override') r.tap(); // a tapped card (the sevadaar's choice)
+    const first = r.lock(id, kind, isBani);
+    if (first != null) {
+      vfAnalytics.track('vf_first_lock', {
+        label: `${r.state.how};kind=${isBani ? 'bani' : 'shabad'}`,
+        value: first,
+      });
+    }
+  };
+  // reason: user (Stop), window_close, error, other.
+  const vfRunEnd = (reason = 'other') => {
+    const r = vfRunRef.current;
+    if (!r) return;
+    vfRunRef.current = null;
+    const mins = r.minutes();
+    vfAnalytics.track('vf_autopilot_stop', {
+      label: ['user', 'window_close', 'error'].includes(reason) ? reason : 'other',
+      value: mins,
+    });
+    if (!r.state.started) {
+      vfAnalytics.track('vf_autopilot_start', { label: `${r.state.how};ready=none` });
+    }
+    if (r.state.lockAt == null) {
+      vfAnalytics.track('vf_first_lock', {
+        label: 'none',
+        value: Math.round((Date.now() - r.state.at) / 100) / 10,
+      });
+    }
+    vfAnalytics.track('vf_session_summary', { label: r.label(vfPressesRef.current), value: mins });
+  };
+  const vfRunBegin = (how) => {
+    vfRunEnd(); // a run that ended in an error and was never stopped
+    vfRunRef.current = createRunStats({ how });
+  };
+  const vfRunEndRef = useRef(vfRunEnd);
+  vfRunEndRef.current = vfRunEnd;
+  // Window close (or reload) mid-run still sends the summary.
+  useEffect(() => {
+    const onUnload = () => vfRunEndRef.current('window_close');
+    window.addEventListener('beforeunload', onUnload);
+    return () => {
+      window.removeEventListener('beforeunload', onUnload);
+      vfRunEndRef.current('other');
+    };
+  }, []);
+  // A run that ends in an error (no microphone, no model) ends here, not at the next Start.
+  useEffect(() => {
+    if (status === 'error') vfRunEndRef.current('error');
+  }, [status]);
+  // Error kinds once per app run, hidden run or not (a computer where Autopilot cannot run).
+  const vfError = (kind) => vfAnalytics.error(kind, shadowing() ? 'hidden' : 'visible');
   const [autoDetect] = useState(false); // blind: identify the shabad from audio, then follow (one-shot)
   // Acoustic text stays inside matching; only canonical BaniDB text is rendered.
   const [, setCands] = useState([]); // [{shabadId, verseId, verse, display, share}] shortlist
@@ -1764,6 +1869,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`could not prepare the recognition model: ${e?.message || e}`);
+      vfError('model_load_failed');
       setDlProgress(null);
       return;
     }
@@ -1800,6 +1906,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(e?.message || 'audio setup failed');
+      vfError(isMicBlocked(e) ? 'mic_blocked' : 'mic_failed');
       cleanup();
       return;
     }
@@ -1819,6 +1926,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`engine init failed: ${e?.message || e}`);
+      vfError('engine_init_failed');
       cleanup();
       return;
     }
@@ -2137,6 +2245,7 @@ const VoiceFollow = () => {
         if (error.name !== 'AbortError') {
           // The worker is gone (timeout, crash): let it go so the next call rebuilds.
           warmIndex.fail(client);
+          vfError('retrieval_search_failed');
           diag(`vf retrieval search failed: ${error.message}`);
           if (SHADOW_BUILD && shadowBus.active()) {
             shadowBus.note({ type: 'vf_retrieval_failed', stage: 'search', error: error.message });
@@ -2227,6 +2336,7 @@ const VoiceFollow = () => {
         } catch (e) {
           if (session !== sessionRef.current) return;
           setDetail(`engine init failed: ${e?.message || e}`);
+          vfError('engine_init_failed');
           if (!isSwitch) await enterSearching();
           return;
         }
@@ -2293,6 +2403,7 @@ const VoiceFollow = () => {
           else if (opts.manual) kind = 'override';
           else if (isSwitch && prevBefore && prevBefore.id === cand.shabadId) kind = 'return';
           else if (isSwitch) kind = 'switch';
+          if (!shadowing()) vfRunLock(cand.shabadId, kind);
           const now = Date.now();
           const sinceLastAuto = lastAutoDecisionRef.current
             ? Math.round((now - lastAutoDecisionRef.current) / 1000)
@@ -2533,6 +2644,8 @@ const VoiceFollow = () => {
         return;
       }
       vetoRef.current = null;
+      // The screen change this tap makes (after the follower is built) is the sevadaar's.
+      vfScreenRef.current.tapUntil = Date.now() + 10000;
       autopilotLock({ shabadId: c.shabadId, verseId: c.verseId, verse }, { manual: true });
     },
     [autopilotLock],
@@ -3641,6 +3754,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`could not prepare the recognition model: ${e?.message || e}`);
+      vfError('model_load_failed');
       setDlProgress(null);
       recognizingRef.current = false;
       return;
@@ -3665,6 +3779,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(e?.message || 'audio setup failed');
+      vfError(isMicBlocked(e) ? 'mic_blocked' : 'mic_failed');
       recognizingRef.current = false;
       cleanup();
       return;
@@ -3679,6 +3794,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`engine init failed: ${e?.message || e}`);
+      vfError('engine_init_failed');
       recognizingRef.current = false;
       cleanup();
       return;
@@ -3746,6 +3862,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`could not prepare the recognition model: ${e?.message || e}`);
+      vfError('model_load_failed');
       setDlProgress(null);
       autopilotRef.current = false;
       recognizingRef.current = false;
@@ -3964,6 +4081,7 @@ const VoiceFollow = () => {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(e?.message || 'audio setup failed');
+      vfError(isMicBlocked(e) ? 'mic_blocked' : 'mic_failed');
       autopilotRef.current = false;
       recognizingRef.current = false;
       cleanup();
@@ -3980,10 +4098,12 @@ const VoiceFollow = () => {
       });
       if (session !== sessionRef.current) return;
       recognizerRef.current = recognizer;
+      if (!shadowing()) vfRunReady();
     } catch (e) {
       if (session !== sessionRef.current) return;
       setStatus('error');
       setDetail(`engine init failed: ${e?.message || e}`);
+      vfError('engine_init_failed');
       autopilotRef.current = false;
       recognizingRef.current = false;
       cleanup();
@@ -4241,7 +4361,71 @@ const VoiceFollow = () => {
       isCeremonyBani,
     });
   }, [isCeremonyBani]);
+  // What the store shows: a change the app did not just write is the sevadaar's (a pangti
+  // click, arrow keys, a controller, or opening another Shabad / Bani). Counted only.
+  useEffect(() => {
+    try {
+      const sc = vfScreenRef.current;
+      let key = null;
+      if (isSundarGutkaBani && sundarGutkaBaniId) key = `${BANI_KEY}${sundarGutkaBaniId}`;
+      else if (activeShabadId != null) key = String(activeShabadId);
+      const verse = activeVerseId != null ? activeVerseId : null;
+      const prevKey = sc.screenKey;
+      const prevVerse = sc.screenVerse;
+      sc.screenKey = key;
+      sc.screenVerse = verse;
+      const r = vfRunRef.current;
+      if (!r || shadowing() || key == null || (key === prevKey && verse === prevVerse)) return;
+      const t = Date.now();
+      const recent = t - sc.appAt <= 1500; // the app's own change still settling in the store
+      const appOwned =
+        (key === sc.appKey && (verse == null || verse === sc.appVerse || recent)) ||
+        (recent && key === sc.prevKey);
+      if (appOwned || t < sc.tapUntil) return;
+      vfAnalytics.correction(r.manual(key !== prevKey ? 'shabad' : 'pangti'));
+    } catch (_) {
+      /* usage counts never get in the way */
+    }
+  }, [activeShabadId, sundarGutkaBaniId, isSundarGutkaBani, activeVerseId]);
+  // Every 30 s while a visible run lasts: the mode it follows in, the performance tier and
+  // audio backlog, and a heartbeat summary every 15 min (long diwans, crashes).
+  useEffect(() => {
+    let last = Date.now();
+    const timer = setInterval(() => {
+      try {
+        const t = Date.now();
+        const r = vfRunRef.current;
+        const ms = t - last;
+        last = t;
+        if (!r || shadowing()) return;
+        const id = currentShabadIdRef.current;
+        if (autopilotRef.current && phaseRef.current === 'following' && id != null) {
+          let how = 'kirtan';
+          if (String(id).startsWith(BANI_KEY)) {
+            how = followerRef.current && followerRef.current.readBani ? 'paath' : 'bani';
+          }
+          r.mode(how, ms);
+        }
+        const pace = engine.pace ? engine.pace.describe() : {};
+        r.perf({
+          tier: pace.tier,
+          passMs: pace.passMs != null ? pace.passMs : pace.selfTestMs,
+          backlogPeak: backlogRef.current ? backlogRef.current.peak : null,
+        });
+        if (r.beatDue()) {
+          vfAnalytics.track('vf_session_heartbeat', {
+            label: r.label(vfPressesRef.current),
+            value: r.minutes(),
+          });
+        }
+      } catch (_) {
+        /* usage counts never get in the way */
+      }
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
   const takeOver = async () => {
+    vfPressesRef.current += 1;
     clearTimeout(ratingTimerRef.current);
     setAskRating(false);
     shadowStateRef.current.running = false;
@@ -4256,7 +4440,10 @@ const VoiceFollow = () => {
       SHADOW_BUILD && !visibleRef.current && (autopilotRef.current || recognizerRef.current);
     if (live) {
       const following = phaseRef.current === 'following' && currentShabadIdRef.current != null;
+      vfRunBegin('adopted');
       visibleRef.current = true;
+      if (recognizerRef.current) vfRunReady(); // the hidden run is already listening
+      if (following) vfRunLock(currentShabadIdRef.current, 'adopt');
       window.dispatchEvent(new CustomEvent('vf-shadow-start'));
       shadowBus.setVisible(true);
       if (following) projectCurrent();
@@ -4274,6 +4461,7 @@ const VoiceFollow = () => {
     setLiveCands({ sCur: 0, items: [] });
     setBoard([]);
     resetShelf();
+    vfRunBegin('cold');
     visibleRef.current = true;
     // A shadow session starts now if none is running, so this whole run is recorded.
     window.dispatchEvent(new CustomEvent('vf-shadow-start'));
@@ -4281,6 +4469,8 @@ const VoiceFollow = () => {
     await startAutopilot();
   };
   const release = () => {
+    vfPressesRef.current += 1;
+    vfRunEnd('user');
     stop();
     visibleRef.current = false;
     shadowStateRef.current.up = null; // so the hidden run's vf_up is logged again
@@ -4297,8 +4487,18 @@ const VoiceFollow = () => {
   };
   let onMainClick = start;
   if (SHADOW_BUILD) onMainClick = active ? release : takeOver;
-  else if (active) onMainClick = stop;
-  else if (autopilot) onMainClick = startAutopilot;
+  else if (active)
+    onMainClick = () => {
+      vfPressesRef.current += 1;
+      vfRunEnd('user');
+      stop();
+    };
+  else if (autopilot)
+    onMainClick = () => {
+      vfPressesRef.current += 1;
+      vfRunBegin('cold');
+      startAutopilot();
+    };
   else if (autoDetect) onMainClick = startDetect;
 
   const currentLabel = isMiscSlide ? 'Slide held' : 'Following';
