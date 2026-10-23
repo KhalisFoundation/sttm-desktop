@@ -378,11 +378,26 @@ const PAATH_READ_LINES = 3;
 const PAATH_SEQ_LINES = 6; // distinct lines read in order before Akhand Paath following starts
 const PAATH_SEQ_WPS = 1.2; // ...at this many words per second at least (kirtan sung straight through: 0.6-1.0)
 const PAATH_SEQ_PACE_LINES = 2; // lines the pace is measured over at least
+// A slow reader (a Gatha, Saloks read with care): this many distinct lines in order, none
+// ever coming back, is a reading at any pace (kirtan returns to its rahao long before).
+const PAATH_SEQ_LINES_SLOW = 12;
 const PAATH_SEQ_AHEAD = 2; // Shabads ahead of the current one in the reading window
 const PAATH_SEQ_CROSS = 2; // fixes inside the next Shabad before it opens (unless stepped into)...
 const PAATH_SEQ_CROSS_MS = 1500; // ...spread over at least this long (one look-alike line is not a crossing)
 const PAATH_SEQ_SKIP = 4; // a Shabad skipped over (not the very next one) needs more fixes...
 const PAATH_SEQ_SKIP_MS = 8000; // ...over at least this long
+// STTM's Banis that are whole sections of Sri Guru Granth Sahib Ji (the Bhagat Bani of each
+// Raag, the Vaars; not Asa di Vaar, which is sung): two of their Shabads READ in order (the
+// first at a reading pace) are Akhand Paath going through that section, so the reading
+// window follows them instead of the Bani.
+const AKHAND_SECTION_BANIS = new Set([
+  ...Array.from({ length: 22 }, (_, i) => 55 + i), // 55-76: Raag Banis
+  86,
+  87,
+  88,
+  89,
+  ...Array.from({ length: 17 }, (_, i) => 91 + i), // 91-107: Vaars
+]);
 const PAATH_SEQ_BACKS = 2; // moves back of 2+ pangtis that end it (kirtan returns; a reader rarely does)
 const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 } };
 // A move back of two pangtis or more from `prev` (the last line followed) to `line`.
@@ -1124,6 +1139,23 @@ const VoiceFollow = () => {
   const paathSeqRef = useRef({ ...PAATH_SEQ_OFF });
   const curCursorPrevRef = useRef(null);
   const seqNextRef = useRef(null);
+  // Akhand Paath detection per plain Shabad (see seqDetectRef), and the Shabad before it.
+  const seqPaceRef = useRef({ id: null });
+  // Was Shabad `sid` (just followed) read in order at a reading pace (or only just begun,
+  // nothing coming back)? (seqPaceRef record)
+  const readAtPaceRef = useRef(null);
+  readAtPaceRef.current = (sid) => {
+    const cur = seqPaceRef.current;
+    let sq = null;
+    if (cur && cur.id === sid) sq = cur;
+    else if (cur && cur.prev && cur.prev.id === sid) sq = cur.prev;
+    if (!sq || sq.sung || !sq.seen || !sq.seen.length) return false;
+    // Only just reached (one pangti heard): no pace yet, and nothing came back.
+    if (sq.seen.length < PAATH_SEQ_PACE_LINES) return true;
+    const span = (sq.seen[sq.seen.length - 1].t - sq.seen[0].t) / 1000;
+    const words = sq.seen.slice(0, -1).reduce((m, x) => m + x.words, 0);
+    return span > 0 && words / span >= PAATH_SEQ_WPS;
+  };
   const recentShabadsRef = useRef([]); // last RECENT_SHABADS plain shabads shown (see baniPreference)
   const autopilotLockRef = useRef(null);
   // Settings > Other Options > "Help Improve Voice-Follow" (on by default): keep the
@@ -2739,7 +2771,25 @@ const VoiceFollow = () => {
               bani = null;
             }
           }
-          if (bani != null && autopilotLockRef.current) {
+          // Akhand Paath through a section of Sri Guru Granth Sahib Ji (a Raag's Bhagat
+          // Bani, a Vaar): the next Shabad, the one before read at a reading pace.
+          if (
+            bani != null &&
+            AKHAND_SECTION_BANIS.has(bani) &&
+            cand.shabadId === fromId + 1 &&
+            readAtPaceRef.current(fromId) &&
+            autopilotLockRef.current
+          ) {
+            sessionLog.logEvent('paath_seq_on', {
+              session: sessionIdRef.current,
+              shabadId: cand.shabadId,
+              section: bani,
+            });
+            autopilotLockRef.current(
+              { shabadId: cand.shabadId, verseId: cand.verseId, verse: cand.verse },
+              { promote: true, window: true },
+            );
+          } else if (bani != null && autopilotLockRef.current) {
             autopilotLockRef.current(
               { shabadId: `${BANI_KEY}${bani}`, verseId: cand.verseId, verse: cand.verse },
               { promote: true, startAt: true },
@@ -2840,15 +2890,16 @@ const VoiceFollow = () => {
   };
 
   // Akhand Paath detection, per follower output `out` of plain Shabad `sid`.
-  const seqPaceRef = useRef({ id: null });
   const seqDetectRef = useRef(null);
   seqDetectRef.current = (sid, out) => {
     if (typeof sid !== 'number' || paathSeqRef.current.on) return;
     const prof = curProfileRef.current;
     if (!prof || prof.window || !followerRef.current || lockingRef.current) return;
     if (seqPaceRef.current.id !== sid) {
-      // eligible: null = not checked yet, then true / false
+      // eligible: null = not checked yet, then true / false; prev = the Shabad before
+      const prev = seqPaceRef.current.id != null ? { ...seqPaceRef.current, prev: null } : null;
       seqPaceRef.current = {
+        prev,
         id: sid,
         last: -1,
         lines: new Set(),
@@ -2906,12 +2957,13 @@ const VoiceFollow = () => {
     const n = (prof.verses || []).length;
     if (sq.lines.size < PAATH_SEQ_LINES && out.lineIndex < n - 1) return;
     // Reading pace: words of the lines finished per second (kirtan sung straight through
-    // is slower).
+    // is slower), or simply a long run of lines in order.
     const { seen } = sq;
     if (seen.length < PAATH_SEQ_PACE_LINES) return;
     const span = (seen[seen.length - 1].t - seen[0].t) / 1000;
     const words = seen.slice(0, -1).reduce((m, x) => m + x.words, 0);
-    if (!(span > 0 && words / span >= PAATH_SEQ_WPS)) return;
+    if (!(span > 0 && words / span >= PAATH_SEQ_WPS) && sq.lines.size < PAATH_SEQ_LINES_SLOW)
+      return;
     const verse = (prof.rawLines || [])[out.lineIndex];
     if (!verse || !autopilotLockRef.current) return;
     sq.eligible = false; // once per Shabad
@@ -3996,7 +4048,15 @@ const VoiceFollow = () => {
           // Gated on wins >= 2 (a single winning decode flickers too much to
           // flip the projector on), only when no misc slide is already showing
           // (never cover the user's own slide), and only once per evaluation.
-          if (leadSlot.wins >= 2 && !seekingRef.current && !isMiscSlideRef.current) {
+          // (Akhand Paath following: the reading is being followed pangti by pangti; a real
+          // move away still switches at SWITCH_CONFIRM, without the slide in between.)
+          const seqFollowing = paathSeqRef.current.on && !!curProfileRef.current?.window;
+          if (
+            leadSlot.wins >= 2 &&
+            !seekingRef.current &&
+            !isMiscSlideRef.current &&
+            !seqFollowing
+          ) {
             seekingRef.current = true;
             sessionLog.logEvent('seeking', {
               session: sessionIdRef.current,
@@ -4309,7 +4369,11 @@ const VoiceFollow = () => {
           // Don't chase the highlight onto a similar-worded line of the OLD shabad:
           // hold position on low-confidence frames, and freeze entirely while a
           // switch is being evaluated (the current shabad is likely being left).
-          const evaluatingSwitch = switchCandRef.current && switchCandRef.current.wins >= 1;
+          // (Akhand Paath following keeps moving with the reader while the judge evaluates.)
+          const evaluatingSwitch =
+            switchCandRef.current &&
+            switchCandRef.current.wins >= 1 &&
+            !(paathSeqRef.current.on && curProfileRef.current?.window);
           if (evaluatingSwitch || out.confidence < UI_MOVE_CONF) return;
           // Just after a sevadaar line move, their pangti stands unless the follower moves
           // on to the next one or clearly insists on another (lineRespect.js). No hold:
