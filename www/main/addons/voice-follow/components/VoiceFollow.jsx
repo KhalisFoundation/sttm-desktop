@@ -400,6 +400,8 @@ const AKHAND_SECTION_BANIS = new Set([
   ...Array.from({ length: 17 }, (_, i) => 91 + i), // 91-107: Vaars
 ]);
 const PAATH_SEQ_BACKS = 2; // moves back of 2+ pangtis that end it (kirtan returns; a reader rarely does)
+// Akhand Paath following switches the projector to STTM's Akhand Paath view (see syncAkpViewRef).
+const AUTO_AKHAND_VIEW = true;
 const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 }, back: null };
 const PAATH_SEQ_BACK_FIXES = 4; // confident fixes in the Shabad just left...
 const PAATH_SEQ_BACK_MS = 3000; // ...over at least this long: go back to it
@@ -1168,6 +1170,32 @@ const VoiceFollow = () => {
   saveAudioRef.current = saveAudio;
   const ringRef = useRef(null); // rolling audio for corrections
   const sessionIdRef = useRef(null);
+  // Akhand Paath view (AUTO_AKHAND_VIEW): while Voice Autopilot drives the screen through an
+  // Akhand Paath (after the reading first crossed into a next Shabad), the projector shows
+  // STTM's own Akhand Paath view: the whole Shabad, the current pangti highlighted, so the
+  // sangat reads on and a change a moment late does not matter. Put back when it ends. Never
+  // while the sevadaar drives; a view the sevadaar turned on or off themselves is left alone.
+  const akhandpatt = useStoreState((state) => state.userSettings.akhandpatt);
+  const setAkhandpatt = useStoreActions((actions) => actions.userSettings.setAkhandpatt);
+  const akpViewRef = useRef({ on: false }); // true = Voice Autopilot turned the view on
+  const akpStoreRef = useRef(null);
+  akpStoreRef.current = { akhandpatt, setAkhandpatt };
+  const syncAkpViewRef = useRef(null);
+  syncAkpViewRef.current = (want) => {
+    if (!AUTO_AKHAND_VIEW) return;
+    const { akhandpatt: cur, setAkhandpatt: set } = akpStoreRef.current;
+    if (typeof set !== 'function') return;
+    if (want && !akpViewRef.current.on) {
+      if (cur) return; // already on (the sevadaar's own choice): not ours to change
+      akpViewRef.current.on = true;
+      set(true);
+      sessionLog.logEvent('akhand_view', { session: sessionIdRef.current, on: true });
+    } else if (!want && akpViewRef.current.on) {
+      akpViewRef.current.on = false;
+      if (cur) set(false);
+      sessionLog.logEvent('akhand_view', { session: sessionIdRef.current, on: false });
+    }
+  };
   const sessionStartRef = useRef(0);
   const lastAutoDecisionRef = useRef(0);
   // Anonymous usage events (vfAnalytics.js) for a run the sevadaar started with Start (never
@@ -1579,6 +1607,7 @@ const VoiceFollow = () => {
   const emptyStreakRef = useRef(0); // consecutive no-hit decodes (shortlist hold)
 
   const cleanup = useCallback(() => {
+    if (syncAkpViewRef.current) syncAkpViewRef.current(false); // the view back as it was
     sessionRef.current += 1;
     transcriptSeqRef.current += 1;
     transcriptAbortRef.current?.abort();
@@ -4265,6 +4294,14 @@ const VoiceFollow = () => {
             phaseRef.current === 'following' &&
               !!(followerRef.current && followerRef.current.readBani) &&
               !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
+          );
+          // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
+          syncAkpViewRef.current(
+            visibleRef.current &&
+              phaseRef.current === 'following' &&
+              paathSeqRef.current.on &&
+              paathSeqRef.current.streak >= 1 &&
+              !!(curProfileRef.current && curProfileRef.current.window),
           );
           // Akhand Paath being followed (the reading window): its listening schedule.
           if (engine.pace.setAkhand) {
