@@ -2475,10 +2475,9 @@ const VoiceFollow = () => {
               inputSr: sampleRateRef.current,
               startLine: at,
               startAt: true,
-              // engine/pace Akhand Paath listening: every 0.125 s where the computer has room
-              // (dwells counted at this step), else the tier's step.
+              // The paath follower at its usual step and dwells until the reading crosses into
+              // a next Shabad (then seqCrossRef's follower listens on the Akhand schedule).
               akhand: true,
-              hopS: 0.125,
             });
             if (followerRef.current && at >= 0) follower.adopt(followerRef.current, at);
           } else
@@ -4260,9 +4259,11 @@ const VoiceFollow = () => {
         if (!autopilotRef.current) return;
         // Performance tiers only while the paath follower follows a read Bani (engine/pace).
         if (engine.pace) {
+          // (A single Shabad read straight through, not yet crossed: untiered, as before.)
           engine.pace.setScoped(
             phaseRef.current === 'following' &&
-              !!(followerRef.current && followerRef.current.readBani),
+              !!(followerRef.current && followerRef.current.readBani) &&
+              !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
           );
           // Akhand Paath being followed (the reading window): its listening schedule.
           if (engine.pace.setAkhand) {
@@ -4402,6 +4403,7 @@ const VoiceFollow = () => {
                 seqCrossRef.current(vs, out);
               } else if (vs === curSid && out.confidence >= UI_MOVE_CONF) {
                 ps.cross = { sid: null, n: 0 };
+                ps.back = null; // the reading is in the current Shabad: no going back
                 // Lines coming back (sung, not read): back to the Shabad follower.
                 if (prev2Back(curCursorPrevRef.current, out.lineIndex)) {
                   ps.backs += 1;
