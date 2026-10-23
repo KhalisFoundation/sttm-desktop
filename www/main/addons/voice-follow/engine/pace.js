@@ -108,8 +108,7 @@ const current = () => (state.scoped ? TIERS[state.tier] : TIERS[0]);
 // Akhand Paath fast listening: only while scoped (a read text is followed), flagged by the
 // component, and only in the fast tier (a slower tier keeps its schedule and its safety).
 const akhandOn = () => !!(state.scoped && state.akhand);
-const akhandFast = () =>
-  akhandOn() && current().name === 'fast' && fits(AKHAND, livePassMs()); // eslint-disable-line no-use-before-define
+const akhandFast = () => akhandOn() && current().name === 'fast' && fits(AKHAND, livePassMs()); // eslint-disable-line no-use-before-define
 function setAkhand(on) {
   state.akhand = !!on;
 }
