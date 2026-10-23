@@ -50,6 +50,23 @@ const readJson = (f, d) => {
   }
 };
 
+// A random tag per install (no name, no machine info), kept in the shadow folder.
+let installTagValue = null;
+const installTag = (base) => {
+  if (installTagValue) return installTagValue;
+  try {
+    const f = path.join(base, 'install-tag');
+    if (fs.existsSync(f)) installTagValue = fs.readFileSync(f, 'utf8').trim();
+    if (!installTagValue) {
+      installTagValue = Math.random().toString(36).slice(2, 10);
+      fs.writeFileSync(f, installTagValue);
+    }
+  } catch (_) {
+    installTagValue = installTagValue || 'x';
+  }
+  return installTagValue;
+};
+
 // Uploads are off in a build that never had the SAS injected (a plain dev build).
 const uploadsOn = () => Boolean(UPLOAD_URL && UPLOAD_SAS && !UPLOAD_SAS.startsWith('__'));
 
@@ -58,7 +75,9 @@ async function putFile(dir, file) {
   if (!fs.existsSync(full) || !uploadsOn()) return false;
   const session = readJson(path.join(dir, 'session.json'), {});
   const t = session.tester || (dir === root ? rootTester : null) || {};
-  const testerId = t.id || 'unknown';
+  // Before a tester registers, errors.log still uploads; give each computer its own random
+  // folder so one install's log never overwrites another's.
+  const testerId = t.id || `unknown-${installTag(root || dir)}`;
   // Container folders people can browse: raw/<gurdwara>/<tester name>/<date>/<session>/
   const slug = (x, d) =>
     String(x || '')
