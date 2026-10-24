@@ -11,7 +11,7 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
-    "test:unit": "node --test www/main/addons/voice-follow/components/ www/main/addons/voice-follow/shadow/bus.test.js && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
+    "test:unit": "node --test www/main/addons/voice-follow/components/ www/main/addons/voice-follow/shadow/bus.test.js www/main/addons/voice-follow/engine/hwcheck.test.js && node www/main/addons/voice-follow/components/switchPolicy.eval.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "smoke": "npm run build:local && cross-env VF_SMOKE=1 electron .",
     "debug": "npm run build:local && cross-env NODE_ENV=development electron . --remote-debugging-port=9222",
