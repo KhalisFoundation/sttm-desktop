@@ -70,12 +70,11 @@ const GlobalState = createStore({
         settingType: 'viewerSettings',
       });
 
-      // The embedded preview and external displays use separate update routes.
-      if (global.webview) {
-        global.webview.send('update-viewer-setting', message);
-      }
+      // Main-process IPC updates every viewer, including the embedded preview.
       if (global.platform) {
         global.platform.ipc.send('update-viewer-setting', message);
+      } else if (global.webview) {
+        global.webview.send('update-viewer-setting', message);
       }
     }),
   },
