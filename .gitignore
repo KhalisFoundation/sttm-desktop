@@ -17,3 +17,7 @@ venv/
 dist/
 # AI translations database, downloaded at runtime from Azure
 www/assets/ai-translations.*
+recordings/
+__pycache__/
+*.pyc
+

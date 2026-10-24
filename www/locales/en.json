@@ -365,6 +365,7 @@
     "SHORTCUT_TRAY": "Shortcut Tray",
     "LIVE_FEED": "Live Feed Text Files",
     "OTHER_OPTIONS": "Other Options",
+    "RECORDING_SETTINGS": "Recording Settings",
     "COLLECT_STATISTICS": "Collect Statistics",
     "VOICE_FOLLOW_ENABLED": "Voice Autopilot (experimental)",
     "VOICE_FOLLOW_ENABLED_MSG": "Shows the Voice Autopilot tab. It listens to the kirtan and follows along on screen; it is experimental and can make mistakes",
