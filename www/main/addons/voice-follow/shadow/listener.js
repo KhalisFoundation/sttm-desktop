@@ -1,0 +1,176 @@
+// The ear that runs while no shadow session is recording, so kirtan in an unattended hall
+// (STTM open, nobody at the laptop) is still collected. It only measures loudness, nothing
+// is recognised or saved here: when the room has been loud for most of the last stretch,
+// it asks the collector to start a session. It keeps the last PRE_ROLL_S seconds of audio in
+// memory (16 kHz, 16-bit), so that session begins with the kirtan that triggered it rather
+// than half a minute in. Everything stays in memory and is dropped when it stops.
+const {
+  SHADOW_SOUND_LEVEL,
+  SHADOW_SOUND_WINDOW_MS,
+  SHADOW_SOUND_SHARE,
+  SHADOW_PRE_ROLL_S,
+} = require('./config');
+const { guard } = require('./diag');
+const { capture } = require('./pcm');
+
+const RATE = 16000;
+const TICK_MS = 500; // one loudness reading per half second
+
+let st = null; // { stream, ctx, cap, ring, ringPos, ringFull, ticks, timer, onSound }
+// Bumped by every start() and stop(): a start() still waiting for the microphone when
+// stop() is called (recording turned off) must not open the ear afterwards.
+let gen = 0;
+
+function stop() {
+  gen += 1;
+  if (!st) return;
+  const s = st;
+  st = null;
+  clearInterval(s.timer);
+  s.cap.stop();
+  try {
+    s.stream.getTracks().forEach((t) => t.stop());
+  } catch (_) {
+    /* already gone */
+  }
+  s.ctx.close().catch(() => {});
+}
+
+// The last pre-roll seconds as 16-bit PCM, oldest first. Stops the ear.
+function takePreRoll() {
+  if (!st) return null;
+  const { ring, ringPos, ringFull } = st;
+  const out = ringFull
+    ? Int16Array.from([...ring.subarray(ringPos), ...ring.subarray(0, ringPos)])
+    : ring.slice(0, ringPos);
+  // The pre-roll's last sample is now: the session clock is anchored to this.
+  const endedAt = Date.now();
+  stop();
+  return out.length ? { pcm: out, rate: RATE, seconds: out.length / RATE, endedAt } : null;
+}
+
+// One captured chunk into the loudness sums and the 16 kHz pre-roll ring. `frame` is the
+// audio-clock frame of x[0] (null on the ScriptProcessor fallback): a hole is filled with
+// silence and an overlap skipped, so the pre-roll keeps real time. Pure; exported for tests.
+/* eslint-disable no-param-reassign */ // feed() updates the ear's state in place
+function feed(s, frame, x, step) {
+  let from = 0;
+  if (frame !== null && s.next !== null) {
+    if (frame > s.next) {
+      // Silence for the hole (at most one ring's worth: older audio would be overwritten).
+      const hole = Math.min(frame - s.next, Math.ceil(s.ring.length * step));
+      feed(s, null, new Float32Array(hole), step);
+    } else if (frame < s.next) from = Math.min(x.length, s.next - frame);
+  }
+  if (frame !== null) s.next = Math.max(s.next === null ? 0 : s.next, frame + x.length);
+  if (from >= x.length) return;
+  const y = from ? x.subarray(from) : x;
+  for (let i = 0; i < y.length; i += 1) {
+    s.sumSq += y[i] * y[i];
+    s.n += 1;
+  }
+  // Downsample by picking every step-th sample (speech band only; this is pre-roll audio).
+  for (s.acc; s.acc < y.length; s.acc += step) {
+    const v = Math.max(-1, Math.min(1, y[Math.floor(s.acc)]));
+    s.ring[s.ringPos] = v < 0 ? v * 32768 : v * 32767;
+    s.ringPos += 1;
+    if (s.ringPos >= s.ring.length) {
+      s.ringPos = 0;
+      s.ringFull = true;
+    }
+  }
+  s.acc -= y.length;
+}
+/* eslint-enable no-param-reassign */
+
+async function start(onSound) {
+  if (st) return;
+  gen += 1;
+  const mine = gen;
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
+  });
+  if (mine !== gen || st) {
+    stream.getTracks().forEach((t) => t.stop());
+    return;
+  }
+  let ctx;
+  try {
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: RATE });
+  } catch (_) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const src = ctx.createMediaStreamSource(stream);
+  const s = {
+    stream,
+    ctx,
+    cap: null,
+    ring: new Int16Array(Math.round(SHADOW_PRE_ROLL_S * RATE)),
+    ringPos: 0,
+    ringFull: false,
+    acc: 0, // resampling phase
+    next: null, // audio-clock frame expected next (worklet path)
+    sumSq: 0,
+    n: 0,
+    ticks: [], // [ms, loud?]
+    timer: null,
+    onSound,
+  };
+  // Captured on the audio thread (pcm.js), so UI stalls cannot drop or repeat pre-roll audio.
+  const step = ctx.sampleRate / RATE;
+  s.cap = capture(ctx, src, 'listener', (frame, x) => feed(s, frame, x, step));
+  s.timer = setInterval(
+    guard('listener.tick', () => {
+      const rms = s.n ? Math.sqrt(s.sumSq / s.n) : 0;
+      s.sumSq = 0;
+      s.n = 0;
+      const now = Date.now();
+      s.ticks.push([now, rms >= SHADOW_SOUND_LEVEL]);
+      s.ticks = s.ticks.filter(([t]) => now - t <= SHADOW_SOUND_WINDOW_MS);
+      const span = now - s.ticks[0][0];
+      const loud = s.ticks.filter(([, l]) => l).length;
+      if (
+        span >= SHADOW_SOUND_WINDOW_MS - TICK_MS * 2 &&
+        loud >= s.ticks.length * SHADOW_SOUND_SHARE
+      ) {
+        s.ticks = [];
+        if (s.onSound) s.onSound();
+      }
+    }),
+    TICK_MS,
+  );
+  st = s;
+}
+
+const running = () => !!st;
+
+// The pre-roll as a WAV file (mono 16-bit), for the session folder.
+function wavBytes({ pcm, rate }) {
+  const b = Buffer.alloc(44 + pcm.length * 2);
+  b.write('RIFF', 0);
+  b.writeUInt32LE(36 + pcm.length * 2, 4);
+  b.write('WAVE', 8);
+  b.write('fmt ', 12);
+  b.writeUInt32LE(16, 16);
+  b.writeUInt16LE(1, 20);
+  b.writeUInt16LE(1, 22);
+  b.writeUInt32LE(rate, 24);
+  b.writeUInt32LE(rate * 2, 28);
+  b.writeUInt16LE(2, 32);
+  b.writeUInt16LE(16, 34);
+  b.write('data', 36);
+  b.writeUInt32LE(pcm.length * 2, 40);
+  Buffer.from(pcm.buffer, pcm.byteOffset, pcm.byteLength).copy(b, 44);
+  return b;
+}
+
+// Every entry point is guarded (diag.js): a fault is logged, never thrown at the caller
+// (start() rejects only through guard: the collector sees it resolve with nothing running).
+module.exports = {
+  start: guard('listener.start', start),
+  stop: guard('listener.stop', stop),
+  takePreRoll: guard('listener.takePreRoll', takePreRoll, null),
+  running,
+  wavBytes,
+  feed,
+};
