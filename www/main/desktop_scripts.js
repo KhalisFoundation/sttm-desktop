@@ -144,8 +144,14 @@ module.exports = {
       localStorage.setItem('isDbDownloaded', true);
     }
     diag(`db: ${force ? 'first download' : 'update check'} starting`);
-    isOnline().then((online) => {
-      if (online) {
+    // The online check (is-online) can say "offline" on networks that block its probe sites
+    // (some school or Gurdwara Sahib networks) even though the database server is reachable,
+    // which left STTM with no Gurbani database at all. Try the server anyway; only a failed
+    // request counts as offline.
+    isOnline()
+      .catch(() => false)
+      .then((online) => {
+        if (!online) diag('db: online check says offline; trying the database server anyway');
         request(
           `https://banidb.blob.core.windows.net/database/${database[dbPlatform].md5}`,
           (error, response, newestDBHash) => {
@@ -225,14 +231,15 @@ module.exports = {
               diag(
                 `db: version check FAILED ${error ? errText(error) : `HTTP ${response && response.statusCode}`}`,
               );
+              if (force) {
+                diag('db: offline, no database yet');
+                if (global.core && global.core.search && global.core.search.offline)
+                  global.core.search.offline(10);
+              }
             }
           },
         );
-      } else {
-        diag(`db: offline${force ? ', no database yet' : ''}`);
-        if (force) global.core.search.offline(10);
-      }
-    });
+      });
   },
 
   // Downloads the AI translations database (PSS) into userData when it is missing or
