@@ -20,7 +20,6 @@ import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 import { i18n } from '../../common/i18n';
 
 const os = require('os');
-const remote = require('@electron/remote');
 const aiTranslationDB = require('../../banidb/pss-db');
 
 const platform = os.platform();
@@ -183,7 +182,7 @@ function ShabadDeck() {
         currentShabad = pane3.activeShabad;
       }
     }
-// A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
+    // A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
     // aren't verse ids, so looking them up in the pane's "shabad" (the bani
     // id) showed that shabad's verses instead, e.g. Japji Sahib's for Gur
     // Mantar (bani 1 → shabad 1).
@@ -191,7 +190,6 @@ function ShabadDeck() {
     if (!isMiscSlide && activeVerseId && isShabadShown) {
       if (showContinuousVerses) {
         loadShabad(currentShabad).then((verses) => setActiveVerse(verses));
-
       } else {
         loadShabadVerse(currentShabad, activeVerseId).then((result) =>
           result.map((activeRes) => setActiveVerse([activeRes])),

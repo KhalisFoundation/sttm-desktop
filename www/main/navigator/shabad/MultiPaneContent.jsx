@@ -42,7 +42,6 @@ const MultiPaneContent = ({ data }) => {
       if (versesRead !== read) setVersesRead(Array.isArray(read) ? [...read] : []);
     }
     // Only when the live pane changes. Re-running on versesRead would loop.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePaneId]);
 
   useEffect(() => {
@@ -51,7 +50,6 @@ const MultiPaneContent = ({ data }) => {
         content: i18n.t('MULTI_PANE.SHABAD'),
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace]);
 
   const goToShabadBtn = (

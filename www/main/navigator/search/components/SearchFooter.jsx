@@ -30,8 +30,7 @@ const SearchFooter = () => {
     // Copy scalars before dispatching. These setters JSON-sync to the viewer
     // inside the reducer; reading the live pane object across those dispatches
     // can hit a revoked immer proxy and freeze the window.
-    const activeShabad = pane.activeShabad;
-    const baniType = pane.baniType;
+    const { activeShabad, baniType } = pane;
     const verse = pane.activeVerse || null;
     if (defaultPaneId !== id) {
       setDefaultPaneId(id);

@@ -30,9 +30,10 @@ const syncProjectionShellBackground = (screenEl) => {
     return;
   }
   const { body, documentElement } = document;
+  const screenStyle = screenEl.style;
   documentElement.style.backgroundColor = backgroundColor;
   body.style.backgroundColor = backgroundColor;
-  screenEl.style.backgroundColor = backgroundColor;
+  screenStyle.backgroundColor = backgroundColor;
 };
 
 const PaneProjection = () => {
@@ -80,7 +81,9 @@ const PaneProjection = () => {
     if (!theme) return undefined;
     const { body, documentElement } = document;
     const previousBody = Array.from(body.classList).filter((c) => c.startsWith('theme-'));
-    const previousHtml = Array.from(documentElement.classList).filter((c) => c.startsWith('theme-'));
+    const previousHtml = Array.from(documentElement.classList).filter((c) =>
+      c.startsWith('theme-'),
+    );
     previousBody.forEach((c) => body.classList.remove(c));
     previousHtml.forEach((c) => documentElement.classList.remove(c));
     body.classList.add(`theme-${theme}`);
@@ -148,7 +151,7 @@ const PaneProjection = () => {
             height: '100%',
             maxHeight: 'none',
             flex: 'none',
-            ['--projection-text-scale']: textScale,
+            '--projection-text-scale': textScale,
           }}
         />
       </div>
