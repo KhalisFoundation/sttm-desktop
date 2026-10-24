@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
+import Noty from 'noty';
 import CollectorBoundary from './Boundary';
 
 // What the tester build records, said once on first launch (ShadowCollector.jsx) and again
@@ -8,6 +9,9 @@ import CollectorBoundary from './Boundary';
 // for both, so they can never drift apart. Keep it true to ShadowCollector.jsx (what is
 // saved: session.json, machineFacts) and uploader.js (what turning it off stops).
 export const SETTING_PATH = 'Settings › Other Options › Help improve Shabad search';
+// Bump when the first-launch notice changes in substance, so every sevadaar is asked again once.
+// Until the ask has been answered for this version, nothing runs and no indicator shows.
+export const NOTICE_VERSION = 2;
 
 export const NoticeText = ({ audio = true }) => (
   <div className="shadow-notice-text">
@@ -15,8 +19,8 @@ export const NoticeText = ({ audio = true }) => (
     <ul>
       {audio && (
         <li>
-          sound from the microphone while a program is going on (from when there is kirtan in the
-          room or you change what is on screen), <b>without you pressing anything</b>
+          sound from the microphone during a diwan (from when there is kirtan in the room or you
+          change what is on screen), <b>without you pressing anything</b>
         </li>
       )}
       <li>what is shown on screen (which Shabad or Bani, and which pangti), and when</li>
@@ -28,11 +32,11 @@ export const NoticeText = ({ audio = true }) => (
       address.
     </p>
     <p>
-      While STTM is open, the microphone stays on to notice when a program starts; the last 2
-      minutes are kept in memory
+      While STTM is open, the microphone stays on to notice when a diwan starts; the last 2 minutes
+      are kept in memory
       {audio ? ' and saved only if a recording starts' : ' and never saved'}.
     </p>
-    <p>Sessions are sent during the program to Khalis Foundation&apos;s secure storage.</p>
+    <p>Sessions are sent during the diwan to Khalis Foundation&apos;s secure storage.</p>
     <p>
       To turn it off: <b>{SETTING_PATH}</b>. Turning it off stops recording and sending at once
       (anything already being sent finishes). Anything recorded but not yet sent stays on this
@@ -93,12 +97,12 @@ const useOpenSharingSetting = () => {
 
 // The popover: the notice, the way to turn sharing off. One for the top-bar chip (tester
 // build) and the footer indicator (prod collector), so they can never drift apart.
-const SharingPopover = ({ title, audio, onClose }) => {
+const SharingPopover = ({ title, audio, onClose, style }) => {
   const [more, setMore] = useState(false);
   const { setCollectorLevel } = useStoreActions((actions) => actions.userSettings);
   const openSetting = useOpenSharingSetting();
   return (
-    <div className="shadow-rec-pop" role="dialog" aria-label="Shabad search sharing">
+    <div className="shadow-rec-pop" role="dialog" aria-label="Shabad search sharing" style={style}>
       <h4>{title}</h4>
       <ShortNotice audio={audio} />
       <button
@@ -127,6 +131,12 @@ const SharingPopover = ({ title, audio, onClose }) => {
           onClick={() => {
             onClose();
             setCollectorLevel('off');
+            // The indicator disappears with sharing off; say so, and how to turn it back on.
+            new Noty({
+              type: 'info',
+              text: `Sharing turned off. To turn it back on: ${SETTING_PATH}`,
+              timeout: 5000,
+            }).show();
           }}
         >
           Stop sharing
@@ -139,6 +149,7 @@ SharingPopover.propTypes = {
   title: PropTypes.string.isRequired,
   audio: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
+  style: PropTypes.shape({}),
 };
 
 // Tester build: the chip at the right of the workspace bar (controller window only, never the
@@ -170,7 +181,7 @@ const RecordingChipInner = () => {
       </button>
       {open && (
         <SharingPopover
-          title={recording ? chipText : 'Mic On, waiting for a program'}
+          title={recording ? chipText : 'Mic On, waiting for a diwan'}
           audio={audio}
           onClose={() => setOpen(false)}
         />
@@ -186,24 +197,44 @@ export const RecordingChip = () => (
   </CollectorBoundary>
 );
 
-// Prod collector: a quiet indicator in the search footer next to the source names: a dot
-// and the word "Sharing", grey while idle (sharing on, no session), Kesari while a session
-// is being shared. Hidden when sharing is off. Same popover as the chip.
+// Prod collector: a quiet indicator next to the source names in the search footer (in
+// Single-Display: in the bottom tab bar, which is always visible): a dot and the word
+// "Sharing", grey while idle (sharing on, no session), Kesari while a diwan is being shared.
+// Hidden when sharing is off and until the first-launch ask has been answered. Same popover as
+// the chip; it is placed on the window (fixed), so the pane it sits in can never clip it.
+const POP_WIDTH = 360;
+const popoverPlace = (btn) => {
+  if (!btn) return undefined;
+  const r = btn.getBoundingClientRect();
+  const width = Math.min(POP_WIDTH, window.innerWidth - 32);
+  return {
+    position: 'fixed',
+    left: Math.max(16, Math.min(r.left, window.innerWidth - width - 16)),
+    bottom: window.innerHeight - r.top + 8,
+    top: 'auto',
+    right: 'auto',
+    width,
+    maxHeight: Math.max(160, r.top - 24),
+  };
+};
 const SharingIndicatorInner = () => {
   const micState = useStoreState((state) => state.app.shadowMicState);
-  const level = useStoreState((state) => state.userSettings.collectorLevel);
+  const { collectorLevel: level, shadowNotice } = useStoreState((state) => state.userSettings);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const btnRef = useRef(null);
   useCloseOnOutside(open, setOpen, ref);
   if (level !== 'labels' && level !== 'audio') return null;
+  if (Number(shadowNotice) < NOTICE_VERSION) return null;
   const sharing = micState === 'recording';
   const audio = level === 'audio';
-  let title = 'Sharing is on, waiting for a program';
+  let title = 'Sharing is on, waiting for a diwan';
   if (sharing) title = audio ? 'Sharing audio and labels' : 'Sharing labels';
   return (
     <div className={`shadow-share ${sharing ? 'is-sharing' : 'is-idle'}`} ref={ref}>
       <button
         type="button"
+        ref={btnRef}
         className="shadow-share-btn"
         title={`${title}. Click for details and to turn it off.`}
         aria-expanded={open}
@@ -212,7 +243,14 @@ const SharingIndicatorInner = () => {
         <span className="shadow-share-dot" />
         Sharing
       </button>
-      {open && <SharingPopover title={title} audio={audio} onClose={() => setOpen(false)} />}
+      {open && (
+        <SharingPopover
+          title={title}
+          audio={audio}
+          onClose={() => setOpen(false)}
+          style={popoverPlace(btnRef.current)}
+        />
+      )}
     </div>
   );
 };

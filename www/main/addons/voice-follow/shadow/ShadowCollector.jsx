@@ -6,7 +6,7 @@ import {
   SHADOW_SEGMENT_MS,
   SHADOW_DISCARD_COOLDOWN_MS,
 } from './config';
-import { ShortNotice } from './RecordingNotice';
+import { ShortNotice, NOTICE_VERSION } from './RecordingNotice';
 import CollectorBoundary from './Boundary';
 import { i18n } from '../../../common/i18n';
 
@@ -176,8 +176,6 @@ const readTester = (raw) => {
   }
 };
 const packTester = (t) => encodeURIComponent(JSON.stringify(t));
-// Bump when the first-launch notice changes in substance, so every tester reads it again once.
-const NOTICE_VERSION = 2;
 
 const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);

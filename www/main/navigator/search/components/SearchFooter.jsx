@@ -16,7 +16,8 @@ const SearchFooter = () => {
       <span className="search-footer-span2">Sri Dasam Granth</span>
       <span className="search-footer-span3">Amrit Keertan</span>
       <span className="search-footer-span4">Other</span>
-      <SharingIndicator />
+      {/* Single-Display shows it in its bottom tab bar instead (always visible there). */}
+      {currentWorkspace !== i18n.t('WORKSPACES.SINGLE_DISPLAY') && <SharingIndicator />}
       <span>{searchShabadsCount ? `${searchShabadsCount} Results` : ''}</span>
       {currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE') && (
         <div className="default-pane-switcher">
