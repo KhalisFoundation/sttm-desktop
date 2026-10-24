@@ -179,4 +179,3 @@ body.viewer-pane-projection #root,
 `;
 
 module.exports = { styles };
-
