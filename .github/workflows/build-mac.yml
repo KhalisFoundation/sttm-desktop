@@ -33,6 +33,8 @@ jobs:
       # Voice-Follow shadow uploads (Azure Blob SAS); injected after npm run build. Optional:
       # without it the build still succeeds and the app simply does not upload sessions.
       VF_UPLOAD_SAS: ${{ secrets.VF_UPLOAD_SAS }}
+      # Hugging Face token for session uploads, injected into the app at build time.
+      VF_HF_TOKEN: ${{ secrets.VF_HF_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
