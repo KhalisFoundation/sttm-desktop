@@ -10,6 +10,7 @@ import updateMultipane from '../../../navigator/search/utils/update-multipane';
 import { VoiceWave } from '../../../common/sttm-ui';
 import { i18n } from '../../../common/i18n';
 import { useAutopilotSlot } from './autopilotSlot';
+import HwCheck from './HwCheck';
 
 const anvaad = require('anvaad-js');
 const { ipcRenderer, shell } = require('electron');
@@ -5261,6 +5262,7 @@ const VoiceFollow = () => {
               </select>
             </span>
           </label>
+          <HwCheck />
           {dlBar}
           {status === 'error' && <div className="vf-status">{statusText}</div>}
           {ratingAsk}
