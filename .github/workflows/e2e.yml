@@ -1,0 +1,84 @@
+name: End-to-end
+
+on:
+  pull_request:
+  schedule:
+    # Nightly, full set, every OS.
+    - cron: '30 2 * * *'
+  push:
+    branches: ['release', 'version-*']
+  workflow_dispatch:
+
+jobs:
+  # Every PR: the quick set on Linux.
+  fast:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # node-sass (the CSS build) has binaries up to Node 20.
+          node-version: '18.18.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Realm database
+        uses: actions/cache@v4
+        with:
+          path: e2e/.cache
+          key: realm-${{ runner.os }}
+      - run: node e2e/scripts/fetch-realm.mjs
+      - run: xvfb-run -a npm run e2e:fast
+      - run: npm run e2e:report
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-fast-linux
+          path: |
+            e2e/results
+            e2e/report.md
+          retention-days: 14
+
+  # Nightly and release branches: the whole sheet on every OS.
+  full:
+    if: github.event_name != 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-2022, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Realm database
+        uses: actions/cache@v4
+        with:
+          path: e2e/.cache
+          key: realm-${{ runner.os }}
+      - run: node e2e/scripts/fetch-realm.mjs
+      - run: npx playwright install chromium
+      - name: Tests (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run e2e
+      - name: Tests
+        if: runner.os != 'Linux'
+        run: npm run e2e
+      - run: npm run e2e:report
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-full-${{ matrix.os }}
+          path: |
+            e2e/results
+            e2e/report.md
+          retention-days: 30
