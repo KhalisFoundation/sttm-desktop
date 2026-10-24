@@ -1380,3 +1380,35 @@ $vf2-yellow-bar: #f2c200;
   background: #444;
   color: #ddd;
 }
+
+// "Check this computer" (HwCheck.jsx): one quiet line under the mic picker, idle panel only.
+.vf-hw {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--vf-muted);
+  text-align: center;
+}
+.vf-hw-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--vf-muted);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.vf-hw-verdict {
+  font-weight: 600;
+  color: inherit;
+}
+.vf-hw.is-great .vf-hw-verdict,
+.vf-hw.is-ok .vf-hw-verdict {
+  color: #3c7a4a;
+}
+.vf-hw.is-below .vf-hw-verdict {
+  color: #b5651d;
+}
+.vf-hw-detail {
+  margin-top: 2px;
+  line-height: 1.4;
+}
