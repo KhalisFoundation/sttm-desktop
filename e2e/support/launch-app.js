@@ -66,6 +66,29 @@ async function waitForWindow(app, file, timeout = 30000) {
  * www/configs/user-settings.json (e.g. { 'bani-length': 'long' });
  * `options.args` are extra Chromium switches, e.g. a fake microphone.
  */
+// The viewer (a <webview> on one display, its own window with a second one)
+// can finish loading after the search box is ready. A slide sent before then
+// is lost, so tests wait until the viewer page has loaded.
+async function waitForViewer(app, timeout = 30000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const ready = await app
+      .evaluate(async ({ webContents }) => {
+        const viewer = webContents
+          .getAllWebContents()
+          .find((contents) => contents.getURL().endsWith('viewer.html'));
+        if (!viewer || viewer.isDestroyed() || viewer.isLoading()) return false;
+        return viewer.executeJavaScript("document.readyState === 'complete'");
+      })
+      .catch(() => false);
+    if (ready) return;
+    await new Promise((resolve) => {
+      setTimeout(resolve, 200);
+    });
+  }
+  throw new Error('The viewer did not finish loading');
+}
+
 async function launchApp(options = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sttm-e2e-'));
   const { version } = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'package.json'), 'utf8'));
@@ -128,6 +151,7 @@ async function launchApp(options = {}) {
   await main.locator('input.input-box').waitFor({ state: 'visible', timeout: 45000 });
   // The search box is enabled once the database has opened.
   await main.locator('input.input-box:not([disabled])').waitFor({ timeout: 30000 });
+  await waitForViewer(app);
   return { app, main, userDataDir };
 }
 
