@@ -325,6 +325,19 @@ export const ShabadText = ({
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
+    // Akhand Paath view: the overlay (stream) shows the reading as several pangtis, like the
+    // projector does: the pangti before, the current one and the next AKHAND_OVERLAY_AHEAD.
+    let akhandLines = null;
+    if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani && rawVerses) {
+      const at = rawVerses.findIndex((obj) => obj.ID === activeVerseId);
+      if (at >= 0) {
+        akhandLines = [];
+        for (let k = Math.max(0, at - 1); k <= Math.min(rawVerses.length - 1, at + 3); k += 1) {
+          const g = rawVerses[k] && rawVerses[k].Gurmukhi;
+          if (g) akhandLines.push({ Gurmukhi: g, current: k === at });
+        }
+      }
+    }
     // Only the live controller pane should drive Display 1 / Display 2.
     // Other multipane panes keep their local list but must not overwrite show-line.
     // activePaneId starts as null until the user focuses a pane — treat that as
@@ -344,6 +357,7 @@ export const ShabadText = ({
           // send the live pane's read verses and home line with every line.
           versesRead: paneAttributes.versesRead ? [...paneAttributes.versesRead] : [],
           homeVerse: paneAttributes.homeVerse,
+          akhand: akhandLines ? { lines: akhandLines } : null,
         }),
       );
     }
@@ -374,6 +388,8 @@ export const ShabadText = ({
     // these deps or the home/tick sync would never reach Display 2 on its own.
     paneAttributes.homeVerse,
     paneAttributes.versesRead,
+    // The overlay switches to/from its Akhand Paath block with the view.
+    akhandpatt,
   ]);
 
   // Display 2: full DOM list (no Virtuoso windowing). Scroll active row into view.

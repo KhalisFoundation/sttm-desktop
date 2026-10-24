@@ -109,7 +109,35 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
+    // Akhand Paath view (sent while STTM shows it): the reading as several pangtis, the
+    // current one in full colour, the one before and the next ones dimmer.
+    const akhandBox = () => document.querySelector('.akp-overlay');
+    const writeAkhand = (akhand, larivaar, larivaarAssist) => {
+      const box = akhandBox();
+      if (!akhand || !akhand.lines || !akhand.lines.length) {
+        box.hidden = true;
+        document.querySelector('.overlay-wrapper').style.visibility = '';
+        return false;
+      }
+      box.innerHTML = akhand.lines
+        .map((l) => `<div class="akp-line${l.current ? ' akp-current' : ''}"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>`)
+        .join('');
+      if (overlayPrefs) {
+        const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
+        box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+        box.style.color = overlayPrefs.gurbaniTextColor;
+        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.75)}vh`;
+        const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
+        if (gf) box.style.fontFamily = gf;
+      }
+      box.hidden = false;
+      document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
+      return true;
+    };
+
     const writeText = (text, isGurmukhi, isAnnouncement) => {
+      akhandBox().hidden = true;
+      document.querySelector('.overlay-wrapper').style.visibility = '';
       let htmlCode;
       if (isAnnouncement && !isGurmukhi) {
         htmlCode = `<span>${text}</span>`;
@@ -269,6 +297,7 @@
         if (overlayPrefs) {
           const { overlayLarivaar, larivaarAssist } = overlayPrefs;
           writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          writeAkhand(request.akhand, overlayLarivaar, larivaarAssist);
         }
       }
     });
@@ -294,9 +323,16 @@
       applyOverlayPrefs();
     });
   </script>
+  <style>
+    .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
+    .akp-overlay .akp-line { opacity: 0.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .akp-overlay .akp-line.akp-current { opacity: 1; font-weight: 700; white-space: normal; }
+    .akp-overlay[hidden] { display: none; }
+  </style>
 </head>
 
 <body class="layout-bottom bani-overlay-page">
+  <section class="akp-overlay" hidden></section>
   <section class="overlay-wrapper">
     <div class="layout-top-bottom">
       <div class="content-bar ">
