@@ -4,6 +4,19 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import Noty from 'noty';
 import CollectorBoundary from './Boundary';
 
+const remoteConfig = require('./remote');
+
+// The server switch for this install (remote.js), re-read every 30 s: "Sharing" shows only
+// while collection is actually on, never while the switch has it off.
+const useSwitchOn = () => {
+  const [on, setOn] = useState(remoteConfig.enabled());
+  useEffect(() => {
+    const t = setInterval(() => setOn(remoteConfig.enabled()), 30000);
+    return () => clearInterval(t);
+  }, []);
+  return on;
+};
+
 // What the tester build records, said once on first launch (ShadowCollector.jsx) and again
 // whenever the sevadaar clicks the "Recording audio" chip in the workspace bar. One text
 // for both, so they can never drift apart. Keep it true to ShadowCollector.jsx (what is
@@ -223,7 +236,9 @@ const SharingIndicatorInner = () => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const btnRef = useRef(null);
+  const switchOn = useSwitchOn();
   useCloseOnOutside(open, setOpen, ref);
+  if (!switchOn) return null;
   if (level !== 'labels' && level !== 'audio') return null;
   if (Number(shadowNotice) < NOTICE_VERSION) return null;
   const sharing = micState === 'recording';

@@ -736,7 +736,9 @@ const ShadowCollector = () => {
   // the top asks once. Nothing is collected until "Allow"; Allow = labels + audio (the setting's
   // default), "No thanks" = off. STTM stays fully usable while the bar is showing.
   const registered = !!tester.id;
-  if (!SHADOW_BUILD || level === 'off' || (registered && noticeSeen)) return null;
+  // Ask only where the server switch has collection on for this install: with the switch off
+  // (the default for everyone) a sevadaar is never asked, so nobody sees an ask for nothing.
+  if (!SHADOW_BUILD || level === 'off' || !remoteOn || (registered && noticeSeen)) return null;
 
   const allow = () => {
     if (!registered) {
