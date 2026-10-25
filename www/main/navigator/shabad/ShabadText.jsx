@@ -325,16 +325,24 @@ export const ShabadText = ({
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
-    // Akhand Paath view: the overlay (stream) shows the reading as several pangtis, like the
-    // projector does: the pangti before, the current one and the next AKHAND_OVERLAY_AHEAD.
+    // Akhand Paath view: the overlay (stream) shows the reading as three pangtis, like the
+    // projector does: the pangti before, the current one and the one after (with translations).
     let akhandLines = null;
     if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani && rawVerses) {
       const at = rawVerses.findIndex((obj) => obj.ID === activeVerseId);
       if (at >= 0) {
         akhandLines = [];
-        for (let k = Math.max(0, at - 1); k <= Math.min(rawVerses.length - 1, at + 3); k += 1) {
-          const g = rawVerses[k] && rawVerses[k].Gurmukhi;
-          if (g) akhandLines.push({ Gurmukhi: g, current: k === at });
+        for (let k = Math.max(0, at - 1); k <= Math.min(rawVerses.length - 1, at + 1); k += 1) {
+          const v = rawVerses[k] && filterOverlayVerseItems(rawVerses, rawVerses[k].ID);
+          if (v && v.Gurmukhi) {
+            akhandLines.push({
+              Gurmukhi: v.Gurmukhi,
+              English: v.English || '',
+              Spanish: v.Spanish || '',
+              Hindi: v.Hindi || '',
+              current: k === at,
+            });
+          }
         }
       }
     }

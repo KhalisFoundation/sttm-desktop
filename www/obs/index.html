@@ -109,8 +109,8 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
-    // Akhand Paath view (sent while STTM shows it): the reading as several pangtis, the
-    // current one in full colour, the one before and the next ones dimmer.
+    // Akhand Paath view (sent while STTM shows it): the pangti before, the current one (full
+    // colour, larger) and the one after, each with its translation.
     const akhandBox = () => document.querySelector('.akp-overlay');
     const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
       const box = akhandBox();
@@ -119,11 +119,14 @@
         document.querySelector('.overlay-wrapper').style.visibility = '';
         return false;
       }
-      let tr = '';
-      if (Line) tr = (languageSettings && Line[languageSettings.translation]) || Line.English || '';
+      const lang = (languageSettings && languageSettings.translation) || 'English';
+      const trOf = (l) => (l.current && Line && Line[lang]) || l[lang] || l.English || '';
       box.innerHTML = akhand.lines
-        .map((l) => `<div class="akp-line${l.current ? ' akp-current' : ''}"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
-          (l.current && tr ? `<div class="akp-translation">${tr}</div>` : ''))
+        .map((l) => {
+          const tr = trOf(l);
+          return `<div class="akp-pair${l.current ? ' akp-current' : ''}"><div class="akp-line"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
+            (tr ? `<div class="akp-translation">${tr}</div>` : '') + '</div>';
+        })
         .join('');
       if (overlayPrefs) {
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
@@ -333,9 +336,12 @@
   </script>
   <style>
     .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
-    .akp-overlay .akp-line { opacity: 0.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .akp-overlay .akp-line.akp-current { opacity: 1; font-weight: 700; white-space: normal; font-size: 125%; }
-    .akp-overlay .akp-translation { margin: 0.2vh 0 0.6vh; }
+    .akp-overlay .akp-pair { opacity: 0.5; margin: 0 0 0.5vh; }
+    .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .akp-overlay .akp-pair.akp-current { opacity: 1; }
+    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 125%; }
+    .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
     .akp-overlay[hidden] { display: none; }
   </style>
 </head>
