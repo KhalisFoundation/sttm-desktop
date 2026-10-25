@@ -79,3 +79,38 @@ describe('shadow bus: overrides in visible mode', () => {
     );
   });
 });
+
+describe('shadow bus: Autopilot on screen before the session exists', () => {
+  const events = (dir) =>
+    fs
+      .readFileSync(path.join(dir, 'events.jsonl'), 'utf8')
+      .trim()
+      .split('\n')
+      .map((l) => JSON.parse(l));
+  afterEach(() => {
+    bus.end();
+    bus.setVisible(false);
+  });
+
+  it('a session begun after Start records Autopilot as on screen from its first second', () => {
+    bus.end();
+    bus.setVisible(true); // Start: no session yet (it begins a moment later)
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vf-bus-'));
+    bus.begin(dir, Date.now());
+    const ev = events(dir);
+    assert.ok(ev.some((e) => e.type === 'vf_visible' && e.t === 0));
+    bus.end();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('a session begun with Autopilot off records nothing', () => {
+    bus.end();
+    bus.setVisible(false);
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vf-bus-'));
+    bus.begin(dir, Date.now());
+    const f = path.join(dir, 'events.jsonl');
+    assert.ok(!fs.existsSync(f) || !fs.readFileSync(f, 'utf8').includes('vf_visible'));
+    bus.end();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+});
