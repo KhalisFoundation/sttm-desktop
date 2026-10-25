@@ -86,10 +86,14 @@ const GlobalState = createStore({
         actionName: 'setPadding',
         settingType: 'viewerSettings',
       });
-      if (global.webview) {
-        global.webview.send('update-viewer-setting', message);
-      } else if (global.platform) {
+      // One path to every viewer: the main process forwards update-viewer-setting to the
+      // projector, Display 2 and the in-app preview (sendToViewerWindows). Sending only to the
+      // preview when it exists left the sangat's projector on its old padding (text off-centre
+      // after setting padding to 0). Viewers only apply it (ViewerState.setPadding), so no loop.
+      if (global.platform) {
         global.platform.ipc.send('update-viewer-setting', message);
+      } else if (global.webview) {
+        global.webview.send('update-viewer-setting', message);
       }
     }),
   },
