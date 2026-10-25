@@ -14,17 +14,13 @@ import {
 import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
-import ExperimentalBadge from '../../common/sttm-ui/experimental-badge';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 import { i18n } from '../../common/i18n';
 
 const os = require('os');
-const remote = require('@electron/remote');
 const aiTranslationDB = require('../../banidb/pss-db');
 
 const platform = os.platform();
-// The viewer also runs embedded in the main window as a <webview>; the external viewer window doesn't
-const isEmbeddedViewer = remote.getCurrentWebContents().getType() === 'webview';
 
 const themes = require('../../../configs/themes.json');
 
@@ -171,7 +167,7 @@ function ShabadDeck() {
         currentShabad = pane3.activeShabad;
       }
     }
-// A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
+    // A bani or ceremony has its own lookup below. Its line ids (1, 2, 3, …)
     // aren't verse ids, so looking them up in the pane's "shabad" (the bani
     // id) showed that shabad's verses instead, e.g. Japji Sahib's for Gur
     // Mantar (bani 1 → shabad 1).
@@ -179,7 +175,6 @@ function ShabadDeck() {
     if (!isMiscSlide && activeVerseId && isShabadShown) {
       if (showContinuousVerses) {
         loadShabad(currentShabad).then((verses) => setActiveVerse(verses));
-
       } else {
         loadShabadVerse(currentShabad, activeVerseId).then((result) =>
           (result || []).map((activeRes) => setActiveVerse([activeRes])),
@@ -369,7 +364,6 @@ function ShabadDeck() {
         </div>
       </div>
       <ViewerIcon className="viewer-logo" />
-      {!isEmbeddedViewer && <ExperimentalBadge className="viewer-experimental-badge" />}
     </>
   );
 }
