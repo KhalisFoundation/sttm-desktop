@@ -1,5 +1,12 @@
 // Shared karansea CTC inference core (JS port of the numpy bits).
-const ort = require('onnxruntime-node');
+// The native engine (onnxruntime-node) is loaded on first use, not when STTM starts: if it
+// cannot load on a computer (antivirus, a missing system library, a security policy), only
+// Voice Autopilot reports an error; the rest of STTM still opens and works.
+let ortModule = null;
+const ort = () => {
+  if (!ortModule) ortModule = require('onnxruntime-node'); // eslint-disable-line global-require
+  return ortModule;
+};
 const VOCAB = require('./assets/vocab'); // id -> piece
 const pace = require('./pace');
 
@@ -83,7 +90,7 @@ class Infer {
     const env = parseInt(process.env.VF_ORT_THREADS || '', 10);
     let threads = cores >= 8 ? 4 : Math.max(1, Math.min(2, cores));
     if (env > 0) threads = env;
-    const sess = await ort.InferenceSession.create(modelPath, {
+    const sess = await ort().InferenceSession.create(modelPath, {
       intraOpNumThreads: threads,
       interOpNumThreads: 1,
       extra: { session: { 'session.intra_op.allow_spinning': '0' } },
@@ -119,8 +126,8 @@ class Infer {
   // One model pass, untimed (emissions() times it: a benchmark that slows the model wraps run).
   async run(buf) {
     const feeds = {
-      audio: new ort.Tensor('float32', buf, [1, buf.length]),
-      audio_len: new ort.Tensor('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
+      audio: new (ort().Tensor)('float32', buf, [1, buf.length]),
+      audio_len: new (ort().Tensor)('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
     };
     const out = await this.sess.run(feeds);
     const lp = out.log_probs;
