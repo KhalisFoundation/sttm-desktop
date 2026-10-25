@@ -109,7 +109,46 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
+    // Akhand Paath view (sent while STTM shows it): the pangti before, the current one (full
+    // colour, larger) and the one after, each with its translation.
+    const akhandBox = () => document.querySelector('.akp-overlay');
+    const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
+      const box = akhandBox();
+      if (!akhand || !akhand.lines || !akhand.lines.length) {
+        box.hidden = true;
+        document.querySelector('.overlay-wrapper').style.visibility = '';
+        return false;
+      }
+      const lang = (languageSettings && languageSettings.translation) || 'English';
+      const trOf = (l) => (l.current && Line && Line[lang]) || l[lang] || l.English || '';
+      box.innerHTML = akhand.lines
+        .map((l) => {
+          const tr = trOf(l);
+          return `<div class="akp-pair${l.current ? ' akp-current' : ''}"><div class="akp-line"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
+            (tr ? `<div class="akp-translation">${tr}</div>` : '') + '</div>';
+        })
+        .join('');
+      if (overlayPrefs) {
+        const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
+        box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+        box.style.color = overlayPrefs.gurbaniTextColor;
+        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.75)}vh`;
+        const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
+        if (gf) box.querySelectorAll('.gurmukhi').forEach((el) => { el.style.fontFamily = gf; });
+        box.querySelectorAll('.akp-translation').forEach((el) => {
+          el.style.color = overlayPrefs.textColor;
+          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.85)}vh`;
+          el.style.fontFamily = overlayPrefs.textFont;
+        });
+      }
+      box.hidden = false;
+      document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
+      return true;
+    };
+
     const writeText = (text, isGurmukhi, isAnnouncement) => {
+      akhandBox().hidden = true;
+      document.querySelector('.overlay-wrapper').style.visibility = '';
       let htmlCode;
       if (isAnnouncement && !isGurmukhi) {
         htmlCode = `<span>${text}</span>`;
@@ -269,6 +308,7 @@
         if (overlayPrefs) {
           const { overlayLarivaar, larivaarAssist } = overlayPrefs;
           writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          writeAkhand(request.akhand, overlayLarivaar, larivaarAssist, request.Line, request.languageSettings);
         }
       }
     });
@@ -294,9 +334,20 @@
       applyOverlayPrefs();
     });
   </script>
+  <style>
+    .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
+    .akp-overlay .akp-pair { opacity: 0.5; margin: 0 0 0.5vh; }
+    .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .akp-overlay .akp-pair.akp-current { opacity: 1; }
+    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 125%; }
+    .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
+    .akp-overlay[hidden] { display: none; }
+  </style>
 </head>
 
 <body class="layout-bottom bani-overlay-page">
+  <section class="akp-overlay" hidden></section>
   <section class="overlay-wrapper">
     <div class="layout-top-bottom">
       <div class="content-bar ">
