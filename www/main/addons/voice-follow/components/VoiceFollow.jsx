@@ -1530,6 +1530,7 @@ const VoiceFollow = () => {
   // gurbaniLevel = how loud Gurbani has been this session (the bar for "quiet").
   const ngFresh = () => ({
     ours: false,
+    session: null,
     lastFit: 0,
     hops: [],
     lastProgress: 0,
@@ -1565,7 +1566,11 @@ const VoiceFollow = () => {
     ng.ours = false;
     ng.back = 0;
     if (!ngSlideStillOurs()) return; // the sevadaar replaced or dismissed it: leave theirs
-    sessionLog.logEvent('not_gurbani', { session: sessionIdRef.current, visible: false, why });
+    sessionLog.logEvent('not_gurbani', {
+      session: sessionIdRef.current || ng.session,
+      visible: false,
+      why,
+    });
     try {
       setIsMiscSlide(false);
       isMiscSlideRef.current = false;
@@ -1597,8 +1602,18 @@ const VoiceFollow = () => {
       const now = Date.now();
       if (pcm) ngNoteLevel(pcm, now);
       if (ng.ours && !ngSlideStillOurs()) {
-        ng.ours = false; // the sevadaar replaced or dismissed our slide: it is theirs now
+        // Dismissed (a pangti click, or a follower line move clearing the misc slide): it is
+        // not ours any more. Start the clocks again so it does not flash straight back up.
+        ng.ours = false;
         ng.back = 0;
+        ng.hops = [];
+        ng.lastFit = now;
+        ng.lastProgress = now;
+        sessionLog.logEvent('not_gurbani', {
+          session: sessionIdRef.current || ng.session,
+          visible: false,
+          why: 'cleared',
+        });
       }
       const active =
         autopilotRef.current &&
@@ -1658,6 +1673,7 @@ const VoiceFollow = () => {
       if (!speechLong && !quietLong) return;
       ng.ours = true;
       ng.back = 0;
+      ng.session = sessionIdRef.current; // Stop logs the take-down after the session id is gone
       sessionLog.logEvent('not_gurbani', {
         session: sessionIdRef.current,
         visible: true,
@@ -1679,6 +1695,8 @@ const VoiceFollow = () => {
   };
   useEffect(() => {
     // The sevadaar put their own slide over ours: it is theirs now, never ours to take down.
+    // (In shadow mode our slide is never on the real screen, so the real one says nothing.)
+    if (shadowing()) return;
     if (ngRef.current.ours && (isAnnouncement || miscSlideText !== slideStrings.waheguru)) {
       ngRef.current.ours = false;
       ngRef.current.back = 0;
@@ -5225,6 +5243,10 @@ const VoiceFollow = () => {
     if (live) {
       const following = phaseRef.current === 'following' && currentShabadIdRef.current != null;
       vfRunBegin('adopted');
+      // The hidden run's Waheguru slide was never on the real screen: a slide there now is the
+      // sevadaar's, never Autopilot's to take down.
+      ngRef.current = { ...ngFresh(), lastFit: Date.now() };
+      isMiscSlideRef.current = isMiscSlide;
       visibleRef.current = true;
       if (recognizerRef.current) vfRunReady(); // the hidden run is already listening
       if (following) vfRunLock(currentShabadIdRef.current, 'adopt');
@@ -5257,6 +5279,7 @@ const VoiceFollow = () => {
     vfRunEnd('user');
     stop();
     visibleRef.current = false;
+    isMiscSlideRef.current = false; // the hidden run's own slides start from none
     shadowStateRef.current.up = null; // so the hidden run's vf_up is logged again
     shadowBus.setVisible(false);
     // One tap of feedback, offered briefly after Stop.
