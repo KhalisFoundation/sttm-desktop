@@ -109,20 +109,20 @@ const KIRTAN_BEHIND_MS = 10000;
 const KIRTAN_BEHIND_SHARE = 0.4;
 
 const state = {
-  tier: 0,
+  tiers: { read: 0, kirtan: 0 }, // tier index per scope: a kirtan step never moves read Banis
   pinned: null,
   passMs: null, // self-test median
   recent: [],
   behindSince: null,
   headroomSince: null,
-  steppedAt: 0,
+  steppedAt: { read: 0, kirtan: 0 },
   steps: 0,
   scoped: false, // see current()
   scope: 'read', // 'read' (a read Bani) or 'kirtan' (a Shabad or Bani being sung), see setScoped
   samples: [], // kirtan: [ms, behind?] backlog samples of the last KIRTAN_BEHIND_MS
   akhand: false, // Akhand Paath being followed (see setAkhand)
   selfTest: null,
-  blockedUntil: {}, // tier index -> ms: left because of backlog, do not re-enter before
+  blockedUntil: { read: {}, kirtan: {} }, // per scope, tier index -> ms: left because of backlog
   listeners: new Set(),
 };
 // Experiment only (benchmarks): a shorter following window in the aligned tiers, so a pass
@@ -134,18 +134,24 @@ const FOLLOW_WINDOW_S = Number(process.env.VF_FOLLOW_WINDOW_S || 0) || null;
   const i = TIERS.findIndex((t) => t.name === pin);
   if (i >= 0) {
     state.pinned = i;
-    state.tier = i;
+    state.tiers = { read: i, kirtan: i };
   }
 }
 
 // Scope: the tiers apply only while the paath follower follows a READ Bani (the component
 // says so per audio chunk). Searching, kirtan Shabads and sung Banis always run the fast tier =
 // the code path without tiers (the bounded audio queue still protects a slow PC there).
-const current = () => {
-  if (!state.scoped) return TIERS[0];
-  const t = TIERS[state.tier];
-  return state.scope === 'kirtan' && KIRTAN[t.name] ? KIRTAN[t.name] : t;
-};
+// The schedule tier index i runs in a scope (kirtan maps the slow tiers onto KIRTAN).
+const tierFor = (i, scope) => (scope === 'kirtan' && KIRTAN[TIERS[i].name]) || TIERS[i];
+const current = () => (state.scoped ? tierFor(state.tiers[state.scope], state.scope) : TIERS[0]);
+// The next index from i in direction dir (+1 slower, -1 faster) that changes the schedule in
+// this scope (kirtan's sync and lean are the same schedule: no empty step between them).
+function nextTier(i, dir, scope) {
+  let j = i + dir;
+  while (j > 0 && j < TIERS.length - 1 && tierFor(j, scope).name === tierFor(i, scope).name)
+    j += dir;
+  return j;
+}
 // Akhand Paath fast listening: only while scoped (a read text is followed), flagged by the
 // component, and only in the fast tier (a slower tier keeps its schedule and its safety).
 const akhandOn = () => !!(state.scoped && state.akhand);
@@ -174,7 +180,8 @@ const fits = (tier, passMs, max = LOAD_MAX) =>
 
 function describe() {
   return {
-    tier: TIERS[state.tier].name, // the tier this computer runs a read Bani at
+    tier: TIERS[state.tiers.read].name, // the tier this computer runs a read Bani at
+    kirtanTier: tierFor(state.tiers.kirtan, 'kirtan').name, // ...and kirtan / a sung Bani at
     active: akhandFast() ? 'akhand' : current().name, // what runs now (fast outside a read Bani)
     passMs: livePassMs() == null ? null : Math.round(livePassMs()),
     selfTestMs: state.passMs == null ? null : Math.round(state.passMs),
@@ -185,11 +192,11 @@ function describe() {
   };
 }
 
-function setTier(i, reason, extra = {}) {
+function setTier(i, reason, extra = {}, scope = state.scope, nowMs = Date.now()) {
   const from = current().name;
-  state.tier = i;
+  state.tiers[scope] = i;
   state.steps += 1;
-  state.steppedAt = Date.now();
+  state.steppedAt[scope] = nowMs;
   state.behindSince = null;
   state.headroomSince = null;
   const ev = { from, to: current().name, reason, ...extra, ...describe() };
@@ -278,7 +285,8 @@ async function measure(infer, passes, warm) {
   }
   if (state.pinned != null) pick = state.pinned;
   state.selfTest = { passMs: Math.round(state.passMs), tier: TIERS[pick].name };
-  setTier(pick, 'self-test');
+  state.tiers.kirtan = pick;
+  setTier(pick, 'self-test', {}, 'read');
   return state.selfTest;
 }
 
@@ -299,45 +307,72 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
   if (state.pinned != null || !state.scoped) return null;
-  const i = state.tier;
-  const held = nowMs - state.steppedAt < HOLD_MS;
-  if (state.scope === 'kirtan') {
+  const { scope } = state;
+  const i = state.tiers[scope];
+  const blocked = state.blockedUntil[scope];
+  const held = nowMs - state.steppedAt[scope] < HOLD_MS;
+  const down = nextTier(i, +1, scope);
+  if (scope === 'kirtan') {
     state.samples.push([nowMs, backlogSec > BEHIND_S]);
     while (state.samples.length && nowMs - state.samples[0][0] > KIRTAN_BEHIND_MS)
       state.samples.shift();
+    // Share of the time (not of the samples: they come per audio push) spent behind.
     const n = state.samples.length;
-    const share = n ? state.samples.filter((x) => x[1]).length / n : 0;
     const span = n ? nowMs - state.samples[0][0] : 0;
+    let behindMs = 0;
+    for (let k = 0; k + 1 < n; k += 1) {
+      if (state.samples[k][1]) behindMs += state.samples[k + 1][0] - state.samples[k][0];
+    }
+    const share = span > 0 ? behindMs / span : 0;
     if (
       !held &&
       span >= KIRTAN_BEHIND_MS * 0.8 &&
       share >= KIRTAN_BEHIND_SHARE &&
       i < TIERS.length - 1
     ) {
-      state.blockedUntil[i] = nowMs + RETRY_MS;
+      blocked[i] = nowMs + RETRY_MS;
       state.samples = [];
-      return setTier(i + 1, 'behind-share', {
-        backlogSec: Math.round(backlogSec * 100) / 100,
-        share: Math.round(share * 100) / 100,
-      });
+      return setTier(
+        down,
+        'behind-share',
+        {
+          backlogSec: Math.round(backlogSec * 100) / 100,
+          share: Math.round(share * 100) / 100,
+        },
+        scope,
+        nowMs,
+      );
     }
   }
   if (backlogSec > BEHIND_S) {
     state.headroomSince = null;
     if (state.behindSince == null) state.behindSince = nowMs;
     else if (!held && nowMs - state.behindSince >= BEHIND_MS && i < TIERS.length - 1) {
-      state.blockedUntil[i] = nowMs + RETRY_MS;
-      return setTier(i + 1, 'behind', { backlogSec: Math.round(backlogSec * 100) / 100 });
+      blocked[i] = nowMs + RETRY_MS;
+      return setTier(
+        down,
+        'behind',
+        { backlogSec: Math.round(backlogSec * 100) / 100 },
+        scope,
+        nowMs,
+      );
     }
     return null;
   }
   state.behindSince = null;
   const passMs = livePassMs();
-  const open = !(state.blockedUntil[i - 1] > nowMs);
-  if (i > 0 && open && backlogSec < 0.2 && fits(TIERS[i - 1], passMs, LOAD_UP)) {
+  const up = i > 0 ? nextTier(i, -1, scope) : 0;
+  const open = !(blocked[up] > nowMs);
+  if (i > 0 && open && backlogSec < 0.2 && fits(tierFor(up, scope), passMs, LOAD_UP)) {
     if (state.headroomSince == null) state.headroomSince = nowMs;
     else if (!held && nowMs - state.headroomSince >= HEADROOM_MS) {
-      return setTier(i - 1, 'headroom', { backlogSec: Math.round(backlogSec * 100) / 100 });
+      return setTier(
+        up,
+        'headroom',
+        { backlogSec: Math.round(backlogSec * 100) / 100 },
+        scope,
+        nowMs,
+      );
     }
   } else state.headroomSince = null;
   return null;
