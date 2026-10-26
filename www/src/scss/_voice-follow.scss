@@ -82,6 +82,32 @@ $vf2-yellow-bar: #f2c200;
   }
 }
 
+// Hold: Ardas, katha or an announcement is going on. The Waheguru slide is on the projector
+// and Autopilot waits for kirtan or paath; the card says so.
+.vf2-hold {
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff8ec;
+  border: 1px solid rgba(243, 156, 29, 0.45);
+  .vf2-label-text {
+    color: $vf2-ink;
+    font-weight: 600;
+  }
+}
+.vf2-hold-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.vf2-dot.is-hold {
+  background: $vf2-orange;
+}
+.vf2-hold-text {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: $vf2-muted;
+}
 // Now: the line being followed.
 .vf2-now {
   padding: 12px 14px 12px;

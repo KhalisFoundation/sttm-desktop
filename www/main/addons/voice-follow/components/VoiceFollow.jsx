@@ -302,6 +302,9 @@ const NG_FOREIGN_MEAN = 0.5;
 const NG_SPOKEN_WINDOWS = 8;
 const NG_SPOKEN_SHARE = 0.8;
 const NG_SPOKEN_PROGRESS = 2;
+// ...unless the decodes fit the Shabad on screen this well on average (someone reading it
+// aloud: a Hukamnama, Sehaj Paath). Talk brushes against pangtis and moves the follower too.
+const NG_READING_MEAN = 0.7;
 const NG_SM_WINDOW_S = 2;
 // While someone is plainly talking, a switch to another Shabad that the audio matches below
 // NG_TALK_STRONG is the talk misheard (Renton: 0.73-0.81), not a new Shabad: it is dropped
@@ -309,6 +312,29 @@ const NG_SM_WINDOW_S = 2;
 const NG_TALK_HOLD = 3;
 const NG_TALK_STRONG = 0.9;
 const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.15;
+// (Chanting-style speech carries some singing score too: it counts as sung only when the
+// singing outweighs the speech.)
+const ngSung = (r) => r.music >= 0.15 || (r.singing >= 0.15 && r.singing >= r.speech);
+// Hold: once Ardas, katha or an announcement is recognised, Autopilot keeps the Waheguru slide
+// and chooses nothing else until singing returns (the classifier hears kirtan or paath sung
+// together), a Shabad is read out strongly (NG_TALK_STRONG: a Hukamnama after Ardas; for Ardas
+// only after NG_ARDAS_MIN_MS). The panel says what is going on; the sevadaar can always pick a
+// pangti or Shabad by hand.
+const NG_ARDAS_MIN_MS = 30000;
+const NG_HOLD_MAX_MS = 10 * 60 * 1000; // failsafe: no hold outlasts this
+// A reading that ends a hold matches the same Shabad strongly again this much later (katha
+// quotes one pangti; a Hukamnama read aloud goes on pangti after pangti).
+const NG_READ_AGAIN_MS = 8000;
+// Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
+// Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
+// (Shabad 7738, verses 80053-80063). Heard outside a Sukhmani Sahib or Akhand Paath reading and
+// not sung as kirtan, it is Ardas.
+const NG_ARDAS_SHABADS = { 906: null, 7738: [80053, 80063] };
+const ngArdasMarker = (c) => {
+  if (!c || !Object.prototype.hasOwnProperty.call(NG_ARDAS_SHABADS, c.shabadId)) return false;
+  const span = NG_ARDAS_SHABADS[c.shabadId];
+  return !span || c.verseId == null || (c.verseId >= span[0] && c.verseId <= span[1]);
+};
 const NG_SILENT_MS = 30000;
 const NG_BACK_DECODES = 8; // (about 4 s of decodes: longer than one quoted pangti)
 const NG_FOLLOW_CONF = 0.6; // a follower fix counts as Gurbani only when it moves on this surely
@@ -1568,8 +1594,31 @@ const VoiceFollow = () => {
     smBuf: [],
     smSamples: 0,
     smBusy: false,
+    hold: null, // { kind: 'ardas' | 'talk' | 'english' | 'quiet', since }
+    strongSeen: null, // { [shabadId]: t }: strong matches seen while talking or held
+    holdLogAt: 0,
   });
   const ngRef = useRef(ngFresh());
+  const ngEnterSearchingRef = useRef(null); // enterSearching, defined further down
+  // What the panel says while the hold is on (null: nothing held).
+  const [ngHoldView, setNgHoldView] = useState(null);
+  const ngSetHold = (kind) => {
+    const ng = ngRef.current;
+    const prev = ng.hold ? ng.hold.kind : null;
+    if (prev === kind) return;
+    ng.hold = kind ? { kind, since: Date.now() } : null;
+    ng.strongSeen = null;
+    sessionLog.logEvent('not_gurbani_hold', {
+      session: sessionIdRef.current || ng.session,
+      kind,
+      from: prev,
+    });
+    try {
+      setNgHoldView(kind);
+    } catch (_) {
+      /* panel closing */
+    }
+  };
   const isMiscSlideRef = useRef(false);
   const miscSlideText = useStoreState((state) => state.navigator.miscSlideText);
   const isAnnouncement = useStoreState((state) => state.navigator.isAnnouncement);
@@ -1590,6 +1639,8 @@ const VoiceFollow = () => {
   };
   const ngTakeDown = (why) => {
     const ng = ngRef.current;
+    ng.followMoves = [];
+    if (ng.hold) ngSetHold(null);
     if (!ng.ours) return;
     ng.ours = false;
     ng.back = 0;
@@ -1650,8 +1701,56 @@ const VoiceFollow = () => {
     sm.classify(buf, sr)
       .then((r) => {
         if (r && ngRef.current.sm === ng.sm) {
-          ng.sm.push({ t: now, plain: ngPlainSpeech(r) });
+          ng.sm.push({
+            t: now,
+            plain: ngPlainSpeech(r),
+            sung: ngSung(r),
+            voice: r.speech + r.singing >= 0.15,
+          });
           while (ng.sm.length && now - ng.sm[0].t > NG_TALK_MS) ng.sm.shift();
+          // Singing is back (kirtan, or paath read together): Autopilot chooses again from a
+          // fresh search (the Shabad from before may not be the one being sung). Our slide
+          // stays until the search locks a Shabad.
+          // Already on an Ardas pangti (locked a moment before the speech was clear): Ardas.
+          if (
+            !ng.hold &&
+            phaseRef.current === 'following' &&
+            // (a known pangti: a Shabad with an Ardas span needs its line)
+            // eslint-disable-next-line no-use-before-define
+            (lastVerseRef.current != null ||
+              NG_ARDAS_SHABADS[currentShabadIdRef.current] === null) &&
+            // eslint-disable-next-line no-use-before-define
+            ngArdasNow({ shabadId: currentShabadIdRef.current, verseId: lastVerseRef.current }) &&
+            // eslint-disable-next-line no-use-before-define
+            ngScreenOurs()
+          ) {
+            sessionLog.logEvent('ardas_detected', {
+              session: sessionIdRef.current,
+              shabadId: currentShabadIdRef.current,
+              on: 'following',
+            });
+            // eslint-disable-next-line no-use-before-define
+            ngRaise('ardas', 'ardas');
+          }
+          // eslint-disable-next-line no-use-before-define
+          if (ng.hold && ngSungNow()) {
+            const heldKind = ng.hold.kind;
+            ngSetHold(null);
+            // (Not after a pause in the Shabad or Bani being followed: a quiet hold, or a Bani,
+            // resumes where it was; and never under a lock that is still committing.)
+            if (
+              heldKind !== 'quiet' &&
+              ng.ours &&
+              phaseRef.current === 'following' &&
+              // eslint-disable-next-line no-use-before-define
+              baniIdOf(currentShabadIdRef.current) == null &&
+              !lockingRef.current &&
+              ngEnterSearchingRef.current
+            ) {
+              sessionLog.logEvent('hold_end', { session: sessionIdRef.current, why: 'singing' });
+              ngEnterSearchingRef.current();
+            }
+          }
         }
       })
       .catch(() => {})
@@ -1663,11 +1762,18 @@ const VoiceFollow = () => {
   // Recent windows only: a classifier that stopped answering never keeps "talking" alive.
   // Never while a Bani is being read (one reader alone sounds like plain speech) or the
   // follower is moving on through the Shabad.
+  // Being read aloud: the follower keeps moving on and the decodes fit the Shabad well.
+  const ngReading = (now) => {
+    const ng = ngRef.current;
+    if (followerRef.current && followerRef.current.readBani) return true;
+    if (ng.progress.filter((t) => now - t <= NG_TALK_MS).length <= NG_SPOKEN_PROGRESS) return false;
+    const hops = ng.hops.filter((h) => now - h.t <= NG_TALK_MS);
+    return !hops.length || hops.reduce((a, h) => a + h.s, 0) / hops.length >= NG_READING_MEAN;
+  };
   const ngTalkingNow = () => {
     const ng = ngRef.current;
     const now = Date.now();
-    if (followerRef.current && followerRef.current.readBani) return false;
-    if (ng.progress.filter((t) => now - t <= NG_TALK_MS).length > NG_SPOKEN_PROGRESS) return false;
+    if (ngReading(now)) return false;
     const recent = ng.sm.filter((x) => now - x.t <= (NG_TALK_HOLD + 0.5) * NG_SM_WINDOW_S * 1000);
     return recent.length >= NG_TALK_HOLD && recent.slice(-NG_TALK_HOLD).every((x) => x.plain);
   };
@@ -1677,11 +1783,116 @@ const VoiceFollow = () => {
     while (ng.progress.length && now - ng.progress[0] > NG_TALK_MS) ng.progress.shift();
     const sm = ng.sm.filter((x) => now - x.t <= NG_TALK_MS);
     if (sm.length < NG_SPOKEN_WINDOWS || now - sm[0].t < NG_TALK_MS - 3000) return false;
-    if (followerRef.current && followerRef.current.readBani) return false;
-    return (
-      sm.filter((x) => x.plain).length >= sm.length * NG_SPOKEN_SHARE &&
-      ng.progress.length <= NG_SPOKEN_PROGRESS
-    );
+    // Since the last lock long enough to tell talk from someone reading this Shabad aloud.
+    if (!ng.hops.length || now - ng.hops[0].t < NG_TALK_MS - 3000) return false;
+    if (ngReading(now)) return false;
+    return sm.filter((x) => x.plain).length >= sm.length * NG_SPOKEN_SHARE;
+  };
+  // Sung right now: the last two classifier windows (about 4 s) hear singing or music.
+  const ngSungNow = () => {
+    const now = Date.now();
+    const recent = ngRef.current.sm.filter((x) => now - x.t <= 2.5 * NG_SM_WINDOW_S * 1000);
+    return recent.length >= 2 && recent.slice(-2).every((x) => x.sung);
+  };
+  // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
+  const ngRaise = (why, kind) => {
+    const ng = ngRef.current;
+    ng.followMoves = [];
+    // A hold (Autopilot choosing nothing else) only with the classifier: without it nothing
+    // could tell when singing returns. The slide itself works as before.
+    const canHold = !!(engine.speechMusic && engine.speechMusic.loaded());
+    ngSetHold(canHold ? kind : null);
+    if (ng.ours) return;
+    if (seekingRef.current) {
+      seekingRef.current = false; // the seeking slide is the same Waheguru slide: ours now
+      ng.ours = true;
+    } else if (isMiscSlideRef.current) {
+      return; // the sevadaar's own slide is up: leave it, but hold
+    }
+    ng.back = 0;
+    ng.session = sessionIdRef.current; // Stop logs the take-down after the session id is gone
+    sessionLog.logEvent('not_gurbani', {
+      session: sessionIdRef.current,
+      visible: true,
+      why,
+      kind,
+      shabadId: currentShabadIdRef.current,
+    });
+    if (ng.ours) return;
+    ng.ours = true;
+    try {
+      // A plain Waheguru slide, not in announcement style (as the Waheguru button does).
+      if (!shadowing() && navActions.setIsAnnouncement) navActions.setIsAnnouncement(false);
+      setMiscSlideText(slideStrings.waheguru);
+      setIsMiscSlide(true);
+      isMiscSlideRef.current = true;
+    } catch (_) {
+      ng.ours = false;
+    }
+  };
+  // Voiced but not sung right now, on positive evidence: the classifier has fresh windows
+  // (about 4 s) that hear a voice (speaking or reciting) and no singing or music. (A silent
+  // pause is not evidence; without the classifier: unknown, so never.)
+  const ngNotSungNow = () => {
+    const now = Date.now();
+    const recent = ngRef.current.sm.filter((x) => now - x.t <= 2.5 * NG_SM_WINDOW_S * 1000);
+    return recent.length >= 2 && recent.slice(-2).every((x) => !x.sung && x.voice);
+  };
+  // Ardas: an Ardas pangti, outside a Sukhmani Sahib or Akhand Paath reading, and not sung
+  // (sung, it is kirtan of the Shabad). The sangat recites the pauri together, chant-like:
+  // neither plain speech nor singing to the classifier.
+  const ngArdasNow = (c) =>
+    ngArdasMarker(c) &&
+    autopilotRef.current &&
+    !(paathSeqRef.current && paathSeqRef.current.on) &&
+    // eslint-disable-next-line no-use-before-define
+    !(curBaniShabadsRef.current && curBaniShabadsRef.current.has(c.shabadId)) &&
+    ngNotSungNow();
+  // Every Autopilot lock passes here first (the sevadaar's own picks do not). True: blocked.
+  const ngGateLock = (cand, opts = {}) => {
+    try {
+      const ng = ngRef.current;
+      const now = Date.now();
+      const marker = ngArdasMarker(cand);
+      if (marker && ngArdasNow(cand)) {
+        // eslint-disable-next-line no-use-before-define
+        if (!ngScreenOurs()) return true; // the sevadaar's Bani or ceremony: never covered
+        if (!ng.hold || ng.hold.kind !== 'ardas') {
+          sessionLog.logEvent('ardas_detected', {
+            session: sessionIdRef.current,
+            shabadId: cand.shabadId,
+            verseId: cand.verseId,
+          });
+        }
+        ngRaise('ardas', 'ardas');
+        return true;
+      }
+      if (!ng.hold) return false;
+      // The reading itself moving on in the Shabad on screen (paath promote / window).
+      if ((opts.promote || opts.window) && cand.shabadId === currentShabadIdRef.current) {
+        return false;
+      }
+      // A first lock (searching) is deliberate evidence: it ends a hold, except early in Ardas.
+      if (
+        phaseRef.current !== 'following' &&
+        !marker &&
+        (ng.hold.kind !== 'ardas' || now - ng.hold.since >= NG_ARDAS_MIN_MS)
+      ) {
+        ngSetHold(null);
+        return false;
+      }
+      if (now - ng.holdLogAt > 5000) {
+        ng.holdLogAt = now;
+        sessionLog.logEvent('hold_block', {
+          session: sessionIdRef.current,
+          kind: ng.hold.kind,
+          to: cand.shabadId,
+        });
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
   };
   const ngTickRef = useRef(null);
   ngTickRef.current = (d, pcm) => {
@@ -1698,11 +1909,19 @@ const VoiceFollow = () => {
         ng.hops = [];
         ng.lastFit = now;
         ng.lastProgress = now;
+        if (ng.hold) ngSetHold(null);
         sessionLog.logEvent('not_gurbani', {
           session: sessionIdRef.current || ng.session,
           visible: false,
           why: 'cleared',
         });
+      }
+      if (ng.hold) {
+        // A hold needs a Waheguru slide on screen (ours, or the sevadaar's own) and ends at
+        // the failsafe cap.
+        if ((!ng.ours && !isMiscSlideRef.current) || now - ng.hold.since >= NG_HOLD_MAX_MS) {
+          ngSetHold(null);
+        }
       }
       const active =
         autopilotRef.current &&
@@ -1712,7 +1931,10 @@ const VoiceFollow = () => {
       if (!active) {
         // The sevadaar opened a Bani or a ceremony, Autopilot stopped driving, or an Akhand
         // Paath reading crossed: our slide must not cover it.
-        if (ng.ours && phaseRef.current === 'following') ngTakeDown('inactive');
+        if (phaseRef.current === 'following') {
+          if (ng.ours) ngTakeDown('inactive');
+          else if (ng.hold && !ngScreenOurs()) ngSetHold(null);
+        }
         ng.lastFit = now;
         ng.hops = [];
         ng.back = 0;
@@ -1731,14 +1953,32 @@ const VoiceFollow = () => {
           // Only the Shabad on screen heard again, decode after decode, takes the slide down.
           ng.back = d.s >= NG_BACK_FIT ? ng.back + 1 : 0;
           // (Still plainly talking, quoting a pangti: not Gurbani resuming.)
-          if (ng.back >= NG_BACK_DECODES && !ngTalkingNow()) ngTakeDown('gurbani');
+          // (Not during Ardas on its own pauri: the pauri read aloud fits it, and the slide
+          // would flicker. That hold ends through singing, a reading, a pick, a lock, Stop.)
+          const onArdasPauri =
+            ng.hold &&
+            ng.hold.kind === 'ardas' &&
+            ngArdasMarker({
+              shabadId: currentShabadIdRef.current,
+              // eslint-disable-next-line no-use-before-define
+              verseId: lastVerseRef.current,
+            });
+          if (ng.back >= NG_BACK_DECODES && !ngTalkingNow() && !onArdasPauri) {
+            ngTakeDown('gurbani');
+          }
           return;
         }
       } else if (d) {
-        // The follower moved on through the Shabad: Gurbani (never takes the slide down).
+        // The follower moved on through the Shabad: Gurbani. With no hold on, three such moves
+        // in a row mean this Shabad is being sung or read again: our slide comes down.
         ng.lastFit = now;
         ng.lastProgress = now;
         ng.progress.push(now);
+        if (ng.ours && !ng.hold) {
+          ng.followMoves = (ng.followMoves || []).filter((t) => now - t <= 10000);
+          ng.followMoves.push(now);
+          if (ng.followMoves.length >= 3) ngTakeDown('gurbani');
+        }
         return;
       } else {
         // No decode: music (an instrumental between lines, alaap) keeps the Shabad up; only
@@ -1752,7 +1992,12 @@ const VoiceFollow = () => {
       }
       if (ng.ours || isMiscSlideRef.current || seekingRef.current || lockingRef.current) return;
       let speechLong = false;
-      if (d && ng.hops.length) {
+      let kind = 'talk';
+      // With the classifier, singing in the last NG_TALK_MS (a new Shabad being sung that the
+      // one on screen does not fit yet) is never talk: the text-only rules below stand down.
+      const smNow = ng.sm.filter((x) => now - x.t <= NG_TALK_MS);
+      const heardSinging = smNow.length >= 2 && smNow.some((x) => x.sung);
+      if (d && ng.hops.length && !heardSinging) {
         const recent = ng.hops.filter((h) => now - h.t <= NG_SPEECH_MS);
         if (recent.length && now - recent[0].t >= NG_SPEECH_MS - 1000) {
           const words = recent.filter((h) => h.word).length;
@@ -1772,29 +2017,13 @@ const VoiceFollow = () => {
             ng.hops.length >= NG_FOREIGN_DECODES &&
             mean < NG_FOREIGN_MEAN &&
             ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE;
+          if (speechLong) kind = 'english';
         }
       }
       if (!speechLong) speechLong = ngSpokenLong(now);
       const quietLong = !d && now - ng.lastFit >= NG_SILENT_MS;
       if (!speechLong && !quietLong) return;
-      ng.ours = true;
-      ng.back = 0;
-      ng.session = sessionIdRef.current; // Stop logs the take-down after the session id is gone
-      sessionLog.logEvent('not_gurbani', {
-        session: sessionIdRef.current,
-        visible: true,
-        why: speechLong ? 'speech' : 'quiet',
-        shabadId: currentShabadIdRef.current,
-      });
-      try {
-        // A plain Waheguru slide, not in announcement style (as the Waheguru button does).
-        if (!shadowing() && navActions.setIsAnnouncement) navActions.setIsAnnouncement(false);
-        setMiscSlideText(slideStrings.waheguru);
-        setIsMiscSlide(true);
-        isMiscSlideRef.current = true;
-      } catch (_) {
-        ng.ours = false;
-      }
+      ngRaise(speechLong ? 'speech' : 'quiet', speechLong ? kind : 'quiet');
     } catch (_) {
       /* the not-Gurbani slide never gets in the way of following */
     }
@@ -2435,16 +2664,20 @@ const VoiceFollow = () => {
     setDetail('Listening for the next Shabad');
     try {
       if (sampleRateRef.current) {
-        recognizerRef.current = await engine.createRecognizer({
+        const session = sessionRef.current;
+        const rec = await engine.createRecognizer({
           inputSr: sampleRateRef.current,
           windowS: AP_SEARCH_WIN_S, // searching: full context, like standalone detect
           hopS: AP_REC_HOP_S,
         });
+        if (session === sessionRef.current) recognizerRef.current = rec; // not after a Stop
       }
     } catch (_) {
       /* keep the existing recognizer if a fresh one can't be built */
     }
   }, []);
+
+  ngEnterSearchingRef.current = enterSearching;
 
   // Load a shabad's verses (tokenized, for a Follower) and normalized line texts
   // (for acoustic scoring). Throws if it can't be loaded / has no usable lines.
@@ -2794,6 +3027,9 @@ const VoiceFollow = () => {
     async (cand, opts = {}) => {
       if (!cand || !cand.verse) return;
       if (lockingRef.current) return; // a lock/switch is already committing
+      // Ardas recognised, or a hold on (Ardas, katha, an announcement): Autopilot keeps the
+      // Waheguru slide and chooses nothing else. The sevadaar's own picks always go through.
+      if (!opts.manual && ngGateLock(cand, opts)) return;
       lockingRef.current = true;
       const session = sessionRef.current;
       // On a switch we already have a working follower; a transient failure below
@@ -4347,10 +4583,40 @@ const VoiceFollow = () => {
         // --- Finish: commits first, then one shared UI from the leader. ---
         const vote = switchCandRef.current;
         const bgp = backstopRef.current;
+        // A strong match (>= NG_TALK_STRONG) while someone talks counts as a reading only when
+        // the same Shabad matches strongly again NG_READ_AGAIN_MS later (katha quotes one pangti;
+        // a Hukamnama read aloud goes on pangti after pangti).
+        // (per Shabad, and only within a minute of the first strong match)
+        const readAgain = (slot) => {
+          const ng = ngRef.current;
+          const now = Date.now();
+          if (!ng.strongSeen) ng.strongSeen = {};
+          const first = ng.strongSeen[slot.shabadId];
+          if (first && now - first >= NG_READ_AGAIN_MS && now - first <= 60000) {
+            ng.strongSeen = null;
+            return true;
+          }
+          if (!first || now - first > 60000) ng.strongSeen[slot.shabadId] = now;
+          return false;
+        };
         const talkHold = (slot) => {
-          if (!slot || !slot.committed || !ngTalkingNow()) return false;
-          // (its best decode: a Hukamnama read on a laptop mic matches strongly at least once)
-          if (Math.max(slot.lastScore || 0, slot.bestScore || 0) >= NG_TALK_STRONG) return false;
+          if (!slot || !slot.committed) return false;
+          if (ngArdasMarker(slot)) return false; // the lock gate turns it into the Ardas hold
+          const slotBest = Math.max(slot.lastScore || 0, slot.bestScore || 0);
+          const ngh = ngRef.current.hold;
+          if (ngh) {
+            // A Shabad read out strongly (a Hukamnama after Ardas) ends the hold.
+            const strong =
+              slotBest >= NG_TALK_STRONG &&
+              (ngh.kind !== 'ardas' || Date.now() - ngh.since >= NG_ARDAS_MIN_MS);
+            if (strong && readAgain(slot)) {
+              ngSetHold(null);
+              return false;
+            }
+            return true; // held: dropped (the lock gate logs it)
+          }
+          if (!ngTalkingNow()) return false;
+          if (slotBest >= NG_TALK_STRONG && readAgain(slot)) return false;
           sessionLog.logEvent('talk_hold', {
             session: sessionIdRef.current,
             from: currentShabadIdRef.current,
@@ -4704,7 +4970,7 @@ const VoiceFollow = () => {
           }
         }
         // Not-Gurbani slide: the silence clock (no decode at all for a while).
-        if (phaseRef.current === 'following') ngTickRef.current(null, pcm);
+        ngTickRef.current(null, pcm);
         // While following, also advance the follower for the live line/word cursor.
         if (phaseRef.current === 'following') {
           let f = followerRef.current;
@@ -4871,7 +5137,14 @@ const VoiceFollow = () => {
               shabadId: currentShabadIdRef.current,
             });
           }
-          if (gate.write && out.verseId != null && out.verseId !== lastVerseRef.current) {
+          // (Not while our Waheguru slide is up: a line written to the screen clears the slide,
+          // and the follower may still be on the Shabad from before the Ardas or katha.)
+          if (
+            gate.write &&
+            out.verseId != null &&
+            out.verseId !== lastVerseRef.current &&
+            !ngRef.current.ours
+          ) {
             lastVerseRef.current = out.verseId;
             if (screenLostRef.current && projectCurrentRef.current) {
               // The kirtan moved on in the followed Shabad while a ceremony was on screen:
@@ -5375,6 +5648,8 @@ const VoiceFollow = () => {
       // The hidden run's Waheguru slide was never on the real screen: a slide there now is the
       // sevadaar's, never Autopilot's to take down.
       if (ngRef.current.ours && SHADOW_BUILD) shadowBus.system({ slide: null });
+      ngSetHold(null);
+      setNgHoldView(null);
       ngRef.current = { ...ngFresh(), lastFit: Date.now() };
       isMiscSlideRef.current = isMiscSlide;
       visibleRef.current = true;
@@ -5515,6 +5790,19 @@ const VoiceFollow = () => {
       <i className="fa fa-stop" aria-hidden="true" />
       {i18n.t('VOICE_FOLLOW.STOP_SHORT')}
     </button>
+  );
+  // While a hold is on: what is going on, and that Autopilot waits for kirtan or paath.
+  const holdCard = ngHoldView && (
+    <section className={`vf2-hold is-${ngHoldView}`} role="status" aria-live="polite">
+      <div className="vf2-label">
+        <span className="vf2-dot is-hold" />
+        <span className="vf2-label-text">
+          {i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}
+        </span>
+      </div>
+      <p className="vf2-hold-text">{i18n.t('VOICE_FOLLOW.HOLD_TEXT')}</p>
+      <div className="vf2-hold-row">{stopButton}</div>
+    </section>
   );
   // Challengers to display: never the Shabad on screen itself (under any id) nor a
   // member of the Bani on screen.
@@ -5701,107 +5989,113 @@ const VoiceFollow = () => {
       {active && (
         <div className="vf2-body">
           {dlBar}
-
-          <section
-            key={beat}
-            className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
-              boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
-            }${beat ? ' is-beat' : ''}`}
-            style={boardCur ? pctVars(boardCur.pct) : undefined}
-          >
-            <div className="vf2-label" aria-live="polite">
-              <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
-              <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
-              {boardCur && <LivePct value={boardCur.pct} />}
-            </div>
-            <div
-              className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
-              key={liveLine || 'none'}
-              role="button"
-              tabIndex={0}
-              title={lineExpanded ? 'Click to show on one line' : 'Click to show the full line'}
-              onClick={() => setLineExpanded((v) => !v)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') setLineExpanded((v) => !v);
-              }}
-            >
-              {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
-            </div>
-            {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
-                sits near the top of the panel without adding a line. */}
-            <div className="vf2-next-row">
-              {nextLine ? (
-                <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
-                  <span className="vf2-next-mark" aria-hidden="true" />
-                  <Gurmukhi text={nextLine} />
+          {holdCard}
+          {!ngHoldView && (
+            <>
+              <section
+                key={beat}
+                className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
+                  boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
+                }${beat ? ' is-beat' : ''}`}
+                style={boardCur ? pctVars(boardCur.pct) : undefined}
+              >
+                <div className="vf2-label" aria-live="polite">
+                  <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
+                  <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
+                  {boardCur && <LivePct value={boardCur.pct} />}
                 </div>
-              ) : (
-                <span className="vf2-next-line is-empty" />
-              )}
-              {stopButton}
-            </div>
-            {boardCur && <LiveBar value={boardCur.pct} />}
-          </section>
-
-          {changing && (
-            <section
-              className={`vf2-change${
-                liveLead.wins >= 2 ? ' is-confirming' : ''
-              } is-tappable lvl-${pctLevel(leadPct)}`}
-              aria-live="polite"
-              role="button"
-              tabIndex={0}
-              title="Tap to change to this Shabad now"
-              style={pctVars(leadPct)}
-              onClick={() => pickCandidate(liveLead)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
-              }}
-            >
-              <div className="vf2-label">
-                <span className="vf2-dot is-seeking" />
-                {changeLabel}
-                <LivePct value={leadPct} />
-              </div>
-              <div className="vf2-cand-line">
-                <MarkedLine line={leadLine} keys={heardKeys} />
-              </div>
-              <LiveBar value={leadPct} />
-            </section>
-          )}
-
-          <section className="vf2-shabads" aria-live="polite">
-            <div className="vf2-shabads-head">
-              <span className="vf2-shabads-title">
-                {i18n.t(currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE')}
-              </span>
-              {boardOthers.length > 0 && (
-                <span className="vf2-shabads-count">{boardOthers.length}</span>
-              )}
-            </div>
-            {boardOthers.length === 0 && (
-              <div className="vf2-empty">
-                {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
-              </div>
-            )}
-            {boardOthers.map((c, i) => (
-              <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
-                <span className="vf2-cand-line">
-                  <MarkedLine line={c.line} keys={heardKeys} />
-                </span>
-                <LiveBar value={c.pct} />
-                <LivePct value={c.pct} />
-                <button
-                  type="button"
-                  className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
-                  onClick={() => pickCandidate({ ...c, pos: i })}
-                  title={i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP')}
+                <div
+                  className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
+                  key={liveLine || 'none'}
+                  role="button"
+                  tabIndex={0}
+                  title={lineExpanded ? 'Click to show on one line' : 'Click to show the full line'}
+                  onClick={() => setLineExpanded((v) => !v)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setLineExpanded((v) => !v);
+                  }}
                 >
-                  {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
-                </button>
-              </div>
-            ))}
-          </section>
+                  {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
+                </div>
+                {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
+                  sits near the top of the panel without adding a line. */}
+                <div className="vf2-next-row">
+                  {nextLine ? (
+                    <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
+                      <span className="vf2-next-mark" aria-hidden="true" />
+                      <Gurmukhi text={nextLine} />
+                    </div>
+                  ) : (
+                    <span className="vf2-next-line is-empty" />
+                  )}
+                  {stopButton}
+                </div>
+                {boardCur && <LiveBar value={boardCur.pct} />}
+              </section>
+
+              {changing && (
+                <section
+                  className={`vf2-change${
+                    liveLead.wins >= 2 ? ' is-confirming' : ''
+                  } is-tappable lvl-${pctLevel(leadPct)}`}
+                  aria-live="polite"
+                  role="button"
+                  tabIndex={0}
+                  title="Tap to change to this Shabad now"
+                  style={pctVars(leadPct)}
+                  onClick={() => pickCandidate(liveLead)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
+                  }}
+                >
+                  <div className="vf2-label">
+                    <span className="vf2-dot is-seeking" />
+                    {changeLabel}
+                    <LivePct value={leadPct} />
+                  </div>
+                  <div className="vf2-cand-line">
+                    <MarkedLine line={leadLine} keys={heardKeys} />
+                  </div>
+                  <LiveBar value={leadPct} />
+                </section>
+              )}
+
+              <section className="vf2-shabads" aria-live="polite">
+                <div className="vf2-shabads-head">
+                  <span className="vf2-shabads-title">
+                    {i18n.t(currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE')}
+                  </span>
+                  {boardOthers.length > 0 && (
+                    <span className="vf2-shabads-count">{boardOthers.length}</span>
+                  )}
+                </div>
+                {boardOthers.length === 0 && (
+                  <div className="vf2-empty">
+                    {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
+                  </div>
+                )}
+                {boardOthers.map((c, i) => (
+                  <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
+                    <span className="vf2-cand-line">
+                      <MarkedLine line={c.line} keys={heardKeys} />
+                    </span>
+                    <LiveBar value={c.pct} />
+                    <LivePct value={c.pct} />
+                    <button
+                      type="button"
+                      className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
+                      onClick={() => pickCandidate({ ...c, pos: i })}
+                      title={i18n.t(
+                        currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP',
+                      )}
+                    >
+                      {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
+                    </button>
+                  </div>
+                ))}
+              </section>
+            </>
+          )}
           {(hiddenRun || (status !== 'listening' && !detecting)) && (
             <div className="vf-status">{statusText}</div>
           )}
