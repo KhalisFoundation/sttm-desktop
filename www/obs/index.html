@@ -109,8 +109,8 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
-    // Akhand Paath view (sent while STTM shows it): the pangti before, the current one (full
-    // colour, larger) and the one after, each with its translation.
+    // Akhand Paath view (sent while STTM shows it): the pangti before and the current one (full
+    // colour, larger), each with its translation.
     const akhandBox = () => document.querySelector('.akp-overlay');
     const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
       const box = akhandBox();
@@ -121,7 +121,9 @@
       }
       const lang = (languageSettings && languageSettings.translation) || 'English';
       const trOf = (l) => (l.current && Line && Line[lang]) || l[lang] || l.English || '';
-      box.innerHTML = akhand.lines
+      const cur = akhand.lines.findIndex((l) => l.current);
+      const shown = cur >= 0 ? akhand.lines.slice(Math.max(0, cur - 1), cur + 1) : akhand.lines;
+      box.innerHTML = shown
         .map((l) => {
           const tr = trOf(l);
           return `<div class="akp-pair${l.current ? ' akp-current' : ''}"><div class="akp-line"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
@@ -132,12 +134,12 @@
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
         box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         box.style.color = overlayPrefs.gurbaniTextColor;
-        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.75)}vh`;
+        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.65)}vh`;
         const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
         if (gf) box.querySelectorAll('.gurmukhi').forEach((el) => { el.style.fontFamily = gf; });
         box.querySelectorAll('.akp-translation').forEach((el) => {
           el.style.color = overlayPrefs.textColor;
-          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.85)}vh`;
+          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.75)}vh`;
           el.style.fontFamily = overlayPrefs.textFont;
         });
       }
@@ -340,7 +342,7 @@
     .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-pair.akp-current { opacity: 1; }
-    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 125%; }
+    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 115%; }
     .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
     .akp-overlay[hidden] { display: none; }
   </style>
