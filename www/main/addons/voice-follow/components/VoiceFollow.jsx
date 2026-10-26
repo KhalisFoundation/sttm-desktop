@@ -311,10 +311,12 @@ const NG_SM_WINDOW_S = 2;
 // (a Hukamnama read out loud matches near 1 and still switches).
 const NG_TALK_HOLD = 3;
 const NG_TALK_STRONG = 0.9;
-const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.15;
+// (Katha may carry soft background music: up to 0.3 still counts as plain speech; kirtan sits
+// well above, plain in under 2% of its 2 s windows.)
+const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.3;
 // (Chanting-style speech carries some singing score too: it counts as sung only when the
 // singing outweighs the speech.)
-const ngSung = (r) => r.music >= 0.15 || (r.singing >= 0.15 && r.singing >= r.speech);
+const ngSung = (r) => r.music >= 0.25 || (r.singing >= 0.15 && r.singing >= r.speech);
 // Hold: once Ardas, katha or an announcement is recognised, Autopilot keeps the Waheguru slide
 // and chooses nothing else until singing returns (the classifier hears kirtan or paath sung
 // together), a Shabad is read out strongly (NG_TALK_STRONG: a Hukamnama after Ardas; for Ardas
@@ -327,9 +329,15 @@ const NG_HOLD_MAX_MS = 10 * 60 * 1000; // failsafe: no hold outlasts this
 const NG_READ_AGAIN_MS = 8000;
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
-// (Shabad 7738, verses 80053-80063). Heard outside a Sukhmani Sahib or Akhand Paath reading and
+// (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
+// said before any announcement). Heard outside a Sukhmani Sahib or Akhand Paath reading and
 // not sung as kirtan, it is Ardas.
-const NG_ARDAS_SHABADS = { 906: null, 7738: [80053, 80063] };
+const NG_ARDAS_SHABADS = { 906: null, 7738: [80058, 80063] };
+// The headings of Vaar Sri Bhagauti Ji (ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ ... ਪਉੜੀ, verses 80053-80057): the
+// same words as the Fateh said before katha or an announcement. Spoken, they start a talk hold
+// (or keep an Ardas one), never a switch to the Vaar.
+const ngFatehMarker = (c) =>
+  !!c && c.shabadId === 7738 && c.verseId != null && c.verseId >= 80053 && c.verseId <= 80057;
 const ngArdasMarker = (c) => {
   if (!c || !Object.prototype.hasOwnProperty.call(NG_ARDAS_SHABADS, c.shabadId)) return false;
   const span = NG_ARDAS_SHABADS[c.shabadId];
@@ -1788,11 +1796,12 @@ const VoiceFollow = () => {
     if (ngReading(now)) return false;
     return sm.filter((x) => x.plain).length >= sm.length * NG_SPOKEN_SHARE;
   };
-  // Sung right now: the last two classifier windows (about 4 s) hear singing or music.
+  // Sung right now: the last three classifier windows (about 6 s) hear singing or music (a
+  // music spike under katha is not kirtan returning).
   const ngSungNow = () => {
     const now = Date.now();
-    const recent = ngRef.current.sm.filter((x) => now - x.t <= 2.5 * NG_SM_WINDOW_S * 1000);
-    return recent.length >= 2 && recent.slice(-2).every((x) => x.sung);
+    const recent = ngRef.current.sm.filter((x) => now - x.t <= 3.5 * NG_SM_WINDOW_S * 1000);
+    return recent.length >= 3 && recent.slice(-3).every((x) => x.sung);
   };
   // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
   const ngRaise = (why, kind) => {
@@ -1868,6 +1877,16 @@ const VoiceFollow = () => {
           });
         }
         ngRaise('ardas', 'ardas');
+        return true;
+      }
+      if (
+        ngFatehMarker(cand) &&
+        autopilotRef.current &&
+        !(paathSeqRef.current && paathSeqRef.current.on) &&
+        ngNotSungNow()
+      ) {
+        // eslint-disable-next-line no-use-before-define
+        if (ngScreenOurs()) ngRaise('fateh', ng.hold ? ng.hold.kind : 'talk');
         return true;
       }
       if (!ng.hold) return false;
@@ -1999,7 +2018,9 @@ const VoiceFollow = () => {
         }
       }
       if (lockingRef.current) return;
-      if (!ng.ours && (isMiscSlideRef.current || seekingRef.current)) return;
+      // (The seeking slide is the same Waheguru slide: the hold takes it over. Any other misc
+      // slide is the sevadaar's.)
+      if (!ng.ours && isMiscSlideRef.current && !seekingRef.current) return;
       if (ng.ours && ng.hold) return;
       let speechLong = false;
       let kind = 'talk';
@@ -2027,7 +2048,12 @@ const VoiceFollow = () => {
             ng.hops.length >= NG_FOREIGN_DECODES &&
             mean < NG_FOREIGN_MEAN &&
             ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE;
-          if (speechLong) kind = 'english';
+          // English is letters to the Gurbani model; Punjabi katha or an announcement reads as
+          // words (word-like decodes), so it is labelled as such.
+          if (speechLong) {
+            kind =
+              ng.hops.filter((h) => h.word).length >= ng.hops.length * 0.5 ? 'talk' : 'english';
+          }
         }
       }
       if (!speechLong) speechLong = ngSpokenLong(now);
@@ -5802,15 +5828,22 @@ const VoiceFollow = () => {
     </button>
   );
   // While a hold is on: what is going on, and that Autopilot waits for kirtan or paath.
+  const HOLD_ICON = {
+    ardas: 'fa-solid fa-hands-praying',
+    talk: 'fa-solid fa-comment-dots',
+    english: 'fa-solid fa-bullhorn',
+    quiet: 'fa-solid fa-volume-xmark',
+  };
   const holdCard = ngHoldView && (
     <section className={`vf2-hold is-${ngHoldView}`} role="status" aria-live="polite">
-      <div className="vf2-label">
-        <span className="vf2-dot is-hold" />
-        <span className="vf2-label-text">
-          {i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}
-        </span>
+      <div className="vf2-hold-icon" aria-hidden="true">
+        <i className={HOLD_ICON[ngHoldView] || HOLD_ICON.talk} />
       </div>
+      <h3 className="vf2-hold-title">{i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}</h3>
       <p className="vf2-hold-text">{i18n.t('VOICE_FOLLOW.HOLD_TEXT')}</p>
+      <div className="vf2-hold-pill">
+        <i className="fa-solid fa-lock" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.HOLD_PILL')}
+      </div>
       <div className="vf2-hold-row">{stopButton}</div>
     </section>
   );

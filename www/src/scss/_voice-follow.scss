@@ -83,31 +83,82 @@ $vf2-yellow-bar: #f2c200;
 }
 
 // Hold: Ardas, katha or an announcement is going on. The Waheguru slide is on the projector
-// and Autopilot waits for kirtan or paath; the card says so.
+// and Autopilot waits for kirtan or paath: one calm card fills the panel, coloured by what is
+// going on (saffron Ardas, teal katha or announcement, blue English, grey silence).
 .vf2-hold {
-  margin-bottom: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: #fff8ec;
-  border: 1px solid rgba(243, 156, 29, 0.45);
-  .vf2-label-text {
-    color: $vf2-ink;
-    font-weight: 600;
+  --hold-bg: #faeeda;
+  --hold-line: #ef9f27;
+  --hold-soft: #fac775;
+  --hold-ink: #633806;
+  --hold-sub: #854f0b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 320px;
+  padding: 28px 22px;
+  border-radius: 16px;
+  background: var(--hold-bg);
+  border: 1px solid var(--hold-line);
+  text-align: center;
+  &.is-talk {
+    --hold-bg: #e1f5ee;
+    --hold-line: #5dcaa5;
+    --hold-soft: #9fe1cb;
+    --hold-ink: #085041;
+    --hold-sub: #0f6e56;
+  }
+  &.is-english {
+    --hold-bg: #e6f1fb;
+    --hold-line: #85b7eb;
+    --hold-soft: #b5d4f4;
+    --hold-ink: #0c447c;
+    --hold-sub: #185fa5;
+  }
+  &.is-quiet {
+    --hold-bg: #f1efe8;
+    --hold-line: #b4b2a9;
+    --hold-soft: #d3d1c7;
+    --hold-ink: #444441;
+    --hold-sub: #5f5e5a;
   }
 }
-.vf2-hold-row {
+.vf2-hold-icon {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--hold-soft);
+  color: var(--hold-ink);
+  font-size: 24px;
 }
-.vf2-dot.is-hold {
-  background: $vf2-orange;
+.vf2-hold-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--hold-ink);
 }
 .vf2-hold-text {
-  margin: 6px 0 10px;
-  font-size: 13px;
-  line-height: 1.45;
-  color: $vf2-muted;
+  margin: 0;
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--hold-sub);
 }
+.vf2-hold-pill {
+  padding: 4px 12px;
+  border: 1px solid var(--hold-line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--hold-sub);
+}
+.vf2-hold-row {
+  margin-top: 4px;
+}
+
 // Now: the line being followed.
 .vf2-now {
   padding: 12px 14px 12px;
