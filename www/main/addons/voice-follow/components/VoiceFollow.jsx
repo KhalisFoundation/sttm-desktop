@@ -338,8 +338,21 @@ const NG_ARDAS_SHABADS = { 906: null, 7738: [80058, 80063] };
 // The headings of Vaar Sri Bhagauti Ji (ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ ... ਪਉੜੀ, verses 80053-80057): the
 // same words as the Fateh said before katha or an announcement. Spoken, they start a talk hold
 // (or keep an Ardas one), never a switch to the Vaar.
+// A heading line that is the Fateh itself (ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ, at the top of many compositions):
+// heard in an announcement's opening Fateh, it is never a Shabad being sung or read.
+const NG_FATEH_LINE = 'ਵਾਹਿਗੁਰੂਜੀਕੀਫਤਹ';
+const ngFatehLine = (c) => {
+  try {
+    const letters = anvaad.unicode(c.verse).replace(/[^\u0A00-\u0A75]/g, '');
+    return letters.length <= NG_FATEH_LINE.length + 4 && letters.includes(NG_FATEH_LINE);
+  } catch (_) {
+    return false;
+  }
+};
 const ngFatehMarker = (c) =>
-  !!c && c.shabadId === 7738 && c.verseId != null && c.verseId >= 80053 && c.verseId <= 80057;
+  !!c &&
+  ((c.shabadId === 7738 && c.verseId != null && c.verseId >= 80053 && c.verseId <= 80057) ||
+    (typeof c.verse === 'string' && ngFatehLine(c)));
 const ngArdasMarker = (c) => {
   if (!c || !Object.prototype.hasOwnProperty.call(NG_ARDAS_SHABADS, c.shabadId)) return false;
   const span = NG_ARDAS_SHABADS[c.shabadId];
@@ -2026,7 +2039,11 @@ const VoiceFollow = () => {
       if (ng.ours && ng.hold) return;
       // A Bani being read is never katha or silence: a soft reader or a lost line is the
       // follower's job (Ardas after the Bani still comes in through its own markers).
-      if (followerRef.current && followerRef.current.readBani && baniIdOf(currentShabadIdRef.current))
+      if (
+        followerRef.current &&
+        followerRef.current.readBani &&
+        baniIdOf(currentShabadIdRef.current)
+      )
         return;
       let speechLong = false;
       let kind = 'talk';
@@ -2079,6 +2096,13 @@ const VoiceFollow = () => {
       ngRef.current.back = 0;
     }
   }, [miscSlideText, isAnnouncement]);
+  // The sevadaar took over during a hold (cleared the Waheguru slide, or opened a Shabad or Bani
+  // by hand): the hold is over and the screen is theirs.
+  useEffect(() => {
+    if (shadowing() || !ngRef.current.hold) return;
+    // (Opening a Shabad or Bani clears the slide too.)
+    if (!isMiscSlide) ngTakeDown('sevadaar');
+  }, [isMiscSlide]);
   if (!shadowing()) isMiscSlideRef.current = isMiscSlide;
   // Every recognizer output while following: does it fit the Shabad on screen (scored the way
   // the switch judge scores it)? Cheap and synchronous, so the clock is the same on every PC.
@@ -3072,6 +3096,8 @@ const VoiceFollow = () => {
       // Ardas recognised, or a hold on (Ardas, katha, an announcement): Autopilot keeps the
       // Waheguru slide and chooses nothing else. The sevadaar's own picks always go through.
       if (!opts.manual && ngGateLock(cand, opts)) return;
+      // The sevadaar picked a Shabad themself: the hold is over, their choice stands.
+      if (opts.manual && ngRef.current.hold) ngTakeDown('sevadaar');
       lockingRef.current = true;
       const session = sessionRef.current;
       // On a switch we already have a working follower; a transient failure below
@@ -5840,17 +5866,18 @@ const VoiceFollow = () => {
     english: 'fa-solid fa-bullhorn',
     quiet: 'fa-solid fa-volume-xmark',
   };
-  const holdCard = ngHoldView && (
+  const holdBanner = ngHoldView && (
     <section className={`vf2-hold is-${ngHoldView}`} role="status" aria-live="polite">
-      <div className="vf2-hold-icon" aria-hidden="true">
-        <i className={HOLD_ICON[ngHoldView] || HOLD_ICON.talk} />
+      <i
+        className={`vf2-hold-icon ${HOLD_ICON[ngHoldView] || HOLD_ICON.talk}`}
+        aria-hidden="true"
+      />
+      <div className="vf2-hold-body">
+        <div className="vf2-hold-title">
+          {i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}
+        </div>
+        <div className="vf2-hold-text">{i18n.t('VOICE_FOLLOW.HOLD_TEXT')}</div>
       </div>
-      <h3 className="vf2-hold-title">{i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}</h3>
-      <p className="vf2-hold-text">{i18n.t('VOICE_FOLLOW.HOLD_TEXT')}</p>
-      <div className="vf2-hold-pill">
-        <i className="fa-solid fa-lock" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.HOLD_PILL')}
-      </div>
-      <div className="vf2-hold-row">{stopButton}</div>
     </section>
   );
   // Challengers to display: never the Shabad on screen itself (under any id) nor a
@@ -6038,113 +6065,111 @@ const VoiceFollow = () => {
       {active && (
         <div className="vf2-body">
           {dlBar}
-          {holdCard}
-          {!ngHoldView && (
-            <>
-              <section
-                key={beat}
-                className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
-                  boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
-                }${beat ? ' is-beat' : ''}`}
-                style={boardCur ? pctVars(boardCur.pct) : undefined}
+          {holdBanner}
+          <>
+            <section
+              key={beat}
+              className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
+                boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
+              }${beat ? ' is-beat' : ''}`}
+              style={boardCur ? pctVars(boardCur.pct) : undefined}
+            >
+              <div className="vf2-label" aria-live="polite">
+                <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
+                <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
+                {boardCur && <LivePct value={boardCur.pct} />}
+              </div>
+              <div
+                className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
+                key={liveLine || 'none'}
+                role="button"
+                tabIndex={0}
+                title={lineExpanded ? 'Click to show on one line' : 'Click to show the full line'}
+                onClick={() => setLineExpanded((v) => !v)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') setLineExpanded((v) => !v);
+                }}
               >
-                <div className="vf2-label" aria-live="polite">
-                  <span className={`vf2-dot ${currentView ? 'is-on' : 'is-seeking'}`} />
-                  <span className="vf2-label-text">{currentView ? currentLabel : 'Finding'}</span>
-                  {boardCur && <LivePct value={boardCur.pct} />}
-                </div>
-                <div
-                  className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
-                  key={liveLine || 'none'}
-                  role="button"
-                  tabIndex={0}
-                  title={lineExpanded ? 'Click to show on one line' : 'Click to show the full line'}
-                  onClick={() => setLineExpanded((v) => !v)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') setLineExpanded((v) => !v);
-                  }}
-                >
-                  {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
-                </div>
-                {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
+                {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.LISTENING')}
+              </div>
+              {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
                   sits near the top of the panel without adding a line. */}
-                <div className="vf2-next-row">
-                  {nextLine ? (
-                    <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
-                      <span className="vf2-next-mark" aria-hidden="true" />
-                      <Gurmukhi text={nextLine} />
-                    </div>
-                  ) : (
-                    <span className="vf2-next-line is-empty" />
-                  )}
-                  {stopButton}
-                </div>
-                {boardCur && <LiveBar value={boardCur.pct} />}
-              </section>
-
-              {changing && (
-                <section
-                  className={`vf2-change${
-                    liveLead.wins >= 2 ? ' is-confirming' : ''
-                  } is-tappable lvl-${pctLevel(leadPct)}`}
-                  aria-live="polite"
-                  role="button"
-                  tabIndex={0}
-                  title="Tap to change to this Shabad now"
-                  style={pctVars(leadPct)}
-                  onClick={() => pickCandidate(liveLead)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
-                  }}
-                >
-                  <div className="vf2-label">
-                    <span className="vf2-dot is-seeking" />
-                    {changeLabel}
-                    <LivePct value={leadPct} />
+              <div className="vf2-next-row">
+                {nextLine ? (
+                  <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
+                    <span className="vf2-next-mark" aria-hidden="true" />
+                    <Gurmukhi text={nextLine} />
                   </div>
-                  <div className="vf2-cand-line">
-                    <MarkedLine line={leadLine} keys={heardKeys} />
-                  </div>
-                  <LiveBar value={leadPct} />
-                </section>
-              )}
-
-              <section className="vf2-shabads" aria-live="polite">
-                <div className="vf2-shabads-head">
-                  <span className="vf2-shabads-title">
-                    {i18n.t(currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE')}
-                  </span>
-                  {boardOthers.length > 0 && (
-                    <span className="vf2-shabads-count">{boardOthers.length}</span>
-                  )}
-                </div>
-                {boardOthers.length === 0 && (
-                  <div className="vf2-empty">
-                    {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
-                  </div>
+                ) : (
+                  <span className="vf2-next-line is-empty" />
                 )}
-                {boardOthers.map((c, i) => (
-                  <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
-                    <span className="vf2-cand-line">
-                      <MarkedLine line={c.line} keys={heardKeys} />
-                    </span>
-                    <LiveBar value={c.pct} />
-                    <LivePct value={c.pct} />
-                    <button
-                      type="button"
-                      className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
-                      onClick={() => pickCandidate({ ...c, pos: i })}
-                      title={i18n.t(
-                        currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP',
-                      )}
-                    >
-                      {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
-                    </button>
-                  </div>
-                ))}
+                {stopButton}
+              </div>
+              {boardCur && <LiveBar value={boardCur.pct} />}
+            </section>
+
+            {changing && !ngHoldView && (
+              <section
+                className={`vf2-change${
+                  liveLead.wins >= 2 ? ' is-confirming' : ''
+                } is-tappable lvl-${pctLevel(leadPct)}`}
+                aria-live="polite"
+                role="button"
+                tabIndex={0}
+                title="Tap to change to this Shabad now"
+                style={pctVars(leadPct)}
+                onClick={() => pickCandidate(liveLead)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
+                }}
+              >
+                <div className="vf2-label">
+                  <span className="vf2-dot is-seeking" />
+                  {changeLabel}
+                  <LivePct value={leadPct} />
+                </div>
+                <div className="vf2-cand-line">
+                  <MarkedLine line={leadLine} keys={heardKeys} />
+                </div>
+                <LiveBar value={leadPct} />
               </section>
-            </>
-          )}
+            )}
+
+            <section className="vf2-shabads" aria-live="polite">
+              <div className="vf2-shabads-head">
+                <span className="vf2-shabads-title">
+                  {i18n.t(currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE')}
+                </span>
+                {boardOthers.length > 0 && (
+                  <span className="vf2-shabads-count">{boardOthers.length}</span>
+                )}
+              </div>
+              {boardOthers.length === 0 && (
+                <div className="vf2-empty">
+                  {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
+                </div>
+              )}
+              {boardOthers.map((c, i) => (
+                <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
+                  <span className="vf2-cand-line">
+                    <MarkedLine line={c.line} keys={heardKeys} />
+                  </span>
+                  <LiveBar value={c.pct} />
+                  <LivePct value={c.pct} />
+                  <button
+                    type="button"
+                    className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
+                    onClick={() => pickCandidate({ ...c, pos: i })}
+                    title={i18n.t(
+                      currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP',
+                    )}
+                  >
+                    {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
+                  </button>
+                </div>
+              ))}
+            </section>
+          </>
           {(hiddenRun || (status !== 'listening' && !detecting)) && (
             <div className="vf-status">{statusText}</div>
           )}

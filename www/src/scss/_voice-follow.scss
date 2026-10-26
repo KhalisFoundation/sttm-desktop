@@ -83,80 +83,70 @@ $vf2-yellow-bar: #f2c200;
 }
 
 // Hold: Ardas, katha or an announcement is going on. The Waheguru slide is on the projector
-// and Autopilot waits for kirtan or paath: one calm card fills the panel, coloured by what is
-// going on (saffron Ardas, teal katha or announcement, blue English, grey silence).
+// and Autopilot waits for kirtan or paath. A slim banner over the panel says what is going on
+// (saffron Ardas, teal katha or announcement, blue English, grey silence); the rest of the
+// panel stays usable, so the sevadaar can still pick any Shabad.
 .vf2-hold {
-  --hold-bg: #faeeda;
+  --hold-bg: #fdf4e6;
   --hold-line: #ef9f27;
-  --hold-soft: #fac775;
   --hold-ink: #633806;
   --hold-sub: #854f0b;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  min-height: 320px;
-  padding: 28px 22px;
-  border-radius: 16px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
   background: var(--hold-bg);
-  border: 1px solid var(--hold-line);
-  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 3px solid var(--hold-line);
+  animation: vf2-hold-in 0.25s ease-out;
   &.is-talk {
-    --hold-bg: #e1f5ee;
-    --hold-line: #5dcaa5;
-    --hold-soft: #9fe1cb;
+    --hold-bg: #e9f7f1;
+    --hold-line: #3fae8a;
     --hold-ink: #085041;
     --hold-sub: #0f6e56;
   }
   &.is-english {
-    --hold-bg: #e6f1fb;
-    --hold-line: #85b7eb;
-    --hold-soft: #b5d4f4;
+    --hold-bg: #edf4fc;
+    --hold-line: #5e9ee0;
     --hold-ink: #0c447c;
     --hold-sub: #185fa5;
   }
   &.is-quiet {
-    --hold-bg: #f1efe8;
-    --hold-line: #b4b2a9;
-    --hold-soft: #d3d1c7;
+    --hold-bg: #f3f2ee;
+    --hold-line: #9a988f;
     --hold-ink: #444441;
     --hold-sub: #5f5e5a;
   }
 }
+@keyframes vf2-hold-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 .vf2-hold-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--hold-soft);
-  color: var(--hold-ink);
-  font-size: 24px;
+  margin-top: 2px;
+  font-size: 15px;
+  color: var(--hold-line);
+}
+.vf2-hold-body {
+  min-width: 0;
 }
 .vf2-hold-title {
-  margin: 0;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--hold-ink);
 }
 .vf2-hold-text {
-  margin: 0;
-  max-width: 340px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--hold-sub);
-}
-.vf2-hold-pill {
-  padding: 4px 12px;
-  border: 1px solid var(--hold-line);
-  border-radius: 999px;
+  margin-top: 2px;
   font-size: 12px;
+  line-height: 1.45;
   color: var(--hold-sub);
-}
-.vf2-hold-row {
-  margin-top: 4px;
 }
 
 // Now: the line being followed.
