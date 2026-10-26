@@ -18,11 +18,11 @@ describe('pace: kirtan scope', () => {
     const pace = fresh();
     pace.setScoped(true, 'kirtan');
     let t = 0;
-    for (let k = 0; k < 200 && pace.describe().tier === 'fast'; k += 1) {
+    for (let k = 0; k < 200 && pace.describe().kirtanTier === 'fast'; k += 1) {
       t += 250;
       pace.observe(0.9, 1e6 + t);
     }
-    assert.notEqual(pace.describe().tier, 'fast', 'stepped down from fast');
+    assert.notEqual(pace.describe().kirtanTier, 'fast', 'stepped down from fast');
     assert.equal(pace.current().name.startsWith('kirtan-'), true);
     assert.equal(pace.windowS('recognizer', 4), 4, 'recognizer keeps its 4 s window');
     assert.equal(pace.windowS('follower', 4), 4);
@@ -32,17 +32,31 @@ describe('pace: kirtan scope', () => {
       'same beat: one shared pass',
     );
   });
-  it('the same slow tier still shortens read-Bani windows as before', () => {
+  it('a kirtan step does not carry over to a later read Bani', () => {
     const pace = fresh();
     pace.setScoped(true, 'kirtan');
     let t = 0;
-    for (let k = 0; k < 200 && pace.describe().tier === 'fast'; k += 1) {
+    for (let k = 0; k < 200 && pace.describe().kirtanTier === 'fast'; k += 1) {
       t += 250;
       pace.observe(0.9, 1e6 + t);
     }
+    assert.notEqual(pace.describe().kirtanTier, 'fast');
     pace.setScoped(true, 'read');
-    assert.equal(pace.current().name, pace.describe().tier);
-    if (pace.current().windowS) assert.equal(pace.windowS('recognizer', 4), pace.current().windowS);
+    assert.equal(pace.describe().tier, 'fast');
+    assert.equal(pace.current().name, 'fast');
+    assert.equal(pace.windowS('recognizer', 4), 4);
+  });
+  it('kirtan skips the empty sync -> lean step (same schedule)', () => {
+    const pace = fresh();
+    pace.setScoped(true, 'kirtan');
+    let t = 1e6;
+    const names = [];
+    for (let k = 0; k < 400; k += 1) {
+      t += 250;
+      const ev = pace.observe(0.9, t);
+      if (ev) names.push(`${ev.from}>${ev.to}`);
+    }
+    assert.deepEqual(names, ['fast>kirtan-lean', 'kirtan-lean>kirtan-min']);
   });
   it('kirtan steps down on a saw-tooth backlog that is never 3 s above in a row', () => {
     const pace = fresh();
@@ -66,5 +80,28 @@ describe('pace: kirtan scope', () => {
       if (pace.observe(k % 4 < 2 ? 0.9 : 0.1, t)) stepped = true;
     }
     assert.equal(stepped, false);
+  });
+});
+
+describe('follower: dwells keep their wall-clock meaning on a slower hop', () => {
+  it('scales window counts by the hop', () => {
+    const { Follower } = require('./follower'); // eslint-disable-line global-require
+    const f = Object.create(Follower.prototype);
+    f.base = {
+      hopS: 0.25,
+      dwell: 3,
+      dwellAdv: 1,
+      dwellBack: 2,
+      dwellSkip: null,
+      initConfirm: 4,
+      release: 14,
+    };
+    assert.equal(f.scaled(1), f.base);
+    const c = f.scaled(2);
+    assert.deepEqual(
+      [c.dwell, c.dwellAdv, c.dwellBack, c.dwellSkip, c.initConfirm, c.release],
+      [2, 1, 1, null, 2, 7],
+    );
+    assert.deepEqual([f.scaled(4).initConfirm, f.scaled(4).release], [1, 4]);
   });
 });
