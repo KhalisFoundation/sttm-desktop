@@ -286,16 +286,12 @@ const NG_SPEECH_MS = 12000;
 const NG_SPEECH_DECODES = 16; // ...with at least this many word-like decodes in that time
 const NG_SPEECH_FIT_SHARE = 0.2;
 const NG_PROGRESS_MS = 6000; // no follower progress for this long
-// Katha and announcements about the Shabad on screen share its words, so about half their
-// decodes still fit it. What tells talk from singing is that the follower never moves on
-// through the Shabad: steady speech for NG_TALK_MS, scoring below NG_TALK_MEAN on average,
-// with no follower progress at all in that time, is talk too.
-const NG_TALK_MS = 20000;
-const NG_TALK_DECODES = 30;
-const NG_TALK_MEAN = 0.65;
 // Speech the model cannot read as words at all (English, fast announcements) comes out as
-// letters scoring far below the Shabad and almost never fitting it: counted with every
-// decode, not only word-like ones.
+// letters scoring far below the Shabad and almost never fitting it: NG_TALK_MS of decodes
+// (any confidence) averaging below NG_FOREIGN_MEAN, with no follower progress, is not
+// Gurbani. (Katha about the Shabad on screen is not caught this way: a pangti repeated in
+// kirtan scores and moves just like it, Sachkhand clip14.)
+const NG_TALK_MS = 20000;
 const NG_FOREIGN_DECODES = 12;
 const NG_FOREIGN_MEAN = 0.5;
 const NG_SILENT_MS = 30000;
@@ -1688,13 +1684,11 @@ const VoiceFollow = () => {
           now - ng.hops[0].t >= NG_TALK_MS - 1000 &&
           now - ng.lastProgress >= NG_TALK_MS
         ) {
-          const meanOf = (hs) => hs.reduce((a, h) => a + h.s, 0) / (hs.length || 1);
-          const talk = ng.hops.filter((h) => h.word);
+          const mean = ng.hops.reduce((a, h) => a + h.s, 0) / ng.hops.length;
           speechLong =
-            (talk.length >= NG_TALK_DECODES && meanOf(talk) < NG_TALK_MEAN) ||
-            (ng.hops.length >= NG_FOREIGN_DECODES &&
-              meanOf(ng.hops) < NG_FOREIGN_MEAN &&
-              ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE);
+            ng.hops.length >= NG_FOREIGN_DECODES &&
+            mean < NG_FOREIGN_MEAN &&
+            ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE;
         }
       }
       const quietLong = !d && now - ng.lastFit >= NG_SILENT_MS;
@@ -2941,6 +2935,7 @@ const VoiceFollow = () => {
         ngRef.current = {
           ...ngFresh(),
           lastFit: Date.now(),
+          lastProgress: Date.now(),
           gurbaniLevel: ngRef.current.gurbaniLevel,
           levels: ngRef.current.levels,
         };
