@@ -161,7 +161,12 @@ function setAkhand(on) {
 }
 function setScoped(on, scope = 'read') {
   const next = scope === 'kirtan' ? 'kirtan' : 'read';
-  if (next !== state.scope) state.samples = [];
+  if (next !== state.scope) {
+    // each scope keeps its own tier; its timers and samples start over
+    state.samples = [];
+    state.behindSince = null;
+    state.headroomSince = null;
+  }
   state.scope = next;
   state.scoped = !!on;
   if (!state.scoped) {
@@ -193,13 +198,13 @@ function describe() {
 }
 
 function setTier(i, reason, extra = {}, scope = state.scope, nowMs = Date.now()) {
-  const from = current().name;
+  const from = tierFor(state.tiers[scope], scope).name;
   state.tiers[scope] = i;
   state.steps += 1;
   state.steppedAt[scope] = nowMs;
   state.behindSince = null;
   state.headroomSince = null;
-  const ev = { from, to: current().name, reason, ...extra, ...describe() };
+  const ev = { from, to: tierFor(i, scope).name, scope, reason, ...extra, ...describe() };
   state.listeners.forEach((fn) => {
     try {
       fn(ev);
@@ -285,7 +290,9 @@ async function measure(infer, passes, warm) {
   }
   if (state.pinned != null) pick = state.pinned;
   state.selfTest = { passMs: Math.round(state.passMs), tier: TIERS[pick].name };
-  state.tiers.kirtan = pick;
+  // Kirtan starts at fast whatever the self-test says and steps down only on an observed
+  // backlog: the switch judge is tuned on the fast schedule, and a computer near the line keeps
+  // up there (the bounded audio queue merges brief catch-ups).
   setTier(pick, 'self-test', {}, 'read');
   return state.selfTest;
 }

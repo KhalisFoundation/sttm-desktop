@@ -105,3 +105,19 @@ describe('follower: dwells keep their wall-clock meaning on a slower hop', () =>
     assert.deepEqual([f.scaled(4).initConfirm, f.scaled(4).release], [1, 4]);
   });
 });
+
+describe('pace: kirtan starts at fast', () => {
+  it('a slow self-test moves read Banis, not kirtan', async () => {
+    const pace = fresh();
+    const slow = {
+      emissions: async () => {
+        const t = Date.now();
+        while (Date.now() - t < 200);
+      },
+    };
+    await pace.selfTest(slow, { passes: 1, warm: 0 });
+    assert.notEqual(pace.describe().tier, 'fast');
+    pace.setScoped(true, 'kirtan');
+    assert.equal(pace.current().name, 'fast');
+  });
+});
