@@ -32,6 +32,8 @@ class Follower {
     this.inputSr = inputSr;
     const c = { ...DEFAULTS, ...opts };
     this.c = c;
+    this.base = c; // the profile as configured; this.c is its tier-scaled copy
+    this.hopS = c.hopS;
 
     this.lineText = lines.map((l) => (l.words || []).join(' '));
     this.linesNorm = this.lineText.map((t) => norm(t));
@@ -191,7 +193,25 @@ class Follower {
     return null;
   }
 
+  // The profile for a hop `scale` times the configured one: every count kept in windows is
+  // divided by it (never below 1 window), so a slower tier confirms, releases and moves after
+  // the same wall-clock time. scale 1 = the profile itself.
+  scaled(scale) {
+    if (scale === 1) return this.base;
+    const c = { ...this.base };
+    ['dwell', 'dwellAdv', 'dwellBack', 'dwellSkip', 'initConfirm', 'release'].forEach((k) => {
+      if (c[k]) c[k] = Math.max(1, Math.round(c[k] / scale));
+    });
+    return c;
+  }
+
   async push(pcm) {
+    // Performance tier: a longer hop, with the window-counted dwells scaled (see scaled()).
+    const hopS = pace.hopS('follower', this.base.hopS);
+    if (hopS !== this.hopS) {
+      this.hopS = hopS;
+      this.c = this.scaled(hopS / this.base.hopS);
+    }
     const c = this.c;
     const res = resampleTo16k(pcm, this.inputSr);
     this.win = Math.floor(pace.windowS('follower', c.windowS) * SR); // performance tier
@@ -202,7 +222,7 @@ class Follower {
       this.buf = merged;
       this.acc += res.length;
     }
-    this.hop = Math.floor(pace.hopS('follower', c.hopS) * SR); // performance tier
+    this.hop = Math.floor(hopS * SR);
     if ((this.acc < this.hop && !pace.onBeat(pcm)) || this.buf.length < SR) return null;
     this.acc = 0;
 

@@ -4287,13 +4287,17 @@ const VoiceFollow = () => {
     try {
       sampleRate = await startAudio(async (pcm) => {
         if (!autopilotRef.current) return;
-        // Performance tiers only while the paath follower follows a read Bani (engine/pace).
+        // Performance tiers while following (engine/pace): a read Bani, and (since 9.0.14) a Shabad or Bani
+        // being sung, where a computer that cannot keep up keeps 4 s windows and shares one model pass
+        // between the recognizer and the follower (pace KIRTAN). A computer that keeps up stays on
+        // 'fast' (the self-test and the backlog decide), i.e. byte-identical to before.
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
           engine.pace.setScoped(
             phaseRef.current === 'following' &&
-              !!(followerRef.current && followerRef.current.readBani) &&
+              !!followerRef.current &&
               !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
+            followerRef.current && followerRef.current.readBani ? 'read' : 'kirtan',
           );
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
           syncAkpViewRef.current(
