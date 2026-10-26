@@ -1625,6 +1625,8 @@ const VoiceFollow = () => {
   const ngEnterSearchingRef = useRef(null); // enterSearching, defined further down
   // What the panel says while the hold is on (null: nothing held).
   const [ngHoldView, setNgHoldView] = useState(null);
+  const [holdListOpen, setHoldListOpen] = useState(false); // "Choose a Shabad yourself" unfolded
+  useEffect(() => setHoldListOpen(false), [ngHoldView]);
   const ngSetHold = (kind) => {
     const ng = ngRef.current;
     const prev = ng.hold ? ng.hold.kind : null;
@@ -5866,17 +5868,30 @@ const VoiceFollow = () => {
     english: 'fa-solid fa-bullhorn',
     quiet: 'fa-solid fa-volume-xmark',
   };
-  const holdBanner = ngHoldView && (
-    <section className={`vf2-hold is-${ngHoldView}`} role="status" aria-live="polite">
-      <i
-        className={`vf2-hold-icon ${HOLD_ICON[ngHoldView] || HOLD_ICON.talk}`}
-        aria-hidden="true"
-      />
-      <div className="vf2-hold-body">
-        <div className="vf2-hold-title">
-          {i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}
+  // The hold takes the place of the pangti: what is going on, what the screen shows, Stop; the
+  // possible Shabads fold away under "Choose a Shabad yourself" (the sevadaar keeps control).
+  let shabadsTitleKey = currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE';
+  if (ngHoldView) shabadsTitleKey = 'VOICE_FOLLOW.HOLD_CHOOSE';
+  const holdCard = ngHoldView && (
+    <section className={`vf2-now vf2-hold is-${ngHoldView}`} role="status" aria-live="polite">
+      <div className="vf2-label">
+        <span className="vf2-dot is-paused" />
+        <span className="vf2-label-text">{i18n.t('VOICE_FOLLOW.HOLD_PAUSED')}</span>
+      </div>
+      <div className="vf2-hold-title">
+        <i
+          className={`vf2-hold-icon ${HOLD_ICON[ngHoldView] || HOLD_ICON.talk}`}
+          aria-hidden="true"
+        />
+        {i18n.t(`VOICE_FOLLOW.HOLD_${ngHoldView.toUpperCase()}`)}
+      </div>
+      <div className="vf2-next-row">
+        <div className="vf2-next-line">
+          <span className="vf2-next-mark" aria-hidden="true" />
+          {i18n.t('VOICE_FOLLOW.HOLD_ON_SCREEN')}&nbsp;
+          <Gurmukhi text={slideStrings.waheguru} />
         </div>
-        <div className="vf2-hold-text">{i18n.t('VOICE_FOLLOW.HOLD_TEXT')}</div>
+        {stopButton}
       </div>
     </section>
   );
@@ -6065,10 +6080,11 @@ const VoiceFollow = () => {
       {active && (
         <div className="vf2-body">
           {dlBar}
-          {holdBanner}
+          {holdCard}
           <>
             <section
               key={beat}
+              hidden={!!ngHoldView}
               className={`vf2-now${currentView ? ' is-following' : ' is-searching'}${
                 boardCur ? ` lvl-${pctLevel(boardCur.pct)}` : ''
               }${beat ? ' is-beat' : ''}`}
@@ -6135,11 +6151,28 @@ const VoiceFollow = () => {
               </section>
             )}
 
-            <section className="vf2-shabads" aria-live="polite">
-              <div className="vf2-shabads-head">
-                <span className="vf2-shabads-title">
-                  {i18n.t(currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE')}
-                </span>
+            <section
+              className={`vf2-shabads${ngHoldView ? ` is-folded${holdListOpen ? ' is-open' : ''}` : ''}`}
+              aria-live="polite"
+            >
+              <div
+                className="vf2-shabads-head"
+                {...(ngHoldView
+                  ? {
+                      role: 'button',
+                      tabIndex: 0,
+                      'aria-expanded': holdListOpen,
+                      onClick: () => setHoldListOpen((v) => !v),
+                      onKeyDown: (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') setHoldListOpen((v) => !v);
+                      },
+                    }
+                  : {})}
+              >
+                {ngHoldView && (
+                  <i className="fa-solid fa-chevron-right vf2-fold-mark" aria-hidden="true" />
+                )}
+                <span className="vf2-shabads-title">{i18n.t(shabadsTitleKey)}</span>
                 {boardOthers.length > 0 && (
                   <span className="vf2-shabads-count">{boardOthers.length}</span>
                 )}
