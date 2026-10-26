@@ -1797,12 +1797,15 @@ const VoiceFollow = () => {
   // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
   const ngRaise = (why, kind) => {
     const ng = ngRef.current;
-    ng.followMoves = [];
     // A hold (Autopilot choosing nothing else) only with the classifier: without it nothing
-    // could tell when singing returns. The slide itself works as before.
-    const canHold = !!(engine.speechMusic && engine.speechMusic.loaded());
+    // could tell when singing returns. The slide itself works as before. (Not again within
+    // NG_HOLD_MAX_MS of the failsafe cap ending one.)
+    const canHold =
+      !!(engine.speechMusic && engine.speechMusic.loaded()) &&
+      !(Date.now() < (ng.noHoldUntil || 0));
     ngSetHold(canHold ? kind : null);
     if (ng.ours) return;
+    ng.followMoves = [];
     if (seekingRef.current) {
       seekingRef.current = false; // the seeking slide is the same Waheguru slide: ours now
       ng.ours = true;
@@ -1919,7 +1922,9 @@ const VoiceFollow = () => {
       if (ng.hold) {
         // A hold needs a Waheguru slide on screen (ours, or the sevadaar's own) and ends at
         // the failsafe cap.
-        if ((!ng.ours && !isMiscSlideRef.current) || now - ng.hold.since >= NG_HOLD_MAX_MS) {
+        if (!ng.ours && !isMiscSlideRef.current) ngSetHold(null);
+        else if (now - ng.hold.since >= NG_HOLD_MAX_MS) {
+          ng.noHoldUntil = now + NG_HOLD_MAX_MS;
           ngSetHold(null);
         }
       }
