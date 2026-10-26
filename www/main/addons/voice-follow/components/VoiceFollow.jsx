@@ -286,6 +286,18 @@ const NG_SPEECH_MS = 12000;
 const NG_SPEECH_DECODES = 16; // ...with at least this many word-like decodes in that time
 const NG_SPEECH_FIT_SHARE = 0.2;
 const NG_PROGRESS_MS = 6000; // no follower progress for this long
+// Katha and announcements about the Shabad on screen share its words, so about half their
+// decodes still fit it. What tells talk from singing is that the follower never moves on
+// through the Shabad: steady speech for NG_TALK_MS, scoring below NG_TALK_MEAN on average,
+// with no follower progress at all in that time, is talk too.
+const NG_TALK_MS = 20000;
+const NG_TALK_DECODES = 30;
+const NG_TALK_MEAN = 0.65;
+// Speech the model cannot read as words at all (English, fast announcements) comes out as
+// letters scoring far below the Shabad and almost never fitting it: counted with every
+// decode, not only word-like ones.
+const NG_FOREIGN_DECODES = 12;
+const NG_FOREIGN_MEAN = 0.5;
 const NG_SILENT_MS = 30000;
 const NG_BACK_DECODES = 8; // (about 4 s of decodes: longer than one quoted pangti)
 const NG_FOLLOW_CONF = 0.6; // a follower fix counts as Gurbani only when it moves on this surely
@@ -1524,7 +1536,7 @@ const VoiceFollow = () => {
   // never clear a misc slide the user opened themselves.
   const seekingRef = useRef(false);
   // Not-Gurbani slide (NG_*): ours = we put the Waheguru slide up for non-Gurbani audio;
-  // lastFit = when Gurbani last fitted; hops = the last NG_SPEECH_MS of decodes ({t, fit,
+  // lastFit = when Gurbani last fitted; hops = the last NG_TALK_MS of decodes ({t, s, fit,
   // word}); lastProgress = the follower's last move on; back = fitting decodes in a row while
   // our slide is up;
   // gurbaniLevel = how loud Gurbani has been this session (the bar for "quiet").
@@ -1631,8 +1643,8 @@ const VoiceFollow = () => {
       }
       if (!ng.lastFit) ng.lastFit = now;
       if (d && d.hop) {
-        ng.hops.push({ t: now, fit: d.s >= NG_FIT, word: d.word });
-        while (ng.hops.length && now - ng.hops[0].t > NG_SPEECH_MS) ng.hops.shift();
+        ng.hops.push({ t: now, s: d.s, fit: d.s >= NG_FIT, word: d.word });
+        while (ng.hops.length && now - ng.hops[0].t > NG_TALK_MS) ng.hops.shift();
         if (d.s >= NG_FIT) {
           ng.lastFit = now;
           const lv = ngLevel();
@@ -1661,13 +1673,29 @@ const VoiceFollow = () => {
       }
       if (ng.ours || isMiscSlideRef.current || seekingRef.current || lockingRef.current) return;
       let speechLong = false;
-      if (d && ng.hops.length && now - ng.hops[0].t >= NG_SPEECH_MS - 1000) {
-        const words = ng.hops.filter((h) => h.word).length;
-        const fits = ng.hops.filter((h) => h.fit).length;
-        speechLong =
-          words >= NG_SPEECH_DECODES &&
-          fits <= ng.hops.length * NG_SPEECH_FIT_SHARE &&
-          now - ng.lastProgress >= NG_PROGRESS_MS;
+      if (d && ng.hops.length) {
+        const recent = ng.hops.filter((h) => now - h.t <= NG_SPEECH_MS);
+        if (recent.length && now - recent[0].t >= NG_SPEECH_MS - 1000) {
+          const words = recent.filter((h) => h.word).length;
+          const fits = recent.filter((h) => h.fit).length;
+          speechLong =
+            words >= NG_SPEECH_DECODES &&
+            fits <= recent.length * NG_SPEECH_FIT_SHARE &&
+            now - ng.lastProgress >= NG_PROGRESS_MS;
+        }
+        if (
+          !speechLong &&
+          now - ng.hops[0].t >= NG_TALK_MS - 1000 &&
+          now - ng.lastProgress >= NG_TALK_MS
+        ) {
+          const meanOf = (hs) => hs.reduce((a, h) => a + h.s, 0) / (hs.length || 1);
+          const talk = ng.hops.filter((h) => h.word);
+          speechLong =
+            (talk.length >= NG_TALK_DECODES && meanOf(talk) < NG_TALK_MEAN) ||
+            (ng.hops.length >= NG_FOREIGN_DECODES &&
+              meanOf(ng.hops) < NG_FOREIGN_MEAN &&
+              ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE);
+        }
       }
       const quietLong = !d && now - ng.lastFit >= NG_SILENT_MS;
       if (!speechLong && !quietLong) return;
@@ -5245,6 +5273,7 @@ const VoiceFollow = () => {
       vfRunBegin('adopted');
       // The hidden run's Waheguru slide was never on the real screen: a slide there now is the
       // sevadaar's, never Autopilot's to take down.
+      if (ngRef.current.ours && SHADOW_BUILD) shadowBus.system({ slide: null });
       ngRef.current = { ...ngFresh(), lastFit: Date.now() };
       isMiscSlideRef.current = isMiscSlide;
       visibleRef.current = true;
