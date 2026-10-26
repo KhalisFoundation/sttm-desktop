@@ -4287,7 +4287,7 @@ const VoiceFollow = () => {
     try {
       sampleRate = await startAudio(async (pcm) => {
         if (!autopilotRef.current) return;
-        // Performance tiers while following (engine/pace): a read Bani, and (since 9.0.12) a Shabad or Bani
+        // Performance tiers while following (engine/pace): a read Bani, and (since 9.0.14) a Shabad or Bani
         // being sung, where a computer that cannot keep up keeps 4 s windows and shares one model pass
         // between the recognizer and the follower (pace KIRTAN). A computer that keeps up stays on
         // 'fast' (the self-test and the backlog decide), i.e. byte-identical to before.
