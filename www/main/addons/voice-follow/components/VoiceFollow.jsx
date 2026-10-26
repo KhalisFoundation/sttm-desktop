@@ -294,6 +294,21 @@ const NG_PROGRESS_MS = 6000; // no follower progress for this long
 const NG_TALK_MS = 20000;
 const NG_FOREIGN_DECODES = 12;
 const NG_FOREIGN_MEAN = 0.5;
+// Spoken, not sung (the speech-music classifier, engine/speech-music, when it is loaded):
+// over NG_TALK_MS at least NG_SPOKEN_SHARE of its 2 s windows are plain speech (Ardas, katha,
+// announcements in any language) while no Bani is being read and the follower has moved on
+// at most NG_SPOKEN_PROGRESS times. Paath read together keeps a singing score, so it is not
+// plain speech, and paath read alone keeps the follower moving.
+const NG_SPOKEN_WINDOWS = 8;
+const NG_SPOKEN_SHARE = 0.8;
+const NG_SPOKEN_PROGRESS = 2;
+const NG_SM_WINDOW_S = 2;
+// While someone is plainly talking, a switch to another Shabad that the audio matches below
+// NG_TALK_STRONG is the talk misheard (Renton: 0.73-0.81), not a new Shabad: it is dropped
+// (a Hukamnama read out loud matches near 1 and still switches).
+const NG_TALK_HOLD = 3;
+const NG_TALK_STRONG = 0.9;
+const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.15;
 const NG_SILENT_MS = 30000;
 const NG_BACK_DECODES = 8; // (about 4 s of decodes: longer than one quoted pangti)
 const NG_FOLLOW_CONF = 0.6; // a follower fix counts as Gurbani only when it moves on this surely
@@ -1548,6 +1563,11 @@ const VoiceFollow = () => {
     back: 0,
     gurbaniLevel: 0,
     levels: [],
+    progress: [],
+    sm: [],
+    smBuf: [],
+    smSamples: 0,
+    smBusy: false,
   });
   const ngRef = useRef(ngFresh());
   const isMiscSlideRef = useRef(false);
@@ -1603,12 +1623,66 @@ const VoiceFollow = () => {
   // null for an audio chunk (pcm). Only
   // while Voice Autopilot follows a Shabad it put on screen; never during a crossed Akhand
   // Paath; never over a slide it did not put up; only ever takes down its own slide.
+  // Every NG_SM_WINDOW_S of audio the loop processes goes to the speech-music classifier (one
+  // at a time; nothing when the model is not loaded). Results: { t, plain } for NG_TALK_MS.
+  const ngFeedSpeech = (pcm, now) => {
+    const sm = engine.speechMusic;
+    const ng = ngRef.current;
+    if (!sm) return;
+    if (!sm.loaded()) {
+      sm.ensure();
+      return;
+    }
+    const sr = sampleRateRef.current || 48000;
+    ng.smBuf.push(pcm);
+    ng.smSamples += pcm.length;
+    if (ng.smSamples < sr * NG_SM_WINDOW_S) return;
+    const buf = new Float32Array(ng.smSamples);
+    let o = 0;
+    ng.smBuf.forEach((c) => {
+      buf.set(c, o);
+      o += c.length;
+    });
+    ng.smBuf = [];
+    ng.smSamples = 0;
+    if (ng.smBusy) return;
+    ng.smBusy = true;
+    sm.classify(buf, sr)
+      .then((r) => {
+        if (r && ngRef.current.sm === ng.sm) {
+          ng.sm.push({ t: now, plain: ngPlainSpeech(r) });
+          while (ng.sm.length && now - ng.sm[0].t > NG_TALK_MS) ng.sm.shift();
+        }
+      })
+      .catch(() => {})
+      .then(() => {
+        ng.smBusy = false;
+      });
+  };
+  // Plainly spoken right now (the last NG_TALK_HOLD classifier windows, about 6 s).
+  const ngTalkingNow = () => {
+    const { sm } = ngRef.current;
+    return sm.length >= NG_TALK_HOLD && sm.slice(-NG_TALK_HOLD).every((x) => x.plain);
+  };
+  // Plainly spoken for NG_TALK_MS (see NG_SPOKEN_*), not while a Bani is being read.
+  const ngSpokenLong = (now) => {
+    const ng = ngRef.current;
+    while (ng.progress.length && now - ng.progress[0] > NG_TALK_MS) ng.progress.shift();
+    const sm = ng.sm.filter((x) => now - x.t <= NG_TALK_MS);
+    if (sm.length < NG_SPOKEN_WINDOWS || now - sm[0].t < NG_TALK_MS - 3000) return false;
+    if (followerRef.current && followerRef.current.readBani) return false;
+    return (
+      sm.filter((x) => x.plain).length >= sm.length * NG_SPOKEN_SHARE &&
+      ng.progress.length <= NG_SPOKEN_PROGRESS
+    );
+  };
   const ngTickRef = useRef(null);
   ngTickRef.current = (d, pcm) => {
     try {
       const ng = ngRef.current;
       const now = Date.now();
       if (pcm) ngNoteLevel(pcm, now);
+      if (pcm) ngFeedSpeech(pcm, now);
       if (ng.ours && !ngSlideStillOurs()) {
         // Dismissed (a pangti click, or a follower line move clearing the misc slide): it is
         // not ours any more. Start the clocks again so it does not flash straight back up.
@@ -1649,13 +1723,16 @@ const VoiceFollow = () => {
         if (ng.ours) {
           // Only the Shabad on screen heard again, decode after decode, takes the slide down.
           ng.back = d.s >= NG_BACK_FIT ? ng.back + 1 : 0;
-          if (ng.back >= NG_BACK_DECODES) ngTakeDown('gurbani');
+          // (Still plainly talking, quoting a pangti: not Gurbani resuming.)
+          const talking = ng.sm.length >= 3 && ng.sm.slice(-3).every((x) => x.plain);
+          if (ng.back >= NG_BACK_DECODES && !talking) ngTakeDown('gurbani');
           return;
         }
       } else if (d) {
         // The follower moved on through the Shabad: Gurbani (never takes the slide down).
         ng.lastFit = now;
         ng.lastProgress = now;
+        ng.progress.push(now);
         return;
       } else {
         // No decode: music (an instrumental between lines, alaap) keeps the Shabad up; only
@@ -1664,7 +1741,7 @@ const VoiceFollow = () => {
         const quietBar = Math.max(ng.gurbaniLevel * 0.25, VOL_SILENT_RMS * 4);
         if (ngLevel() >= quietBar) {
           ng.lastFit = Math.max(ng.lastFit, now - NG_SILENT_MS + NG_SPEECH_MS);
-          return;
+          if (!ngSpokenLong(now)) return;
         }
       }
       if (ng.ours || isMiscSlideRef.current || seekingRef.current || lockingRef.current) return;
@@ -1691,6 +1768,7 @@ const VoiceFollow = () => {
             ng.hops.filter((h) => h.fit).length <= ng.hops.length * NG_SPEECH_FIT_SHARE;
         }
       }
+      if (!speechLong) speechLong = ngSpokenLong(now);
       const quietLong = !d && now - ng.lastFit >= NG_SILENT_MS;
       if (!speechLong && !quietLong) return;
       ng.ours = true;
@@ -2938,6 +3016,7 @@ const VoiceFollow = () => {
           lastProgress: Date.now(),
           gurbaniLevel: ngRef.current.gurbaniLevel,
           levels: ngRef.current.levels,
+          sm: ngRef.current.sm, // what was heard (speech or singing) is not undone by a lock
         };
         // A commit resolves the uncertainty: take down our seeking slide if up
         // (opening the shabad already dismisses misc slides; this covers the
@@ -4258,11 +4337,26 @@ const VoiceFollow = () => {
         // --- Finish: commits first, then one shared UI from the leader. ---
         const vote = switchCandRef.current;
         const bgp = backstopRef.current;
-        if (vote && vote.committed && !lockingRef.current) {
+        const talkHold = (slot) => {
+          if (!slot || !slot.committed || !ngTalkingNow()) return false;
+          if ((slot.lastScore || 0) >= NG_TALK_STRONG) return false;
+          sessionLog.logEvent('talk_hold', {
+            session: sessionIdRef.current,
+            from: currentShabadIdRef.current,
+            to: slot.shabadId,
+            score: slot.lastScore,
+          });
+          return true;
+        };
+        const heldVote = talkHold(vote);
+        if (heldVote) switchCandRef.current = null;
+        else if (vote && vote.committed && !lockingRef.current) {
           autopilotLock({ shabadId: vote.shabadId, verseId: vote.verseId, verse: vote.verse });
           return;
         }
-        if (bgp && bgp.committed && !lockingRef.current) {
+        const heldBackstop = talkHold(bgp);
+        if (heldBackstop) backstopRef.current = null;
+        else if (bgp && bgp.committed && !lockingRef.current) {
           let { verse } = bgp;
           try {
             verse = (await banidb.getVerse(bgp.shabadId, bgp.verseId)) || verse;
@@ -4277,6 +4371,7 @@ const VoiceFollow = () => {
           autopilotLock({ shabadId: bgp.shabadId, verseId: bgp.verseId, verse });
           return;
         }
+        if (heldVote || heldBackstop) return; // the next decode shows what is left
         if (!vote && !bgp) {
           // No live evaluation on either slot — rest the switch UI.
           setSwitchView(null);
