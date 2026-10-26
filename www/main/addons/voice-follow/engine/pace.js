@@ -72,6 +72,41 @@ const BEHIND_MS = 3000; // ...for this long = step down
 const HEADROOM_MS = 30000; // headroom for the faster tier for this long = step up
 const HOLD_MS = 10000; // no second step sooner than this
 const RECENT = 8; // model passes the live pass-time estimate uses
+// Kirtan (a Shabad followed while it is sung, or a sung Bani): a computer that cannot keep up
+// keeps the engines' own 4 s windows (the switch judge is tuned on them; a 2.5 s window cost
+// switches) and puts the follower on the recognizer's 0.5 s beat, so both read the same window
+// and one model pass answers both (Infer memo). 'fast' stays exactly as before.
+const KIRTAN = {
+  sync: {
+    name: 'kirtan-lean',
+    followerHopS: 0.5,
+    recognizerHopS: 0.5,
+    aligned: true,
+    passesPerS: 2,
+    backlogBoundS: 1.0,
+  },
+  lean: {
+    name: 'kirtan-lean',
+    followerHopS: 0.5,
+    recognizerHopS: 0.5,
+    aligned: true,
+    passesPerS: 2,
+    backlogBoundS: 1.0,
+  },
+  min: {
+    name: 'kirtan-min',
+    followerHopS: 1.0,
+    recognizerHopS: 1.0,
+    aligned: true,
+    passesPerS: 1,
+    backlogBoundS: 0.5,
+  },
+};
+// Kirtan step-down: a backlog that saw-tooths (merges reset it) never stays above BEHIND_S for
+// BEHIND_MS in a row, so in kirtan a step also follows when it was above BEHIND_S in at least
+// KIRTAN_BEHIND_SHARE of the samples of the last KIRTAN_BEHIND_MS.
+const KIRTAN_BEHIND_MS = 10000;
+const KIRTAN_BEHIND_SHARE = 0.4;
 
 const state = {
   tier: 0,
@@ -83,6 +118,8 @@ const state = {
   steppedAt: 0,
   steps: 0,
   scoped: false, // see current()
+  scope: 'read', // 'read' (a read Bani) or 'kirtan' (a Shabad or Bani being sung), see setScoped
+  samples: [], // kirtan: [ms, behind?] backlog samples of the last KIRTAN_BEHIND_MS
   akhand: false, // Akhand Paath being followed (see setAkhand)
   selfTest: null,
   blockedUntil: {}, // tier index -> ms: left because of backlog, do not re-enter before
@@ -104,7 +141,11 @@ const FOLLOW_WINDOW_S = Number(process.env.VF_FOLLOW_WINDOW_S || 0) || null;
 // Scope: the tiers apply only while the paath follower follows a READ Bani (the component
 // says so per audio chunk). Searching, kirtan Shabads and sung Banis always run the fast tier =
 // the code path without tiers (the bounded audio queue still protects a slow PC there).
-const current = () => (state.scoped ? TIERS[state.tier] : TIERS[0]);
+const current = () => {
+  if (!state.scoped) return TIERS[0];
+  const t = TIERS[state.tier];
+  return state.scope === 'kirtan' && KIRTAN[t.name] ? KIRTAN[t.name] : t;
+};
 // Akhand Paath fast listening: only while scoped (a read text is followed), flagged by the
 // component, and only in the fast tier (a slower tier keeps its schedule and its safety).
 const akhandOn = () => !!(state.scoped && state.akhand);
@@ -112,9 +153,13 @@ const akhandFast = () => akhandOn() && current().name === 'fast' && fits(AKHAND,
 function setAkhand(on) {
   state.akhand = !!on;
 }
-function setScoped(on) {
+function setScoped(on, scope = 'read') {
+  const next = scope === 'kirtan' ? 'kirtan' : 'read';
+  if (next !== state.scope) state.samples = [];
+  state.scope = next;
   state.scoped = !!on;
   if (!state.scoped) {
+    state.samples = [];
     state.behindSince = null;
     state.headroomSince = null;
   }
@@ -189,6 +234,7 @@ function backlogBoundS() {
 function windowS(kind, ownWindowS) {
   if (kind === 'akhand') return windowS('paath', ownWindowS);
   const t = current();
+  if (state.scoped && state.scope === 'kirtan') return ownWindowS; // kirtan keeps its windows
   if (kind === 'follower' || !t.aligned || ownWindowS > 4) return ownWindowS;
   return FOLLOW_WINDOW_S || t.windowS || ownWindowS;
 }
@@ -255,6 +301,27 @@ function observe(backlogSec, nowMs = Date.now()) {
   if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
   const held = nowMs - state.steppedAt < HOLD_MS;
+  if (state.scope === 'kirtan') {
+    state.samples.push([nowMs, backlogSec > BEHIND_S]);
+    while (state.samples.length && nowMs - state.samples[0][0] > KIRTAN_BEHIND_MS)
+      state.samples.shift();
+    const n = state.samples.length;
+    const share = n ? state.samples.filter((x) => x[1]).length / n : 0;
+    const span = n ? nowMs - state.samples[0][0] : 0;
+    if (
+      !held &&
+      span >= KIRTAN_BEHIND_MS * 0.8 &&
+      share >= KIRTAN_BEHIND_SHARE &&
+      i < TIERS.length - 1
+    ) {
+      state.blockedUntil[i] = nowMs + RETRY_MS;
+      state.samples = [];
+      return setTier(i + 1, 'behind-share', {
+        backlogSec: Math.round(backlogSec * 100) / 100,
+        share: Math.round(share * 100) / 100,
+      });
+    }
+  }
   if (backlogSec > BEHIND_S) {
     state.headroomSince = null;
     if (state.behindSince == null) state.behindSince = nowMs;
@@ -283,6 +350,7 @@ function onStep(fn) {
 
 module.exports = {
   TIERS,
+  KIRTAN,
   LOAD_MAX,
   current,
   describe,
