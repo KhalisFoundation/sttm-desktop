@@ -316,7 +316,9 @@ const NG_TALK_STRONG = 0.9;
 const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.3;
 // (Chanting-style speech carries some singing score too: it counts as sung only when the
 // singing outweighs the speech.)
-const ngSung = (r) => r.music >= 0.25 || (r.singing >= 0.15 && r.singing >= r.speech);
+// (Never both: a window that is plain speech, katha over soft music, is not singing.)
+const ngSung = (r) =>
+  !ngPlainSpeech(r) && (r.music >= 0.25 || (r.singing >= 0.15 && r.singing >= r.speech));
 // Hold: once Ardas, katha or an announcement is recognised, Autopilot keeps the Waheguru slide
 // and chooses nothing else until singing returns (the classifier hears kirtan or paath sung
 // together), a Shabad is read out strongly (NG_TALK_STRONG: a Hukamnama after Ardas; for Ardas
