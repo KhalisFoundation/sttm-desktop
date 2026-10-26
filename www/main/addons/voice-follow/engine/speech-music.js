@@ -41,11 +41,13 @@ const isComplete = (file) => {
 let sessionPromise = null;
 let session = null;
 let failedAt = 0; // a failed load or download is not retried for RETRY_MS
+let unusable = false; // a verified model this computer cannot load: never retried this run
 const RETRY_MS = 10 * 60 * 1000;
 
 // Load (downloading first if needed) once; resolves null when it cannot be had.
 function ensure() {
   if (!sessionPromise) {
+    if (unusable) return Promise.resolve(null);
     if (failedAt && Date.now() - failedAt < RETRY_MS) return Promise.resolve(null);
     sessionPromise = (async () => {
       const file = filePath();
@@ -63,7 +65,10 @@ function ensure() {
           interOpNumThreads: 1,
         });
       } catch (e) {
-        fs.unlinkSync(file); // a complete file that will not load: fetch it again next time
+        // A verified file that will not load: this computer's runtime cannot run it (keep a
+        // dev override's file).
+        unusable = true;
+        if (!process.env.VF_SPEECH_MODEL) fs.unlinkSync(file);
         throw e;
       }
       return session;

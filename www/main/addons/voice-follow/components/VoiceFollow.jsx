@@ -4038,8 +4038,10 @@ const VoiceFollow = () => {
           const step = nextSwitchWins(slot.wins, sCand, sCurFull, acousticCfg);
           slot.wins = step.wins; // eslint-disable-line no-param-reassign
           // Held decodes judged nothing — keep showing the last judged score.
-          if (!step.held) slot.lastScore = sCand; // eslint-disable-line no-param-reassign
-          slot.bestScore = Math.max(slot.bestScore || 0, sCand); // eslint-disable-line no-param-reassign
+          if (!step.held) {
+            slot.lastScore = sCand; // eslint-disable-line no-param-reassign
+            slot.bestScore = Math.max(slot.bestScore || 0, sCand); // eslint-disable-line no-param-reassign
+          }
           return slot.wins >= SWITCH_CONFIRM;
         };
         const decaySlot = (slot) => {
