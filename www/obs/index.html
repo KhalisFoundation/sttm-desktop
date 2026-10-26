@@ -134,12 +134,12 @@
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
         box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         box.style.color = overlayPrefs.gurbaniTextColor;
-        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.65)}vh`;
+        box.style.fontSize = `${Math.max(2.5, overlayPrefs.gurbaniSize * 0.55)}vh`;
         const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
         if (gf) box.querySelectorAll('.gurmukhi').forEach((el) => { el.style.fontFamily = gf; });
         box.querySelectorAll('.akp-translation').forEach((el) => {
           el.style.color = overlayPrefs.textColor;
-          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.75)}vh`;
+          el.style.fontSize = `${Math.max(1.7, overlayPrefs.textSize * 0.62)}vh`;
           el.style.fontFamily = overlayPrefs.textFont;
         });
       }
@@ -342,7 +342,7 @@
     .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-pair.akp-current { opacity: 1; }
-    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 115%; }
+    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 110%; }
     .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
     .akp-overlay[hidden] { display: none; }
   </style>
