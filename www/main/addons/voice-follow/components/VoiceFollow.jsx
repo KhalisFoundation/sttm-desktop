@@ -1965,8 +1965,11 @@ const VoiceFollow = () => {
             });
           if (ng.back >= NG_BACK_DECODES && !ngTalkingNow() && !onArdasPauri) {
             ngTakeDown('gurbani');
+            return;
           }
-          return;
+          // Our slide is up and the hold lapsed: the rules below re-arm it (with what is going
+          // on now, so the panel says so).
+          if (ng.hold || !ng.ours) return;
         }
       } else if (d) {
         // The follower moved on through the Shabad: Gurbani. With no hold on, three such moves
@@ -1983,14 +1986,16 @@ const VoiceFollow = () => {
       } else {
         // No decode: music (an instrumental between lines, alaap) keeps the Shabad up; only
         // a quiet room counts towards "nothing sung".
-        if (ng.ours) return;
+        if (ng.ours && ng.hold) return;
         const quietBar = Math.max(ng.gurbaniLevel * 0.25, VOL_SILENT_RMS * 4);
         if (ngLevel() >= quietBar) {
           ng.lastFit = Math.max(ng.lastFit, now - NG_SILENT_MS + NG_SPEECH_MS);
           if (!ngSpokenLong(now)) return;
         }
       }
-      if (ng.ours || isMiscSlideRef.current || seekingRef.current || lockingRef.current) return;
+      if (lockingRef.current) return;
+      if (!ng.ours && (isMiscSlideRef.current || seekingRef.current)) return;
+      if (ng.ours && ng.hold) return;
       let speechLong = false;
       let kind = 'talk';
       // With the classifier, singing in the last NG_TALK_MS (a new Shabad being sung that the
