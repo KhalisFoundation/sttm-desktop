@@ -40,10 +40,13 @@ const isComplete = (file) => {
 
 let sessionPromise = null;
 let session = null;
+let failedAt = 0; // a failed load or download is not retried for RETRY_MS
+const RETRY_MS = 10 * 60 * 1000;
 
 // Load (downloading first if needed) once; resolves null when it cannot be had.
 function ensure() {
   if (!sessionPromise) {
+    if (failedAt && Date.now() - failedAt < RETRY_MS) return Promise.resolve(null);
     sessionPromise = (async () => {
       const file = filePath();
       if (!isComplete(file)) {
@@ -54,12 +57,18 @@ function ensure() {
           throw new Error('speech model download did not verify');
         }
       }
-      session = await ort().InferenceSession.create(file, {
-        intraOpNumThreads: 1,
-        interOpNumThreads: 1,
-      });
+      try {
+        session = await ort().InferenceSession.create(file, {
+          intraOpNumThreads: 1,
+          interOpNumThreads: 1,
+        });
+      } catch (e) {
+        fs.unlinkSync(file); // a complete file that will not load: fetch it again next time
+        throw e;
+      }
       return session;
     })().catch(() => {
+      failedAt = Date.now();
       sessionPromise = null;
       return null;
     });

@@ -1660,9 +1660,16 @@ const VoiceFollow = () => {
       });
   };
   // Plainly spoken right now (the last NG_TALK_HOLD classifier windows, about 6 s).
+  // Recent windows only: a classifier that stopped answering never keeps "talking" alive.
+  // Never while a Bani is being read (one reader alone sounds like plain speech) or the
+  // follower is moving on through the Shabad.
   const ngTalkingNow = () => {
-    const { sm } = ngRef.current;
-    return sm.length >= NG_TALK_HOLD && sm.slice(-NG_TALK_HOLD).every((x) => x.plain);
+    const ng = ngRef.current;
+    const now = Date.now();
+    if (followerRef.current && followerRef.current.readBani) return false;
+    if (ng.progress.filter((t) => now - t <= NG_TALK_MS).length > NG_SPOKEN_PROGRESS) return false;
+    const recent = ng.sm.filter((x) => now - x.t <= (NG_TALK_HOLD + 0.5) * NG_SM_WINDOW_S * 1000);
+    return recent.length >= NG_TALK_HOLD && recent.slice(-NG_TALK_HOLD).every((x) => x.plain);
   };
   // Plainly spoken for NG_TALK_MS (see NG_SPOKEN_*), not while a Bani is being read.
   const ngSpokenLong = (now) => {
@@ -1724,8 +1731,7 @@ const VoiceFollow = () => {
           // Only the Shabad on screen heard again, decode after decode, takes the slide down.
           ng.back = d.s >= NG_BACK_FIT ? ng.back + 1 : 0;
           // (Still plainly talking, quoting a pangti: not Gurbani resuming.)
-          const talking = ng.sm.length >= 3 && ng.sm.slice(-3).every((x) => x.plain);
-          if (ng.back >= NG_BACK_DECODES && !talking) ngTakeDown('gurbani');
+          if (ng.back >= NG_BACK_DECODES && !ngTalkingNow()) ngTakeDown('gurbani');
           return;
         }
       } else if (d) {
@@ -4026,12 +4032,14 @@ const VoiceFollow = () => {
           if (tiedLeaderIds.has(slot.shabadId) || vetoed) {
             slot.wins = 0; // eslint-disable-line no-param-reassign
             slot.lastScore = sCand; // eslint-disable-line no-param-reassign
+            slot.bestScore = Math.max(slot.bestScore || 0, sCand); // eslint-disable-line no-param-reassign
             return false;
           }
           const step = nextSwitchWins(slot.wins, sCand, sCurFull, acousticCfg);
           slot.wins = step.wins; // eslint-disable-line no-param-reassign
           // Held decodes judged nothing — keep showing the last judged score.
           if (!step.held) slot.lastScore = sCand; // eslint-disable-line no-param-reassign
+          slot.bestScore = Math.max(slot.bestScore || 0, sCand); // eslint-disable-line no-param-reassign
           return slot.wins >= SWITCH_CONFIRM;
         };
         const decaySlot = (slot) => {
@@ -4339,7 +4347,8 @@ const VoiceFollow = () => {
         const bgp = backstopRef.current;
         const talkHold = (slot) => {
           if (!slot || !slot.committed || !ngTalkingNow()) return false;
-          if ((slot.lastScore || 0) >= NG_TALK_STRONG) return false;
+          // (its best decode: a Hukamnama read on a laptop mic matches strongly at least once)
+          if (Math.max(slot.lastScore || 0, slot.bestScore || 0) >= NG_TALK_STRONG) return false;
           sessionLog.logEvent('talk_hold', {
             session: sessionIdRef.current,
             from: currentShabadIdRef.current,
