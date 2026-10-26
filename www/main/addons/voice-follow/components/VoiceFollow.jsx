@@ -272,6 +272,23 @@ const SWITCH_HYP_SLICE = 35; // chars of recent decoded audio to score (≈ the 
 // is rejected — without needing slower confirmation (offline confusion-pair
 // benchmark; harness not shipped).
 const SWITCH_ACOUSTIC_MIN = 0.65; // candidate must match the recent audio at least this well
+// Not Gurbani (Ardas, announcements, katha talk, or nothing sung after a Shabad): the
+// projector shows the Waheguru slide instead of a stale or wrong pangti. Speech that has not
+// fitted the Shabad on screen for NG_SPEECH_MS (at most NG_SPEECH_FIT_SHARE of the decodes in
+// that time fit, and the follower has not moved on), or a quiet room with no Gurbani for
+// NG_SILENT_MS, puts it up; the Shabad heard again for NG_BACK_DECODES decodes in a row (so
+// one quoted pangti does not bring it back) takes it down. Music between lines (alaap,
+// instruments) is never "quiet"; a decode that is letters, not words (below HEARD_MIN_CONF),
+// is never speech. A new Shabad starting is the switch judge's (and its seeking slide's).
+const NG_FIT = 0.55; // a decode fits the Shabad on screen at this score (laptop-mic kirtan: 0.5-0.6)
+const NG_BACK_FIT = 0.6; // ...and at this score it counts towards taking the slide down
+const NG_SPEECH_MS = 12000;
+const NG_SPEECH_DECODES = 16; // ...with at least this many word-like decodes in that time
+const NG_SPEECH_FIT_SHARE = 0.2;
+const NG_PROGRESS_MS = 6000; // no follower progress for this long
+const NG_SILENT_MS = 30000;
+const NG_BACK_DECODES = 8; // (about 4 s of decodes: longer than one quoted pangti)
+const NG_FOLLOW_CONF = 0.6; // a follower fix counts as Gurbani only when it moves on this surely
 const SWITCH_ACOUSTIC_MARGIN = 0.15; // ...and beat the current shabad by at least this much
 // Length-aware penalty applied to the CANDIDATE score only (the current shabad is
 // scored by cursorLineScore, which we leave untouched so it stays strong). A proposed
@@ -1506,8 +1523,200 @@ const VoiceFollow = () => {
   // of a possibly-wrong shabad. seekingRef tracks whether WE put it up, so we
   // never clear a misc slide the user opened themselves.
   const seekingRef = useRef(false);
+  // Not-Gurbani slide (NG_*): ours = we put the Waheguru slide up for non-Gurbani audio;
+  // lastFit = when Gurbani last fitted; hops = the last NG_SPEECH_MS of decodes ({t, fit,
+  // word}); lastProgress = the follower's last move on; back = fitting decodes in a row while
+  // our slide is up;
+  // gurbaniLevel = how loud Gurbani has been this session (the bar for "quiet").
+  const ngFresh = () => ({
+    ours: false,
+    lastFit: 0,
+    hops: [],
+    lastProgress: 0,
+    lastFollow: 0,
+    followLine: null,
+    followWord: -1,
+    back: 0,
+    gurbaniLevel: 0,
+    levels: [],
+  });
+  const ngRef = useRef(ngFresh());
   const isMiscSlideRef = useRef(false);
+  const miscSlideText = useStoreState((state) => state.navigator.miscSlideText);
+  const isAnnouncement = useStoreState((state) => state.navigator.isAnnouncement);
+  // Read through a ref: Stop and the lock path are stable callbacks from an earlier render.
+  const ngScreenStateRef = useRef({});
+  ngScreenStateRef.current = { isCeremonyBani };
+  // Is the misc slide on screen still ours? Dismissed (isMiscSlide off) or replaced by the
+  // sevadaar's own slide (an announcement, Dhan Guru, a controller slide: see the effect below).
+  const ngSlideStillOurs = () => isMiscSlideRef.current;
+  // Is the screen showing what Autopilot put there (no ceremony, no Shabad or Bani the
+  // sevadaar opened by hand)? Nothing is on the real screen in shadow mode.
+  const ngScreenOurs = () => {
+    if (shadowing()) return true;
+    // eslint-disable-next-line no-use-before-define
+    if (screenLostRef.current || ngScreenStateRef.current.isCeremonyBani) return false;
+    const sc = vfScreenRef.current;
+    return sc.screenKey == null || sc.appKey == null || sc.screenKey === sc.appKey;
+  };
+  const ngTakeDown = (why) => {
+    const ng = ngRef.current;
+    if (!ng.ours) return;
+    ng.ours = false;
+    ng.back = 0;
+    if (!ngSlideStillOurs()) return; // the sevadaar replaced or dismissed it: leave theirs
+    sessionLog.logEvent('not_gurbani', { session: sessionIdRef.current, visible: false, why });
+    try {
+      setIsMiscSlide(false);
+      isMiscSlideRef.current = false;
+    } catch (_) {
+      /* store closing */
+    }
+  };
+  // Loudness of the last ~3 s of audio the loop has processed (80th percentile of chunk rms).
+  const ngLevel = () => {
+    const recent = ngRef.current.levels.map((x) => x.rms).sort((a, b) => a - b);
+    return recent.length ? recent[Math.floor(recent.length * 0.8)] : 0;
+  };
+  const ngNoteLevel = (pcm, now) => {
+    let e = 0;
+    for (let i = 0; i < pcm.length; i += 1) e += pcm[i] * pcm[i];
+    const lv = ngRef.current.levels;
+    lv.push({ t: now, rms: Math.sqrt(e / (pcm.length || 1)) });
+    while (lv.length && now - lv[0].t > 3000) lv.shift();
+  };
+  // One step of the not-Gurbani slide. d: { hop, s, word } for a decode (s: how well it fits
+  // the Shabad on screen; word: words, not letters), { follow } for the follower moving on, or
+  // null for an audio chunk (pcm). Only
+  // while Voice Autopilot follows a Shabad it put on screen; never during a crossed Akhand
+  // Paath; never over a slide it did not put up; only ever takes down its own slide.
+  const ngTickRef = useRef(null);
+  ngTickRef.current = (d, pcm) => {
+    try {
+      const ng = ngRef.current;
+      const now = Date.now();
+      if (pcm) ngNoteLevel(pcm, now);
+      if (ng.ours && !ngSlideStillOurs()) {
+        ng.ours = false; // the sevadaar replaced or dismissed our slide: it is theirs now
+        ng.back = 0;
+      }
+      const active =
+        autopilotRef.current &&
+        phaseRef.current === 'following' &&
+        !(paathSeqRef.current.on && paathSeqRef.current.streak >= 1) &&
+        ngScreenOurs();
+      if (!active) {
+        // The sevadaar opened a Bani or a ceremony, Autopilot stopped driving, or an Akhand
+        // Paath reading crossed: our slide must not cover it.
+        if (ng.ours && phaseRef.current === 'following') ngTakeDown('inactive');
+        ng.lastFit = now;
+        ng.hops = [];
+        ng.back = 0;
+        return;
+      }
+      if (!ng.lastFit) ng.lastFit = now;
+      if (d && d.hop) {
+        ng.hops.push({ t: now, fit: d.s >= NG_FIT, word: d.word });
+        while (ng.hops.length && now - ng.hops[0].t > NG_SPEECH_MS) ng.hops.shift();
+        if (d.s >= NG_FIT) {
+          ng.lastFit = now;
+          const lv = ngLevel();
+          ng.gurbaniLevel = ng.gurbaniLevel ? ng.gurbaniLevel * 0.9 + lv * 0.1 : lv;
+        }
+        if (ng.ours) {
+          // Only the Shabad on screen heard again, decode after decode, takes the slide down.
+          ng.back = d.s >= NG_BACK_FIT ? ng.back + 1 : 0;
+          if (ng.back >= NG_BACK_DECODES) ngTakeDown('gurbani');
+          return;
+        }
+      } else if (d) {
+        // The follower moved on through the Shabad: Gurbani (never takes the slide down).
+        ng.lastFit = now;
+        ng.lastProgress = now;
+        return;
+      } else {
+        // No decode: music (an instrumental between lines, alaap) keeps the Shabad up; only
+        // a quiet room counts towards "nothing sung".
+        if (ng.ours) return;
+        const quietBar = Math.max(ng.gurbaniLevel * 0.25, VOL_SILENT_RMS * 4);
+        if (ngLevel() >= quietBar) {
+          ng.lastFit = Math.max(ng.lastFit, now - NG_SILENT_MS + NG_SPEECH_MS);
+          return;
+        }
+      }
+      if (ng.ours || isMiscSlideRef.current || seekingRef.current || lockingRef.current) return;
+      let speechLong = false;
+      if (d && ng.hops.length && now - ng.hops[0].t >= NG_SPEECH_MS - 1000) {
+        const words = ng.hops.filter((h) => h.word).length;
+        const fits = ng.hops.filter((h) => h.fit).length;
+        speechLong =
+          words >= NG_SPEECH_DECODES &&
+          fits <= ng.hops.length * NG_SPEECH_FIT_SHARE &&
+          now - ng.lastProgress >= NG_PROGRESS_MS;
+      }
+      const quietLong = !d && now - ng.lastFit >= NG_SILENT_MS;
+      if (!speechLong && !quietLong) return;
+      ng.ours = true;
+      ng.back = 0;
+      sessionLog.logEvent('not_gurbani', {
+        session: sessionIdRef.current,
+        visible: true,
+        why: speechLong ? 'speech' : 'quiet',
+        shabadId: currentShabadIdRef.current,
+      });
+      try {
+        // A plain Waheguru slide, not in announcement style (as the Waheguru button does).
+        if (!shadowing() && navActions.setIsAnnouncement) navActions.setIsAnnouncement(false);
+        setMiscSlideText(slideStrings.waheguru);
+        setIsMiscSlide(true);
+        isMiscSlideRef.current = true;
+      } catch (_) {
+        ng.ours = false;
+      }
+    } catch (_) {
+      /* the not-Gurbani slide never gets in the way of following */
+    }
+  };
+  useEffect(() => {
+    // The sevadaar put their own slide over ours: it is theirs now, never ours to take down.
+    if (ngRef.current.ours && (isAnnouncement || miscSlideText !== slideStrings.waheguru)) {
+      ngRef.current.ours = false;
+      ngRef.current.back = 0;
+    }
+  }, [miscSlideText, isAnnouncement]);
   if (!shadowing()) isMiscSlideRef.current = isMiscSlide;
+  // Every recognizer output while following: does it fit the Shabad on screen (scored the way
+  // the switch judge scores it)? Cheap and synchronous, so the clock is the same on every PC.
+  const ngHeardRef = useRef(null);
+  ngHeardRef.current = (rout) => {
+    try {
+      const text = rout.text || '';
+      const hyp = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+      if (hyp.length < SWITCH_HYP_MIN) return;
+      const lines = curLinesNormRef.current || [];
+      let all = lines;
+      let words = curWordsNormRef.current || [];
+      const cur = curCursorRef.current;
+      if (baniIdOf(currentShabadIdRef.current) != null && cur != null) {
+        const from = Math.max(0, cur - BANI_CUR_SPAN);
+        all = lines.slice(from, cur + BANI_CUR_SPAN + 1);
+        words = words.slice(from, cur + BANI_CUR_SPAN + 1);
+      }
+      const s = Math.max(
+        cursorLineScore(hyp, lines, cur, CUR_SCORE_BACK, CUR_SCORE_AHEAD),
+        maxLineScore(hyp, all, SWITCH_CAND_MIN_LINE_CHARS),
+        orderFreeLineScore(
+          tokenize(text).map(vfNorm).filter(Boolean),
+          words,
+          SWITCH_CAND_MIN_LINE_CHARS,
+        ),
+      );
+      const wordLike = rout.confidence == null || rout.confidence >= HEARD_MIN_CONF;
+      ngTickRef.current({ hop: true, s, word: wordLike });
+    } catch (_) {
+      /* never in the way of following */
+    }
+  };
   const ctxRef = useRef(null);
   const streamRef = useRef(null);
   // Microphones for the start screen's "Listening through" picker. 'default' and
@@ -1661,6 +1870,9 @@ const VoiceFollow = () => {
       engine.pace.setScoped(false);
       if (engine.pace.setAkhand) engine.pace.setAkhand(false);
     }
+    // Take down our not-Gurbani slide if we put one up; never touch the user's own.
+    ngTakeDown('stop');
+    ngRef.current = ngFresh();
     // Take down our seeking slide if we put one up; never touch the user's own.
     if (seekingRef.current) {
       seekingRef.current = false;
@@ -2677,6 +2889,15 @@ const VoiceFollow = () => {
             openShabadRef.current(cand.shabadId, cand.verseId, cand.verse);
           }
         }
+        // A lock: take down our not-Gurbani slide if up (a lock to the same Shabad or a Bani
+        // open does not dismiss misc slides on its own) and start its clocks again.
+        ngTakeDown('lock');
+        ngRef.current = {
+          ...ngFresh(),
+          lastFit: Date.now(),
+          gurbaniLevel: ngRef.current.gurbaniLevel,
+          levels: ngRef.current.levels,
+        };
         // A commit resolves the uncertainty: take down our seeking slide if up
         // (opening the shabad already dismisses misc slides; this covers the
         // keep-follower transient-failure path too).
@@ -4095,6 +4316,7 @@ const VoiceFollow = () => {
             leadSlot.wins >= 2 &&
             !seekingRef.current &&
             !isMiscSlideRef.current &&
+            !ngRef.current.ours &&
             !seqFollowing
           ) {
             seekingRef.current = true;
@@ -4330,9 +4552,12 @@ const VoiceFollow = () => {
           if (session !== sessionRef.current || recognizerRef.current !== r) return;
           if (rout && rout.text) {
             noteHeard(rout.text, rout.confidence);
+            if (phaseRef.current === 'following') ngHeardRef.current(rout);
             handleTranscript(rout.text);
           }
         }
+        // Not-Gurbani slide: the silence clock (no decode at all for a while).
+        if (phaseRef.current === 'following') ngTickRef.current(null, pcm);
         // While following, also advance the follower for the live line/word cursor.
         if (phaseRef.current === 'following') {
           let f = followerRef.current;
@@ -4373,6 +4598,20 @@ const VoiceFollow = () => {
           // Follower released (singer paused, or moved on): hold on screen —
           // the acoustic switch test handles a real move to another shabad.
           if (out.lineIndex == null || out.verseIndex === -1) return;
+          // The follower moving on through the Shabad (next pangti, or on along the same one)
+          // is Gurbani being heard: it keeps the silence clock fresh (never takes the slide down).
+          {
+            const ngf = ngRef.current;
+            const moved =
+              out.lineIndex === (ngf.followLine == null ? -2 : ngf.followLine + 1) ||
+              (out.lineIndex === ngf.followLine && out.wordIndex > ngf.followWord);
+            ngf.followLine = out.lineIndex;
+            ngf.followWord = out.wordIndex == null ? -1 : out.wordIndex;
+            if (moved && out.confidence >= NG_FOLLOW_CONF && Date.now() - ngf.lastFollow >= 500) {
+              ngf.lastFollow = Date.now();
+              ngTickRef.current({ follow: true });
+            }
+          }
           // Remember where we are so the switch test can score the current shabad
           // relative to the cursor (not as a global max over all its lines).
           curCursorRef.current = out.lineIndex;
