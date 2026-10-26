@@ -2024,6 +2024,10 @@ const VoiceFollow = () => {
       // slide is the sevadaar's.)
       if (!ng.ours && isMiscSlideRef.current && !seekingRef.current) return;
       if (ng.ours && ng.hold) return;
+      // A Bani being read is never katha or silence: a soft reader or a lost line is the
+      // follower's job (Ardas after the Bani still comes in through its own markers).
+      if (followerRef.current && followerRef.current.readBani && baniIdOf(currentShabadIdRef.current))
+        return;
       let speechLong = false;
       let kind = 'talk';
       // With the classifier, singing in the last NG_TALK_MS (a new Shabad being sung that the
