@@ -2,7 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { decide, shouldAutoUpdate } = require('../rollout');
 
-const rules = { version: '9.1.0', regions: ['US-CA', 'US-WA', 'GB'], geoUrl: 'https://geo.test' };
+const UNTIL = '2099-01-01';
+const rules = { version: '9.1.0', until: UNTIL, regions: ['US-CA', 'US-WA', 'GB'], geoUrl: 'https://geo.test' };
 const fake = (map) => async (url) => {
   if (map[url] instanceof Error) throw map[url];
   return map[url];
@@ -77,6 +78,7 @@ const { distanceKm } = require('../rollout');
 
 const areaRules = {
   version: '9.1.0',
+  until: UNTIL,
   regions: ['US-WA'],
   areas: [{ name: 'Fresno', lat: 36.74, lon: -119.78, km: 60 }],
 };
@@ -101,7 +103,7 @@ test('region rule still works alongside areas', () => {
   assert.strictEqual(decide({ rules: areaRules, appVersion: '9.0.5', location: loc }).update, true);
 });
 test('areas-only rule is a valid rule', () => {
-  const rules = { version: '9.1.0', areas: areaRules.areas };
+  const rules = { version: '9.1.0', until: UNTIL, areas: areaRules.areas };
   const la = { country: 'US', region: 'US-CA', lat: 34.05, lon: -118.24 };
   assert.strictEqual(decide({ rules, appVersion: '9.0.5', location: la }).update, false);
 });
@@ -113,7 +115,7 @@ test('location without coordinates falls back to region only', () => {
   );
 });
 test('malformed area entries are ignored', () => {
-  const rules = { version: '9.1.0', areas: [null, { name: 'x', lat: 'a', lon: 1, km: 5 }] };
+  const rules = { version: '9.1.0', until: UNTIL, areas: [null, { name: 'x', lat: 'a', lon: 1, km: 5 }] };
   const loc = { country: 'US', lat: 1, lon: 1 };
   assert.strictEqual(decide({ rules, appVersion: '9.0.5', location: loc }).update, false);
 });
@@ -168,4 +170,22 @@ test('unreadable app version updates normally', () => {
     decide({ rules: { version: '9.1.0', regions: ['US-WA'] }, appVersion: 'garbage' }).update,
     true,
   );
+});
+
+test('rule past its until date: everyone updates', () => {
+  const old = { ...rules, until: '2026-01-01' };
+  const loc = { country: 'US', region: 'US-NY' };
+  assert.strictEqual(decide({ rules: old, appVersion: '9.0.5', location: loc }).update, true);
+});
+test('rule without until is ignored: everyone updates', () => {
+  const { until, ...noUntil } = rules;
+  const loc = { country: 'US', region: 'US-NY' };
+  assert.strictEqual(decide({ rules: noUntil, appVersion: '9.0.5', location: loc }).update, true);
+  assert.strictEqual(decide({ rules: { ...rules, until: 'soon' }, appVersion: '9.0.5', location: loc }).update, true);
+});
+test('rule before its until date still holds back', () => {
+  const r = { ...rules, until: '2026-12-01' };
+  const loc = { country: 'US', region: 'US-NY' };
+  const now = new Date('2026-11-01');
+  assert.strictEqual(decide({ rules: r, appVersion: '9.0.5', location: loc, now }).update, false);
 });

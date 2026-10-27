@@ -12,6 +12,9 @@
  * allow any PC within `km` of the point. Internet-address locations are often
  * 20-50 km off (they point at the provider's hub), so use a generous radius.
  *
+ * Every rule needs "until": "2026-11-30". After that date (or without one) the rule is
+ * ignored and every PC updates, so a forgotten rollout can't leave PCs behind.
+ *
  * Failure rules:
  *  - rollout.json missing, unreadable, or no rule  -> update normally
  *  - rule present but location unknown             -> wait (retry on next launch)
@@ -42,11 +45,17 @@ const fetchJson = async (url) => {
 };
 
 /** Returns a final answer when location doesn't matter, otherwise null. */
-const decideWithoutLocation = (rules, appVersion) => {
+const decideWithoutLocation = (rules, appVersion, now = new Date()) => {
   const hasRule = rules && (Array.isArray(rules.regions) || Array.isArray(rules.areas));
   if (!rules || typeof rules !== 'object' || !rules.version || !hasRule) {
     return { update: true, reason: 'no rollout rule' };
   }
+  // Every rule must end: after `until` (or without one) everyone updates, so no PC is left behind.
+  const until = typeof rules.until === 'string' ? new Date(rules.until) : null;
+  if (!until || Number.isNaN(until.getTime())) {
+    return { update: true, reason: 'rule has no valid "until" date' };
+  }
+  if (now > until) return { update: true, reason: `rollout ended ${rules.until}` };
   const target = semver.valid(semver.coerce(rules.version));
   const current = semver.valid(semver.coerce(appVersion));
   if (!target || !current) return { update: true, reason: 'unreadable version in rule' };
@@ -55,8 +64,8 @@ const decideWithoutLocation = (rules, appVersion) => {
 };
 
 /** Pure decision: returns { update: boolean, reason: string }. */
-const decide = ({ rules, appVersion, location }) => {
-  const early = decideWithoutLocation(rules, appVersion);
+const decide = ({ rules, appVersion, location, now }) => {
+  const early = decideWithoutLocation(rules, appVersion, now);
   if (early) return early;
 
   const region =
