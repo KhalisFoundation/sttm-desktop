@@ -8,7 +8,7 @@
 const FAST_ON_WPS = 1.55; // the block comes up at this pace or faster...
 const FAST_OFF_WPS = 1.35; // ...and gives way to the normal overlay below this
 const PACE_STEPS = 12; // pangtis the pace is measured over (the latest ones)
-const PACE_MIN_STEPS = 6; // fewer steps than this: no pace yet
+const PACE_MIN_STEPS = 4; // fewer steps than this: no pace yet
 const PACE_GAP_S = 30; // a step slower than this (a pause, an Ardas) is not counted
 
 // Pace of a reading from the pangtis put on screen. A step is one pangti to the very next

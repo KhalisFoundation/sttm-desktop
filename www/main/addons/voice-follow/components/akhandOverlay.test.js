@@ -17,9 +17,9 @@ const read = (pace, n, words, secs, from = 100, t0 = 0) => {
 
 test('no pace until enough pangtis are read in order', () => {
   const pace = createPace();
-  read(pace, 6, 8, 4); // 5 steps
+  read(pace, 4, 8, 4); // 3 steps
   assert.strictEqual(pace.wps(), null);
-  pace.line(106, 8, 24000);
+  pace.line(104, 8, 16000);
   assert.strictEqual(pace.wps(), 2);
 });
 
