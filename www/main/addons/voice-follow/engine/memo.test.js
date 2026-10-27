@@ -25,16 +25,20 @@ function fakeInfer() {
 }
 
 describe('Infer memo (every tier)', () => {
-  it('the fast tier answers a repeated window from the memo (one pass, same output)', async () => {
-    pace.setScoped(false); // searching, kirtan and sung Banis run the fast tier
-    assert.equal(pace.current().name, 'fast');
-    const inf = fakeInfer();
-    const w = windowOf(1);
-    const a = await inf.emissions(w); // the recognizer
-    const b = await inf.emissions(w.slice(0)); // the follower: its own copy of the same audio
-    assert.equal(inf.passes, 1);
-    assert.strictEqual(b, a);
-  });
+  it(
+    'the fast tier answers a repeated window from the memo (one pass, same output)',
+    { skip: !!process.env.VF_NO_MEMO },
+    async () => {
+      pace.setScoped(false); // searching, kirtan and sung Banis run the fast tier
+      assert.equal(pace.current().name, 'fast');
+      const inf = fakeInfer();
+      const w = windowOf(1);
+      const a = await inf.emissions(w); // the recognizer
+      const b = await inf.emissions(w.slice(0)); // the follower: its own copy of the same audio
+      assert.equal(inf.passes, 1);
+      assert.strictEqual(b, a);
+    },
+  );
 
   it('a different window is a model pass', async () => {
     pace.setScoped(false);
@@ -44,7 +48,21 @@ describe('Infer memo (every tier)', () => {
     assert.equal(inf.passes, 2);
   });
 
-  it('VF_NO_MEMO turns the memo off', async () => {
+  it(
+    'a read-Bani (aligned) tier still uses the memo',
+    { skip: !!process.env.VF_NO_MEMO },
+    async () => {
+      pace.setScoped(true);
+      const inf = fakeInfer();
+      const w = windowOf(4);
+      await inf.emissions(w);
+      await inf.emissions(w.slice(0));
+      assert.equal(inf.passes, 1);
+      pace.setScoped(false);
+    },
+  );
+
+  it('without a memo (VF_NO_MEMO) every window is a pass', async () => {
     const inf = fakeInfer();
     inf.memo = null; // what VF_NO_MEMO=1 does in the constructor
     const w = windowOf(3);
