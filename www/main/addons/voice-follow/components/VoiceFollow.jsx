@@ -304,6 +304,8 @@ const NG_READ_AGAIN_MS = 4000;
 // After the Ardas, a Shabad the switch judge commits to (its usual bar) ends the hold at once
 // when it matches this clearly, otherwise when it is committed again NG_READ_AGAIN_MS later.
 const NG_HOLD_EXIT_SCORE = 0.85;
+// ...and the Shabad from before the Ardas only when the audio matches its lines this well.
+const NG_BEFORE_FIT = 0.8;
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
 // (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
@@ -1656,6 +1658,11 @@ const VoiceFollow = () => {
     ng.hold = kind ? { kind, since: Date.now() } : null;
     ng.strongSeen = null;
     ng.searched = false;
+    // The Shabad on screen when the Ardas began, and its lines (see the lock gate).
+    if (kind && !prev) {
+      ng.before = currentShabadIdRef.current;
+      ng.beforeLines = (curLinesNormRef.current || []).slice();
+    }
     sessionLog.logEvent('not_gurbani_hold', {
       session: sessionIdRef.current || ng.session,
       kind,
@@ -1870,6 +1877,13 @@ const VoiceFollow = () => {
     // eslint-disable-next-line no-use-before-define
     !(curBaniShabadsRef.current && curBaniShabadsRef.current.has(c.shabadId)) &&
     ngNotSungNow();
+  // The audio heard lately matches a line of the Shabad from before the Ardas: kirtan going on
+  // with it (the search drifting back to it over a read Hukamnama scores far lower).
+  const ngBeforeHeard = () => {
+    const ng = ngRef.current;
+    if (!ng.lastHyp || !ng.beforeLines || !ng.beforeLines.length) return false;
+    return maxLineScore(ng.lastHyp, ng.beforeLines, SWITCH_CAND_MIN_LINE_CHARS) >= NG_BEFORE_FIT;
+  };
   // Every Autopilot lock passes here first (the sevadaar's own picks do not). True: blocked.
   const ngGateLock = (cand, opts = {}) => {
     try {
@@ -1903,11 +1917,15 @@ const VoiceFollow = () => {
         return false;
       }
       // A first lock (searching) on a Shabad that is not the Ardas, after the Ardas has had
-      // its pauri: the Hukamnama, kirtan or paath starting. The search's own bar is enough.
+      // its pauri: the Hukamnama, kirtan or paath starting. The search's own bar is enough,
+      // except for the Shabad from before the Ardas: kirtan may well go on with it, but the
+      // search also drifts back to it (it came back on screen during a read Hukamnama), so
+      // the audio has to match its lines.
       if (
         phaseRef.current !== 'following' &&
         !ngArdasShabad(cand.shabadId) &&
-        now - ng.hold.since >= NG_ARDAS_MIN_MS
+        now - ng.hold.since >= NG_ARDAS_MIN_MS &&
+        (cand.shabadId !== ng.before || ngBeforeHeard())
       ) {
         ngSetHold(null);
         return false;
@@ -2045,6 +2063,7 @@ const VoiceFollow = () => {
     try {
       const text = rout.text || '';
       const hyp = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+      ngRef.current.lastHyp = hyp;
       if (hyp.length < SWITCH_HYP_MIN) return;
       const lines = curLinesNormRef.current || [];
       let all = lines;
