@@ -13,6 +13,18 @@
             opacity: 1;
         }
     }
+
+    // Voice Autopilot is on: Auto Play is paused (the title says why).
+    &.autopilot-following {
+        .autoplay-icon-btn {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .speed-display {
+            display: none;
+        }
+    }
 }
 
 .increase-speed-btn, .decrease-speed-btn {

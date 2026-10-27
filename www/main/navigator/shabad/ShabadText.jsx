@@ -21,7 +21,11 @@ import {
   isFlowerVerse,
 } from './utils';
 
-const { listScrollAction } = require('../../addons/voice-follow/components/autopilotScreen');
+const {
+  listScrollAction,
+  autoplayMayAdvance,
+  noteAutoplayTick,
+} = require('../../addons/voice-follow/components/autopilotScreen');
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -563,21 +567,23 @@ export const ShabadText = ({
     }
   }, [shortcuts]);
 
+  // Auto Play: the next pangti every autoplayDelay seconds. Paused while Voice Autopilot is
+  // on (it follows the reader instead); the saved setting is untouched, so it runs again on Stop.
   useEffect(() => {
     if (isProjection) return undefined;
+    if (!autoplayMayAdvance({ autoplayToggle, autopilotLive })) return undefined;
     const milisecondsDelay = parseInt(autoplayDelay, 10) * 1000;
     const interval = setInterval(() => {
-      if (autoplayToggle) {
-        setShortcuts({
-          ...shortcuts,
-          nextVerse: true,
-        });
-      }
+      noteAutoplayTick();
+      setShortcuts({
+        ...shortcuts,
+        nextVerse: true,
+      });
     }, milisecondsDelay);
     return () => {
       clearInterval(interval);
     };
-  }, [autoplayToggle, autoplayDelay, isProjection]);
+  }, [autoplayToggle, autoplayDelay, isProjection, autopilotLive]);
 
   const renderVerse = (index, verseObj) => {
     const { verseId, verse, english } = verseObj;

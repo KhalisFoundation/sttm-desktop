@@ -154,7 +154,7 @@ const {
   orderFreeLineScore,
   sameGurbani,
 } = require('./switchPolicy');
-const { screenTakenByCeremony } = require('./autopilotScreen');
+const { screenTakenByCeremony, autoplayTickedRecently } = require('./autopilotScreen');
 // Banis followed at a longer length than the user's (Rehras, Aarti, Sohila), unit-tested in
 // baniLength.test.js.
 const {
@@ -1353,6 +1353,15 @@ const VoiceFollow = () => {
     const { akhandpatt: cur, setAkhandpatt: set } = akpStoreRef.current;
     if (cur && typeof set === 'function') set(false);
   }, []);
+  // STTM's Auto Play (the next pangti every N seconds) is paused while Autopilot is on (see
+  // autoplayMayAdvance); its state goes into the session log so the data shows it.
+  const autoplayToggle = useStoreState((state) => state.userSettings.autoplayToggle);
+  const autoplayDelay = useStoreState((state) => state.userSettings.autoplayDelay);
+  const autoplayFieldsRef = useRef(null);
+  autoplayFieldsRef.current = () => ({
+    autoplay: !!autoplayToggle,
+    autoplayDelay: Number(autoplayDelay) || null,
+  });
   const sessionStartRef = useRef(0);
   const lastAutoDecisionRef = useRef(0);
   // Anonymous usage events (vfAnalytics.js) for a run the sevadaar started with Start (never
@@ -2344,6 +2353,7 @@ const VoiceFollow = () => {
       following,
       sameShabad: cur != null && onScreen != null && String(cur) === String(onScreen),
       known: line >= 0,
+      autoplay: autoplayTickedRecently(now), // STTM's Auto Play timer moved it, not the sevadaar
     });
     if (kind !== 'sevadaar' || verseId === lastVerseRef.current) return;
     const from = lastVerseRef.current;
@@ -2623,6 +2633,7 @@ const VoiceFollow = () => {
       sessionLog.logEvent('session_end', {
         session: sessionIdRef.current,
         seconds: Math.round((Date.now() - sessionStartRef.current) / 1000),
+        ...autoplayFieldsRef.current(),
       });
       sessionIdRef.current = null;
     }
@@ -5109,6 +5120,7 @@ const VoiceFollow = () => {
     sessionLog.logEvent('session_start', {
       session: sessionIdRef.current,
       saveAudio: saveAudioRef.current,
+      ...autoplayFieldsRef.current(),
     });
 
     if (!engine.isReady()) {
@@ -5680,6 +5692,19 @@ const VoiceFollow = () => {
   useEffect(() => {
     setAutopilotLive(active);
   }, [active, setAutopilotLive]);
+  // Auto Play in the session log: paused when Autopilot comes on, running again after Stop,
+  // and any change of the setting while a session runs.
+  const autoplayLogRef = useRef(false); // Autopilot was on at the last check
+  useEffect(() => {
+    const was = autoplayLogRef.current;
+    autoplayLogRef.current = active;
+    if (!active && !was) return; // Autopilot off before and now: nothing to note
+    sessionLog.logEvent('autoplay', {
+      session: sessionIdRef.current,
+      ...autoplayFieldsRef.current(),
+      paused: !!autoplayToggle && active, // false after Stop: the setting runs as before
+    });
+  }, [active, autoplayToggle, autoplayDelay]);
   // A held card fades and goes on time even when no decode arrives (a pause in the singing).
   const shelfShown = shelf.length > 0;
   useEffect(() => {
