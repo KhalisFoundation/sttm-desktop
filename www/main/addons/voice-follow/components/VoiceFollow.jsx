@@ -329,6 +329,7 @@ const NG_HOLD_MAX_MS = 10 * 60 * 1000; // failsafe: no hold outlasts this
 // A reading that ends a hold matches the same Shabad strongly again this much later (katha
 // quotes one pangti; a Hukamnama read aloud goes on pangti after pangti).
 const NG_READ_AGAIN_MS = 8000;
+const NG_HOLD_KINDS = new Set(['ardas']); // holds that are on (katha/announcement/silence: off)
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
 // (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
@@ -1822,6 +1823,10 @@ const VoiceFollow = () => {
   };
   // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
   const ngRaise = (why, kind) => {
+    // Only Ardas (recognised by its own pangtis) holds the Waheguru slide. Katha, announcement
+    // and silence holds fired during solo kirtan (a single voice without instruments sounds
+    // like speech to the classifier), so they are off until that is solved.
+    if (!NG_HOLD_KINDS.has(kind)) return;
     const ng = ngRef.current;
     // A hold (Autopilot choosing nothing else) only with the classifier: without it nothing
     // could tell when singing returns. The slide itself works as before. (Not again within
@@ -4685,15 +4690,7 @@ const VoiceFollow = () => {
             }
             return true; // held: dropped (the lock gate logs it)
           }
-          if (!ngTalkingNow()) return false;
-          if (slotBest >= NG_TALK_STRONG && readAgain(slot)) return false;
-          sessionLog.logEvent('talk_hold', {
-            session: sessionIdRef.current,
-            from: currentShabadIdRef.current,
-            to: slot.shabadId,
-            score: slot.lastScore,
-          });
-          return true;
+          return false; // no talk holds without a hold (see NG_HOLD_KINDS)
         };
         const heldVote = talkHold(vote);
         if (heldVote) switchCandRef.current = null;
