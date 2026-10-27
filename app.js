@@ -302,10 +302,15 @@ function checkForUpdates(manual = false) {
       return;
     }
     // Automatic checks respect the staged rollout (see rollout.js)
-    rollout.shouldAutoUpdate(appVersion).then(({ update, reason }) => {
-      log.info(`[rollout] ${update ? 'checking for updates' : 'skipping update check'}: ${reason}`);
-      if (update) autoUpdater.checkForUpdatesAndNotify();
-    });
+    rollout
+      .shouldAutoUpdate(appVersion)
+      .catch((e) => ({ update: true, reason: `rollout check failed (${e.message})` }))
+      .then(({ update, reason }) => {
+        log.info(
+          `[rollout] ${update ? 'checking for updates' : 'skipping update check'}: ${reason}`,
+        );
+        if (update) autoUpdater.checkForUpdatesAndNotify();
+      });
   }
 }
 

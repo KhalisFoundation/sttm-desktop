@@ -6,7 +6,7 @@ export default {
     const cf = request.cf || {};
     const country = cf.country || null;
     const region = country && cf.regionCode ? `${country}-${cf.regionCode}` : null;
-    const num = (v) => (v == null || isNaN(parseFloat(v)) ? null : parseFloat(v));
+    const num = (v) => (Number.isFinite(parseFloat(v)) ? parseFloat(v) : null);
     return new Response(
       JSON.stringify({
         country,
