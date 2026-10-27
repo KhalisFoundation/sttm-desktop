@@ -271,6 +271,14 @@
       $gurbaniWrapper.forEach($gurbani => {
         let line = '';
         const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+        // Akhand Paath view: re-split each pangti on its own (splitting the whole block garbles it).
+        if ($gurbani.querySelector('.akp-cur')) {
+          $gurbani.querySelectorAll('.akp-prev, .akp-cur').forEach(part => {
+            const words = [...part.children].map(word => word.innerHTML).join(' ');
+            part.innerHTML = assist(words, overlayLarivaar, larivaarAssist);
+          });
+          return;
+        }
         if ($gurbani.children.length) {
           line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
         }
@@ -315,14 +323,6 @@
       applyOverlayPrefs();
     });
   </script>
-  <style>
-    .akp-mode .o-gurbani, .akp-mode .o-translation { display: inline-block; }
-    .akp-mode .akp-prev, .akp-mode .akp-cur { display: block; line-height: 1.3; }
-    .akp-mode .akp-prev { opacity: 0.5; font-size: 0.55em; }
-    .akp-mode .o-gurbani .akp-cur { font-size: 0.6em; font-weight: 700; }
-    .akp-mode .o-translation .akp-cur { font-size: 0.62em; }
-    .akp-mode .o-translation .akp-prev { font-size: 0.62em; }
-  </style>
 </head>
 
 <body class="layout-bottom bani-overlay-page">

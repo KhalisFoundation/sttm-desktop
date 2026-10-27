@@ -362,3 +362,32 @@ body {
     display: none;
   }
 }
+
+// Akhand Paath view: the pangti before (dimmed) and the current one, smaller, in the overlay's own place.
+.akp-mode {
+  .o-gurbani,
+  .o-translation {
+    display: inline-block;
+  }
+
+  .akp-prev,
+  .akp-cur {
+    display: block;
+    line-height: 1.3;
+  }
+
+  .akp-prev {
+    opacity: 0.5;
+    font-size: 0.55em;
+  }
+
+  .o-gurbani .akp-cur {
+    font-size: 0.6em;
+    font-weight: 700;
+  }
+
+  .o-translation .akp-cur,
+  .o-translation .akp-prev {
+    font-size: 0.62em;
+  }
+}
