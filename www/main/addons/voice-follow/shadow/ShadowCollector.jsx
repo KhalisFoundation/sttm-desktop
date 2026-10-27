@@ -196,6 +196,13 @@ const ShadowCollector = () => {
   const nav = useStoreState((state) => state.navigator);
   const { shadowRecording, shadowTester, shadowNotice, hfToken, voiceFollowEnabled, statistics } =
     useStoreState((state) => state.userSettings);
+  // STTM's Auto Play state at the start of a recording (its timer moves the screen by itself).
+  const { autoplayToggle, autoplayDelay } = useStoreState((state) => state.userSettings);
+  const autoplayRef = useRef(null);
+  autoplayRef.current = {
+    autoplay: !!autoplayToggle,
+    autoplayDelay: Number(autoplayDelay) || null,
+  };
   // Anonymous usage events (vfAnalytics.js) honour STTM's "Collect statistics" setting.
   vfAnalytics.setAllowed(statistics);
   const { setShadowRecording, setShadowTester, setShadowNotice } = useStoreActions(
@@ -361,7 +368,7 @@ const ShadowCollector = () => {
           ),
         );
         bus.begin(dir, t0);
-        bus.note({ type: 'session_start', reason: startReasonRef.current });
+        bus.note({ type: 'session_start', reason: startReasonRef.current, ...autoplayRef.current });
         if (pre) bus.note({ type: 'pre_roll', file: 'audio-pre.wav', seconds: pre.seconds });
         bus.human(labelOf(nav));
         const event = (obj) => {

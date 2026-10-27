@@ -48,6 +48,8 @@ PauseIcon.propTypes = {
 // Shown while Voice Autopilot is on: Auto Play is paused then (see autoplayMayAdvance).
 const AUTOPILOT_FOLLOWING_TIP =
   'Voice Autopilot is following the reading. Auto Play is paused and comes back when Autopilot stops.';
+const AUTOPILOT_FOLLOWING_TIP_OFF =
+  'Voice Autopilot is following the reading. Auto Play can be turned on after Autopilot stops.';
 
 const AutoPlayIcon = () => {
   const { autoplayToggle, autoplayDelay } = useStoreState((state) => state.userSettings);
@@ -55,7 +57,9 @@ const AutoPlayIcon = () => {
   // While Autopilot is on the timer does not run, so the button shows it paused.
   const running = autoplayToggle && !autopilotLive;
   let buttonLabel = autoplayToggle ? 'Pause autoplay' : 'Start autoplay';
-  if (autopilotLive) buttonLabel = AUTOPILOT_FOLLOWING_TIP;
+  let tip;
+  if (autopilotLive) tip = autoplayToggle ? AUTOPILOT_FOLLOWING_TIP : AUTOPILOT_FOLLOWING_TIP_OFF;
+  if (tip) buttonLabel = tip;
 
   const toggleAutoplay = () => {
     if (autopilotLive) return;
@@ -83,7 +87,7 @@ const AutoPlayIcon = () => {
   return (
     <div
       className={`autoplay-icon-container${autopilotLive ? ' autopilot-following' : ''}`}
-      title={autopilotLive ? AUTOPILOT_FOLLOWING_TIP : undefined}
+      title={tip}
     >
       <button
         className={`${autoplayDelay <= 1 ? 'disabled' : ''} decrease-speed-btn`}

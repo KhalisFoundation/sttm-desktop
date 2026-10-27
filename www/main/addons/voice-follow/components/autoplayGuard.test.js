@@ -70,7 +70,8 @@ describe('Auto Play guard wiring', () => {
   it('the Auto Play button is disabled with a tooltip while Autopilot is on', () => {
     const src = read('../../../viewer/Slide/AutoPlayIcon.jsx');
     assert.match(src, /disabled=\{autopilotLive\}/);
-    assert.match(src, /title=\{autopilotLive \? AUTOPILOT_FOLLOWING_TIP : undefined\}/);
+    assert.match(src, /title=\{tip\}/);
+    assert.match(src, /if \(autopilotLive\) tip =/);
   });
   it('the viewers are told when Autopilot is on', () => {
     const src = read('../../../common/store/GlobalState.js');
@@ -81,5 +82,7 @@ describe('Auto Play guard wiring', () => {
     const src = read('./VoiceFollow.jsx');
     assert.match(src, /autoplay: autoplayTickedRecently\(now\)/);
     assert.match(src, /sessionLog\.logEvent\('autoplay'/);
+    assert.match(src, /shadowBus\.note\(\{ type: 'autoplay'/);
+    assert.match(src, /session: sessionIdRef\.current \|\| endedSessionRef\.current/);
   });
 });

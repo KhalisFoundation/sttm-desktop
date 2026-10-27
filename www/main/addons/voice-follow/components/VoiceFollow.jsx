@@ -1358,6 +1358,7 @@ const VoiceFollow = () => {
   const autoplayToggle = useStoreState((state) => state.userSettings.autoplayToggle);
   const autoplayDelay = useStoreState((state) => state.userSettings.autoplayDelay);
   const autoplayFieldsRef = useRef(null);
+  const endedSessionRef = useRef(null); // the session Stop just ended (for its Auto Play row)
   autoplayFieldsRef.current = () => ({
     autoplay: !!autoplayToggle,
     autoplayDelay: Number(autoplayDelay) || null,
@@ -2635,6 +2636,7 @@ const VoiceFollow = () => {
         seconds: Math.round((Date.now() - sessionStartRef.current) / 1000),
         ...autoplayFieldsRef.current(),
       });
+      endedSessionRef.current = sessionIdRef.current;
       sessionIdRef.current = null;
     }
     recognizingRef.current = false;
@@ -5698,11 +5700,13 @@ const VoiceFollow = () => {
   useEffect(() => {
     const was = autoplayLogRef.current;
     autoplayLogRef.current = active;
+    // paused is false after Stop: the setting runs as before.
+    const fields = { ...autoplayFieldsRef.current(), paused: !!autoplayToggle && active };
+    if (SHADOW_BUILD && shadowBus.active()) shadowBus.note({ type: 'autoplay', ...fields });
     if (!active && !was) return; // Autopilot off before and now: nothing to note
     sessionLog.logEvent('autoplay', {
-      session: sessionIdRef.current,
-      ...autoplayFieldsRef.current(),
-      paused: !!autoplayToggle && active, // false after Stop: the setting runs as before
+      session: sessionIdRef.current || endedSessionRef.current,
+      ...fields,
     });
   }, [active, autoplayToggle, autoplayDelay]);
   // A held card fades and goes on time even when no decode arrives (a pause in the singing).
