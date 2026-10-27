@@ -306,6 +306,27 @@ const NG_READ_AGAIN_MS = 4000;
 const NG_HOLD_EXIT_SCORE = 0.85;
 // ...and the Shabad from before the Ardas only when the audio matches its lines this well.
 const NG_BEFORE_FIT = 0.8;
+// Katha or an announcement (see ngTalkOk): over every NG_TALK_W window for NG_TALK_TRIG in a
+// row, a voice is there (NG_TALK_VOICED of the classifier windows), little singing or music
+// (NG_TALK_SUNG), the follower has not moved on, almost no decode fits the Shabad on screen
+// (NG_TALK_FIT_SHARE), and the heard text matches no pangti in the whole index (a whole-index
+// score of NG_RET_HI in at most NG_RET_SHARE of the probes; kirtan and paath, even mis-heard,
+// keep matching lines, Punjabi prose does not). Thresholds from 3.5 h of real diwan recordings
+// (no kirtan or paath clip comes within a third of NG_TALK_TRIG) and 1 h of katha from five
+// kathavachaks.
+const NG_TALK_W = 40000;
+const NG_TALK_TRIG = 90000;
+const NG_TALK_VOICED = 0.6;
+const NG_TALK_SUNG = 0.3;
+const NG_TALK_FIT_SHARE = 0.1;
+const NG_RET_HI = 0.3;
+const NG_RET_SHARE = 0.1;
+const NG_TALK_MIN_WINDOWS = 10;
+const NG_TALK_AFTER_LOCK_MS = 20000; // a Shabad just found is being sung: no katha check yet
+const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on, or it was a quote
+const NG_RET_TEXT_MS = 8000; // heard text probed against the index: the last this much
+const NG_RET_EVERY_MS = 1500;
+const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows, decodes kept
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
 // (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
@@ -1650,6 +1671,10 @@ const VoiceFollow = () => {
   // gurbaniLevel = how loud Gurbani has been this session (the bar for "quiet").
   const ngFresh = () => ({
     ours: false,
+    ret: [],
+    texts: [],
+    talkSince: null,
+    probation: null,
     session: null,
     lastFit: 0,
     hops: [],
@@ -1682,6 +1707,7 @@ const VoiceFollow = () => {
     ng.hold = kind ? { kind, since: Date.now() } : null;
     ng.strongSeen = null;
     ng.searched = false;
+    ng.talkSince = null;
     // The Shabad on screen when the Ardas began, and its lines (see the lock gate).
     if (kind && !prev) {
       ng.before = currentShabadIdRef.current;
@@ -1786,7 +1812,7 @@ const VoiceFollow = () => {
             sung: ngSung(r),
             voice: r.speech + r.singing >= 0.15,
           });
-          while (ng.sm.length && now - ng.sm[0].t > NG_TALK_MS) ng.sm.shift();
+          while (ng.sm.length && now - ng.sm[0].t > NG_KEEP_MS) ng.sm.shift();
           // Singing is back (kirtan, or paath read together): Autopilot chooses again from a
           // fresh search (the Shabad from before may not be the one being sung). Our slide
           // stays until the search locks a Shabad.
@@ -1948,9 +1974,11 @@ const VoiceFollow = () => {
       if (
         phaseRef.current !== 'following' &&
         !ngArdasShabad(cand.shabadId) &&
-        now - ng.hold.since >= NG_ARDAS_MIN_MS &&
+        (ng.hold.kind !== 'ardas' || now - ng.hold.since >= NG_ARDAS_MIN_MS) &&
         (cand.shabadId !== ng.before || ngBeforeHeard())
       ) {
+        if (ng.hold.kind === 'talk')
+          ng.probation = { until: now + NG_TALK_PROBATION_MS, progress: 0 };
         ngSetHold(null);
         return false;
       }
@@ -1966,6 +1994,67 @@ const VoiceFollow = () => {
     } catch (_) {
       return false;
     }
+  };
+  // Katha or an announcement going on right now (see NG_TALK_*). loose: the shorter check
+  // after a Shabad found during katha turned out to be a quoted pangti.
+  const ngTalkOk = (now, loose = false) => {
+    const ng = ngRef.current;
+    if (!autopilotRef.current || ng.hold) return false;
+    if (phaseRef.current !== 'following' && phaseRef.current !== 'searching') return false;
+    if (paathSeqRef.current && paathSeqRef.current.on) return false;
+    if (baniIdOf(currentShabadIdRef.current) != null) return false;
+    if (followerRef.current && followerRef.current.readBani) return false;
+    if (!ngScreenOurs()) return false;
+    const win = loose ? NG_TALK_PROBATION_MS : NG_TALK_W;
+    if (!loose && now - lastAutoDecisionRef.current < NG_TALK_AFTER_LOCK_MS) return false;
+    const lo = now - win;
+    const sm = ng.sm.filter((x) => x.t >= lo);
+    if (sm.length < (loose ? NG_TALK_MIN_WINDOWS / 2 : NG_TALK_MIN_WINDOWS)) return false;
+    if (sm.filter((x) => x.voice).length < sm.length * NG_TALK_VOICED) return false;
+    if (sm.filter((x) => x.sung).length > sm.length * NG_TALK_SUNG) return false;
+    if (ng.progress.filter((t) => t >= lo).length >= (loose ? 2 : 1)) return false;
+    if (loose) return true;
+    const hops = ng.hops.filter((h) => h.t >= lo);
+    if (hops.length && hops.filter((h) => h.fit).length > hops.length * NG_TALK_FIT_SHARE)
+      return false;
+    const ret = ng.ret.filter((x) => x.t >= lo);
+    if (ret.length && ret.filter((x) => x.top >= NG_RET_HI).length > ret.length * NG_RET_SHARE)
+      return false;
+    return true;
+  };
+  const ngTalkCheck = (now) => {
+    const ng = ngRef.current;
+    // A Shabad found during katha: if the follower does not move on within the probation, it
+    // was a pangti quoted in the katha, and the hold comes back at once.
+    if (ng.probation && !ng.hold) {
+      if (ng.probation.progress >= 2) ng.probation = null;
+      else if (now >= ng.probation.until) {
+        ng.probation = null;
+        if (ngTalkOk(now, true)) {
+          sessionLog.logEvent('talk_detected', { session: sessionIdRef.current, why: 'quote' });
+          // eslint-disable-next-line no-use-before-define
+          ngRaise('talk', 'talk');
+          return;
+        }
+      }
+    }
+    if (!ngTalkOk(now)) {
+      ng.talkSince = null;
+      return;
+    }
+    if (!ng.talkSince) {
+      ng.talkSince = now;
+      return;
+    }
+    if (now - ng.talkSince < NG_TALK_TRIG - NG_TALK_W) return;
+    ng.talkSince = null;
+    sessionLog.logEvent('talk_detected', {
+      session: sessionIdRef.current,
+      shabadId: currentShabadIdRef.current,
+      phase: phaseRef.current,
+    });
+    // eslint-disable-next-line no-use-before-define
+    ngRaise('talk', 'talk');
   };
   const ngTickRef = useRef(null);
   ngTickRef.current = (d, pcm) => {
@@ -2003,7 +2092,7 @@ const VoiceFollow = () => {
         if (
           ng.hold &&
           !ng.searched &&
-          now - ng.hold.since >= NG_ARDAS_MIN_MS &&
+          now - ng.hold.since >= (ng.hold.kind === 'ardas' ? NG_ARDAS_MIN_MS : 0) &&
           phaseRef.current === 'following' &&
           !lockingRef.current &&
           ngEnterSearchingRef.current
@@ -2013,6 +2102,7 @@ const VoiceFollow = () => {
           ngEnterSearchingRef.current();
         }
       }
+      if (!ng.hold) ngTalkCheck(now);
       const active =
         autopilotRef.current &&
         phaseRef.current === 'following' &&
@@ -2033,7 +2123,7 @@ const VoiceFollow = () => {
       if (!ng.lastFit) ng.lastFit = now;
       if (d && d.hop) {
         ng.hops.push({ t: now, s: d.s, fit: d.s >= NG_FIT, word: d.word });
-        while (ng.hops.length && now - ng.hops[0].t > NG_TALK_MS) ng.hops.shift();
+        while (ng.hops.length && now - ng.hops[0].t > NG_KEEP_MS) ng.hops.shift();
         if (d.s >= NG_FIT) {
           ng.lastFit = now;
           const lv = ngLevel();
@@ -2053,6 +2143,8 @@ const VoiceFollow = () => {
         ng.lastFit = now;
         ng.lastProgress = now;
         ng.progress.push(now);
+        while (ng.progress.length && now - ng.progress[0] > NG_KEEP_MS) ng.progress.shift();
+        if (ng.probation) ng.probation.progress += 1;
         if (ng.ours && !ng.hold) {
           ng.followMoves = (ng.followMoves || []).filter((t) => now - t <= 10000);
           ng.followMoves.push(now);
@@ -2082,6 +2174,37 @@ const VoiceFollow = () => {
   if (!shadowing()) isMiscSlideRef.current = isMiscSlide;
   // Every recognizer output while following: does it fit the Shabad on screen (scored the way
   // the switch judge scores it)? Cheap and synchronous, so the clock is the same on every PC.
+  // The last NG_RET_TEXT_MS of heard text against the whole pangti index, every
+  // NG_RET_EVERY_MS, in every phase: ng.ret [{ t, top }] (top: the best line's score).
+  const ngRetProbeRef = useRef(null);
+  ngRetProbeRef.current = (rout) => {
+    try {
+      if (!autopilotRef.current) return;
+      const ng = ngRef.current;
+      const now = Date.now();
+      const raw = (rout.text || '').trim();
+      if (raw) ng.texts.push({ t: now, text: raw });
+      while (ng.texts.length && now - ng.texts[0].t > NG_RET_TEXT_MS) ng.texts.shift();
+      if (now - (ng.retAt || 0) < NG_RET_EVERY_MS) return;
+      const joined = ng.texts
+        .map((x) => x.text)
+        .join(' ')
+        .trim();
+      if (joined.length < 12) return;
+      ng.retAt = now;
+      const ac = new AbortController();
+      // eslint-disable-next-line no-use-before-define
+      searchCanonicalText(joined.slice(-120), 3, ac.signal)
+        .then((r) => {
+          if (ngRef.current !== ng) return;
+          ng.ret.push({ t: now, top: r && r[0] ? r[0].score : 0 });
+          while (ng.ret.length && now - ng.ret[0].t > NG_KEEP_MS) ng.ret.shift();
+        })
+        .catch(() => {});
+    } catch (_) {
+      /* never in the way of following */
+    }
+  };
   const ngHeardRef = useRef(null);
   ngHeardRef.current = (rout) => {
     try {
@@ -5009,6 +5132,7 @@ const VoiceFollow = () => {
           if (session !== sessionRef.current || recognizerRef.current !== r) return;
           if (rout && rout.text) {
             noteHeard(rout.text, rout.confidence);
+            ngRetProbeRef.current(rout);
             if (phaseRef.current === 'following') ngHeardRef.current(rout);
             handleTranscript(rout.text);
           }
@@ -5836,7 +5960,7 @@ const VoiceFollow = () => {
     </button>
   );
   // While Ardas is going on: Autopilot is on and holding the Waheguru slide (never "paused").
-  const HOLD_ICON = { ardas: 'fa-solid fa-hands-praying' };
+  const HOLD_ICON = { ardas: 'fa-solid fa-hands-praying', talk: 'fa-solid fa-comment-dots' };
   // The hold takes the place of the pangti: what is going on, what the screen shows, Stop; the
   // possible Shabads fold away under "Choose a Shabad yourself" (the sevadaar keeps control).
   let shabadsTitleKey = currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE';
