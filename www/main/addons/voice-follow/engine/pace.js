@@ -12,8 +12,10 @@
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
 //
-// 'fast' is exactly today's schedule and code path (own clocks, 4 s windows, no memo): a
-// computer that keeps up runs byte-identical to the build without tiers. The tier is
+// 'fast' is today's schedule (4 s windows, the follower every 0.25 s, the recognizer every
+// 0.5 s); since 9.0.x the follower window that equals the recognizer's (every other one) is
+// answered from the Infer memo in every tier, so a computer runs 4 passes / s, not 6, while
+// following, with exactly the same windows and decisions. The tier is
 // picked by a short self-test when the model loads (median pass time on a 4 s window) and
 // then stepped live: down when the audio backlog stays above BEHIND_S, up when the measured
 // pass time leaves clear headroom for the faster tier. VF_TIER=fast|lean|min pins it.
@@ -194,15 +196,17 @@ function windowS(kind, ownWindowS) {
 }
 
 // The recognizer's beat: the chunk it last decoded on. The component pushes every chunk to
-// the recognizer first and then to the follower, so in an aligned tier the follower decodes
-// on that same chunk (the same 4 s window: one model pass answers both) and, between beats,
-// on its own hop counted from the beat.
+// the recognizer first and then to the follower, so the follower decodes on that same chunk
+// (the same window: one model pass answers both, Infer memo) and, between beats, on its own
+// hop counted from the beat. In every tier: in 'fast' the follower's own 0.25 s hop already
+// lands on the 0.5 s beat when both start together; the beat keeps them together when they
+// do not (a lock that takes a few chunks), so the shared pass never depends on timing.
 let beat = null;
 function markBeat(pcm) {
   beat = pcm;
 }
 function onBeat(pcm) {
-  return current().aligned && pcm === beat;
+  return pcm === beat;
 }
 
 async function measure(infer, passes, warm) {
