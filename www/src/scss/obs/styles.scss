@@ -362,3 +362,53 @@ body {
     display: none;
   }
 }
+
+// Akhand Paath view (as before 9.0.11's revert): the pangti before (dimmed, one line) and the
+// current one (bold), each with its translation under it, smaller, in the overlay's own Gurbani place.
+.akp-mode {
+  .o-gurbani,
+  .o-translation {
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  .akp-prev,
+  .akp-cur,
+  .akp-g,
+  .akp-t {
+    display: block;
+    line-height: 1.35;
+  }
+
+  .akp-prev {
+    opacity: 0.5;
+    margin-bottom: 0.5vh;
+
+    .akp-g,
+    .akp-t {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .akp-g {
+    font-size: unquote("max(2.5vh, 0.55em)");
+  }
+
+  .akp-cur .akp-g {
+    font-size: unquote("max(2.75vh, 0.605em)");
+    font-weight: 700;
+  }
+
+  .akp-t {
+    font-weight: 400;
+  }
+
+  // Only the pangtis and their translations, as before: no teeka or transliteration lines.
+  .o-teeka,
+  .o-transliteration,
+  .content-bottom {
+    display: none;
+  }
+}
