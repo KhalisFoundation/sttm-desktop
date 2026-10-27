@@ -310,6 +310,8 @@ const NG_READ_AGAIN_MS = 8000;
 // said before any announcement). Heard outside a Sukhmani Sahib or Akhand Paath reading and
 // not sung as kirtan, it is Ardas.
 const NG_ARDAS_SHABADS = { 906: null, 7738: [80058, 80063] };
+// Either Ardas Shabad, any line of it (the Vaar beyond the first pauri included).
+const ngArdasShabad = (id) => Object.prototype.hasOwnProperty.call(NG_ARDAS_SHABADS, id);
 // The headings of Vaar Sri Bhagauti Ji (ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ ... ਪਉੜੀ, verses 80053-80057): the
 // same words as the Fateh said before an announcement. Spoken, they are never a switch to the
 // Vaar (and never end an Ardas hold).
@@ -329,7 +331,7 @@ const ngFatehMarker = (c) =>
   ((c.shabadId === 7738 && c.verseId != null && c.verseId >= 80053 && c.verseId <= 80057) ||
     (typeof c.verse === 'string' && ngFatehLine(c)));
 const ngArdasMarker = (c) => {
-  if (!c || !Object.prototype.hasOwnProperty.call(NG_ARDAS_SHABADS, c.shabadId)) return false;
+  if (!c || !ngArdasShabad(c.shabadId)) return false;
   const span = NG_ARDAS_SHABADS[c.shabadId];
   return !span || c.verseId == null || (c.verseId >= span[0] && c.verseId <= span[1]);
 };
@@ -1918,7 +1920,7 @@ const VoiceFollow = () => {
       // mis-heard as a Shabad once do not), and never early in the Ardas.
       if (
         phaseRef.current !== 'following' &&
-        !marker &&
+        !ngArdasShabad(cand.shabadId) &&
         now - ng.hold.since >= NG_ARDAS_MIN_MS &&
         ngSeenAgain(cand.shabadId, now)
       ) {
@@ -4605,10 +4607,12 @@ const VoiceFollow = () => {
           const slotBest = Math.max(slot.lastScore || 0, slot.bestScore || 0);
           const ngh = ngRef.current.hold;
           if (ngh) {
+            // The Ardas itself matched strongly (the sangat reciting the pauri, or the Vaar
+            // beyond it) is never a reading that ends the hold: that opened the Vaar on the
+            // projector for a moment mid-Ardas (the flicker).
+            if (ngArdasShabad(slot.shabadId)) return true;
             // A Shabad read out strongly (a Hukamnama after Ardas) ends the hold.
-            const strong =
-              slotBest >= NG_TALK_STRONG &&
-              (ngh.kind !== 'ardas' || Date.now() - ngh.since >= NG_ARDAS_MIN_MS);
+            const strong = slotBest >= NG_TALK_STRONG && Date.now() - ngh.since >= NG_ARDAS_MIN_MS;
             if (strong && readAgain(slot)) {
               ngSetHold(null);
               return false;
