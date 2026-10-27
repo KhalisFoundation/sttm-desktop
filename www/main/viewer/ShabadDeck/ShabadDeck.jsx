@@ -15,14 +15,21 @@ import ViewerIcon from '../icons/ViewerIcon';
 import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
 import { ShabadInfo } from '../Slide/ShabadInfo';
+import { TranslationReviewQr } from '../Slide/TranslationReviewQr';
 import { useShabadInfo } from '../hooks/use-shabad-info';
+import { useTranslationReviewQr } from '../hooks/use-translation-review-qr';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 import { i18n } from '../../common/i18n';
 
 const os = require('os');
+const remote = require('@electron/remote');
 const aiTranslationDB = require('../../banidb/pss-db');
 
 const platform = os.platform();
+
+// The viewer also runs in a webview inside the main window, as the preview in
+// the Presenter and Multi-Pane workspaces and as the display in Single-Display.
+const isInAppViewer = remote.getCurrentWebContents().getType() === 'webview';
 
 const themes = require('../../../configs/themes.json');
 
@@ -56,6 +63,13 @@ function ShabadDeck() {
     defaultPaneId,
     teekaSource,
     translationEnglishSource,
+    content1,
+    content2,
+    content3,
+    content1Visibility,
+    content2Visibility,
+    content3Visibility,
+    shabadInfoTranslationReview,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
   const showContinuousVerses = akhandpatt;
@@ -161,14 +175,37 @@ function ShabadDeck() {
   // only while there's something to show; otherwise the display is unchanged.
   const isShabad = !isMiscSlide && !isSundarGutkaBani && !isCeremonyBani;
   const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
-  const showsShabadInfo = shabadInfoDetails.length > 0;
 
-  // The bar comes and goes on its own (once the details load, and when the
-  // "Show for n seconds" time is up), not only on a line change, so recast then.
+  // While a Prof Sahib Singh translation is on the display, the info bar has a
+  // QR code linking to the shabad's review page, where the sangat can give
+  // feedback on it. It's for the sangat, so it isn't on the in-app preview.
+  const isSingleDisplay = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
+  const showsEnglishTranslation = [content1, content2, content3].some(
+    (content, index) =>
+      content === 'translation-english' &&
+      [content1Visibility, content2Visibility, content3Visibility][index],
+  );
+  const showsAiTranslation =
+    shabadInfoTranslationReview &&
+    (!isInAppViewer || isSingleDisplay) &&
+    isShabad &&
+    showsEnglishTranslation &&
+    aiTranslationDB.isAiSource(translationEnglishSource) &&
+    activeVerse.some((verse) => aiTranslationDB.getTranslation(verse.ID, translationEnglishSource));
+  const reviewQr = useTranslationReviewQr(
+    showsAiTranslation ? activeVerse[0]?.Shabads?.[0]?.ShabadID : undefined,
+  );
+
+  // The bar is shown for the details, the QR code, or both.
+  const showsShabadInfo = shabadInfoDetails.length > 0 || !!reviewQr;
+
+  // The bar comes and goes on its own (once the details or QR code load, and
+  // when the "Show for n seconds" time is up), not only on a line change, so
+  // recast then.
   const shabadInfoKey = shabadInfoDetails.join('|');
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
-  }, [shabadInfoKey]);
+  }, [shabadInfoKey, reviewQr]);
 
   useEffect(() => {
     let currentShabad = activeShabadId;
@@ -339,7 +376,7 @@ function ShabadDeck() {
       <div
         className={classNames(
           'shabad-deck',
-          currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY') && 'single-display-mode',
+          isSingleDisplay && 'single-display-mode',
           miscSlideText === '' && 'empty-slide',
           minimizedBySingleDisplay && 'single-display-minimized',
           showContinuousVerses && !isMiscSlide && 'akhandpatt-view',
@@ -383,7 +420,15 @@ function ShabadDeck() {
           <ShabadInfo
             details={shabadInfoDetails}
             color={getCurrentThemeInstance()['translation-color']}
-          />
+          >
+            {reviewQr && (
+              <TranslationReviewQr
+                src={reviewQr}
+                source={translationEnglishSource}
+                color={getCurrentThemeInstance()['translation-color']}
+              />
+            )}
+          </ShabadInfo>
         ) : null}
       </div>
       {/* The info bar carries the logo while it's shown. */}

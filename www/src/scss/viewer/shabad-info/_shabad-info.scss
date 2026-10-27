@@ -23,27 +23,32 @@ $shabad-info-logo-width: 100px;
   .shabad-info {
     align-items: center;
     background-color: rgba(128, 128, 128, 0.12);
-    display: flex;
+    column-gap: 24px;
+    display: grid;
     flex: 0 0 auto;
-    justify-content: center;
+    // The logo, the details and the translation review QR code. The side
+    // columns share the room left over, so the details stay centred unless the
+    // QR code needs more, and wrap rather than run under either side.
+    grid-template-columns:
+      minmax(max-content, 1fr)
+      minmax(0, max-content)
+      minmax(max-content, 1fr);
     min-height: 46px;
-    // Room for the logo on the left, and the same on the right to keep the
-    // details centred.
-    padding: 0.8vh calc(#{$shabad-info-logo-width} + 24px);
+    padding: 0.8vh 12px;
     position: relative;
     z-index: 5;
 
+    // Each in its own column, so the others stay put when Chromecast drops the
+    // logo.
     &__logo {
       fill: $grey;
-      left: 12px;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+      grid-column: 1;
       width: $shabad-info-logo-width;
     }
 
     &__text {
       animation: shabad-info-fade-in 0.6s ease;
+      grid-column: 2;
       line-height: 1.4;
       text-align: center;
     }

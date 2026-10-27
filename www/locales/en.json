@@ -322,6 +322,7 @@
     "SHABAD_INFO_ANG": "Ang",
     "SHABAD_INFO_WRITER": "Writer",
     "SHABAD_INFO_RAAG": "Raag",
+    "SHABAD_INFO_TRANSLATION_REVIEW": "Translation Feedback QR Code",
     "SHABAD_INFO_ANG_LABEL": "Ang",
     "SINGLE_COLOR": "Single Color",
     "SLIDE_LAYOUT": "Slide Layout",
@@ -523,5 +524,9 @@
     "HIDE_BUTTON_TOOLTIP": "Hides all external STTM screens (slide and second display) when not needed. Desktop background shows on those screens. Click \"Show Display\" to bring them back.",
     "SWAP_DISPLAYS": "Swap Displays",
     "SWAP_DISPLAYS_TOOLTIP": "Swap which external screen shows the full slide and which shows the second display. Only available when two external screens are connected."
+  },
+  "TRANSLATION_REVIEW": {
+    "TITLE": "How is this English translation?",
+    "SUBTITLE": "Translation based on {{source}} · scan to share feedback"
   }
 }

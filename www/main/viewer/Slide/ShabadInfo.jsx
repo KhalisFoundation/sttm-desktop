@@ -7,9 +7,10 @@ import ViewerIcon from '../icons/ViewerIcon';
 const FONT_SIZES = { small: 2, medium: 3, large: 4 };
 
 // A bar under the slide with the logo and the shabad's source, Ang, writer and
-// raag. It's only on screen while there are details to show (see
-// useShabadInfo); otherwise the display looks as it always has.
-export const ShabadInfo = ({ details, color }) => {
+// raag. It's only on screen while there are details (see useShabadInfo) or a
+// translation review QR code to show; otherwise the display looks as it always
+// has. Its children (the QR code) go at its right end.
+export const ShabadInfo = ({ details, color, children }) => {
   const { shabadInfoFontSize } = useStoreState((state) => state.userSettings);
   const fontSize = FONT_SIZES[shabadInfoFontSize] || FONT_SIZES.small;
 
@@ -23,6 +24,7 @@ export const ShabadInfo = ({ details, color }) => {
           </span>
         ))}
       </div>
+      {children}
     </div>
   );
 };
@@ -30,4 +32,5 @@ export const ShabadInfo = ({ details, color }) => {
 ShabadInfo.propTypes = {
   details: PropTypes.arrayOf(PropTypes.string).isRequired,
   color: PropTypes.string,
+  children: PropTypes.node,
 };
