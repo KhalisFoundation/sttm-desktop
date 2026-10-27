@@ -1,5 +1,5 @@
 {
   "version": "9.1.0",
   "regions": ["US-CA", "US-WA"],
-  "geoUrl": "https://sttm-geo.<account>.workers.dev"
+  "geoUrl": "https://sttm-geo.arash2348.workers.dev"
 }

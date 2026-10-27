@@ -14,7 +14,7 @@ Upload `rollout.json` to the bucket root (public-read, like `latest.yml`), using
 `rollout.example.json` as the template:
 
 ```json
-{ "version": "9.1.0", "regions": ["US-CA", "US-WA"], "geoUrl": "https://sttm-geo.<account>.workers.dev" }
+{ "version": "9.1.0", "regions": ["US-CA", "US-WA"], "geoUrl": "https://sttm-geo.arash2348.workers.dev" }
 ```
 
 - `regions`: ISO 3166-2 codes (`US-CA`, `CA-ON`, `GB-ENG`) or a whole country (`CA`, `GB`).
