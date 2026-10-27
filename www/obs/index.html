@@ -107,26 +107,32 @@
 
       document.querySelector('.overlay-wrapper').hidden =
         Line.Gurmukhi === '' && Line.English === '';
-      writeAkhand(akhand, larivaar, larivaarAssist, Line, translation, languageSettings);
+      writeAkhand(akhand, larivaar, larivaarAssist, languageSettings);
     };
 
     // Akhand Paath view (sent while STTM shows it): the pangti before (dimmed) and the current
-    // one, each with its translation, in smaller text. Written into the overlay's own Gurbani and
-    // translation places, so it follows the overlay's Position, colours, fonts and background.
-    const writeAkhand = (akhand, larivaar, larivaarAssist, Line, translation, languageSettings) => {
+    // one, each with its translation right under it, in smaller text. Written into the overlay's
+    // own Gurbani place, so it follows the overlay's Position, colours, fonts and background.
+    const writeAkhand = (akhand, larivaar, larivaarAssist, languageSettings) => {
       const lines = (akhand && akhand.lines) || [];
       const cur = lines.findIndex((l) => l.current);
-      const prev = cur > 0 ? lines[cur - 1] : null;
       document.body.classList.toggle('akp-mode', cur >= 0);
       if (cur < 0) return;
       const lang = (languageSettings && languageSettings.translation) || 'English';
-      const prevTr = prev ? prev[lang] || prev.English || '' : '';
+      const prefs = overlayPrefs || {};
+      const trStyle = [
+        prefs.textFont ? `font-family: ${prefs.textFont}` : '',
+        prefs.textColor ? `color: ${prefs.textColor}` : '',
+        prefs.textSize ? `font-size: ${Math.max(1.7, prefs.textSize * 0.62)}vh` : '',
+      ].filter(Boolean).join('; ');
+      const block = (l, cls) => {
+        const tr = l[lang] || l.English || '';
+        return `<span class="${cls}"><span class="akp-g">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span>` +
+          (tr ? `<span class="akp-t" style="${trStyle}">${tr}</span>` : '') + '</span>';
+      };
       getElements('.o-gurbani').setProperty('innerHTML',
-        (prev ? `<span class="akp-prev">${assist(prev.Gurmukhi, larivaar, larivaarAssist)}</span>` : '') +
-        `<span class="akp-cur">${assist(Line.Gurmukhi, larivaar, larivaarAssist)}</span>`);
-      getElements('.o-translation').setProperty('innerHTML',
-        (prevTr ? `<span class="akp-prev">${prevTr}</span>` : '') +
-        `<span class="akp-cur">${translation}</span>`);
+        (cur > 0 ? block(lines[cur - 1], 'akp-prev') : '') + block(lines[cur], 'akp-cur'));
+      getElements('.o-translation').setProperty('innerHTML', '');
     };
 
     const writeText = (text, isGurmukhi, isAnnouncement) => {
@@ -271,19 +277,18 @@
       $gurbaniWrapper.forEach($gurbani => {
         let line = '';
         const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-        // Akhand Paath view: re-split each pangti on its own (splitting the whole block garbles it).
-        if ($gurbani.querySelector('.akp-cur')) {
-          $gurbani.querySelectorAll('.akp-prev, .akp-cur').forEach(part => {
-            const words = [...part.children].map(word => word.innerHTML).join(' ');
-            part.innerHTML = assist(words, overlayLarivaar, larivaarAssist);
-          });
-          return;
-        }
+        // Akhand Paath view: rewritten whole below (splitting the whole block garbles it).
+        if ($gurbani.querySelector('.akp-cur')) return;
         if ($gurbani.children.length) {
           line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
         }
         $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
       });
+      if (document.body.classList.contains('akp-mode') && lineBeforeAnnouncement.akhand) {
+        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
+        writeAkhand(lineBeforeAnnouncement.akhand, overlayLarivaar, larivaarAssist,
+          lineBeforeAnnouncement.languageSettings);
+      }
 
       // Apply the font weight and italic to translation and transliteration
       document.querySelectorAll('span.o-translation, span.o-transliteration').forEach(el => {
