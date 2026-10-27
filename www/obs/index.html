@@ -112,6 +112,14 @@
     // Akhand Paath view (sent while STTM shows it): the pangti before and the current one (full
     // colour, larger), each with its translation.
     const akhandBox = () => document.querySelector('.akp-overlay');
+    // The block follows the overlay's Position setting: at the top for the top layout, at the
+    // bottom otherwise (a stream cropped to the top band would otherwise lose it).
+    const placeAkhand = () => {
+      const box = akhandBox();
+      const atTop = !!overlayPrefs && overlayPrefs.layout === 'top';
+      box.style.top = atTop ? '0' : 'auto';
+      box.style.bottom = atTop ? 'auto' : '0';
+    };
     const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
       const box = akhandBox();
       if (!akhand || !akhand.lines || !akhand.lines.length) {
@@ -143,6 +151,7 @@
           el.style.fontFamily = overlayPrefs.textFont;
         });
       }
+      placeAkhand();
       box.hidden = false;
       document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
       return true;
@@ -224,6 +233,7 @@
       getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
       document.body.classList.add('layout-' + overlayPrefs.layout);
+      placeAkhand();
 
       if (['top', 'bottom'].includes(overlayPrefs.layout)) {
         document.querySelector('.layout-top-bottom').style.display = 'flex';
