@@ -324,6 +324,10 @@ const NG_RET_SHARE = 0.1;
 const NG_TALK_MIN_WINDOWS = 10;
 const NG_TALK_AFTER_LOCK_MS = 20000; // a Shabad just found is being sung: no katha check yet
 const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on, or it was a quote
+// For NG_TALK_RECENT_MS after a katha hold ended (a quoted Shabad read out for a few lines), the
+// katha only has to be heard again for NG_TALK_RETRIG, not the full NG_TALK_TRIG.
+const NG_TALK_RECENT_MS = 180000;
+const NG_TALK_RETRIG = 45000;
 const NG_RET_TEXT_MS = 8000; // heard text probed against the index: the last this much
 const NG_RET_EVERY_MS = 1500;
 const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows, decodes kept
@@ -1708,6 +1712,7 @@ const VoiceFollow = () => {
     ng.strongSeen = null;
     ng.searched = false;
     ng.talkSince = null;
+    if (prev === 'talk' && !kind) ng.talkRecent = Date.now();
     // The Shabad on screen when the Ardas began, and its lines (see the lock gate).
     if (kind && !prev) {
       ng.before = currentShabadIdRef.current;
@@ -1997,7 +2002,7 @@ const VoiceFollow = () => {
   };
   // Katha or an announcement going on right now (see NG_TALK_*). loose: the shorter check
   // after a Shabad found during katha turned out to be a quoted pangti.
-  const ngTalkOk = (now, loose = false) => {
+  const ngTalkOk = (now, loose = false, win = loose ? NG_TALK_PROBATION_MS : NG_TALK_W) => {
     const ng = ngRef.current;
     if (!autopilotRef.current || ng.hold) return false;
     if (phaseRef.current !== 'following' && phaseRef.current !== 'searching') return false;
@@ -2005,11 +2010,10 @@ const VoiceFollow = () => {
     if (baniIdOf(currentShabadIdRef.current) != null) return false;
     if (followerRef.current && followerRef.current.readBani) return false;
     if (!ngScreenOurs()) return false;
-    const win = loose ? NG_TALK_PROBATION_MS : NG_TALK_W;
     if (!loose && now - lastAutoDecisionRef.current < NG_TALK_AFTER_LOCK_MS) return false;
     const lo = now - win;
     const sm = ng.sm.filter((x) => x.t >= lo);
-    if (sm.length < (loose ? NG_TALK_MIN_WINDOWS / 2 : NG_TALK_MIN_WINDOWS)) return false;
+    if (sm.length < Math.max(5, Math.round((NG_TALK_MIN_WINDOWS * win) / NG_TALK_W))) return false;
     if (sm.filter((x) => x.voice).length < sm.length * NG_TALK_VOICED) return false;
     if (sm.filter((x) => x.sung).length > sm.length * NG_TALK_SUNG) return false;
     if (ng.progress.filter((t) => t >= lo).length >= (loose ? 2 : 1)) return false;
@@ -2038,7 +2042,11 @@ const VoiceFollow = () => {
         }
       }
     }
-    if (!ngTalkOk(now)) {
+    // Shortly after a katha hold ended (a quoted Shabad read out for a few lines), the same
+    // checks over a shorter window are enough.
+    const recent = !!ng.talkRecent && now - ng.talkRecent < NG_TALK_RECENT_MS;
+    const win = recent ? NG_TALK_PROBATION_MS : NG_TALK_W;
+    if (!ngTalkOk(now, false, win)) {
       ng.talkSince = null;
       return;
     }
@@ -2046,7 +2054,7 @@ const VoiceFollow = () => {
       ng.talkSince = now;
       return;
     }
-    if (now - ng.talkSince < NG_TALK_TRIG - NG_TALK_W) return;
+    if (now - ng.talkSince < (recent ? NG_TALK_RETRIG : NG_TALK_TRIG) - win) return;
     ng.talkSince = null;
     sessionLog.logEvent('talk_detected', {
       session: sessionIdRef.current,
@@ -3427,6 +3435,11 @@ const VoiceFollow = () => {
           gurbaniLevel: ngRef.current.gurbaniLevel,
           levels: ngRef.current.levels,
           sm: ngRef.current.sm, // what was heard (speech or singing) is not undone by a lock
+          ret: ngRef.current.ret,
+          texts: ngRef.current.texts,
+          retAt: ngRef.current.retAt,
+          talkRecent: ngRef.current.talkRecent, // a katha just held: the shorter re-trigger
+          probation: ngRef.current.probation, // a Shabad found during katha: must move on
         };
         // A commit resolves the uncertainty: take down our seeking slide if up
         // (opening the shabad already dismisses misc slides; this covers the
