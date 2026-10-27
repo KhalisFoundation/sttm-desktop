@@ -30,6 +30,7 @@ const prodConfig = require('./config.prod.json');
 const defaultPrefs = require('./www/configs/defaults.json');
 const themes = require('./www/configs/themes.json');
 const Analytics = require('./analytics');
+const rollout = require('./rollout');
 
 // Are we packaging for a platform's app store?
 const appstore = false;
@@ -295,9 +296,21 @@ function checkForUpdates(manual = false) {
     if (manual) {
       manualUpdate = true;
     }
-    if (!isUnsupportedWindow) {
+    if (isUnsupportedWindow) return;
+    if (manual) {
       autoUpdater.checkForUpdatesAndNotify();
+      return;
     }
+    // Automatic checks respect the staged rollout (see rollout.js)
+    rollout
+      .shouldAutoUpdate(appVersion)
+      .catch((e) => ({ update: true, reason: `rollout check failed (${e.message})` }))
+      .then(({ update, reason }) => {
+        log.info(
+          `[rollout] ${update ? 'checking for updates' : 'skipping update check'}: ${reason}`,
+        );
+        if (update) autoUpdater.checkForUpdatesAndNotify();
+      });
   }
 }
 
