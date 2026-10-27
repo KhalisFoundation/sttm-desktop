@@ -311,11 +311,11 @@ const NG_BEFORE_FIT = 0.8;
 // (NG_TALK_SUNG), the follower has not moved on, almost no decode fits the Shabad on screen
 // (NG_TALK_FIT_SHARE), and the heard text matches no pangti in the whole index (a whole-index
 // score of NG_RET_HI in at most NG_RET_SHARE of the probes; kirtan and paath, even mis-heard,
-// keep matching lines, Punjabi prose does not). Thresholds from 3.5 h of real diwan recordings
-// (no kirtan or paath clip comes within a third of NG_TALK_TRIG) and 1 h of katha from five
-// kathavachaks.
-const NG_TALK_W = 40000;
-const NG_TALK_TRIG = 90000;
+// keep matching lines, Punjabi prose does not). Thresholds from 4.7 h of real diwan recordings
+// (the longest katha-like stretch on any kirtan or paath clip is 19 s) and 1 h of katha from
+// five kathavachaks. The owner chose 30 s (Oct 27) over the first 90 s.
+const NG_TALK_W = 30000;
+const NG_TALK_TRIG = 30000;
 const NG_TALK_VOICED = 0.6;
 const NG_TALK_SUNG = 0.3;
 const NG_TALK_FIT_SHARE = 0.1;
@@ -327,7 +327,7 @@ const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on,
 // For NG_TALK_RECENT_MS after a katha hold ended (a quoted Shabad read out for a few lines), the
 // katha only has to be heard again for NG_TALK_RETRIG, not the full NG_TALK_TRIG.
 const NG_TALK_RECENT_MS = 180000;
-const NG_TALK_RETRIG = 45000;
+const NG_TALK_RETRIG = 20000;
 const NG_RET_TEXT_MS = 8000; // heard text probed against the index: the last this much
 const NG_RET_EVERY_MS = 1500;
 const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows, decodes kept
