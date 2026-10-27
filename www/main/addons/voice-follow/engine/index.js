@@ -19,7 +19,6 @@ const NITNEM = require('./assets/nitnem-lines');
 const { partialRatio } = require('./fuzz');
 const modelManager = require('./model-manager');
 const pace = require('./pace');
-const speechMusic = require('./speech-music');
 
 let inferPromise = null; // shared session (load the model once)
 let sp = null; // tokenizer is cheap + stateless, share it too
@@ -93,8 +92,6 @@ module.exports = {
   createPaathFollower,
   // Performance tiers (self-test, live stepping, tier for the session log).
   pace,
-  // Speech or singing (optional YAMNet classifier; see speech-music).
-  speechMusic,
   // Text helpers reused by the supervisor for acoustic switch-scoring: `norm`
   // strips whitespace/punctuation the way the follower does, and `partialRatio`
   // is the same fuzzy matcher, so a shabad scored here is comparable to the
