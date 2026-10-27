@@ -132,4 +132,4 @@ async function ensureModel(onProgress) {
   return modelPath();
 }
 
-module.exports = { ensureModel, isReady, modelPath, modelDir, download, MODEL_URL };
+module.exports = { ensureModel, isReady, modelPath, modelDir, MODEL_URL };
