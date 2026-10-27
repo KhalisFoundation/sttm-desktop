@@ -151,6 +151,7 @@ test('junk input never throws, and with no valid rule always updates', async () 
 test('junk inside a real rule never throws', () => {
   const rules = {
     version: '9.1.0',
+    until: UNTIL,
     regions: [null, 5, {}, 'US-WA'],
     areas: [null, 'x', {}, { lat: 1 }],
   };
