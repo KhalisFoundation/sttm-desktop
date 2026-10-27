@@ -285,9 +285,6 @@ const NG_TALK_MS = 20000;
 // of audio: plainly spoken, sung, or neither (the sangat reciting the Ardas pauri together is
 // neither). Without it nothing can tell when singing returns, so no hold is ever started.
 const NG_SM_WINDOW_S = 2;
-// A Shabad read out loud after Ardas (a Hukamnama) matches near 1: read strongly twice, it
-// ends the hold.
-const NG_TALK_STRONG = 0.9;
 // (Soft background music up to 0.3 still counts as plain speech; kirtan sits well above.)
 const ngPlainSpeech = (r) => r.speech >= 0.3 && r.singing < 0.15 && r.music < 0.3;
 // (Chanting-style speech carries some singing score too: it counts as sung only when the
@@ -298,12 +295,15 @@ const ngSung = (r) =>
 // until singing returns (the classifier hears kirtan or paath sung together), a Shabad is read
 // out strongly (a Hukamnama; only after NG_ARDAS_MIN_MS), the sevadaar picks a Shabad or clears
 // the slide, or the failsafe cap. The panel says Autopilot is on and holding the slide.
-const NG_ARDAS_MIN_MS = 30000; // an Ardas hold is never ended within this
-const NG_SUNG_END = 5; // classifier windows of singing in a row that end the hold (about 10 s)
+const NG_ARDAS_MIN_MS = 20000; // an Ardas hold is never ended within this (the pauri itself)
+const NG_SUNG_END = 4; // classifier windows of singing in a row that end the hold (about 8 s)
 const NG_HOLD_MAX_MS = 10 * 60 * 1000; // failsafe: no hold outlasts this
 // A reading that ends a hold matches the same Shabad strongly again this much later (one
 // quoted pangti is not a reading; a Hukamnama read aloud goes on pangti after pangti).
-const NG_READ_AGAIN_MS = 8000;
+const NG_READ_AGAIN_MS = 4000;
+// After the Ardas, a Shabad the switch judge commits to (its usual bar) ends the hold at once
+// when it matches this clearly, otherwise when it is committed again NG_READ_AGAIN_MS later.
+const NG_HOLD_EXIT_SCORE = 0.85;
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
 // (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
@@ -1655,7 +1655,7 @@ const VoiceFollow = () => {
     if (prev === kind) return;
     ng.hold = kind ? { kind, since: Date.now() } : null;
     ng.strongSeen = null;
-    ng.seen = null;
+    ng.searched = false;
     sessionLog.logEvent('not_gurbani_hold', {
       session: sessionIdRef.current || ng.session,
       kind,
@@ -1813,19 +1813,6 @@ const VoiceFollow = () => {
     );
     return recent.length >= NG_SUNG_END && recent.slice(-NG_SUNG_END).every((x) => x.sung);
   };
-  // The same Shabad presented again NG_READ_AGAIN_MS to 60 s after it was first presented: a
-  // reading going on (a Hukamnama), not Ardas words mis-heard as a Shabad once.
-  const ngSeenAgain = (shabadId, now) => {
-    const ng = ngRef.current;
-    if (!ng.seen) ng.seen = {};
-    const first = ng.seen[shabadId];
-    if (first && now - first >= NG_READ_AGAIN_MS && now - first <= 60000) {
-      ng.seen = {};
-      return true;
-    }
-    if (!first || now - first > 60000) ng.seen[shabadId] = now;
-    return false;
-  };
   // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
   const ngRaise = (why, kind) => {
     const ng = ngRef.current;
@@ -1915,14 +1902,12 @@ const VoiceFollow = () => {
       if ((opts.promote || opts.window) && cand.shabadId === currentShabadIdRef.current) {
         return false;
       }
-      // A first lock (searching) ends the hold only as a reading: the same Shabad found again
-      // NG_READ_AGAIN_MS or more later (a Hukamnama goes on pangti after pangti; Ardas words
-      // mis-heard as a Shabad once do not), and never early in the Ardas.
+      // A first lock (searching) on a Shabad that is not the Ardas, after the Ardas has had
+      // its pauri: the Hukamnama, kirtan or paath starting. The search's own bar is enough.
       if (
         phaseRef.current !== 'following' &&
         !ngArdasShabad(cand.shabadId) &&
-        now - ng.hold.since >= NG_ARDAS_MIN_MS &&
-        ngSeenAgain(cand.shabadId, now)
+        now - ng.hold.since >= NG_ARDAS_MIN_MS
       ) {
         ngSetHold(null);
         return false;
@@ -1969,6 +1954,21 @@ const VoiceFollow = () => {
         else if (now - ng.hold.since >= NG_HOLD_MAX_MS) {
           ng.noHoldUntil = now + NG_HOLD_MAX_MS;
           ngSetHold(null);
+        }
+        // Once the pauri is over, the hold goes on with a fresh search: the Hukamnama, kirtan
+        // or paath that follows is found the way a Shabad is found cold, instead of being
+        // judged against the stale Shabad from before the Ardas (40 s in the owner's test).
+        if (
+          ng.hold &&
+          !ng.searched &&
+          now - ng.hold.since >= NG_ARDAS_MIN_MS &&
+          phaseRef.current === 'following' &&
+          !lockingRef.current &&
+          ngEnterSearchingRef.current
+        ) {
+          ng.searched = true;
+          sessionLog.logEvent('hold_search', { session: sessionIdRef.current });
+          ngEnterSearchingRef.current();
         }
       }
       const active =
@@ -4585,8 +4585,8 @@ const VoiceFollow = () => {
         // --- Finish: commits first, then one shared UI from the leader. ---
         const vote = switchCandRef.current;
         const bgp = backstopRef.current;
-        // A strong match (>= NG_TALK_STRONG) while someone talks counts as a reading only when
-        // the same Shabad matches strongly again NG_READ_AGAIN_MS later (one quoted pangti is not;
+        // A committed Shabad below NG_HOLD_EXIT_SCORE ends the hold only when the same Shabad
+        // is committed again NG_READ_AGAIN_MS later (one quoted pangti is not;
         // a Hukamnama read aloud goes on pangti after pangti).
         // (per Shabad, and only within a minute of the first strong match)
         const readAgain = (slot) => {
@@ -4611,9 +4611,11 @@ const VoiceFollow = () => {
             // beyond it) is never a reading that ends the hold: that opened the Vaar on the
             // projector for a moment mid-Ardas (the flicker).
             if (ngArdasShabad(slot.shabadId)) return true;
-            // A Shabad read out strongly (a Hukamnama after Ardas) ends the hold.
-            const strong = slotBest >= NG_TALK_STRONG && Date.now() - ngh.since >= NG_ARDAS_MIN_MS;
-            if (strong && readAgain(slot)) {
+            if (Date.now() - ngh.since < NG_ARDAS_MIN_MS) return true;
+            // After the Ardas: the Hukamnama read out, or kirtan. The judge has committed to
+            // this Shabad (its usual bar); a clear match, or the same Shabad committed again a
+            // little later, ends the hold and the lock goes through.
+            if (slotBest >= NG_HOLD_EXIT_SCORE || readAgain(slot)) {
               ngSetHold(null);
               return false;
             }
