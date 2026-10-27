@@ -112,6 +112,14 @@
     // Akhand Paath view (sent while STTM shows it): the pangti before and the current one (full
     // colour, larger), each with its translation.
     const akhandBox = () => document.querySelector('.akp-overlay');
+    // The block sits at the top of the screen, or at the bottom when the overlay's Position is
+    // set to bottom (it follows the setting, so a stream cropped to one band never loses it).
+    const placeAkhand = () => {
+      const box = akhandBox();
+      const atTop = !overlayPrefs || overlayPrefs.layout !== 'bottom';
+      box.style.top = atTop ? '0' : 'auto';
+      box.style.bottom = atTop ? 'auto' : '0';
+    };
     const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
       const box = akhandBox();
       if (!akhand || !akhand.lines || !akhand.lines.length) {
@@ -143,6 +151,7 @@
           el.style.fontFamily = overlayPrefs.textFont;
         });
       }
+      placeAkhand();
       box.hidden = false;
       document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
       return true;
@@ -224,6 +233,7 @@
       getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
       document.body.classList.add('layout-' + overlayPrefs.layout);
+      placeAkhand();
 
       if (['top', 'bottom'].includes(overlayPrefs.layout)) {
         document.querySelector('.layout-top-bottom').style.display = 'flex';
@@ -337,7 +347,7 @@
     });
   </script>
   <style>
-    .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
+    .akp-overlay { position: fixed; left: 0; right: 0; top: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
     .akp-overlay .akp-pair { opacity: 0.5; margin: 0 0 0.5vh; }
     .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
