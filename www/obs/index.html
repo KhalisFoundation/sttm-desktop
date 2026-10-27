@@ -86,8 +86,8 @@
         .join(overlayLarivaar ? '' : ' ');
     };
 
-    const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
-      lineBeforeAnnouncement = { Line, larivaar, larivaarAssist, languageSettings };
+    const writeLine = (Line, larivaar, larivaarAssist, languageSettings, akhand) => {
+      lineBeforeAnnouncement = { Line, larivaar, larivaarAssist, languageSettings, akhand };
       getElements('.o-gurbani').setProperty('innerHTML',
         assist(Line.Gurmukhi, larivaar, larivaarAssist));
 
@@ -107,48 +107,30 @@
 
       document.querySelector('.overlay-wrapper').hidden =
         Line.Gurmukhi === '' && Line.English === '';
+      writeAkhand(akhand, larivaar, larivaarAssist, Line, translation, languageSettings);
     };
 
-    // Akhand Paath view (sent while STTM shows it): the pangti before, the current one (full
-    // colour, larger) and the one after, each with its translation.
-    const akhandBox = () => document.querySelector('.akp-overlay');
-    const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
-      const box = akhandBox();
-      if (!akhand || !akhand.lines || !akhand.lines.length) {
-        box.hidden = true;
-        document.querySelector('.overlay-wrapper').style.visibility = '';
-        return false;
-      }
+    // Akhand Paath view (sent while STTM shows it): the pangti before (dimmed) and the current
+    // one, each with its translation, in smaller text. Written into the overlay's own Gurbani and
+    // translation places, so it follows the overlay's Position, colours, fonts and background.
+    const writeAkhand = (akhand, larivaar, larivaarAssist, Line, translation, languageSettings) => {
+      const lines = (akhand && akhand.lines) || [];
+      const cur = lines.findIndex((l) => l.current);
+      const prev = cur > 0 ? lines[cur - 1] : null;
+      document.body.classList.toggle('akp-mode', cur >= 0);
+      if (cur < 0) return;
       const lang = (languageSettings && languageSettings.translation) || 'English';
-      const trOf = (l) => (l.current && Line && Line[lang]) || l[lang] || l.English || '';
-      box.innerHTML = akhand.lines
-        .map((l) => {
-          const tr = trOf(l);
-          return `<div class="akp-pair${l.current ? ' akp-current' : ''}"><div class="akp-line"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
-            (tr ? `<div class="akp-translation">${tr}</div>` : '') + '</div>';
-        })
-        .join('');
-      if (overlayPrefs) {
-        const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
-        box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
-        box.style.color = overlayPrefs.gurbaniTextColor;
-        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.75)}vh`;
-        const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
-        if (gf) box.querySelectorAll('.gurmukhi').forEach((el) => { el.style.fontFamily = gf; });
-        box.querySelectorAll('.akp-translation').forEach((el) => {
-          el.style.color = overlayPrefs.textColor;
-          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.85)}vh`;
-          el.style.fontFamily = overlayPrefs.textFont;
-        });
-      }
-      box.hidden = false;
-      document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
-      return true;
+      const prevTr = prev ? prev[lang] || prev.English || '' : '';
+      getElements('.o-gurbani').setProperty('innerHTML',
+        (prev ? `<span class="akp-prev">${assist(prev.Gurmukhi, larivaar, larivaarAssist)}</span>` : '') +
+        `<span class="akp-cur">${assist(Line.Gurmukhi, larivaar, larivaarAssist)}</span>`);
+      getElements('.o-translation').setProperty('innerHTML',
+        (prevTr ? `<span class="akp-prev">${prevTr}</span>` : '') +
+        `<span class="akp-cur">${translation}</span>`);
     };
 
     const writeText = (text, isGurmukhi, isAnnouncement) => {
-      akhandBox().hidden = true;
-      document.querySelector('.overlay-wrapper').style.visibility = '';
+      document.body.classList.remove('akp-mode');
       let htmlCode;
       if (isAnnouncement && !isGurmukhi) {
         htmlCode = `<span>${text}</span>`;
@@ -239,8 +221,8 @@
         }
       } else {
         if (Object.keys(lineBeforeAnnouncement).length) {
-          const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnouncement;
-          writeLine(Line, larivaar, larivaarAssist, languageSettings);
+          const { Line, larivaar, larivaarAssist, languageSettings, akhand } = lineBeforeAnnouncement;
+          writeLine(Line, larivaar, larivaarAssist, languageSettings, akhand);
         }
       }
 
@@ -307,8 +289,7 @@
       if (!preview) {
         if (overlayPrefs) {
           const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
-          writeAkhand(request.akhand, overlayLarivaar, larivaarAssist, request.Line, request.languageSettings);
+          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings, request.akhand);
         }
       }
     });
@@ -335,19 +316,16 @@
     });
   </script>
   <style>
-    .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
-    .akp-overlay .akp-pair { opacity: 0.5; margin: 0 0 0.5vh; }
-    .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .akp-overlay .akp-pair.akp-current { opacity: 1; }
-    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 125%; }
-    .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
-    .akp-overlay[hidden] { display: none; }
+    .akp-mode .o-gurbani, .akp-mode .o-translation { display: inline-block; }
+    .akp-mode .akp-prev, .akp-mode .akp-cur { display: block; line-height: 1.3; }
+    .akp-mode .akp-prev { opacity: 0.5; font-size: 0.55em; }
+    .akp-mode .o-gurbani .akp-cur { font-size: 0.6em; font-weight: 700; }
+    .akp-mode .o-translation .akp-cur { font-size: 0.62em; }
+    .akp-mode .o-translation .akp-prev { font-size: 0.62em; }
   </style>
 </head>
 
 <body class="layout-bottom bani-overlay-page">
-  <section class="akp-overlay" hidden></section>
   <section class="overlay-wrapper">
     <div class="layout-top-bottom">
       <div class="content-bar ">
