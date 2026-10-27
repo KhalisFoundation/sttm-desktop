@@ -2,10 +2,12 @@
 const ort = require('onnxruntime-node');
 const VOCAB = require('./assets/vocab'); // id -> piece
 const pace = require('./pace');
+const { hasNaN } = require('./gpu-mode');
 
 const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_MS || 0) : 0;
 const SR = 16000;
 const BLANK = 256;
+const GPU_BUSY = new WeakMap(); // GPU session -> passes running on it (GPU mode only)
 
 // strip whitespace, dandas, Gurmukhi/ASCII digits, punctuation (matches _STRIP)
 const STRIP = /[\s।॥|0-9੦-੯.,;:!?\-]+/g;
@@ -71,7 +73,9 @@ class Infer {
     };
   }
 
-  static async create(modelPath, vocab = VOCAB) {
+  // Session options: the thread rule below, plus executionProviders for GPU mode only (the default
+  // CPU session is created with exactly the options it always had).
+  static sessionOptions(executionProviders) {
     // ONNX Runtime defaults to one spinning thread per core (9.9 cores busy on a 20-core PC
     // for work 4 threads finish in 239 ms of the 500 ms hop). 4 threads give bit-identical
     // output to the default (58/58 kirtan windows, zero confidence difference) and use 2.3
@@ -83,12 +87,86 @@ class Infer {
     const env = parseInt(process.env.VF_ORT_THREADS || '', 10);
     let threads = cores >= 8 ? 4 : Math.max(1, Math.min(2, cores));
     if (env > 0) threads = env;
-    const sess = await ort.InferenceSession.create(modelPath, {
+    const opts = {
       intraOpNumThreads: threads,
       interOpNumThreads: 1,
       extra: { session: { 'session.intra_op.allow_spinning': '0' } },
-    });
+    };
+    if (executionProviders) {
+      opts.executionProviders = executionProviders;
+      opts.logSeverityLevel = 3; // the expected "some nodes stay on the CPU" warning is not news
+    }
+    return opts;
+  }
+
+  // GPU mode (gpu-mode.js): a session on the graphics chip through WebGPU, never CoreML.
+  static createGpuSession(modelPath) {
+    return ort.InferenceSession.create(modelPath, Infer.sessionOptions(['webgpu']));
+  }
+
+  static createCpuSession(modelPath) {
+    return ort.InferenceSession.create(modelPath, Infer.sessionOptions());
+  }
+
+  static async create(modelPath, vocab = VOCAB) {
+    const sess = await Infer.createCpuSession(modelPath);
     return new Infer(sess, vocab);
+  }
+
+  // GPU mode on: model passes go to gpuSess; the CPU (int8) session stays loaded as the fallback.
+  // onFallback(error) is told once if the graphics chip fails.
+  useGpu(gpuSess, onFallback) {
+    if (!this.cpuSess) this.cpuSess = this.sess;
+    this.gpuSess = gpuSess;
+    this.onFallback = onFallback || null;
+    this.sess = gpuSess;
+    this.gpu = true;
+    this.memo = this.memo && { buf: null, out: null };
+  }
+
+  // Back to the CPU (int8) session; error = the GPU failure that caused it (reported once).
+  useCpu(error) {
+    if (!this.gpu) return;
+    this.gpu = false;
+    this.sess = this.cpuSess;
+    this.memo = this.memo && { buf: null, out: null };
+    const g = this.gpuSess;
+    this.gpuSess = null;
+    if (error) {
+      this.gpuError = String((error && error.message) || error);
+      const cb = this.onFallback;
+      this.onFallback = null;
+      if (cb) {
+        try {
+          cb(error);
+        } catch (_) {
+          /* logging never breaks a pass */
+        }
+      }
+    }
+    Infer.releaseWhenIdle(g, error ? Infer.RELEASE_MS.failed : 0);
+  }
+
+  // Free a GPU session once no pass is using it (a failed one after a pause; errors ignored).
+  static releaseWhenIdle(sess, delayMs = 0) {
+    if (!sess) return;
+    const release = () => {
+      if ((GPU_BUSY.get(sess) || 0) > 0) {
+        setTimeout(release, Infer.RELEASE_MS.poll);
+        return;
+      }
+      try {
+        Promise.resolve(sess.release && sess.release()).catch(() => {});
+      } catch (_) {
+        /* already unusable */
+      }
+    };
+    setTimeout(release, delayMs);
+  }
+
+  // The CPU session (the int8 model): the GPU self-check times it.
+  cpuSession() {
+    return this.gpu ? this.cpuSess : this.sess;
   }
 
   // buf: Float32Array @16k -> {data:Float32Array flat, frames, C}
@@ -101,6 +179,7 @@ class Infer {
       return memo.out;
     }
     const t0 = Date.now();
+    this.lastPassAt = t0; // GPU mode's self-check waits while live passes run
     const out = await this.run(buf);
     // Scripted end-to-end tests only (VF_TEST_WAV is the microphone): VF_TEST_PASS_MS adds this
     // much time per 4 s window, to run a fast computer at a slower one's measured speed.
@@ -117,12 +196,31 @@ class Infer {
   }
 
   // One model pass, untimed (emissions() times it: a benchmark that slows the model wraps run).
+  // In GPU mode, any error or NaN from the graphics chip moves this app run to the CPU and the
+  // same window is decoded there.
   async run(buf) {
+    if (this.gpu) {
+      const g = this.gpuSess;
+      GPU_BUSY.set(g, (GPU_BUSY.get(g) || 0) + 1);
+      try {
+        const out = await Infer.runOn(g, buf);
+        if (hasNaN(out)) throw new Error('NaN in the GPU output');
+        return out;
+      } catch (e) {
+        if (this.gpuSess === g) this.useCpu(e);
+      } finally {
+        GPU_BUSY.set(g, GPU_BUSY.get(g) - 1);
+      }
+    }
+    return Infer.runOn(this.sess, buf);
+  }
+
+  static async runOn(sess, buf) {
     const feeds = {
       audio: new ort.Tensor('float32', buf, [1, buf.length]),
       audio_len: new ort.Tensor('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
     };
-    const out = await this.sess.run(feeds);
+    const out = await sess.run(feeds);
     const lp = out.log_probs;
     const [, , C] = lp.dims;
     const frames = Number(out.out_len.data[0]);
@@ -167,5 +265,8 @@ class Infer {
     return frames ? sum / frames : 0;
   }
 }
+
+// When a GPU session is freed: a failed one after a pause; a busy one re-checked every poll.
+Infer.RELEASE_MS = { failed: 5000, poll: 1000 };
 
 module.exports = { Infer, resampleTo16k, norm, SR, BLANK };
