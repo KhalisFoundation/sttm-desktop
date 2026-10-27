@@ -371,15 +371,19 @@ function retrieveToken() {
   const userDataPath = app.getPath('userData');
   const tokenPath = path.join(userDataPath, 'userToken.enc');
 
-  if (fs.existsSync(tokenPath)) {
-    const encryptedToken = fs.readFileSync(tokenPath);
+  if (!fs.existsSync(tokenPath)) return null;
+  // A saved token this build cannot read (safe storage unavailable, or the token was written by
+  // a differently signed build) means logged out, never a crash.
+  try {
     if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error('Decryption is not available on this system');
+      log.warn('safe storage is not available: the saved login token cannot be read');
+      return null;
     }
-    return safeStorage.decryptString(encryptedToken);
+    return safeStorage.decryptString(fs.readFileSync(tokenPath));
+  } catch (err) {
+    log.warn(`the saved login token could not be read: ${err.message}`);
+    return null;
   }
-
-  return null;
 }
 
 function deleteToken() {
