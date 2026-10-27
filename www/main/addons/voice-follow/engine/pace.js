@@ -5,15 +5,18 @@
 // up to that bound behind the reader. These tiers cut the work instead, so the engines
 // keep up and the screen stays on the reader's line:
 //
-//   fast  follower every 0.25 s, recognizer every 0.5 s, each on its own clock (6 passes / s)
-//   sync  the same, but the follower decodes on the recognizer's beat: both see the same
-//         window, which the model runs once (Infer memo), on 2.5 s windows (0.6x the cost)
-//         -> 2.5 pass-equivalents / s. Tiers apply only while a READ Bani is followed.
+//   fast  follower every 0.25 s, recognizer every 0.5 s, 4 s windows; the follower decodes on
+//         the recognizer's beat, so every other follower window is the recognizer's and the
+//         model runs it once (Infer memo): 4 passes / s (6 before 9.0.16)
+//   sync  the same on 2.5 s windows (0.6x the cost) -> 2.5 pass-equivalents / s.
+//         The slower tiers apply only while a READ Bani is followed.
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
 //
-// 'fast' is exactly today's schedule and code path (own clocks, 4 s windows, no memo): a
-// computer that keeps up runs byte-identical to the build without tiers. The tier is
+// 'fast' is today's schedule (4 s windows, the follower every 0.25 s, the recognizer every
+// 0.5 s); since 9.0.16 the follower window that equals the recognizer's (every other one) is
+// answered from the Infer memo in every tier, so a computer runs 4 passes / s, not 6, while
+// following, with exactly the same windows and decisions. The tier is
 // picked by a short self-test when the model loads (median pass time on a 4 s window) and
 // then stepped live: down when the audio backlog stays above BEHIND_S, up when the measured
 // pass time leaves clear headroom for the faster tier. VF_TIER=fast|lean|min pins it.
@@ -27,8 +30,8 @@ const TIERS = [
     name: 'fast',
     followerHopS: 0.25,
     recognizerHopS: 0.5,
-    aligned: false,
-    passesPerS: 6,
+    aligned: false, // 'aligned' now only selects the shorter windows (windowS); the beat and memo apply in every tier
+    passesPerS: 6, // the tier-fit budget as before 9.0.16 (4 real passes / s now): tier picks unchanged
     backlogBoundS: 1.0,
   },
   {
@@ -194,15 +197,17 @@ function windowS(kind, ownWindowS) {
 }
 
 // The recognizer's beat: the chunk it last decoded on. The component pushes every chunk to
-// the recognizer first and then to the follower, so in an aligned tier the follower decodes
-// on that same chunk (the same 4 s window: one model pass answers both) and, between beats,
-// on its own hop counted from the beat.
+// the recognizer first and then to the follower, so the follower decodes on that same chunk
+// (the same window: one model pass answers both, Infer memo) and, between beats, on its own
+// hop counted from the beat. In every tier: in 'fast' the follower's own 0.25 s hop already
+// lands on the 0.5 s beat when both start together; the beat keeps them together when they
+// do not (a lock that takes a few chunks), so the shared pass never depends on timing.
 let beat = null;
 function markBeat(pcm) {
   beat = pcm;
 }
 function onBeat(pcm) {
-  return current().aligned && pcm === beat;
+  return pcm === beat;
 }
 
 async function measure(infer, passes, warm) {
