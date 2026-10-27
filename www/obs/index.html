@@ -109,17 +109,9 @@
         Line.Gurmukhi === '' && Line.English === '';
     };
 
-    // Akhand Paath view (sent while STTM shows it): the pangti before and the current one (full
-    // colour, larger), each with its translation.
+    // Akhand Paath view (sent while STTM shows it): the pangti before, the current one (full
+    // colour, larger) and the one after, each with its translation.
     const akhandBox = () => document.querySelector('.akp-overlay');
-    // The block sits at the top of the screen, or at the bottom when the overlay's Position is
-    // set to bottom (it follows the setting, so a stream cropped to one band never loses it).
-    const placeAkhand = () => {
-      const box = akhandBox();
-      const atTop = !overlayPrefs || overlayPrefs.layout !== 'bottom';
-      box.style.top = atTop ? '0' : 'auto';
-      box.style.bottom = atTop ? 'auto' : '0';
-    };
     const writeAkhand = (akhand, larivaar, larivaarAssist, Line, languageSettings) => {
       const box = akhandBox();
       if (!akhand || !akhand.lines || !akhand.lines.length) {
@@ -129,9 +121,7 @@
       }
       const lang = (languageSettings && languageSettings.translation) || 'English';
       const trOf = (l) => (l.current && Line && Line[lang]) || l[lang] || l.English || '';
-      const cur = akhand.lines.findIndex((l) => l.current);
-      const shown = cur >= 0 ? akhand.lines.slice(Math.max(0, cur - 1), cur + 1) : akhand.lines;
-      box.innerHTML = shown
+      box.innerHTML = akhand.lines
         .map((l) => {
           const tr = trOf(l);
           return `<div class="akp-pair${l.current ? ' akp-current' : ''}"><div class="akp-line"><span class="gurmukhi">${assist(l.Gurmukhi, larivaar, larivaarAssist)}</span></div>` +
@@ -142,16 +132,15 @@
         const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
         box.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         box.style.color = overlayPrefs.gurbaniTextColor;
-        box.style.fontSize = `${Math.max(2.5, overlayPrefs.gurbaniSize * 0.55)}vh`;
+        box.style.fontSize = `${Math.max(3, overlayPrefs.gurbaniSize * 0.75)}vh`;
         const gf = getComputedStyle(document.querySelector('.o-gurbani')).fontFamily;
         if (gf) box.querySelectorAll('.gurmukhi').forEach((el) => { el.style.fontFamily = gf; });
         box.querySelectorAll('.akp-translation').forEach((el) => {
           el.style.color = overlayPrefs.textColor;
-          el.style.fontSize = `${Math.max(1.7, overlayPrefs.textSize * 0.62)}vh`;
+          el.style.fontSize = `${Math.max(2, overlayPrefs.textSize * 0.85)}vh`;
           el.style.fontFamily = overlayPrefs.textFont;
         });
       }
-      placeAkhand();
       box.hidden = false;
       document.querySelector('.overlay-wrapper').style.visibility = 'hidden';
       return true;
@@ -233,7 +222,6 @@
       getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
       document.body.classList.add('layout-' + overlayPrefs.layout);
-      placeAkhand();
 
       if (['top', 'bottom'].includes(overlayPrefs.layout)) {
         document.querySelector('.layout-top-bottom').style.display = 'flex';
@@ -347,12 +335,12 @@
     });
   </script>
   <style>
-    .akp-overlay { position: fixed; left: 0; right: 0; top: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
+    .akp-overlay { position: fixed; left: 0; right: 0; bottom: 0; padding: 1.2vh 5%; text-align: center; line-height: 1.35; }
     .akp-overlay .akp-pair { opacity: 0.5; margin: 0 0 0.5vh; }
     .akp-overlay .akp-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-translation { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .akp-overlay .akp-pair.akp-current { opacity: 1; }
-    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 110%; }
+    .akp-overlay .akp-pair.akp-current .akp-line { font-weight: 700; white-space: normal; font-size: 125%; }
     .akp-overlay .akp-pair.akp-current .akp-translation { white-space: normal; }
     .akp-overlay[hidden] { display: none; }
   </style>
