@@ -22,6 +22,10 @@ import {
 } from './utils';
 
 const { listScrollAction } = require('../../addons/voice-follow/components/autopilotScreen');
+const {
+  akhandOverlayOn,
+  onAkhandOverlay,
+} = require('../../addons/voice-follow/components/akhandOverlay');
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -44,6 +48,9 @@ export const ShabadText = ({
   const [activeVerse, setActiveVerse] = useState({});
   const [rawVerses, setRawVerses] = useState([]);
   const [atHome, setHome] = useState(true);
+  // The Bani Overlay's Akhand Paath block (akhandOverlay.js): resend the line when it changes.
+  const [akhandOverlay, setAkhandOverlayShown] = useState(akhandOverlayOn());
+  useEffect(() => onAkhandOverlay(setAkhandOverlayShown), []);
 
   const virtuosoRef = useRef(null);
   const activeVerseRef = useRef(null);
@@ -325,10 +332,12 @@ export const ShabadText = ({
 
   useEffect(() => {
     const overlayVerse = filterOverlayVerseItems(rawVerses, activeVerseId);
-    // Akhand Paath view: the overlay (stream) shows the reading as three pangtis, like the
-    // projector does: the pangti before, the current one and the one after (with translations).
+    // Akhand Paath read at a normal or fast pace (Voice Autopilot, see akhandOverlay.js): the
+    // overlay (stream) shows the reading as pangtis around the current one (with translations;
+    // the overlay keeps the one before and the current one). Normal paath, kirtan and a slow
+    // Akhand Paath: the normal overlay.
     let akhandLines = null;
-    if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani && rawVerses) {
+    if (akhandOverlay && !isSundarGutkaBani && !isCeremonyBani && rawVerses) {
       const at = rawVerses.findIndex((obj) => obj.ID === activeVerseId);
       if (at >= 0) {
         akhandLines = [];
@@ -396,8 +405,8 @@ export const ShabadText = ({
     // these deps or the home/tick sync would never reach Display 2 on its own.
     paneAttributes.homeVerse,
     paneAttributes.versesRead,
-    // The overlay switches to/from its Akhand Paath block with the view.
-    akhandpatt,
+    // The overlay switches to/from its Akhand Paath block (akhandOverlay.js).
+    akhandOverlay,
   ]);
 
   // Display 2: full DOM list (no Virtuoso windowing). Scroll active row into view.

@@ -157,6 +157,7 @@ const {
 const { screenTakenByCeremony } = require('./autopilotScreen');
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
+const { createPace, fastEnough, akhandOverlayOn, setAkhandOverlay } = require('./akhandOverlay');
 
 // maxLineScore lives in ./switchPolicy (same implementation, unit-tested there)
 // so the benchmarked length-penalty math is shared, not duplicated.
@@ -1270,6 +1271,10 @@ const VoiceFollow = () => {
   const akpStoreRef = useRef(null);
   akpStoreRef.current = { akhandpatt, setAkhandpatt };
   const syncAkpViewRef = useRef(null);
+  // The Bani Overlay's Akhand Paath block (akhandOverlay.js): only while Akhand Paath is
+  // followed at a normal or fast pace, measured from the pangtis put on screen.
+  const akpPaceRef = useRef(null);
+  if (!akpPaceRef.current) akpPaceRef.current = createPace();
   syncAkpViewRef.current = (want) => {
     if (!AUTO_AKHAND_VIEW) return;
     const { akhandpatt: cur, setAkhandpatt: set } = akpStoreRef.current;
@@ -2238,6 +2243,8 @@ const VoiceFollow = () => {
 
   const cleanup = useCallback(() => {
     if (syncAkpViewRef.current) syncAkpViewRef.current(false); // the view back as it was
+    setAkhandOverlay(false); // the normal Bani Overlay
+    if (akpPaceRef.current) akpPaceRef.current.reset();
     sessionRef.current += 1;
     transcriptSeqRef.current += 1;
     transcriptAbortRef.current?.abort();
@@ -4991,7 +4998,23 @@ const VoiceFollow = () => {
     let sampleRate;
     try {
       sampleRate = await startAudio(async (pcm) => {
-        if (!autopilotRef.current) return;
+        if (!autopilotRef.current) {
+          setAkhandOverlay(false);
+          return;
+        }
+        {
+          // The Bani Overlay's Akhand Paath block: Akhand Paath followed (a crossed reading,
+          // as for the Akhand Paath view) at a normal or fast pace; anything else, the normal
+          // overlay (normal paath, kirtan, a slow Akhand Paath).
+          const reading =
+            visibleRef.current &&
+            phaseRef.current === 'following' &&
+            paathSeqRef.current.on &&
+            paathSeqRef.current.streak >= 1 &&
+            !!(curProfileRef.current && curProfileRef.current.window);
+          if (!reading) akpPaceRef.current.reset();
+          setAkhandOverlay(reading && fastEnough(akpPaceRef.current.wps(), akhandOverlayOn()));
+        }
         // Performance tiers only while the paath follower follows a read Bani (engine/pace).
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
@@ -5216,6 +5239,15 @@ const VoiceFollow = () => {
             !ngRef.current.ours
           ) {
             lastVerseRef.current = out.verseId;
+            // Reading pace for the Bani Overlay's Akhand Paath block (only while in a reading
+            // window; reset otherwise).
+            if (paathSeqRef.current.on && curProf && curProf.window) {
+              akpPaceRef.current.line(
+                out.verseId,
+                (curWordsNormRef.current[out.lineIndex] || []).length,
+                nowMs,
+              );
+            }
             if (screenLostRef.current && projectCurrentRef.current) {
               // The kirtan moved on in the followed Shabad while a ceremony was on screen:
               // put the Shabad (or Bani) back, at this pangti.
