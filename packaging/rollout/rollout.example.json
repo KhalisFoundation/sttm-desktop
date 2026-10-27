@@ -1,5 +1,6 @@
 {
   "version": "9.1.0",
-  "regions": ["US-CA", "US-WA"],
+  "regions": ["US-WA"],
+  "areas": [{ "name": "Fresno", "lat": 36.74, "lon": -119.78, "km": 60 }],
   "geoUrl": "https://sttm-geo.arash2348.workers.dev"
 }

@@ -1,4 +1,4 @@
-# Staged rollout by state / region
+# Staged rollout by state / region / area
 
 Automatic update checks first read `rollout.json` from the release bucket
 (`https://sttm-releases.s3.us-west-2.amazonaws.com/rollout.json`). The menu's
@@ -18,6 +18,10 @@ Upload `rollout.json` to the bucket root (public-read, like `latest.yml`), using
 ```
 
 - `regions`: ISO 3166-2 codes (`US-CA`, `CA-ON`, `GB-ENG`) or a whole country (`CA`, `GB`).
+- `areas` (optional): `{ "name": "Fresno", "lat": 36.74, "lon": -119.78, "km": 60 }` allows PCs within
+  `km` of the point. Locations from the internet address are often 20-50 km off (e.g. a Renton PC
+  shows as downtown Seattle), so use 50 km or more. Neighbouring cities can't be told apart reliably.
+- A PC updates if it matches any region **or** any area.
 - To widen: add regions. To release to everyone: delete `rollout.json` (or empty it).
 - Combine with `stagingPercentage` in `latest.yml` for "California, 20%".
 
@@ -26,7 +30,7 @@ Upload `rollout.json` to the bucket root (public-read, like `latest.yml`), using
 |---|---|
 | No / unreadable `rollout.json` | Updates normally |
 | App already on `version` or newer | Updates normally |
-| Region listed | Updates |
+| Region listed, or inside an area | Updates |
 | Region not listed | Waits; re-checks on next launch |
 | Location service down | Waits; re-checks on next launch |
 
