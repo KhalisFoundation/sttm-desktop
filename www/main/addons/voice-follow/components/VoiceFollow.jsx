@@ -298,7 +298,8 @@ const ngSung = (r) =>
 // until singing returns (the classifier hears kirtan or paath sung together), a Shabad is read
 // out strongly (a Hukamnama; only after NG_ARDAS_MIN_MS), the sevadaar picks a Shabad or clears
 // the slide, or the failsafe cap. The panel says Autopilot is on and holding the slide.
-const NG_ARDAS_MIN_MS = 30000;
+const NG_ARDAS_MIN_MS = 30000; // an Ardas hold is never ended within this
+const NG_SUNG_END = 5; // classifier windows of singing in a row that end the hold (about 10 s)
 const NG_HOLD_MAX_MS = 10 * 60 * 1000; // failsafe: no hold outlasts this
 // A reading that ends a hold matches the same Shabad strongly again this much later (one
 // quoted pangti is not a reading; a Hukamnama read aloud goes on pangti after pangti).
@@ -1652,6 +1653,7 @@ const VoiceFollow = () => {
     if (prev === kind) return;
     ng.hold = kind ? { kind, since: Date.now() } : null;
     ng.strongSeen = null;
+    ng.seen = null;
     sessionLog.logEvent('not_gurbani_hold', {
       session: sessionIdRef.current || ng.session,
       kind,
@@ -1777,7 +1779,7 @@ const VoiceFollow = () => {
             ngRaise('ardas', 'ardas');
           }
           // eslint-disable-next-line no-use-before-define
-          if (ng.hold && ngSungNow()) {
+          if (ng.hold && Date.now() - ng.hold.since >= NG_ARDAS_MIN_MS && ngSungLong()) {
             ngSetHold(null);
             // (Not after a pause in a Bani being followed: it resumes where it was; and never
             // under a lock that is still committing.)
@@ -1800,12 +1802,27 @@ const VoiceFollow = () => {
         ng.smBusy = false;
       });
   };
-  // Sung right now: the last three classifier windows (about 6 s) hear singing or music (a
-  // music spike under speech is not kirtan returning).
-  const ngSungNow = () => {
+  // Sung for the last NG_SUNG_END windows (about 10 s): kirtan has started. (The sangat's
+  // responses during Ardas score as sung for a window or two; they never end the hold.)
+  const ngSungLong = () => {
     const now = Date.now();
-    const recent = ngRef.current.sm.filter((x) => now - x.t <= 3.5 * NG_SM_WINDOW_S * 1000);
-    return recent.length >= 3 && recent.slice(-3).every((x) => x.sung);
+    const recent = ngRef.current.sm.filter(
+      (x) => now - x.t <= (NG_SUNG_END + 0.5) * NG_SM_WINDOW_S * 1000,
+    );
+    return recent.length >= NG_SUNG_END && recent.slice(-NG_SUNG_END).every((x) => x.sung);
+  };
+  // The same Shabad presented again NG_READ_AGAIN_MS to 60 s after it was first presented: a
+  // reading going on (a Hukamnama), not Ardas words mis-heard as a Shabad once.
+  const ngSeenAgain = (shabadId, now) => {
+    const ng = ngRef.current;
+    if (!ng.seen) ng.seen = {};
+    const first = ng.seen[shabadId];
+    if (first && now - first >= NG_READ_AGAIN_MS && now - first <= 60000) {
+      ng.seen = {};
+      return true;
+    }
+    if (!first || now - first > 60000) ng.seen[shabadId] = now;
+    return false;
   };
   // Put up our Waheguru slide (or take over the seeking slide, also Waheguru) and hold.
   const ngRaise = (why, kind) => {
@@ -1896,11 +1913,14 @@ const VoiceFollow = () => {
       if ((opts.promote || opts.window) && cand.shabadId === currentShabadIdRef.current) {
         return false;
       }
-      // A first lock (searching) is deliberate evidence: it ends a hold, except early in Ardas.
+      // A first lock (searching) ends the hold only as a reading: the same Shabad found again
+      // NG_READ_AGAIN_MS or more later (a Hukamnama goes on pangti after pangti; Ardas words
+      // mis-heard as a Shabad once do not), and never early in the Ardas.
       if (
         phaseRef.current !== 'following' &&
         !marker &&
-        (ng.hold.kind !== 'ardas' || now - ng.hold.since >= NG_ARDAS_MIN_MS)
+        now - ng.hold.since >= NG_ARDAS_MIN_MS &&
+        ngSeenAgain(cand.shabadId, now)
       ) {
         ngSetHold(null);
         return false;
@@ -1978,17 +1998,10 @@ const VoiceFollow = () => {
         if (ng.ours) {
           // Only the Shabad on screen heard again, decode after decode, takes the slide down.
           ng.back = d.s >= NG_BACK_FIT ? ng.back + 1 : 0;
-          // (Not during Ardas on its own pauri: the pauri read aloud fits it, and the slide
-          // would flicker. That hold ends through singing, a reading, a pick, a lock, Stop.)
-          const onArdasPauri =
-            ng.hold &&
-            ng.hold.kind === 'ardas' &&
-            ngArdasMarker({
-              shabadId: currentShabadIdRef.current,
-              // eslint-disable-next-line no-use-before-define
-              verseId: lastVerseRef.current,
-            });
-          if (ng.back >= NG_BACK_DECODES && !onArdasPauri) ngTakeDown('gurbani');
+          // (Never while the Ardas hold is on: the Shabad on screen may be one the Ardas words
+          // matched, and the pauri read aloud fits it, so the slide flickered. The hold ends
+          // through sustained singing, a reading found twice, a pick, Stop or the cap.)
+          if (ng.back >= NG_BACK_DECODES && !ng.hold) ngTakeDown('gurbani');
         }
       } else if (d) {
         // The follower moved on through the Shabad: Gurbani. With no hold on, three such moves
