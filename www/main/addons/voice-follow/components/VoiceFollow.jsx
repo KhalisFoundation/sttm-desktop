@@ -469,6 +469,9 @@ const AKHAND_SECTION_BANIS = new Set([
 const PAATH_SEQ_BACKS = 2; // moves back of 2+ pangtis that end it (kirtan returns; a reader rarely does)
 // Akhand Paath following switches the projector to STTM's Akhand Paath view (see syncAkpViewRef).
 const AUTO_AKHAND_VIEW = true;
+// The view is a saved STTM setting: remembered here while Voice Autopilot has it on, so a view
+// left on when STTM closed (or crashed) mid Akhand Paath is put back at the next launch.
+const AKP_VIEW_KEY = 'vf-akhand-view-ours';
 const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 }, back: null };
 const PAATH_SEQ_BACK_FIXES = 4; // confident fixes in the Shabad just left...
 const PAATH_SEQ_BACK_MS = 3000; // ...over at least this long: go back to it
@@ -1301,14 +1304,35 @@ const VoiceFollow = () => {
     if (want && !akpViewRef.current.on) {
       if (cur) return; // already on (the sevadaar's own choice): not ours to change
       akpViewRef.current.on = true;
+      try {
+        window.localStorage.setItem(AKP_VIEW_KEY, '1');
+      } catch (_) {
+        /* No storage: put back at Stop only. */
+      }
       set(true);
       sessionLog.logEvent('akhand_view', { session: sessionIdRef.current, on: true });
     } else if (!want && akpViewRef.current.on) {
       akpViewRef.current.on = false;
+      try {
+        window.localStorage.removeItem(AKP_VIEW_KEY);
+      } catch (_) {
+        /* No storage. */
+      }
       if (cur) set(false);
       sessionLog.logEvent('akhand_view', { session: sessionIdRef.current, on: false });
     }
   };
+  // At launch: a view Voice Autopilot left on (STTM closed mid Akhand Paath) goes back off.
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(AKP_VIEW_KEY) !== '1') return;
+      window.localStorage.removeItem(AKP_VIEW_KEY);
+    } catch (_) {
+      return;
+    }
+    const { akhandpatt: cur, setAkhandpatt: set } = akpStoreRef.current;
+    if (cur && typeof set === 'function') set(false);
+  }, []);
   const sessionStartRef = useRef(0);
   const lastAutoDecisionRef = useRef(0);
   // Anonymous usage events (vfAnalytics.js) for a run the sevadaar started with Start (never
@@ -4938,7 +4962,10 @@ const VoiceFollow = () => {
     let sampleRate;
     try {
       sampleRate = await startAudio(async (pcm) => {
-        if (!autopilotRef.current) return;
+        if (!autopilotRef.current) {
+          syncAkpViewRef.current(false); // Autopilot no longer drives: the view back as it was
+          return;
+        }
         // Performance tiers only while the paath follower follows a read Bani (engine/pace).
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
