@@ -28,7 +28,8 @@ MODELS = {
     'jaspal-v1': ('jssaluja/sggs-asr-v1-onnx', 'sggs-large-epoch90.int8.onnx', 'bpe.model', 0, None),
     # The published v2 ONNX takes 80-dim features (x [N,T,80], x_lens), not audio. Its front-end is v1's in-graph
     # fbank + per-utterance normalisation, cut out of the v1 file by make_v2_frontend.py (outputs /Div_output_0,
-    # /Where_output_0). Without it v2 output is gibberish; with it v2 matches v1's style. Pending the author's confirmation.
+    # /Where_output_0). Un-normalised features give much shorter, less accurate text; with this front-end v2 matches v1's
+    # style. PROVISIONAL: the model card describes an audio-input graph, so the author should confirm the file and front-end.
     'jaspal-v2': ('jssaluja/sggs-asr-v2-onnx', 'sggs-asr-v2.int8.onnx', 'bpe.model', 0, 'frontend-from-v1.onnx'),
 }
 # v0 has no tokenizer in its ONNX repo: the author's matching bpe.model lives in jssaluja/sggs-asr-v0.
@@ -132,12 +133,18 @@ def main():
             'frontend_sha256': sha256(frontend) if frontend else None, 'window_s': a.win, 'hop_s': 1.0, 'blank': blank,
             'threads': a.threads, 'onnxruntime': ort.__version__, 'numpy': np.__version__, 'machine': platform.machine(),
             'started': time.strftime('%Y-%m-%d %H:%M')}
+    # Resume only finished clips from the SAME model files and window; anything else is redone.
+    key = {k: meta[k] for k in ('onnx_sha256', 'tokenizer_sha256', 'frontend_sha256', 'window_s', 'blank')}
+    mp = os.path.join(od, 'meta.json')
+    prev = json.load(open(mp)).get('key') if os.path.exists(mp) else None
+    meta['key'] = key
+    json.dump(dict(meta, complete=False), open(mp, 'w'), indent=1)
     t0, nw = time.time(), 0
     for c in sample['clips']:
         if only and c['id'] not in only:
             continue
         f = os.path.join(od, f"{c['id']}.jsonl")
-        if os.path.exists(f):
+        if os.path.exists(f) and prev == key:
             continue
         pcm = read_wav(os.path.join(a.data, 'clips', c['id'], 'audio.wav'))
         rows = [{'t': t, 'text': m.transcribe(w)} for t, w in windows(pcm, c['start'], c['end'], a.win)]
@@ -146,9 +153,8 @@ def main():
         os.replace(f + '.tmp', f)
         nw += len(rows)
         print(f"{name} {c['id']}: {len(rows)} windows ({time.time() - t0:.0f} s)", flush=True)
-    meta.update(seconds=round(time.time() - t0), windows=nw)
-    if not only:
-        json.dump(meta, open(os.path.join(od, 'meta.json'), 'w'), indent=1)
+    meta.update(seconds=round(time.time() - t0), windows_this_run=nw, complete=not only)
+    json.dump(meta, open(mp, 'w'), indent=1)
 
 
 if __name__ == '__main__':

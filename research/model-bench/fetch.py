@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fetch.py - download everything the benchmark needs, pinned, into data/ (about 1.6 GB).
+"""fetch.py - download everything the benchmark needs, pinned, into data/ (about 1.4 GB).
 
   data/clips/<id>/{audio.wav, shabads.csv, lines.csv}  from khalisfoundation/GurbaniAutopilotBench at sample.json's revision
   data/models/<name>/...                              the published ONNX models + tokenizers (sha256-checked)
@@ -23,6 +23,16 @@ SCORING_FILES = {'corpus-97f67774fcf00cdd.json': ('corpus.json', 'f21365bb8d2b7c
 FRONTEND_SHA256 = SHA256['jaspal-v2/frontend-from-v1.onnx']
 
 
+# Model repos pinned to the commits benchmarked (Oct 27-28 2026); sha256 is checked as well.
+MODEL_REVISIONS = {
+    'karansea/indicconformer-stt-pa-ctc-shabad-preview': '5fd2e89e3a43d31f47b0fb55fdce5ed50a91283f',
+    'jssaluja/sggs-asr-v0-onnx': '843ac1463daccf345b518a9f5a8a9ed5864e19cf',
+    'jssaluja/sggs-asr-v0': '1ac93f65f9cb544c2b02b924ce87568789d11304',
+    'jssaluja/sggs-asr-v1-onnx': '97e333b38ef5a5f9b3f3a5e48e7ad08bfc47a078',
+    'jssaluja/sggs-asr-v2-onnx': 'db4d932121f999c1781860ecc9db4582cac80494',
+}
+
+
 def put(repo, fname, dest, kind='dataset', revision=None, want=None):
     if not os.path.exists(dest):
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -39,8 +49,9 @@ def main(data=os.path.join(HERE, 'data')):
     print(f"clips: {len(sample['clips'])}")
     for name, (repo, onnx_file, tok, _, _) in MODELS.items():
         d = os.path.join(data, 'models', name)
-        put(repo, onnx_file, os.path.join(d, onnx_file), kind='model', want=SHA256.get(f'{name}/{onnx_file}'))
-        put(TOKENIZER_REPO.get(name, repo), tok, os.path.join(d, tok), kind='model', want=SHA256.get(f'{name}/{tok}'))
+        trepo = TOKENIZER_REPO.get(name, repo)
+        put(repo, onnx_file, os.path.join(d, onnx_file), kind='model', revision=MODEL_REVISIONS[repo], want=SHA256.get(f'{name}/{onnx_file}'))
+        put(trepo, tok, os.path.join(d, tok), kind='model', revision=MODEL_REVISIONS[trepo], want=SHA256.get(f'{name}/{tok}'))
     fe = os.path.join(data, 'models', 'jaspal-v2', 'frontend-from-v1.onnx')
     if not os.path.exists(fe):
         v1 = os.path.join(data, 'models', 'jaspal-v1', MODELS['jaspal-v1'][1])

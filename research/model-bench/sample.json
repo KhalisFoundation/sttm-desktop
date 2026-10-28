@@ -8,7 +8,8 @@
   "paath-hall": "Paath (hall)",
   "paath-studio": "Paath (studio)",
   "sung-bani": "Bani sung as kirtan",
-  "akhand-paath": "Akhand Paath"
+  "akhand-paath": "Akhand Paath (natural speed)",
+  "akhand-paath-fast": "Akhand Paath sped up 1.35x (synthetic; one clip repeats a natural-speed clip)"
  },
  "clips": [
   {
@@ -553,7 +554,7 @@
   },
   {
    "id": "ytap_5N6Cgw8WAaY_1200-1800_x1.35",
-   "tier": "akhand-paath",
+   "tier": "akhand-paath-fast",
    "gab": "4-akhand-paath/ytap_5N6Cgw8WAaY_1200-1800_x1.35",
    "start": 0.0,
    "end": 300,
@@ -565,7 +566,7 @@
   },
   {
    "id": "ytap_XEhUI8Vurj8_600-1200_x1.35",
-   "tier": "akhand-paath",
+   "tier": "akhand-paath-fast",
    "gab": "4-akhand-paath/ytap_XEhUI8Vurj8_600-1200_x1.35",
    "start": 0.0,
    "end": 300,

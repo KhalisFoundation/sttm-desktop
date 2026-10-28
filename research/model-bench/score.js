@@ -110,22 +110,57 @@ for (const clip of SAMPLE.clips) {
   clipRows.push(row);
 }
 
+// Windows overlap (1 s hop), so the real sample size is about the number of clips: uncertainty comes from resampling
+// whole clips (bootstrap, 2000 draws, fixed seed so the intervals reproduce). The difference is model - baseline, where
+// the baseline is the model named by --baseline (default: the one starting "karanbir") at the same window length.
+let seed = 12345;
+const rand = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+const hits = (W) => [W.filter((w) => w.rank >= 0).length, W.length];
+const winOf = (m) => JSON.parse(fs.readFileSync(path.join(TR, m, 'meta.json'), 'utf8')).window_s;
+const baseOf = (m) => models.find((b) => b.startsWith(arg('baseline', 'karanbir')) && winOf(b) === winOf(m));
 const agg = [];
 for (const tier of Object.keys(SAMPLE.tiers)) {
   for (const m of models) {
     const clips = SAMPLE.clips.filter((c) => c.tier === tier && perWindow[m] && perWindow[m][c.id]);
     const W = clips.flatMap((c) => perWindow[m][c.id]);
     if (!W.length) continue;
-    agg.push({ tier, model: m, clips: clips.length, windows: W.length,
+    const per = clips.map((c) => hits(perWindow[m][c.id])).filter(([, n]) => n);
+    const r = { tier, model: m, clips: clips.length, windows: W.length,
       hit1: pct(W.filter((w) => w.rank === 0).length, W.length), hit5: pct(W.filter((w) => w.rank >= 0).length, W.length),
+      hit5ClipMean: +(per.reduce((a, [h, n]) => a + 100 * h / n, 0) / per.length).toFixed(1),
       usable: pct(W.filter((w) => w.usable).length, W.length),
-      vote: pct(W.filter((w) => w.voteRight).length, W.length), voteWrong: pct(W.filter((w) => w.voteWrong).length, W.length) });
+      vote: pct(W.filter((w) => w.voteRight).length, W.length), voteWrong: pct(W.filter((w) => w.voteWrong).length, W.length) };
+    const b = baseOf(m);
+    if (b && b !== m) {
+      const pairs = clips.filter((c) => perWindow[b] && perWindow[b][c.id]).map((c) => [hits(perWindow[m][c.id]), hits(perWindow[b][c.id])]);
+      const diff = (P) => { let hm = 0; let nm = 0; let hb = 0; let nb = 0; P.forEach(([[a, n], [c, k]]) => { hm += a; nm += n; hb += c; nb += k; }); return 100 * (hm / nm - hb / nb); };
+      const draws = [];
+      for (let i = 0; i < 2000; i++) draws.push(diff(pairs.map(() => pairs[Math.floor(rand() * pairs.length)])));
+      draws.sort((x, y) => x - y);
+      r.vsBaseline = { baseline: b, diff: +diff(pairs).toFixed(1), ci95: [+draws[49].toFixed(1), +draws[1949].toFixed(1)] };
+      r.vsBaseline.clear = r.vsBaseline.ci95[0] > 0 || r.vsBaseline.ci95[1] < 0;
+    }
+    agg.push(r);
   }
 }
 
-const L = ['| Behaviour | Model | Clips | Windows | hit@1 % | hit@5 % | Usable % | 30 s vote right % (wrong %) |', '|---|---|---|---|---|---|---|---|'];
-for (const r of agg) L.push(`| ${SAMPLE.tiers[r.tier]} | ${r.model} | ${r.clips} | ${r.windows} | ${r.hit1} | ${r.hit5} | ${r.usable} | ${r.vote} (${r.voteWrong}) |`);
+const L = ['| Behaviour | Model | Clips | Windows | hit@5 % | hit@5 per-clip avg % | vs baseline (95% CI) | hit@1 % | Usable % | 30 s vote right % (wrong %) |', '|---|---|---|---|---|---|---|---|---|---|'];
+for (const r of agg) {
+  const v = r.vsBaseline;
+  const vs = v ? `${v.diff > 0 ? '+' : ''}${v.diff} [${v.ci95[0]}, ${v.ci95[1]}]${v.clear ? ' clear' : ' not clear'}` : 'baseline';
+  L.push(`| ${SAMPLE.tiers[r.tier]} | ${r.model} | ${r.clips} | ${r.windows} | ${r.hit5} | ${r.hit5ClipMean} | ${vs} | ${r.hit1} | ${r.usable} | ${r.vote} (${r.voteWrong}) |`);
+}
 const md = L.join('\n') + '\n';
 process.stdout.write(md);
 if (arg('md')) fs.writeFileSync(arg('md'), md);
-if (arg('json')) fs.writeFileSync(arg('json'), JSON.stringify({ models, agg, clips: clipRows }, null, 1));
+// Provenance: which app search code scored this (score.js loads it from the working tree).
+const { execSync } = require('child_process');
+const crypto = require('crypto');
+const fileSha = (f) => crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, f))).digest('hex');
+let commit = null;
+try { commit = execSync('git rev-parse HEAD', { cwd: ROOT }).toString().trim(); } catch (_) { /* not a git checkout */ }
+const provenance = { commit, gab_revision: SAMPLE.gab_revision,
+  files: Object.fromEntries(['www/main/addons/voice-follow/engine/retrieval/text-index.js', 'www/main/addons/voice-follow/components/switchPolicy.js']
+    .map((f) => [f, fileSha(f)])),
+  transcripts: Object.fromEntries(models.map((m) => [m, JSON.parse(fs.readFileSync(path.join(TR, m, 'meta.json'), 'utf8'))])) };
+if (arg('json')) fs.writeFileSync(arg('json'), JSON.stringify({ provenance, models, agg, clips: clipRows }, null, 1));
