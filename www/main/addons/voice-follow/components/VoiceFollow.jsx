@@ -326,6 +326,9 @@ const NG_TALK_AFTER_LOCK_MS = 20000; // a Shabad just found is being sung: no ka
 // Under Akhand Paath following (or any reading the follower is in), the reading must have
 // stopped this long (no line moved on, nothing found) before katha is considered at all.
 const NG_TALK_SEQ_QUIET_MS = 45000;
+// ...and the heard text must match the index even less: a reading the follower has lost still
+// retrieves pangtis at 0.25-0.38 (studio Sehaj Paath), Punjabi prose stays below 0.25.
+const NG_RET_HI_READ = 0.25;
 const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on, or it was a quote
 // For NG_TALK_RECENT_MS after a katha hold ended (a quoted Shabad read out for a few lines), the
 // katha only has to be heard again for NG_TALK_RETRIG, not the full NG_TALK_TRIG.
@@ -2050,7 +2053,7 @@ const VoiceFollow = () => {
     if (hops.length && hops.filter((h) => h.fit).length > hops.length * NG_TALK_FIT_SHARE)
       return false;
     const ret = ng.ret.filter((x) => x.t >= lo);
-    if (ret.length && ret.filter((x) => x.top >= NG_RET_HI).length > ret.length * NG_RET_SHARE)
+    if (ret.length && ret.filter((x) => x.top >= (reading ? NG_RET_HI_READ : NG_RET_HI)).length > ret.length * NG_RET_SHARE)
       return false;
     return true;
   };
