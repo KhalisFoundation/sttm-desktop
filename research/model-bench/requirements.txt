@@ -5,3 +5,4 @@ onnxruntime==1.29.0
 onnx==1.22.0
 sentencepiece==0.2.2
 huggingface_hub==2.3.0
+jiwer==4.0.0

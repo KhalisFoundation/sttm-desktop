@@ -2,3 +2,5 @@ data/
 transcripts/
 results.json
 .venv/
+transcripts-lines/
+results-wer.json
