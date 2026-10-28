@@ -1,5 +1,6 @@
-# Pinned: the published numbers were produced with exactly these (x86-64 Linux, Python 3.11/3.12).
-numpy==2.5.3
+# The model and search versions are pinned exactly. numpy only slices audio and takes argmax here, so any 1.26+ works
+# (the published x86 run: numpy 2.4.x on Python 3.11).
+numpy>=1.26,<3
 onnxruntime==1.29.0
 onnx==1.22.0
 sentencepiece==0.2.2
