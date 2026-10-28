@@ -323,6 +323,9 @@ const NG_RET_HI = 0.3;
 const NG_RET_SHARE = 0.1;
 const NG_TALK_MIN_WINDOWS = 10;
 const NG_TALK_AFTER_LOCK_MS = 20000; // a Shabad just found is being sung: no katha check yet
+// Under Akhand Paath following (or any reading the follower is in), the reading must have
+// stopped this long (no line moved on, nothing found) before katha is considered at all.
+const NG_TALK_SEQ_QUIET_MS = 45000;
 const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on, or it was a quote
 // For NG_TALK_RECENT_MS after a katha hold ended (a quoted Shabad read out for a few lines), the
 // katha only has to be heard again for NG_TALK_RETRIG, not the full NG_TALK_TRIG.
@@ -1889,6 +1892,12 @@ const VoiceFollow = () => {
       !!(engine.speechMusic && engine.speechMusic.loaded()) &&
       !(Date.now() < (ng.noHoldUntil || 0));
     ngSetHold(canHold ? kind : null);
+    // Katha under Akhand Paath following: the reading has stopped; the next Shabad or
+    // reading found starts afresh.
+    if (kind === 'talk' && paathSeqRef.current && paathSeqRef.current.on) {
+      paathSeqRef.current = { ...PAATH_SEQ_OFF };
+      seqNextRef.current = null;
+    }
     if (ng.ours) return;
     ng.followMoves = [];
     if (seekingRef.current) {
@@ -2021,9 +2030,13 @@ const VoiceFollow = () => {
     const ng = ngRef.current;
     if (!autopilotRef.current || ng.hold) return false;
     if (phaseRef.current !== 'following' && phaseRef.current !== 'searching') return false;
-    if (paathSeqRef.current && paathSeqRef.current.on) return false;
+    const lastRead = Math.max(ng.lastProgress || 0, lastAutoDecisionRef.current || 0);
+    const reading =
+      (paathSeqRef.current && paathSeqRef.current.on) ||
+      (followerRef.current && followerRef.current.readBani);
+    if (reading && now - lastRead < NG_TALK_SEQ_QUIET_MS)
+      return false;
     if (baniIdOf(currentShabadIdRef.current) != null) return false;
-    if (followerRef.current && followerRef.current.readBani) return false;
     if (!ngScreenOurs()) return false;
     if (!loose && now - lastAutoDecisionRef.current < NG_TALK_AFTER_LOCK_MS) return false;
     const lo = now - win;
@@ -2046,8 +2059,15 @@ const VoiceFollow = () => {
     // A Shabad found during katha: if the follower does not move on within the probation, it
     // was a pangti quoted in the katha, and the hold comes back at once.
     if (ng.probation && !ng.hold) {
-      if (ng.probation.progress >= 2) ng.probation = null;
-      else if (now >= ng.probation.until) {
+      if (ng.probation.progress >= 2) {
+        // Read on: a real Shabad (the Hukamnama after an Ardas). The hold it ended is over;
+        // what comes later is judged afresh, not as that Ardas going on.
+        if (ng.probation.kind === 'ardas') {
+          ng.talkRecent = null;
+          ng.recentKind = null;
+        }
+        ng.probation = null;
+      } else if (now >= ng.probation.until) {
         const kind = ng.probation.kind === 'ardas' ? 'ardas' : 'talk';
         ng.probation = null;
         if (ngTalkOk(now, true)) {
