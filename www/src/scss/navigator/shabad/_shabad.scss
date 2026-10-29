@@ -75,6 +75,20 @@
       }
     }
 
+    .clear-pane-btn {
+      background-color: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 14px;
+      height: 40px;
+      margin: 0 0 0 4px;
+      padding: 0 8px;
+
+      &:hover {
+        background-color: #eaeaea;
+      }
+    }
+
     > i {
       border-radius: 50%;
       font-size: 18px;
