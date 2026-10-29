@@ -41,10 +41,10 @@ class Infer {
     // Wall ms of each model pass since perfStats() last read them (session health).
     this.perf = { ms: [], since: Date.now(), repeats: 0 };
     // The last window and its output. The recognizer and the follower each keep their own
-    // copy of the same audio, so while a Bani or Shabad is followed every other follower
-    // window is byte-identical to the recognizer's: the model is run once per distinct
-    // window (a third of the passes while following) — in the aligned tiers only, see
-    // emissions(). VF_NO_MEMO=1 turns it off (A/B).
+    // copy of the same audio, so while a Bani or Shabad is followed many follower windows are
+    // byte-identical to the recognizer's (and every window of a backlog push is): the model is
+    // run once per distinct window. Same input, same output (the model is deterministic), so
+    // the engines see exactly what a second pass would give them. VF_NO_MEMO=1 turns it off (A/B).
     this.memo = process.env.VF_NO_MEMO ? null : { buf: null, out: null };
   }
 
