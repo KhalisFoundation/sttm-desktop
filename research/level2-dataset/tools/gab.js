@@ -41,7 +41,7 @@ const G = require('./gab-score');
 
 const TOOLS = __dirname;
 const DS = require('./gab-data').DS;
-const MAIN_REPO = process.env.VF_MAIN_REPO || '/Users/asingh02/personal/sttm-desktop';
+const MAIN_REPO = process.env.VF_MAIN_REPO || require('path').join(require('os').homedir(), 'personal/sttm-desktop');
 let BENCH = process.env.VF_BENCHMARK || path.join(os.homedir(), 'personal/vf-benchmark');
 const { DEFAULT_ROOT, modelSha } = require('./emis-cache');
 const CACHE = path.resolve(process.env.VF_EMIS_CACHE || DEFAULT_ROOT);

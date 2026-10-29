@@ -11,7 +11,7 @@ const { execFileSync } = require('child_process');
 
 const TOOLS = __dirname;
 const DS = require('./gab-data').DS;
-const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
+const CLIPS = process.env.VF_CLIPS || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/clips');
 const durOf = (wav) => {
   try { return Math.max(0, (fs.statSync(wav).size - 44) / 32000); } catch (_) { return 0; }
 };

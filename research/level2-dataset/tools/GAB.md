@@ -144,6 +144,29 @@ reconciliation rows (64.0% -> 73.1% with line hold) reproduce exactly under GAB-
 * **Excluded:** pt37, pt42, pt46 (their 30-60 s window is not Aarti; dataset truth to fix).
 * **Headline:** per behaviour, no 50/50 mix in the headline; all-behaviours row is labelled "mixed; not a headline".
 
+## Setup (any machine)
+
+The tools run from this folder with Node 20 and the app's `node_modules` (link or install them at the repo root).
+Everything machine-specific comes from the environment; the defaults are the paths under the home folder that the
+original Mac used.
+
+| variable | what | default |
+|---|---|---|
+| `VF_GAB_DATA` | benchmark data the tools read and write: answer keys and test lists (`*-tests.json`, `clip-notes.json`, `aarti/`, `renton-oct11/`, ...), `results/` | the folder above `tools/` |
+| `VF_BENCHMARK` | local copy of the GAB dataset (`manifest.csv`, `<folder>/<id>/lines.csv`, `shabads.csv`, audio) | `~/personal/vf-benchmark` |
+| `VF_CLIPS` | the clip audio (wav) the replay runners play | `~/personal/live-darbar-venues/clips` |
+| `VF_EMIS_CACHE` | speech-model output cache (one folder per model and codec) | see `emis-cache.js` |
+| `VF_MAIN_REPO` | app checkout that git revs (`gab run <rev>`) resolve in | `~/personal/sttm-desktop` |
+| `VF_SPEECH_MODEL` | a speech model pack: a folder with `model.json` (`name`, `onnx`, `tokenizer`, `blank`, optional `frontend`/`io`; see the app's `engine/speech-model.js`). Every command runs that CTC model; the cache is keyed per model and scorecards name it | unset = the built-in Karanbir model |
+| `MODEL` | path of the built-in model's ONNX (only when `VF_SPEECH_MODEL` is unset) | `~/AAI/models/karansea-shabad-ctc/model.int8.onnx` |
+
+Two speech models on one build: run it once per model, then compare the saved scorecards:
+
+    gab run <build> --tier smoke --out /tmp/gab-karanbir
+    VF_SPEECH_MODEL=<pack> gab fill --root <build> --tier smoke --no-push   # model output for that pack (x86 machine)
+    VF_SPEECH_MODEL=<pack> gab run <build> --tier smoke --out /tmp/gab-pack
+    gab compare --cards /tmp/gab-karanbir/scorecard.json /tmp/gab-pack/scorecard.json --name-a karanbir --name-b <pack>
+
 ## Run it (one line)
 
 ```

@@ -25,7 +25,7 @@ const { spawnSync } = require('child_process');
 const argv = process.argv.slice(2);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
 const flag = (n) => argv.includes(`--${n}`);
-const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
+const CLIPS = process.env.VF_CLIPS || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/clips');
 const CLIP = arg('clip', 'rt11_rehras');
 const ROOT = path.resolve(arg('root', path.resolve(__dirname, '../../..')));
 const FROM = Number(arg('from', 0));
@@ -45,7 +45,7 @@ if (FILL && !process.env.VF_SIM_LOCKED) {
 const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 Object.assign(process.env, {
-  VF_EMIS_CACHE: process.env.VF_EMIS_CACHE || '/Users/asingh02/personal/live-darbar-venues/cache',
+  VF_EMIS_CACHE: process.env.VF_EMIS_CACHE || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/cache'),
   VF_EMIS_MODE: FILL ? 'record' : 'replay',
   VF_DRIVER_ROOT: ROOT,
   VF_SIM_PASS_MS: String(PASS_MS),

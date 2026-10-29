@@ -24,7 +24,7 @@ const path = require('path');
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
 const ROOT = path.resolve(arg('root', path.resolve(__dirname, '../../..')));
-const CLIPS = '/Users/asingh02/personal/live-darbar-venues/clips';
+const CLIPS = process.env.VF_CLIPS || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/clips');
 const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 const SR = 16000;

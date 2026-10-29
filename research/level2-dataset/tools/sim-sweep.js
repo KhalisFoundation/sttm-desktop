@@ -23,7 +23,7 @@ const argv = process.argv.slice(2);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
 const flag = (n) => argv.includes(`--${n}`);
 const home = (p) => p.replace(/^~(?=\/|$)/, os.homedir());
-const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
+const CLIPS = process.env.VF_CLIPS || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/clips');
 const SLOTS = Number(process.env.VF_REPLAY_SLOTS || 3);
 
 const ALIAS = { rehras: 'rt11_rehras:0:600', sohila: 'rt11_sohila' };

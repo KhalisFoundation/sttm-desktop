@@ -36,7 +36,7 @@ const { spawn, execFileSync } = require('child_process');
 
 const TOOLS = __dirname;
 const DS = require('./gab-data').DS;
-const MAIN_REPO = '/Users/asingh02/personal/sttm-desktop';
+const MAIN_REPO = process.env.VF_MAIN_REPO || require('path').join(require('os').homedir(), 'personal/sttm-desktop');
 const BENCH = process.env.VF_BENCHMARK || path.join(os.homedir(), 'personal/vf-benchmark');
 const { DEFAULT_ROOT } = require('./emis-cache');
 const CACHE = path.resolve(process.env.VF_EMIS_CACHE || DEFAULT_ROOT);

@@ -36,7 +36,7 @@ const CODEC = process.env.VF_EMIS_CODEC || 'q16';
 // entries are x86 by construction, so an entry without a provenance stamp counts as linux-x64, and no other platform
 // may record into it.
 const X86_NS = /-x86$/.test(CODEC);
-const MAIN_REPO = process.env.VF_MAIN_REPO || '/Users/asingh02/personal/sttm-desktop';
+const MAIN_REPO = process.env.VF_MAIN_REPO || require('path').join(require('os').homedir(), 'personal/sttm-desktop');
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(`--${n}`);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : d; };

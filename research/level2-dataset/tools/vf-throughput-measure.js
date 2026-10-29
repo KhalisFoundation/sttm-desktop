@@ -22,7 +22,7 @@ const { Recognizer } = require(path.join(ENGINE, 'recognizer'));
 const { Follower } = require(path.join(ENGINE, 'follower'));
 const { SP } = require(path.join(ENGINE, 'sentencepiece'));
 
-const CLIPS = '/Users/asingh02/personal/live-darbar-venues/clips';
+const CLIPS = process.env.VF_CLIPS || require('path').join(require('os').homedir(), 'personal/live-darbar-venues/clips');
 const MODEL = require('./speech-pack').speechModel().onnx;
 const SR = 16000;
 const CHUNK = 2048;
