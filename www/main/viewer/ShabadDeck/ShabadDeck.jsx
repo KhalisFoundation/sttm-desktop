@@ -20,7 +20,6 @@ import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 import { i18n } from '../../common/i18n';
 
 const os = require('os');
-const remote = require('@electron/remote');
 const aiTranslationDB = require('../../banidb/pss-db');
 
 const platform = os.platform();
@@ -59,6 +58,7 @@ function ShabadDeck() {
     translationEnglishSource,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
+  const showContinuousVerses = akhandpatt;
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
   const verseRefKeys = useRef([]);
@@ -188,8 +188,8 @@ function ShabadDeck() {
     // Mantar (bani 1 → shabad 1).
     const isShabadShown = !isSundarGutkaBani && !isCeremonyBani;
     if (!isMiscSlide && activeVerseId && isShabadShown) {
-      if (akhandpatt) {
-        loadShabad(currentShabad, activeVerseId).then((verses) => setActiveVerse(verses));
+      if (showContinuousVerses) {
+        loadShabad(currentShabad).then((verses) => setActiveVerse(verses));
       } else {
         loadShabadVerse(currentShabad, activeVerseId).then((result) =>
           result.map((activeRes) => setActiveVerse([activeRes])),
@@ -272,6 +272,7 @@ function ShabadDeck() {
   }, [
     activeShabadId,
     activeVerseId,
+    showContinuousVerses,
     sundarGutkaBaniId,
     ceremonyId,
     akhandpatt,
@@ -283,17 +284,27 @@ function ShabadDeck() {
   ]);
 
   useEffect(() => {
-    if (activeVerseId && akhandpatt) {
+    if (activeVerseId && showContinuousVerses) {
       const verseDOM = verseRefs.current[activeVerseId];
 
-      if (verseDOM) {
-        verseDOM.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+      if (!verseDOM) {
+        return;
       }
+
+      const rect = verseDOM.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const isVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
+
+      if (isVisible) {
+        return;
+      }
+
+      verseDOM.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     }
-  }, [activeVerseId, akhandpatt, verseRefKeys.current]);
+  }, [activeVerseId, showContinuousVerses, verseRefKeys.current]);
 
   useEffect(() => {
     if (isMiscSlide) {
@@ -331,7 +342,7 @@ function ShabadDeck() {
           currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY') && 'single-display-mode',
           miscSlideText === '' && 'empty-slide',
           minimizedBySingleDisplay && 'single-display-minimized',
-          akhandpatt && !isMiscSlide && 'akhandpatt-view',
+          showContinuousVerses && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
           // The info bar sits under the slide, which shrinks to make room.
@@ -359,6 +370,7 @@ function ShabadDeck() {
                 verseObj={activeVerseObj}
                 nextLineObj={nextVerse}
                 isMiscSlide={isMiscSlide}
+                continuousView={showContinuousVerses}
                 updateVerseRef={updateVerseRef}
                 slideIndex={index}
               />
