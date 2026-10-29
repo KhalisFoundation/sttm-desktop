@@ -1,6 +1,6 @@
 # Speech-model hearing benchmark (Voice Autopilot)
 
-Compares speech models on one question: **does the right Shabad come up from what the model heard?** Every model hears
+Part of [research/BENCHMARKS.md](../BENCHMARKS.md) (model + harness). Compares speech models on one question: **does the right Shabad come up from what the model heard?** Every model hears
 the same audio windows. Its transcripts go through the app's own Gurbani search, and the result is scored per
 behaviour. Clips, models, the search corpus and the speech libraries are pinned by revision and sha256. On x86-64 a
 re-run gives the same numbers; other CPUs (e.g. Apple arm64) give slightly different text and so slightly different numbers.
