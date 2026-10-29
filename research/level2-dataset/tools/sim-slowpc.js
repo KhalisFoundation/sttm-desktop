@@ -42,7 +42,7 @@ if (FILL && !process.env.VF_SIM_LOCKED) {
   process.exit(r.status == null ? 1 : r.status);
 }
 
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 Object.assign(process.env, {
   VF_EMIS_CACHE: process.env.VF_EMIS_CACHE || '/Users/asingh02/personal/live-darbar-venues/cache',

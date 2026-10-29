@@ -18,7 +18,7 @@ const NW = path.join(__dirname, '../newton'); // taps, truth, Bani 90 row maps (
 const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
 const SESSION = path.join(CLIPS, 'nw11_session.wav'); // stitched 16 kHz session (2953 s)
 const TAPS = JSON.parse(fs.readFileSync(path.join(NW, 'taps.json')));
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 const SR = 16000, CHUNK = 2048;
 const MODE = arg('mode', 'session');

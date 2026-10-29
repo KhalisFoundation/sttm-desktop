@@ -16,7 +16,7 @@ const os = require('os');
 
 const argv = process.argv.slice(2);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const ROOT = path.resolve(DS, '../..');
 const { vfNorm } = (() => { try { return { vfNorm: require(path.join(ROOT, 'www/main/addons/voice-follow/engine/infer')).norm }; } catch (_) { return { vfNorm: (s) => (s || '').replace(/[^ਁ-੥ੰ-ੵ]/g, '') }; } })();
 process.env.COPIES = '1';
@@ -111,7 +111,7 @@ function acousticFor(id) {
   const b = fs.readFileSync(fs.realpathSync(wav)); let off = 12; let pcm = null;
   while (off + 8 <= b.length) { const tag = b.toString('ascii', off, off + 4); const sz = b.readUInt32LE(off + 4); if (tag === 'data') { const n = Math.floor(sz / 2); pcm = new Float32Array(n); for (let i = 0; i < n; i++) pcm[i] = b.readInt16LE(off + 8 + i * 2) / 32768; break; } off += 8 + sz + (sz & 1); }
   AC.clip = id; AC.pcm = pcm; AC.key = windowKey;
-  AC.store = new Store(storeDir({ model: process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx', clip: id }));
+  AC.store = new Store(storeDir({ model: require('./speech-pack').speechModel().onnx, clip: id }));
   if (!AC.lines) {
     textIndex();
     AC.lines = new Map(); for (const r of TI.rows) { if (!AC.lines.has(r.shabadId)) AC.lines.set(r.shabadId, []); AC.lines.get(r.shabadId).push(r.text); }

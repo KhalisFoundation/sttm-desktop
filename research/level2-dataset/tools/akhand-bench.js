@@ -16,14 +16,14 @@ const os = require('os');
 const { createDriver } = require(path.join(__dirname, 'bench-driver'));
 
 const BENCH = process.env.VF_BENCHMARK || path.join(os.homedir(), 'personal/vf-benchmark');
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(os.homedir(), 'Library/Application Support/SikhiToTheMax');
 const SR = 16000;
 const CHUNK = 2048;
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
 const ONLY = arg('only', '') ? new Set(arg('only', '').split(',')) : null;
 const FAST = process.argv.includes('--fast');
-const OUT = arg('out', path.join(__dirname, '..', 'results', `akhand-${Date.now()}`));
+const OUT = arg('out', path.join(require('./gab-data').DS, 'results', `akhand-${Date.now()}`));
 fs.mkdirSync(OUT, { recursive: true });
 
 function readWav(file) {

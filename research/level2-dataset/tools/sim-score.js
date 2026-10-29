@@ -13,7 +13,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const TOOLS = __dirname;
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const KT = JSON.parse(fs.readFileSync(path.join(DS, 'khalis-tests.json')));
 const STEP = 0.1;
 

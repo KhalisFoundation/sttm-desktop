@@ -146,10 +146,18 @@ async function createDriver({
   const { partialRatio } = require(path.join(ROOT, 'www/main/addons/voice-follow/engine/fuzz'));
   // Thread cap: ORT defaults intraOp threads to all cores; several benchmark
   // processes then oversubscribe the machine. VF_ORT_THREADS (default 4) caps it.
+  // The build's speech model (engine/speech-model.js, VF_SPEECH_MODEL model packs): its vocabulary,
+  // and sessions built by Infer.create so a pack with a front-end ONNX runs. Older builds: the
+  // built-in vocabulary (blank after the last piece).
+  const SM_PATH = path.join(ROOT, 'www/main/addons/voice-follow/engine/speech-model.js');
+  const SM = fs.existsSync(SM_PATH) ? require(SM_PATH) : null;
+  const VOCAB = SM ? SM.active().vocab : require(path.join(ROOT, 'www/main/addons/voice-follow/engine/assets/vocab'));
+  const CLASSES = SM ? SM.classes(SM.active()) : VOCAB.length + 1;
   const realInfer = async () => {
+    if (!process.env.VF_ORT_THREADS) process.env.VF_ORT_THREADS = '4';
+    if (SM) return Infer.create(model, VOCAB);
     const ort = require(path.join(ROOT, 'node_modules/onnxruntime-node'));
-    const VOCAB = require(path.join(ROOT, 'www/main/addons/voice-follow/engine/assets/vocab'));
-    const n = parseInt(process.env.VF_ORT_THREADS || '4', 10);
+    const n = parseInt(process.env.VF_ORT_THREADS, 10);
     const sess = await ort.InferenceSession.create(model, { intraOpNumThreads: n, interOpNumThreads: 1 });
     return new Infer(sess, VOCAB);
   };
@@ -161,7 +169,6 @@ async function createDriver({
     const codec = process.env.VF_EMIS_CODEC || 'q16';
     const dir = storeDir({ root: EMIS_CACHE, model, codec, clip: cacheId });
     const store = new Store(dir, { write: EMIS_MODE === 'record' && !SIM, codec });
-    const VOCAB = require(path.join(ROOT, 'www/main/addons/voice-follow/engine/assets/vocab'));
     infer = new Infer(null, VOCAB);
     const real = EMIS_MODE === 'record' ? await realInfer() : null;
     cache = { store, dir, hits: 0, misses: 0, recorded: 0, missErrors: [], real };
@@ -187,7 +194,7 @@ async function createDriver({
           // the self-test's noise windows: only their (virtual) time matters
           cache.selfTest += 1;
           const frames = Math.max(1, Math.floor(buf.length / 640));
-          const C = VOCAB.length + 1;
+          const C = CLASSES;
           out = { data: new Float32Array(frames * C).fill(-30), frames, C };
         } else if (real) {
           const job = (real.run ? real.run(buf) : real.emissions(buf)).then((o) => {

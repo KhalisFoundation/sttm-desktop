@@ -260,7 +260,7 @@ function markdown(card) {
   const L = [];
   L.push(`## ${card.gab} scorecard — ${card.setTitle || 'GAB'} — ${card.build.name || card.build.commit || card.build.root}`);
   L.push('');
-  L.push(`build \`${card.build.root}\` @ ${card.build.commit || '?'}${card.build.dirty ? ' (uncommitted edits)' : ''}${card.build.featureVersion ? ` · Voice-Follow ${card.build.featureVersion}` : ''} · manifest ${card.manifest.sha} (${card.manifest.rows} rows) · set **${card.set || 'pre-tier (mixed)'}** · tier **${card.tier}** · split **${card.split}**${card.folders ? ` · folders ${card.folders}` : ''} · ${card.createdAt}`);
+  L.push(`build \`${card.build.root}\` @ ${card.build.commit || '?'}${card.build.dirty ? ' (uncommitted edits)' : ''}${card.build.featureVersion ? ` · Voice-Follow ${card.build.featureVersion}` : ''}${card.model ? ` · speech model **${card.model.name}** (${card.model.sha12})` : ''} · manifest ${card.manifest.sha} (${card.manifest.rows} rows) · set **${card.set || 'pre-tier (mixed)'}** · tier **${card.tier}** · split **${card.split}**${card.folders ? ` · folders ${card.folders}` : ''} · ${card.createdAt}`);
   L.push('');
   L.push('| behaviour | clips · audio | right Shabad/Bani on screen (human truth) | sangat sees the right pangti (truth basis; coverage) | same or neighbouring pangti | seconds behind p50 / p90 | wrong Shabad s per hour | time to find p50 / p90 s | switch: found within 10 s / later / never; p50 |');
   L.push('|---|---|---|---|---|---|---|---|---|');
@@ -379,7 +379,7 @@ function compareMarkdown(c, A, B) {
   const L = [];
   L.push(`## ${c.gab} compare (${c.set}) — A: ${A.build.name || A.build.commit} vs B: ${B.build.name || B.build.commit}`);
   L.push('');
-  L.push(`A \`${A.build.root}\` @ ${A.build.commit}${A.build.dirty ? ' (dirty)' : ''} · B \`${B.build.root}\` @ ${B.build.commit}${B.build.dirty ? ' (dirty)' : ''} · manifest ${c.manifest[0]} · tier ${c.tier} · split ${c.split}${c.warning ? ` · WARNING: ${c.warning}` : ''}`);
+  L.push(`A \`${A.build.root}\` @ ${A.build.commit}${A.build.dirty ? ' (dirty)' : ''}${A.model ? ` (model ${A.model.name})` : ''} · B \`${B.build.root}\` @ ${B.build.commit}${B.build.dirty ? ' (dirty)' : ''}${B.model ? ` (model ${B.model.name})` : ''} · manifest ${c.manifest[0]} · tier ${c.tier} · split ${c.split}${c.warning ? ` · WARNING: ${c.warning}` : ''}`);
   L.push('');
   L.push('| row | scope | metric | A | B | verdict |');
   L.push('|---|---|---|---|---|---|');

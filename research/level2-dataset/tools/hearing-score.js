@@ -23,7 +23,7 @@ const os = require('os');
 process.env.COPIES = '1';
 const argv = process.argv.slice(2);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const ROOT = path.resolve(DS, '../..');
 const ENGINE = path.join(ROOT, 'www/main/addons/voice-follow/engine');
 const { TextIndex } = require(path.join(ENGINE, 'retrieval/text-index.js'));

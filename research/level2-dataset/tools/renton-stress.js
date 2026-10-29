@@ -25,7 +25,7 @@ const path = require('path');
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
 const ROOT = path.resolve(arg('root', path.resolve(__dirname, '../../..')));
 const CLIPS = '/Users/asingh02/personal/live-darbar-venues/clips';
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 const SR = 16000;
 const CHUNK = 2048; // 128 ms, like bench-runner

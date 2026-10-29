@@ -2,7 +2,7 @@
 // aCER/aWER = edit distance to the best-matching stretch of the true Shabad (semi-global), / hypothesis length.
 // right chars = hyp length - edits (>=0), averaged over ALL windows (silence counts as 0) = raw hearing power.
 const fs = require('fs'); const path = require('path'); const os = require('os');
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const { parseCsv } = require('./vf-manifest');
 const TR = path.join(DS, 'results/hearing/transcripts');
 const SAMPLE = JSON.parse(fs.readFileSync(path.join(__dirname, 'hearing-sample.json'), 'utf8')).clips;

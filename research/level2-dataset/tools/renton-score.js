@@ -11,8 +11,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-const V = process.env.VF || path.join(__dirname, '..', 'renton-oct11');
-const DS = process.env.DS || path.join(__dirname, '..');
+const V = process.env.VF || path.join(require('./gab-data').DS, 'renton-oct11');
+const DS = process.env.DS || require('./gab-data').DS;
 const mem = JSON.parse(fs.readFileSync(path.join(DS, 'aarti/bani-members.json'))).members;
 const K = JSON.parse(fs.readFileSync(path.join(V, 'kirtan-targets.json')));
 const STEP = 0.1;

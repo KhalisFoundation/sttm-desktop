@@ -24,7 +24,7 @@ const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i
 const CACHE = path.resolve(arg('cache', process.env.VF_EMIS_CACHE || DEFAULT_ROOT));
 const WORK = path.join(CACHE, 'line-truth');
 const FB = path.resolve(__dirname, '../../follower-bench');
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const APP = path.join(os.homedir(), 'Library/Application Support/SikhiToTheMax');
 const ROOT = path.resolve(__dirname, '../../..');
 

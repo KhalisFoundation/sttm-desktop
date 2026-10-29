@@ -10,7 +10,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const TOOLS = __dirname;
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
 const durOf = (wav) => {
   try { return Math.max(0, (fs.statSync(wav).size - 44) / 32000); } catch (_) { return 0; }
@@ -84,7 +84,7 @@ const SUITES = {
     jobs: () => sheetJobs('aarti-tests.json', 'aa', ['--trace-all']),
     metrics: [['right %', 1], ['wrong %', -1], ['none %', -1], ['piece exact %', 1], ['heard line %', 1], ['found', 1], ['found <=30 s', 1], ['found <=60 s', 1], ['median find s', -1], ['wrong switches', -1]],
     score(dir) {
-      const out = node([path.join(DS, 'aarti/aarti-score.js'), dir]);
+      const out = node([path.join(__dirname, 'aarti-score.js'), dir]);
       const line = out.split('\n').find((l) => l.startsWith('RIGHT (Aarti text up)')) || '';
       const [right, wrong, none, piece, heard] = pick(line, /RIGHT \(Aarti text up\) ([\d.]+)% \| WRONG ([\d.]+)% \| NONE ([\d.]+)% \| piece-exact ([\w.-]+)% \| heard-line ([\w.-]+)%/).map((x) => (Number.isNaN(x) ? null : x));
       const [found, , w30, w60, med] = pick(line, /found (\d+)\/(\d+), within 30 s (\d+), within 60 s (\d+), median ([\d.-]+) s/);

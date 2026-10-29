@@ -10,7 +10,7 @@ const path = require('path');
 const { isRight } = require('./bani-aware');
 const dir = process.argv[2];
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const notes = JSON.parse(fs.readFileSync(path.join(DS, 'clip-notes.json')));
 const STEP = 0.1;
 const files = [];

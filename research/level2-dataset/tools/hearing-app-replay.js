@@ -12,7 +12,7 @@ const path = require('path');
 const os = require('os');
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const TIER = arg('tier', 'akhand');
 const OUT = path.join(DS, 'results/hearing', `app-${TIER}`);
 process.env.VF_EMIS_CACHE = process.env.VF_EMIS_CACHE || path.join(DS, 'results/hearing/emis');
@@ -22,7 +22,7 @@ fs.mkdirSync(OUT, { recursive: true });
 // as vf-check: shadow config OFF, so a lock reaches the screen (useNewShabad) instead of the shadow bus
 if (fs.existsSync(path.join(process.env.VF_DRIVER_ROOT || path.resolve(__dirname, '../../..'), 'www/main/addons/voice-follow/shadow/config.js'))) require('./no-shadow-preload');
 const { createDriver } = require(path.join(__dirname, 'bench-driver'));
-const MODEL = process.env.MODEL || path.join(os.homedir(), 'AAI/models/karansea-shabad-ctc/model.int8.onnx');
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(os.homedir(), 'Library/Application Support/SikhiToTheMax');
 const SR = 16000;
 const CHUNK = 2048; // as bench-runner / khalis-bench / akhand-bench

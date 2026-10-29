@@ -14,7 +14,7 @@ const path = require('path');
 const { createDriver, COMPONENT } = require(path.join(__dirname, 'bench-driver'));
 
 const CLIP = process.argv[2] || '/Users/asingh02/personal/live-darbar-venues/clips/bn01_dy1bAclA25k_0-520.wav';
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 const USER_LENGTH = process.env.VF_TEST_BANI_LENGTH || 'short';
 const SR = 16000;

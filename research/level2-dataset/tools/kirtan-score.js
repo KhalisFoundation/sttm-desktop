@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const SWITCH_BEFORE = 15;
 const SWITCH_AFTER = 30;
 const ledgerBy = () => {

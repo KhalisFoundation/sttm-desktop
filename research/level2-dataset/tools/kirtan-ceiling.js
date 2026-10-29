@@ -13,7 +13,7 @@ const { clipEvents } = require('./kirtan-score');
 
 const argv = process.argv.slice(2);
 const EVERY = argv.includes('--every') ? Number(argv[argv.indexOf('--every') + 1]) : 2;
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const ROOT = path.resolve(DS, '../..');
 const { TextIndex } = require(path.join(ROOT, 'www/main/addons/voice-follow/engine/retrieval/text-index.js'));
 const cdir = path.join(os.homedir(), 'personal/live-darbar-venues/cache/corpus');

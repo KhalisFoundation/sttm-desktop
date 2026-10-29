@@ -43,7 +43,7 @@ const flag = (n) => argv.includes(`--${n}`);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : d; };
 
 const TOOLS = __dirname;
-const DS = path.join(__dirname, '..');
+const DS = require('./gab-data').DS;
 const ROOT = path.resolve(DS, '../..');
 const ORG = 'khalisfoundation';
 const PREFIX = 'sttm_desktop_';

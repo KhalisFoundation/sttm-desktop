@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { createDriver } = require(path.join(__dirname, 'bench-driver'));
 const CLIPS = process.env.VF_CLIPS || '/Users/asingh02/personal/live-darbar-venues/clips';
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const USERDATA = process.env.VF_BANIDB_USER_DATA || path.join(process.env.HOME, 'Library/Application Support/SikhiToTheMax');
 const SR = 16000, CHUNK = 2048, STEP = 0.1;
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : d; };
@@ -20,7 +20,7 @@ const ONLY = arg('only', '') ? new Set(arg('only', '').split(',')) : null;
 const FAST = process.argv.includes('--fast');
 const TRACE = process.argv.includes('--trace');
 const TRACE_ALL = process.argv.includes('--trace-all');
-const OUT = arg('out', path.join(__dirname, '..', 'results', `khalis-${Date.now()}`));
+const OUT = arg('out', path.join(require('./gab-data').DS, 'results', `khalis-${Date.now()}`));
 fs.mkdirSync(OUT, { recursive: true });
 function readWav(file) {
   const b = fs.readFileSync(file); let off = 12;

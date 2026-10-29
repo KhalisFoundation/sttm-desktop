@@ -8,9 +8,12 @@
  *   gab run <build> [--set main|hard] [--manifest hf | <local benchmark dir>] [--tier smoke|full] [--split dev|test|train,dev] [--folders 1-kirtan-shabad,2-bani-recited/japji] [--ids rt11_,kh12]
  *                   [--name "<build name>"] [--out <dir>] [--jobs N] [--keep]                        -> scorecard
  *   gab compare <A> <B> [same options]                    -> both scorecards + before/after with pass/fail guardrails
+ *   gab compare --cards <A scorecard.json> <B scorecard.json> [--name-a ..] [--name-b ..]  -> the same, from saved scorecards
+ *   Speech model: VF_SPEECH_MODEL=<model pack folder> (model.json; see engine/speech-model.js) runs that CTC model in
+ *   every command (cache keyed per model); unset = the built-in Karanbir model (MODEL env overrides its path).
  *   gab slowpc <A> <B> [--clips rehras,kh04,ytasa1] [--speeds 0.5,0.7,0.9,1.2] [--jobs N]  -> simulated slow-PC sweep
  *   gab pull [--split ...]                                 -> fetch every locally missing / partial cache entry from Azure
- *   gab fill [--root <build>] [--plan] [--no-push]        -> pull from Azure, then record (model) only what is in
+ *   gab fill [--root <build>] [--tier smoke|full] [--plan] [--no-push]      -> pull from Azure, then record (model) only what is in
  *                                                             neither place, then push it to Azure
  *   gab ingest [--dry-run] [--push]                       -> pull new Jaspal recordings, rebuild the manifest, fill plan
  *   gab publish <main scorecard.json> --hard <hard scorecard.json> --name "<build name>"  -> one row (both tiers) on the
@@ -37,12 +40,13 @@ const { spawn, execFileSync } = require('child_process');
 const G = require('./gab-score');
 
 const TOOLS = __dirname;
-const DS = path.join(TOOLS, '..');
+const DS = require('./gab-data').DS;
 const MAIN_REPO = process.env.VF_MAIN_REPO || '/Users/asingh02/personal/sttm-desktop';
 let BENCH = process.env.VF_BENCHMARK || path.join(os.homedir(), 'personal/vf-benchmark');
 const { DEFAULT_ROOT, modelSha } = require('./emis-cache');
 const CACHE = path.resolve(process.env.VF_EMIS_CACHE || DEFAULT_ROOT);
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const SPEECH = require('./speech-pack').speechModel();
+const MODEL = SPEECH.onnx;
 // x86 is the reference (owner, Oct 17 2026): GAB scores from the x86 (linux-x64) model output of every recording
 // (codec namespace q16-x86, recorded on the GCP VM). VF_EMIS_CODEC=q16 = the older mixed Mac + x86 cache. Set in env so
 // vf-check and the runners it starts use the same namespace.
@@ -114,7 +118,7 @@ if (argv[0] === 'hard' || argv[0] === 'akhand') {
   argv = [sub, ...argv.slice(sub === argv[1] ? 2 : 1), '--set', argv[0]];
 }
 const cmd = argv[0];
-const pos = argv.slice(1).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && all[i - 1].startsWith('--') && !['--keep', '--plan', '--push', '--no-push', '--dry-run', '--include-dev'].includes(all[i - 1])));
+const pos = argv.slice(1).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && all[i - 1].startsWith('--') && !['--keep', '--plan', '--push', '--no-push', '--dry-run', '--include-dev', '--cards'].includes(all[i - 1])));
 const flag = (n) => argv.includes(`--${n}`);
 const arg = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : d; };
 const sh = (c, a, o = {}) => execFileSync(c, a, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...o }).trim();
@@ -299,6 +303,7 @@ function cardFor(sel, build, side, outDir, rep, extra) {
   const card = G.scorecard({ sv, ds, clips: runs, meta: {
     createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
     build: { name: arg('name') || null, root: build.root, commit: build.commit, dirty: build.dirty, subject: build.subject, featureVersion: build.featureVersion },
+    model: { name: SPEECH.name, pack: SPEECH.pack, sha12: msha12() },
     manifest: { sha: sel.man.sha, rows: sel.man.rows.length, path: path.join(BENCH, 'manifest.csv') },
     set: sel.set, tier: sel.tier, split: sel.split === 'dev' ? 'dev (train + dev rows; test held out)' : sel.split, folders: arg('folders') || null,
     notRun: notRun.sort((a, b) => a.id.localeCompare(b.id)),
@@ -357,7 +362,33 @@ async function cmdRun() {
   if (!flag('keep')) fs.rmSync(path.join(out, 'replay'), { recursive: true, force: true });
 }
 
+// gab compare --cards A.json B.json: compare two saved scorecards (e.g. one build run twice, once per
+// speech model: VF_SPEECH_MODEL=<pack> gab run <build>), without replaying anything.
+function compareCards() {
+  const [ca, cb] = pos.slice(0, 2).map((f) => JSON.parse(fs.readFileSync(f, 'utf8')));
+  if (arg('name-a')) ca.build.name = arg('name-a');
+  if (arg('name-b')) cb.build.name = arg('name-b');
+  const scr = (card) => Object.fromEntries((card.clips || []).map((x) => [x.id, JSON.stringify((x.events || []).filter((e) => ['shabad', 'verse', 'seeking'].includes(e.type)))]));
+  const sa = scr(ca);
+  const sb = scr(cb);
+  const both = Object.keys(sa).filter((id) => id in sb);
+  const changed = both.filter((id) => sa[id] !== sb[id]);
+  const c = G.compare(ca, cb);
+  c.screenChanged = changed;
+  const ids = (card) => (card.clips || []).map((x) => x.id).sort().join(',');
+  if (ids(ca) !== ids(cb)) { c.incomplete = [{ key: 'clips', why: 'the two scorecards cover different clips' }]; c.pass = false; }
+  const out = path.resolve(arg('out', path.join(path.dirname(path.resolve(pos[1])), 'compare-cards')));
+  fs.mkdirSync(out, { recursive: true });
+  write(path.join(out, 'compare.json'), c);
+  const md = [G.compareMarkdown(c, ca, cb), '', `Screen events differ on ${changed.length} of ${both.length} clips${changed.length ? `: ${changed.slice(0, 20).join(', ')}${changed.length > 20 ? ' ...' : ''}` : ''}.`].join('\n');
+  write(path.join(out, 'compare.md'), md);
+  console.log(`\n${md}\n\ncompare: ${path.join(out, 'compare.json')}`);
+  if (c.incomplete) console.log(`\n${incompleteNote(c.incomplete)}`);
+  process.exitCode = c.incomplete ? 3 : c.pass ? 0 : 1;
+}
+
 async function cmdCompare() {
+  if (flag('cards')) { compareCards(); return; }
   const A = resolveBuild(pos[0]);
   const B = resolveBuild(pos[1]);
   const { t0, sel, out, missingBoth } = await prepare([A, B], 'compare');
@@ -420,7 +451,7 @@ async function cmdFill() {
   // every manifest clip with a runner, all splits: pull from Azure first (thorough), then the model only for the rest
   process.argv.push('--split', 'train,dev,test');
   argv.push('--split', 'train,dev,test');
-  const sel = select({ tier: 'full', set: 'all' });
+  const sel = select({ tier: arg('tier', 'full'), set: 'all' });
   const left = await pullMissing(sel.jobs, { thorough: true });
   console.log(`fill: ${sel.jobs.length} manifest clips with a runner; ${left.length} in neither the local nor the Azure cache`);
   if (!left.length) return;

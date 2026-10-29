@@ -29,7 +29,7 @@ const { SUITES, TOOLS, DS } = require('./vf-suites');
 const { DEFAULT_ROOT, modelSha } = require('./emis-cache');
 
 const LOCK = '/tmp/vf-bench.lock';
-const MODEL = process.env.MODEL || '/Users/asingh02/AAI/models/karansea-shabad-ctc/model.int8.onnx';
+const MODEL = require('./speech-pack').speechModel().onnx;
 const CODEC = process.env.VF_EMIS_CODEC || 'q16';
 // x86 reference (owner, Oct 17 2026): codec 'q16-x86' is the same q16 encoding in its own namespace that holds ONLY
 // linux-x64 (x86) model output for every GAB recording (the production reference: most PCs are Intel/Windows). Its
@@ -493,7 +493,7 @@ async function check() {
   // reuse saved replays of an unchanged, committed app tree (same harness, model, codec)
   const hk = harnessKey();
   // scorers + suite definitions also key the stored metrics
-  const scoreKey = sha1([hk, ...['vf-suites.js', 'rescore.js', 'bani-aware.js', 'paath-score.js', '../aarti/aarti-score.js', 'khalis-arbiter.js', 'renton-score.js', 'nw-score.js', 'sangat-score.js']
+  const scoreKey = sha1([hk, ...['vf-suites.js', 'rescore.js', 'bani-aware.js', 'paath-score.js', 'aarti-score.js', 'khalis-arbiter.js', 'renton-score.js', 'nw-score.js', 'sangat-score.js']
     .map((f) => fs.readFileSync(path.join(TOOLS, f), 'utf8'))].join('\0'));
   const msha = modelSha(MODEL, CACHE);
   const savedDir = (root) => { const tk = treeKey(root); return tk ? path.join(CACHE, 'replays', sha1(`${tk}|${hk}|${msha}|${CODEC}`).slice(0, 16)) : null; };
