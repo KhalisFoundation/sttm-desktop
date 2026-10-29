@@ -1738,7 +1738,7 @@ const VoiceFollow = () => {
   // score = the candidate's match to the last ~10 s of audio (the number the
   // judge actually compares), wins = confirmation progress. Honest by design:
   // what the sevadar sees is exactly what decides a switch.
-  const [, setLiveCands] = useState({ sCur: 0, items: [] });
+  const [liveCands, setLiveCands] = useState({ sCur: 0, items: [] });
   // Live board: calibrated % for the current Shabad and every Shabad in contention, updated
   // every decode (see liveBoard.js); and a rolling transcript of what the model hears.
   const boardRef = useRef(null);
@@ -6806,34 +6806,13 @@ const VoiceFollow = () => {
   const leadLine = liveLead ? nameLine(liveLead) : '';
   // The change card's percentage: the live board's, else the shelf's held one.
   let leadPct = 0;
-  let leadProg = 0;
   if (liveLead) {
     const onBoard = boardPct(liveLead.shabadId);
-    leadPct = onBoard != null ? onBoard : liveLead.pct || 0;
-    leadProg = liveLead.prog || 0;
+    leadPct = onBoard != null ? onBoard : liveLead.score || 0;
   }
   // A change in progress is the one thing to look at. The same Gurbani under another id is
   // not a change.
   const changing = !!(liveLead && leadLine && !sameAsCurrent(leadLine));
-
-  // The next pangti; on the last pangti, a quiet "End of Shabad" in its place.
-  let nextRow = <span className="vf2-next-line is-empty" />;
-  if (nextLine)
-    nextRow = (
-      <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
-        <span className="vf2-next-mark" aria-hidden="true" />
-        <Gurmukhi text={nextLine} />
-      </div>
-    );
-  else if (atEnd)
-    nextRow = (
-      <div className="vf2-next-line is-end">
-        <span className="vf2-next-mark" aria-hidden="true" />
-        {i18n.t(
-          curBaniShabadsRef.current ? 'VOICE_FOLLOW.END_OF_BANI' : 'VOICE_FOLLOW.END_OF_SHABAD',
-        )}
-      </div>
-    );
 
   const heardStrip = (() => {
     // A rolling window: only the last few settled words, newest kept in view.
