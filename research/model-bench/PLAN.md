@@ -1,5 +1,7 @@
 # Plan: one way to benchmark speech models for Voice Autopilot
 
+Making a model? Start with [MODEL-GUIDE.md](MODEL-GUIDE.md).
+
 Goal: Jaspal's runs, our runs and anyone's Claude produce the **same numbers** for the same model, and every
 number says what it measures. Proposed Oct 28 2026; open for Jaspal's edits.
 
