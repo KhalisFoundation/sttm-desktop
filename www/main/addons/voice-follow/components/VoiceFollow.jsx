@@ -155,6 +155,15 @@ const {
   sameGurbani,
 } = require('./switchPolicy');
 const { screenTakenByCeremony } = require('./autopilotScreen');
+// Banis followed at a longer length than the user's (Rehras, Aarti, Sohila), unit-tested in
+// baniLength.test.js.
+const {
+  REHRAS_BANI,
+  AARTI_BANI,
+  BANI_MIN_LENGTH,
+  baniLengthFor,
+  readRuleMayOpen,
+} = require('./baniLength');
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
 
@@ -439,7 +448,6 @@ const baniIdOf = (id) =>
 // has (Bhagat Dhanna ji's "Jo jan tumree bhagat karante"); a line Aarti shares with
 // Sohila (Gagan mai thaal) or Rehras (the Savaiya and Dohra) never opens it.
 const PAATH_BANIS = [1000, 10, 2, 4, 6, 7, 9, 22]; // Anand 6, Anand, Japji, Jaap, Savaiye x2, Chaupai, Aarti
-const AARTI_BANI = 22;
 const AARTI_SHARED_BANIS = [21, 23]; // Rehras, Sohila
 const PAATH_FAMILY = {
   1000: 'anand',
@@ -529,27 +537,11 @@ const PAATH_POOL_HITS = 5;
 // the same score floor fires on no kirtan cold start (41 Level 2 clips) that 5 of 8 did not.
 const PAATH_POOL_HITS_BY_BANI = { [AARTI_BANI]: 4 };
 const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
-// Rehras is followed at the extra-long length by default: it contains every shorter
-// Rehras (the long readers' opening "Har jug jug bhagat upaya" and its salok, the extra
-// Dasam shabads) plus the Chaupai pauris and dohras some gurdwaras (Renton) read; a
-// reader of any length is then followed from the first line, and the paath follower
-// steps over the lines a shorter reader leaves out. (The Taksal list's only lines the
-// extra-long one lacks are three headers and a repeated dohra.) While Rehras is open the
-// Bani length is raised to this (never lowered) and restored when it ends.
-const REHRAS_BANI = 21;
-const REHRAS_LENGTH = 'extralong';
-const LENGTH_ORDER = ['short', 'medium', 'long', 'extralong'];
-// Aarti likewise is followed at the extra-long length: a sung Aarti (Renton) runs through
-// pieces the short list lacks (Kabir's Sorath "Bhookhe bhagat na keejai", the opening
-// Savaiya), and a Bani profile without those lines has nothing to show while they are sung.
-const AARTI_LENGTH = 'extralong';
-const BANI_MIN_LENGTH = { [REHRAS_BANI]: REHRAS_LENGTH, [AARTI_BANI]: AARTI_LENGTH };
-const baniLengthFor = (baniId, userLength) => {
-  const min = BANI_MIN_LENGTH[baniId];
-  return min && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(min) ? min : userLength;
-};
-// Stop never moves the screen: the length Voice-Follow raised for a Bani (Rehras long,
-// Aarti extra-long) stays while that Bani is still up, because putting the user's length
+// Rehras and Aarti are followed at the extra-long length, Kirtan Sohila at the long length,
+// whatever the user's own Sundar Gutka length (see baniLength.js): while one of them is open
+// the Bani length is raised to it (never lowered) and restored when it ends.
+// Stop never moves the screen: the length Voice-Follow raised for a Bani (Rehras, Aarti,
+// Sohila) stays while that Bani is still up, because putting the user's length
 // back reloads the Bani and the pane jumps to its first line (Renton, Oct 2026: a
 // sevadaar pressed Stop mid-Rehras and had to scroll back down to the line). The user's
 // length comes back once the screen has moved on. pending = { prev, to, baniId }.
@@ -564,10 +556,6 @@ export const pendingLengthAction = (pending, nav) => {
     nav.isSundarGutkaBani && !nav.isCeremonyBani && nav.sundarGutkaBaniId === pending.baniId;
   return sameBani ? 'keep' : 'restore';
 };
-// Of the long Rehras's extra shabads, only its opening (Har jug jug bhagat upaya and the
-// salok after it) may open Rehras by the reading rule: its closing saloks and pauris
-// (e.g. 1944) are sung as kirtan in their own right (Level 2 clip04).
-const REHRAS_READ_OPENING = new Set([1661, 1721]);
 const BANI_LENGTH_ALL = ['existsSGPC', 'existsMedium', 'existsTaksal', 'existsBuddhaDal'];
 // Pooled search votes of one PAATH_POOL_BANIS Bani (see there), or null.
 function poolPaathVotes(ranked, index) {
@@ -2906,7 +2894,7 @@ const VoiceFollow = () => {
   const getBaniIndex = useCallback(() => {
     const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
     if (!baniIndexRef.current || baniIndexRef.current.col !== col) {
-      // Banis followed at a longer length than the user's (Rehras, Aarti) take their shabad
+      // Banis followed at a longer length than the user's (Rehras, Aarti, Sohila) take their shabad
       // list from that length, so sequence and copy rules see every piece they can follow.
       const longer = Object.keys(BANI_MIN_LENGTH)
         .map(Number)
@@ -2917,8 +2905,12 @@ const VoiceFollow = () => {
         banidb.loadBaniIndex(col),
         ...extraCols.map((c) => banidb.loadBaniIndex(c)),
       ]).then(([banis, ...extra]) => {
-        // The user-length Rehras, kept for the reading rule (see REHRAS_READ_OPENING).
-        const rehrasUser = new Set(banis[REHRAS_BANI] || []);
+        // The user-length list of each raised Bani, kept for the reading rule (see
+        // readRuleMayOpen in baniLength.js).
+        const userShabads = {};
+        longer.forEach(([b]) => {
+          userShabads[b] = new Set(banis[b] || []);
+        });
         longer.forEach(([b, c]) => {
           const got = extra[extraCols.indexOf(c)];
           // eslint-disable-next-line no-param-reassign
@@ -2932,7 +2924,7 @@ const VoiceFollow = () => {
             byShabad.set(sid, list);
           }),
         );
-        return { banis, byShabad, rehrasUser };
+        return { banis, byShabad, userShabads };
       });
       promise.catch(() => {
         if (baniIndexRef.current && baniIndexRef.current.promise === promise) {
@@ -5480,12 +5472,8 @@ const VoiceFollow = () => {
                     ]),
                   ]
                     .filter((b) => PAATH_READ_BANIS.includes(b))
-                    .filter(
-                      (b) =>
-                        b !== REHRAS_BANI ||
-                        !index.rehrasUser ||
-                        index.rehrasUser.has(sid) ||
-                        REHRAS_READ_OPENING.has(sid),
+                    .filter((b) =>
+                      readRuleMayOpen(b, sid, index.userShabads, paathSeqRef.current.on),
                     );
                   if (
                     banis.length !== 1 ||
