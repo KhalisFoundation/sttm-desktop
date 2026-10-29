@@ -11,6 +11,7 @@
 //         -> 2.5 pass-equivalents / s. Tiers apply only while a READ Bani is followed.
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
+//   crawl follower and recognizer every 2 s (0.5 pass / s), the 10 s search window every 4 s
 //
 // 'fast' is exactly today's schedule and code path (own clocks, 4 s windows, no memo): a
 // computer that keeps up runs byte-identical to the build without tiers. The tier is
@@ -54,6 +55,17 @@ const TIERS = [
     recognizerHopS: 1.0,
     aligned: true,
     passesPerS: 1,
+    backlogBoundS: 0.5,
+  },
+  {
+    // A computer the model itself runs slower than real time on (a 2011 desktop, a 2015 Core i3:
+    // 1.4-1.6 s per 4 s window): one pass per 2 s of audio, the 10 s search window every 4 s.
+    name: 'crawl',
+    followerHopS: 2.0,
+    recognizerHopS: 2.0,
+    searchHopS: 4.0,
+    aligned: true,
+    passesPerS: 0.5,
     backlogBoundS: 0.5,
   },
 ];
@@ -101,7 +113,19 @@ const KIRTAN = {
     passesPerS: 1,
     backlogBoundS: 0.5,
   },
+  crawl: {
+    name: 'kirtan-crawl',
+    followerHopS: 2.0,
+    recognizerHopS: 2.0,
+    searchHopS: 4.0,
+    aligned: true,
+    passesPerS: 0.5,
+    backlogBoundS: 0.5,
+  },
 };
+// Kirtan starts at fast (see measure) unless the self-test picks a tier from here on: a computer
+// that cannot run even two passes a second would only drop audio until the backlog stepped it.
+const KIRTAN_SELF_TEST_FROM = TIERS.findIndex((t) => t.name === 'min');
 // Kirtan step-down: a backlog that saw-tooths (merges reset it) never stays above BEHIND_S for
 // BEHIND_MS in a row, so in kirtan a step also follows when it was above BEHIND_S in at least
 // KIRTAN_BEHIND_SHARE of the samples of the last KIRTAN_BEHIND_MS.
@@ -231,7 +255,8 @@ function hopS(kind, ownHopS) {
     return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
   }
   const t = current();
-  const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
+  let tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
+  if (kind === 'search') tierHop = t.searchHopS || t.recognizerHopS; // the 10 s searching window
   return Math.max(ownHopS, tierHop);
 }
 
@@ -294,6 +319,7 @@ async function measure(infer, passes, warm) {
   // backlog: the switch judge is tuned on the fast schedule, and a computer near the line keeps
   // up there (the bounded audio queue merges brief catch-ups).
   setTier(pick, 'self-test', {}, 'read');
+  if (pick >= KIRTAN_SELF_TEST_FROM) setTier(pick, 'self-test', {}, 'kirtan');
   return state.selfTest;
 }
 

@@ -56,7 +56,11 @@ describe('pace: kirtan scope', () => {
       const ev = pace.observe(0.9, t);
       if (ev) names.push(`${ev.from}>${ev.to}`);
     }
-    assert.deepEqual(names, ['fast>kirtan-lean', 'kirtan-lean>kirtan-min']);
+    assert.deepEqual(names, [
+      'fast>kirtan-lean',
+      'kirtan-lean>kirtan-min',
+      'kirtan-min>kirtan-crawl',
+    ]);
   });
   it('kirtan steps down on a saw-tooth backlog that is never 3 s above in a row', () => {
     const pace = fresh();
@@ -119,5 +123,55 @@ describe('pace: kirtan starts at fast', () => {
     assert.notEqual(pace.describe().tier, 'fast');
     pace.setScoped(true, 'kirtan');
     assert.equal(pace.current().name, 'fast');
+  });
+});
+
+describe('pace: crawl tier and searching (9.0.21)', () => {
+  const slowSelfTest = async (pace, passMs) => {
+    const infer = {
+      emissions: async () => {
+        await new Promise((r) => {
+          setTimeout(r, passMs);
+        });
+      },
+    };
+    return pace.selfTest(infer, { passes: 1, warm: 0 });
+  };
+  it('a PC that cannot run one pass a second self-tests to crawl and starts kirtan there', async () => {
+    const pace = fresh();
+    const r = await slowSelfTest(pace, 1400);
+    assert.equal(r.tier, 'crawl');
+    pace.setScoped(true, 'kirtan');
+    assert.equal(pace.current().name, 'kirtan-crawl');
+    assert.equal(pace.hopS('follower', 0.25), 2);
+    assert.equal(pace.hopS('recognizer', 0.5), 2);
+    assert.equal(pace.hopS('search', 0.5), 4, 'the 10 s searching window every 4 s');
+    assert.equal(pace.windowS('recognizer', 10), 10, 'searching keeps its window');
+    assert.equal(pace.windowS('recognizer', 4), 4);
+    assert.equal(pace.backlogBoundS(), 0.5);
+    pace.setScoped(true, 'read');
+    assert.equal(pace.current().name, 'crawl');
+    assert.equal(pace.hopS('follower', 0.25), 2);
+  });
+  it('a PC near the line still starts kirtan at fast (self-test lean or faster)', async () => {
+    const pace = fresh();
+    const r = await slowSelfTest(pace, 350);
+    assert.equal(r.tier, 'lean');
+    pace.setScoped(true, 'kirtan');
+    assert.equal(pace.current().name, 'fast');
+    assert.equal(pace.hopS('search', 0.5), 0.5);
+  });
+  it('kirtan-min reaches crawl on a lasting backlog, and the search hop follows', () => {
+    const pace = fresh();
+    pace.setScoped(true, 'kirtan');
+    let t = 1e6;
+    const names = [];
+    for (let k = 0; k < 800; k += 1) {
+      t += 250;
+      const ev = pace.observe(0.9, t);
+      if (ev) names.push(ev.to);
+    }
+    assert.deepEqual(names, ['kirtan-lean', 'kirtan-min', 'kirtan-crawl']);
+    assert.equal(pace.hopS('search', 0.5), 4);
   });
 });

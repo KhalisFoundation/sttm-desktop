@@ -5149,11 +5149,15 @@ const VoiceFollow = () => {
         // 'fast' (the self-test and the backlog decide), i.e. byte-identical to before.
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
+          // Searching (9.0.21) is kirtan scope too: a crawling PC decodes the 10 s window less often.
           engine.pace.setScoped(
-            phaseRef.current === 'following' &&
-              !!followerRef.current &&
-              !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
-            followerRef.current && followerRef.current.readBani ? 'read' : 'kirtan',
+            phaseRef.current === 'searching' ||
+              (phaseRef.current === 'following' &&
+                !!followerRef.current &&
+                !(paathSeqRef.current.on && paathSeqRef.current.streak === 0)),
+            phaseRef.current === 'following' && followerRef.current && followerRef.current.readBani
+              ? 'read'
+              : 'kirtan',
           );
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
           syncAkpViewRef.current(
