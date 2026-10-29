@@ -1,0 +1,76 @@
+// Shabad overview: a slide with the shabad's home line, raag and writer, the
+// raag's description and a QR code to the full shabad on SikhiToTheMax. Scoped
+// under #viewer-container like the info bar, so Chromecast picks up its rules
+// the same way. Its text has the verse slide's classes (.slide-gurbani,
+// .slide-translation) for the theme's colours; the sizes and spacing here win
+// over theirs.
+#viewer-container {
+  .shabad-overview {
+    align-items: center;
+    animation: shabad-info-fade-in 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: 4vh 6vw;
+    position: relative;
+    text-align: center;
+    z-index: 10;
+
+    &__heading {
+      font-size: 8vh;
+      font-weight: normal;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    // The raag (in Gurmukhi) and the writer, on one line with a dot between.
+    &__byline {
+      align-items: baseline;
+      display: flex;
+      font-size: 3vh;
+      margin: 2.5vh 0 0;
+    }
+
+    &__raag {
+      @extend .gurmukhi-vaak-thick;
+      font-size: 1.2em;
+      font-weight: normal;
+    }
+
+    .shabad-overview__raag + .shabad-overview__writer::before {
+      content: '•';
+      margin: 0 0.6em;
+      opacity: 0.5;
+    }
+
+    &__description {
+      font-size: 2.6vh;
+      font-weight: normal;
+      line-height: 1.5;
+      margin: 4vh 0 0;
+      max-width: 70vw;
+    }
+
+    &__qr {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      margin-top: 4vh;
+      row-gap: 1.2vh;
+    }
+
+    &__qr-label {
+      font-size: 2.2vh;
+      margin: 0;
+    }
+
+    // The code comes with a white margin, so it scans on any theme.
+    &__qr-code {
+      border-radius: 4px;
+      display: block;
+      height: 14vh;
+      width: 14vh;
+    }
+  }
+}

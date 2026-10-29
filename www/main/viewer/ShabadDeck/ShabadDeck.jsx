@@ -16,6 +16,7 @@ import PaddingTools from '../Slide/PaddingTools';
 import AutoPlayIcon from '../Slide/AutoPlayIcon';
 import { ShabadInfo } from '../Slide/ShabadInfo';
 import { TranslationReviewQr } from '../Slide/TranslationReviewQr';
+import { ShabadOverview } from '../Slide/ShabadOverview';
 import { useShabadInfo } from '../hooks/use-shabad-info';
 import { useTranslationReviewQr } from '../hooks/use-translation-review-qr';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
@@ -40,6 +41,7 @@ function ShabadDeck() {
     activeVerseId,
     isMiscSlide,
     miscSlideText,
+    shabadOverview,
     sundarGutkaBaniId,
     isSundarGutkaBani,
     ceremonyId,
@@ -63,12 +65,6 @@ function ShabadDeck() {
     defaultPaneId,
     teekaSource,
     translationEnglishSource,
-    content1,
-    content2,
-    content3,
-    content1Visibility,
-    content2Visibility,
-    content3Visibility,
     shabadInfoTranslationReview,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
@@ -176,28 +172,27 @@ function ShabadDeck() {
   const isShabad = !isMiscSlide && !isSundarGutkaBani && !isCeremonyBani;
   const shabadInfoDetails = useShabadInfo(isShabad ? activeVerse[0] : null);
 
-  // While a Prof Sahib Singh translation is on the display, the info bar has a
-  // QR code linking to the shabad's review page, where the sangat can give
-  // feedback on it. It's for the sangat, so it isn't on the in-app preview.
+  // The shabad overview (from the info button in the shabad pane) takes the
+  // slide's place, without the info bar or the review QR code under it. A misc
+  // slide still goes over it, and opening a line takes it down.
+  const showsOverview = !!shabadOverview && isShabad;
+
+  // While a shabad is on the display, whatever the translation source, the info
+  // bar has a QR code linking to the verse's review page, where the sangat can
+  // give feedback on its translation. It's for the sangat, so it isn't on the
+  // in-app preview.
   const isSingleDisplay = currentWorkspace === i18n.t('WORKSPACES.SINGLE_DISPLAY');
-  const showsEnglishTranslation = [content1, content2, content3].some(
-    (content, index) =>
-      content === 'translation-english' &&
-      [content1Visibility, content2Visibility, content3Visibility][index],
-  );
-  const showsAiTranslation =
-    shabadInfoTranslationReview &&
-    (!isInAppViewer || isSingleDisplay) &&
-    isShabad &&
-    showsEnglishTranslation &&
-    aiTranslationDB.isAiSource(translationEnglishSource) &&
-    activeVerse.some((verse) => aiTranslationDB.getTranslation(verse.ID, translationEnglishSource));
+  const showsReviewQr =
+    shabadInfoTranslationReview && (!isInAppViewer || isSingleDisplay) && isShabad;
   const reviewQr = useTranslationReviewQr(
-    showsAiTranslation ? activeVerse[0]?.Shabads?.[0]?.ShabadID : undefined,
+    showsReviewQr ? activeVerse[0]?.Shabads?.[0]?.ShabadID : undefined,
+    showsReviewQr ? activeVerse[0]?.ID : undefined,
   );
 
-  // The bar is shown for the details, the QR code, or both.
-  const showsShabadInfo = shabadInfoDetails.length > 0 || !!reviewQr;
+  // The bar is shown while there are details. Once it hides (or when it's off),
+  // the QR code stays on its own, without the bar.
+  const showsShabadInfo = !showsOverview && shabadInfoDetails.length > 0;
+  const showsCompactQr = !showsOverview && !showsShabadInfo && !!reviewQr;
 
   // The bar comes and goes on its own (once the details or QR code load, and
   // when the "Show for n seconds" time is up), not only on a line change, so
@@ -382,8 +377,9 @@ function ShabadDeck() {
           showContinuousVerses && !isMiscSlide && 'akhandpatt-view',
           platform === 'win32' && 'win32',
           `theme-${getCurrentThemeInstance().key}`,
-          // The info bar sits under the slide, which shrinks to make room.
-          showsShabadInfo && 'shabad-deck--with-info',
+          // The info bar (or QR code) sits under the slide, which shrinks to
+          // make room.
+          (showsShabadInfo || showsCompactQr) && 'shabad-deck--with-info',
         )}
         style={applyTheme()}
       >
@@ -400,21 +396,25 @@ function ShabadDeck() {
             padding: `${containerPadding.top}px ${containerPadding.right}px ${containerPadding.bottom}px ${containerPadding.left}px`,
           }}
         >
-          {activeVerse.length ? (
-            activeVerse.map((activeVerseObj, index) => (
-              <Slide
-                key={index}
-                verseObj={activeVerseObj}
-                nextLineObj={nextVerse}
-                isMiscSlide={isMiscSlide}
-                continuousView={showContinuousVerses}
-                updateVerseRef={updateVerseRef}
-                slideIndex={index}
-              />
-            ))
-          ) : (
-            <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+          {showsOverview && (
+            <ShabadOverview shabadId={shabadOverview.shabadId} verseId={shabadOverview.verseId} />
           )}
+          {!showsOverview &&
+            (activeVerse.length ? (
+              activeVerse.map((activeVerseObj, index) => (
+                <Slide
+                  key={index}
+                  verseObj={activeVerseObj}
+                  nextLineObj={nextVerse}
+                  isMiscSlide={isMiscSlide}
+                  continuousView={showContinuousVerses}
+                  updateVerseRef={updateVerseRef}
+                  slideIndex={index}
+                />
+              ))
+            ) : (
+              <Slide isMiscSlide={isMiscSlide} bgColor={applyOverlay()} />
+            ))}
         </div>
         {showsShabadInfo ? (
           <ShabadInfo
@@ -430,6 +430,9 @@ function ShabadDeck() {
             )}
           </ShabadInfo>
         ) : null}
+        {showsCompactQr && (
+          <TranslationReviewQr src={reviewQr} source={translationEnglishSource} compact />
+        )}
       </div>
       {/* The info bar carries the logo while it's shown. */}
       {!showsShabadInfo && <ViewerIcon className="viewer-logo" />}

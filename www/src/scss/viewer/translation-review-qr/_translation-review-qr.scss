@@ -1,5 +1,5 @@
 // Translation review QR code: the right end of the shabad info bar, asking how
-// the English translation is, with a QR code linking to the shabad's review
+// the English translation is, with a QR code linking to the verse's review
 // page. Scoped under #viewer-container like the info bar, so Chromecast picks up
 // its rules the same way.
 #viewer-container {
@@ -10,6 +10,16 @@
     display: flex;
     grid-column: 3;
     justify-self: end;
+
+    // Just the code, at the right under the slide, with no bar behind it. The
+    // slide still stops above it, so the code never covers its text.
+    &--compact {
+      align-self: flex-end;
+      flex: 0 0 auto;
+      padding: 0.8vh 12px;
+      position: relative;
+      z-index: 5;
+    }
 
     &__text {
       display: flex;

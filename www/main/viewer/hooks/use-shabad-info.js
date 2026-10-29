@@ -8,7 +8,7 @@ const { i18n } = remote.require('./app');
 
 // The shabad's details, not the current line's: a heading line has no writer,
 // and the Ang is where the shabad starts (lines can run onto the next Ang).
-const getShabadDetails = (verses) => {
+export const getShabadDetails = (verses) => {
   const first = (pick) => verses.map(pick).find(Boolean);
   return {
     source: first((v) => v.Source?.SourceEnglish),

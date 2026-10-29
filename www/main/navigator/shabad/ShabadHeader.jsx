@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import classNames from '../../common/utils/classnames';
 import FavShabadIcon from './FavShabadIcon';
+import ShabadOverviewIcon from './ShabadOverviewIcon';
 import ArrowIcon from './ArrowIcon';
 import { i18n } from '../../common/i18n';
 
@@ -91,6 +92,7 @@ const ShabadHeader = ({ data = {} }) => {
 
   return (
     <div className="shabad-pane-header">
+      <ShabadOverviewIcon />
       <FavShabadIcon />
       <button
         className={classNames('button toggle-viewer-btn', !showViewer && 'btn-danger')}

@@ -525,6 +525,10 @@
     "SWAP_DISPLAYS": "Swap Displays",
     "SWAP_DISPLAYS_TOOLTIP": "Swap which external screen shows the full slide and which shows the second display. Only available when two external screens are connected."
   },
+  "SHABAD_OVERVIEW": {
+    "BUTTON_TOOLTIP": "Show an overview of this shabad on the display: its home line, raag and writer, what the raag is about, and a QR code to read the full shabad on SikhiToTheMax. Click again to go back to the shabad.",
+    "QR_LABEL": "Scan to read this shabad"
+  },
   "TRANSLATION_REVIEW": {
     "TITLE": "How is this English translation?",
     "SUBTITLE": "Translation based on {{source}} · scan to share feedback"

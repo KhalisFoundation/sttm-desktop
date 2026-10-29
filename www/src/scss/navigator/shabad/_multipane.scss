@@ -11,6 +11,11 @@
       button {
         height: 100%;
 
+        &.shabad-overview-btn {
+          height: 26px;
+          margin: 0 4px;
+        }
+
         &.disabled {
           opacity: 0.5;
           i {

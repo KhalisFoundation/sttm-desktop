@@ -7,6 +7,8 @@ export const API_ENDPOINT = useStageAPI
 
 export const SOCKET_SCRIPT_SOURCE = `${API_ENDPOINT}/socket.io/socket.io.js`;
 
+export const BANIDB_API = 'https://api.banidb.com/v2';
+
 export const SP_API = 'https://serviceprovider.khalis.net';
 
 export const USER_STORE_API = 'https://users.khalis.net';

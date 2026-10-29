@@ -52,6 +52,7 @@ export const ShabadText = ({
   const {
     activeVerseId,
     isMiscSlide,
+    shabadOverview,
     isSundarGutkaBani,
     sundarGutkaBaniId,
     isCeremonyBani,
@@ -80,6 +81,7 @@ export const ShabadText = ({
   const {
     setActiveVerseId,
     setIsMiscSlide,
+    setShabadOverview,
     setActiveShabadId,
     setVerseHistory,
     setActivePaneId,
@@ -95,6 +97,9 @@ export const ShabadText = ({
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
+    }
+    if (shabadOverview) {
+      setShabadOverview(null);
     }
     // Ignoring flower verse to avoid unwanted scroll during asa di vaar
     if (isFlowerVerse(newTraversedVerse, isAsaDiVaar)) {

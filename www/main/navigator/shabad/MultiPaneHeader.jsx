@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import FavShabadIcon from './FavShabadIcon';
+import ShabadOverviewIcon from './ShabadOverviewIcon';
 import ArrowIcon from './ArrowIcon';
 import { i18n } from '../../common/i18n';
 
@@ -88,6 +89,7 @@ const MultiPaneHeader = ({ data }) => {
             <i className="fa-solid fa-lock-open"></i>
           )}
         </button>
+        <ShabadOverviewIcon paneId={paneId} />
       </div>
       <span className="pane-title">{paneAttributes.content}</span>
       <div className="pane-tools">
