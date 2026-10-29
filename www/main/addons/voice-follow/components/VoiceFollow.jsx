@@ -2328,8 +2328,7 @@ const VoiceFollow = () => {
     const reading =
       (paathSeqRef.current && paathSeqRef.current.on) ||
       (followerRef.current && followerRef.current.readBani);
-    if (reading && now - lastRead < NG_TALK_SEQ_QUIET_MS)
-      return false;
+    if (reading && now - lastRead < NG_TALK_SEQ_QUIET_MS) return false;
     if (baniIdOf(currentShabadIdRef.current) != null) return false;
     if (!ngScreenOurs()) return false;
     if (!loose && now - lastAutoDecisionRef.current < NG_TALK_AFTER_LOCK_MS) return false;
@@ -2344,7 +2343,11 @@ const VoiceFollow = () => {
     if (hops.length && hops.filter((h) => h.fit).length > hops.length * NG_TALK_FIT_SHARE)
       return false;
     const ret = ng.ret.filter((x) => x.t >= lo);
-    if (ret.length && ret.filter((x) => x.top >= (reading ? NG_RET_HI_READ : NG_RET_HI)).length > ret.length * NG_RET_SHARE)
+    if (
+      ret.length &&
+      ret.filter((x) => x.top >= (reading ? NG_RET_HI_READ : NG_RET_HI)).length >
+        ret.length * NG_RET_SHARE
+    )
       return false;
     return true;
   };
@@ -4752,8 +4755,7 @@ const VoiceFollow = () => {
               ).length;
               if (!(PC_FRAGMENT_MIN_PANGTIS > 0 && real < PC_FRAGMENT_MIN_PANGTIS))
                 cands.push({ id, role, linesNorm: prof.linesNorm, prof });
-            }
-            else if (!fc.has(id) && loads < 2) {
+            } else if (!fc.has(id) && loads < 2) {
               loads += 1;
               if (fc.size >= PC_FRAGMENT_CACHE) {
                 const oldest = fc.keys().next();
