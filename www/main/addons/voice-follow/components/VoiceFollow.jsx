@@ -2037,8 +2037,10 @@ const VoiceFollow = () => {
       kind,
       from: prev,
     });
+    // Only the Ardas hold shows a card. A talk hold is Autopilot being unsure and searching
+    // (the Waheguru slide goes on screen); the panel stays as it is, with no katha card.
     try {
-      setNgHoldView(kind);
+      setNgHoldView(kind === 'talk' ? null : kind);
     } catch (_) {
       /* panel closing */
     }
