@@ -55,9 +55,6 @@
       padding: 0px 0.9em;
       margin: unset;
       background-color: $dull-blue;
-      // Keeps it and the arrows on the right, with the info and favourite
-      // buttons on the left.
-      margin-left: auto;
       margin-right: 12px;
       position: relative;
 
@@ -115,28 +112,16 @@
   }
 }
 
-// Shows the shabad's overview slide. It's first in the pane header, on the
-// left, in a circle of the header's own text colour, so it suits every theme.
-// The themes tint it on hover; while the overview is on the display, it's
-// filled with a stronger tint of that same colour.
-.shabad-overview-btn {
-  align-items: center;
-  background: transparent;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-size: 12px;
-  height: 26px;
-  justify-content: center;
-  line-height: 1;
-  margin: 0 8px 0 0;
-  padding: 0;
-  width: 26px;
+// The shabad's overview row ("slide 0"), above its lines. It's a line of the
+// list, so it gets the themes' hover and on-display highlight, but in the
+// app's English type, smaller, with a rule under it, so it doesn't read as
+// part of the shabad.
+.verse-block li.shabad-overview-row {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  font-family: $body-font-family;
+  font-size: 0.9rem;
 
-  &--active {
-    background-color: color-mix(in srgb, currentColor 20%, transparent);
+  .fa-circle-info {
+    margin-right: 8px;
   }
 }

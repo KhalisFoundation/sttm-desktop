@@ -20,6 +20,16 @@ import {
   ASA_DI_VAAR_BANI_ID,
   isFlowerVerse,
 } from './utils';
+import ShabadOverviewRow, { hasOverview } from './ShabadOverviewRow';
+
+// The list's header: the shabad's overview row, when it has one. Outside the
+// component so the list doesn't remount it on every render.
+const ListHeader = ({ context }) =>
+  context.overview ? <ShabadOverviewRow {...context.overview} /> : null;
+
+ListHeader.propTypes = {
+  context: PropTypes.object,
+};
 
 const baniLengthCols = {
   short: 'existsSGPC',
@@ -530,6 +540,21 @@ export const ShabadText = ({
     };
   }, [autoplayToggle, autoplayDelay, isProjection]);
 
+  // A shabad's overview row sits above its lines, as its "slide 0". Banis and
+  // ceremonies mix raags and writers, so they don't have one.
+  const hasOverviewRow =
+    baniType === 'shabad' && loadedShabadIdRef.current === shabadId && hasOverview(rawVerses);
+  const overview = hasOverviewRow
+    ? {
+        shabadId,
+        homeVerseId: (filteredItems[paneAttributes.homeVerse] || filteredItems[0])?.verseId,
+        paneId: currentPane,
+      }
+    : null;
+  // While the overview is on the display, its row is highlighted instead of
+  // the line. The arrow keys still move on from that line.
+  const isOverviewShown = !!overview && shabadOverview?.shabadId === shabadId && !isMiscSlide;
+
   const renderVerse = (index, verseObj) => {
     const { verseId, verse, english } = verseObj;
     // Display 2's pane copy isn't updated on live verse reads (only the top-level
@@ -540,7 +565,7 @@ export const ShabadText = ({
     return (
       <ShabadVerse
         key={verseId != null ? verseId : index}
-        activeVerse={activeVerse}
+        activeVerse={isOverviewShown ? {} : activeVerse}
         isHomeVerse={renderHomeVerse}
         lineNumber={index}
         versesRead={renderVersesRead}
@@ -574,6 +599,8 @@ export const ShabadText = ({
             data={filteredItems}
             ref={virtuosoRef}
             totalCount={filteredItems.length}
+            context={{ overview }}
+            components={{ Header: ListHeader }}
             rangeChanged={(range) => {
               if (projectionSource && !isProjection) {
                 ipcRenderer.send('projection-range', { paneId: currentPane, ...range });

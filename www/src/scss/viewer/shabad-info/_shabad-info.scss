@@ -17,6 +17,9 @@ $shabad-info-logo-width: 100px;
       // A slide with more than fits stops at the bar, as it would at the
       // bottom of the screen, instead of spilling over it.
       overflow: hidden;
+      // Only the padding eases (the viewer eases everything). Easing flex-grow
+      // in from 0 started the bar under the text and slid it down to the bottom.
+      transition-property: padding;
     }
   }
 

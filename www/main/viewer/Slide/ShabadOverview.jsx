@@ -6,8 +6,8 @@ import { i18n } from '../../common/i18n';
 
 const SHABAD_URL = 'https://sttm.co/s';
 
-// A slide introducing the shabad, shown from the info button in the shabad
-// pane instead of its lines: the home line, the raag (in Gurmukhi) and writer
+// A slide introducing the shabad, shown from the overview row above its lines
+// in the shabad pane instead of them: the home line, the raag (in Gurmukhi) and writer
 // on one line, what the raag is about, and a QR code to read the full shabad
 // on SikhiToTheMax. Its text takes the verse slide's classes, so each theme
 // colours it the same way: the home line as Gurbani, the rest as translation.
@@ -15,7 +15,7 @@ export const ShabadOverview = ({ shabadId, verseId }) => {
   const overview = useShabadOverview(shabadId, verseId);
   const qr = useQrCode(`${SHABAD_URL}/${shabadId}`);
 
-  // The slide fills in as the details, description and QR code arrive.
+  // The slide fills in as the details and QR code arrive.
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
   }, [overview, qr]);
