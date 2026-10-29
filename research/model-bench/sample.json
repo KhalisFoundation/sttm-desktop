@@ -1,0 +1,581 @@
+{
+ "gab_repo": "khalisfoundation/GurbaniAutopilotBench",
+ "gab_revision": "0b307522287c6ea1a9773ee8a620707b2b7e9f84",
+ "tiers": {
+  "main": "Kirtan, mixer feed",
+  "hard": "Kirtan, hall laptop mic (GAB-Hard)",
+  "akhand": "Akhand Kirtan",
+  "paath-hall": "Paath (hall)",
+  "paath-studio": "Paath (studio)",
+  "sung-bani": "Bani sung as kirtan",
+  "akhand-paath": "Akhand Paath (natural speed)",
+  "akhand-paath-fast": "Akhand Paath sped up 1.35x (synthetic; one clip repeats a natural-speed clip)"
+ },
+ "clips": [
+  {
+   "id": "clip01",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip01",
+   "start": 0.0,
+   "end": 252.01,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip03",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip03",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip05",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip05",
+   "start": 0.0,
+   "end": 105.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip06",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip06",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip12",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip12",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip17",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip17",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "clip33",
+   "tier": "main",
+   "gab": "1-kirtan-shabad/clip33",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": true,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh11_sttm_desktop_2026_10_11T02_40_20_422Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh11_sttm_desktop_2026_10_11T02_40_20_422Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh12_sttm_desktop_2026_10_11T02_50_05_783Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh12_sttm_desktop_2026_10_11T02_50_05_783Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh13_sttm_desktop_2026_10_11T03_07_57_411Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh13_sttm_desktop_2026_10_11T03_07_57_411Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh15_sttm_desktop_2026_10_11T13_45_00_522Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh15_sttm_desktop_2026_10_11T13_45_00_522Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh19_sttm_desktop_2026_10_11T20_08_08_535Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh19_sttm_desktop_2026_10_11T20_08_08_535Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh20_sttm_desktop_2026_10_11T20_15_43_327Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh20_sttm_desktop_2026_10_11T20_15_43_327Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh27_sttm_desktop_2026_10_13T02_48_34_427Z",
+   "tier": "hard",
+   "gab": "1-kirtan-shabad/kh27_sttm_desktop_2026_10_13T02_48_34_427Z",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip01",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip01",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip26",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip26",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip02",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip02",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip03",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip03",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip04",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip04",
+   "start": 0.0,
+   "end": 260.02,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip06",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip06",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "l3clip07",
+   "tier": "akhand",
+   "gab": "5-akhand-kirtan/l3clip07",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "rt11_rehras",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/rehras/rt11_rehras",
+   "start": 0.0,
+   "end": 600,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "rt11_sohila",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/sohila/rt11_sohila",
+   "start": 0.0,
+   "end": 325.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt31",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/jaap/pt31",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt32",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/jaap/pt32",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt33",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/jaap/pt33",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt34",
+   "tier": "paath-hall",
+   "gab": "2-bani-recited/jaap/pt34",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt01",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/japji/pt01",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt05",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/jaap/pt05",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt09",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/chaupai/pt09",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt15",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/anand-40/pt15",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt19",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/rehras/pt19",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "pt28",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/sohila/pt28",
+   "start": 0.0,
+   "end": 70.01,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytsalokm9_UI8D1oI5aNk_full",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/salok-m9/ytsalokm9_UI8D1oI5aNk_full",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytkabeer_Zs5qq_OljyQ_full",
+   "tier": "paath-studio",
+   "gab": "2-bani-recited/salok-kabeer/ytkabeer_Zs5qq_OljyQ_full",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "rt11_aarti",
+   "tier": "sung-bani",
+   "gab": "3-bani-sung-like-kirtan/aarti/rt11_aarti",
+   "start": 0.0,
+   "end": 600,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "aa01",
+   "tier": "sung-bani",
+   "gab": "3-bani-sung-like-kirtan/aarti/aa01",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "aa05",
+   "tier": "sung-bani",
+   "gab": "3-bani-sung-like-kirtan/aarti/aa05",
+   "start": 0.0,
+   "end": 300.0,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "nw11_asa1",
+   "tier": "sung-bani",
+   "gab": "5-akhand-kirtan/nw11_asa1",
+   "start": 0.0,
+   "end": 600,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytasa1_4IXk2t_Irqo_900-1620",
+   "tier": "sung-bani",
+   "gab": "5-akhand-kirtan/ytasa1_4IXk2t_Irqo_900-1620",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "kh23_sttm_desktop_2026_10_13T01_50_01_713Z",
+   "tier": "sung-bani",
+   "gab": "3-bani-sung-like-kirtan/aarti/kh23_sttm_desktop_2026_10_13T01_50_01_713Z",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_PB6nfe3QKn4_900-1500",
+   "tier": "akhand-paath",
+   "gab": "4-akhand-paath/ytap_PB6nfe3QKn4_900-1500",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_cKpg64jaTAo_1200-1800",
+   "tier": "akhand-paath",
+   "gab": "4-akhand-paath/ytap_cKpg64jaTAo_1200-1800",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_mUPs0SqeXvY_1500-2100",
+   "tier": "akhand-paath",
+   "gab": "4-akhand-paath/ytap_mUPs0SqeXvY_1500-2100",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_XEhUI8Vurj8_600-1200",
+   "tier": "akhand-paath",
+   "gab": "4-akhand-paath/ytap_XEhUI8Vurj8_600-1200",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_5N6Cgw8WAaY_1200-1800_x1.35",
+   "tier": "akhand-paath-fast",
+   "gab": "4-akhand-paath/ytap_5N6Cgw8WAaY_1200-1800_x1.35",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  },
+  {
+   "id": "ytap_XEhUI8Vurj8_600-1200_x1.35",
+   "tier": "akhand-paath-fast",
+   "gab": "4-akhand-paath/ytap_XEhUI8Vurj8_600-1200_x1.35",
+   "start": 0.0,
+   "end": 300,
+   "coldFirst": false,
+   "truthFiles": [
+    "lines.csv",
+    "shabads.csv"
+   ]
+  }
+ ],
+ "truth_rule": "Truth must be independent of every model compared: human labels or the broadcaster's own on-screen captions (broadcast-caption). Clips whose truth was made with a speech model (e.g. aligned-2model-audited, which used Karanbir's model) are excluded, since they would favour that model."
+}

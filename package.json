@@ -164,6 +164,7 @@
       "!**/*.map",
       "!www/main/**/*.{js,jsx}",
       "!build-resources${/*}",
+      "!research${/*}",
       "!www/assets/*.db"
     ],
     "asarUnpack": [
