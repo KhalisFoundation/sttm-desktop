@@ -93,12 +93,11 @@ class Infer {
 
   // buf: Float32Array @16k -> {data:Float32Array flat, frames, C}
   async emissions(buf) {
-    // The memo serves the aligned tiers only: in the fast tier (a computer that keeps up)
-    // every window is a model pass, exactly as before the tiers existed.
-    const memo = this.memo && pace.current().aligned ? this.memo : null;
-    if (memo && Infer.sameWindow(memo.buf, buf)) {
+    // A window byte-identical to the last one gets the last one's output: the model is
+    // deterministic, so the engines see exactly what a second pass would give them.
+    if (this.memo && Infer.sameWindow(this.memo.buf, buf)) {
       this.perf.repeats += 1;
-      return memo.out;
+      return this.memo.out;
     }
     const t0 = Date.now();
     const out = await this.run(buf);
