@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
@@ -23,7 +23,7 @@ const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
 const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
-const { createBoard, mergeTranscript } = require('./liveBoard');
+const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
 const { installDemoAudio } = require('./devAudio');
 const { vfAnalytics, createRunStats } = require('./vfAnalytics');
@@ -153,6 +153,7 @@ const {
   bestLineMatch,
   orderFreeLineScore,
   sameGurbani,
+  switchConfirmNeeded,
 } = require('./switchPolicy');
 const { screenTakenByCeremony } = require('./autopilotScreen');
 // Banis followed at a longer length than the user's (Rehras, Aarti, Sohila), unit-tested in
@@ -166,6 +167,8 @@ const {
 } = require('./baniLength');
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
+const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
+const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
 
 // maxLineScore lives in ./switchPolicy (same implementation, unit-tested there)
 // so the benchmarked length-penalty math is shared, not duplicated.
@@ -408,10 +411,146 @@ const SWITCH_CAND_MIN_LINE_CHARS = 15;
 // (misses switches: recall 68->60%), so raising it is not safe. The 9s stress ceiling
 // (~35% on-correct) is latency-bound (react time ~4-5s vs 9s dwell), not tunable.
 const SWITCH_CONFIRM = 3; // consecutive winning decodes needed to commit a switch
+// End-of-Bani exit (switchPolicy.switchConfirmNeeded): on a sung Bani's last BANI_END_EXIT pangtis a decisive
+// win commits a switch at once. 0 = off (as 9.0.4). Sung Banis only (Aarti): a recited paath decodes densely,
+// so the normal confirm already follows it out, and at the end of Rehras the spoken Fateh would win at once.
+const BANI_END_EXIT = 2;
+const BANI_END_EXIT_BANIS = new Set([22]); // Aarti (AARTI_BANI, defined below)
 // Same-Gurbani lock (ported from cycle 11): the same text stored as two shabads (Aarti in
 // Sohila and in Dhanasari, a Rehras shabad and its SGGS original) searches as an exact
 // tie, and a tie never locks. 1 = while searching, treat such copies as one candidate.
 const DUP_AWARE_LOCK = 1;
+// Pankti Cumulation (panktiCumulation.js): pangtis add up per Shabad, pauses don't reset. A
+// Shabad is a set of pangtis, so each pangti heard ADDS to its Shabad's confidence instead of the
+// search starting over on every pangti: different pangtis count much more than one pangti twice,
+// a neighbouring pangti gets a bonus, a pangti shared by several Shabads counts about nothing, and
+// alaap, held vowels, tabla and silence freeze the evidence clock instead of erasing it.
+//
+// Pankti Cumulation (first find): while searching, the unique full-text leader of each decode is
+// the heard pangti; a Shabad locks once it holds PC_FIND.distinct different pangtis, a total of
+// PC_FIND.lock and PC_FIND.lead times any other Shabad, while it is this decode's top line.
+// Additive: the other search routes are unchanged. 0 = off.
+const PANKTI_CUMULATION_FIND = 0;
+const PC_FIND = {
+  minScore: 0.35,
+  minMargin: 0.05,
+  marginFull: 0.15,
+  repeat: 0.15,
+  neighbour: 0.35,
+  tauS: 90,
+  lock: 1.4,
+  distinct: 2,
+  lead: 1.5,
+  cap: 1.5,
+};
+const PC_QUIET_LETTERS = 8; // a decode with fewer letters heard is a pause (alaap, tabla, silence)
+// 1 = first find: quiet decodes freeze the clock (always on for the switch); 0 = always fade.
+const PC_FIND_FREEZE = 0;
+// 1 = first find never locks a Shabad of Rehras, Sohila, Japji or Aarti: those are read as paath
+// and the paath rules open the whole Bani (held-back Rehras: the first find showed its first
+// Shabad early and 3 s scored wrong). 0 = off.
+const PC_FIND_PAATH_SKIP = 0;
+// Half pangtis (owner: ragis sing the latter half of a pangti, then its opening): also search the
+// last PC_FRAG_PIECES pangti-sized pieces (>= PC_FRAG_LETTERS letters, whole words only) of the
+// window on their own, so a half pangti counts for its pangti, at weight PC_FRAG.w when it scores
+// >= PC_FRAG.minScore with a margin >= PC_FRAG.minMargin. 0 = off.
+const PC_FIND_FRAG = 0;
+const PC_FRAG_PIECES = 3;
+const PC_FRAG_LETTERS = 22;
+const PC_FRAG = { minScore: 0.6, minMargin: 0.1, w: 0.7 };
+// Pankti Cumulation (switch): while following, the pangtis of ANOTHER Shabad add up the same way
+// (pauses always freeze the clock) and the screen switches once that Shabad holds
+// PC_SWITCH.distinct different pangtis, a total of PC_SWITCH.lock and PC_SWITCH.lead times any
+// other Shabad (owner's live test, Oct 16: Shabad 2621 shown 77 s sooner, 0 wrong switches).
+// Each heard line (>= PC_SWITCH_MIN_LETTERS letters) is searched over all Gurbani. Additive: the
+// acoustic switch judge is unchanged. Never while a Bani is followed. 0 = off.
+const PANKTI_CUMULATION_SWITCH = 1;
+const PC_SWITCH_MIN_LETTERS = 10;
+const PC_SWITCH = {
+  minScore: 0.5,
+  minMargin: 0.1,
+  marginFull: 0.2,
+  repeat: 0.15,
+  neighbour: 0.35,
+  tauS: 90,
+  lock: 2.0,
+  distinct: 3,
+  lead: 2,
+  cap: 1.5,
+};
+// Repeated pangti (owner's case: "ਦਰਸ ਤੇਰੇ ਕੀ ਪਿਆਸ ਮਨਿ ਲਾਗੀ", Shabad 1512, one pangti sung again and
+// again between long pauses): Pankti Cumulation (switch) also switches when ONE pangti of another
+// Shabad is heard on PC_REPEAT.times separate occasions (at least PC_REPEAT.gapS apart), each
+// scoring >= PC_REPEAT.minScore with a margin >= PC_REPEAT.minMargin over every other Shabad.
+// 2 times showed 1512 60 s sooner on the owner's test but made 2 wrong switches; 3 made none.
+// 0 = off.
+const PC_SWITCH_REPEAT = 0;
+const PC_REPEAT = { times: 3, gapS: 15, minScore: 0.9, minMargin: 0.15 };
+// Pankti Cumulation (follower), owner's case "ਦਰਸ ਤੇਰੇ ਕੀ ਪਿਆਸ ਮਨਿ ਲਾਗੀ" (ytraji_HQk5QmYtZJA, Shabad 1512:
+// pangti lag p90 7.3 s on 9.0.4). PC_FOLLOW_KEEP = 1: a pause never releases the Shabad
+// follower (9.0.4 wiped its line evidence after ~3.5 s without words, 13 times on that clip, and
+// then needed 4 decodes to pick a line again). PC_FOLLOW_UNIQUE = gap: a half pangti that matches
+// one line clearly better than every other (by >= gap) moves the line after 1 decode, even back
+// to the rahao. Shabads only (kirtan, Akhand Paath); the paath follower is untouched. 0 = off.
+const PC_FOLLOW_KEEP = 0;
+const PC_FOLLOW_UNIQUE = 0;
+// Shared-pangti hold in the existing switch judge (owner's live test: a pangti shared by several
+// Shabads flipped the screen 6 times): a switch or return WIN counts only when the heard line,
+// searched over all Gurbani, puts that Shabad on top by >= PC_SHARED_HOLD_MARGIN; a shared line
+// holds the count (no win, no loss). 0 = off.
+const PANKTI_SHARED_HOLD = 0;
+const PC_SHARED_HOLD_MARGIN = 0.05;
+// Fragment confirm (fragmentConfirm.js; owner, Oct 18: "if it's any of the options it should increase
+// the weight of that option"): while following, every short piece heard (>= PC_FRAGMENT.minLetters
+// letters) is matched against the pangtis of each Shabad on the board (the "Changing to" card and
+// the Possible new Shabads list, at most PC_FRAGMENT_CANDS of them). A piece that fits a pangti of
+// a board Shabad at >= minScore (verbatim when shorter than shortLetters) and beats the Shabad on
+// screen by >= minMargin adds weight to it
+// (little when the pangti also fits another board Shabad; nothing when it fits the Shabad on
+// screen); the panel's evidence bars show the weight rising. The "Changing to" Shabad (or one just
+// nominated by the full-text search, below) confirms on 2 different pangtis, a listed one on 3.
+// Pauses freeze the weights.
+// Additive: the acoustic switch judge and Pankti Cumulation (switch) are unchanged. 0 = off.
+const PANKTI_FRAGMENT_CONFIRM = 1;
+const PC_FRAGMENT_CANDS = 6;
+const PC_FRAGMENT_CACHE = 12; // candidate line profiles kept for this rule (its own cache: the judge's is untouched)
+// A heard line of PC_SWITCH_MIN_LETTERS+ letters whose top Shabad over all Gurbani leads the next by
+// this much nominates that Shabad as a candidate for PC_FRAGMENT_NOMINATE_S seconds, counted like the
+// "Changing to" card (2 different pangtis): the board is slow to list a Shabad the judge has not
+// scored yet, and the owner's case (2879) was nominated this way 3 s before its card appeared.
+const PC_FRAGMENT_NOMINATE_MARGIN = 0.15;
+const PC_FRAGMENT_NOMINATE_S = 30;
+// Judge assist: when the switch judge's contender had a verbatim fragment hit (a pangti unique to
+// it, not fitting the Shabad on screen) within the last PC_FRAGMENT_ASSIST_S seconds, one winning
+// decode fewer commits the switch (owner's Oct 17 test: a correct confirm shifted the judge's
+// timing so 4814 and 2727 stopped at 2 wins). 0 = off. PC_FRAGMENT_GAP_S: at most one fragment
+// confirm this often.
+const PC_FRAGMENT_ASSIST_S = 0;
+const PC_FRAGMENT_GAP_S = 8;
+// EXPERIMENT gates (GAB-Hard, Oct 18), 0 = off:
+const PC_FRAGMENT_FRESH_S = 20; // a confirm counts only pangtis hit within this many seconds
+const PC_FRAGMENT_RETURN = 0; // the Shabad just left confirms on 2 pangtis (like "Changing to")
+const PC_FRAGMENT_COOLDOWN_S = 0; // no fragment confirm / judge assist this soon after a Shabad change
+const PC_FRAGMENT_ASSIST_MIN_LETTERS = 0; // judge assist only from a hit piece this long
+const PC_FRAGMENT_MIN_LETTERS_CONFIRM = 0; // the piece that completes a confirm must be this long
+// A Shabad with fewer than this many real pangtis (a salok, usually sung as a parmaan inside the Shabad on
+// screen) is left to the acoustic judge: fragment confirm never changes the screen to it. 0 = off.
+const PC_FRAGMENT_MIN_PANGTIS = 3;
+const PC_FRAGMENT = {
+  minLetters: 5,
+  minScore: 0.8,
+  shortLetters: 8,
+  shortScore: 1.0,
+  minMargin: 0.25,
+  sharedW: 0.2,
+  repeat: 0.15,
+  cap: 1.5,
+  tauS: 90,
+  distinctChange: 2,
+  distinctList: 3,
+  lock: 1.6,
+  minLineLetters: 8,
+};
 // Mool Mantar home (ported from cycle 12): the Mool Mantar begins dozens of shabads, so
 // it ties exactly and never locks, leaving nothing on screen. After this many distinct
 // heard fragments that tie between Japji's Mool Mantar and other shabads, show Japji's
@@ -957,9 +1096,10 @@ const useMoving = (value) => {
   }, [value]);
   return moving;
 };
-// A change rolls through the numbers in between (odometer style) rather than jumping:
-// the bigger the move, the longer the roll, so 33% -> 67% is seen counting up.
-const rollMs = (from, to) => 350 + 1800 * Math.min(1, Math.abs(to - from));
+// A change rolls through the numbers in between rather than jumping: every new value is
+// eased in over ~0.4 s (values arrive about every 0.5 s, so the motion stays continuous).
+const ROLL_MS = 400;
+const rollMs = () => ROLL_MS;
 const LivePct = ({ value }) => {
   const [shown, setShown] = useState(value);
   const shownRef = useRef(value);
@@ -979,7 +1119,10 @@ const LivePct = ({ value }) => {
     return () => cancelAnimationFrame(raf);
   }, [value]);
   return (
-    <span className={`vf2-live-pct ${pctLevel(value)}`} style={{ color: pctColor(shown) }}>
+    <span
+      className={`vf2-live-pct ${pctLevel(value)}`}
+      style={{ '--pt-h': pctHue(shown).toFixed(0) }}
+    >
       {fmtPct(shown)}
     </span>
   );
@@ -1006,6 +1149,107 @@ const LiveBar = ({ value }) => {
   );
 };
 LiveBar.propTypes = { value: PropTypes.number.isRequired };
+
+// Shabad-level evidence on a card: one chip per distinct pangti heard from that Shabad, in the
+// order they were heard (filled = heard clearly, half = heard weakly; the pangti on hover).
+const EvidenceChips = ({ ev }) => {
+  if (!ev || !ev.pangtis || !ev.pangtis.length) return null;
+  return (
+    <span className="vf2-chips" aria-label={`${ev.distinct} pangtis heard`}>
+      {ev.more > 0 && <span className="vf2-chips-more">+{ev.more}</span>}
+      {ev.pangtis.map((p) => (
+        <span
+          key={p.key}
+          className={`vf2-chip ${p.clear ? 'is-clear' : ''}${!p.clear && !p.faint ? 'is-weak' : ''}${
+            p.faint ? 'is-faint' : ''
+          }`}
+          title={p.line ? toAkhar(p.line) : ''}
+        />
+      ))}
+    </span>
+  );
+};
+EvidenceChips.propTypes = { ev: PropTypes.shape({}) };
+// One bar per Shabad: its evidence toward a switch, with a tick at the switch line (at 80% of
+// the bar, so a Shabad past the line is still seen growing). Eases to each new value.
+const EV_TICK = 0.8;
+const EvidenceBar = ({ fill, title }) => {
+  const w = Math.min(1, Math.max(0, fill) * EV_TICK) * 100;
+  return (
+    <span className={`vf2-ev-bar${fill >= 1 ? ' is-over' : ''}`} title={title}>
+      <span className="vf2-ev-fill" style={{ width: `${Math.round(w * 10) / 10}%` }} />
+      <span className="vf2-ev-tick" style={{ left: `${EV_TICK * 100}%` }} />
+    </span>
+  );
+};
+EvidenceBar.propTypes = { fill: PropTypes.number.isRequired, title: PropTypes.string };
+
+// Cards glide to their new places instead of jumping (FLIP): after each render, every element
+// with data-flip-id that moved starts at its old place and eases to the new one in ~0.3 s.
+// A Shabad leaving the list for the "Changing to" card glides up into it the same way (the
+// two share the id). Positions are taken relative to the scope, so scrolling is not motion.
+const FLIP_MS = 300;
+const FLIP_KEEP_MS = 1500; // a card that just left is remembered this long (for its handover)
+const FlipScope = ({ className, children }) => {
+  const ref = useRef(null);
+  const last = useRef(new Map()); // id -> { top, left, at } layout box, relative to the scope
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root || typeof window === 'undefined') return;
+    const still =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const base = root.getBoundingClientRect();
+    const now = performance.now();
+    const next = new Map();
+    root.querySelectorAll('[data-flip-id]').forEach((el) => {
+      const id = el.getAttribute('data-flip-id');
+      const r = el.getBoundingClientRect();
+      // A glide still running shows as a transform: take it off to get the layout box,
+      // and keep it as the place the card is seen at right now.
+      let dx = 0;
+      let dy = 0;
+      const tf = window.getComputedStyle(el).transform;
+      if (tf && tf !== 'none' && window.DOMMatrixReadOnly) {
+        const m = new window.DOMMatrixReadOnly(tf);
+        dx = m.m41;
+        dy = m.m42;
+      }
+      const top = r.top - dy - base.top;
+      const left = r.left - dx - base.left;
+      next.set(id, { top, left, at: now });
+      const prev = last.current.get(id);
+      if (!prev || still) return;
+      // Same place as last time: any glide still running just carries on.
+      if (prev.el === el && Math.abs(prev.top - top) < 0.5 && Math.abs(prev.left - left) < 0.5)
+        return;
+      // Seen at: its old layout box plus whatever glide it was still in.
+      const fromY = prev.top + (prev.el === el ? dy : 0) - top;
+      const fromX = prev.left + (prev.el === el ? dx : 0) - left;
+      if (Math.abs(fromY) < 1 && Math.abs(fromX) < 1) return;
+      const anim = el;
+      anim.style.transition = 'none';
+      anim.style.transform = `translate(${fromX}px, ${fromY}px)`;
+      // eslint-disable-next-line no-unused-expressions
+      anim.offsetHeight; // apply the start position before easing away from it
+      anim.style.transition = `transform ${FLIP_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
+      anim.style.transform = '';
+    });
+    root.querySelectorAll('[data-flip-id]').forEach((el) => {
+      const rec = next.get(el.getAttribute('data-flip-id'));
+      if (rec) rec.el = el;
+    });
+    last.current.forEach((rec, id) => {
+      if (!next.has(id) && now - rec.at < FLIP_KEEP_MS) next.set(id, { ...rec, el: null });
+    });
+    last.current = next;
+  });
+  return (
+    <div className={className} ref={ref}>
+      {children}
+    </div>
+  );
+};
+FlipScope.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
 const VoiceFollow = () => {
   // Select the primitive directly rather than holding the whole navigator slice
@@ -1220,6 +1464,19 @@ const VoiceFollow = () => {
   const [status, setStatus] = useState('idle'); // idle|connecting|listening|detecting|error|stopped
   const [autopilot] = useState(true); // hands-free: detect + follow + auto-switch, one press
   const vetoRef = useRef(null); // { id, left }: shabad a tap just left, and judged decodes remaining
+  const kfSwitchRef = useRef({ cur: null, session: null, store: new Map(), last: '' }); // PANKTI_CUMULATION_SWITCH
+  const fragRef = useRef({
+    cur: null,
+    session: null,
+    store: new Map(),
+    top: null,
+    searched: '',
+    recent: new Map(),
+    lastConfirm: 0,
+    hitAt: new Map(),
+    since: 0,
+  }); // PANKTI_FRAGMENT_CONFIRM
+  const fragCacheRef = useRef(new Map()); // shabadId -> profile (PANKTI_FRAGMENT_CONFIRM's own line cache)
   const baniLengthRef = useRef('short');
   baniLengthRef.current = baniLength;
   // The user's own length (what they chose), even while Rehras has it raised (by this run,
@@ -1496,13 +1753,18 @@ const VoiceFollow = () => {
   const shelfRef = useRef(null);
   if (!shelfRef.current) shelfRef.current = createShelf();
   const [shelf, setShelf] = useState([]);
+  // The "Changing to" card, held by the shelf a moment past the judge's wobbles.
+  const [changeCard, setChangeCard] = useState(null);
   const heardLastRef = useRef(0); // when a word was last heard confidently (ms)
-  const liveLeadRef = useRef(null); // the Shabad in the change card (its own card, not listed)
+  const liveLeadRef = useRef(null); // the Shabad the judge is checking as a change (its id)
+  const liveLeadItemRef = useRef(null); // ... and its judge entry (line, score, wins)
   const boardLogRef = useRef({ at: 0, sig: '' });
   const resetShelf = useCallback(() => {
     shelfRef.current.reset();
     liveLeadRef.current = null;
+    liveLeadItemRef.current = null;
     setShelf([]);
+    setChangeCard(null);
   }, []);
   const publishBoard = useCallback((force = false) => {
     const now = Date.now();
@@ -1514,24 +1776,62 @@ const VoiceFollow = () => {
     const bani = curBaniShabadsRef.current;
     // Listed: any Shabad in contention other than the one on screen (under any id) or a
     // member of the Bani on screen; while following, never the judge's scratch work under
-    // 1%; and only with a pangti to show (never an empty row).
-    const hide = [cur, liveLeadRef.current].filter((x) => x != null);
-    const items = snap.filter(
-      (b) =>
-        b.role !== 'current' &&
-        b.shabadId !== cur &&
-        !(cur != null && bani && bani.has(b.shabadId)) &&
-        (cur == null || b.pct >= 0.01) &&
-        !!cardLine(b),
-    );
+    // 1%; and only with a pangti to show (never an empty row). The Shabad being checked as
+    // a change goes to its own card (the shelf holds it there through brief wobbles).
+    const hide = [cur].filter((x) => x != null);
+    const leadItem = cur != null ? liveLeadItemRef.current : null;
+    let lead = null;
+    if (leadItem && leadItem.shabadId !== cur) {
+      const onBoard = snap.find((x) => x.shabadId === leadItem.shabadId);
+      lead = {
+        ...leadItem,
+        line: leadItem.line || (onBoard && cardLine(onBoard)) || '',
+        pct: onBoard ? onBoard.pct : leadItem.score || 0,
+        prog: switchProgress(leadItem),
+        ev: boardRef.current.evidenceOf(leadItem.shabadId, now),
+      };
+    }
+    // While following, the list is the Shabad-level evidence (shabadEvidence.js): every Shabad
+    // with pangtis heard, named by its strongest pangti, for as long as its evidence lasts.
+    // While searching, the lock progress as before.
+    const pctOf = (id) => {
+      const b = snap.find((x) => x.shabadId === id);
+      return b ? b.pct : 0;
+    };
+    const items =
+      cur != null
+        ? boardRef.current
+            .evidenceSnapshot(now)
+            .filter((e) => e.shabadId !== cur && !(bani && bani.has(e.shabadId)))
+            .map((e) => {
+              const best = e.ev.pangtis.reduce((m, x) => (!m || x.w > m.w ? x : m), null);
+              return {
+                ...e,
+                line: (best && best.line) || cardLine(e),
+                pct: pctOf(e.shabadId),
+                prog: Math.max(e.ev.fill, 0),
+                at: now,
+              };
+            })
+            .filter((e) => !!e.line)
+        : snap.filter((b) => b.role !== 'current' && !!cardLine(b));
     const listed = shelfRef.current.update({
       now,
       items,
       current: cur,
       heardAt: heardLastRef.current,
       hide,
+      lead,
     });
     setShelf(listed);
+    const held = shelfRef.current.changeCard(now);
+    if (held) {
+      // The change card's rail: the further of the evidence and the judge's own count.
+      held.ev = boardRef.current.evidenceOf(held.shabadId, now) || held.ev || null;
+      const judge = lead && held.shabadId === lead.shabadId ? lead.prog : held.prog || 0;
+      held.prog = Math.max(judge, held.ev ? Math.min(1, held.ev.fill) : 0);
+    }
+    setChangeCard(held);
     // Session log (shadow sessions): the cards as listed, about once a second and only when
     // they changed, so how long a candidate stayed readable can be measured.
     if (SHADOW_BUILD && shadowBus.active() && now - boardLogRef.current.at >= BOARD_LOG_MS) {
@@ -1541,9 +1841,7 @@ const VoiceFollow = () => {
         ...(curCard
           ? [{ id: curCard.shabadId, pct: r2(curCard.pct), role: 'current', vis: 1 }]
           : []),
-        ...(liveLeadRef.current != null
-          ? [{ id: liveLeadRef.current, role: 'change', vis: 1 }]
-          : []),
+        ...(held ? [{ id: held.shabadId, role: 'change', vis: 1 }] : []),
         ...listed.map((c, i) => ({
           id: c.shabadId,
           pct: r2(c.pct),
@@ -1721,8 +2019,10 @@ const VoiceFollow = () => {
       kind,
       from: prev,
     });
+    // Only the Ardas hold shows a card. A talk hold is Autopilot being unsure and searching
+    // (the Waheguru slide goes on screen); the panel stays as it is, with no katha card.
     try {
-      setNgHoldView(kind);
+      setNgHoldView(kind === 'talk' ? null : kind);
     } catch (_) {
       /* panel closing */
     }
@@ -1998,7 +2298,12 @@ const VoiceFollow = () => {
         // was a pangti quoted in the katha or a Shabad the search found in the Ardas's own
         // words (Renton 27 Oct: three such Shabads, 28 s, 155 s and 36 s into the Ardas), and
         // the hold comes back.
-        ng.probation = { until: now + NG_TALK_PROBATION_MS, progress: 0, kind: ng.hold.kind };
+        ng.probation = {
+          until: now + NG_TALK_PROBATION_MS,
+          progress: 0,
+          kind: ng.hold.kind,
+          shabadId: cand.shabadId,
+        };
         ngSetHold(null);
         return false;
       }
@@ -2025,8 +2330,7 @@ const VoiceFollow = () => {
     const reading =
       (paathSeqRef.current && paathSeqRef.current.on) ||
       (followerRef.current && followerRef.current.readBani);
-    if (reading && now - lastRead < NG_TALK_SEQ_QUIET_MS)
-      return false;
+    if (reading && now - lastRead < NG_TALK_SEQ_QUIET_MS) return false;
     if (baniIdOf(currentShabadIdRef.current) != null) return false;
     if (!ngScreenOurs()) return false;
     if (!loose && now - lastAutoDecisionRef.current < NG_TALK_AFTER_LOCK_MS) return false;
@@ -2041,7 +2345,11 @@ const VoiceFollow = () => {
     if (hops.length && hops.filter((h) => h.fit).length > hops.length * NG_TALK_FIT_SHARE)
       return false;
     const ret = ng.ret.filter((x) => x.t >= lo);
-    if (ret.length && ret.filter((x) => x.top >= (reading ? NG_RET_HI_READ : NG_RET_HI)).length > ret.length * NG_RET_SHARE)
+    if (
+      ret.length &&
+      ret.filter((x) => x.top >= (reading ? NG_RET_HI_READ : NG_RET_HI)).length >
+        ret.length * NG_RET_SHARE
+    )
       return false;
     return true;
   };
@@ -2050,6 +2358,21 @@ const VoiceFollow = () => {
     // A Shabad found during katha: if the follower does not move on within the probation, it
     // was a pangti quoted in the katha, and the hold comes back at once.
     if (ng.probation && !ng.hold) {
+      // The screen moved to another Shabad during the probation (the judge or Pankti Cumulation
+      // switched): that is Gurbani being sung, not a quote; the new Shabad gets its own probation
+      // (owner, 29 Oct: "katha" came up 3 s after a right switch while singing ਤੂੰ ਮੇਰਾ ਪਿਤਾ).
+      if (
+        ng.probation.shabadId != null &&
+        currentShabadIdRef.current != null &&
+        currentShabadIdRef.current !== ng.probation.shabadId
+      ) {
+        ng.probation = {
+          until: now + NG_TALK_PROBATION_MS,
+          progress: 0,
+          kind: ng.probation.kind,
+          shabadId: currentShabadIdRef.current,
+        };
+      }
       if (ng.probation.progress >= 2) {
         // Read on: a real Shabad (the Hukamnama after an Ardas). The hold it ended is over;
         // what comes later is judged afresh, not as that Ardas going on.
@@ -3871,6 +4194,14 @@ const VoiceFollow = () => {
         const { step } = memory;
         memory.entries = memory.entries.filter((e) => step - e.step <= 24);
         const hyp = vfNorm(text);
+        // Pankti Cumulation clock: sung decodes fade the evidence, quiet ones (alaap, tabla) may freeze it
+        if (PANKTI_CUMULATION_FIND > 0 && memory.kf)
+          pcElapse(
+            memory.kf,
+            AP_REC_HOP_S,
+            PC_FIND_FREEZE > 0 && hyp.length < PC_QUIET_LETTERS,
+            PC_FIND,
+          );
         if (hyp.length >= 8) {
           const acousticRecognizer = recognizerRef.current;
           const acousticPcm = acousticRecognizer?.buf;
@@ -4055,6 +4386,82 @@ const VoiceFollow = () => {
                 return;
             }
           }
+          if (PANKTI_CUMULATION_FIND > 0 && top && hyp !== memory.kfHyp) {
+            memory.kfHyp = hyp;
+            if (!memory.kf) memory.kf = new Map();
+            const ev = pcAddHit(
+              memory.kf,
+              { shabadId: top.shabadId, verseId: top.verseId, score: top.score, margin },
+              PC_FIND,
+            );
+            let lockId = ev && ev.ready ? top.shabadId : null;
+            let lockVerse = top.verseId;
+            if (PC_FIND_FRAG > 0 && lockId == null) {
+              const words = String(text || '')
+                .trim()
+                .split(/\s+/);
+              const pieces = [];
+              let cur = [];
+              for (let i = words.length - 1; i >= 0 && pieces.length < PC_FRAG_PIECES; i -= 1) {
+                cur.unshift(words[i]); // whole words only
+                if (vfNorm(cur.join(' ')).length >= PC_FRAG_LETTERS) {
+                  pieces.push(cur.join(' '));
+                  cur = [];
+                }
+              }
+              for (let i = 0; i < pieces.length && lockId == null; i += 1) {
+                // eslint-disable-next-line no-await-in-loop
+                let fl = await searchCanonicalText(pieces[i], 3 + DUP_AWARE_LOCK, request.signal);
+                // eslint-disable-next-line no-await-in-loop
+                if (DUP_AWARE_LOCK && fl) fl = await distinctLeaders(fl, 2);
+                if (stale()) return;
+                const f0 = fl?.[0];
+                const fe =
+                  f0 &&
+                  pcAddHit(
+                    memory.kf,
+                    {
+                      shabadId: f0.shabadId,
+                      verseId: f0.verseId,
+                      score: f0.score,
+                      margin: f0.score - (fl[1]?.score || 0),
+                      w: PC_FRAG.w,
+                    },
+                    { ...PC_FIND, minScore: PC_FRAG.minScore, minMargin: PC_FRAG.minMargin },
+                  );
+                if (fe && fe.ready) {
+                  lockId = f0.shabadId;
+                  lockVerse = f0.verseId;
+                }
+              }
+            }
+            if (
+              lockId != null &&
+              PC_FIND_PAATH_SKIP > 0 &&
+              poolIndex &&
+              (poolIndex.byShabad.get(lockId) || []).some((x) => PAATH_READ_BANIS.includes(x.bani))
+            )
+              lockId = null;
+            if (lockId != null) {
+              let profile;
+              try {
+                profile = await loadShabadProfile(lockId);
+              } catch (_) {
+                return;
+              }
+              if (stale()) return;
+              const at = profile.verses.findIndex((v) => v.verseId === lockVerse);
+              if (at >= 0) {
+                memory.kf = null;
+                autopilotLock({
+                  shabadId: lockId,
+                  verseId: lockVerse,
+                  verse: profile.displayLines[at],
+                });
+                return;
+              }
+            }
+          }
           if (top) {
             if (!memory.entries.some((e) => e.hyp === hyp)) {
               memory.entries.push({
@@ -4173,6 +4580,289 @@ const VoiceFollow = () => {
           }
         }
       } else contextEvidenceRef.current = null;
+      if (
+        PANKTI_CUMULATION_SWITCH > 0 &&
+        autopilotRef.current &&
+        phaseRef.current === 'following' &&
+        !lockingRef.current
+      ) {
+        const curId = currentShabadIdRef.current;
+        if (kfSwitchRef.current.cur !== curId || kfSwitchRef.current.session !== session)
+          kfSwitchRef.current = { cur: curId, session, store: new Map(), last: '', rep: new Map() };
+        const ks = kfSwitchRef.current;
+        const kfHeard = vfNorm(text);
+        if (curId != null && baniIdOf(curId) == null) {
+          pcElapse(ks.store, AP_REC_HOP_S, kfHeard.length < PC_QUIET_LETTERS, PC_SWITCH);
+          if (kfHeard.length >= PC_SWITCH_MIN_LETTERS && kfHeard !== ks.last) {
+            ks.last = kfHeard;
+            const ctl = new AbortController();
+            let found = await searchCanonicalText(text, 4, ctl.signal);
+            if (found && DUP_AWARE_LOCK) found = await distinctLeaders(found, 2);
+            ks.found = found;
+            ks.foundHyp = kfHeard;
+            const kfStale = () =>
+              session !== sessionRef.current ||
+              !recognizingRef.current ||
+              phaseRef.current !== 'following' ||
+              lockingRef.current ||
+              kfSwitchRef.current !== ks ||
+              currentShabadIdRef.current !== curId;
+            if (kfStale()) return;
+            const k0 = found?.[0];
+            const vetoed = vetoRef.current && vetoRef.current.id === k0?.shabadId;
+            const same = k0 && (k0.shabadId === curId || (await isSameGurbani(k0.shabadId, curId)));
+            if (kfStale()) return;
+            if (k0 && !same && !vetoed) {
+              const ev = pcAddHit(
+                ks.store,
+                {
+                  shabadId: k0.shabadId,
+                  verseId: k0.verseId,
+                  score: k0.score,
+                  margin: k0.score - (found[1]?.score || 0),
+                },
+                PC_SWITCH,
+              );
+              let repeated = false;
+              const kfMargin = k0.score - (found[1]?.score || 0);
+              if (
+                PC_SWITCH_REPEAT > 0 &&
+                k0.score >= PC_REPEAT.minScore &&
+                kfMargin >= PC_REPEAT.minMargin
+              ) {
+                const key = `${k0.shabadId}:${k0.verseId}`;
+                const now = Date.now() / 1000;
+                const r = ks.rep.get(key) || { n: 0, last: -Infinity };
+                if (now - r.last >= PC_REPEAT.gapS) r.n += 1;
+                r.last = now;
+                ks.rep.set(key, r);
+                repeated = r.n >= PC_REPEAT.times;
+              }
+              if ((ev && ev.ready) || repeated) {
+                let profile;
+                try {
+                  profile = await loadShabadProfile(k0.shabadId);
+                } catch (_) {
+                  profile = null;
+                }
+                if (kfStale()) return;
+                const at = profile ? profile.verses.findIndex((v) => v.verseId === k0.verseId) : -1;
+                if (at >= 0) {
+                  if (SHADOW_BUILD) diag(`vf pankti cumulation switch -> ${k0.shabadId}`);
+                  autopilotLock({
+                    shabadId: k0.shabadId,
+                    verseId: k0.verseId,
+                    verse: profile.displayLines[at],
+                  });
+                  return;
+                }
+              }
+            }
+          }
+        }
+      }
+      // --- Fragment confirm (fragmentConfirm.js): short pieces of the next pangti, scored
+      // against every Shabad on the board; the panel shows the weight rising. ---
+      if (
+        PANKTI_FRAGMENT_CONFIRM > 0 &&
+        autopilotRef.current &&
+        phaseRef.current === 'following' &&
+        !lockingRef.current &&
+        currentShabadIdRef.current != null &&
+        baniIdOf(currentShabadIdRef.current) == null
+      ) {
+        // Runs here, before the first-letter gate below: a piece of one or two words (the case
+        // that matters: a slow pangti heard in 5-9 letter pieces) never reaches the judge.
+        const curId = currentShabadIdRef.current;
+        const hypFull = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+        {
+          const fr = fragRef.current;
+          if (fr.cur !== curId || fr.session !== session) {
+            fr.cur = curId;
+            fr.session = session;
+            fr.store = new Map();
+            fr.recent = new Map();
+            fr.hitAt = new Map();
+            fr.since = Date.now();
+          }
+          fragElapse(fr.store, AP_REC_HOP_S, hypFull.length < PC_QUIET_LETTERS, PC_FRAGMENT);
+          const nowMs = Date.now();
+          // Nominate the top Shabad of the full-text search for a long enough piece (reusing
+          // Pankti Cumulation (switch)'s search of this decode when it ran).
+          const heardAll = vfNorm(text);
+          if (heardAll.length >= PC_SWITCH_MIN_LETTERS && heardAll !== fr.searched) {
+            fr.searched = heardAll;
+            const ks = kfSwitchRef.current;
+            let found = ks.foundHyp === heardAll ? ks.found : null;
+            if (!found) {
+              const ctl = new AbortController();
+              found = await searchCanonicalText(text, 4, ctl.signal);
+              if (found && DUP_AWARE_LOCK) found = await distinctLeaders(found, 2);
+              if (
+                session !== sessionRef.current ||
+                !recognizingRef.current ||
+                phaseRef.current !== 'following' ||
+                lockingRef.current ||
+                currentShabadIdRef.current !== curId
+              )
+                return;
+            }
+            const f0 = found?.[0];
+            const margin = f0 ? f0.score - (found[1]?.score || 0) : 0;
+            if (f0 && f0.shabadId !== curId && margin >= PC_FRAGMENT_NOMINATE_MARGIN) {
+              fr.top = { id: f0.shabadId, at: nowMs };
+            }
+          }
+          const change = shelfRef.current.changeCard(nowMs);
+          const ids = [];
+          const addId = (id, role) => {
+            // Shabads only: a Bani card ('bani:<id>') has no Shabad profile to load, and a string id
+            // crashes the Realm query (the 10.0.3 crash on 30 GAB recordings).
+            if (!Number.isSafeInteger(id) || id === curId || ids.some((x) => x.id === id)) return;
+            if (vetoRef.current && vetoRef.current.id === id) return;
+            if (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id)) return;
+            if (knownSame(curId, id)) return;
+            ids.push({ id, role });
+          };
+          if (change) addId(change.shabadId, 'change');
+          if (fr.top && nowMs - fr.top.at <= PC_FRAGMENT_NOMINATE_S * 1000)
+            addId(fr.top.id, 'change');
+          // Shabads already carrying weight from earlier pieces stay candidates while it lasts.
+          fr.store.forEach((lines, id) => {
+            let w = 0;
+            lines.forEach((x) => {
+              w += x;
+            });
+            if (w >= 0.3) addId(id, 'list');
+          });
+          boardRef.current
+            .evidenceSnapshot(nowMs)
+            .slice(0, PC_FRAGMENT_CANDS)
+            .forEach((e) => addId(e.shabadId, 'list'));
+          if (PC_FRAGMENT_RETURN > 0 && prevShabadRef.current)
+            addId(prevShabadRef.current.id, 'change');
+          [switchCandRef.current, backstopRef.current, returnSlotRef.current].forEach(
+            (slot) => slot && addId(slot.shabadId, 'list'),
+          );
+          const cands = [];
+          let loads = 0;
+          const fc = fragCacheRef.current;
+          ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
+            const prof =
+              (fc.get(id) && fc.get(id).linesNorm ? fc.get(id) : null) ||
+              lineCacheRef.current.get(id);
+            if (prof && prof.linesNorm) {
+              const real = prof.linesNorm.filter(
+                (l) => l && l.length >= PC_FRAGMENT.minLineLetters,
+              ).length;
+              if (!(PC_FRAGMENT_MIN_PANGTIS > 0 && real < PC_FRAGMENT_MIN_PANGTIS))
+                cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+            } else if (!fc.has(id) && loads < 2) {
+              loads += 1;
+              if (fc.size >= PC_FRAGMENT_CACHE) {
+                const oldest = fc.keys().next();
+                if (!oldest.done) fc.delete(oldest.value);
+              }
+              const pendingProfile = {};
+              fc.set(id, pendingProfile);
+              loadShabadProfile(id)
+                .then((q) => {
+                  if (session === sessionRef.current && fc.get(id) === pendingProfile)
+                    fc.set(id, q);
+                })
+                .catch(() => {
+                  if (fc.get(id) === pendingProfile) fc.delete(id);
+                });
+            }
+          });
+          const r = fragStep(
+            fr.store,
+            { hyp: hypFull, cur: { linesNorm: curLinesNormRef.current }, cands },
+            partialRatio,
+            PC_FRAGMENT,
+          );
+          if (r.hits.length) {
+            r.hits.forEach((h) => {
+              if (h.w >= 1) fr.recent.set(h.id, { at: nowMs, index: h.index, len: hypFull.length });
+              if (!fr.hitAt.has(h.id)) fr.hitAt.set(h.id, new Map());
+              fr.hitAt.get(h.id).set(h.index, nowMs);
+            });
+            const named = r.hits.map((h) => {
+              const c = cands.find((x) => x.id === h.id);
+              const v = (c && c.prof.verses[h.index]) || {};
+              return {
+                shabadId: h.id,
+                verseId: v.verseId,
+                line: (c && c.prof.displayLines[h.index]) || '',
+                score: h.s,
+              };
+            });
+            boardRef.current.fragments({ now: nowMs, cur: curId, sCur: r.sCur, cands: named });
+            sessionLog.logEvent('pc_fragment', {
+              session: sessionIdRef.current,
+              cur: curId,
+              heard: hypFull.length,
+              hits: r.hits.map((h) => ({ id: h.id, index: h.index, s: +h.s.toFixed(2), w: h.w })),
+              ready: r.ready,
+            });
+          }
+          let gate = null;
+          if (r.ready) {
+            const rc = cands.find((x) => x.id === r.ready.id);
+            const need =
+              rc && rc.role === 'change' ? PC_FRAGMENT.distinctChange : PC_FRAGMENT.distinctList;
+            if (PC_FRAGMENT_FRESH_S > 0) {
+              const ha = fr.hitAt.get(r.ready.id);
+              let fresh = 0;
+              (fr.store.get(r.ready.id) || new Map()).forEach((w, i) => {
+                if (w >= 0.3 && ha && ha.get(i) >= nowMs - PC_FRAGMENT_FRESH_S * 1000) fresh += 1;
+              });
+              if (fresh < need) gate = 'fresh';
+            }
+            if (PC_FRAGMENT_COOLDOWN_S > 0 && nowMs - fr.since < PC_FRAGMENT_COOLDOWN_S * 1000)
+              gate = gate || 'cooldown';
+            if (
+              PC_FRAGMENT_MIN_LETTERS_CONFIRM > 0 &&
+              hypFull.length < PC_FRAGMENT_MIN_LETTERS_CONFIRM
+            )
+              gate = gate || 'letters';
+            const lines = fr.store.get(r.ready.id);
+            const dump = [];
+            if (lines)
+              lines.forEach((w, i) => {
+                const ha = fr.hitAt.get(r.ready.id);
+                dump.push(
+                  `${i}:${w.toFixed(2)}@${ha && ha.get(i) ? ((nowMs - ha.get(i)) / 1000).toFixed(1) : '?'}s`,
+                );
+              });
+          }
+          if (
+            r.ready &&
+            !gate &&
+            nowMs - fr.lastConfirm >= PC_FRAGMENT_GAP_S * 1000 &&
+            !lockingRef.current &&
+            session === sessionRef.current &&
+            recognizingRef.current &&
+            phaseRef.current === 'following' &&
+            currentShabadIdRef.current === curId
+          ) {
+            const c = cands.find((x) => x.id === r.ready.id);
+            const v = (c && c.prof.verses[r.ready.index]) || {};
+            if (v.verseId) {
+              if (SHADOW_BUILD) diag(`vf fragment confirm -> ${r.ready.id}`);
+              fr.store = new Map();
+              fr.lastConfirm = nowMs;
+              await autopilotLock({
+                shabadId: r.ready.id,
+                verseId: v.verseId,
+                verse: c.prof.displayLines[r.ready.index],
+              });
+              return;
+            }
+          }
+        }
+      }
+
       // Search uses ASCII-font first letters (the DB's FirstLetterStr encoding).
       // The recognizer's unverified text is never a display or canonical source.
       const fl = toAsciiFirstLetters(text);
@@ -4480,6 +5170,16 @@ const VoiceFollow = () => {
           hypLen: hypFull.length,
           hypMin: SWITCH_HYP_MIN,
         };
+        let kfFlipTop = null; // PANKTI_SHARED_HOLD: { id, margin } of the heard line over all Gurbani
+        if (PANKTI_SHARED_HOLD > 0) {
+          const ctl = new AbortController();
+          let fl0 = await searchCanonicalText(text, 4, ctl.signal);
+          if (fl0 && DUP_AWARE_LOCK) fl0 = await distinctLeaders(fl0, 2);
+          if (!isCurrentTranscript() || lockingRef.current) return;
+          kfFlipTop = fl0?.[0]
+            ? { id: fl0[0].shabadId, margin: fl0[0].score - (fl0[1]?.score || 0) }
+            : { id: null, margin: 0 };
+        }
         const stepSlot = (slot, sCand) => {
           // Suppress confirmation only for identities in the tied leader set.
           const vetoed =
@@ -4494,13 +5194,51 @@ const VoiceFollow = () => {
             return false;
           }
           const step = nextSwitchWins(slot.wins, sCand, sCurFull, acousticCfg);
+          if (
+            kfFlipTop &&
+            step.wins > slot.wins &&
+            !(
+              (kfFlipTop.id === slot.shabadId || knownSame(kfFlipTop.id, slot.shabadId)) &&
+              kfFlipTop.margin >= PC_SHARED_HOLD_MARGIN
+            )
+          ) {
+            slot.lastScore = sCand; // eslint-disable-line no-param-reassign
+            return slot.wins >= SWITCH_CONFIRM; // a shared line: hold the count
+          }
           slot.wins = step.wins; // eslint-disable-line no-param-reassign
           // Held decodes judged nothing — keep showing the last judged score.
           if (!step.held) {
             slot.lastScore = sCand; // eslint-disable-line no-param-reassign
             slot.bestScore = Math.max(slot.bestScore || 0, sCand); // eslint-disable-line no-param-reassign
           }
-          return slot.wins >= SWITCH_CONFIRM;
+          const needed = switchConfirmNeeded(
+            {
+              isBani: BANI_END_EXIT_BANIS.has(Number(baniIdOf(curId))),
+              cursor: curCursorRef.current,
+              nLines: (curLinesNormRef.current || []).length,
+              decisive: step.decisive,
+            },
+            BANI_END_EXIT,
+            SWITCH_CONFIRM,
+          );
+          const fragHit =
+            PANKTI_FRAGMENT_CONFIRM > 0 && PC_FRAGMENT_ASSIST_S > 0
+              ? fragRef.current.recent.get(slot.shabadId)
+              : null;
+          let assisted = !!fragHit && Date.now() - fragHit.at <= PC_FRAGMENT_ASSIST_S * 1000;
+          if (
+            assisted &&
+            PC_FRAGMENT_ASSIST_MIN_LETTERS > 0 &&
+            (fragHit.len || 0) < PC_FRAGMENT_ASSIST_MIN_LETTERS
+          )
+            assisted = false;
+          if (
+            assisted &&
+            PC_FRAGMENT_COOLDOWN_S > 0 &&
+            Date.now() - fragRef.current.since < PC_FRAGMENT_COOLDOWN_S * 1000
+          )
+            assisted = false;
+          return slot.wins >= (assisted ? Math.max(1, needed - 1) : needed);
         };
         const decaySlot = (slot) => {
           slot.wins = Math.max(0, slot.wins - 1); // eslint-disable-line no-param-reassign
@@ -4677,7 +5415,15 @@ const VoiceFollow = () => {
               const m = bestLineMatch(hypFull, prev.profile.linesNorm, SWITCH_CAND_MIN_LINE_CHARS);
               if (m.index >= 0) {
                 const step = nextSwitchWins(rs.wins, m.s, sCurFull, acousticCfg);
-                rs.wins = step.wins;
+                const kfShared =
+                  kfFlipTop &&
+                  baniIdOf(prev.id) == null &&
+                  step.wins > rs.wins &&
+                  !(
+                    (kfFlipTop.id === prev.id || knownSame(kfFlipTop.id, prev.id)) &&
+                    kfFlipTop.margin >= PC_SHARED_HOLD_MARGIN
+                  );
+                if (!kfShared) rs.wins = step.wins;
                 if (!step.held) {
                   rs.lastScore = m.s;
                   rs.index = m.index;
@@ -4789,6 +5535,8 @@ const VoiceFollow = () => {
               .filter((x) => x.shabadId !== currentShabadIdRef.current)
               .reduce((m, c) => (!m || c.wins > m.wins ? c : m), null);
             liveLeadRef.current = top && top.wins >= 1 ? top.shabadId : null;
+            liveLeadItemRef.current =
+              top && top.wins >= 1 ? { ...top, sCur: sCurFull, at: Date.now() } : null;
           }
           // Publish only when the picture changed (ids or wins), and at most
           // ~3x/s: the recognizer shares this thread, so needless re-renders
@@ -5952,10 +6700,13 @@ const VoiceFollow = () => {
   }
   // The next pangti: from the follower's position, else the line after the one on screen.
   let nextLine = null;
+  let atEnd = false;
   if (showNext && currentView && profLines) {
     let at = posIsCurrent ? pos.lineIndex : -1;
     if (at < 0 && liveLine) at = profLines.findIndex((l) => l === liveLine);
     if (at >= 0 && at + 1 < profLines.length) nextLine = profLines[at + 1] || null;
+    // On the last pangti there is no next one: the row says so instead of standing empty.
+    else if (at >= 0 && at + 1 >= profLines.length) atEnd = true;
   }
   // Volume label: no sound (red), low (amber), good (green), great (dark green), with a
   // little hysteresis so it doesn't flicker (see VOL_* above).
@@ -6065,9 +6816,6 @@ const VoiceFollow = () => {
   };
   // A candidate row shows the pangti the engine heard being sung, wherever it falls in
   // the Shabad, so the sevadaar can recognise it at once (as the 8.6 panel did).
-  // Nothing heard for a few seconds (the hearing strip has cleared): no change card. The
-  // candidate list has its own, longer hold (candidateShelf.js).
-  const hearingNow = heardKeys.length > 0;
   const nameLine = cardLine;
   const curFirst =
     (curProfileRef.current && curProfileRef.current.displayLines
@@ -6077,35 +6825,27 @@ const VoiceFollow = () => {
     !!line &&
     ((liveLine && engine.norm(line) === engine.norm(liveLine)) ||
       (curFirst && engine.norm(line) === engine.norm(curFirst)));
-  // The listed cards come from the shelf (publishBoard): held, steady and fading there.
-  // They are not tied to the hearing strip: a pause in the singing does not empty the list.
+  // The listed cards come from the shelf (publishBoard): held, ordered by confidence and
+  // fading there. They are not tied to the hearing strip: a pause does not empty the list.
   const boardOthers = shelf
     .filter((b) => !(currentView && b.shabadId === currentView.id))
-    .filter(
-      (b) => !(currentView && liveLead && liveLead.wins >= 1 && b.shabadId === liveLead.shabadId),
-    )
+    .filter((b) => !(liveLead && b.shabadId === liveLead.shabadId))
     .map((b) => ({ ...b, line: nameLine(b) }))
     .filter((b) => !!b.line)
-    // The same Gurbani under another id (a Bani copy of a Shabad) is not a different Shabad.
-    .filter((b) => !(currentView && sameAsCurrent(b.line)))
-    .slice(0, 5);
+    // Not hidden for sharing a pangti with the Shabad on screen: a look-alike pangti is often
+    // exactly how the next Shabad first shows itself (copies under another id are already
+    // kept out by the judge).
+    .slice(0, 6);
   const leadLine = liveLead ? nameLine(liveLead) : '';
-  // The change card's percentage: the live board's, else the judge's own match score.
+  // The change card's percentage: the live board's, else the shelf's held one.
   let leadPct = 0;
   if (liveLead) {
     const onBoard = boardPct(liveLead.shabadId);
     leadPct = onBoard != null ? onBoard : liveLead.score || 0;
   }
-  // A change in progress is the one thing to look at: the candidate list hides under it.
-  // The same Gurbani under another id is not a change.
-  const changing = !!(
-    currentView &&
-    liveLead &&
-    liveLead.wins >= 1 &&
-    hearingNow &&
-    leadLine &&
-    !sameAsCurrent(leadLine)
-  );
+  // A change in progress is the one thing to look at. The same Gurbani under another id is
+  // not a change.
+  const changing = !!(liveLead && leadLine && !sameAsCurrent(leadLine));
 
   const heardStrip = (() => {
     // A rolling window: only the last few settled words, newest kept in view.
@@ -6221,7 +6961,7 @@ const VoiceFollow = () => {
       )}
 
       {active && (
-        <div className="vf2-body">
+        <div className={`vf2-body${!changing && boardOthers.length === 0 ? ' is-quiet' : ''}`}>
           {dlBar}
           {holdCard}
           <>
