@@ -12,7 +12,7 @@
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
 //
-// 'fast' is exactly today's schedule and code path (own clocks, 4 s windows, no memo): a
+// 'fast' is exactly today's schedule and code path (own clocks, 4 s windows): a
 // computer that keeps up runs byte-identical to the build without tiers. The tier is
 // picked by a short self-test when the model loads (median pass time on a 4 s window) and
 // then stepped live: down when the audio backlog stays above BEHIND_S, up when the measured

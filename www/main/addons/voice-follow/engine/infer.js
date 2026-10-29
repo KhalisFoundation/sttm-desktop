@@ -41,10 +41,10 @@ class Infer {
     // Wall ms of each model pass since perfStats() last read them (session health).
     this.perf = { ms: [], since: Date.now(), repeats: 0 };
     // The last window and its output. The recognizer and the follower each keep their own
-    // copy of the same audio, so while a Bani or Shabad is followed every other follower
-    // window is byte-identical to the recognizer's: the model is run once per distinct
-    // window (a third of the passes while following) — in the aligned tiers only, see
-    // emissions(). VF_NO_MEMO=1 turns it off (A/B).
+    // copy of the same audio, so while a Bani or Shabad is followed many follower windows are
+    // byte-identical to the recognizer's (and every window of a backlog push is): the model is
+    // run once per distinct window. Same input, same output (the model is deterministic), so
+    // the engines see exactly what a second pass would give them. VF_NO_MEMO=1 turns it off (A/B).
     this.memo = process.env.VF_NO_MEMO ? null : { buf: null, out: null };
   }
 
@@ -93,12 +93,11 @@ class Infer {
 
   // buf: Float32Array @16k -> {data:Float32Array flat, frames, C}
   async emissions(buf) {
-    // The memo serves the aligned tiers only: in the fast tier (a computer that keeps up)
-    // every window is a model pass, exactly as before the tiers existed.
-    const memo = this.memo && pace.current().aligned ? this.memo : null;
-    if (memo && Infer.sameWindow(memo.buf, buf)) {
+    // A window byte-identical to the last one gets the last one's output: the model is
+    // deterministic, so the engines see exactly what a second pass would give them.
+    if (this.memo && Infer.sameWindow(this.memo.buf, buf)) {
       this.perf.repeats += 1;
-      return memo.out;
+      return this.memo.out;
     }
     const t0 = Date.now();
     const out = await this.run(buf);
