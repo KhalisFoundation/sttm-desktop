@@ -533,6 +533,9 @@ const PC_FRAGMENT_RETURN = 0; // the Shabad just left confirms on 2 pangtis (lik
 const PC_FRAGMENT_COOLDOWN_S = 0; // no fragment confirm / judge assist this soon after a Shabad change
 const PC_FRAGMENT_ASSIST_MIN_LETTERS = 0; // judge assist only from a hit piece this long
 const PC_FRAGMENT_MIN_LETTERS_CONFIRM = 0; // the piece that completes a confirm must be this long
+// A Shabad with fewer than this many real pangtis (a salok, usually sung as a parmaan inside the Shabad on
+// screen) is left to the acoustic judge: fragment confirm never changes the screen to it. 0 = off.
+const PC_FRAGMENT_MIN_PANGTIS = 3;
 const PC_FRAGMENT = {
   minLetters: 5,
   minScore: 0.8,
@@ -4723,7 +4726,13 @@ const VoiceFollow = () => {
             const prof =
               (fc.get(id) && fc.get(id).linesNorm ? fc.get(id) : null) ||
               lineCacheRef.current.get(id);
-            if (prof && prof.linesNorm) cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+            if (prof && prof.linesNorm) {
+              const real = prof.linesNorm.filter(
+                (l) => l && l.length >= PC_FRAGMENT.minLineLetters,
+              ).length;
+              if (!(PC_FRAGMENT_MIN_PANGTIS > 0 && real < PC_FRAGMENT_MIN_PANGTIS))
+                cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+            }
             else if (!fc.has(id) && loads < 2) {
               loads += 1;
               if (fc.size >= PC_FRAGMENT_CACHE) {
