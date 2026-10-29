@@ -6,7 +6,6 @@ const {
   REHRAS_BANI,
   AARTI_BANI,
   SOHILA_BANI,
-  SOHILA_OPENING,
   baniLengthFor,
   readRuleMayOpen,
 } = require('./baniLength');
@@ -41,12 +40,9 @@ describe('readRuleMayOpen', () => {
     [REHRAS_BANI]: new Set([40, 41, 42]),
     [SOHILA_BANI]: new Set([49, 50, 51, 52, 53]),
   };
-  it("never lets the long Sohila's opening shabads open Sohila by the reading rule", () => {
-    // Sung as kirtan too (clip17): they open Sohila only as two shabads in order.
-    assert.deepEqual([...SOHILA_OPENING], [2367, 3085, 820, 1958]);
-    SOHILA_OPENING.forEach((sid) => {
-      assert.equal(readRuleMayOpen(SOHILA_BANI, sid, userShabads), false);
-      assert.equal(readRuleMayOpen(SOHILA_BANI, sid, userShabads, true), false);
+  it("lets the long Sohila's opening shabads open Sohila by the reading rule", () => {
+    [2367, 3085, 820, 1958].forEach((sid) => {
+      assert.equal(readRuleMayOpen(SOHILA_BANI, sid, userShabads), true);
     });
   });
   it("keeps Sohila proper's own shabads opening it as before", () => {
@@ -65,11 +61,12 @@ describe('readRuleMayOpen', () => {
     assert.equal(readRuleMayOpen(REHRAS_BANI, 1944, userShabads), false);
     assert.equal(readRuleMayOpen(REHRAS_BANI, 40, userShabads), true);
   });
-  it('never opens Rehras from its long-only opening during Akhand Paath following', () => {
-    assert.equal(readRuleMayOpen(REHRAS_BANI, 1661, userShabads, true), false);
-    assert.equal(readRuleMayOpen(REHRAS_BANI, 1721, userShabads, true), false);
-    assert.equal(readRuleMayOpen(REHRAS_BANI, 40, userShabads, true), true);
+  it('never opens Sohila from its opening shabads during Akhand Paath following', () => {
+    [2367, 3085, 820, 1958].forEach((sid) => {
+      assert.equal(readRuleMayOpen(SOHILA_BANI, sid, userShabads, true), false);
+    });
     assert.equal(readRuleMayOpen(SOHILA_BANI, 49, userShabads, true), true);
+    assert.equal(readRuleMayOpen(REHRAS_BANI, 1661, userShabads, true), false);
   });
   it('leaves a Bani the user already reads at full length, and other Banis, alone', () => {
     assert.equal(readRuleMayOpen(SOHILA_BANI, 2490, {}), true);

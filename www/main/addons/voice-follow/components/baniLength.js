@@ -33,27 +33,24 @@ const baniLengthFor = (baniId, userLength) => {
   return min && LENGTH_ORDER.indexOf(userLength) < LENGTH_ORDER.indexOf(min) ? min : userLength;
 };
 
-// Of the shabads a raised length adds, only the ones listed here may open the Bani by the
-// reading rule (PAATH_READ_LINES lines of one shabad read straight through); a single line
-// never does, since these shabads are also sung as kirtan in their own right.
+// Of the shabads a raised length adds, only the ones that OPEN the Bani may open it by the
+// reading rule (PAATH_READ_LINES lines read straight through) or by two shabads in order; a
+// single line never does, since these shabads are also sung as kirtan in their own right.
 // Rehras: its opening (Har jug jug bhagat upaya and the salok after it); its closing saloks
 // and pauris (e.g. 1944) are sung as kirtan (Level 2 clip04) and never open it.
-// Sohila: none. Its opening pieces (SOHILA_OPENING) are sung as kirtan too, and a ragi singing
-// three lines of one of them in order looks like a reading (Darbar Sahib kirtan of the Bilaval
-// shabad, Level 2 clip17, opened Sohila for 5 minutes). They open Sohila only when two
-// DIFFERENT Sohila shabads are heard in order (e.g. 2367 then 3085, or 1958 then 49), the
-// two-shabads-in-order rule, which kirtan of one shabad never meets.
-const SOHILA_OPENING = new Set([2367, 3085, 820, 1958]); // reading order; Angs 626, 819, 256, 519
+// Sohila: its four opening pieces, in reading order (2367 Sorath Mahala 5, 3085 Bilaval
+// Mahala 5, and the saloks 820 and 1958). The only other shabad the long Sohila adds to the
+// short one, the Pavan Guru salok (39, also Japji's closing salok), never opens it.
 const READ_OPENING = {
   [REHRAS_BANI]: new Set([1661, 1721]),
-  [SOHILA_BANI]: new Set(),
+  [SOHILA_BANI]: new Set([2367, 3085, 820, 1958]),
 };
 
 // May shabad `sid` of Bani `bani` open that Bani by the reading rule? `userShabads` maps a
 // raised Bani to the shabads of its user-length list (those always may). While Akhand Paath
 // following is on (`akhandPaath`), Sri Guru Granth Sahib Ji is being read Ang after Ang, so a
-// shabad only the raised list has (Rehras's opening) is that reading going on, not the Bani:
-// it never opens it then.
+// shabad only the raised list has (Sohila's opening on Angs 256, 519, 626 and 819) is that
+// reading going on, not the Bani: it never opens it then.
 const readRuleMayOpen = (bani, sid, userShabads, akhandPaath = false) => {
   const own = userShabads && userShabads[bani];
   if (!READ_OPENING[bani] || !own || own.has(sid)) return true;
@@ -67,7 +64,6 @@ module.exports = {
   LENGTH_ORDER,
   BANI_MIN_LENGTH,
   READ_OPENING,
-  SOHILA_OPENING,
   baniLengthFor,
   readRuleMayOpen,
 };
