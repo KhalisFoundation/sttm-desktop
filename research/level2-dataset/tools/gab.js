@@ -451,7 +451,8 @@ async function cmdFill() {
   // every manifest clip with a runner, all splits: pull from Azure first (thorough), then the model only for the rest
   process.argv.push('--split', 'train,dev,test');
   argv.push('--split', 'train,dev,test');
-  const sel = select({ tier: arg('tier', 'full'), set: 'all' });
+  // --tier smoke: the smoke clips of the chosen GAB set (--set, default main); default: every clip of every set
+  const sel = arg('tier') ? select({ tier: arg('tier') }) : select({ tier: 'full', set: 'all' });
   const left = await pullMissing(sel.jobs, { thorough: true });
   console.log(`fill: ${sel.jobs.length} manifest clips with a runner; ${left.length} in neither the local nor the Azure cache`);
   if (!left.length) return;
