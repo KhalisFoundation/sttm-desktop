@@ -26,7 +26,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     pane1,
     pane2,
     pane3,
-    activePaneId,
   } = useStoreState((state) => state.navigator);
 
   const { currentWorkspace, defaultPaneId } = useStoreState((state) => state.userSettings);
@@ -42,7 +41,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
     setPane1,
     setPane2,
     setPane3,
-    setActivePaneId,
   } = useStoreActions((state) => state.navigator);
 
   const { isLoadingBanis, banis } = useLoadBani();
@@ -141,9 +139,6 @@ const SundarGutka = ({ isShowTranslitSwitch = false, onScreenClose }) => {
           break;
         default:
           break;
-      }
-      if (paneId !== activePaneId) {
-        setActivePaneId(paneId);
       }
     }
 

@@ -11,11 +11,6 @@ export const updateViewerScale = () => {
     ? document.querySelector('.viewer-content')
     : document.body;
 
-  // Viewer DOM can be missing while Display 2 / main controller is still mounting.
-  if (!$fitInsideWindow) {
-    return;
-  }
-
   let previewStyles = '';
   previewStyles += `font-size: ${global.viewer.height / 100}px;`;
 

@@ -43,20 +43,20 @@ const Navigator = () => {
     controllerMarkup = (
       <div className="multipane-grid">
         <div className="shabad1-container">
-          <ShabadPane multiPaneId={1} projectionSource />
+          <ShabadPane multiPaneId={1} />
         </div>
         <div className="shabad2-container">
-          <ShabadPane multiPaneId={2} projectionSource />
+          <ShabadPane multiPaneId={2} />
         </div>
         <div className="shabad3-container">
-          <ShabadPane multiPaneId={3} projectionSource />
+          <ShabadPane multiPaneId={3} />
         </div>
       </div>
     );
   } else {
     controllerMarkup = (
       <div className="navigator-row">
-        <ShabadPane projectionSource />
+        <ShabadPane />
         <MiscPane
           waheguruSlide={displayWaheguruSlide}
           moolMantraSlide={displayMoolMantraSlide}
