@@ -341,6 +341,10 @@ const NG_TALK_SEQ_QUIET_MS = 45000;
 // ...and the heard text must match the index even less: a reading the follower has lost still
 // retrieves pangtis at 0.25-0.38 (studio Sehaj Paath), Punjabi prose stays below 0.25.
 const NG_RET_HI_READ = 0.25;
+// The panel calls a talk hold "searching" until it has lasted this long: a hold that ends with a
+// Shabad found within a minute was the app being lost, not katha (owner, 29 Oct: "when you say
+// katha I get confused ... that's a completely different thing"). The sangat screen is the same.
+const NG_TALK_LABEL_MS = 60000;
 const NG_TALK_PROBATION_MS = 20000; // a Shabad found during katha must move on, or it was a quote
 // For NG_TALK_RECENT_MS after a katha hold ended (a quoted Shabad read out for a few lines), the
 // katha only has to be heard again for NG_TALK_RETRIG, not the full NG_TALK_TRIG.
@@ -1997,6 +2001,7 @@ const VoiceFollow = () => {
   const [ngHoldView, setNgHoldView] = useState(null);
   const [holdListOpen, setHoldListOpen] = useState(false); // "Choose a Shabad yourself" unfolded
   useEffect(() => setHoldListOpen(false), [ngHoldView]);
+  const ngLabelTimerRef = useRef(null);
   const ngSetHold = (kind) => {
     const ng = ngRef.current;
     const prev = ng.hold ? ng.hold.kind : null;
@@ -2019,10 +2024,27 @@ const VoiceFollow = () => {
       kind,
       from: prev,
     });
+    if (ngLabelTimerRef.current) {
+      clearTimeout(ngLabelTimerRef.current);
+      ngLabelTimerRef.current = null;
+    }
     try {
-      setNgHoldView(kind);
+      setNgHoldView(kind === 'talk' && NG_TALK_LABEL_MS > 0 ? 'search' : kind);
     } catch (_) {
       /* panel closing */
+    }
+    if (kind === 'talk' && NG_TALK_LABEL_MS > 0) {
+      const since = ng.hold.since;
+      ngLabelTimerRef.current = setTimeout(() => {
+        ngLabelTimerRef.current = null;
+        if (ng.hold && ng.hold.kind === 'talk' && ng.hold.since === since) {
+          try {
+            setNgHoldView('talk');
+          } catch (_) {
+            /* panel closing */
+          }
+        }
+      }, NG_TALK_LABEL_MS);
     }
   };
   const isMiscSlideRef = useRef(false);
@@ -6759,7 +6781,11 @@ const VoiceFollow = () => {
     </button>
   );
   // While Ardas is going on: Autopilot is on and holding the Waheguru slide (never "paused").
-  const HOLD_ICON = { ardas: 'fa-solid fa-hands-praying', talk: 'fa-solid fa-comment-dots' };
+  const HOLD_ICON = {
+    ardas: 'fa-solid fa-hands-praying',
+    talk: 'fa-solid fa-comment-dots',
+    search: 'fa-solid fa-magnifying-glass',
+  };
   // The hold takes the place of the pangti: what is going on, what the screen shows, Stop; the
   // possible Shabads fold away under "Choose a Shabad yourself" (the sevadaar keeps control).
   let shabadsTitleKey = currentView ? 'VOICE_FOLLOW.POSSIBLE_NEW' : 'VOICE_FOLLOW.POSSIBLE';
