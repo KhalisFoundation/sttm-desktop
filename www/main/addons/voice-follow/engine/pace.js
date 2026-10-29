@@ -11,7 +11,7 @@
 //         -> 2.5 pass-equivalents / s. Tiers apply only while a READ Bani is followed.
 //   lean  follower every 0.5 s on the recognizer's beat (2 passes / s)
 //   min   follower and recognizer every 1 s (1 pass / s), audio bound 0.5 s
-//   crawl follower and recognizer every 2 s (0.5 pass / s), the 10 s search window every 4 s
+//   crawl follower and recognizer every 2 s (0.5 pass / s); searching is never tiered
 //
 // 'fast' is exactly today's schedule and code path (own clocks, 4 s windows, no memo): a
 // computer that keeps up runs byte-identical to the build without tiers. The tier is
@@ -59,11 +59,10 @@ const TIERS = [
   },
   {
     // A computer the model itself runs slower than real time on (a 2011 desktop, a 2015 Core i3:
-    // 1.4-1.6 s per 4 s window): one pass per 2 s of audio, the 10 s search window every 4 s.
+    // 1.4-1.6 s per 4 s window): one pass per 2 s of audio while following.
     name: 'crawl',
     followerHopS: 2.0,
     recognizerHopS: 2.0,
-    searchHopS: 4.0,
     aligned: true,
     passesPerS: 0.5,
     backlogBoundS: 0.5,
@@ -117,7 +116,6 @@ const KIRTAN = {
     name: 'kirtan-crawl',
     followerHopS: 2.0,
     recognizerHopS: 2.0,
-    searchHopS: 4.0,
     aligned: true,
     passesPerS: 0.5,
     backlogBoundS: 0.5,
@@ -255,8 +253,7 @@ function hopS(kind, ownHopS) {
     return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
   }
   const t = current();
-  let tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
-  if (kind === 'search') tierHop = t.searchHopS || t.recognizerHopS; // the 10 s searching window
+  const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
   return Math.max(ownHopS, tierHop);
 }
 

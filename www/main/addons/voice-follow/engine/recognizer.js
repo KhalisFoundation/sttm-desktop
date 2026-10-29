@@ -26,8 +26,7 @@ class Recognizer {
       this.buf = merged;
       this.acc += res.length;
     }
-    // performance tier ('search' = the long searching window, which a crawling PC decodes less often)
-    this.hop = Math.floor(pace.hopS(this.windowS > 4 ? 'search' : 'recognizer', this.hopS) * SR);
+    this.hop = Math.floor(pace.hopS('recognizer', this.hopS) * SR); // performance tier
     if (this.acc < this.hop || this.buf.length < SR) return null;
     this.acc = 0;
     pace.markBeat(pcm);

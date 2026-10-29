@@ -126,7 +126,7 @@ describe('pace: kirtan starts at fast', () => {
   });
 });
 
-describe('pace: crawl tier and searching (9.0.21)', () => {
+describe('pace: crawl tier (9.0.21)', () => {
   const slowSelfTest = async (pace, passMs) => {
     const infer = {
       emissions: async () => {
@@ -145,8 +145,7 @@ describe('pace: crawl tier and searching (9.0.21)', () => {
     assert.equal(pace.current().name, 'kirtan-crawl');
     assert.equal(pace.hopS('follower', 0.25), 2);
     assert.equal(pace.hopS('recognizer', 0.5), 2);
-    assert.equal(pace.hopS('search', 0.5), 4, 'the 10 s searching window every 4 s');
-    assert.equal(pace.windowS('recognizer', 10), 10, 'searching keeps its window');
+    assert.equal(pace.windowS('recognizer', 10), 10, 'the searching window is its own');
     assert.equal(pace.windowS('recognizer', 4), 4);
     assert.equal(pace.backlogBoundS(), 0.5);
     pace.setScoped(true, 'read');
@@ -159,9 +158,8 @@ describe('pace: crawl tier and searching (9.0.21)', () => {
     assert.equal(r.tier, 'lean');
     pace.setScoped(true, 'kirtan');
     assert.equal(pace.current().name, 'fast');
-    assert.equal(pace.hopS('search', 0.5), 0.5);
   });
-  it('kirtan-min reaches crawl on a lasting backlog, and the search hop follows', () => {
+  it('kirtan-min reaches crawl on a lasting backlog', () => {
     const pace = fresh();
     pace.setScoped(true, 'kirtan');
     let t = 1e6;
@@ -172,6 +170,5 @@ describe('pace: crawl tier and searching (9.0.21)', () => {
       if (ev) names.push(ev.to);
     }
     assert.deepEqual(names, ['kirtan-lean', 'kirtan-min', 'kirtan-crawl']);
-    assert.equal(pace.hopS('search', 0.5), 4);
   });
 });
