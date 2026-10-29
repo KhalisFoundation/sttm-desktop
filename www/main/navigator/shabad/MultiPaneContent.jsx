@@ -9,22 +9,11 @@ import { i18n } from '../../common/i18n';
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
-  const isProjection = data.isProjection || false;
-  const projectionSource = data.projectionSource || false;
   const navigatorState = useStoreState((state) => state.navigator);
   const navigatorActions = useStoreActions((state) => state.navigator);
   const paneAttributes = navigatorState[`pane${paneId}`];
   const setPaneAttributes = navigatorActions[`setPane${paneId}`];
-  const {
-    activePaneId,
-    homeVerse,
-    versesRead,
-    activeShabadId,
-    isSundarGutkaBani,
-    isCeremonyBani,
-    sundarGutkaBaniId,
-    ceremonyId,
-  } = navigatorState;
+  const { activePaneId, homeVerse, versesRead } = navigatorState;
   const { setHomeVerse, setVersesRead } = navigatorActions;
   const { currentWorkspace } = useStoreState((state) => state.userSettings);
 
@@ -36,20 +25,14 @@ const MultiPaneContent = ({ data }) => {
   } = useSlides();
 
   useEffect(() => {
-    if (!isProjection && activePaneId === paneId && paneAttributes) {
+    if (activePaneId === paneId) {
       if (homeVerse !== paneAttributes.homeVerse) setHomeVerse(paneAttributes.homeVerse);
-      const read = paneAttributes.versesRead;
-      if (versesRead !== read) setVersesRead(Array.isArray(read) ? [...read] : []);
+      if (versesRead !== paneAttributes.versesRead) setVersesRead(paneAttributes.versesRead);
     }
-    // Only when the live pane changes. Re-running on versesRead would loop.
   }, [activePaneId]);
 
   useEffect(() => {
-    if (!isProjection && paneAttributes) {
-      setPaneAttributes({
-        content: i18n.t('MULTI_PANE.SHABAD'),
-      });
-    }
+    setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
   }, [currentWorkspace]);
 
   const goToShabadBtn = (
@@ -57,7 +40,7 @@ const MultiPaneContent = ({ data }) => {
       className="multipane-content-btn"
       style={paneAttributes.activeShabad ? {} : { display: 'none' }}
       onClick={() => {
-        setPaneAttributes({ content: i18n.t('MULTI_PANE.SHABAD') });
+        setPaneAttributes({ ...paneAttributes, content: i18n.t('MULTI_PANE.SHABAD') });
       }}
       onMouseEnter={(e) => {
         e.currentTarget.children[0].classList.add('fa-beat');
@@ -74,37 +57,16 @@ const MultiPaneContent = ({ data }) => {
   switch (paneAttributes.content) {
     case i18n.t('MULTI_PANE.CLEAR_PANE'):
       return null;
-    case i18n.t('MULTI_PANE.SHABAD'): {
-      // Display 2's pane copy is only filled by the startup snapshot, so a later
-      // shabad change never reaches pane.activeShabad — only the live scalar ids
-      // (which already move the projected line) stay in step. Follow those on the
-      // projection so the list tracks shabad changes, not just line changes.
-      let projectedShabadId = paneAttributes.activeShabad;
-      let projectedBaniType = paneAttributes.baniType;
-      if (isProjection) {
-        if (isSundarGutkaBani && sundarGutkaBaniId) {
-          projectedShabadId = sundarGutkaBaniId;
-          projectedBaniType = 'bani';
-        } else if (isCeremonyBani && ceremonyId) {
-          projectedShabadId = ceremonyId;
-          projectedBaniType = 'ceremony';
-        } else if (activeShabadId) {
-          projectedShabadId = activeShabadId;
-          projectedBaniType = 'shabad';
-        }
-      }
+    case i18n.t('MULTI_PANE.SHABAD'):
       return (
         <ShabadText
-          shabadId={projectedShabadId}
-          baniType={projectedBaniType}
+          shabadId={paneAttributes.activeShabad}
+          baniType={paneAttributes.baniType}
           paneAttributes={paneAttributes}
           setPaneAttributes={setPaneAttributes}
           currentPane={paneId}
-          isProjection={isProjection}
-          projectionSource={projectionSource}
         />
       );
-    }
     case i18n.t('TOOLBAR.HISTORY'):
       return (
         <>

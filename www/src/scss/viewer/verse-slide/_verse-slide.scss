@@ -129,8 +129,7 @@
 
 // Quick Tools Styles
 
-.slide-quicktools,
-.slide-paddingtools {
+.slide-quicktools, .slide-paddingtools {
   font-size: 12px;
   font-weight: bold;
   height: 100%;
@@ -156,8 +155,7 @@
   }
 }
 
-.quicktool,
-.paddingtool {
+.quicktool, .paddingtool {
   &-header {
     background-color: #0000001a;
     display: flex;

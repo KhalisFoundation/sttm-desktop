@@ -18,10 +18,8 @@ const { getTheme } = require('../../../theme_editor');
 
 const CeremonyPane = ({ token, name, id, onScreenClose }) => {
   const { setTheme, setThemeBg } = useStoreActions((state) => state.userSettings);
-  const { setPane1, setPane2, setPane3, setActivePaneId } = useStoreActions(
-    (state) => state.navigator,
-  );
-  const { pane1, pane2, pane3, activePaneId } = useStoreState((state) => state.navigator);
+  const { setPane1, setPane2, setPane3 } = useStoreActions((state) => state.navigator);
+  const { pane1, pane2, pane3 } = useStoreState((state) => state.navigator);
   const {
     theme: currentTheme,
     currentWorkspace,
@@ -107,9 +105,6 @@ const CeremonyPane = ({ token, name, id, onScreenClose }) => {
           break;
         default:
           break;
-      }
-      if (multipaneId !== activePaneId) {
-        setActivePaneId(multipaneId);
       }
     }
     analytics.trackEvent({

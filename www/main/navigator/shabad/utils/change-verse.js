@@ -9,8 +9,7 @@ export const udpateHistory = (
   const currentHistoryObj = verseHistory[existingShabadIndex];
   if (currentHistoryObj) {
     currentHistoryObj.continueFrom = newTraversedVerse;
-    const isNewRead = !currentHistoryObj.versesRead.includes(newTraversedVerse);
-    if (isNewRead) {
+    if (!currentHistoryObj.versesRead.includes(newTraversedVerse)) {
       currentHistoryObj.versesRead = [...currentHistoryObj.versesRead, newTraversedVerse];
     }
   }
@@ -20,9 +19,10 @@ export const udpateHistory = (
   const versesRead = paneAttributes.versesRead || [];
   if (paneAttributes.activeVerse !== newTraversedVerse || !versesRead.includes(newTraversedVerse)) {
     setPaneAttributes({
+      ...paneAttributes,
       activeVerse: newTraversedVerse,
       versesRead: versesRead.includes(newTraversedVerse)
-        ? versesRead.slice()
+        ? versesRead
         : [...versesRead, newTraversedVerse],
     });
   }

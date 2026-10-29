@@ -12,8 +12,7 @@ export const scrollToVerse = (
   if (
     verseIndex >= 0 &&
     !isFlowerVerse(verseId, isAsaDiVaar) &&
-    activeShabad[verseIndex].verse !== ',' &&
-    virtuosoRef?.current
+    activeShabad[verseIndex].verse !== ','
   ) {
     virtuosoRef.current.scrollToIndex({
       index: verseIndex,
