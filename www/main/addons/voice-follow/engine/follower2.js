@@ -69,6 +69,10 @@ const DEFAULTS = {
   akhEnterLetters: 1,
   akhEnterGain: 3,
   akhEndSlack: 2,
+  // ...and a step into the next pangti waits while its heard letters fit the opening of the
+  // current pangti better (a pangti read again from its top; see restarted()). This many heard
+  // letters before the next pangti's part are included in that comparison.
+  restartSlack: 2,
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
@@ -285,6 +289,27 @@ class FollowerV2 {
     return r.raw - prev;
   }
 
+  // Akhand Paath: are the heard letters that the match `r` puts into the next pangti a better
+  // match for the opening of the current pangti? When a pangti is read again from its start,
+  // the end of the pangti flowing straight on into the next pangti's opening makes a longer
+  // unbroken match than the current pangti's opening alone, so the repeat shows up as a few
+  // letters into the next pangti whenever those letters loosely fit its opening. Compared on the opening of each line only, and a tie (two pangtis that open
+  // alike) moves on as before, so a real step into the next pangti is not held back.
+  restarted(h, r) {
+    const next = this.cur + 1;
+    if (next >= this.lineStart.length) return false;
+    const into = r.end - this.lineStart[next] + 1;
+    if (into <= 0) return false;
+    const tail = h.slice(Math.max(0, h.length - into - this.c.restartSlack));
+    const span = tail.length + this.c.restartSlack;
+    const fit = (line) => {
+      const a = this.lineStart[line];
+      const m = this.align(tail, a, Math.min(this.lineEnd[line], a + span - 1));
+      return m ? m.raw : 0;
+    };
+    return fit(this.cur) > fit(next);
+  }
+
   // Best score of the heard letters (ending at their end) anywhere in other Gurbani.
   bgScore(h) {
     if (!this.bg) return 0;
@@ -412,6 +437,10 @@ class FollowerV2 {
       line -= 1;
       while (line > this.cur && this.lineEnd[line] < this.lineStart[line]) line -= 1;
     }
+    // Akhand Paath: the letters that would open the next pangti fit the opening of the
+    // current pangti better: the reader went back to the top of the pangti (a deliberate
+    // repeat), so stay on it.
+    if (c.akhand && line === this.cur + 1 && this.restarted(h, Lc)) line = this.cur;
     if (line === this.cur) {
       this.cand = null;
       this.foreign = 0;
