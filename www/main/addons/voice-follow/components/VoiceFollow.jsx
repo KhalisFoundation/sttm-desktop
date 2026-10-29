@@ -2296,7 +2296,12 @@ const VoiceFollow = () => {
         // was a pangti quoted in the katha or a Shabad the search found in the Ardas's own
         // words (Renton 27 Oct: three such Shabads, 28 s, 155 s and 36 s into the Ardas), and
         // the hold comes back.
-        ng.probation = { until: now + NG_TALK_PROBATION_MS, progress: 0, kind: ng.hold.kind };
+        ng.probation = {
+          until: now + NG_TALK_PROBATION_MS,
+          progress: 0,
+          kind: ng.hold.kind,
+          shabadId: cand.shabadId,
+        };
         ngSetHold(null);
         return false;
       }
@@ -2348,6 +2353,21 @@ const VoiceFollow = () => {
     // A Shabad found during katha: if the follower does not move on within the probation, it
     // was a pangti quoted in the katha, and the hold comes back at once.
     if (ng.probation && !ng.hold) {
+      // The screen moved to another Shabad during the probation (the judge or Pankti Cumulation
+      // switched): that is Gurbani being sung, not a quote; the new Shabad gets its own probation
+      // (owner, 29 Oct: "katha" came up 3 s after a right switch while singing ਤੂੰ ਮੇਰਾ ਪਿਤਾ).
+      if (
+        ng.probation.shabadId != null &&
+        currentShabadIdRef.current != null &&
+        currentShabadIdRef.current !== ng.probation.shabadId
+      ) {
+        ng.probation = {
+          until: now + NG_TALK_PROBATION_MS,
+          progress: 0,
+          kind: ng.probation.kind,
+          shabadId: currentShabadIdRef.current,
+        };
+      }
       if (ng.probation.progress >= 2) {
         // Read on: a real Shabad (the Hukamnama after an Ardas). The hold it ended is over;
         // what comes later is judged afresh, not as that Ardas going on.
