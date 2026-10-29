@@ -84,6 +84,16 @@ const SUNG_BANIS = {
   90: { back: 8, backDwell: 2, backDwell1: 4, distCost: 0.01, skipGain: 3, noMatchHops: 48 },
 };
 
+// Aarti (BaniDB Bani 22) is sung, slowly, and each pangti starts on a long first syllable. With the
+// recited profile the screen waited for 2 letters of the new pangti, and a move to another piece of
+// the Aarti that is not next in the Bani's order (as many Gurdwara Sahibs sing it) for 4 windows (1 s).
+// Measured on the Aarti at Gurdwara Sahib Renton (Oct 24-25, 2026) at full speed: one letter of the
+// next pangti is enough when it improves the match, and such a move confirms in 3 windows. 2 windows
+// was faster still, but after the Aarti it jumped to a look-alike pangti while another Shabad was sung.
+// Recited Banis keep DEFAULTS untouched.
+const AARTI_BANI = 22;
+const AARTI = { enterLetters: 1, enterGain: 2, jumpDwell: 3 };
+
 // Letters only, with marks that recognition often drops or adds removed, so that
 // spelling noise costs little.
 const SIMPLE = /[\s।॥|0-9੦-੯.,;:!?\-ੰਂੱ਼੍]/g; // eslint-disable-line no-misleading-character-class
@@ -97,12 +107,18 @@ const GAP = -1;
 class FollowerV2 {
   constructor(infer, lines, opts = {}) {
     this.infer = infer;
-    this.c = { ...DEFAULTS, ...(SUNG_BANIS[opts.baniId] || {}), ...opts };
+    const aarti = Number(opts.baniId) === AARTI_BANI;
+    this.c = {
+      ...DEFAULTS,
+      ...(SUNG_BANIS[opts.baniId] || {}),
+      ...(aarti ? AARTI : {}),
+      ...opts,
+    };
     this.base = this.c; // the profile as configured; this.c is its tier-scaled copy
     this.sung = !!SUNG_BANIS[opts.baniId]; // sung Banis keep the full window in every tier
     // A read Bani: the only following the performance tiers apply to. Aarti (Bani 22) is sung like
     // kirtan, so it never gets the tiers even when it follows on this follower.
-    this.readBani = !this.sung && Number(opts.baniId) !== 22;
+    this.readBani = !this.sung && !aarti;
     this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
