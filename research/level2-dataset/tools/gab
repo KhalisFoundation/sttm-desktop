@@ -1,0 +1,3 @@
+#!/bin/sh
+# GAB, the Gurbani Autopilot Bench (see GAB.md): ./gab run|compare|slowpc|pull|fill|ingest|publish|harvest|review|label
+exec node "$(dirname "$0")/gab.js" "$@"

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAB Public Bench</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --ink: #1d1f22; --muted: #6b6f76; --line: #e3e4e6; --ok: #4f9a5b; --bad: #c95a5e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b949e; --line: #30363d; --ok: #6fa776; --bad: #c96a6e; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b949e; --line: #30363d; --ok: #6fa776; --bad: #c96a6e; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 22px; font-weight: 600; margin: 0; }
+h2 { font-size: 16px; font-weight: 600; margin: 22px 0 6px; }
+.sub { color: var(--muted); font-size: 13px; margin: 2px 0 16px; max-width: 75ch; }
+a { color: inherit; }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; text-align: right; } th.n { text-align: right; }
+td.set { white-space: normal; min-width: 180px; }
+.muted { color: var(--muted); }
+details { margin-top: 18px; font-size: 14px; }
+details summary { cursor: pointer; }
+details p { color: var(--muted); font-size: 13px; max-width: 75ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GAB: Gurbani Autopilot Bench (public recordings)</h1>
+  <p class="sub">How well Gurbani Autopilot (the Voice-Follow feature of SikhiToTheMax Desktop) keeps the right Shabad and pangti on screen while kirtan is sung. This page covers only recordings that are public on YouTube, plus Karanbir Singh's public benchmark. <a href="./timeline.html">Second-by-second timeline →</a></p>
+  <div class="box"><table id="t"><thead><tr><th>Set</th><th>Version</th><th class="n">Recordings</th><th class="n">Hours</th><th class="n">Right pangti</th><th class="n">Wrong Shabad s/h</th></tr></thead><tbody><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div>
+  <p class="sub" style="margin-top:8px">Right pangti = share of scored seconds with the very pangti being sung on screen (where only a Shabad answer key exists, the right Shabad). Wrong Shabad s/h = seconds per hour a wrong Shabad was on screen. Within a set, every version is scored on the same recordings. Practice recordings only; the held-out test set is never shown.</p>
+  <!--KARANBIR-->
+  <details>
+    <summary>What is not on this page</summary>
+    <p>The full GAB also scores paath (Bani read aloud), Bani sung like kirtan (Aarti, Asa di Vaar, Rehras), Akhand Paath, laptop-mic hall recordings and older versions. Those include recordings that are not public, so their numbers are not shown here.</p>
+  </details>
+</div>
+<script>
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const short = (s) => String(s).replace(/^Gurbani Autopilot\s*/, '');
+const acc = (c) => { const n = c.n; const t = n.P + n.A + n.S + n.W + n.N; if (!t) return null;
+  return c.basis ? 100 * n.P / (n.P + n.A + n.W + n.N) : 100 * (n.P + n.A + n.S) / t; };
+function total(clips) { let w = 0, v = 0, wrong = 0;
+  for (const c of clips) { const a = acc(c); if (a == null) continue; const t = c.n.P + c.n.A + c.n.S + c.n.W + c.n.N; w += t; v += a * t; wrong += c.n.W; }
+  return { acc: w ? v / w : null, wrongH: w ? wrong / (w / 3600) : null, h: w / 3600 }; }
+(async () => {
+  const idx = await (await fetch('timeline/index.json')).json();
+  const rows = [];
+  for (const tier of idx.tiers) {
+    const data = await Promise.all(tier.builds.map(async (b) => (await fetch('timeline/' + b.file)).json()));
+    const common = data.map((d) => new Set(d.clips.map((c) => c.id))).reduce((a, s) => new Set([...a].filter((x) => s.has(x))));
+    tier.builds.slice().reverse().forEach((b, j) => {
+      const d = data[tier.builds.length - 1 - j]; const clips = d.clips.filter((c) => common.has(c.id)); const t = total(clips);
+      rows.push(`<tr>${j === 0 ? `<td class="set" rowspan="${tier.builds.length}"><a href="./timeline.html?set=${encodeURIComponent(tier.key)}">${esc(tier.title)}</a></td>` : ''}`
+        + `<td>${esc(short(b.label))}${b.note ? ` <span class="muted">${esc(b.note)}</span>` : ''}</td><td class="n">${clips.length}</td><td class="n">${t.h.toFixed(1)}</td>`
+        + `<td class="n"><b>${t.acc == null ? '–' : t.acc.toFixed(1) + '%'}</b></td><td class="n">${t.wrongH == null ? '–' : Math.round(t.wrongH)}</td></tr>`);
+    });
+  }
+  document.querySelector('#t tbody').innerHTML = rows.join('') || '<tr><td colspan="6" class="muted">No recordings.</td></tr>';
+})();
+</script>
+</body>
+</html>

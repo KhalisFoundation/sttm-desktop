@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fremont Check</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+  :root {
+    --bg: #f4f2ee; --card: #ffffff; --ink: #1c1a17; --muted: #6b665e; --line: #ddd8cf;
+    --yes: #1f7a45; --no: #b33a2a; --early: #2a5fb3; --late: #8a4fb0; --unsure: #8a8378; --marker: #e08a00;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 48px; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 22px; margin: 0; }
+  .count { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .help { color: var(--muted); font-size: 14px; margin: 6px 0 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .meta { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  .ctx { font-family: "Noto Sans Gurmukhi", sans-serif; color: var(--muted); font-size: 17px; margin: 10px 0 0; }
+  .line { font-family: "Noto Sans Gurmukhi", sans-serif; font-size: 30px; font-weight: 600; margin: 8px 0; line-height: 1.4; }
+  .q { font-size: 17px; margin: 18px 0 10px; }
+  .bar { position: relative; height: 14px; background: var(--line); border-radius: 7px; margin: 14px 0 6px; cursor: pointer; }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; background: #b9b2a6; border-radius: 7px; }
+  .tick { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--marker); border-radius: 2px; }
+  .ticklabel { position: absolute; top: 18px; font-size: 12px; color: var(--marker); transform: translateX(-50%); white-space: nowrap; }
+  .buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 30px; }
+  button { font: inherit; font-weight: 700; font-size: 16px; border: 0; border-radius: 10px; padding: 14px 8px; color: #fff; cursor: pointer; }
+  button small { display: block; font-weight: 400; font-size: 12px; opacity: .9; margin-top: 2px; }
+  .y { background: var(--yes); } .n { background: var(--no); } .e { background: var(--early); } .l { background: var(--late); } .u { background: var(--unsure); } .k { background: #3d7f86; }
+  button:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+  .row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 600; padding: 8px 14px; }
+  input[type=text] { flex: 1; min-width: 200px; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+  .status { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .done { text-align: center; padding: 40px 10px; }
+  .cue { margin: 16px 0 4px; padding: 14px; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 700; background: var(--line); color: var(--muted); transition: background .15s; }
+  .cue.now { background: var(--marker); color: #fff; }
+  @media (max-width: 640px) { .buttons { grid-template-columns: repeat(2, 1fr); } .line { font-size: 24px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fremont check: who is right?</h1>
+    <span class="count" id="count"></span>
+  </header>
+  <p class="help">From the orange mark, the app and the sevadaar showed different pangtis. Listen and pick which screen the sangat should see. Keys: <b>A</b> app right, <b>S</b> sevadaar right, <b>F</b> both fine, <b>N</b> neither, <b>I</b> instruments only (keep the line before), <b>U</b> not sure, <b>R</b> replay, <b>B</b> back.</p>
+  <div class="card" id="card"></div>
+</div>
+<audio id="audio" preload="auto"></audio>
+<script>
+let items = [], answers = {}, i = 0;
+const audio = document.getElementById('audio');
+const card = document.getElementById('card');
+
+function esc(s) { return String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+async function load() {
+  items = await (await fetch('items.json')).json();
+  try { answers = await (await fetch('answers.json')).json(); } catch (e) { answers = {}; }
+  i = items.findIndex((it) => !answers[it.id]);
+  if (i < 0) i = items.length;
+  render();
+}
+
+function save() {
+  fetch('/answers', { method: 'POST', body: JSON.stringify(answers) })
+    .then(() => { const s = document.getElementById('status'); if (s) s.textContent = 'Saved'; })
+    .catch(() => { const s = document.getElementById('status'); if (s) s.textContent = 'Not saved, is the server running?'; });
+}
+
+function render() {
+  const done = Object.keys(answers).length;
+  document.getElementById('count').textContent = `${Math.min(done, items.length)} of ${items.length} answered`;
+  if (i >= items.length) {
+    card.innerHTML = `<div class="done"><h2>All done, thank you.</h2><p class="help">Your answers are saved. You can close this tab.</p><button class="ghost" onclick="i=items.length-1;render()">Go back to the last one</button></div>`;
+    audio.pause();
+    return;
+  }
+  const it = items[i];
+  const prev = answers[it.id];
+  card.innerHTML = `
+    <div class="meta">${esc(it.set)} · ${i + 1} of ${items.length}${prev ? ' · answered: ' + esc(prev.answer) : ''}</div>
+    <div class="q" style="color:var(--muted)">Before the orange mark, the pangti was:</div>
+    <div class="ctx" style="font-size:20px">${esc(it.beforeLine)}</div>
+    <div class="q">From the orange mark, the app showed:</div>
+    <div class="line">${esc(it.appLine)}</div>
+    <div class="q">and the sevadaar showed:</div>
+    <div class="line" style="color:#8a4f1f">${esc(it.sevadaarLine)}</div>
+    <div class="q">For ${it.seconds} s from the mark. Which is right for what is being sung?</div>
+    <div id="cue" class="cue">Press R to play</div>
+    <div class="bar" id="bar"><div class="fill" id="fill"></div><div class="tick" id="tick"></div><div class="ticklabel" id="ticklabel">they differ from here</div></div>
+    <div class="buttons">
+      <button class="y" data-a="app">App<small>app is right</small></button>
+      <button class="l" data-a="sevadaar">Sevadaar<small>sevadaar is right</small></button>
+      <button class="e" data-a="both">Both fine<small>either is OK</small></button>
+      <button class="n" data-a="neither">Neither<small>both wrong</small></button>
+      <button class="k" data-a="instrumental">Instruments only<small>keep the line before</small></button>
+      <button class="u" data-a="unsure">Not sure<small>can't tell</small></button>
+    </div>
+    <div class="row">
+      <button class="ghost" id="replay">Replay (R)</button>
+      <button class="ghost" id="back">Back (B)</button>
+      <input type="text" id="note" placeholder="Other: write a note (optional), then press an answer" value="${esc(prev && prev.note)}">
+    </div>
+    <div class="status" id="status"></div>`;
+  card.querySelectorAll('button[data-a]').forEach((b) => b.addEventListener('click', () => answer(b.dataset.a)));
+  document.getElementById('replay').addEventListener('click', play);
+  document.getElementById('back').addEventListener('click', back);
+  document.getElementById('bar').addEventListener('click', (ev) => {
+    const r = ev.currentTarget.getBoundingClientRect();
+    { const D = (items[i] && items[i].duration) || audio.duration; if (D && isFinite(D)) { audio.currentTime = ((ev.clientX - r.left) / r.width) * D; audio.play(); } }
+  });
+  audio.src = it.clip;
+  { const pct = (it.marker / (it.duration || it.marker + 10)) * 100; document.getElementById('tick').style.left = pct + '%'; document.getElementById('ticklabel').style.left = pct + '%'; }
+
+  play();
+}
+
+function play() { audio.currentTime = 0; audio.play().catch(() => {}); }
+function back() { if (i > 0) { i -= 1; render(); } }
+
+function answer(a) {
+  const it = items[i];
+  const note = (document.getElementById('note') || {}).value || '';
+  answers[it.id] = { answer: a, note, recording: it.recording, t0: it.t0, seconds: it.seconds, appVerse: it.appVerse, sevadaarVerse: it.sevadaarVerse };
+  save();
+  i += 1;
+  render();
+}
+
+let beeped = false, actx = null;
+function beep() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + 0.12);
+  } catch (e) {}
+}
+audio.onplay = () => { beeped = audio.currentTime > (items[i] ? items[i].marker : 0); };
+audio.ontimeupdate = () => {
+  const f = document.getElementById('fill'); const D = (items[i] && items[i].duration) || audio.duration; if (f && D && isFinite(D)) f.style.width = Math.min(100, (audio.currentTime / D) * 100) + '%';
+  const c = document.getElementById('cue'); const it = items[i]; if (!c || !it) return;
+  const left = it.marker - audio.currentTime;
+  if (left > 0) { c.className = 'cue'; c.textContent = 'Listening…'; }
+  else { c.className = 'cue now'; c.textContent = 'From here: which screen is right?';  }
+};
+audio.onended = () => { const c = document.getElementById('cue'); if (c) { c.className = 'cue'; c.textContent = 'Answer, or press R to hear it again'; } };
+
+document.addEventListener('keydown', (e) => {
+  if (e.target && e.target.id === 'note') return;
+  const k = e.key.toLowerCase();
+  const map = { a: 'app', s: 'sevadaar', f: 'both', n: 'neither', i: 'instrumental', k: 'instrumental', u: 'unsure' };
+  if (map[k] && i < items.length) { e.preventDefault(); answer(map[k]); }
+  else if (k === 'r' || k === ' ') { e.preventDefault(); play(); }
+  else if (k === 'b') { e.preventDefault(); back(); }
+});
+
+load();
+</script>
+</body>
+</html>

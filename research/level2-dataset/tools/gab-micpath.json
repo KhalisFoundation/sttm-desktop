@@ -1,0 +1,55 @@
+{
+  "_doc": "GAB mic path per benchmark clip. First rule whose gurdwara regex matches (case-insensitive) wins; else the acoustics rule; else 'unknown'. mixer-feed and room-mic are shown with their 50/50 mean as a second view (the user's estimate: Gurdwaras split about half and half; never the headline). Since GAB v1.2 the Fremont hall laptop-mic recordings are GAB-Hard (gab-sets.json tiers), so main GAB kirtan is mixer-feed only and its 50/50 reads 'mixer-feed only'. studio and unknown are shown but stay outside the 50/50. Edit this file when a recording's mic path is confirmed; the scorecard prints the assumption. A rule may carry a 4th element = the manifest acoustics value it requires.",
+  "classes": {
+    "mixer-feed": "mixer / broadcast feed straight into the PC (USB from the mixer, livestream audio)",
+    "room-mic": "room or laptop microphone in the hall (reverb, sangat singing along)",
+    "studio": "studio / produced recording (clean; outside the 50/50)",
+    "unknown": "not known (outside the 50/50)"
+  },
+  "byGurdwara": [
+    [
+      "Renton",
+      "mixer-feed",
+      "Renton PC takes USB from the mixer (Oct 11 production run); the L2 clips are its YouTube livestream"
+    ],
+    [
+      "Harmandir|Darbar Sahib|SGPC",
+      "mixer-feed",
+      "Darbar Sahib broadcast feed"
+    ],
+    [
+      "Fremont \\(Jaspal\\)",
+      "room-mic",
+      "STTM Desktop on the sevadaar's laptop in the hall (laptop mic; unconfirmed, ask Jaspal)"
+    ],
+    [
+      "Fremont",
+      "mixer-feed",
+      "Fremont YouTube livestream (L2 clips; broadcast feed, not a mic in the hall)"
+    ],
+    [
+      "Newton",
+      "room-mic",
+      "Gauravjeet's laptop in the hall"
+    ],
+    [
+      "User test",
+      "room-mic",
+      "laptop mic at home"
+    ],
+    [
+      "Yuba City",
+      "mixer-feed",
+      "Gurdwara Yuba City kirtan videos (Jas Gurbani YouTube uploads of the program; board / recording feed, not a mic in the hall; assumed, unconfirmed)"
+    ],
+    [
+      "AKJ|Akhand Kirtan|Smagam|Rehnsabhai|Rainsabai",
+      "mixer-feed",
+      "smagam livestream (AKJ.Org, Manchester Rehnsabhai YouTube); broadcast feed of many singers and the sangat (assumed, unconfirmed)"
+    ]
+  ],
+  "byAcoustics": {
+    "studio": "studio",
+    "laptop-mic": "room-mic"
+  }
+}

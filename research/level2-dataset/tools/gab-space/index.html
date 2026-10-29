@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAB Leaderboard</title>
+<style>
+:root {
+  --bg: #fbfaf7; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6962; --line: #e4e1d8; --sub: #f6f4ef;
+  --app: #1f5f8b; --app-soft: #e6eff6;
+  --better-ink: #13703b; --worse-ink: #b0241c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #a9a69c; --line: #34332f; --sub: #252522;
+    --app: #9cc8ea; --app-soft: #1f2d38; --better-ink: #7fd89e; --worse-ink: #f48a7e; }
+}
+:root[data-theme="dark"] { --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #a9a69c; --line: #34332f; --sub: #252522;
+  --app: #9cc8ea; --app-soft: #1f2d38; --better-ink: #7fd89e; --worse-ink: #f48a7e; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.page { max-width: 1140px; margin: 0 auto; padding: 18px 16px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+.gabv { font-size: 13px; margin: -4px 0 8px; }
+.gabtag, .oldtag { display: inline-block; font-size: 11px; padding: 0 6px; margin-left: 6px; border-radius: 8px; border: 1px solid var(--muted); color: var(--muted); white-space: nowrap; }
+.oldtag { opacity: .75; border-style: dashed; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+/* the version names get real room, and the timeline column keeps its width, so its line and dots never cross the names */
+td.nm, thead th.vh { min-width: 200px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 12px; border-bottom: 1px solid var(--line); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.ver { cursor: pointer; }
+tr.ver:hover td:first-child, tr.ver:focus-visible td:first-child { background: var(--sub); }
+tr.ver:focus-visible { outline: 2px solid var(--app); outline-offset: -2px; }
+td.nm { font-weight: 600; }
+td.nm .car { display: inline-block; width: 14px; color: var(--muted); font-size: 11px; transition: transform .15s; }
+tr.open td.nm .car { transform: rotate(90deg); }
+td.nm .what { display: block; font-weight: 400; color: var(--muted); font-size: 12px; margin: 1px 0 0 14px; }
+.ch { font-size: 11px; font-weight: 600; margin-left: 3px; }
+.ch.up { color: var(--better-ink); } .ch.dn { color: var(--worse-ink); }
+tr.idea td.nm { font-weight: 500; color: var(--muted); }
+tr.old td.nm { font-weight: 400; }
+.pill { display: inline-block; margin-left: 6px; border-radius: 999px; padding: 0 7px; font-size: 10px; font-weight: 600; line-height: 16px; vertical-align: 1px; white-space: nowrap; background: var(--app-soft); color: var(--app); border: 1px solid var(--app); }
+td.v { font-size: 15px; white-space: nowrap; width: 10%; }
+tr.det > td { padding: 0 12px 12px 26px; background: var(--sub); text-align: left; }
+.sd { width: 100%; font-size: 13px; }
+.sd th, .sd td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.sd th { font-size: 12px; }
+.sd td.none { color: var(--muted); font-size: 12px; }
+.sd td { width: 26%; white-space: nowrap; } .sd td:first-child { width: auto; white-space: normal; }
+.sd tr.node { cursor: pointer; }
+.sd .tw { display: inline-block; width: 16px; background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
+
+/* ---- timeline spine, content-colour bars, change-type chips ---- */
+:root { --k: #d9822b; --p: #3b7dd8; --s: #8a5cc7; --a: #2f9a7a; --ap: #1f8f9b; --spine: #cfcac0;
+  --t-acc: #2f8f83; --t-spd: #3b7dd8; --t-pc: #b7791f; --t-ui: #8a5cc7; --t-inf: #7a7a72; --t-new: #c2507a; --app-dot: #1f5f8b; }
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --k: #e9a050; --p: #6aa0ec; --s: #ab86e0; --a: #5cc4a2; --ap: #5fc3cc; --spine: #4a4843; --app-dot: #9cc8ea;
+  --t-acc: #5cc3b5; --t-spd: #6aa0ec; --t-pc: #d9a24a; --t-ui: #ab86e0; --t-inf: #a3a39a; --t-new: #e07fa3; } }
+:root[data-theme="dark"] { --k: #e9a050; --p: #6aa0ec; --s: #ab86e0; --a: #5cc4a2; --ap: #5fc3cc; --spine: #4a4843; --app-dot: #9cc8ea;
+  --t-acc: #5cc3b5; --t-spd: #6aa0ec; --t-pc: #d9a24a; --t-ui: #ab86e0; --t-inf: #a3a39a; --t-new: #e07fa3; }
+.ch { display: inline-block; border-radius: 999px; padding: 0 6px; line-height: 16px; font-size: 10.5px; vertical-align: 1px; }
+.ch.up { background: color-mix(in srgb, var(--better-ink) 14%, var(--panel)); } .ch.dn { background: color-mix(in srgb, var(--worse-ink) 14%, var(--panel)); }
+.chips { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: 2px; }
+.chip { font-size: 10px; font-weight: 600; border-radius: 4px; padding: 0 6px; line-height: 16px; color: var(--c); background: color-mix(in srgb, var(--c) 13%, var(--panel)); border: 1px solid color-mix(in srgb, var(--c) 35%, var(--panel)); white-space: nowrap; }
+.grp th { border-bottom: 0; padding-bottom: 0; font-size: 12px; color: var(--ink); }
+.grp th.g { text-align: center; border-bottom: 2px solid var(--line); }
+.grp th.g span { font-weight: 400; color: var(--muted); }
+th .u { display: block; font-weight: 400; font-size: 11px; }
+th.s, td.s { background: color-mix(in srgb, var(--app-dot) 3%, var(--panel)); }
+th.s:not(.g) + th.s, td.s + td.s { }
+td.v.s { font-size: 14px; color: var(--ink); }
+td.v.s:first-of-type { }
+th.s.lag, td.s.lag { font-weight: 600; }
+th.s.lag { min-width: 170px; } th.s { min-width: 130px; }
+.sd td.spd { color: var(--muted); font-size: 12px; text-align: left; }
+td.nm, th.vh { text-align: left !important; }
+.items { padding: 10px 0 6px; display: grid; gap: 5px; }
+.item { font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.item .chips { margin-left: 0; }
+.item .ichg { font-size: 11px; color: var(--muted); }
+.item .cm { margin-left: auto; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+/* timeline spine */
+td.tl, th.tl { width: 36px; min-width: 36px; padding: 0 0 0 14px !important; position: relative; }
+td.tl::before { content: ''; position: absolute; left: 22px; top: 0; bottom: 0; width: 2px; background: var(--spine); }
+tbody tr:first-child td.tl::before { top: 50%; }
+tbody tr.lastver td.tl::before { bottom: 50%; }
+tr.det td.tl::before { bottom: 0 !important; }
+.dot { position: absolute; left: 16px; top: 50%; margin-top: -7px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); border: 2px solid var(--panel); box-shadow: 0 0 0 1px var(--ink); }
+tr.idea .dot { background: var(--panel); box-shadow: 0 0 0 1.5px var(--muted); border: 2px dashed var(--muted); box-shadow: none; }
+tr.old .dot { background: var(--muted); box-shadow: 0 0 0 1px var(--muted); }
+tr.now .dot { background: var(--app-dot); box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-dot) 25%, var(--panel)); width: 16px; height: 16px; margin-top: -8px; left: 15px; }
+tr.now td { background: color-mix(in srgb, var(--app-dot) 4%, var(--panel)); }
+/* bars */
+.bar { position: relative; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--c) 12%, var(--panel)); margin-top: 4px; min-width: 90px; }
+.bar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--c); opacity: .85; }
+.bar > b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; }
+tr.idea .bar > i { background: repeating-linear-gradient(135deg, var(--c) 0 4px, color-mix(in srgb, var(--c) 45%, var(--panel)) 4px 7px); }
+th .hdot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; background: var(--c); margin-right: 5px; vertical-align: 0; }
+.sd td.k1 { box-shadow: inset 3px 0 0 var(--c); }
+td.v .pg { margin-top: 3px; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.v .pg .ch { font-size: 9.5px; }
+.ap { margin-left: 2px; color: var(--muted); cursor: help; }
+.sd td:first-child { min-width: 170px; }
+/* big picture: one version across every situation */
+.bigbar { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.bigbar .note { font-weight: 400; color: var(--muted); font-size: 12px; }
+select { font: inherit; font-size: 13px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+.tools { color: var(--muted); font-size: 13px; margin: 16px 0 6px; }
+.tools b { color: var(--ink); }
+/* compact: one line per situation; the small print sits inline after each number */
+.ps { color: var(--muted); font-weight: 700; margin-left: 1px; cursor: help; }
+#big td.k1 { box-shadow: inset 3px 0 0 var(--c); font-weight: 600; }
+#big td, #big th { white-space: nowrap; padding: 5px 10px; font-size: 13px; }
+#big td .u { display: inline; margin-left: 5px; font-weight: 400; font-size: 11px; color: var(--muted); }
+#big th .u { display: block; font-weight: 400; font-size: 11px; color: var(--muted); }
+#big td.none { color: var(--muted); font-size: 12px; text-align: left; }
+@media (max-width: 560px) {
+  .page { padding: 16px 12px; }
+  th, td { padding: 8px 6px; }
+  td.v { font-size: 14px; }
+  td.nm .sysn { display: none; }
+  th { white-space: normal; }
+  tr.det > td { padding: 0 6px 10px 6px; }
+  /* phone: the table scrolls inside its box; spine and name stay put */
+  .box { overflow-x: auto; }
+  #board { min-width: 760px; }
+  #big { min-width: 760px; }
+  td.tl, th.tl { position: sticky; left: 0; z-index: 2; background: var(--panel); min-width: 30px; width: 30px; }
+  tbody tr.ver td.nm, thead th.vh { position: sticky; left: 30px; z-index: 2; background: var(--panel); min-width: 120px; max-width: 130px; white-space: normal; box-shadow: 1px 0 0 var(--line); }
+  tr.now td.tl, tr.now td.nm { background: color-mix(in srgb, var(--app-dot) 4%, var(--panel)); }
+  tr.det td.tl { background: var(--sub); }
+  .det .sd, .det .items { max-width: 340px; position: sticky; left: 36px; }
+  .bar { min-width: 60px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>GAB: Gurbani Autopilot Bench</h1>
+  <p class="gabv"><b>GAB v1.5</b> · speech-model output from <b>x86</b> (Intel / AMD PCs, linux-x64), the reference platform · rows marked <span class="oldtag">GAB v1.3</span> were scored on the earlier, smaller set and are not compared with v1.5 rows</p>
+  <p class="sub">Each cell: <b>right Shabad</b> (the right Shabad or Bani on screen) and, below it, <b>right pangti</b> (the very pangti being sung or read) · ≈ pangti keys from two-model alignment, spot-checked by a person; otherwise keyed by a person · ▲▼ change vs the version before, shown only beyond noise · tap a version for what went into it · <a href="./timeline.html">second-by-second timeline →</a> · <a href="./annotate.html">pangti labeller</a></p>
+  <div class="box big"><div class="bigbar"><span>Big picture</span><select id="bigsel" aria-label="version shown in the big picture"></select><span class="note">one version across every situation · hours of recordings behind each number · worst 10% = the slowest tenth</span></div><table id="big"></table></div>
+  <p class="tools"><b>Every version</b> · right Shabad % per version, oldest at the bottom · <sup class="ps">*</sup> scored on the recordings that replayed; a few more need speech-model output not recorded yet (hover for how many)</p>
+  <div class="box"><table id="board"></table></div>
+  <details class="ext" style="margin-top:12px;font-size:14px"><summary style="cursor:pointer">Outside check: Karanbir Singh's benchmark (12 kirtan cases)</summary>
+  <p class="sub" style="margin:8px 0">Karanbir Singh's <a href="https://github.com/karanbirsingh/live-gurbani-captioning-benchmark-v1">Live Captioning for Gurbani Kirtan benchmark v1</a>: 4 hand-labelled kirtan recordings, each joined at the start, a third in and two thirds in. His score: every second, the right pangti (a 1 s collar at pangti changes and blank screens in pauses allowed), from his own eval.py. Speech-model output recorded on the Mac. <a href="./timeline.html?set=kbv1">See every second →</a></p>
+  <table style="font-size:14px"><thead><tr><th>System</th><th>His score</th><th>Right pangti</th><th>Right Shabad</th><th>Wrong Shabad s/h</th></tr></thead><tbody>
+  <tr><td>Gurbani Autopilot 10.0.4 and 10.0.5 (same result)</td><td><b>90.5%</b></td><td>88.6%</td><td>94.5%</td><td>0</td></tr>
+  <tr><td>Karanbir's own system (kirtan-captioning 0.2.0)</td><td>57.9%</td><td>–</td><td>10 of 12 found</td><td>–</td></tr>
+  <tr><td>Reference: nothing shown / right pangti 5 s late</td><td>26.0% / 85.5%</td><td>–</td><td>–</td><td>–</td></tr>
+  </tbody></table></details>
+</div>
+<script>
+let SYSTEM = { latin: 'Gurbani Autopilot' };
+// headline: right Shabad/Bani % per behaviour, main GAB (Gurdwara mic)
+const HEAD = [
+  { t: 'Kirtan', key: '1-kirtan-shabad' },
+  { t: 'Paath', key: '2-bani-recited' },
+  { t: 'Sung Bani', key: '3-bani-sung-like-kirtan' },
+  // Akhand Paath (reading Ang after Ang): its own column since Oct 16 2026 (owner's P0); keys = publisher slides
+  { t: 'Akhand Paath', key: '4-akhand-paath', col: '--ap' },
+  // GAB-Akhand Kirtan (its own tier: smagam kirtan, many singers, sangat singing along); kirtan rows of res.akhand
+  { t: 'Akhand Kirtan', key: '5-akhand-kirtan', tier: 'akhand', col: '--a' },
+];
+// ---- big picture: one version across every situation, six numbers each (hours, right Shabad, right pangti, behind
+// the singer p50 / p90, wrong Shabad s/h, time to find p50 / p90); the table below it is unchanged
+const SIT = [
+  { t: 'Kirtan', sub: 'everyday Gurdwara', key: '1-kirtan-shabad', col: '--k' },
+  { t: 'Paath', sub: 'Bani read aloud', key: '2-bani-recited', col: '--p' },
+  { t: 'Sung Bani', sub: 'Aarti, Asa di Vaar, Rehras sung like kirtan', key: '3-bani-sung-like-kirtan', col: '--s' },
+  { t: 'Akhand Paath', sub: 'Ang after Ang', key: '4-akhand-paath', col: '--ap', none: 'not scored yet: no Akhand Paath recording is in the practice set GAB scores, and none has a replay runner yet' },
+  { t: 'Kirtan, laptop mic', sub: 'Fremont hall (GAB-Hard)', key: '1-kirtan-shabad', tier: 'hard', col: '--k' },
+  { t: 'Akhand Kirtan', sub: 'smagam, many singers', key: '5-akhand-kirtan', tier: 'akhand', col: '--a' },
+];
+const num = (x) => (x == null || x === '' ? null : Number(x));
+const BIG_N = 6;
+const BIG_TH = '<th>Hours<span class="u">recordings</span></th><th>Right Shabad</th><th>Right pangti</th><th>Behind the singer<span class="u">typical / worst 10%, s</span></th><th>Wrong Shabad<span class="u">s per hour</span></th><th>Time to find<span class="u">typical / worst 10%, s · starts missed</span></th>';
+function bigCells(r, p, none) {
+  if (r && r.incomplete) return `<td class="none" colspan="${BIG_N}" title="${esc(r.note || '')}">${typeof r.incomplete === 'number' ? `not scored: ${r.incomplete} recording${r.incomplete > 1 ? 's need' : ' needs'} speech-model output this version asks for, not saved yet` : 'not scored yet'}</td>`;
+  if (!has(r)) return `<td class="none" colspan="${BIG_N}">${esc(none || 'no recordings yet')}</td>`;
+  const g = (k) => num(r[k]); const pg = (k) => (p && has(p) ? num(p[k]) : null);
+  const mk = pmark(r.pangti_basis);
+  const two = (a, b, kind) => `${g(a)}${g(b) != null ? ` / ${g(b)}` : ''} s${chg(g(a), pg(a), kind)}`;
+  const nf = g('not_found');
+  return `<td>${g('hours') != null ? `${Number(g('hours')).toFixed(1)} h` : '–'}<span class="u">· ${g('clips')}</span></td>`
+    + `<td>${g('right_shabad_pct')}%${chg(g('right_shabad_pct'), pg('right_shabad_pct'), 'pct')}</td>`
+    + `<td>${g('pangti_pct') != null ? `${g('pangti_pct')}%${mk}${chg(g('pangti_pct'), pg('pangti_pct'), 'pct')}` : '–'}</td>`
+    + `<td>${g('behind_p50_s') != null ? `${two('behind_p50_s', 'behind_p90_s', 'sec')}${mk}` : '–'}</td>`
+    + `<td>${g('wrong_s_per_h') != null ? `${g('wrong_s_per_h')}${chg(g('wrong_s_per_h'), pg('wrong_s_per_h'), 'wrong')}` : '–'}</td>`
+    + `<td>${g('find_p50_s') != null ? two('find_p50_s', 'find_p90_s', 'sec') : '–'}${nf ? `<span class="u" title="recordings whose first Shabad or Bani never reached the screen (a later one in the same recording may have)">· ${nf} of ${g('find_n')} missed</span>` : ''}</td>`;
+}
+function sitRow(res, s) {
+  if (s.tier && !res[s.tier]) return { incomplete: true };
+  const rows = tierRowsOf(res, s.tier);
+  return rowOf(rows, s.key) || rows.find((x) => x.key === s.key && x.incomplete) || null;
+}
+let BIG_LIST = []; let BIG_CUR = null;
+function renderBig(res) {
+  const pv = PREV.get(res);
+  const body = SIT.map((s) => `<tr><td class="k1" style="--c: var(${s.col})">${esc(s.t)}<span class="u">${esc(s.sub)}</span></td>${bigCells(sitRow(res, s), pv ? sitRow(pv, s) : null, s.none)}</tr>`).join('');
+  document.getElementById('big').innerHTML = `<thead><tr><th>Situation</th>${BIG_TH}</tr></thead><tbody>${body}</tbody>`;
+}
+// the rows of one GAB tier of a result (main = res.rows; hard / akhand = res.hard.rows / res.akhand.rows)
+const tierRowsOf = (res, tier) => (!tier || tier === 'main' ? res.rows : (res[tier] || {}).rows) || [];
+// expanded view: a tree built from the scorecard rows (behaviour -> mic -> Bani -> mic type), no fixed list
+const BEH_NAME = { '1-kirtan-shabad': 'Kirtan', '2-bani-recited': 'Paath (recited Bani)', '3-bani-sung-like-kirtan': 'Sung Bani', '4-akhand-paath': 'Akhand Paath', '5-akhand-kirtan': 'Akhand Kirtan' };
+const BANI = { japji: 'Japji Sahib', jaap: 'Jaap Sahib', 'tav-prasad-savaiye': 'Tav Prasad Savaiye', chaupai: 'Chaupai Sahib', 'anand-40': 'Anand Sahib', anand: 'Anand Sahib', rehras: 'Rehras Sahib', sohila: 'Kirtan Sohila', sukhmani: 'Sukhmani Sahib', saloks: 'Saloks', aarti: 'Aarti', 'asa-di-vaar': 'Asa di Vaar' };
+const MIC = { 'mixer-feed': 'Mixer feed', 'room-mic': 'Room mic', studio: 'Studio', unknown: 'Mic not known' };
+// Nitnem order first, then anything new (alphabetical)
+const ORDER = ['japji', 'jaap', 'tav-prasad-savaiye', 'chaupai', 'anand-40', 'anand', 'rehras', 'sohila', 'sukhmani', 'saloks', 'aarti', 'asa-di-vaar'];
+const ord = (slug) => { const i = ORDER.indexOf(slug); return i < 0 ? 99 : i; };
+const nice = (slug) => BANI[slug] || slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const kindOf = (r) => r.kind || (r.status === 'merged' ? 'release' : 'experiment');
+// Akhand Kirtan has its own folder since Oct 16 2026 (5-akhand-kirtan); results scored before that keep it under 1-kirtan-shabad
+const rowOf = (rows, key) => (rows || []).find((x) => x.key === key && x.clips) || (key === '5-akhand-kirtan' ? rowOf(rows, '1-kirtan-shabad') : null);
+// pangti level: % of the time the screen is on the pangti being sung or read; '≈' marks keys made by aligning the audio
+// with two speech models (a person confirmed 20 of 20 random ones), plain = keys made by a person
+const ppct = (res, key, tier) => { const r = rowOf(tierRowsOf(res, tier), key); return r && r.pangti_pct != null ? Number(r.pangti_pct) : null; };
+const pbasis = (res, key, tier) => { const r = rowOf(tierRowsOf(res, tier), key); return r ? r.pangti_basis : null; };
+// ≈ only on keys made by aligning the audio with two models; keys made or frame-checked by a person (human,
+// publisher slides) carry no mark
+const pmark = (basis) => (basis && /^aligned/.test(String(basis)) ? '<span class="ap" title="pangti keys from two-model alignment, spot-checked by a person">≈</span>' : '');
+const pct = (res, key, tier) => { const r = rowOf(tierRowsOf(res, tier), key); return r && r.right_shabad_pct != null ? Number(r.right_shabad_pct) : null; };
+let RESULTS = []; let WHY = {};
+const TCOL = { Accuracy: '--t-acc', Speed: '--t-spd', 'Slow PCs': '--t-pc', 'Panel/UI': '--t-ui', Infrastructure: '--t-inf', 'New behaviour': '--t-new' };
+const HCOL = { '1-kirtan-shabad': '--k', '2-bani-recited': '--p', '3-bani-sung-like-kirtan': '--s', '4-akhand-paath': '--ap' };
+let TYPEOF = {};
+const chipsOf = (res) => { const t = TYPEOF[String(res.commit).slice(0, 8)] || []; return t.length ? `<span class="chips">${t.map((x) => `<span class="chip" style="--c: var(${TCOL[x] || '--t-inf'})">${esc(x)}</span>`).join('')}</span>` : ''; };
+const SPINE = true; const CHIPS = true; const BARS = true;
+
+// change vs the version before it (an idea: vs its base); shown only above the noise floor
+const FLOOR = { pct: 0.3, wrong: 3, sec: 0.5 };
+function chg(v, b, kind) {
+  if (v == null || b == null) return '';
+  const d = Math.round((v - b) * 10) / 10;
+  if (Math.abs(d) <= FLOOR[kind]) return '';
+  const better = kind === 'pct' ? d > 0 : d < 0; // wrong s/h and seconds: lower is better
+  return ` <span class="ch ${better ? 'up' : 'dn'}" title="${better ? 'better' : 'worse'} than the version before (${b})">${d > 0 ? '▲ +' : '▼ −'}${Math.abs(d)}</span>`;
+}
+let PREV = new Map();
+// speed: typical seconds, lower is better. Behind only on human or ear-checked line answers (>= 3 clips), else '–'
+const sv = (res, key, k, need) => { const r = rowOf(res.rows, key); if (!r || r[k] == null || (need && !need(r))) return null; return Number(r[k]); };
+// lag (typical seconds behind the singer or reader) counts only on line timings made or checked by a person, >= 3 clips
+const lagOf = (r) => { if (!r) return null; const l = (r.lines || []).find((x) => x.basis !== 'aligned' && x.clips >= 3 && x.behind_p50_s != null); return l ? Number(l.behind_p50_s) : null; };
+// the collapsed row's lag: the first source (in this order) that any version has; the header says which one
+const LAG_SRC = [
+  { lab: 'paath', get: (res) => lagOf(rowOf(res.rows, '2-bani-recited')) },
+  { lab: 'Aarti / sung Bani', get: (res) => lagOf(rowOf(res.rows, '3-bani-sung-like-kirtan')) },
+  { lab: 'kirtan', get: (res) => lagOf(rowOf(res.rows, '1-kirtan-shabad')) },
+  { lab: 'kirtan, laptop mic', get: (res) => lagOf(rowOf((res.hard || {}).rows, '1-kirtan-shabad')) },
+];
+let LAG = LAG_SRC[0];
+const SHOW_SWITCH = false; // Switch rests on too few events for now; true brings it back (row and tree)
+const SPEED = [
+  { t: 'Lag', sub: () => `behind the singer/reader, s\n${LAG.lab}`, tip: () => `typical seconds the screen is behind the singer or reader (${LAG.lab}); lower is better`, none: 'needs line timings', get: (res) => LAG.get(res) },
+  { t: 'Shows Shabad in', sub: () => 'seconds after start\nkirtan', tip: () => 'typical seconds from pressing Start until the right Shabad is on screen (kirtan)', get: (res) => sv(res, '1-kirtan-shabad', 'find_p50_s') },
+  ...(SHOW_SWITCH ? [{ t: 'Switch', sub: () => 'sung Bani', tip: () => 'typical seconds to the new Shabad or Bani after a change', get: (res) => sv(res, '3-bani-sung-like-kirtan', 'switch_p50_s', (r) => r.switch_n > 0) }] : []),
+];
+const speedTxt = (r) => { if (!r) return ''; const p = []; const lg = lagOf(r); if (lg != null) p.push(`lag ${lg} s`); if (r.find_p50_s != null) p.push(`shows in ${r.find_p50_s} s`); if (SHOW_SWITCH && r.switch_n && r.switch_p50_s != null) p.push(`switch ${r.switch_p50_s} s`); return p.join(' · '); };
+
+
+const verOf = (res) => (res.vf_feature_version && kindOf(res) === 'release' ? res.vf_feature_version : String(res.label || res.name).split(' · ')[0].split(' + ')[0]);
+function nameCell(g, isNow) {
+  const res = g.rep; const idea = kindOf(res) === 'experiment';
+  const nm = idea ? `Idea: ${esc(String(res.label || res.name).split(' · ')[0])}` : `<span class="sysn">${esc(SYSTEM.latin)} </span>${esc(g.ver)}`;
+  const tag = res.older_gab ? `<span class="oldtag" title="scored on an earlier GAB version; not compared with GAB v1.5 rows">${esc(res.gab || 'older GAB')}</span>` : `<span class="gabtag" title="scored on ${esc(res.gab || '')} with x86 speech-model output">${esc(res.gab || '')}${res.platform ? ` · ${esc(res.platform)}` : ''}</span>`;
+  return `<td class="nm"><span class="car">▶</span>${nm}${isNow ? '<span class="pill">in the app now</span>' : ''}${tag}</td>`;
+}
+// what went into a version: one line per build, with its chips and any change beyond noise vs the build before it
+function itemsHtml(g) {
+  return g.builds.map((res) => {
+    const c8 = String(res.commit).slice(0, 8);
+    const lab = String(res.label || res.name); const short = lab.includes(' · ') ? lab.split(' · ').slice(1).join(' · ') : lab.includes(' + ') ? lab.split(' + ').slice(1).join(' + ') : kindOf(res) === 'experiment' ? '' : 'release';
+    const why = WHY[c8] || '';
+    const text = why && short && why.toLowerCase().startsWith(short.toLowerCase()) ? why : [short, why].filter(Boolean).join(': ');
+    const pv = PREV_BUILD.get(res); const ch = [];
+    if (pv) for (const c of HEAD) {
+      const a = rowOf(tierRowsOf(res, c.tier), c.key); const b = rowOf(tierRowsOf(pv, c.tier), c.key);
+      if (has(a) && has(b)) {
+        const x = chg(Number(a.right_shabad_pct), Number(b.right_shabad_pct), 'pct'); if (x) ch.push(`${c.t}${x}`);
+        const y = chg(Number(a.wrong_s_per_h), Number(b.wrong_s_per_h), 'wrong'); if (y) ch.push(`${c.t} wrong${y}`);
+      }
+    }
+    return `<div class="item"><span class="itxt">${esc(text)}</span>${chipsOf(res)}${ch.length ? `<span class="ichg">${ch.join(' ')}</span>` : ''}<span class="cm" title="${esc(lab)}">${c8}</span></div>`;
+  }).join('');
+}
+let PREV_BUILD = new Map(); let CUR_G = null;
+const has = (r) => !!(r && r.clips && r.right_shabad_pct != null);
+// mic types inside one scorecard row (only when there is more than one real type)
+function micKids(path, r) {
+  const ks = Object.keys((r && r.mic) || {}).filter((k) => k !== '50/50' && r.mic[k] && r.mic[k].clips);
+  return ks.length > 1 ? ks.map((k) => ({ id: `${path}|mic:${k}`, name: MIC[k] || k, row: r.mic[k], kids: [] })) : [];
+}
+function banisOf(rows, beh, path) {
+  return (rows || []).filter((x) => x.level === 'bani' && x.key.startsWith(`${beh}/`)).sort((a, b) => has(b) - has(a) || ord(a.key.slice(beh.length + 1)) - ord(b.key.slice(beh.length + 1)) || a.key.localeCompare(b.key)).map((x) => ({ id: `${path}|${x.key}`, name: nice(x.key.slice(beh.length + 1)), row: x, kids: has(x) ? micKids(`${path}|${x.key}`, x) : [] }));
+}
+function tree(res) {
+  const main = res.rows || []; const hard = (res.hard || {}).rows || [];
+  const behs = [...new Set([...main, ...hard].filter((x) => x.level === 'behaviour').map((x) => x.key))].sort();
+  return behs.map((k) => {
+    const m = main.find((x) => x.key === k); const h = hard.find((x) => x.key === k);
+    const inc = (r) => !!(r && r.incomplete); // not scored: needs speech-model output not in the cache
+    const node = { id: k, name: BEH_NAME[k] || (m || h).title, row: has(m) || inc(m) ? m : has(h) ? h : null, kids: [] };
+    if (has(h) || inc(h)) {
+      // two mics: Gurdwara mic (main GAB) and Laptop mic (GAB-Hard), each with its own Banis / mic types
+      node.kids = [
+        { id: `${k}|gurdwara`, name: 'Gurdwara mic', row: has(m) || inc(m) ? m : null, kids: has(m) ? (banisOf(main, k, `${k}|gurdwara`).length ? banisOf(main, k, `${k}|gurdwara`) : micKids(`${k}|gurdwara`, m)) : [] },
+        { id: `${k}|laptop`, name: 'Laptop mic', row: h, kids: has(h) ? banisOf(hard, k, `${k}|laptop`) : [] },
+      ];
+    } else if (has(m)) node.kids = banisOf(main, k, k).length ? banisOf(main, k, k) : micKids(k, m);
+    return node;
+  }).concat(akhandNode(res));
+}
+// GAB-Akhand Kirtan branch: its kirtan row, then one child per smagam set (AKJ Toronto, Manchester, ...)
+function akhandNode(res) {
+  const rows = tierRowsOf(res, 'akhand');
+  const r = rows.find((x) => x.key === '5-akhand-kirtan') || rows.find((x) => x.key === '1-kirtan-shabad');
+  if (!res.akhand) return [{ id: 'akhand', name: 'Akhand Kirtan', row: null, raw: { incomplete: true }, kids: [] }];
+  const kids = rows.filter((x) => x.level === 'set' && has(x)).map((x) => ({ id: `akhand|${x.key}`, name: x.title.split(' (')[0], row: x, kids: [] }));
+  return [{ id: 'akhand', name: 'Akhand Kirtan', row: r && (has(r) || r.incomplete) ? r : null, kids: has(r) ? kids : [] }];
+}
+const walk = (nodes, f, d = 0) => nodes.forEach((n) => { f(n, d); walk(n.kids, f, d + 1); });
+function nodeCells(n, pn) {
+  if (n.row && n.row.incomplete) return `<td class="none" colspan="3" title="${esc(n.row.note || '')}">not scored: ${n.row.incomplete} recording${n.row.incomplete > 1 ? 's need' : ' needs'} speech-model output this version asks for, not saved yet</td>`;
+  if (!has(n.row)) return `<td class="none" colspan="4">${n.raw && n.raw.incomplete ? 'not scored yet' : 'no recordings yet'}</td>`;
+  const r = Number(n.row.right_shabad_pct); const w = Number(n.row.wrong_s_per_h);
+  const p = pn && has(pn.row) ? pn.row : null;
+  const pg = n.row.pangti_pct != null ? Number(n.row.pangti_pct) : null;
+  const pcell = `<td>${pg != null ? `${pg}%${pmark(n.row.pangti_basis)}${chg(pg, p && p.pangti_pct != null ? Number(p.pangti_pct) : null, 'pct')}` : '–'}</td>`;
+  return `<td>${r}%${chg(r, p ? Number(p.right_shabad_pct) : null, 'pct')}</td>${pcell}<td>${w}${chg(w, p ? Number(p.wrong_s_per_h) : null, 'wrong')}</td><td class="spd">${esc(speedTxt(n.row)) || '–'}</td>`;
+}
+function detail(res) {
+  const out = []; const pv = PREV.get(res); const pnodes = {};
+  if (pv) walk(tree(pv), (n) => { pnodes[n.id] = n; });
+  walk(tree(res), (n, d) => {
+    const open = n.kids.length && has(n.row) || n.kids.length;
+    const kid = d ? ` data-p="${esc(n.id.split('|').slice(0, -1).join('|') || n.id)}" hidden` : '';
+    const hc = HCOL[n.id.split('|')[0].split('/')[0]] || (n.id.split('|')[0] === 'akhand' ? '--a' : null);
+    out.push(`<tr class="node"${kid} data-id="${esc(n.id)}"><td class="${hc ? 'k1' : ''}" style="padding-left:${6 + d * 16}px;${hc ? `--c: var(${hc})` : ''}">${open ? `<button type="button" class="tw" aria-expanded="false">▸</button>` : '<span class="tw"></span>'}${esc(n.name)}</td>${nodeCells(n, pnodes[n.id])}</tr>`);
+  });
+  return `${CUR_G ? `<div class="items">${itemsHtml(CUR_G)}</div>` : ''}<table class="sd"><thead><tr><th></th><th>Right Shabad</th><th>Right pangti</th><th>Wrong (s/h)</th><th>Speed</th></tr></thead><tbody>${out.join('')}</tbody></table>`;
+}
+function render() {
+  const byOrd = (a, b) => (a.order ?? -99) - (b.order ?? -99) || String(a.date).localeCompare(String(b.date));
+  const rank = { 'older version': 0, release: 1 };
+  const vers = RESULTS.filter((x) => kindOf(x) !== 'experiment').sort((a, b) => (rank[kindOf(a)] ?? 1) - (rank[kindOf(b)] ?? 1) || byOrd(a, b));
+  PREV_BUILD = new Map(); vers.forEach((x, i) => { if (i) PREV_BUILD.set(x, vers[i - 1]); });
+  // one row per version number (its last build carries the numbers), oldest first here
+  const groups = [];
+  for (const x of vers) { const v = verOf(x); const g = groups.length && groups[groups.length - 1].ver === v ? groups[groups.length - 1] : null; if (g) { g.builds.push(x); g.rep = x; } else groups.push({ ver: v, builds: [x], rep: x }); }
+  PREV = new Map(); groups.forEach((g, i) => { if (i) PREV.set(g.rep, groups[i - 1].rep); });
+  const ideas = RESULTS.filter((x) => kindOf(x) === 'experiment').sort(byOrd).reverse().map((x) => {
+    const b = x.base && RESULTS.find((y) => y !== x && String(y.commit).startsWith(String(x.base).slice(0, 8)));
+    if (b) { PREV.set(x, b); PREV_BUILD.set(x, b); }
+    return { ver: null, builds: [x], rep: x };
+  });
+  // never show a change between rows of different GAB versions
+  for (const M of [PREV, PREV_BUILD]) for (const [k, v] of [...M]) if (!!k.older_gab !== !!v.older_gab) M.delete(k);
+  const nowG = [...groups].reverse().find((g) => kindOf(g.rep) === 'release');
+  const rows = [...ideas, ...groups.reverse()];
+  const list = rows.map((g) => g.rep);
+  const cell = (res, c) => {
+    const v = pct(res, c.key, c.tier); if (v == null) return '<td class="v" title="not scored yet">–</td>';
+    const pv = PREV.get(res); const b = pv ? pct(pv, c.key, c.tier) : null;
+    const bar = BARS ? `<div class="bar" style="--c: var(${c.col || HCOL[c.key]})"><i style="width:${v}%"></i>${b != null ? `<b style="left:calc(${b}% - 1px)" title="version before: ${b}%"></b>` : ''}</div>` : '';
+    const pg = ppct(res, c.key, c.tier); const pb = pv ? ppct(pv, c.key, c.tier) : null;
+    const pl = pg != null ? `<div class="pg" title="right pangti: the screen is on the pangti being sung or read">pangti ${pg}%${pmark(pbasis(res, c.key, c.tier))}${chg(pg, pb, 'pct')}</div>` : '';
+    const pr = rowOf(tierRowsOf(res, c.tier), c.key); const star = pr && pr.partial ? `<sup class="ps" title="${esc(pr.note || 'partial')}">*</sup>` : '';
+    return `<td class="v">${v}%${star}${chg(v, b, 'pct')}${bar}${pl}</td>`;
+  };
+  LAG = LAG_SRC.find((src) => RESULTS.some((x) => src.get(x) != null)) || LAG_SRC[0];
+  const scell = (res, c) => {
+    const v = c.get(res); if (v == null) return `<td class="v s" title="${esc(c.none || c.tip())}">–</td>`;
+    const pv = PREV.get(res); const b = pv ? c.get(pv) : null;
+    return `<td class="v s${c.t === 'Lag' ? ' lag' : ''}" title="${esc(c.tip())}">${v} s${chg(v, b, 'sec')}</td>`;
+  };
+  const tl = (cls = '') => (SPINE ? `<td class="tl ${cls}">${cls === 'd' ? '' : '<span class="dot"></span>'}</td>` : '');
+  const body = rows.map((g, i) => { CUR_G = g; const res = g.rep; const isNow = g === nowG;
+    return `<tr class="ver ${{ experiment: 'idea', 'older version': 'old' }[kindOf(res)] || ''}${isNow ? ' now' : ''}${i === rows.length - 1 ? ' lastver' : ''}" data-i="${i}" tabindex="0" aria-expanded="false">${tl()}${nameCell(g, isNow)}${HEAD.map((c) => cell(res, c)).join('')}${SPEED.map((c) => scell(res, c)).join('')}</tr><tr class="det" hidden>${tl('d')}<td colspan="${HEAD.length + SPEED.length + 1}">${detail(res)}</td></tr>`; }).join('');
+  CUR_G = null;
+  document.getElementById('board').innerHTML = `<thead><tr class="grp">${SPINE ? '<th class="tl"></th>' : ''}<th></th><th colspan="${HEAD.length}" class="g">Accuracy <span>right Shabad % · right pangti % below</span></th><th colspan="${SPEED.length}" class="g s">Speed <span>seconds, lower is better</span></th></tr><tr>${SPINE ? '<th class="tl"></th>' : ''}<th class="vh">Version</th>${HEAD.map((c) => `<th style="--c: var(${c.col || HCOL[c.key]})"${c.tier === 'akhand' ? ' title="GAB-Akhand Kirtan: smagam kirtan with many singers and the sangat singing along (its own tier)"' : ''}>${BARS ? '<span class="hdot"></span>' : ''}${c.t}</th>`).join('')}${SPEED.map((c) => `<th class="s${c.t === 'Lag' ? ' lag' : ''}" title="${esc(c.tip())}">${c.t}<span class="u">${esc(c.sub()).replace('\n', '<br>')}</span></th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
+  // big picture: the version in the app now unless the reader picked another
+  BIG_LIST = rows.map((g) => ({ res: g.rep, name: kindOf(g.rep) === 'experiment' ? `Idea: ${String(g.rep.label || g.rep.name).split(' · ')[0]}` : `${SYSTEM.latin} ${g.ver}${g === nowG ? ' (in the app now)' : ''}` }));
+  const sel = document.getElementById('bigsel');
+  sel.innerHTML = BIG_LIST.map((x, i) => `<option value="${i}">${esc(x.name)}</option>`).join('');
+  let ci = BIG_LIST.findIndex((x) => x.res === BIG_CUR); if (ci < 0) ci = Math.max(0, BIG_LIST.findIndex((x) => nowG && x.res === nowG.rep));
+  sel.value = String(ci); BIG_CUR = (BIG_LIST[ci] || {}).res || null;
+  if (BIG_CUR) renderBig(BIG_CUR);
+  const q = new URLSearchParams(location.search).get('open');
+  if (q) document.querySelectorAll('tr.ver').forEach((tr) => { if (rows[tr.dataset.i] && rows[tr.dataset.i].builds.some((x) => String(x.commit).startsWith(q))) toggle(tr); });
+}
+// open: show direct children; close: hide every descendant
+function setNode(tr, on) {
+  const b = tr.querySelector('button.tw'); b.setAttribute('aria-expanded', String(on)); b.textContent = on ? '▾' : '▸';
+  const tb = tr.closest('tbody'); const id = tr.dataset.id;
+  tb.querySelectorAll('tr.node').forEach((x) => {
+    if (x.dataset.p === id) x.hidden = !on;
+    else if (!on && x.dataset.id.startsWith(`${id}|`)) { x.hidden = true; const bb = x.querySelector('button.tw'); if (bb) { bb.setAttribute('aria-expanded', 'false'); bb.textContent = '▸'; } }
+  });
+}
+function toggle(tr) {
+  const d = tr.nextElementSibling; d.hidden = !d.hidden;
+  tr.classList.toggle('open', !d.hidden); tr.setAttribute('aria-expanded', String(!d.hidden));
+}
+document.getElementById('board').addEventListener('click', (e) => {
+  const b = e.target.closest('button.tw');
+  if (b) { const tr = b.closest('tr'); const on = b.getAttribute('aria-expanded') !== 'true'; setNode(tr, on); return; }
+  if (e.target.closest('tr.node')) { const t = e.target.closest('tr.node').querySelector('button.tw'); if (t) t.click(); return; }
+  const tr = e.target.closest('tr.ver'); if (tr) toggle(tr);
+});
+document.getElementById('bigsel').addEventListener('change', (e) => { BIG_CUR = (BIG_LIST[Number(e.target.value)] || {}).res || null; if (BIG_CUR) renderBig(BIG_CUR); });
+document.getElementById('board').addEventListener('keydown', (e) => { const tr = e.target.closest('tr.ver'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(tr); } });
+(async () => {
+  try { const N = await (await fetch('gab-names.json', { cache: 'no-store' })).json(); if (N.system) SYSTEM = N.system; TYPEOF = Object.fromEntries(Object.entries(N.builds || {}).filter(([, b]) => b.type).map(([c, b]) => [c, [].concat(b.type)])); WHY = Object.fromEntries(Object.entries(N.builds || {}).map(([c, b]) => [c, b.why || ''])); } catch (e) { /* fallback name */ }
+  try {
+    const idx = await (await fetch('results/index.json', { cache: 'no-store' })).json();
+    RESULTS = await Promise.all(idx.results.map(async (x) => ({ ...x, ...(await (await fetch(`results/${x.file}`, { cache: 'no-store' })).json()) })));
+    render();
+  } catch (e) { document.getElementById('board').innerHTML = '<tr><td>Could not load results.</td></tr>'; }
+})();
+</script>
+</body>
+</html>

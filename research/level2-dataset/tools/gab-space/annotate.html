@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAB Pangti Labeller</title>
+<style>
+:root {
+  --bg: #fbfaf7; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6962; --line: #e4e1d8; --sub: #f6f4ef; --app: #1f5f8b; --app-soft: #e6eff6;
+  --c0: #2f8a4e; --c1: #5b8fc9; --gap: #c9c5bb; --warn: #b0241c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #a9a69c; --line: #34332f; --sub: #252522; --app: #9cc8ea; --app-soft: #1f2d38;
+    --c0: #4fb873; --c1: #79a8de; --gap: #4a4843; --warn: #f48a7e; }
+}
+:root[data-theme="dark"] { --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #a9a69c; --line: #34332f; --sub: #252522; --app: #9cc8ea; --app-soft: #1f2d38;
+  --c0: #4fb873; --c1: #79a8de; --gap: #4a4843; --warn: #f48a7e; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.page { max-width: 980px; margin: 0 auto; padding: 18px 16px 60px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 18px 0 8px; }
+.sub { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+a { color: var(--app); }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button, select, input[type=text], input[type=number] { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; }
+button { cursor: pointer; }
+button:hover { background: var(--sub); }
+button.primary { background: var(--app); color: var(--panel); border-color: var(--app); }
+button:disabled { opacity: .5; cursor: default; }
+input[type=text] { min-width: 0; flex: 1 1 220px; }
+.g { font-family: "Noto Sans Gurmukhi", "Gurmukhi MN", "Raavi", system-ui, sans-serif; }
+audio { width: 100%; margin: 6px 0; }
+.keys { color: var(--muted); font-size: 12px; }
+kbd { font: 11px ui-monospace, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--sub); }
+.results { margin-top: 8px; max-height: 260px; overflow: auto; }
+.res { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 6px 4px; background: none; }
+.res small { color: var(--muted); }
+.units { display: grid; gap: 10px; }
+.unit h3 { margin: 0 0 6px; font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
+.unit h3 small { color: var(--muted); font-weight: 400; }
+.unit h3 button { margin-left: auto; font-size: 12px; padding: 1px 7px; }
+.pl { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center; width: 100%; text-align: left; padding: 5px 6px; border-radius: 6px; border: 1px solid transparent; background: none; }
+.pl:hover { background: var(--sub); }
+.pl.now { border-color: var(--app); background: var(--app-soft); }
+.pl .n { color: var(--muted); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+.pl .g { font-size: 17px; line-height: 1.35; }
+.pl .cnt { color: var(--muted); font-size: 12px; }
+.pl.hdr .g { color: var(--muted); font-size: 14px; }
+.tl { position: relative; height: 26px; background: var(--sub); border-radius: 4px; overflow: hidden; cursor: pointer; margin: 8px 0 2px; }
+.tl i { position: absolute; top: 0; bottom: 0; border-right: 1px solid var(--panel); }
+.tl .ph { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ink); }
+.axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.now-line { min-height: 48px; margin: 8px 0 0; }
+.now-line .k { color: var(--muted); font-size: 12px; }
+.now-line .g { font-size: 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+td, th { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+td.t { white-space: nowrap; }
+td .g { font-size: 15px; }
+td button { padding: 0 6px; font-size: 12px; }
+tr.cur td { background: var(--app-soft); }
+.status { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 6px 12px; border-radius: 6px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.status.on { opacity: .92; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+details { margin-top: 18px; font-size: 13px; color: var(--muted); }
+details summary { cursor: pointer; color: var(--ink); font-size: 14px; }
+.hidden { display: none !important; }
+.warn { color: var(--warn); }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>GAB pangti labeller</h1>
+  <p class="sub">Mark when each pangti starts while you listen. The audio stays on this computer; nothing is uploaded. Exports GAB's answer-key files. <a href="./index.html">Leaderboard</a> · <a href="./timeline.html">Timeline</a></p>
+
+  <div class="box">
+    <div class="row">
+      <label class="row">Recording <input type="file" id="audioFile" accept="audio/*,video/*"></label>
+      <input type="text" id="recId" placeholder="recording id (e.g. kh12 or clip05)" style="flex:0 1 240px">
+      <label class="row" title="Resume from files you exported before, Jaspal's verse_timestamps.csv, or a Karanbir benchmark JSON">Continue from <input type="file" id="importFile" accept=".csv,.json" multiple></label>
+    </div>
+    <audio id="audio" controls preload="auto"></audio>
+    <div class="row keys">
+      <span><kbd>Space</kbd> play/pause</span><span><kbd>Enter</kbd> next pangti starts now</span><span><kbd>1</kbd>–<kbd>9</kbd> pangti n (<kbd>Shift</kbd> +10)</span>
+      <span><kbd>R</kbd> same pangti again</span><span><kbd>X</kbd> pause in singing / not Gurbani</span><span><kbd>←</kbd><kbd>→</kbd> 2 s (<kbd>Shift</kbd> 10 s)</span><span><kbd>[</kbd><kbd>]</kbd> speed</span><span><kbd>Z</kbd> undo</span>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <span class="keys">Speed</span><select id="speed"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select>
+      <span class="keys">Stamp</span><select id="lagSel" title="People press a little after they hear the pangti start; this moves each stamp earlier"><option value="0">as pressed</option><option value="0.3" selected>0.3 s earlier</option><option value="0.6">0.6 s earlier</option></select>
+    </div>
+    <div class="tl" id="tl"><span class="ph" id="ph"></span></div>
+    <div class="axis"><span>0:00</span><span id="axMid"></span><span id="axEnd"></span></div>
+    <div class="now-line"><div class="k" id="nowK">Load a recording, then find the Shabad or Bani below.</div><div class="g" id="nowG"></div></div>
+  </div>
+
+  <div class="two">
+    <div>
+      <h2>Shabad or Bani</h2>
+      <div class="box">
+        <div class="row">
+          <input type="text" id="q" class="g" placeholder="first letters (ਪਕਬਮਪ), words, Shabad id, or b2 for a Bani" autocomplete="off">
+          <button id="qBtn">Find</button>
+        </div>
+        <div class="results" id="results"></div>
+        <div class="units" id="units" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div>
+      <h2>Marks <span class="keys" id="markCount"></span></h2>
+      <div class="box">
+        <div class="row" style="margin-bottom:8px">
+          <button class="primary" id="exportBtn" disabled>Download answer key</button>
+          <button id="clearBtn">Start over</button>
+        </div>
+        <div style="max-height:420px;overflow:auto"><table><thead><tr><th>Start</th><th>Pangti</th><th></th></tr></thead><tbody id="marks"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>What gets downloaded, and credit</summary>
+    <ul>
+      <li><b>lines.csv</b> (GAB answer key: verseId, start_s, end_s, source = human), <b>shabads.csv</b> (shabadId or bani:N, start_s, end_s, source = human), <b>verse_timestamps.csv</b> (verseId, timestamp_seconds: the layout of Jaspal's Hugging Face recordings) and <b>segments.json</b> (Karanbir Singh's benchmark format: start, end, shabad_id, line_idx, verse_id), all in one .zip-free bundle of separate downloads.</li>
+      <li>A pangti ends where the next mark starts; <kbd>X</kbd> marks a pause (alaap, katha, silence), which ends the pangti before it. Labels from this page are human labels: GAB scores pangti only on human or ear-checked keys.</li>
+      <li>Shabad and Bani text comes from <a href="https://www.banidb.com/">BaniDB</a> (the same ids as STTM Desktop). Pangtis are always shown whole.</li>
+      <li>The draft is kept in this browser while you work (per recording id); download the files to keep them.</li>
+      <li>The idea of stamping each pangti with number keys while listening comes from Karanbir Singh's <a href="https://karanbirsingh.github.io/live-gurbani-captioning-benchmark-v1/annotate.html">annotate tool</a> for the <a href="https://github.com/karanbirsingh/live-gurbani-captioning-benchmark-v1">Live Captioning for Gurbani Kirtan benchmark</a>. Thank you.</li>
+    </ul>
+  </details>
+</div>
+<div class="status" id="status"></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mmss = (s, d = 1) => { s = Math.max(0, s); const m = Math.floor(s / 60); const x = (s - m * 60).toFixed(d); return `${m}:${x.padStart(d ? 3 + d : 2, '0')}`; };
+const audio = $('audio');
+let units = [];   // [{key: '1821' | 'bani:2', title, lines: [{verseId, text, header}]}]
+let marks = [];   // [{t, unit, idx}] idx = -1 for a pause; sorted by t
+let undo = [];
+const status = (m) => { const s = $('status'); s.textContent = m; s.classList.add('on'); clearTimeout(status.tm); status.tm = setTimeout(() => s.classList.remove('on'), 1400); };
+const store = { get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
+const draftKey = () => 'gab-label:' + ($('recId').value.trim() || 'untitled');
+function save() { store.set(draftKey(), JSON.stringify({ units, marks })); }
+function loadDraft() {
+  try { const d = JSON.parse(store.get(draftKey()) || 'null'); if (d && (d.units.length || d.marks.length)) { units = d.units; marks = d.marks; renderAll(); status('Draft restored'); } } catch (_) {}
+}
+
+// ---------------------------------------------------------------- audio
+$('audioFile').onchange = (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  audio.src = URL.createObjectURL(f);
+  if (!$('recId').value.trim()) $('recId').value = f.name.replace(/\.[^.]+$/, '');
+  loadDraft();
+};
+$('recId').onchange = loadDraft;
+$('speed').onchange = () => { audio.playbackRate = Number($('speed').value); };
+audio.addEventListener('loadedmetadata', renderTimeline);
+audio.addEventListener('timeupdate', tick);
+const lag = () => Number($('lagSel').value);
+
+// ---------------------------------------------------------------- BaniDB
+const API = 'https://api.banidb.com/v2';
+async function getJSON(u) { const r = await fetch(u); if (!r.ok) throw new Error(r.status); return r.json(); }
+const isHeader = (t) => /ੴ|ਮਹਲਾ|ਮਃ/.test(t) && t.replace(/[^਀-੿]/g, '').length < 40;
+async function addShabad(id) {
+  if (units.some((u) => u.key === String(id))) return status('Already loaded');
+  const d = await getJSON(`${API}/shabads/${id}`);
+  const lines = d.verses.map((v) => ({ verseId: v.verseId, text: v.verse.unicode, header: isHeader(v.verse.unicode) }));
+  const src = d.shabadInfo.source || {};
+  const first = lines.find((l) => !l.header) || lines[0];
+  units.push({ key: String(id), title: first.text, meta: `${src.english || ''}${src.sourceId === 'G' ? `, Ang ${d.shabadInfo.pageNo}` : ''}`, lines });
+  renderAll(); save();
+}
+async function addBani(id) {
+  if (units.some((u) => u.key === `bani:${id}`)) return status('Already loaded');
+  const d = await getJSON(`${API}/banis/${id}`);
+  const lines = d.verses.map((v) => ({ verseId: v.verse.verseId, text: v.verse.verse.unicode, header: !!v.header }));
+  units.push({ key: `bani:${id}`, title: d.baniInfo.unicode, meta: 'Bani', lines });
+  renderAll(); save();
+}
+async function search() {
+  const q = $('q').value.trim(); if (!q) return;
+  const box = $('results');
+  try {
+    if (/^\d+$/.test(q)) { await addShabad(Number(q)); box.innerHTML = ''; return; }
+    if (/^b\d+$/i.test(q)) { await addBani(Number(q.slice(1))); box.innerHTML = ''; return; }
+    box.innerHTML = '<span class="keys">Searching…</span>';
+    const type = /\s/.test(q) ? 2 : 1; // words, or first letters anywhere
+    const d = await getJSON(`${API}/search/${encodeURIComponent(q)}?searchtype=${type}&source=all`);
+    const vs = d.verses || [];
+    box.innerHTML = vs.length ? vs.map((v) => `<button class="res" data-id="${v.shabadId}"><span class="g">${esc(v.verse.unicode)}</span><br><small>${esc((v.source || {}).english || '')}${(v.source || {}).sourceId === 'G' ? `, Ang ${v.pageNo}` : ''} · Shabad ${v.shabadId}</small></button>`).join('') : '<span class="keys">Nothing found. Try first letters of each word, e.g. ਪਕਬਮਪ.</span>';
+    box.querySelectorAll('.res').forEach((b) => b.onclick = async () => { await addShabad(Number(b.dataset.id)); box.innerHTML = ''; $('q').value = ''; });
+  } catch (e) { box.innerHTML = `<span class="warn">BaniDB did not answer (${esc(e.message)}).</span>`; }
+}
+$('qBtn').onclick = search;
+$('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); search(); } e.stopPropagation(); });
+$('recId').addEventListener('keydown', (e) => e.stopPropagation());
+
+// ---------------------------------------------------------------- marks
+function stamp(unit, idx) {
+  if (!audio.src) return status('Load a recording first');
+  const t = Math.max(0, audio.currentTime - (audio.paused ? 0 : lag()));
+  undo.push(JSON.stringify(marks));
+  marks = marks.filter((m) => Math.abs(m.t - t) > 0.05);
+  marks.push({ t: +t.toFixed(2), unit, idx });
+  marks.sort((a, b) => a.t - b.t);
+  renderAll(); save();
+  status(idx < 0 ? `${mmss(t)} pause` : `${mmss(t)} pangti ${idx + 1}`);
+}
+function markAt(t) { let m = null; for (const x of marks) { if (x.t <= t + 1e-6) m = x; else break; } return m; }
+function nextLine(step) {
+  const t = audio.currentTime;
+  const m = [...marks].reverse().find((x) => x.t <= t && x.idx >= 0) || null;
+  const u = m ? units.find((x) => x.key === m.unit) : units[0];
+  if (!u) return status('Find the Shabad first');
+  let i = m ? m.idx + step : u.lines.findIndex((l) => !l.header);
+  if (step > 0) while (i < u.lines.length - 1 && u.lines[i].header) i++;
+  if (i < 0 || i >= u.lines.length) return status('No more pangtis in this Shabad');
+  stamp(u.key, i);
+}
+const lineOf = (m) => { const u = units.find((x) => x.key === m.unit); return u && u.lines[m.idx]; };
+function renderUnits() {
+  const cur = markAt(audio.currentTime);
+  $('units').innerHTML = units.map((u, k) => {
+    const cnt = {}; for (const m of marks) if (m.unit === u.key) cnt[m.idx] = (cnt[m.idx] || 0) + 1;
+    return `<div class="unit"><h3><span class="g">${esc(u.title)}</span><small>${esc(u.meta || '')}</small><button data-rm="${k}" title="Remove this Shabad and its marks">remove</button></h3>`
+      + u.lines.map((l, i) => `<button class="pl${l.header ? ' hdr' : ''}${cur && cur.unit === u.key && cur.idx === i ? ' now' : ''}" data-u="${esc(u.key)}" data-i="${i}"><span class="n">${k === 0 && i < 20 ? (i + 1) : ''}</span><span class="g">${esc(l.text)}</span><span class="cnt">${cnt[i] ? '×' + cnt[i] : ''}</span></button>`).join('') + '</div>';
+  }).join('');
+  $('units').querySelectorAll('.pl').forEach((b) => b.onclick = () => stamp(b.dataset.u, Number(b.dataset.i)));
+  $('units').querySelectorAll('[data-rm]').forEach((b) => b.onclick = () => {
+    const u = units[Number(b.dataset.rm)];
+    if (!confirm('Remove this Shabad and its marks?')) return;
+    undo.push(JSON.stringify(marks)); marks = marks.filter((m) => m.unit !== u.key); units = units.filter((x) => x !== u); renderAll(); save();
+  });
+}
+function renderMarks() {
+  const cur = markAt(audio.currentTime);
+  $('marks').innerHTML = marks.map((m, k) => { const l = m.idx >= 0 ? lineOf(m) : null; return `<tr class="${m === cur ? 'cur' : ''}"><td class="t"><button data-k="${k}" data-d="-0.2" title="0.2 s earlier">−</button> <a href="#" data-seek="${m.t}">${mmss(m.t)}</a> <button data-k="${k}" data-d="0.2" title="0.2 s later">+</button></td><td>${l ? `<span class="g">${esc(l.text)}</span>` : '<span class="keys">pause / not Gurbani</span>'}</td><td><button data-del="${k}" title="Delete this mark">✕</button></td></tr>`; }).join('');
+  $('marks').querySelectorAll('[data-seek]').forEach((a) => a.onclick = (e) => { e.preventDefault(); audio.currentTime = Number(a.dataset.seek); });
+  $('marks').querySelectorAll('[data-d]').forEach((b) => b.onclick = () => { undo.push(JSON.stringify(marks)); const m = marks[Number(b.dataset.k)]; m.t = +Math.max(0, m.t + Number(b.dataset.d)).toFixed(2); marks.sort((a, c) => a.t - c.t); renderAll(); save(); });
+  $('marks').querySelectorAll('[data-del]').forEach((b) => b.onclick = () => { undo.push(JSON.stringify(marks)); marks.splice(Number(b.dataset.del), 1); renderAll(); save(); });
+  $('markCount').textContent = marks.length ? `${marks.filter((m) => m.idx >= 0).length} pangti marks` : '';
+  $('exportBtn').disabled = !marks.some((m) => m.idx >= 0);
+}
+function renderTimeline() {
+  const d = audio.duration || Math.max(60, ...marks.map((m) => m.t + 10));
+  const tl = $('tl');
+  tl.querySelectorAll('i').forEach((x) => x.remove());
+  marks.forEach((m, k) => {
+    const end = k + 1 < marks.length ? marks[k + 1].t : d;
+    const i = document.createElement('i');
+    i.style.left = (100 * m.t / d) + '%'; i.style.width = (100 * (end - m.t) / d) + '%';
+    i.style.background = m.idx < 0 ? 'var(--gap)' : (m.idx % 2 ? 'var(--c1)' : 'var(--c0)');
+    const l = m.idx >= 0 ? lineOf(m) : null; i.title = `${mmss(m.t)} ${l ? l.text : 'pause'}`;
+    tl.insertBefore(i, $('ph'));
+  });
+  $('axMid').textContent = mmss(d / 2, 0); $('axEnd').textContent = mmss(d, 0);
+}
+function tick() {
+  const d = audio.duration || 1;
+  $('ph').style.left = (100 * audio.currentTime / d) + '%';
+  const m = markAt(audio.currentTime);
+  const l = m && m.idx >= 0 ? lineOf(m) : null;
+  $('nowK').textContent = audio.src ? `${mmss(audio.currentTime)} · now marked:` : 'Load a recording, then find the Shabad or Bani below.';
+  $('nowG').textContent = l ? l.text : (m ? '(pause)' : '');
+  if (tick.last !== m) { tick.last = m; renderUnits(); renderMarks(); }
+}
+function renderAll() { renderUnits(); renderMarks(); renderTimeline(); tick(); }
+$('tl').onclick = (e) => { const r = $('tl').getBoundingClientRect(); if (audio.duration) audio.currentTime = (e.clientX - r.left) / r.width * audio.duration; };
+$('clearBtn').onclick = () => { if (!confirm('Clear every Shabad and mark for this recording?')) return; undo.push(JSON.stringify(marks)); units = []; marks = []; renderAll(); save(); };
+
+// ---------------------------------------------------------------- keys
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === ' ') { e.preventDefault(); audio.paused ? audio.play() : audio.pause(); }
+  else if (k === 'Enter') { e.preventDefault(); nextLine(1); }
+  else if (k === 'r' || k === 'R') { const m = [...marks].reverse().find((x) => x.t <= audio.currentTime && x.idx >= 0); if (m) stamp(m.unit, m.idx); }
+  else if (k === 'x' || k === 'X') stamp(null, -1);
+  else if (/^[0-9]$/.test(k) || /^Digit[0-9]$/.test(e.code)) {
+    const n = Number(e.code.slice(-1)); const i = (n === 0 ? 10 : n) - 1 + (e.shiftKey ? 10 : 0);
+    if (units[0] && i < units[0].lines.length) { e.preventDefault(); stamp(units[0].key, i); }
+  } else if (k === 'ArrowLeft' || k === 'ArrowRight') { e.preventDefault(); audio.currentTime = Math.max(0, audio.currentTime + (k === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 10 : 2)); }
+  else if (k === '[' || k === ']') { const s = $('speed'); s.selectedIndex = Math.max(0, Math.min(s.options.length - 1, s.selectedIndex + (k === ']' ? 1 : -1))); s.onchange(); status(s.value + '×'); }
+  else if (k === 'z' || k === 'Z') { if (undo.length) { marks = JSON.parse(undo.pop()); renderAll(); save(); status('Undone'); } }
+});
+
+// ---------------------------------------------------------------- export / import
+function download(name, text, type = 'text/csv') { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+function segments() {
+  const d = audio.duration || (marks.length ? marks[marks.length - 1].t + 10 : 0);
+  return marks.map((m, k) => ({ ...m, end: k + 1 < marks.length ? marks[k + 1].t : d })).filter((m) => m.idx >= 0 && m.end > m.t);
+}
+$('exportBtn').onclick = () => {
+  const id = $('recId').value.trim() || 'recording';
+  const seg = segments();
+  const r2 = (x) => x.toFixed(2);
+  download(`${id}.lines.csv`, 'verseId,start_s,end_s,source,confidence\n' + seg.map((s) => `${lineOf(s).verseId},${r2(s.t)},${r2(s.end)},human,`).join('\n') + '\n');
+  // Shabad windows: consecutive pangti marks of one Shabad/Bani (pauses inside are kept)
+  const win = [];
+  for (const s of seg) { const w = win[win.length - 1]; if (w && w.unit === s.unit) w.end = s.end; else win.push({ unit: s.unit, start: s.t, end: s.end }); }
+  setTimeout(() => download(`${id}.shabads.csv`, 'shabadId,start_s,end_s,source\n' + win.map((w) => `${w.unit},${r2(w.start)},${r2(w.end)},human`).join('\n') + '\n'), 250);
+  setTimeout(() => download(`${id}.verse_timestamps.csv`, 'verseId,timestamp_seconds\n' + seg.map((s) => `${lineOf(s).verseId},${r2(s.t)}`).join('\n') + '\n'), 500);
+  const kb = { video_id: id, total_duration: audio.duration || null, segments: seg.map((s) => ({ start: +r2(s.t), end: +r2(s.end), line_idx: s.idx, verse_id: lineOf(s).verseId, banidb_gurmukhi: lineOf(s).text, shabad_id: /^\d+$/.test(s.unit) ? Number(s.unit) : s.unit })) };
+  setTimeout(() => download(`${id}.segments.json`, JSON.stringify(kb, null, 1), 'application/json'), 750);
+  status('Downloaded 4 files');
+};
+const parseCsv = (t) => { const L = t.trim().split(/\r?\n/); const h = L[0].split(',').map((x) => x.trim()); return L.slice(1).map((l) => Object.fromEntries(l.split(',').map((c, i) => [h[i], c.trim()]))); };
+$('importFile').onchange = async (e) => {
+  const files = [...e.target.files];
+  const read = (f) => f.text();
+  try {
+    let added = 0; const rows = [];
+    for (const f of files.filter((x) => /\.json$/i.test(x.name))) {
+      const j = JSON.parse(await read(f));
+      for (const s of j.segments || []) { if (s.shabad_id != null && !units.some((u) => u.key === String(s.shabad_id))) await (String(s.shabad_id).startsWith('bani:') ? addBani(Number(String(s.shabad_id).slice(5))) : addShabad(s.shabad_id)); rows.push({ verseId: s.verse_id, t: s.start, unit: String(s.shabad_id), idx: s.line_idx, end: s.end }); }
+    }
+    for (const f of files.filter((x) => /shabads\.csv$/i.test(x.name))) for (const r of parseCsv(await read(f))) for (const id of (r.shabadId || '').split('|').filter(Boolean)) if (!units.some((u) => u.key === id)) await (id.startsWith('bani:') ? addBani(Number(id.slice(5))) : addShabad(Number(id)));
+    for (const f of files.filter((x) => /\.csv$/i.test(x.name) && !/shabads\.csv$/i.test(x.name))) {
+      for (const r of parseCsv(await read(f))) { const t = Number(r.start_s ?? r.timestamp_seconds); if (r.verseId && isFinite(t)) rows.push({ verseId: Number(r.verseId), t, end: r.end_s != null ? Number(r.end_s) : null }); }
+    }
+    undo.push(JSON.stringify(marks));
+    const missing = new Set();
+    rows.sort((a, b) => a.t - b.t);
+    rows.forEach((r, k) => {
+      let unit = r.unit, idx = r.idx;
+      if (unit == null || idx == null || !units.some((u) => u.key === unit)) {
+        const u = units.find((x) => x.lines.some((l) => l.verseId === r.verseId));
+        if (!u) { missing.add(r.verseId); return; }
+        unit = u.key; idx = u.lines.findIndex((l) => l.verseId === r.verseId);
+      }
+      marks.push({ t: +r.t.toFixed(2), unit, idx }); added++;
+      const next = rows[k + 1];
+      if (r.end != null && (!next || next.t - r.end > 0.5)) marks.push({ t: +r.end.toFixed(2), unit: null, idx: -1 });
+    });
+    marks.sort((a, b) => a.t - b.t);
+    renderAll(); save();
+    status(`Added ${added} marks` + (missing.size ? `; ${missing.size} pangtis not in a loaded Shabad (load the Shabad, then import again)` : ''));
+  } catch (err) { status('Could not read: ' + err.message); }
+  e.target.value = '';
+};
+renderAll();
+</script>
+</body>
+</html>

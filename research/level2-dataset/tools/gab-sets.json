@@ -1,0 +1,120 @@
+{
+  "_doc": "GAB v1.3 configuration (see GAB.md). sets = named clip sets that earlier reports used, scored as their own rows so an old number can be reproduced on its own clips. A set matches manifest rows by suite (any suite_jobs entry '<suite>:'), optional folder prefix and optional split. coldFirst = suites whose clips were cut from inside a performance: the first Shabad/Bani is already being sung at t=0, so its find time is measured from t=0 (the app was started while it was sung), never from the truth window start. exclude = clips left out of every number, with the reason (dataset truth to fix). expectBanis = the Banis each behaviour should cover (the user's list); a Bani with no clip shows as 'no clips yet'. tiers = which recordings each GAB tier scores (data, not code): a tier with `gurdwara` takes the manifest rows whose gurdwara matches that regex (case-insensitive); a tier with `excludeTiers` takes every row that is in none of those tiers. A tier rule may also match a tag in the row's notes (`notes` regex), so new recordings join a tier from their manifest row. `gab run` / `compare` score the main tier unless `--set hard` / `--set akhand` (or `gab hard ...` / `gab akhand ...`); tiers are never mixed in one scorecard or compare. A set with `tier` is a row only in that tier.",
+  "sets": [
+    {
+      "key": "set:L2-41",
+      "title": "Level-2 kirtan 41 (L2 sheet, human Shabad truth)",
+      "folder": "1-kirtan-shabad",
+      "suite": "l2"
+    },
+    {
+      "key": "set:fremont-dev",
+      "title": "Fremont kirtan, dev sessions (Jaspal, sevadaar screen = human line truth)",
+      "folder": "1-kirtan-shabad",
+      "suite": "jaspal",
+      "split": "dev",
+      "tier": "hard"
+    },
+    {
+      "key": "set:fremont-train",
+      "title": "Fremont kirtan, train sessions",
+      "folder": "1-kirtan-shabad",
+      "suite": "jaspal",
+      "split": "train",
+      "tier": "hard"
+    },
+    {
+      "key": "set:paath-60",
+      "title": "Paath 60 (recited Nitnem cuts, human Bani truth 30-60 s of each)",
+      "folder": "2-bani-recited",
+      "suite": "paath"
+    },
+    {
+      "key": "set:aarti-50",
+      "title": "Aarti-50 (cold starts inside a sung Aarti, human piece truth)",
+      "folder": "3-bani-sung-like-kirtan",
+      "suite": "aarti"
+    },
+    {
+      "key": "set:renton-oct11",
+      "title": "Renton Oct 11 production parts (test split: reconciliation only)",
+      "suite": "renton"
+    },
+    {
+      "key": "set:renton-finds",
+      "title": "Renton Finds darbars (Sep 25 reviewer; full darbars cut per Shabad, real switches)",
+      "folder": "1-kirtan-shabad",
+      "suite": "rfinds"
+    },
+    {
+      "key": "set:yuba",
+      "title": "Gurdwara Yuba City (Jas Gurbani recordings; Cycle 10 unseen-venue test)",
+      "folder": "1-kirtan-shabad",
+      "suite": "yuba"
+    },
+    {
+      "key": "set:l3-toronto",
+      "title": "AKJ Toronto Smagam 2022 (Friday train; Saturday test)",
+      "suite": "l3",
+      "tier": "akhand",
+      "gurdwara": "Toronto"
+    },
+    {
+      "key": "set:l3-manchester",
+      "title": "Manchester Smagam 2024 Rehnsabhai",
+      "suite": "l3",
+      "tier": "akhand",
+      "gurdwara": "Manchester"
+    }
+  ],
+  "coldFirst": {
+    "l2": "the sheet's start is a labelled pangti inside the Shabad; the 30 s before it is the same Shabad",
+    "paath": "70 s cuts from a continuous reading; the scored window (30-60 s) is in the middle of it",
+    "aarti": "cuts that start at many points inside one sung Aarti",
+    "asa": "a cut from inside a sung Asa di Vaar"
+  },
+  "exclude": {
+    "pt37": "the 30-60 s window is not Aarti (paath-tests not_bani); the dataset's bani:22 truth there is wrong",
+    "pt42": "the 30-60 s window is not Aarti (paath-tests not_bani); the dataset's bani:22 truth there is wrong",
+    "pt46": "the 30-60 s window is not Aarti (paath-tests not_bani); the dataset's bani:22 truth there is wrong"
+  },
+  "expectBanis": {
+    "2-bani-recited": [
+      "japji",
+      "jaap",
+      "tav-prasad-savaiye",
+      "chaupai",
+      "anand-40",
+      "rehras",
+      "sohila",
+      "saloks"
+    ],
+    "3-bani-sung-like-kirtan": [
+      "aarti",
+      "asa-di-vaar",
+      "rehras",
+      "saloks"
+    ]
+  },
+  "tiers": {
+    "main": {
+      "title": "GAB",
+      "excludeTiers": [
+        "hard",
+        "akhand"
+      ],
+      "doc": "everything except GAB-Hard and GAB-Akhand Kirtan; the priority, and what a build is judged on"
+    },
+    "hard": {
+      "title": "GAB-Hard (Fremont hall, laptop mic)",
+      "gurdwara": "Fremont \\(Jaspal\\)",
+      "doc": "Jaspal's STTM Desktop recordings at Gurdwara Sahib Fremont (kh01-kh32): a resonant hall, the laptop mic far from the ragis, little clean audio. Tracked, not the priority (user decision Oct 14 2026). The Fremont YouTube livestream clips (clip04-clip09, mixer feed) stay in main: add 'Fremont' without '(Jaspal)' here to move them."
+    },
+    "akhand": {
+      "title": "GAB-Akhand Kirtan (smagam, many singers)",
+      "gurdwara": "AKJ|Akhand Kirtan|Rehnsabhai|Rainsabai|Raensabai|Rensbai",
+      "notes": "\\btags:[^;]*\\bakhand-kirtan\\b",
+      "doc": "Akhand Kirtan smagams (AKJ Toronto 2022, Manchester 2024 Rehnsabhai; Level 3 of the human sheet): 5-15 singers, the sangat singing along, many instruments, a resonant sound. Its own tier (user, Oct 14 2026), never mixed with main GAB or GAB-Hard; tracked, never used to tune (level3 policy). Rule = data, not ids: a manifest row joins when its gurdwara/source names AKJ, Akhand Kirtan or a Rehnsabhai/Rainsabai, or its notes carry the tag `tags: akhand-kirtan`."
+    }
+  }
+}

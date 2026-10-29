@@ -1,0 +1,255 @@
+{
+  "_doc": "vf-check --changed <base>..<head>: which suites a change needs. Each changed file is matched against 'paths' (prefix or glob-free substring, first rule wins). For VoiceFollow.jsx every changed hunk is mapped to the function / constant around it and matched against 'functions' (regex on that name). A change runs the union of its areas' 'suites' in full plus their 'sentinels' (the suite's sentinel subset, see vf-suites.js). Anything unmatched runs EVERYTHING (safe default). 'live' = also needs a live-paced check (cached replay cannot see timing).",
+  "areas": {
+    "bani": {
+      "title": "Bani / paath follower",
+      "suites": [
+        "paath",
+        "aarti",
+        "renton",
+        "asa"
+      ],
+      "sentinels": [
+        "l2"
+      ]
+    },
+    "shabad-follower": {
+      "title": "Shabad (kirtan line) follower",
+      "suites": [
+        "l2",
+        "fremont",
+        "renton"
+      ],
+      "sentinels": [
+        "paath"
+      ]
+    },
+    "search": {
+      "title": "Search / lock / switch judge",
+      "suites": [
+        "l2",
+        "fremont",
+        "aarti"
+      ],
+      "sentinels": [
+        "paath",
+        "renton"
+      ]
+    },
+    "model": {
+      "title": "Model input / decoding (cache may not cover it)",
+      "suites": [
+        "l2",
+        "paath",
+        "aarti",
+        "fremont",
+        "renton",
+        "asa"
+      ],
+      "sentinels": []
+    },
+    "audio": {
+      "title": "Audio pipeline / timing",
+      "suites": [],
+      "sentinels": [
+        "l2",
+        "paath",
+        "aarti",
+        "fremont",
+        "renton",
+        "asa"
+      ],
+      "live": "timing/backlog change: run tools/vf-lag-stress.js (wall pace, slowed engine) on base and candidate"
+    },
+    "session": {
+      "title": "Start / Stop / take-over",
+      "suites": [],
+      "sentinels": [
+        "l2",
+        "paath",
+        "aarti",
+        "fremont",
+        "renton",
+        "asa"
+      ],
+      "live": "run tools/stop-keeps-screen-test.js (model, under the lock)"
+    },
+    "ui": {
+      "title": "UI only",
+      "suites": [],
+      "sentinels": [
+        "l2",
+        "paath",
+        "aarti",
+        "fremont",
+        "renton",
+        "asa"
+      ]
+    },
+    "none": {
+      "title": "Outside the app's Voice-Follow path",
+      "suites": [],
+      "sentinels": []
+    },
+    "all": {
+      "title": "Unmapped change: everything",
+      "suites": [
+        "l2",
+        "paath",
+        "aarti",
+        "fremont",
+        "renton",
+        "asa"
+      ],
+      "sentinels": []
+    }
+  },
+  "paths": [
+    [
+      "www/main/addons/voice-follow/engine/follower2.js",
+      "bani"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/assets/nitnem-lines",
+      "bani"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/spoken.js",
+      "bani"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/follower.js",
+      "shabad-follower"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/retrieval/",
+      "search"
+    ],
+    [
+      "www/main/addons/voice-follow/components/switchPolicy.js",
+      "search"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/infer.js",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/recognizer.js",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/sentencepiece.js",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/fuzz.js",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/assets/",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/index.js",
+      "model"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/model-manager.js",
+      "ui"
+    ],
+    [
+      "www/main/addons/voice-follow/engine/session-log.js",
+      "ui"
+    ],
+    [
+      "www/main/addons/voice-follow/shadow/",
+      "ui"
+    ],
+    [
+      "www/main/addons/voice-follow/components/liveBoard.js",
+      "ui"
+    ],
+    [
+      "www/main/addons/voice-follow/components/VoiceFollow.jsx",
+      "@functions"
+    ],
+    [
+      "www/main/addons/voice-follow/",
+      "all"
+    ],
+    [
+      "www/main/banidb/",
+      "all"
+    ],
+    [
+      "www/main/navigator/utils/load-bani",
+      "bani"
+    ],
+    [
+      "research/level2-dataset/tools/bench-driver.js",
+      "all"
+    ],
+    [
+      "research/level2-dataset/tools/emis-cache.js",
+      "all"
+    ],
+    [
+      "research/",
+      "none"
+    ],
+    [
+      "test/",
+      "none"
+    ],
+    [
+      ".claude/",
+      "none"
+    ],
+    [
+      "www/",
+      "ui"
+    ],
+    [
+      "",
+      "all"
+    ]
+  ],
+  "functions": [
+    [
+      "Ref$",
+      "none"
+    ],
+    [
+      "(Bani|Paath|Aarti|Rehras|Sohila|Follow)",
+      "bani"
+    ],
+    [
+      "^(getPaathLines|loadBaniProfile|getBaniIndex|paathCopies|baniIdOf|baniLengthFor|poolPaathVotes|poolTextAgrees|findBaniSequence|baniPreference|restoreBaniLength|parkBaniLength|settlePendingLength|setPendingLength|userLength|setIsSundarGutkaBani|setSundarGutkaBaniId|setIsCeremonyBani)$",
+      "bani"
+    ],
+    [
+      "^(PAATH|BANI|AARTI|NOT_PAATH|REHRAS|PENDING_LENGTH|LENGTH)(_|$)",
+      "bani"
+    ],
+    [
+      "^(handleTranscript|pickCandidate|autopilotLock|searchCanonicalText|distinctLeaders|isSameGurbani|knownSame|loadShabadProfile|ensureFlIndex|cursorLineScore|lineEvidenceOk|toAsciiFirstLetters|tokenize|wordKey|commonPrefix|wordMatches|lineWordsOf|lockOnto|enterSearching|startDetect|startAutopilot|changeActiveShabad|updatePane|setActiveVerseId|setLineNumber|setIsMiscSlide|setMiscSlideText|entries|rank)$",
+      "search"
+    ],
+    [
+      "^(SWITCH|AP|DETECT|RETURN|BACKSTOP|DUP_AWARE|MOOL|MOOL_HOME|CUR_SCORE|TAP_VETO|UI_MOVE|VOTE|UNI_TO_ASCII|FIRST_LETTERS|EMPTY_HOLD|AUTO_LOCK|START_MATCH|RECENT|GRAM|ONE_LINE|MANY_WINS|LOCK)(_|$)",
+      "search"
+    ],
+    [
+      "^(startAudio|cleanup|saveAudio|cpuSample|WORKLET_SRC|CORRECTION_SECONDS)$|^AUDIO_",
+      "audio"
+    ],
+    [
+      "^(stop|start|takeOver|release|projectCurrent|shadowing|mirror)$|^(ADOPT|TAKEOVER)_",
+      "session"
+    ],
+    [
+      "^(MarkedLine|pctLevel|fmtPct|pctHue|pctColor|pctVars|useMoving|rollMs|LivePct|LiveBar|publishRanks|publishBoard|toggleHeard|noteBeat|noteHeard|startDrag|dot|rate|profLines|boardPct|nameLine|sameAsCurrent|pillText|anvaad|os|setSingleDisplayActiveTab|setOverlayScreen)$|^shadow|^(HEARD|HEARTBEAT|RATING|STATUS|MODES|DOT)(_|$)",
+      "ui"
+    ]
+  ]
+}
