@@ -29,6 +29,35 @@ more slowly (seen with Surinder's model in October). So (1) is always measured d
 | Size | about 200 MB or less (installers bundle the model) |
 | Licence | allows use in STTM (MIT / Apache style); say what data it was trained on |
 
+## 2a. What the app does with the model's output today
+
+The app (the "harness") is tuned around Karanbir's model, but none of that is sacred: **if another model plus a
+changed harness scores better, we change the harness.** Every candidate gets the same tuning effort on GAB dev before
+it is compared. What the app uses, so you know what matters:
+
+| The app uses | How | What this asks of the model |
+|---|---|---|
+| Greedy CTC text of the last **10 s** (searching) or **4 s** (following), redone every **0.5 s** | first letters of each word + full text, searched over all Gurbani | correct **spelling as in Sri Guru Granth Sahib Ji** (BaniDB), not pronunciation; real word breaks (spaces); good on short windows that start or end mid-word |
+| Fuzzy text match of that text against candidate pangtis | decides switches and whether the Shabad on screen still fits (scores 0.55-0.65 today) | stable text window to window; few invented letters between lines |
+| `log_probs` directly | the kirtan follower scores candidate lines by CTC alignment, using the model's own tokenizer | sensible probabilities (a clear line scores high, harmonium / tabla low) |
+| Confidence = mean over frames of the top probability | below 0.88 the text is treated as noise (sung lines score 0.93-0.99 today) | confident on Gurbani, unconfident on music and noise |
+| A separate small speech / singing classifier (YAMNet) + text fit | detects katha, talk, Ardas | **no Gurbani-looking text during talk or katha** |
+| Time budget | one 10 s window must finish well inside the 0.5 s hop, on 2 threads, next to STTM | about 380 ms or less per 10 s window |
+
+**Fixed** (changing these means a large rewrite, so only for a big gain): ONNX on CPU (onnxruntime), 16 kHz audio in,
+CTC output (frames x vocab log-probs), Gurmukhi Unicode text that matches BaniDB spelling, offline on an ordinary
+Windows / Mac computer.
+
+**Open** (we retune or rebuild these for a better model):
+- the tokenizer / vocabulary and blank id (the engine will load yours; today it assumes Karanbir's);
+- window lengths (10 s / 4 s) and hop (0.5 s);
+- every threshold above (fit 0.55-0.65, confidence 0.88, switch margins, confirm counts);
+- decoding: greedy today; beam search with a Gurbani n-gram (for example Sukhpal's 3-gram) is open;
+- frame rate, front-end, model size within the limits in section 2.
+
+So, aim at: right spelling, short windows, quiet on talk and music, fast on 2 threads. Don't try to imitate Karanbir's
+output or confidence levels; we will retune for yours.
+
 ## 3. Data rules (so the test stays fair)
 
 - **Never train on** anything in `gab-do-not-train.csv` (GAB dev + test). GAB `train` is fine.
