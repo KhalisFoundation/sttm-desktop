@@ -37,9 +37,33 @@ const listScrollAction = ({ autopilotLive, lastUserScrollAt, now, activeIndex, r
 const screenTakenByCeremony = ({ following, visible, isCeremonyBani }) =>
   !!(following && visible && isCeremonyBani);
 
+// STTM's Auto Play (Akhand Paath view: the next pangti every N seconds) and Voice Autopilot
+// must never drive the screen together: the timer moves on at a fixed pace whether the reader
+// has finished the pangti or not (Renton, Oct 26: about 3 in 10 moves came early). While
+// Autopilot is on, Auto Play is paused. The sevadaar's saved setting is never changed, so it
+// is back exactly as it was when Autopilot stops.
+const autoplayMayAdvance = ({ autoplayToggle, autopilotLive }) =>
+  !!autoplayToggle && !autopilotLive;
+
+// A screen move made by the Auto Play timer is never the sevadaar's own move (lineRespect.js).
+// The timer notes each move it makes; a line change this soon after is the timer's.
+const AUTOPLAY_TICK_GRACE_MS = 1500;
+let lastAutoplayTickAt = 0;
+const noteAutoplayTick = (now = Date.now()) => {
+  lastAutoplayTickAt = now;
+};
+const autoplayTickedRecently = (now = Date.now()) =>
+  lastAutoplayTickAt > 0 &&
+  now - lastAutoplayTickAt >= 0 &&
+  now - lastAutoplayTickAt <= AUTOPLAY_TICK_GRACE_MS;
+
 module.exports = {
   SCROLL_PAUSE_MS,
   SCROLL_ACTIVE_MS,
+  AUTOPLAY_TICK_GRACE_MS,
   listScrollAction,
   screenTakenByCeremony,
+  autoplayMayAdvance,
+  noteAutoplayTick,
+  autoplayTickedRecently,
 };

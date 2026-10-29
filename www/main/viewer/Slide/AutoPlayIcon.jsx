@@ -45,10 +45,24 @@ PauseIcon.propTypes = {
   size: PropTypes.number,
 };
 
+// Shown while Voice Autopilot is on: Auto Play is paused then (see autoplayMayAdvance).
+const AUTOPILOT_FOLLOWING_TIP =
+  'Voice Autopilot is following the reading. Auto Play is paused and comes back when Autopilot stops.';
+const AUTOPILOT_FOLLOWING_TIP_OFF =
+  'Voice Autopilot is following the reading. Auto Play can be turned on after Autopilot stops.';
+
 const AutoPlayIcon = () => {
   const { autoplayToggle, autoplayDelay } = useStoreState((state) => state.userSettings);
+  const autopilotLive = useStoreState((state) => !!(state.app && state.app.autopilotLive));
+  // While Autopilot is on the timer does not run, so the button shows it paused.
+  const running = autoplayToggle && !autopilotLive;
+  let buttonLabel = autoplayToggle ? 'Pause autoplay' : 'Start autoplay';
+  let tip;
+  if (autopilotLive) tip = autoplayToggle ? AUTOPILOT_FOLLOWING_TIP : AUTOPILOT_FOLLOWING_TIP_OFF;
+  if (tip) buttonLabel = tip;
 
   const toggleAutoplay = () => {
+    if (autopilotLive) return;
     const globalObj = {
       actionName: 'setAutoplayToggle',
       payload: !autoplayToggle,
@@ -58,6 +72,7 @@ const AutoPlayIcon = () => {
   };
 
   const handleSpeedChange = (sum) => {
+    if (autopilotLive) return;
     const newDelay = autoplayDelay + sum;
     if (newDelay !== autoplayDelay && newDelay > 0 && newDelay <= 20) {
       const globalObj = {
@@ -70,12 +85,15 @@ const AutoPlayIcon = () => {
   };
 
   return (
-    <div className="autoplay-icon-container">
+    <div
+      className={`autoplay-icon-container${autopilotLive ? ' autopilot-following' : ''}`}
+      title={tip}
+    >
       <button
         className={`${autoplayDelay <= 1 ? 'disabled' : ''} decrease-speed-btn`}
         aria-label="Decrease speed"
         style={{
-          display: autoplayToggle ? 'initial' : 'none',
+          display: running ? 'initial' : 'none',
         }}
         onClick={() => {
           handleSpeedChange(-1);
@@ -97,8 +115,9 @@ const AutoPlayIcon = () => {
       <div className="autoplay-center-container">
         <div className="speed-display">{autoplayDelay}s</div>
         <button
-          aria-label={autoplayToggle ? 'Pause autoplay' : 'Start autoplay'}
+          aria-label={buttonLabel}
           onClick={toggleAutoplay}
+          disabled={autopilotLive}
           className="autoplay-icon-btn"
         >
           <svg width={SIZE} height={SIZE}>
@@ -112,7 +131,7 @@ const AutoPlayIcon = () => {
             />
           </svg>
           <span className="play-pause-container">
-            {autoplayToggle ? <PauseIcon size={24} /> : <PlayIcon size={24} />}
+            {running ? <PauseIcon size={24} /> : <PlayIcon size={24} />}
           </span>
         </button>
       </div>
@@ -120,7 +139,7 @@ const AutoPlayIcon = () => {
         className={`${autoplayDelay >= 20 ? 'disabled' : ''} increase-speed-btn`}
         aria-label="Increase speed"
         style={{
-          display: autoplayToggle ? 'initial' : 'none',
+          display: running ? 'initial' : 'none',
         }}
         onClick={() => {
           handleSpeedChange(1);

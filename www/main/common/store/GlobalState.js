@@ -43,6 +43,13 @@ const GlobalState = createStore({
     }),
     setAutopilotLive: action((state, payload) => {
       state.autopilotLive = !!payload;
+      // The viewers show it too: their Auto Play button is paused while Autopilot is on.
+      const message = JSON.stringify({
+        payload: !!payload,
+        actionName: 'setAutopilotLive',
+        settingType: 'app',
+      });
+      if (global.platform) global.platform.ipc.send('update-viewer-setting', message);
     }),
     setShadowMicState: action((state, payload) => {
       state.shadowMicState = payload || 'off';

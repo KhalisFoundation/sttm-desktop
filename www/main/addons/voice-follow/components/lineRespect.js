@@ -46,16 +46,18 @@ function createLineRespect() {
       writes.push({ verseId, at: now });
     },
 
-    // The screen line changed to `verseId`. ctx: { now, following, sameShabad, known }
-    // (known: the line belongs to what is being followed). Returns 'app', 'sevadaar' or
-    // 'ignore' (nothing to do: no line, not following, or another Shabad / Bani).
-    classify(verseId, { now, following, sameShabad, known }) {
+    // The screen line changed to `verseId`. ctx: { now, following, sameShabad, known,
+    // autoplay } (known: the line belongs to what is being followed; autoplay: STTM's Auto
+    // Play timer made this move). Returns 'app', 'sevadaar' or 'ignore' (nothing to do: no
+    // line, not following, another Shabad / Bani, or a timer move: a timer is not a sevadaar).
+    classify(verseId, { now, following, sameShabad, known, autoplay = false }) {
       if (verseId == null) return 'ignore';
       prune(now);
       const last = writes[writes.length - 1];
       if (last && last.verseId === verseId) return 'app';
       if (writes.some((w) => w.verseId === verseId && now - w.at <= APP_WRITE_BURST_MS))
         return 'app';
+      if (autoplay) return 'ignore';
       if (!following || !sameShabad || !known) return 'ignore';
       return 'sevadaar';
     },
