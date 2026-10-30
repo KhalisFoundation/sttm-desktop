@@ -12,6 +12,14 @@ const SHADOW_SLICE_MS = 5000;
 // A new self-contained audio file this often; each finished one uploads within a minute,
 // so a laptop dying mid-service loses at most a few minutes. Nobody has to quit the app.
 const SHADOW_SEGMENT_MS = 2 * 60 * 1000;
+// Microphone settings for everything the collector records: the room as it sounds. Chromium
+// turns automatic gain on unless told otherwise, and it pumps music up and down.
+const SHADOW_AUDIO = {
+  channelCount: 1,
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+};
 // A session runs from the sevadaar's first screen change until they have made none for
 // SHADOW_IDLE_STOP_MS; while words are still being heard it waits, up to the hard stop.
 // (Scripted tests that feed audio with VF_TEST_WAV may shorten these.)
@@ -62,7 +70,7 @@ const HF_TOKEN = '__VF_HF_TOKEN__';
 // Which Voice-Follow release produced a session. VF_FEATURE_VERSION is bumped with every merged
 // Voice-Follow PR (MVP numbering); VF_BUILD_COMMIT is the exact commit, injected after
 // `npm run build` by packaging/inject-upload-sas.js (CI: GITHUB_SHA; local: git HEAD).
-const VF_FEATURE_VERSION = '9.0.20';
+const VF_FEATURE_VERSION = '9.0.28';
 const VF_BUILD_COMMIT = '__VF_BUILD_COMMIT__';
 
 module.exports = {
@@ -72,6 +80,7 @@ module.exports = {
   SHADOW_AUDIO_BPS,
   SHADOW_SLICE_MS,
   SHADOW_SEGMENT_MS,
+  SHADOW_AUDIO,
   SHADOW_IDLE_STOP_MS,
   SHADOW_IDLE_HARD_STOP_MS,
   SHADOW_HEARD_GRACE_MS,
