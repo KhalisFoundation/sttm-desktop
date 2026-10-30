@@ -31,7 +31,8 @@
         "shabad-info-source",
         "shabad-info-ang",
         "shabad-info-writer",
-        "shabad-info-raag"
+        "shabad-info-raag",
+        "shabad-info-translation-review"
       ]
     },
     "font-sizes": {
@@ -255,6 +256,10 @@
     },
     "shabad-info-raag": {
       "title": "SHABAD_INFO_RAAG",
+      "initialValue": true
+    },
+    "shabad-info-translation-review": {
+      "title": "SHABAD_INFO_TRANSLATION_REVIEW",
       "initialValue": true
     },
     "reset-padding": {

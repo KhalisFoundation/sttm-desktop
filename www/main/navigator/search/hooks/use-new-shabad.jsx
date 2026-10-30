@@ -11,6 +11,7 @@ export const useNewShabad = () => {
     isSundarGutkaBani,
     isCeremonyBani,
     isMiscSlide,
+    shabadOverview,
     singleDisplayActiveTab,
     searchVerse,
   } = useStoreState((state) => state.navigator);
@@ -23,6 +24,7 @@ export const useNewShabad = () => {
     setVersesRead,
     setActiveVerseId,
     setIsMiscSlide,
+    setShabadOverview,
     setIsSundarGutkaBani,
     setIsCeremonyBani,
     setSingleDisplayActiveTab,
@@ -43,6 +45,9 @@ export const useNewShabad = () => {
     }
     if (isMiscSlide) {
       setIsMiscSlide(false);
+    }
+    if (shabadOverview) {
+      setShabadOverview(null);
     }
     if (isSundarGutkaBani) {
       setIsSundarGutkaBani(false);
