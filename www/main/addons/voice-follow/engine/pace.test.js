@@ -126,7 +126,7 @@ describe('pace: kirtan starts at fast', () => {
   });
 });
 
-describe('pace: crawl tier (9.0.21)', () => {
+describe('pace: crawl tier (9.0.26)', () => {
   const slowSelfTest = async (pace, passMs) => {
     const infer = {
       emissions: async () => {
