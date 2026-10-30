@@ -9,12 +9,14 @@ const {
   SHADOW_SOUND_WINDOW_MS,
   SHADOW_SOUND_SHARE,
   SHADOW_PRE_ROLL_S,
+  SHADOW_AUDIO,
 } = require('./config');
+const { open: openRecorder } = require('./pcm');
 
 const RATE = 16000;
 const TICK_MS = 500; // one loudness reading per half second
 
-let st = null; // { stream, ctx, node, src, ring, ringPos, ringFull, ticks, timer, onSound }
+let st = null; // { stream, rec, ring, ringPos, ringFull, ticks, timer, onSound }
 // Bumped by every start() and stop(): a start() still waiting for the microphone when
 // stop() is called (recording turned off) must not open the ear afterwards.
 let gen = 0;
@@ -25,18 +27,12 @@ function stop() {
   const s = st;
   st = null;
   clearInterval(s.timer);
-  try {
-    s.src.disconnect();
-    s.node.disconnect();
-  } catch (_) {
-    /* already gone */
-  }
+  s.rec.close();
   try {
     s.stream.getTracks().forEach((t) => t.stop());
   } catch (_) {
     /* already gone */
   }
-  s.ctx.close().catch(() => {});
 }
 
 // The last pre-roll seconds as 16-bit PCM, oldest first. Stops the ear.
@@ -54,49 +50,36 @@ async function start(onSound) {
   if (st) return;
   gen += 1;
   const mine = gen;
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-  });
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: SHADOW_AUDIO });
   if (mine !== gen || st) {
     stream.getTracks().forEach((t) => t.stop());
     return;
   }
-  let ctx;
-  try {
-    ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: RATE });
-  } catch (_) {
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  const src = ctx.createMediaStreamSource(stream);
-  // ScriptProcessor is enough for a loudness meter plus a ring buffer.
-  const node = ctx.createScriptProcessor(4096, 1, 1);
   const ring = new Int16Array(Math.round(SHADOW_PRE_ROLL_S * RATE));
   const s = {
     stream,
-    ctx,
-    src,
-    node,
+    rec: null,
     ring,
     ringPos: 0,
     ringFull: false,
-    acc: 0, // resampling phase
+    acc: 0, // resampling phase, used only when the device would not run at 16 kHz
     sumSq: 0,
     n: 0,
     ticks: [], // [ms, loud?]
     timer: null,
     onSound,
   };
-  const step = ctx.sampleRate / RATE;
-  node.onaudioprocess = (e) => {
-    const x = e.inputBuffer.getChannelData(0);
+  // The same audio-thread recorder as the sessions, with no file: a loudness reading plus
+  // the pre-roll ring.
+  let step = 1;
+  const onChunk = (x) => {
     for (let i = 0; i < x.length; i += 1) {
-      s.sumSq += x[i] * x[i];
+      const v = x[i] / 32768;
+      s.sumSq += v * v;
       s.n += 1;
     }
-    // Downsample by picking every step-th sample (speech band only; this is pre-roll audio).
     for (s.acc; s.acc < x.length; s.acc += step) {
-      const v = Math.max(-1, Math.min(1, x[Math.floor(s.acc)]));
-      s.ring[s.ringPos] = v < 0 ? v * 32768 : v * 32767;
+      s.ring[s.ringPos] = x[Math.floor(s.acc)];
       s.ringPos += 1;
       if (s.ringPos >= s.ring.length) {
         s.ringPos = 0;
@@ -105,8 +88,14 @@ async function start(onSound) {
     }
     s.acc -= x.length;
   };
-  src.connect(node);
-  node.connect(ctx.destination); // a ScriptProcessor only runs while connected; output is silent
+  const rec = await openRecorder(stream, { onChunk, holdSeconds: 0 });
+  if (mine !== gen || st) {
+    rec.close();
+    stream.getTracks().forEach((t) => t.stop());
+    return;
+  }
+  step = rec.rate / RATE;
+  s.rec = rec;
   s.timer = setInterval(() => {
     const rms = s.n ? Math.sqrt(s.sumSq / s.n) : 0;
     s.sumSq = 0;

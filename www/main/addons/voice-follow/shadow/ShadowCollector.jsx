@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
-import { SHADOW_BUILD, SHADOW_SEGMENT_MS, SHADOW_DISCARD_COOLDOWN_MS } from './config';
+import {
+  SHADOW_BUILD,
+  SHADOW_SEGMENT_MS,
+  SHADOW_DISCARD_COOLDOWN_MS,
+  SHADOW_AUDIO,
+} from './config';
 import { ShortNotice } from './RecordingNotice';
 
 const fs = require('fs');
@@ -26,7 +31,7 @@ const { vfAnalytics } = require('../components/vfAnalytics');
 //   system.jsonl       - what Voice-Follow would have shown (shadow mode)
 //   events.jsonl       - matches, pauses, audio segment boundaries
 //   score.json         - live agreement totals, rewritten every 30 s
-//   session.json       - tester, app version, microphone, start time
+//   session.json       - tester, app version, microphone, start time, recorder health
 const shadowRoot = () => path.join(logDir(), 'shadow');
 
 // Diagnostics for machines we cannot see: a startup health line (platform, database,
@@ -190,6 +195,25 @@ const readTester = (raw) => {
 };
 const packTester = (t) => encodeURIComponent(JSON.stringify(t));
 // Bump when the first-launch notice changes in substance, so every tester reads it again once.
+// How complete the recording is (pcm.js health), kept in session.json so a session can be
+// judged, or left out of training data, without listening to it. Rewritten at every segment.
+const writeRecorderHealth = (s) => {
+  try {
+    const file = path.join(s.dir, 'session.json');
+    const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const track = s.stream.getAudioTracks()[0];
+    json.recorder = {
+      kind: 'worklet',
+      segments: s.seg,
+      ...s.rec.health(),
+      autoGainControl: track?.getSettings ? (track.getSettings().autoGainControl ?? null) : null,
+    };
+    fs.writeFileSync(file, JSON.stringify(json, null, 1));
+  } catch (_) {
+    /* never disturb the sevadaar */
+  }
+};
+
 const NOTICE_VERSION = 1;
 
 const ShadowCollector = () => {
@@ -305,12 +329,11 @@ const ShadowCollector = () => {
     let stopped = false;
     let segTimer = null;
     let meterTimer = null;
-    let meterCtx = null;
     const start = async () => {
       startingRef.current = true;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
+          audio: SHADOW_AUDIO,
         });
         if (stopped) {
           stream.getTracks().forEach((t) => t.stop());
@@ -318,6 +341,20 @@ const ShadowCollector = () => {
         }
         // The audio from just before (the listener's pre-roll) opens the session, so the
         // session clock starts that much earlier and every timeline lines up with it.
+        // One recorder for the whole session (audio thread); the loudness meter reads its chunks.
+        let level = 0;
+        const rec = await pcm.open(stream, {
+          onChunk: (x) => {
+            let sum = 0;
+            for (let k = 0; k < x.length; k += 1) sum += x[k] * x[k];
+            level = Math.sqrt(sum / x.length) / 32768;
+          },
+        });
+        if (stopped) {
+          rec.close();
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
         const pre = preRollRef.current;
         preRollRef.current = null;
         const startedAt = Date.now();
@@ -333,7 +370,7 @@ const ShadowCollector = () => {
           }
         }
         discardRef.current = false;
-        const s = { dir, t0, startedAt, stream, recorder: null, seg: 0 };
+        const s = { dir, t0, startedAt, stream, rec, recording: false, seg: 0 };
         sessionRef.current = s;
         startingRef.current = false;
         setShadowMicState('recording');
@@ -383,9 +420,8 @@ const ShadowCollector = () => {
           } catch (_) {
             /* already gone */
           }
-          s.stream = await navigator.mediaDevices.getUserMedia({
-            audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-          });
+          s.stream = await navigator.mediaDevices.getUserMedia({ audio: SHADOW_AUDIO });
+          if (s.rec) s.rec.setStream(s.stream);
           event({ type: 'mic_restarted', microphone: s.stream.getAudioTracks()[0]?.label || '' });
         };
         // Audio in self-contained segments so finished ones can upload during the service.
@@ -396,17 +432,21 @@ const ShadowCollector = () => {
           s.seg += 1; // a failed start never reuses a file name
           const file = path.join(dir, `audio-${String(n).padStart(3, '0')}.wav`);
           // Uncompressed 16 kHz mono WAV, as the team's recorder captures training audio.
-          const rec = pcm.record(s.stream, file);
-          s.recorder = rec;
+          // Segments follow on without a gap: the recorder only moves to the next file.
+          s.rec.begin(file);
+          s.recording = true;
           s.recFile = file;
-          event({ type: 'audio_segment', file: path.basename(file), rate: rec.rate });
+          event({ type: 'audio_segment', file: path.basename(file), rate: s.rec.rate });
           s.stream.getAudioTracks().forEach((t) => t.addEventListener('ended', onEnded));
         };
         const endSegment = () => {
-          if (!s.recorder) return;
-          s.recorder.stop();
-          s.recorder = null;
-          if (s.recFile) uploader.enqueue(dir, path.basename(s.recFile));
+          if (!s.recording) return;
+          s.recording = false;
+          const name = s.recFile && path.basename(s.recFile);
+          s.rec.end().then(() => {
+            if (name) uploader.enqueue(dir, name);
+          });
+          writeRecorderHealth(s);
         };
         let rotating = false;
         const rotate = async () => {
@@ -426,27 +466,8 @@ const ShadowCollector = () => {
             rotating = false;
           }
         };
-        // Loudness meter for the activity log (reattached whenever the mic is replaced).
-        let analyser = null;
-        let meterStream = null;
-        const buf = new Float32Array(2048);
-        meterCtx = new (window.AudioContext || window.webkitAudioContext)();
-        meterTimer = setInterval(() => {
-          try {
-            if (meterStream !== s.stream) {
-              meterStream = s.stream;
-              analyser = meterCtx.createAnalyser();
-              analyser.fftSize = 2048;
-              meterCtx.createMediaStreamSource(s.stream).connect(analyser);
-            }
-            analyser.getFloatTimeDomainData(buf);
-            let sum = 0;
-            for (let k = 0; k < buf.length; k += 1) sum += buf[k] * buf[k];
-            bus.level(Math.sqrt(sum / buf.length));
-          } catch (_) {
-            /* meter only; recording carries on */
-          }
-        }, 250);
+        // Loudness meter for the activity log, from the recorder's latest chunk.
+        meterTimer = setInterval(() => bus.level(level), 250);
         startSegment();
         // A new file every SHADOW_SEGMENT_MS; also check every 20 s that the mic is alive.
         let lastRotate = Date.now();
@@ -477,18 +498,14 @@ const ShadowCollector = () => {
       stopped = true;
       clearInterval(segTimer);
       clearInterval(meterTimer);
-      try {
-        if (meterCtx) meterCtx.close();
-      } catch (_) {
-        /* already closed */
-      }
       const s = sessionRef.current;
       sessionRef.current = null;
       if (!s) return;
       setShadowMicState('off');
       try {
-        if (s.recorder) s.recorder.stop();
-        s.recorder = null;
+        if (s.recording) writeRecorderHealth(s);
+        s.recording = false;
+        s.rec.close();
       } catch (_) {
         /* already stopped */
       }
