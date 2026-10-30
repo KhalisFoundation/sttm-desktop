@@ -33,7 +33,12 @@ function bundledModelPath() {
   }
 }
 
+// A model pack from VF_SPEECH_MODEL (benchmarks, developers) is used as it is: never downloaded.
+// eslint-disable-next-line global-require
+const PACK_ONNX = require('./speech-model').active().onnx;
+
 function modelPath() {
+  if (PACK_ONNX) return PACK_ONNX;
   const bundled = bundledModelPath();
   // eslint-disable-next-line no-use-before-define
   if (bundled && isComplete(bundled)) return bundled;
@@ -49,6 +54,7 @@ function isComplete(file) {
 }
 
 function isReady() {
+  if (PACK_ONNX) return fs.existsSync(PACK_ONNX);
   return isComplete(modelPath());
 }
 

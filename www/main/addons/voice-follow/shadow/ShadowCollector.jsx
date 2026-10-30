@@ -352,6 +352,8 @@ const ShadowCollector = () => {
                 commit: VF_BUILD_COMMIT.startsWith('__') ? 'dev' : VF_BUILD_COMMIT,
               },
               platform: process.platform,
+              // eslint-disable-next-line global-require
+              speechModel: require('../engine/speech-model').active().name, // 'karanbir' unless VF_SPEECH_MODEL
               microphone: stream.getAudioTracks()[0]?.label || '',
               startedBy: startReasonRef.current,
               preRollSeconds: pre ? Math.round(pre.seconds * 10) / 10 : 0,
