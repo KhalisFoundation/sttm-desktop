@@ -1,11 +1,12 @@
 // Shared karansea CTC inference core (JS port of the numpy bits).
 const ort = require('onnxruntime-node');
-const VOCAB = require('./assets/vocab'); // id -> piece
+const MODEL = require('./speech-model').active(); // built-in Karanbir, or VF_SPEECH_MODEL's pack
 const pace = require('./pace');
 
+const VOCAB = MODEL.vocab; // id -> piece
 const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_MS || 0) : 0;
 const SR = 16000;
-const BLANK = 256;
+const BLANK = MODEL.blank;
 
 // strip whitespace, dandas, Gurmukhi/ASCII digits, punctuation (matches _STRIP)
 const STRIP = /[\s।॥|0-9੦-੯.,;:!?\-]+/g;
@@ -168,4 +169,4 @@ class Infer {
   }
 }
 
-module.exports = { Infer, resampleTo16k, norm, SR, BLANK };
+module.exports = { Infer, resampleTo16k, norm, SR, BLANK, MODEL };
