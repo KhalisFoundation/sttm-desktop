@@ -2246,6 +2246,7 @@ const VoiceFollow = () => {
     if (shadowing()) return;
     if (ngRef.current.ours && (isAnnouncement || miscSlideText !== slideStrings.waheguru)) {
       ngRef.current.ours = false;
+      ngRef.current.quietUp = false;
       ngRef.current.back = 0;
     }
   }, [miscSlideText, isAnnouncement]);
