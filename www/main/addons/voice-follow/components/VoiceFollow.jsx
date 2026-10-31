@@ -351,11 +351,11 @@ const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows
 // The diwan is over: no Gurbani heard (nothing fits the Shabad on screen, the follower has not
 // moved on, nothing found) and the room quiet (at most NG_QUIET_LOUD_S of sound above a quarter
 // of the Gurbani's loudness: a cough, a door) for NG_QUIET_MS after Sohila Sahib, the end of the
-// day, or NG_QUIET_LONG_MS after anything else (soft simran or a distant mic mid-diwan can be
-// that quiet for minutes: 9 recordings, Oct 30). The Waheguru slide goes up instead of the last
-// pangti. No hold: the next Shabad heard or found takes it down as usual.
+// day, or NG_QUIET_LONG_MS after anything else (a little longer: soft simran or a distant mic
+// mid-diwan can be quiet for minutes). The Waheguru slide goes up instead of the last pangti.
+// No hold: the next Shabad heard or found takes it down as usual.
 const NG_QUIET_MS = 120000;
-const NG_QUIET_LONG_MS = 600000;
+const NG_QUIET_LONG_MS = 180000;
 const NG_QUIET_LOUD_S = 10;
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
