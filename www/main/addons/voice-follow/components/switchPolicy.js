@@ -175,7 +175,18 @@ function sameGurbani(linesA, linesB) {
   return k >= 0.8 * small.size;
 }
 
+// End-of-Bani exit (BANI_END_EXIT in VoiceFollow.jsx). While a Bani is open and its follower stands on
+// one of the Bani's last `endLines` pangtis, the Bani is finishing: whatever is sung next is new. There a
+// decisive (strong) win commits on its own (2 wins) instead of waiting for SWITCH_CONFIRM. GAB-Aarti r1aarti:
+// the Funhe after Aarti scored 0.80 vs 0.27 at once, but the run broke on the next weak decode and the
+// Waheguru slide stood for 42 s. endLines 0 = off (the confirm count is unchanged).
+function switchConfirmNeeded({ isBani, cursor, nLines, decisive }, endLines, confirm) {
+  if (!endLines || !isBani || !decisive || cursor == null || !nLines) return confirm;
+  return nLines - 1 - cursor < endLines ? Math.min(confirm, 2) : confirm;
+}
+
 module.exports = {
+  switchConfirmNeeded,
   sameGurbani,
   nextSwitchWins,
   nextEmptyStreak,
