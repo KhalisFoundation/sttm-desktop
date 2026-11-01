@@ -1087,14 +1087,13 @@ const pctLevel = (v) => {
 };
 // Whole numbers: tenths mean nothing at a glance, and a full bar may read 100.
 const fmtPct = (v) => `${Math.round(Math.min(1, Math.max(0, v)) * 100)}%`;
-// Continuous colour for a percentage: amber (0) through yellow (0.5) to green (1), so the
-// tint moves with the number instead of snapping between three fixed colours. Never red: a
-// low number is "early", not "wrong".
-const pctHue = (v) => {
-  const x = Math.min(1, Math.max(0, v));
-  return x <= 0.5 ? 36 + (48 - 36) * (x / 0.5) : 48 + (135 - 48) * ((x - 0.5) / 0.5);
+// One colour language for every percentage (theme tokens, never red: a low number is "early",
+// not "wrong"): low = a lighter accent, mid = the accent, high = the theme's green.
+const pctColor = (v) => {
+  if (v >= 0.8) return 'var(--vf-good)';
+  if (v >= 0.4) return 'var(--vf-accent)';
+  return 'color-mix(in srgb, var(--vf-accent) 60%, transparent)';
 };
-const pctColor = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 42%)`;
 // Each card carries its percentage as CSS variables; the card style (wash / rail / clean,
 // chosen by the sevadar) decides how that shows. Colour lives in what moves, not in a box.
 const pctVars = (v) => ({ '--pc': pctColor(v), '--pct': `${Math.round(v * 1000) / 10}%` });
@@ -1137,12 +1136,7 @@ const LivePct = ({ value }) => {
     return () => cancelAnimationFrame(raf);
   }, [value]);
   return (
-    <span
-      className={`vf2-live-pct ${pctLevel(value)}`}
-      style={{ '--pt-h': pctHue(shown).toFixed(0) }}
-    >
-      {fmtPct(shown)}
-    </span>
+    <span className={`vf2-live-pct ${pctLevel(value)}`}>{fmtPct(shown)}</span>
   );
 };
 LivePct.propTypes = { value: PropTypes.number.isRequired };
@@ -1159,7 +1153,6 @@ const LiveBar = ({ value }) => {
         className={`vf2-live-fill ${pctLevel(value)}${moving ? ' is-moving' : ''}`}
         style={{
           width: `${Math.round(value * 1000) / 10}%`,
-          background: pctColor(value),
           transitionDuration: `${dur}ms, ${dur}ms`,
         }}
       />
@@ -1800,9 +1793,10 @@ const VoiceFollow = () => {
     const cur = currentShabadIdRef.current;
     // A Shabad no route may pick right now (a tap just left it, the same Gurbani under another
     // id, a member of the Bani on screen) has no progress to show.
+    const sameKey = cur < id ? `${cur}:${id}` : `${id}:${cur}`;
     if (
       (vetoRef.current && vetoRef.current.id === id) ||
-      knownSame(cur, id) ||
+      sameKnownRef.current.get(sameKey) === true || // a pure read: never seeds the judge's cache
       (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id))
     )
       return { prog: 0, route: null };
@@ -1925,19 +1919,26 @@ const VoiceFollow = () => {
     // takes the card, and keeps it until it falls below the off line or another Shabad is clearly
     // ahead, so two Shabads never trade the card back and forth.
     let promoted = null;
-    if (!held && cur != null) {
+    if (cur != null) {
       const P = soon.params;
       const pr = promotedRef.current;
-      const best = rows.reduce((m, c) => (!m || (c.prog || 0) > (m.prog || 0) ? c : m), null);
-      const kept = pr ? rows.find((c) => c.shabadId === pr.id) : null;
+      const live = rows.filter((c) => !c.fading);
+      const best = live.reduce((m, c) => (!m || (c.prog || 0) > (m.prog || 0) ? c : m), null);
+      const kept = pr ? live.find((c) => c.shabadId === pr.id) : null;
       const overtaken =
         best && kept && best.shabadId !== kept.shabadId && (best.prog || 0) >= (kept.prog || 0) + 0.15;
       if (kept && (kept.prog || 0) >= P.soonOff && !overtaken) promoted = kept;
       else if (best && (best.prog || 0) >= P.soonOn) promoted = best;
+      // The judge's own card keeps the place unless a promoted Shabad is clearly further along.
+      if (held && promoted && (held.prog || 0) >= (promoted.prog || 0) - 0.15) promoted = null;
     }
     promotedRef.current = promoted ? { id: promoted.shabadId } : null;
-    setShelf(promoted ? rows.filter((c) => c.shabadId !== promoted.shabadId) : rows);
-    setChangeCard(held || (promoted ? { ...promoted, promoted: true } : null));
+    let shown = promoted ? rows.filter((c) => c.shabadId !== promoted.shabadId) : rows;
+    // A judge card displaced by a promoted Shabad stays visible in the list.
+    if (held && promoted && !shown.some((c) => c.shabadId === held.shabadId))
+      shown = [{ ...held, role: 'candidate', fading: false }, ...shown];
+    setShelf(shown);
+    setChangeCard(promoted ? { ...promoted, promoted: true } : held);
     // Session log (shadow sessions): the cards as listed, about once a second and only when
     // they changed, so how long a candidate stayed readable can be measured.
     if (SHADOW_BUILD && shadowBus.active() && now - boardLogRef.current.at >= BOARD_LOG_MS) {
@@ -5622,17 +5623,22 @@ const VoiceFollow = () => {
             if (vetoRef.current.left <= 0) vetoRef.current = null;
           }
           const live = [];
-          // For the panel only: on a sung Bani's last pangtis a decisive decode commits at 2.
-          const panelNeeded = switchConfirmNeeded(
-            {
-              isBani: BANI_END_EXIT_BANIS.has(Number(baniIdOf(currentShabadIdRef.current))),
-              cursor: curCursorRef.current,
-              nLines: (curLinesNormRef.current || []).length,
-              decisive: true,
-            },
-            BANI_END_EXIT,
-            SWITCH_CONFIRM,
-          );
+          // For the panel only: on a sung Bani's last pangtis a decisive decode commits at 2
+          // (switchConfirmNeeded, as stepSlot decides it for this decode's score).
+          const panelNeeded = (score) =>
+            switchConfirmNeeded(
+              {
+                isBani: BANI_END_EXIT_BANIS.has(Number(baniIdOf(currentShabadIdRef.current))),
+                cursor: curCursorRef.current,
+                nLines: (curLinesNormRef.current || []).length,
+                decisive:
+                  score != null &&
+                  score >= SWITCH_STRONG_MIN &&
+                  score - sCurFull >= SWITCH_STRONG_MARGIN,
+              },
+              BANI_END_EXIT,
+              SWITCH_CONFIRM,
+            );
           const sc = switchCandRef.current;
           const bsl = backstopRef.current;
           const rsl = returnSlotRef.current;
@@ -5644,7 +5650,7 @@ const VoiceFollow = () => {
               line: anvaad.unicode(sc.verse || ''),
               score: sc.lastScore,
               wins: sc.wins,
-              needed: panelNeeded,
+              needed: panelNeeded(sc.lastScore),
               kind: 'vote',
             });
           }
@@ -5655,7 +5661,7 @@ const VoiceFollow = () => {
               line: bsl.display || '',
               score: bsl.lastScore,
               wins: bsl.wins,
-              needed: panelNeeded,
+              needed: panelNeeded(bsl.lastScore),
               kind: 'acoustic',
             });
           }
@@ -5695,13 +5701,18 @@ const VoiceFollow = () => {
           } else boardRef.current.hold(Date.now());
           // For the panel's switch gauge: the judge's entries this decode (display only).
           judgeLiveRef.current = { cur: currentShabadIdRef.current, sCur: sCurFull, items: live };
+          publishBoard();
           // Gate for the panel: only candidates that clear the judge's own
           // minimum match (the bar a win needs), and nothing at all while the
           // heard fragment is too thin to judge (silence, a breath, a pause) —
           // so the list is empty when nobody is singing and never shows junk.
           const speaking = hypFull.length >= SWITCH_HYP_MIN;
           const next = speaking
-            ? live.filter((x) => x.score >= SWITCH_ACOUSTIC_MIN).slice(0, 3)
+            ? live
+                .filter((x) => x.score >= SWITCH_ACOUSTIC_MIN)
+                .slice(0, 3)
+                // With its gauge, so the card never shows a first tick at 0 while the shelf catches up.
+                .map((x) => ({ ...x, ...gaugeOf(x.shabadId, 'change') }))
             : [];
           // The Shabad in the change card is listed there, not among the candidates.
           {
@@ -5722,7 +5733,6 @@ const VoiceFollow = () => {
             liveAtRef.current = now;
             setLiveCands({ sCur: sCurFull, items: next });
           }
-          publishBoard(); // after the lead is set, so the change card never shows a first tick at 0
         }
 
         // --- Finish: commits first, then one shared UI from the leader. ---
@@ -6975,7 +6985,9 @@ const VoiceFollow = () => {
       )
     : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
-  const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
+  const liveLead = liveItems
+    .filter((c) => c.wins > 0)
+    .reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
   let cardStyle = 'rail';
@@ -7004,10 +7016,8 @@ const VoiceFollow = () => {
   const leadLine = leadCard ? nameLine(leadCard) : '';
   const leadProg = leadCard ? leadCard.prog || 0 : 0;
   const leadSoon = !!(changeCard && changeCard.soon);
-  // The card's label says how far: a full bar switches on the next decode.
-  let changeLabel = i18n.t('VOICE_FOLLOW.MIGHT_CHANGE_TO');
-  if (leadProg >= 0.995) changeLabel = i18n.t('VOICE_FOLLOW.SWITCHING_NOW');
-  else if (leadSoon) changeLabel = i18n.t('VOICE_FOLLOW.SWITCHING_SOON');
+  // The card's label says how far: two states, steady (soon has hysteresis).
+  const changeLabel = i18n.t(leadSoon ? 'VOICE_FOLLOW.SWITCHING_SOON' : 'VOICE_FOLLOW.MIGHT_CHANGE_TO');
   const boardOthers = shelf
     .filter((b) => !(currentView && b.shabadId === currentView.id))
     .filter((b) => !(leadCard && b.shabadId === leadCard.shabadId))
@@ -7029,11 +7039,7 @@ const VoiceFollow = () => {
     const words = [...settled.split(/\s+/).filter(Boolean).slice(-HEARD_SHOW_WORDS), tentative]
       .filter(Boolean)
       .join(' ');
-    return words ? (
-      <Gurmukhi text={words} />
-    ) : (
-      <span className="vf2-heard-placeholder">{i18n.t('VOICE_FOLLOW.LISTENING')}</span>
-    );
+    return words ? <Gurmukhi text={words} /> : null;
   })();
 
   const dlBar = dlProgress != null && (
@@ -7158,6 +7164,7 @@ const VoiceFollow = () => {
                     <span className="vf2-match-word">{i18n.t('VOICE_FOLLOW.MATCH')}</span>
                   </span>
                 )}
+                {!currentView && stopButton}
               </div>
               <div
                 className={`vf2-line${lineExpanded ? ' is-expanded' : ''}`}
@@ -7172,28 +7179,30 @@ const VoiceFollow = () => {
               >
                 {liveLine ? <Gurmukhi text={liveLine} /> : i18n.t('VOICE_FOLLOW.NO_SHABAD_YET')}
               </div>
-              {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
-                  sits near the top of the panel without adding a line. */}
-              <div className="vf2-next-row">
-                {nextLine && (
-                  <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
-                    <span className="vf2-next-mark" aria-hidden="true" />
-                    <Gurmukhi text={nextLine} />
-                  </div>
-                )}
-                {!nextLine && atEnd && (
-                  // The last pangti: the row says so instead of standing empty beside Stop.
-                  <div className="vf2-next-line is-end">
-                    {i18n.t(
-                      currentView && baniIdOf(currentView.id) != null
-                        ? 'VOICE_FOLLOW.END_OF_BANI'
-                        : 'VOICE_FOLLOW.END_OF_SHABAD',
-                    )}
-                  </div>
-                )}
-                {!nextLine && !atEnd && <span className="vf2-next-line is-empty" />}
-                {stopButton}
-              </div>
+              {/* While following, the next pangti (marked by a thin grey bar) and Stop share one
+                  row; while finding, Stop sits on the label row and this row is not shown. */}
+              {currentView && (
+                <div className="vf2-next-row">
+                  {nextLine && (
+                    <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
+                      <span className="vf2-next-mark" aria-hidden="true" />
+                      <Gurmukhi text={nextLine} />
+                    </div>
+                  )}
+                  {!nextLine && atEnd && (
+                    // The last pangti: the row says so instead of standing empty beside Stop.
+                    <div className="vf2-next-line is-end">
+                      {i18n.t(
+                        currentView && baniIdOf(currentView.id) != null
+                          ? 'VOICE_FOLLOW.END_OF_BANI'
+                          : 'VOICE_FOLLOW.END_OF_SHABAD',
+                      )}
+                    </div>
+                  )}
+                  {!nextLine && !atEnd && <span className="vf2-next-line is-empty" />}
+                  {stopButton}
+                </div>
+              )}
               {boardCur && <LiveBar value={boardCur.pct} />}
             </section>
 
@@ -7213,9 +7222,12 @@ const VoiceFollow = () => {
                 }}
               >
                 <div className="vf2-label">
-                  <span className="vf2-dot is-seeking" />
+                  <span className={`vf2-dot ${leadSoon ? 'is-seeking' : 'is-still'}`} />
                   {changeLabel}
-                  <LivePct value={leadProg} />
+                  <span className="vf2-there">
+                    <LivePct value={leadProg} />
+                    <span className="vf2-there-word">{i18n.t('VOICE_FOLLOW.THERE')}</span>
+                  </span>
                 </div>
                 <div className="vf2-change-row">
                   <div className="vf2-cand-line">
@@ -7223,7 +7235,7 @@ const VoiceFollow = () => {
                   </div>
                   <button
                     type="button"
-                    className="vf2-switch is-primary"
+                    className={`vf2-switch${leadSoon ? ' is-primary' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       pickCandidate(leadCard);
@@ -7259,9 +7271,6 @@ const VoiceFollow = () => {
                   <i className="fa-solid fa-chevron-right vf2-fold-mark" aria-hidden="true" />
                 )}
                 <span className="vf2-shabads-title">{i18n.t(shabadsTitleKey)}</span>
-                {boardOthers.length > 1 && (
-                  <span className="vf2-shabads-count">{boardOthers.length}</span>
-                )}
               </div>
               {boardOthers.length === 0 && (
                 <div className="vf2-empty">
@@ -7270,19 +7279,13 @@ const VoiceFollow = () => {
               )}
               {boardOthers.map((c, i) => (
                 <div
-                  className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}${
-                    c.soon && currentView ? ' is-soon' : ''
-                  }`}
+                  className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`}
                   key={c.shabadId}
                   title={i18n.t('VOICE_FOLLOW.PROGRESS_TIP')}
                 >
                   <span className="vf2-cand-line">
                     <MarkedLine line={c.line} keys={heardKeys} />
                   </span>
-                  {c.soon && currentView && (
-                    <span className="vf2-soon">{i18n.t('VOICE_FOLLOW.SWITCHING_SOON')}</span>
-                  )}
-                  <LiveBar value={c.prog || 0} />
                   <LivePct value={c.prog || 0} />
                   <button
                     type="button"
@@ -7321,7 +7324,9 @@ const VoiceFollow = () => {
               barColor="currentColor"
               className="vf-ap-wave"
             />
-            <span className="vf2-heard-label">{i18n.t('VOICE_FOLLOW.HEARING')}</span>
+            {!!heard && (
+              <span className="vf2-heard-label">{i18n.t('VOICE_FOLLOW.HEARING')}</span>
+            )}
             <span className="vf2-heard-text" ref={heardBoxRef}>
               {heardStrip}
             </span>

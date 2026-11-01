@@ -71,6 +71,9 @@ $vf2-yellow-bar: #f2c200;
     background: $vf2-orange;
     animation: vf2-breathe 1.4s ease-in-out infinite;
   }
+  &.is-still {
+    background: $vf2-orange;
+  }
 }
 @keyframes vf2-breathe {
   0%,
@@ -247,10 +250,10 @@ $vf2-yellow-bar: #f2c200;
     color: var(--vf-muted);
   }
   &.is-mid {
-    color: var(--vf-accent);
+    color: var(--vf-accent-text);
   }
   &.is-high {
-    color: #2e8f55;
+    color: var(--vf-good);
   }
 }
 .vf2-now .vf2-cand-track {
@@ -283,7 +286,7 @@ $vf2-yellow-bar: #f2c200;
     background: var(--vf-accent) !important;
   }
   &.is-high {
-    background: #2e8f55 !important;
+    background: var(--vf-good) !important;
   }
 }
 // What the model hears: one faint line, newest words on the right, older ones fading out.
@@ -336,36 +339,32 @@ $vf2-yellow-bar: #f2c200;
   font-size: 14px;
   font-weight: 500;
 }
-// "Switching soon": a small pill on a candidate row once the switch routes are half way there
-// (switchGauge.js; steady, with hysteresis). The row's bar and number are its progress. Colours
-// come from the theme so the pill reads on light and dark cards alike.
-.vf2-soon {
-  flex: none;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--vf-accent);
-  background: color-mix(in srgb, var(--vf-accent) 16%, transparent);
-  animation: vf2-fade 0.28s ease-out;
-}
-// A list row that is switching soon: a faint wash of the accent, on any theme; the pill takes
-// the bar's place so the pangti keeps its room on a narrow pane.
-.vf2-shabad-row.is-soon {
-  background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
-  .vf2-cand-track {
-    display: none;
-  }
-}
-.vf2-shabad-row .vf2-cand-line {
-  min-width: 45%;
-}
-// The change card past the "soon" line: the same wash, so one colour means one thing.
+// The change card past the "soon" line: an accent wash, so one colour means one thing.
 .vf-autopilot .vf2-change.is-soon {
   border-color: var(--vf-accent);
   background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
+}
+// "64% there" on the change card: the progress, not a match; the word says so.
+.vf2-there {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-left: auto;
+  .vf2-live-pct {
+    margin-left: 0;
+  }
+  .vf2-there-word {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
+    color: var(--vf-muted);
+  }
+}
+// A candidate row: the pangti keeps its room; the number is its only gauge.
+.vf2-shabad-row .vf2-cand-line {
+  flex: 1;
+  min-width: 0;
 }
 // The change card's pangti and its Switch button share a row.
 .vf2-change-row {
@@ -395,16 +394,6 @@ $vf2-yellow-bar: #f2c200;
     text-transform: lowercase;
     color: var(--vf-muted);
   }
-}
-// A small label before the raw hearing, so it is never taken for a pangti.
-.vf2-heard-label {
-  flex: none;
-  margin-right: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--vf-faint);
 }
 // A thin grey bar marks the next pangti (instead of a "Next" label).
 .vf2-next-mark {
@@ -467,11 +456,12 @@ $vf2-yellow-bar: #f2c200;
 }
 .vf2-heard-label {
   flex: none;
-  font-size: 10px;
+  margin-right: 8px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: $vf2-faint;
+  color: var(--vf-muted);
 }
 .vf2-heard-tentative {
   opacity: 0.45;
@@ -879,6 +869,8 @@ $vf2-yellow-bar: #f2c200;
   --vf-faint: #{$vf2-faint};
   --vf-line: #{$vf2-line};
   --vf-accent: #{darken($vf2-orange, 12%)};
+  --vf-accent-text: #9a5d00; // the accent as text on white (5.3:1)
+  --vf-good: #247a46; // the "nearly there" green as text and fill on white (5.3:1)
 
   display: flex;
   flex-direction: column;
@@ -1125,7 +1117,7 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--vf-accent);
+  color: var(--vf-accent-text);
 }
 .vf2-shabads-count {
   color: var(--vf-faint);

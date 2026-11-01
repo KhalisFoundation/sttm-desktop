@@ -112,6 +112,11 @@ describe('switchGauge: gauge', () => {
       prog: 0.7,
       route: 'pieces',
     });
+    // a store that looks ready waits for the next heard piece: just under full
+    assert.deepEqual(gauge({ acoustic: null, cumulation: 1, fragment: 0 }, CFG), {
+      prog: 0.95,
+      route: 'pangtis',
+    });
     const g = gauge(
       { acoustic: { score: 0.9, wins: 2, needed: 3, sCur: 0.2 }, cumulation: 0.5, fragment: 0 },
       CFG,

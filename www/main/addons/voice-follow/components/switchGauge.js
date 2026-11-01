@@ -93,11 +93,14 @@ function fragmentGauge(store, shabadId, role, cfg, opts = {}) {
 // ('judge' | 'pangtis' | 'pieces' | null when nothing has started).
 function gauge({ acoustic = null, cumulation = 0, fragment = 0 }, cfg) {
   const judge = acoustic ? acousticGauge(acoustic, cfg.acoustic) : 0;
-  const best = Math.max(judge, cumulation, fragment);
+  // The two stores switch only inside the hit that completes them, so a store that already
+  // looks ready is "waiting for the next heard piece": shown just under full. A full bar is the
+  // judge's alone, whose next decode commits.
+  const best = Math.max(judge, Math.min(cumulation, 0.95), Math.min(fragment, 0.95));
   let route = null;
   if (best > 0) {
     if (best === judge) route = 'judge';
-    else if (best === cumulation) route = 'pangtis';
+    else if (best === Math.min(cumulation, 0.95)) route = 'pangtis';
     else route = 'pieces';
   }
   return { prog: best, route };
