@@ -160,6 +160,7 @@ const { screenTakenByCeremony } = require('./autopilotScreen');
 const {
   REHRAS_BANI,
   AARTI_BANI,
+  SOHILA_BANI,
   BANI_MIN_LENGTH,
   baniLengthFor,
   readRuleMayOpen,
@@ -351,10 +352,12 @@ const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows
 // nothing found) and the room silent, no instrument and no voice, for NG_QUIET_MS (at most
 // NG_QUIET_LOUD_S of sound: a cough, a door). Silent = within NG_QUIET_FLOOR x the room's own
 // background noise (its quiet moments in the last NG_FLOOR_MS), never above a quarter of the
-// Gurbani's loudness. On 16 h of Gurdwara Sahib recordings it went up 1 to 2.5 min after the
-// diwan ended, and mid-diwan almost only in gaps after a Shabad or Bani was done. The Waheguru slide goes up instead of the last pangti. No hold: the
-// next Shabad heard or found takes it down as usual.
+// Gurbani's loudness. NG_QUIET_SOHILA_MS after Sohila Sahib, the end of the day. On 16 h of
+// Gurdwara Sahib recordings it went up 1 to 2.5 min after the diwan ended, and mid-diwan almost
+// only in gaps after a Shabad or Bani was done. The Waheguru slide goes up instead of the last
+// pangti. No hold: the next Shabad heard or found takes it down as usual.
 const NG_QUIET_MS = 45000;
+const NG_QUIET_SOHILA_MS = 30000;
 const NG_QUIET_LOUD_S = 2;
 const NG_QUIET_FLOOR = 3;
 const NG_FLOOR_MS = 600000;
@@ -2251,8 +2254,10 @@ const VoiceFollow = () => {
         // The sevadaar cleared our quiet slide: not again until Gurbani is heard.
         if (ng.quietSkip) return;
         const lastGurbani = Math.max(ng.lastFit, ng.lastProgress, lastAutoDecisionRef.current || 0);
-        if (now - lastGurbani < NG_QUIET_MS || now - ng.loudFrom < NG_QUIET_MS) return;
-        const loudS = ng.loud.reduce((a, x) => a + x.s, 0);
+        const quietMs =
+          baniIdOf(currentShabadIdRef.current) === SOHILA_BANI ? NG_QUIET_SOHILA_MS : NG_QUIET_MS;
+        if (now - lastGurbani < quietMs || now - ng.loudFrom < quietMs) return;
+        const loudS = ng.loud.reduce((a, x) => (now - x.t <= quietMs ? a + x.s : a), 0);
         if (loudS > NG_QUIET_LOUD_S) return;
         ng.quietUp = true;
         ngRaise('quiet', null);
