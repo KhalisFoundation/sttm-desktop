@@ -75,6 +75,24 @@ describe('switchGauge: fragment confirm', () => {
     assert.ok(fragmentGauge(store, 7, 'list', FR) < fragmentGauge(store, 7, 'change', FR));
     assert.equal(fragmentGauge(store, 8, 'list', FR), 0);
   });
+  it('counts only pangtis heard recently, and a gated confirm stays just under 1', () => {
+    const store = new Map();
+    store.set(
+      7,
+      new Map([
+        [0, 1],
+        [1, 1],
+      ]),
+    );
+    const hitAt = new Map([
+      [0, 1000],
+      [1, 30000],
+    ]);
+    const fresh = { hitAt, now: 31000, freshMs: 20000 };
+    assert.equal(fragmentGauge(store, 7, 'change', FR), 1); // without freshness: 2 of 2
+    assert.equal(fragmentGauge(store, 7, 'change', FR, fresh), 0.5); // line 0 is stale
+    assert.equal(fragmentGauge(store, 7, 'change', FR, { gated: true }), 0.95);
+  });
 });
 
 describe('switchGauge: gauge', () => {

@@ -18,6 +18,7 @@
 const { shabadTotal } = require('./panktiCumulation');
 const { of: fragmentOf } = require('./fragmentConfirm');
 
+const FRAG_LIVE = 0.3; // fragmentConfirm.js LIVE: a pangti with at least this weight counts as heard
 const clamp01 = (x) => Math.min(1, Math.max(0, Number.isFinite(x) ? x : 0));
 
 // The acoustic judge: wins so far plus how near this decode came to a win (the weaker of the
@@ -47,12 +48,27 @@ function cumulationGauge(store, shabadId, cfg) {
 }
 
 // Fragment confirm: one Shabad's pieces (Map lineIndex -> weight); `role` is where the card sits
-// ('change' = the Changing-to card, else the list), which sets how many pangtis it needs.
-function fragmentGauge(store, shabadId, role, cfg) {
-  const { total, distinct } = fragmentOf(store, shabadId);
+// ('change' = the Changing-to card or a Shabad the search nominated, else the list), which sets how
+// many pangtis it needs. The confirm also wants those pangtis heard recently: with `hitAt` (Map
+// lineIndex -> ms) and `now`, a pangti counts only when hit within `freshMs`. `gated` (a confirm
+// too soon after the last one, or in the cool-down after a change) holds the gauge just under 1.
+function fragmentGauge(store, shabadId, role, cfg, opts = {}) {
+  const lines = store && store.get ? store.get(shabadId) : null;
+  if (!lines || !lines.size) return 0;
+  const { total } = fragmentOf(store, shabadId);
   if (!(total > 0)) return 0;
+  let distinct = 0;
+  lines.forEach((w, i) => {
+    if (w < FRAG_LIVE) return;
+    if (opts.hitAt && opts.freshMs > 0) {
+      const at = opts.hitAt.get(i);
+      if (!(at != null && at >= opts.now - opts.freshMs)) return;
+    }
+    distinct += 1;
+  });
   const need = role === 'change' ? cfg.distinctChange : cfg.distinctList;
-  return clamp01(Math.min(total / cfg.lock, distinct / need));
+  const g = clamp01(Math.min(total / cfg.lock, distinct / need));
+  return opts.gated ? Math.min(g, 0.95) : g;
 }
 
 // All routes for one Shabad. Returns { prog, route } with route = the furthest one

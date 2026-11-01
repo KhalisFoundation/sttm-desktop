@@ -350,6 +350,10 @@ $vf2-yellow-bar: #f2c200;
   background: $vf2-orange;
   animation: vf2-fade 0.28s ease-out;
 }
+// A list row that is switching soon: a touch of the change card's green, so the eye lands on it.
+.vf2-shabad-row.is-soon {
+  background: #eefbf0;
+}
 // A thin grey bar marks the next pangti (instead of a "Next" label).
 .vf2-next-mark {
   flex: none;

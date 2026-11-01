@@ -1798,12 +1798,31 @@ const VoiceFollow = () => {
     const judged = jl && jl.cur === cur ? jl.items.find((x) => x.shabadId === id) : null;
     const ks = kfSwitchRef.current;
     const fr = fragRef.current;
+    const nowMs = Date.now();
+    let fragment = 0;
+    if (fr && fr.cur === cur) {
+      // The fragment confirm's own view of this Shabad: a search nomination or the Shabad just
+      // left counts as a change card; pangtis must be fresh; a confirm can be gated by time.
+      let fragRole = role;
+      if (fr.top && fr.top.id === id && nowMs - fr.top.at <= PC_FRAGMENT_NOMINATE_S * 1000)
+        fragRole = 'change';
+      if (PC_FRAGMENT_RETURN > 0 && prevShabadRef.current && prevShabadRef.current.id === id)
+        fragRole = 'change';
+      const gated =
+        (PC_FRAGMENT_GAP_S > 0 && nowMs - (fr.lastConfirm || 0) < PC_FRAGMENT_GAP_S * 1000) ||
+        (PC_FRAGMENT_COOLDOWN_S > 0 && nowMs - (fr.since || 0) < PC_FRAGMENT_COOLDOWN_S * 1000);
+      fragment = switchGauge.fragmentGauge(fr.store, id, fragRole, PC_FRAGMENT, {
+        hitAt: fr.hitAt ? fr.hitAt.get(id) : null,
+        now: nowMs,
+        freshMs: PC_FRAGMENT_FRESH_S * 1000,
+        gated,
+      });
+    }
     return switchGauge.gauge(
       {
         acoustic: judged ? { ...judged, sCur: jl.sCur } : null,
         cumulation: ks && ks.cur === cur ? switchGauge.cumulationGauge(ks.store, id, PC_SWITCH) : 0,
-        fragment:
-          fr && fr.cur === cur ? switchGauge.fragmentGauge(fr.store, id, role, PC_FRAGMENT) : 0,
+        fragment,
       },
       { acoustic: { min: SWITCH_ACOUSTIC_MIN, margin: SWITCH_ACOUSTIC_MARGIN } },
     );
