@@ -1770,6 +1770,8 @@ const VoiceFollow = () => {
   const boardLogRef = useRef({ at: 0, sig: '' });
   // What the switch judge scored on its last decode ({ cur, sCur, items }), and the steady
   // "switching soon" flags (switchGauge.js). Both display only.
+  // Pairs of Shabads known to be the same Gurbani (filled by knownSame below; read by the gauge).
+  const sameKnownRef = useRef(new Map());
   const judgeLiveRef = useRef(null);
   const promotedRef = useRef(null); // { id, owner }: the list Shabad shown in the change card (display only)
   const soonRef = useRef(null);
@@ -3612,7 +3614,6 @@ const VoiceFollow = () => {
   // Synchronous view of isSameGurbani for the switch judge: false until known. The first
   // time a pair meets, the check starts in the background; a switch needs several wins
   // over a second or more, so the answer is in by the time it matters.
-  const sameKnownRef = useRef(new Map());
   const knownSame = (a, b) => {
     if (typeof a !== 'number' || typeof b !== 'number' || a === b) return false;
     const key = a < b ? `${a}:${b}` : `${b}:${a}`;
