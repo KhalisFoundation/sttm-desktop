@@ -1092,7 +1092,7 @@ const fmtPct = (v) => `${Math.round(Math.min(1, Math.max(0, v)) * 100)}%`;
 const pctColor = (v) => {
   if (v >= 0.8) return 'var(--vf-good)';
   if (v >= 0.4) return 'var(--vf-accent)';
-  return 'color-mix(in srgb, var(--vf-accent) 60%, transparent)';
+  return 'var(--vf-muted)';
 };
 // Each card carries its percentage as CSS variables; the card style (wash / rail / clean,
 // chosen by the sevadar) decides how that shows. Colour lives in what moves, not in a box.

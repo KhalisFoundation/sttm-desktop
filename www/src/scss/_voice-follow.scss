@@ -280,7 +280,7 @@ $vf2-yellow-bar: #f2c200;
   }
   // Never red: a low fill is "early", not "wrong".
   &.is-low {
-    background: color-mix(in srgb, var(--vf-accent) 60%, transparent) !important;
+    background: var(--vf-muted) !important;
   }
   &.is-mid {
     background: var(--vf-accent) !important;
@@ -342,7 +342,7 @@ $vf2-yellow-bar: #f2c200;
 // The change card past the "soon" line: an accent wash, so one colour means one thing.
 .vf-autopilot .vf2-change.is-soon {
   border-color: var(--vf-accent);
-  background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
+  background: color-mix(in srgb, var(--vf-accent) 6%, transparent);
 }
 // "64% there" on the change card: the progress, not a match; the word says so.
 .vf2-there {
@@ -492,7 +492,7 @@ $vf2-yellow-bar: #f2c200;
 .vf2-empty {
   padding: 4px 6px 2px;
   font-size: 12px;
-  color: $vf2-faint;
+  color: var(--vf-muted);
 }
 
 // One card, only while a change is being confirmed.
@@ -868,7 +868,7 @@ $vf2-yellow-bar: #f2c200;
   --vf-muted: #{$vf2-muted};
   --vf-faint: #{$vf2-faint};
   --vf-line: #{$vf2-line};
-  --vf-accent: #{darken($vf2-orange, 12%)};
+  --vf-accent: #b86f00; // bars and borders: >= 3:1 on the white card and its track
   --vf-accent-text: #9a5d00; // the accent as text on white (5.3:1)
   --vf-good: #247a46; // the "nearly there" green as text and fill on white (5.3:1)
 
