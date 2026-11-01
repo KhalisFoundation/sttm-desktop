@@ -168,6 +168,8 @@ const {
 } = require('./baniLength');
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
+// Waheguru Simran heard (the not-Gurbani slide and the lock gate), unit-tested in simran.test.js.
+const { createSimran, noteHeard: noteSimran, simranStep, simranNow } = require('./simran');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
 const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
 
@@ -351,6 +353,13 @@ const NG_ARDAS_RECENT_MS = 120000; // a hold raised again this soon after an Ard
 const NG_RET_TEXT_MS = 8000; // heard text probed against the index: the last this much
 const NG_RET_EVERY_MS = 1500;
 const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows, decodes kept
+const NG_SIMRAN_FIT_MS = 10000; // no Simran slide while the Shabad on screen fitted this recently
+// The Fateh said aloud (simran.js): the Waheguru slide NG_FATEH_WAIT_MS after it, when nobody is
+// singing (the speech-music classifier) and the Shabad on screen has not been sung or read again
+// since; not once it is NG_FATEH_KEEP_MS old. (A ragi says it mid-kirtan too: Renton rn56, where
+// the slide stayed up over the kirtan going on.)
+const NG_FATEH_WAIT_MS = 2000;
+const NG_FATEH_KEEP_MS = 15000;
 // Silence: no Gurbani heard (nothing fits the Shabad on screen, the follower has not moved on,
 // nothing found) and the room silent, no instrument and no voice, for NG_QUIET_MS (at most
 // NG_QUIET_LOUD_S of sound: a cough, a door). Silent = within NG_QUIET_FLOOR x the room's own
@@ -2003,6 +2012,7 @@ const VoiceFollow = () => {
     smSamples: 0,
     smBusy: false,
     hold: null, // { kind: 'ardas' | 'talk' | 'english' | 'quiet', since }
+    simran: createSimran(), // Waheguru Simran heard (simran.js)
     loud: [], // { t, s }: audio chunks above the quiet bar in the last NG_QUIET_MS
     floor: [], // a quiet chunk (25th percentile) of every NG_FLOOR_BUCKET_MS in the last NG_FLOOR_MS
     floorNow: null, // { t, v: [] }: the chunk levels of the bucket being filled
@@ -2070,6 +2080,8 @@ const VoiceFollow = () => {
     if (!ng.ours) return;
     ng.ours = false;
     ng.quietUp = false;
+    if (ng.simranUp) ng.simranSkip = true; // not again until this Simran is over
+    ng.simranUp = false;
     ng.back = 0;
     if (!ngSlideStillOurs()) return; // the sevadaar replaced or dismissed it: leave theirs
     sessionLog.logEvent('not_gurbani', {
@@ -2270,6 +2282,20 @@ const VoiceFollow = () => {
     if (!ng.lastHyp || !ng.beforeLines || !ng.beforeLines.length) return false;
     return maxLineScore(ng.lastHyp, ng.beforeLines, SWITCH_CAND_MIN_LINE_CHARS) >= NG_BEFORE_FIT;
   };
+  // Does this candidate's pangti clearly match the latest transcript (NG_HOLD_EXIT_SCORE)?
+  const ngCandHeard = (cand) => {
+    try {
+      const { texts } = ngRef.current;
+      const last = texts[texts.length - 1];
+      if (!last || typeof cand.verse !== 'string') return false;
+      const line = vfNorm(anvaad.unicode(cand.verse));
+      return (
+        maxLineScore(vfNorm(last.text), [line], SWITCH_CAND_MIN_LINE_CHARS) >= NG_HOLD_EXIT_SCORE
+      );
+    } catch (_) {
+      return false;
+    }
+  };
   // Every Autopilot lock passes here first (the sevadaar's own picks do not). True: blocked.
   const ngGateLock = (cand, opts = {}) => {
     try {
@@ -2296,6 +2322,18 @@ const VoiceFollow = () => {
         ngNotSungNow()
       ) {
         return true; // a heading that is only the Fateh: never a Shabad to open
+      }
+      // Searching while Waheguru Simran is heard right now: no Shabad is opened over it (Renton: a
+      // Shabad of Bhai Nand Lal Ji went up 25 s into the sangat's Simran; its pangti matched what
+      // was heard at 0.44-0.60). Never while following (switching, a Bani or Akhand Paath moving
+      // on), and never a pangti that is clearly what is being sung (Akhand Kirtan, where ਵਾਹਿਗੁਰੂ
+      // runs through the singing): only the first Shabad is held back.
+      if (phaseRef.current !== 'following' && simranNow(ng.simran, now) && !ngCandHeard(cand)) {
+        if (now - ng.holdLogAt > 5000) {
+          ng.holdLogAt = now;
+          sessionLog.logEvent('simran_block', { session: sessionIdRef.current, to: cand.shabadId });
+        }
+        return true;
       }
       if (!ng.hold) return false;
       // The reading itself moving on in the Shabad on screen (paath promote / window).
@@ -2459,6 +2497,8 @@ const VoiceFollow = () => {
         ng.lastProgress = now;
         ng.quietSkip = !!ng.quietUp;
         ng.quietUp = false;
+        if (ng.simranUp) ng.simranSkip = true;
+        ng.simranUp = false;
         if (ng.hold) ngSetHold(null);
         sessionLog.logEvent('not_gurbani', {
           session: sessionIdRef.current || ng.session,
@@ -2491,6 +2531,7 @@ const VoiceFollow = () => {
         }
       }
       if (!ng.hold) ngTalkCheck(now);
+      if (simranStep(ng.simran, now) === 'end') ng.simranSkip = false;
       const active =
         autopilotRef.current &&
         phaseRef.current === 'following' &&
@@ -2509,6 +2550,40 @@ const VoiceFollow = () => {
         return;
       }
       if (!ng.lastFit) ng.lastFit = now;
+      // Waheguru Simran or the Fateh said aloud (simran.js) while a Shabad is followed: the Waheguru
+      // slide, no hold (the Shabad sung again takes it down, as for kirtan that sings Simran between
+      // its pangtis). Simran never while what is heard fits the Shabad on screen (the Bhatt
+      // Swaiye's ਵਾਹਿਗੁਰੂ refrain).
+      const { fatehAt } = ng.simran;
+      const fateh =
+        fatehAt &&
+        fatehAt !== ng.fatehDone &&
+        now - fatehAt >= NG_FATEH_WAIT_MS &&
+        now - fatehAt <= NG_FATEH_KEEP_MS &&
+        ng.lastFit <= fatehAt &&
+        ngNotSungNow(); // a ragi's Fateh between the pangtis while the kirtan goes on: not over
+
+      const free =
+        !ng.ours &&
+        !ng.hold &&
+        !isMiscSlideRef.current &&
+        !seekingRef.current &&
+        !lockingRef.current;
+      if (fateh && free) {
+        ng.fatehDone = fatehAt;
+        sessionLog.logEvent('fateh_detected', {
+          session: sessionIdRef.current,
+          shabadId: currentShabadIdRef.current,
+        });
+        ngRaise('fateh', null);
+      } else if (free && ng.simran.on && !ng.simranSkip && now - ng.lastFit > NG_SIMRAN_FIT_MS) {
+        ng.simranUp = true;
+        sessionLog.logEvent('simran_detected', {
+          session: sessionIdRef.current,
+          shabadId: currentShabadIdRef.current,
+        });
+        ngRaise('simran', null);
+      }
       if (d && d.hop) {
         ng.hops.push({ t: now, s: d.s, fit: d.s >= NG_FIT, word: d.word });
         while (ng.hops.length && now - ng.hops[0].t > NG_KEEP_MS) ng.hops.shift();
@@ -2596,6 +2671,8 @@ const VoiceFollow = () => {
     if (ngRef.current.ours && (isAnnouncement || miscSlideText !== slideStrings.waheguru)) {
       ngRef.current.ours = false;
       ngRef.current.quietUp = false;
+      if (ngRef.current.simranUp) ngRef.current.simranSkip = true;
+      ngRef.current.simranUp = false;
       ngRef.current.back = 0;
     }
   }, [miscSlideText, isAnnouncement]);
@@ -2619,6 +2696,7 @@ const VoiceFollow = () => {
       const now = Date.now();
       const raw = (rout.text || '').trim();
       if (raw) ng.texts.push({ t: now, text: raw });
+      if (raw) noteSimran(ng.simran, now, raw);
       while (ng.texts.length && now - ng.texts[0].t > NG_RET_TEXT_MS) ng.texts.shift();
       if (now - (ng.retAt || 0) < NG_RET_EVERY_MS) return;
       const joined = ng.texts
@@ -3865,6 +3943,10 @@ const VoiceFollow = () => {
           lastProgress: Date.now(),
           gurbaniLevel: ngRef.current.gurbaniLevel,
           levels: ngRef.current.levels,
+          // A Shabad found during a Simran: the Simran goes on being heard, the slide stays down.
+          simran: ngRef.current.simran,
+          simranSkip: ngRef.current.simran.on,
+          fatehDone: ngRef.current.simran.fatehAt, // a Fateh before the lock is not over this Shabad
           floor: ngRef.current.floor, // the room's background noise is not undone by a lock
           floorNow: ngRef.current.floorNow,
           sm: ngRef.current.sm, // what was heard (speech or singing) is not undone by a lock
