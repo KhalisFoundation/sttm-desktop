@@ -7188,14 +7188,16 @@ const VoiceFollow = () => {
               )}
               {boardOthers.map((c, i) => (
                 <div
-                  className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}${c.soon ? ' is-soon' : ''}`}
+                  className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}${
+                    c.soon && currentView ? ' is-soon' : ''
+                  }`}
                   key={c.shabadId}
                   title={i18n.t('VOICE_FOLLOW.PROGRESS_TIP')}
                 >
                   <span className="vf2-cand-line">
                     <MarkedLine line={c.line} keys={heardKeys} />
                   </span>
-                  {c.soon && (
+                  {c.soon && currentView && (
                     <span className="vf2-soon">{i18n.t('VOICE_FOLLOW.SWITCHING_SOON')}</span>
                   )}
                   <LiveBar value={c.prog || 0} />
