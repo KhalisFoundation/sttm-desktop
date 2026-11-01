@@ -1135,9 +1135,7 @@ const LivePct = ({ value }) => {
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [value]);
-  return (
-    <span className={`vf2-live-pct ${pctLevel(value)}`}>{fmtPct(shown)}</span>
-  );
+  return <span className={`vf2-live-pct ${pctLevel(value)}`}>{fmtPct(shown)}</span>;
 };
 LivePct.propTypes = { value: PropTypes.number.isRequired };
 const LiveBar = ({ value }) => {
@@ -1773,7 +1771,7 @@ const VoiceFollow = () => {
   // What the switch judge scored on its last decode ({ cur, sCur, items }), and the steady
   // "switching soon" flags (switchGauge.js). Both display only.
   const judgeLiveRef = useRef(null);
-  const promotedRef = useRef(null); // { id }: the list Shabad shown in the change card (display only)
+  const promotedRef = useRef(null); // { id, owner }: the list Shabad shown in the change card (display only)
   const soonRef = useRef(null);
   if (!soonRef.current) soonRef.current = switchGauge.createSoon();
   const resetShelf = useCallback(() => {
@@ -1926,13 +1924,24 @@ const VoiceFollow = () => {
       const best = live.reduce((m, c) => (!m || (c.prog || 0) > (m.prog || 0) ? c : m), null);
       const kept = pr ? live.find((c) => c.shabadId === pr.id) : null;
       const overtaken =
-        best && kept && best.shabadId !== kept.shabadId && (best.prog || 0) >= (kept.prog || 0) + 0.15;
+        best &&
+        kept &&
+        best.shabadId !== kept.shabadId &&
+        (best.prog || 0) >= (kept.prog || 0) + 0.15;
       if (kept && (kept.prog || 0) >= P.soonOff && !overtaken) promoted = kept;
       else if (best && (best.prog || 0) >= P.soonOn) promoted = best;
-      // The judge's own card keeps the place unless a promoted Shabad is clearly further along.
-      if (held && promoted && (held.prog || 0) >= (promoted.prog || 0) - 0.15) promoted = null;
+      // Judge card against promoted card: whoever holds the card keeps it until the other is
+      // clearly ahead (0.15), so a wobbling judge gauge never flips the card back and forth.
+      if (held && promoted) {
+        const owner = pr && pr.owner;
+        const jp = held.prog || 0;
+        const pp = promoted.prog || 0;
+        if (owner === 'promoted' ? jp >= pp + 0.15 : pp < jp + 0.15) promoted = null;
+      }
     }
-    promotedRef.current = promoted ? { id: promoted.shabadId } : null;
+    promotedRef.current = promoted
+      ? { id: promoted.shabadId, owner: held ? 'promoted' : 'list' }
+      : null;
     let shown = promoted ? rows.filter((c) => c.shabadId !== promoted.shabadId) : rows;
     // A judge card displaced by a promoted Shabad stays visible in the list.
     if (held && promoted && !shown.some((c) => c.shabadId === held.shabadId))
@@ -7017,7 +7026,9 @@ const VoiceFollow = () => {
   const leadProg = leadCard ? leadCard.prog || 0 : 0;
   const leadSoon = !!(changeCard && changeCard.soon);
   // The card's label says how far: two states, steady (soon has hysteresis).
-  const changeLabel = i18n.t(leadSoon ? 'VOICE_FOLLOW.SWITCHING_SOON' : 'VOICE_FOLLOW.MIGHT_CHANGE_TO');
+  const changeLabel = i18n.t(
+    leadSoon ? 'VOICE_FOLLOW.SWITCHING_SOON' : 'VOICE_FOLLOW.MIGHT_CHANGE_TO',
+  );
   const boardOthers = shelf
     .filter((b) => !(currentView && b.shabadId === currentView.id))
     .filter((b) => !(leadCard && b.shabadId === leadCard.shabadId))
@@ -7324,9 +7335,7 @@ const VoiceFollow = () => {
               barColor="currentColor"
               className="vf-ap-wave"
             />
-            {!!heard && (
-              <span className="vf2-heard-label">{i18n.t('VOICE_FOLLOW.HEARING')}</span>
-            )}
+            {!!heard && <span className="vf2-heard-label">{i18n.t('VOICE_FOLLOW.HEARING')}</span>}
             <span className="vf2-heard-text" ref={heardBoxRef}>
               {heardStrip}
             </span>
