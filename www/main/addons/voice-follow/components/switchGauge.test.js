@@ -38,6 +38,10 @@ describe('switchGauge: Pankti Cumulation (switch)', () => {
     hit(100);
     // one pangti of three: distinct is the weakest condition
     assert.ok(Math.abs(cumulationGauge(store, 7, PC) - 1 / 3) < 1e-9);
+    // a second pangti being built up moves the gauge before it counts as heard
+    store.get(7).set(101, 0.15);
+    assert.ok(Math.abs(cumulationGauge(store, 7, PC) - 1.5 / 3) < 1e-9);
+    store.get(7).delete(101);
     hit(101);
     const two = cumulationGauge(store, 7, PC);
     assert.ok(two > 1 / 3 && two < 1);
@@ -91,6 +95,9 @@ describe('switchGauge: fragment confirm', () => {
     const fresh = { hitAt, now: 31000, freshMs: 20000 };
     assert.equal(fragmentGauge(store, 7, 'change', FR), 1); // without freshness: 2 of 2
     assert.equal(fragmentGauge(store, 7, 'change', FR, fresh), 0.5); // line 0 is stale
+    store.get(7).set(2, 0.15); // a third pangti half-way to counting, heard just now
+    hitAt.set(2, 30500);
+    assert.equal(fragmentGauge(store, 7, 'change', FR, fresh), 0.75);
     assert.equal(fragmentGauge(store, 7, 'change', FR, { gated: true }), 0.95);
   });
 });
@@ -116,20 +123,20 @@ describe('switchGauge: gauge', () => {
 
 describe('switchGauge: switching soon', () => {
   it('comes on at the threshold, holds through a dip, and goes off only well below', () => {
-    const s = createSoon({ soonOn: 0.66, soonOff: 0.45, soonHoldMs: 1500 });
-    assert.equal(s.update(7, 0.5, 0), false);
-    assert.equal(s.update(7, 0.7, 500), true);
-    assert.equal(s.update(7, 0.5, 1000), true); // between the two lines: stays on
+    const s = createSoon({ soonOn: 0.5, soonOff: 0.3, soonHoldMs: 1500 });
+    assert.equal(s.update(7, 0.4, 0), false);
+    assert.equal(s.update(7, 0.55, 500), true);
+    assert.equal(s.update(7, 0.4, 1000), true); // between the two lines: stays on
     assert.equal(s.update(7, 0.2, 1200), true); // too soon to drop
     assert.equal(s.update(7, 0.2, 2100), false);
-    assert.equal(s.update(7, 0.6, 2200), false); // off: needs the full threshold again
+    assert.equal(s.update(7, 0.45, 2200), false); // off: needs the full threshold again
   });
   it('forgets Shabads that left the panel', () => {
     const s = createSoon();
     s.update(7, 0.9, 0);
     s.update(8, 0.9, 0);
     s.prune(new Set([8]));
-    assert.equal(s.update(7, 0.5, 10), false);
-    assert.equal(s.update(8, 0.5, 10), true);
+    assert.equal(s.update(7, 0.4, 10), false);
+    assert.equal(s.update(8, 0.4, 10), true);
   });
 });

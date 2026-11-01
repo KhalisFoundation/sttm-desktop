@@ -1879,6 +1879,13 @@ const VoiceFollow = () => {
             })
             .filter((e) => !!e.line)
         : snap.filter((b) => b.role !== 'current' && !!cardLine(b));
+    // One card, one meaning: the Shabad furthest toward a switch sits in the change card. The
+    // judge's own candidate takes it; otherwise any Shabad past the "soon" line does.
+    if (!lead && cur != null) {
+      const top = items.reduce((m, it) => (!m || (it.prog || 0) > (m.prog || 0) ? it : m), null);
+      if (top && (top.prog || 0) >= soonRef.current.params.soonOn)
+        lead = { ...top, line: top.line || cardLine(top) || '' };
+    }
     const listed = shelfRef.current.update({
       now,
       items,
@@ -6954,28 +6961,25 @@ const VoiceFollow = () => {
       (curFirst && engine.norm(line) === engine.norm(curFirst)));
   // The listed cards come from the shelf (publishBoard): held, ordered by confidence and
   // fading there. They are not tied to the hearing strip: a pause does not empty the list.
+  // The change card: the shelf's held card (the judge's candidate, or the Shabad furthest past
+  // the "soon" line; steady through wobbles), else the judge's live entry while the shelf catches
+  // up. Its gauge is how close that Shabad is to being put on screen.
+  const leadCard = changeCard || liveLead;
+  const leadLine = leadCard ? nameLine(leadCard) : '';
+  const leadProg = leadCard ? leadCard.prog || 0 : 0;
+  const leadSoon = !!(changeCard && changeCard.soon);
   const boardOthers = shelf
     .filter((b) => !(currentView && b.shabadId === currentView.id))
-    .filter((b) => !(liveLead && b.shabadId === liveLead.shabadId))
+    .filter((b) => !(leadCard && b.shabadId === leadCard.shabadId))
     .map((b) => ({ ...b, line: nameLine(b) }))
     .filter((b) => !!b.line)
     // Not hidden for sharing a pangti with the Shabad on screen: a look-alike pangti is often
     // exactly how the next Shabad first shows itself (copies under another id are already
     // kept out by the judge).
     .slice(0, 6);
-  const leadLine = liveLead ? nameLine(liveLead) : '';
-  // The change card's gauge: how close this Shabad is to being put on screen (the shelf's held
-  // card carries it, steady through the judge's wobbles), and whether it is switching soon.
-  let leadProg = 0;
-  let leadSoon = false;
-  if (liveLead) {
-    const held = changeCard && changeCard.shabadId === liveLead.shabadId ? changeCard : null;
-    leadProg = held ? held.prog || 0 : liveLead.prog || 0;
-    leadSoon = !!(held && held.soon);
-  }
   // A change in progress is the one thing to look at. The same Gurbani under another id is
   // not a change.
-  const changing = !!(liveLead && leadLine && !sameAsCurrent(leadLine));
+  const changing = !!(leadCard && leadLine && !sameAsCurrent(leadLine));
 
   const heardStrip = (() => {
     // A rolling window: only the last few settled words, newest kept in view.
@@ -7157,9 +7161,9 @@ const VoiceFollow = () => {
                 tabIndex={0}
                 title={i18n.t('VOICE_FOLLOW.PROGRESS_TIP')}
                 style={pctVars(leadProg)}
-                onClick={() => pickCandidate(liveLead)}
+                onClick={() => pickCandidate(leadCard)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') pickCandidate(liveLead);
+                  if (e.key === 'Enter' || e.key === ' ') pickCandidate(leadCard);
                 }}
               >
                 <div className="vf2-label">

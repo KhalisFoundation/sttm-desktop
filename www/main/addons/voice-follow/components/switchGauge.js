@@ -12,13 +12,14 @@
 // A Shabad's progress is the furthest of its routes.
 //
 // "Switching soon": a steady flag with hysteresis, so it never flickers with one decode. It comes
-// on at `soonOn` and goes off only below `soonOff`, never sooner than `soonHoldMs` after it came
+// on at `soonOn` (half way) and goes off only below `soonOff`, never sooner than `soonHoldMs` after it came
 // on. Time is whatever `now` the caller passes (ms), so it is deterministic in replay.
 
 const { shabadTotal } = require('./panktiCumulation');
 const { of: fragmentOf } = require('./fragmentConfirm');
 
 const FRAG_LIVE = 0.3; // fragmentConfirm.js LIVE: a pangti with at least this weight counts as heard
+const PC_LIVE = 0.3; // panktiCumulation.js LIVE
 const clamp01 = (x) => Math.min(1, Math.max(0, Number.isFinite(x) ? x : 0));
 
 // The acoustic judge: wins so far plus how near this decode came to a win (the weaker of the
@@ -33,6 +34,21 @@ function acousticGauge(entry, cfg) {
   return clamp01((Math.min(Math.max(0, wins), steps) + near) / (steps + 1));
 }
 
+// A Shabad's pangtis counted toward `need` distinct ones: every pangti at or above `live` weight
+// is one; the strongest pangti still below it counts for its share, so the gauge moves while a
+// pangti is being built up instead of stepping once per pangti. `ok(index)` can leave a pangti
+// out (a stale one).
+function distinctWith(lines, live, ok = () => true) {
+  let distinct = 0;
+  let frac = 0;
+  lines.forEach((w, i) => {
+    if (!ok(i)) return;
+    if (w >= live) distinct += 1;
+    else frac = Math.max(frac, w / live);
+  });
+  return distinct + frac;
+}
+
 // Pankti Cumulation (switch): one Shabad's lines (Map verseId -> weight) against the whole store.
 function cumulationGauge(store, shabadId, cfg) {
   const lines = store && store.get ? store.get(shabadId) : null;
@@ -42,7 +58,7 @@ function cumulationGauge(store, shabadId, cfg) {
   store.forEach((l, sid) => {
     if (sid !== shabadId) next = Math.max(next, shabadTotal(l).total);
   });
-  const parts = [own.total / cfg.lock, own.distinct / cfg.distinct];
+  const parts = [own.total / cfg.lock, distinctWith(lines, PC_LIVE) / cfg.distinct];
   if (next > 0) parts.push(own.total / (cfg.lead * next));
   return clamp01(Math.min(...parts));
 }
@@ -57,17 +73,13 @@ function fragmentGauge(store, shabadId, role, cfg, opts = {}) {
   if (!lines || !lines.size) return 0;
   const { total } = fragmentOf(store, shabadId);
   if (!(total > 0)) return 0;
-  let distinct = 0;
-  lines.forEach((w, i) => {
-    if (w < FRAG_LIVE) return;
-    if (opts.hitAt && opts.freshMs > 0) {
-      const at = opts.hitAt.get(i);
-      if (!(at != null && at >= opts.now - opts.freshMs)) return;
-    }
-    distinct += 1;
-  });
+  const fresh = (i) => {
+    if (!(opts.hitAt && opts.freshMs > 0)) return true;
+    const at = opts.hitAt.get(i);
+    return at != null && at >= opts.now - opts.freshMs;
+  };
   const need = role === 'change' ? cfg.distinctChange : cfg.distinctList;
-  const g = clamp01(Math.min(total / cfg.lock, distinct / need));
+  const g = clamp01(Math.min(total / cfg.lock, distinctWith(lines, FRAG_LIVE, fresh) / need));
   return opts.gated ? Math.min(g, 0.95) : g;
 }
 
@@ -85,7 +97,7 @@ function gauge({ acoustic = null, cumulation = 0, fragment = 0 }, cfg) {
   return { prog: best, route };
 }
 
-const SOON_DEFAULTS = { soonOn: 0.66, soonOff: 0.45, soonHoldMs: 1500 };
+const SOON_DEFAULTS = { soonOn: 0.5, soonOff: 0.3, soonHoldMs: 1500 };
 
 // Per-Shabad "switching soon" flags with hysteresis and a minimum hold.
 function createSoon(params = {}) {
@@ -124,6 +136,7 @@ module.exports = {
   cumulationGauge,
   fragmentGauge,
   gauge,
+  distinctWith,
   createSoon,
   SOON_DEFAULTS,
 };

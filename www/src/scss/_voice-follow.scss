@@ -336,8 +336,9 @@ $vf2-yellow-bar: #f2c200;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
-// "Switching soon": a small pill on a candidate row once the switch routes are nearly there
-// (switchGauge.js; steady, with hysteresis). The row's bar and number are its progress.
+// "Switching soon": a small pill on a candidate row once the switch routes are half way there
+// (switchGauge.js; steady, with hysteresis). The row's bar and number are its progress. Colours
+// come from the theme so the pill reads on light and dark cards alike.
 .vf2-soon {
   flex: none;
   padding: 2px 8px;
@@ -346,13 +347,13 @@ $vf2-yellow-bar: #f2c200;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #fff;
-  background: $vf2-orange;
+  color: var(--vf-on-ink, #fff);
+  background: var(--vf-accent);
   animation: vf2-fade 0.28s ease-out;
 }
-// A list row that is switching soon: a touch of the change card's green, so the eye lands on it.
+// A list row that is switching soon: a faint wash of the accent, on any theme.
 .vf2-shabad-row.is-soon {
-  background: #eefbf0;
+  background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
 }
 // A thin grey bar marks the next pangti (instead of a "Next" label).
 .vf2-next-mark {
