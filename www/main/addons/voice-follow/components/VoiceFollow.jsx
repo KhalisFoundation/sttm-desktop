@@ -160,6 +160,7 @@ const { screenTakenByCeremony } = require('./autopilotScreen');
 const {
   REHRAS_BANI,
   AARTI_BANI,
+  SOHILA_BANI,
   BANI_MIN_LENGTH,
   baniLengthFor,
   readRuleMayOpen,
@@ -347,6 +348,20 @@ const NG_ARDAS_RECENT_MS = 120000; // a hold raised again this soon after an Ard
 const NG_RET_TEXT_MS = 8000; // heard text probed against the index: the last this much
 const NG_RET_EVERY_MS = 1500;
 const NG_KEEP_MS = Math.max(NG_TALK_MS, NG_TALK_W) + 5000; // classifier windows, decodes kept
+// Silence: no Gurbani heard (nothing fits the Shabad on screen, the follower has not moved on,
+// nothing found) and the room silent, no instrument and no voice, for NG_QUIET_MS (at most
+// NG_QUIET_LOUD_S of sound: a cough, a door). Silent = within NG_QUIET_FLOOR x the room's own
+// background noise (its quiet moments in the last NG_FLOOR_MS), never above a quarter of the
+// Gurbani's loudness. NG_QUIET_SOHILA_MS after Sohila Sahib, the end of the day. On 16 h of
+// Gurdwara Sahib recordings it went up 1 to 2.5 min after the diwan ended, and mid-diwan almost
+// only in gaps after a Shabad or Bani was done. The Waheguru slide goes up instead of the last
+// pangti. No hold: the next Shabad heard or found takes it down as usual.
+const NG_QUIET_MS = 45000;
+const NG_QUIET_SOHILA_MS = 30000;
+const NG_QUIET_LOUD_S = 2;
+const NG_QUIET_FLOOR = 3;
+const NG_FLOOR_MS = 600000;
+const NG_FLOOR_BUCKET_MS = 5000;
 // Ardas begins (super respectfully) with the pauri "ਤੂ ਠਾਕੁਰੁ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ" (Sukhmani Sahib,
 // Ang 268: Shabad 906, verses 11825-11834) and the first pauri of Vaar Sri Bhagauti Ji
 // (Shabad 7738, verses 80058-80063: not its headings, ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ is also the Fateh
@@ -1690,6 +1705,9 @@ const VoiceFollow = () => {
     smSamples: 0,
     smBusy: false,
     hold: null, // { kind: 'ardas' | 'talk' | 'english' | 'quiet', since }
+    loud: [], // { t, s }: audio chunks above the quiet bar in the last NG_QUIET_MS
+    floor: [], // a quiet chunk (25th percentile) of every NG_FLOOR_BUCKET_MS in the last NG_FLOOR_MS
+    floorNow: null, // { t, v: [] }: the chunk levels of the bucket being filled
     strongSeen: null, // { [shabadId]: t }: strong matches seen while talking or held
     holdLogAt: 0,
   });
@@ -1751,6 +1769,7 @@ const VoiceFollow = () => {
     if (ng.hold) ngSetHold(null);
     if (!ng.ours) return;
     ng.ours = false;
+    ng.quietUp = false;
     ng.back = 0;
     if (!ngSlideStillOurs()) return; // the sevadaar replaced or dismissed it: leave theirs
     sessionLog.logEvent('not_gurbani', {
@@ -2115,6 +2134,8 @@ const VoiceFollow = () => {
         ng.hops = [];
         ng.lastFit = now;
         ng.lastProgress = now;
+        ng.quietSkip = !!ng.quietUp;
+        ng.quietUp = false;
         if (ng.hold) ngSetHold(null);
         sessionLog.logEvent('not_gurbani', {
           session: sessionIdRef.current || ng.session,
@@ -2170,6 +2191,8 @@ const VoiceFollow = () => {
         while (ng.hops.length && now - ng.hops[0].t > NG_KEEP_MS) ng.hops.shift();
         if (d.s >= NG_FIT) {
           ng.lastFit = now;
+          ng.quietUp = false;
+          ng.quietSkip = false;
           const lv = ngLevel();
           ng.gurbaniLevel = ng.gurbaniLevel ? ng.gurbaniLevel * 0.9 + lv * 0.1 : lv;
         }
@@ -2186,6 +2209,8 @@ const VoiceFollow = () => {
         // in a row mean this Shabad is being sung or read again: our slide comes down.
         ng.lastFit = now;
         ng.lastProgress = now;
+        ng.quietUp = false;
+        ng.quietSkip = false;
         ng.progress.push(now);
         while (ng.progress.length && now - ng.progress[0] > NG_KEEP_MS) ng.progress.shift();
         if (ng.probation) ng.probation.progress += 1;
@@ -2194,6 +2219,48 @@ const VoiceFollow = () => {
           ng.followMoves.push(now);
           if (ng.followMoves.length >= 3) ngTakeDown('gurbani');
         }
+      } else if (pcm) {
+        // An audio chunk: is the room silent, and has it been long enough (NG_QUIET_*)?
+        const lv = ng.levels[ng.levels.length - 1];
+        if (!lv) return;
+        if (ng.floorNow && now - ng.floorNow.t >= NG_FLOOR_BUCKET_MS) {
+          const v = ng.floorNow.v.sort((a, b) => a - b);
+          ng.floor.push({ t: ng.floorNow.t, q: v[Math.floor(v.length * 0.25)] });
+          ng.floorNow = null;
+        }
+        if (!ng.floorNow) ng.floorNow = { t: now, v: [] };
+        ng.floorNow.v.push(lv.rms);
+        while (ng.floor.length && now - ng.floor[0].t > NG_FLOOR_MS) ng.floor.shift();
+        // A minute of background noise first, so the bar is the room's and not the singing's.
+        if (ng.floor.length < 60000 / NG_FLOOR_BUCKET_MS) {
+          ng.loudFrom = 0;
+          return;
+        }
+        if (!ng.loudFrom) ng.loudFrom = now; // sound is counted from here
+        // Background noise: the 10th percentile of the buckets (one dropout does not set it).
+        const qs = ng.floor.map((x) => x.q).sort((a, b) => a - b);
+        const floor = qs[Math.floor(qs.length * 0.1)];
+        let bar = Math.max(floor * NG_QUIET_FLOOR, VOL_SILENT_RMS);
+        if (ng.gurbaniLevel) bar = Math.min(bar, ng.gurbaniLevel * 0.25);
+        if (lv.rms >= bar)
+          ng.loud.push({ t: now, s: pcm.length / (sampleRateRef.current || 48000) });
+        while (ng.loud.length && now - ng.loud[0].t > NG_QUIET_MS) ng.loud.shift();
+        if (ng.ours || ng.hold) return;
+        // Another slide up, or a Shabad being opened: the quiet is counted afresh after it.
+        if (isMiscSlideRef.current || seekingRef.current || lockingRef.current) {
+          ng.lastFit = now;
+          return;
+        }
+        // The sevadaar cleared our quiet slide: not again until Gurbani is heard.
+        if (ng.quietSkip) return;
+        const lastGurbani = Math.max(ng.lastFit, ng.lastProgress, lastAutoDecisionRef.current || 0);
+        const quietMs =
+          baniIdOf(currentShabadIdRef.current) === SOHILA_BANI ? NG_QUIET_SOHILA_MS : NG_QUIET_MS;
+        if (now - lastGurbani < quietMs || now - ng.loudFrom < quietMs) return;
+        const loudS = ng.loud.reduce((a, x) => (now - x.t <= quietMs ? a + x.s : a), 0);
+        if (loudS > NG_QUIET_LOUD_S) return;
+        ng.quietUp = true;
+        ngRaise('quiet', null);
       }
     } catch (_) {
       /* the not-Gurbani slide never gets in the way of following */
@@ -2205,6 +2272,7 @@ const VoiceFollow = () => {
     if (shadowing()) return;
     if (ngRef.current.ours && (isAnnouncement || miscSlideText !== slideStrings.waheguru)) {
       ngRef.current.ours = false;
+      ngRef.current.quietUp = false;
       ngRef.current.back = 0;
     }
   }, [miscSlideText, isAnnouncement]);
@@ -3474,6 +3542,8 @@ const VoiceFollow = () => {
           lastProgress: Date.now(),
           gurbaniLevel: ngRef.current.gurbaniLevel,
           levels: ngRef.current.levels,
+          floor: ngRef.current.floor, // the room's background noise is not undone by a lock
+          floorNow: ngRef.current.floorNow,
           sm: ngRef.current.sm, // what was heard (speech or singing) is not undone by a lock
           ret: ngRef.current.ret,
           texts: ngRef.current.texts,
