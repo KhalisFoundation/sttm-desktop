@@ -9,6 +9,7 @@ const {
   noteHeard,
   simranStep,
   simranNow,
+  simranGone,
 } = require('./simran');
 
 // Stand-ins for other things heard (plain Punjabi, not Gurbani).
@@ -107,4 +108,19 @@ test('the Fateh is recognised as heard, with ਖ਼ and ਫ਼ in either spellin
   assert.ok(fatehIn('ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ \u0A5Eਤਿਹ'));
   assert.ok(!fatehIn('ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ ਜੀਉ'));
   assert.ok(!fatehIn(SINGING));
+});
+
+test('Simran gone (slide comes down): only on seconds clearly heard without Waheguru', () => {
+  const s = createSimran();
+  let r = hear(s, 0, 30, 'ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ');
+  assert.strictEqual(simranGone(s, r.t), false);
+  r = hear(s, r.t, 2, SINGING);
+  assert.strictEqual(simranGone(s, r.t), false);
+  r = hear(s, r.t, 3, SINGING);
+  assert.strictEqual(simranGone(s, r.t), true);
+  // a slow PC: only two transcripts in the last 6 s is too little to end it
+  const slow = createSimran();
+  for (let t = 0; t < 30000; t += 3000) noteHeard(slow, t, 'ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ');
+  noteHeard(slow, 33000, SINGING);
+  assert.strictEqual(simranGone(slow, 33000), false);
 });

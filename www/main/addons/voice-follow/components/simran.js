@@ -128,6 +128,13 @@ function simranNow(s, now) {
   return w.length >= 6 && w.filter((x) => x.has).length / w.length >= SIMRAN_ON;
 }
 
+// Simran has clearly stopped: the last few seconds were heard (3+ transcripts, so a slow PC
+// with few transcripts never ends it early) and almost none held a Waheguru.
+function simranGone(s, now) {
+  const w = s.heard.filter((x) => now - x.t <= SIMRAN_NOW_W);
+  return w.length >= 3 && w.filter((x) => x.has).length / w.length < SIMRAN_OFF;
+}
+
 module.exports = {
   isWaheguru,
   countSimran,
@@ -136,4 +143,5 @@ module.exports = {
   noteHeard,
   simranStep,
   simranNow,
+  simranGone,
 };

@@ -169,7 +169,13 @@ const {
 // Respecting the sevadaar's line moves (tag / adopt / hold), unit-tested in lineRespect.test.js.
 const { createLineRespect, lineOfVerse } = require('./lineRespect');
 // Waheguru Simran heard (the not-Gurbani slide and the lock gate), unit-tested in simran.test.js.
-const { createSimran, noteHeard: noteSimran, simranStep, simranNow } = require('./simran');
+const {
+  createSimran,
+  noteHeard: noteSimran,
+  simranStep,
+  simranNow,
+  simranGone,
+} = require('./simran');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
 const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
 
@@ -2583,6 +2589,10 @@ const VoiceFollow = () => {
           shabadId: currentShabadIdRef.current,
         });
         ngRaise('simran', null);
+      } else if (ng.simranUp && ng.ours && !ng.hold && simranGone(ng.simran, now)) {
+        // The Simran is over and the Shabad is sung again: down now, not after the follower
+        // finds its place (clip04: 7.5 s of sung Gurbani under the slide).
+        ngTakeDown('simran_over');
       }
       if (d && d.hop) {
         ng.hops.push({ t: now, s: d.s, fit: d.s >= NG_FIT, word: d.word });
