@@ -1935,7 +1935,7 @@ const VoiceFollow = () => {
       // Judge card against promoted card: whoever holds the card keeps it until the other is
       // clearly ahead (0.15), so a wobbling judge gauge never flips the card back and forth.
       if (held && promoted) {
-        const owner = pr && pr.owner;
+        const owner = pr && pr.id === promoted.shabadId ? pr.owner : null;
         const jp = held.prog || 0;
         const pp = promoted.prog || 0;
         if (owner === 'promoted' ? jp >= pp + 0.15 : pp < jp + 0.15) promoted = null;
