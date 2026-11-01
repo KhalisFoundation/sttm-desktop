@@ -15,15 +15,18 @@
 // on at `soonOn` (half way) and goes off only below `soonOff`, never sooner than `soonHoldMs` after it came
 // on. Time is whatever `now` the caller passes (ms), so it is deterministic in replay.
 
-const { shabadTotal } = require('./panktiCumulation');
-const { of: fragmentOf } = require('./fragmentConfirm');
+const { shabadTotal, LIVE: cumulationLive } = require('./panktiCumulation');
+const { of: fragmentOf, LIVE: fragmentLive } = require('./fragmentConfirm');
 
-const FRAG_LIVE = 0.3; // fragmentConfirm.js LIVE: a pangti with at least this weight counts as heard
-const PC_LIVE = 0.3; // panktiCumulation.js LIVE
+const FRAG_LIVE = fragmentLive; // a pangti with at least this weight counts as heard
+const PC_LIVE = cumulationLive;
 const clamp01 = (x) => Math.min(1, Math.max(0, Number.isFinite(x) ? x : 0));
 
 // The acoustic judge: wins so far plus how near this decode came to a win (the weaker of the
-// two conditions a win needs: match >= min, and ahead of the Shabad on screen by margin).
+// two conditions a win needs: match >= min, and ahead of the Shabad on screen by margin). One
+// strong decode (match >= 0.8, margin >= 0.3) counts two wins, so whenever a single decode could
+// commit (two or fewer steps to go) the gauge sits at least at `soonFloor`: the sevadaar is
+// warned before any switch the judge can make.
 function acousticGauge(entry, cfg) {
   const { score = 0, wins = 0, needed = 3, sCur = 0 } = entry || {};
   const near = Math.min(
@@ -31,7 +34,10 @@ function acousticGauge(entry, cfg) {
     clamp01((score - sCur) / cfg.margin),
   );
   const steps = Math.max(1, needed);
-  return clamp01((Math.min(Math.max(0, wins), steps) + near) / (steps + 1));
+  const w = Math.min(Math.max(0, wins), steps);
+  let g = clamp01((w + near) / (steps + 1));
+  if (steps - w <= 2 && cfg.soonFloor > 0) g = Math.max(g, cfg.soonFloor);
+  return g;
 }
 
 // A Shabad's pangtis counted toward `need` distinct ones: every pangti at or above `live` weight

@@ -244,13 +244,13 @@ $vf2-yellow-bar: #f2c200;
   font-variant-numeric: tabular-nums;
   transition: color 0.25s ease;
   &.is-low {
-    color: $vf2-red;
+    color: var(--vf-muted);
   }
   &.is-mid {
-    color: $vf2-yellow;
+    color: var(--vf-accent);
   }
   &.is-high {
-    color: $vf2-green;
+    color: #2e8f55;
   }
 }
 .vf2-now .vf2-cand-track {
@@ -275,14 +275,15 @@ $vf2-yellow-bar: #f2c200;
     );
     animation: vf2-sheen 1.2s ease-out;
   }
+  // Never red: a low fill is "early", not "wrong".
   &.is-low {
-    background: $vf2-red !important;
+    background: color-mix(in srgb, var(--vf-accent) 60%, transparent) !important;
   }
   &.is-mid {
-    background: $vf2-yellow-bar !important;
+    background: var(--vf-accent) !important;
   }
   &.is-high {
-    background: $vf2-green !important;
+    background: #2e8f55 !important;
   }
 }
 // What the model hears: one faint line, newest words on the right, older ones fading out.
@@ -330,11 +331,10 @@ $vf2-yellow-bar: #f2c200;
 }
 // On the last pangti the row says so (muted), so Stop never floats beside an empty space.
 .vf2-next-row .vf2-next-line.is-end {
-  color: var(--vf-faint);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  color: var(--vf-muted);
+  opacity: 1;
+  font-size: 14px;
+  font-weight: 500;
 }
 // "Switching soon": a small pill on a candidate row once the switch routes are half way there
 // (switchGauge.js; steady, with hysteresis). The row's bar and number are its progress. Colours
@@ -347,13 +347,64 @@ $vf2-yellow-bar: #f2c200;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--vf-on-ink, #fff);
-  background: var(--vf-accent);
+  color: var(--vf-accent);
+  background: color-mix(in srgb, var(--vf-accent) 16%, transparent);
   animation: vf2-fade 0.28s ease-out;
 }
-// A list row that is switching soon: a faint wash of the accent, on any theme.
+// A list row that is switching soon: a faint wash of the accent, on any theme; the pill takes
+// the bar's place so the pangti keeps its room on a narrow pane.
 .vf2-shabad-row.is-soon {
   background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
+  .vf2-cand-track {
+    display: none;
+  }
+}
+.vf2-shabad-row .vf2-cand-line {
+  min-width: 45%;
+}
+// The change card past the "soon" line: the same wash, so one colour means one thing.
+.vf-autopilot .vf2-change.is-soon {
+  border-color: var(--vf-accent);
+  background: color-mix(in srgb, var(--vf-accent) 10%, transparent);
+}
+// The change card's pangti and its Switch button share a row.
+.vf2-change-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 5px;
+  .vf2-cand-line {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+  }
+}
+// "95% match" on the Shabad being followed: the match, not a progress; the word says so.
+.vf2-match {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-left: auto;
+  .vf2-live-pct {
+    margin-left: 0;
+  }
+  .vf2-match-word {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
+    color: var(--vf-muted);
+  }
+}
+// A small label before the raw hearing, so it is never taken for a pangti.
+.vf2-heard-label {
+  flex: none;
+  margin-right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vf-faint);
 }
 // A thin grey bar marks the next pangti (instead of a "Next" label).
 .vf2-next-mark {
@@ -1106,15 +1157,12 @@ $vf2-yellow-bar: #f2c200;
     margin-top: 0;
     border-radius: 3px;
   }
-  .vf2-live-fill {
-    background: $vf2-orange !important;
-  }
+  // Rows and the change card share one colour language (the level classes above).
   .vf2-live-pct {
-    min-width: 3.4em;
+    min-width: 3em;
     margin-left: 0;
     font-size: 15px;
     text-align: right;
-    color: var(--vf-accent) !important;
   }
 }
 .vf2-switch {

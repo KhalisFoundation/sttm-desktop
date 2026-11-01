@@ -82,4 +82,4 @@ function addHit(store, hit, cfg = DEFAULTS) {
   return { ...own, next, ready };
 }
 
-module.exports = { DEFAULTS, shabadTotal, elapse, addHit };
+module.exports = { DEFAULTS, LIVE, shabadTotal, elapse, addHit };
