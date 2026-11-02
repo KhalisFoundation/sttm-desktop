@@ -121,6 +121,8 @@ app.on('will-quit', (e) => {
     /* unreadable settings: fall through to the usual flush */
   }
   e.preventDefault();
+  // The windows are gone while the session uploads: let a relaunch start normally (not find us).
+  app.releaseSingleInstanceLock();
   try {
     // eslint-disable-next-line global-require
     const shadowUploader = require('./www/js/addons/voice-follow/shadow/uploader');
@@ -1209,7 +1211,7 @@ if (!singleInstanceLock) {
   app.quit();
 } else {
   app.on('second-instance', (event, commandLine) => {
-    if (mainWindow) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
       if (mainWindow.isMinimized()) {
         mainWindow.restore();
       }
@@ -1227,6 +1229,7 @@ app.on('open-url', (event, url) => {
 });
 
 app.on('ready', () => {
+  if (!singleInstanceLock) return; // another STTM is running: this copy only hands over and quits
   // Retrieve the userid value, and if it's not there, assign it a new uuid.
   let userId = store.get('userId');
 
