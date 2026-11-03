@@ -71,9 +71,6 @@ $vf2-yellow-bar: #f2c200;
     background: $vf2-orange;
     animation: vf2-breathe 1.4s ease-in-out infinite;
   }
-  &.is-still {
-    background: $vf2-orange;
-  }
 }
 @keyframes vf2-breathe {
   0%,
@@ -247,13 +244,13 @@ $vf2-yellow-bar: #f2c200;
   font-variant-numeric: tabular-nums;
   transition: color 0.25s ease;
   &.is-low {
-    color: var(--vf-muted);
+    color: $vf2-red;
   }
   &.is-mid {
-    color: var(--vf-accent-text);
+    color: $vf2-yellow;
   }
   &.is-high {
-    color: var(--vf-good);
+    color: $vf2-green;
   }
 }
 .vf2-now .vf2-cand-track {
@@ -278,15 +275,14 @@ $vf2-yellow-bar: #f2c200;
     );
     animation: vf2-sheen 1.2s ease-out;
   }
-  // Never red: a low fill is "early", not "wrong".
   &.is-low {
-    background: var(--vf-muted) !important;
+    background: $vf2-red !important;
   }
   &.is-mid {
-    background: var(--vf-accent) !important;
+    background: $vf2-yellow-bar !important;
   }
   &.is-high {
-    background: var(--vf-good) !important;
+    background: $vf2-green !important;
   }
 }
 // What the model hears: one faint line, newest words on the right, older ones fading out.
@@ -330,69 +326,6 @@ $vf2-yellow-bar: #f2c200;
   }
   > .vf2-next-mark {
     margin-top: 0.15em;
-  }
-}
-// On the last pangti the row says so (muted), so Stop never floats beside an empty space.
-.vf2-next-row .vf2-next-line.is-end {
-  color: var(--vf-muted);
-  opacity: 1;
-  font-size: 14px;
-  font-weight: 500;
-}
-// The change card past the "soon" line: an accent wash, so one colour means one thing.
-.vf-autopilot .vf2-change.is-soon {
-  border-color: var(--vf-accent);
-  background: color-mix(in srgb, var(--vf-accent) 6%, transparent);
-}
-// "64% there" on the change card: the progress, not a match; the word says so.
-.vf2-there {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-left: auto;
-  .vf2-live-pct {
-    margin-left: 0;
-  }
-  .vf2-there-word {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    text-transform: lowercase;
-    color: var(--vf-muted);
-  }
-}
-// A candidate row: the pangti keeps its room; the number is its only gauge.
-.vf2-shabad-row .vf2-cand-line {
-  flex: 1;
-  min-width: 0;
-}
-// The change card's pangti and its Switch button share a row.
-.vf2-change-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 5px;
-  .vf2-cand-line {
-    flex: 1;
-    min-width: 0;
-    margin-top: 0;
-  }
-}
-// "95% match" on the Shabad being followed: the match, not a progress; the word says so.
-.vf2-match {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-left: auto;
-  .vf2-live-pct {
-    margin-left: 0;
-  }
-  .vf2-match-word {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    text-transform: lowercase;
-    color: var(--vf-muted);
   }
 }
 // A thin grey bar marks the next pangti (instead of a "Next" label).
@@ -456,12 +389,11 @@ $vf2-yellow-bar: #f2c200;
 }
 .vf2-heard-label {
   flex: none;
-  margin-right: 8px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--vf-muted);
+  color: $vf2-faint;
 }
 .vf2-heard-tentative {
   opacity: 0.45;
@@ -492,7 +424,7 @@ $vf2-yellow-bar: #f2c200;
 .vf2-empty {
   padding: 4px 6px 2px;
   font-size: 12px;
-  color: var(--vf-muted);
+  color: $vf2-faint;
 }
 
 // One card, only while a change is being confirmed.
@@ -868,9 +800,7 @@ $vf2-yellow-bar: #f2c200;
   --vf-muted: #{$vf2-muted};
   --vf-faint: #{$vf2-faint};
   --vf-line: #{$vf2-line};
-  --vf-accent: #b86f00; // bars and borders: >= 3:1 on the white card and its track
-  --vf-accent-text: #9a5d00; // the accent as text on white (5.3:1)
-  --vf-good: #247a46; // the "nearly there" green as text and fill on white (5.3:1)
+  --vf-accent: #{darken($vf2-orange, 12%)};
 
   display: flex;
   flex-direction: column;
@@ -927,7 +857,7 @@ $vf2-yellow-bar: #f2c200;
     color: var(--vf-muted);
   }
   .vf2-empty {
-    color: var(--vf-muted);
+    color: var(--vf-faint);
   }
   .vf2-cand-track,
   .vf-dl {
@@ -1117,7 +1047,7 @@ $vf2-yellow-bar: #f2c200;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--vf-accent-text);
+  color: var(--vf-accent);
 }
 .vf2-shabads-count {
   color: var(--vf-faint);
@@ -1149,12 +1079,15 @@ $vf2-yellow-bar: #f2c200;
     margin-top: 0;
     border-radius: 3px;
   }
-  // Rows and the change card share one colour language (the level classes above).
+  .vf2-live-fill {
+    background: $vf2-orange !important;
+  }
   .vf2-live-pct {
-    min-width: 3em;
+    min-width: 3.4em;
     margin-left: 0;
     font-size: 15px;
     text-align: right;
+    color: var(--vf-accent) !important;
   }
 }
 .vf2-switch {
@@ -1533,4 +1466,11 @@ $vf2-yellow-bar: #f2c200;
 .vf-hw-detail {
   margin-top: 2px;
   line-height: 1.4;
+}
+// The last pangti of a Shabad or Bani: the row under it says so instead of standing empty.
+.vf2-next-row .vf2-next-line.is-end {
+  color: var(--vf-muted);
+  opacity: 1;
+  font-size: 14px;
+  font-weight: 500;
 }

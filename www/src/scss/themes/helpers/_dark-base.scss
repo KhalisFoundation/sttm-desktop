@@ -131,10 +131,6 @@
     --vf-muted: #{$text-base};
     --vf-faint: #{$text-dim};
     --vf-line: #{rgba($white, 0.12)};
-    // The accent and green as they read on a dark card (text 4.9:1 / 4.6:1, bars > 3:1 on the track).
-    --vf-accent: #f5a833;
-    --vf-accent-text: #f5a833;
-    --vf-good: #5fc585;
   }
 
   .viewer-pane {
