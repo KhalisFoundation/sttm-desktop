@@ -1,12 +1,4 @@
-const fs = require('fs');
-const path = require('path');
 const { ipcRenderer } = require('electron');
-const remote = require('@electron/remote');
-const Database = require('better-sqlite3');
-
-const { store } = remote.require('./app');
-
-const userDataPath = remote.app.getPath('userData');
 
 // Translation `type` values stored in the `ai_translations` table. These double
 // as the `translation-english-source` keys in configs/user-settings.json.
@@ -18,99 +10,29 @@ const TYPES = {
 const TYPE_VALUES = Object.values(TYPES);
 
 /**
- * Whether a translation source is served by this database rather than by the
- * translations bundled with each verse.
+ * Whether a translation source is served by the AI translations database
+ * rather than by the translations bundled with each verse.
  *
  * @param {string} source A `translation-english-source` key
  * @returns {boolean}
  */
 const isAiSource = (source) => TYPE_VALUES.includes(source);
 
-let db = null;
-let statement = null;
-let dbUnavailable = false;
-
 // Cache of `${type}:${verseId}` -> string|null, so repeated renders of the same
-// verse don't re-query the database.
+// verse don't round-trip to the main process.
 const cache = new Map();
 
-/**
- * Resolve the path to the translations database.
- *
- * The file is downloaded into userData next to the realm database (see
- * downloadAiTranslationsDB in desktop_scripts.js). Each version gets its own
- * file name, stored as `aiTranslationsFile`, so an update never has to replace
- * a file another window still has open.
- *
- * @returns {string|null} Absolute path to the db file, or null if not downloaded yet
- */
-const resolveDbPath = () => {
-  const fileName = store.get('aiTranslationsFile');
-  if (!fileName) {
-    return null;
-  }
-
-  const dbPath = path.resolve(userDataPath, fileName);
-  return fs.existsSync(dbPath) ? dbPath : null;
-};
-
-/**
- * Drop the open handle and cached lookups, so the next lookup opens whichever
- * database is current. Runs when a new version has been downloaded.
- */
-const reset = () => {
-  if (db) {
-    try {
-      db.close();
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      console.error('Failed to close AI translations database:', err.message);
-    }
-  }
-  db = null;
-  statement = null;
-  dbUnavailable = false;
-  cache.clear();
-};
-
-ipcRenderer.on('ai-translations-updated', reset);
-
-/**
- * Open the translations database. Called lazily on first lookup; the handle and
- * prepared statement are reused afterwards.
- *
- * The database is optional – if the file is missing or unreadable, lookups
- * simply return null and the app falls back to the bundled translations.
- *
- * @returns {object|null} A prepared lookup statement, or null if unavailable
- */
-const getStatement = () => {
-  if (statement || dbUnavailable) {
-    return statement;
-  }
-
-  try {
-    const dbPath = resolveDbPath();
-    if (!dbPath) {
-      throw new Error('AI translations database has not been downloaded yet');
-    }
-
-    db = new Database(dbPath, { readonly: true, fileMustExist: true });
-    statement = db.prepare(
-      'SELECT translation_text AS text FROM ai_translations WHERE verse_id = ? AND type = ?',
-    );
-  } catch (err) {
-    dbUnavailable = true;
-    statement = null;
-    /* eslint-disable-next-line no-console */
-    console.error('Failed to open AI translations database:', err.message);
-  }
-
-  return statement;
-};
+// A new database version was downloaded; drop cached lookups so the next
+// lookup reads from the new file (the main process reopens it).
+ipcRenderer.on('ai-translations-updated', () => cache.clear());
 
 /**
  * Get an AI translation for a specific verse.
+ *
+ * The SQLite database is opened only in the main process (see
+ * `get-ai-translation` in app.js): the better-sqlite3 native addon crashes
+ * Chromium renderer processes, which is where the viewer runs. The lookup is a
+ * synchronous IPC call so the text is available during render.
  *
  * @param {number} verseId The verse ID to look up
  * @param {string} type The translation type, e.g. 'pss' or 'pss_simple'
@@ -123,16 +45,11 @@ const getTranslation = (verseId, type = TYPES.PSS) => {
   }
 
   let text = null;
-  const lookup = getStatement();
-
-  if (lookup) {
-    try {
-      const row = lookup.get(verseId, type);
-      text = (row && row.text) || null;
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      console.error('AI translation lookup failed:', err.message);
-    }
+  try {
+    text = ipcRenderer.sendSync('get-ai-translation', verseId, type) || null;
+  } catch (err) {
+    /* eslint-disable-next-line no-console */
+    console.error('AI translation lookup failed:', err.message);
   }
 
   cache.set(cacheKey, text);
