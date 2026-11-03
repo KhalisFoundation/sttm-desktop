@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { ipcRenderer } = require('electron');
 const remote = require('@electron/remote');
-const Database = require('better-sqlite3');
 
 const { store } = remote.require('./app');
 
@@ -95,6 +94,9 @@ const getStatement = () => {
       throw new Error('AI translations database has not been downloaded yet');
     }
 
+    // Native module loaded here, inside the try: if it cannot load on a computer, only the AI
+    // translations are unavailable; the viewer still opens.
+    const Database = require('better-sqlite3'); // eslint-disable-line global-require
     db = new Database(dbPath, { readonly: true, fileMustExist: true });
     statement = db.prepare(
       'SELECT translation_text AS text FROM ai_translations WHERE verse_id = ? AND type = ?',
