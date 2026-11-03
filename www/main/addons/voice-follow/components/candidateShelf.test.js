@@ -239,3 +239,15 @@ describe('candidateShelf', () => {
     assert.deepEqual(ids(out), [7]);
   });
 });
+
+describe('shelf: the progress is never held above what is offered', () => {
+  it('falls the same publish the live gauge falls', () => {
+    const shelf = createShelf();
+    const item = (prog) => [{ shabadId: 7, pct: 0.3, prog, line: 'x', ev: { total: 1, fill: 0.5 } }];
+    shelf.update({ now: 1000, items: item(0.6), current: 1, heardAt: 1000 });
+    const up = shelf.update({ now: 1500, items: item(0.6), current: 1, heardAt: 1500 });
+    assert.equal(up[0].prog, 0.6);
+    const down = shelf.update({ now: 2000, items: item(0.1), current: 1, heardAt: 2000 });
+    assert.equal(down[0].prog, 0.1);
+  });
+});

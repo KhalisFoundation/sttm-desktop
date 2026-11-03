@@ -1467,3 +1467,10 @@ $vf2-yellow-bar: #f2c200;
   margin-top: 2px;
   line-height: 1.4;
 }
+// The last pangti of a Shabad or Bani: the row under it says so instead of standing empty.
+.vf2-next-row .vf2-next-line.is-end {
+  color: var(--vf-muted);
+  opacity: 1;
+  font-size: 14px;
+  font-weight: 500;
+}

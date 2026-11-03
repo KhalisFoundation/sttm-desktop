@@ -19,8 +19,8 @@
 //  - a change of the Shabad on screen removes only that Shabad: the other cards stay and
 //    fade on their own timers (the list used to empty at every handover);
 //  - everything clears after SILENCE_MS without a confidently heard word.
-// Each card also carries `prog`: how close it is to being chosen (liveBoard.js), held and
-// decaying like its %, so its bar grows as the Shabad builds toward a switch.
+// Each card also carries `prog`: how close it is to being chosen (switchGauge.js), shown as
+// offered (it rises and falls with the real stores) and decaying only once no longer offered.
 //
 // Evidence cards (items with `ev`, Shabad-level evidence from shabadEvidence.js): a card stays
 // exactly as long as its Shabad's evidence does (the evidence itself fades over tens of
@@ -92,8 +92,10 @@ function createShelf(params = {}) {
     if (at > t.lastAt || (at === t.lastAt && it.pct > t.lastPct)) {
       t.lastAt = at;
       if (it.pct != null) t.lastPct = it.pct;
-      if (it.prog != null) t.lastProg = it.prog;
     }
+    // The progress is the switch gauge, a value that already rises and falls with the stores it
+    // reads; the shelf never holds it above what is offered right now.
+    if (it.prog != null) t.lastProg = it.prog;
   };
 
   // items: the Shabads eligible to be listed right now (already filtered by the caller),
@@ -150,7 +152,7 @@ function createShelf(params = {}) {
       // eslint-disable-next-line no-param-reassign
       t.pct = Math.max(live ? live.pct || 0 : 0, decayed(t.lastPct, t, now));
       // eslint-disable-next-line no-param-reassign
-      t.prog = Math.max(live && live.prog != null ? live.prog : 0, decayed(t.lastProg, t, now));
+      t.prog = live && live.prog != null ? live.prog : decayed(t.lastProg, t, now);
     });
 
     // Listed: tracked, not on screen, not in the change card, not hidden.

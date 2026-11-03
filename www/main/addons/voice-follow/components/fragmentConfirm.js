@@ -104,4 +104,4 @@ function step(store, { hyp, cur, cands }, ratio, cfg = DEFAULTS) {
 /** { total, distinct } of one candidate (for the panel / tests). */
 const of = (store, id) => totalOf(store.get(id));
 
-module.exports = { DEFAULTS, bestPangti, elapse, step, of };
+module.exports = { DEFAULTS, LIVE, bestPangti, elapse, step, of };

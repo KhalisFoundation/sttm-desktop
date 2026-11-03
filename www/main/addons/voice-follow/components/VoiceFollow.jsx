@@ -23,8 +23,9 @@ const { SP: AcousticSP } = require('../engine/sentencepiece');
 const { createRendererRetrieval } = require('../engine/retrieval/renderer-client');
 const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
-const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
+const { createBoard, mergeTranscript } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
+const switchGauge = require('./switchGauge');
 const { installDemoAudio } = require('./devAudio');
 const { vfAnalytics, createRunStats } = require('./vfAnalytics');
 
@@ -1106,6 +1107,37 @@ const pctHue = (v) => {
   const x = Math.min(1, Math.max(0, v));
   return x <= 0.5 ? 4 + (48 - 4) * (x / 0.5) : 48 + (135 - 48) * ((x - 0.5) / 0.5);
 };
+// Rows of possible Shabads while following, highest progress first. With `orderRef` (the last order shown), a
+// row moves above the one before it only when ahead by ROW_SWAP, so rows hold their places
+// through small wobbles; new rows enter by value.
+const ROW_SWAP = 0.05;
+const rankRows = (rows, orderRef) => {
+  const val = (r) => r.prog || 0;
+  if (!orderRef) return rows; // the shelf's own order
+  const byId = new Map(rows.map((r) => [r.shabadId, r]));
+  const order = orderRef.current.filter((id) => byId.has(id)).map((id) => byId.get(id));
+  rows
+    .filter((r) => !order.includes(r))
+    .sort((a, b) => val(b) - val(a))
+    .forEach((r) => {
+      const at = order.findIndex((o) => val(r) > val(o));
+      if (at < 0) order.push(r);
+      else order.splice(at, 0, r);
+    });
+  for (let pass = 0; pass < order.length; pass += 1) {
+    let moved = false;
+    for (let i = 1; i < order.length; i += 1) {
+      if (val(order[i]) > val(order[i - 1]) + ROW_SWAP) {
+        [order[i - 1], order[i]] = [order[i], order[i - 1]];
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // eslint-disable-next-line no-param-reassign
+  orderRef.current = order.map((r) => r.shabadId);
+  return order;
+};
 const pctColor = (v) => `hsl(${pctHue(v).toFixed(0)} 70% 42%)`;
 // Each card carries its percentage as CSS variables; the card style (wash / rail / clean,
 // chosen by the sevadar) decides how that shows. Colour lives in what moves, not in a box.
@@ -1789,12 +1821,71 @@ const VoiceFollow = () => {
   const liveLeadRef = useRef(null); // the Shabad the judge is checking as a change (its id)
   const liveLeadItemRef = useRef(null); // ... and its judge entry (line, score, wins)
   const boardLogRef = useRef({ at: 0, sig: '' });
+  // Pairs of Shabads known to be the same Gurbani (filled by knownSame below; read by the gauge).
+  const sameKnownRef = useRef(new Map());
+  // What the switch judge scored on its last decode ({ cur, sCur, items }); display only.
+  const judgeLiveRef = useRef(null);
+  const rowOrderRef = useRef([]); // the list's order last render (ids, top first), display only
   const resetShelf = useCallback(() => {
     shelfRef.current.reset();
+    judgeLiveRef.current = null;
     liveLeadRef.current = null;
     liveLeadItemRef.current = null;
     setShelf([]);
     setChangeCard(null);
+  }, []);
+  // How close a Shabad is to being put on screen, from the values the three switch routes
+  // decide on (switchGauge.js): the judge's wins, the Pankti Cumulation store and the fragment
+  // store. `role` is where its card sits ('change' or 'list'). Returns { prog, route }.
+  const gaugeOf = useCallback((id, role) => {
+    const cur = currentShabadIdRef.current;
+    // A Shabad no route may pick right now (a tap just left it, the same Gurbani under another
+    // id, a member of the Bani on screen) has no progress to show.
+    const sameKey = cur < id ? `${cur}:${id}` : `${id}:${cur}`;
+    if (
+      (vetoRef.current && vetoRef.current.id === id) ||
+      sameKnownRef.current.get(sameKey) === true || // a pure read: never seeds the judge's cache
+      (curBaniShabadsRef.current && curBaniShabadsRef.current.has(id))
+    )
+      return { prog: 0, route: null };
+    const jl = judgeLiveRef.current;
+    const judged = jl && jl.cur === cur ? jl.items.find((x) => x.shabadId === id) : null;
+    const ks = kfSwitchRef.current;
+    const fr = fragRef.current;
+    const nowMs = Date.now();
+    let fragment = 0;
+    if (fr && fr.cur === cur) {
+      // The fragment confirm's own view of this Shabad: a search nomination or the Shabad just
+      // left counts as a change card; pangtis must be fresh; a confirm can be gated by time.
+      let fragRole = role;
+      if (fr.top && fr.top.id === id && nowMs - fr.top.at <= PC_FRAGMENT_NOMINATE_S * 1000)
+        fragRole = 'change';
+      if (PC_FRAGMENT_RETURN > 0 && prevShabadRef.current && prevShabadRef.current.id === id)
+        fragRole = 'change';
+      const gated =
+        (PC_FRAGMENT_GAP_S > 0 && nowMs - (fr.lastConfirm || 0) < PC_FRAGMENT_GAP_S * 1000) ||
+        (PC_FRAGMENT_COOLDOWN_S > 0 && nowMs - (fr.since || 0) < PC_FRAGMENT_COOLDOWN_S * 1000);
+      fragment = switchGauge.fragmentGauge(fr.store, id, fragRole, PC_FRAGMENT, {
+        hitAt: fr.hitAt ? fr.hitAt.get(id) : null,
+        now: nowMs,
+        freshMs: PC_FRAGMENT_FRESH_S * 1000,
+        gated,
+      });
+    }
+    return switchGauge.gauge(
+      {
+        acoustic: judged ? { ...judged, sCur: jl.sCur } : null,
+        cumulation: ks && ks.cur === cur ? switchGauge.cumulationGauge(ks.store, id, PC_SWITCH) : 0,
+        fragment,
+      },
+      {
+        acoustic: {
+          min: SWITCH_ACOUSTIC_MIN,
+          margin: SWITCH_ACOUSTIC_MARGIN,
+          soonFloor: switchGauge.SOON_DEFAULTS.soonOn,
+        },
+      },
+    );
   }, []);
   const publishBoard = useCallback((force = false) => {
     const now = Date.now();
@@ -1817,7 +1908,7 @@ const VoiceFollow = () => {
         ...leadItem,
         line: leadItem.line || (onBoard && cardLine(onBoard)) || '',
         pct: onBoard ? onBoard.pct : leadItem.score || 0,
-        prog: switchProgress(leadItem),
+        ...gaugeOf(leadItem.shabadId, 'change'),
         ev: boardRef.current.evidenceOf(leadItem.shabadId, now),
       };
     }
@@ -1828,6 +1919,8 @@ const VoiceFollow = () => {
       const b = snap.find((x) => x.shabadId === id);
       return b ? b.pct : 0;
     };
+    const changeNow = shelfRef.current.changeCard(now);
+    const roleOf = (id) => (changeNow && changeNow.shabadId === id ? 'change' : 'list');
     const items =
       cur != null
         ? boardRef.current
@@ -1839,7 +1932,7 @@ const VoiceFollow = () => {
                 ...e,
                 line: (best && best.line) || cardLine(e),
                 pct: pctOf(e.shabadId),
-                prog: Math.max(e.ev.fill, 0),
+                ...gaugeOf(e.shabadId, roleOf(e.shabadId)),
                 at: now,
               };
             })
@@ -1856,10 +1949,9 @@ const VoiceFollow = () => {
     setShelf(listed);
     const held = shelfRef.current.changeCard(now);
     if (held) {
-      // The change card's rail: the further of the evidence and the judge's own count.
       held.ev = boardRef.current.evidenceOf(held.shabadId, now) || held.ev || null;
-      const judge = lead && held.shabadId === lead.shabadId ? lead.prog : held.prog || 0;
-      held.prog = Math.max(judge, held.ev ? Math.min(1, held.ev.fill) : 0);
+      // The change card's progress is what the switch routes say right now.
+      held.prog = gaugeOf(held.shabadId, 'change').prog;
     }
     setChangeCard(held);
     // Session log (shadow sessions): the cards as listed, about once a second and only when
@@ -3598,7 +3690,6 @@ const VoiceFollow = () => {
   // Synchronous view of isSameGurbani for the switch judge: false until known. The first
   // time a pair meets, the check starts in the background; a switch needs several wins
   // over a second or more, so the answer is in by the time it matters.
-  const sameKnownRef = useRef(new Map());
   const knownSame = (a, b) => {
     if (typeof a !== 'number' || typeof b !== 'number' || a === b) return false;
     const key = a < b ? `${a}:${b}` : `${b}:${a}`;
@@ -5622,6 +5713,22 @@ const VoiceFollow = () => {
             if (vetoRef.current.left <= 0) vetoRef.current = null;
           }
           const live = [];
+          // For the panel only: on a sung Bani's last pangtis a decisive decode commits at 2
+          // (switchConfirmNeeded, as stepSlot decides it for this decode's score).
+          const panelNeeded = (score) =>
+            switchConfirmNeeded(
+              {
+                isBani: BANI_END_EXIT_BANIS.has(Number(baniIdOf(currentShabadIdRef.current))),
+                cursor: curCursorRef.current,
+                nLines: (curLinesNormRef.current || []).length,
+                decisive:
+                  score != null &&
+                  score >= SWITCH_STRONG_MIN &&
+                  score - sCurFull >= SWITCH_STRONG_MARGIN,
+              },
+              BANI_END_EXIT,
+              SWITCH_CONFIRM,
+            );
           const sc = switchCandRef.current;
           const bsl = backstopRef.current;
           const rsl = returnSlotRef.current;
@@ -5633,7 +5740,7 @@ const VoiceFollow = () => {
               line: anvaad.unicode(sc.verse || ''),
               score: sc.lastScore,
               wins: sc.wins,
-              needed: SWITCH_CONFIRM,
+              needed: panelNeeded(sc.lastScore),
               kind: 'vote',
             });
           }
@@ -5644,7 +5751,7 @@ const VoiceFollow = () => {
               line: bsl.display || '',
               score: bsl.lastScore,
               wins: bsl.wins,
-              needed: SWITCH_CONFIRM,
+              needed: panelNeeded(bsl.lastScore),
               kind: 'acoustic',
             });
           }
@@ -5682,6 +5789,8 @@ const VoiceFollow = () => {
             });
             noteBeat(sCurFull);
           } else boardRef.current.hold(Date.now());
+          // For the panel's switch progress: the judge's entries this decode (display only).
+          judgeLiveRef.current = { cur: currentShabadIdRef.current, sCur: sCurFull, items: live };
           publishBoard();
           // Gate for the panel: only candidates that clear the judge's own
           // minimum match (the bar a win needs), and nothing at all while the
@@ -5689,7 +5798,11 @@ const VoiceFollow = () => {
           // so the list is empty when nobody is singing and never shows junk.
           const speaking = hypFull.length >= SWITCH_HYP_MIN;
           const next = speaking
-            ? live.filter((x) => x.score >= SWITCH_ACOUSTIC_MIN).slice(0, 3)
+            ? live
+                .filter((x) => x.score >= SWITCH_ACOUSTIC_MIN)
+                .slice(0, 3)
+                // With its switch progress, for the Changing to card.
+                .map((x) => ({ ...x, ...gaugeOf(x.shabadId, 'change') }))
             : [];
           // The Shabad in the change card is listed there, not among the candidates.
           {
@@ -6972,10 +7085,6 @@ const VoiceFollow = () => {
   } catch (e) {
     cardStyle = 'rail';
   }
-  const boardPct = (id) => {
-    const b = board.find((x) => x.shabadId === id);
-    return b ? b.pct : null;
-  };
   // A candidate row shows the pangti the engine heard being sung, wherever it falls in
   // the Shabad, so the sevadaar can recognise it at once (as the 8.6 panel did).
   const nameLine = cardLine;
@@ -6989,22 +7098,26 @@ const VoiceFollow = () => {
       (curFirst && engine.norm(line) === engine.norm(curFirst)));
   // The listed cards come from the shelf (publishBoard): held, ordered by confidence and
   // fading there. They are not tied to the hearing strip: a pause does not empty the list.
-  const boardOthers = shelf
-    .filter((b) => !(currentView && b.shabadId === currentView.id))
-    .filter((b) => !(liveLead && b.shabadId === liveLead.shabadId))
-    .map((b) => ({ ...b, line: nameLine(b) }))
-    .filter((b) => !!b.line)
+  // While following, a row's bar is its switch progress (switchGauge.js) and the rows are
+  // ordered by it, so the Shabad the switch routes lean on rises before it is chosen; a row
+  // passes another only when clearly ahead, so rows do not trade places on every update.
+  // While finding, the bar is the lock progress as before.
+  const rowVal = (b) => (currentView ? b.prog || 0 : b.pct || 0);
+  const boardOthers = rankRows(
+    shelf
+      .filter((b) => !(currentView && b.shabadId === currentView.id))
+      .filter((b) => !(liveLead && b.shabadId === liveLead.shabadId))
+      .map((b) => ({ ...b, line: nameLine(b) }))
+      .filter((b) => !!b.line),
+    currentView ? rowOrderRef : null,
+  )
     // Not hidden for sharing a pangti with the Shabad on screen: a look-alike pangti is often
     // exactly how the next Shabad first shows itself (copies under another id are already
     // kept out by the judge).
     .slice(0, 6);
   const leadLine = liveLead ? nameLine(liveLead) : '';
-  // The change card's percentage: the live board's, else the shelf's held one.
-  let leadPct = 0;
-  if (liveLead) {
-    const onBoard = boardPct(liveLead.shabadId);
-    leadPct = onBoard != null ? onBoard : liveLead.score || 0;
-  }
+  // The change card's percentage: how close its Shabad is to being put on screen.
+  const leadPct = liveLead ? liveLead.prog || 0 : 0;
   // A change in progress is the one thing to look at. The same Gurbani under another id is
   // not a change.
   const changing = !!(liveLead && leadLine && !sameAsCurrent(leadLine));
@@ -7156,12 +7269,23 @@ const VoiceFollow = () => {
               {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
                   sits near the top of the panel without adding a line. */}
               <div className="vf2-next-row">
-                {nextLine ? (
+                {nextLine && (
                   <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
                     <span className="vf2-next-mark" aria-hidden="true" />
                     <Gurmukhi text={nextLine} />
                   </div>
-                ) : (
+                )}
+                {!nextLine && currentView && atEnd && (
+                  // The last pangti: the row says so instead of standing empty beside Stop.
+                  <div className="vf2-next-line is-end">
+                    {i18n.t(
+                      baniIdOf(currentView.id) != null
+                        ? 'VOICE_FOLLOW.END_OF_BANI'
+                        : 'VOICE_FOLLOW.END_OF_SHABAD',
+                    )}
+                  </div>
+                )}
+                {!nextLine && !(currentView && atEnd) && (
                   <span className="vf2-next-line is-empty" />
                 )}
                 {stopButton}
@@ -7232,8 +7356,8 @@ const VoiceFollow = () => {
                   <span className="vf2-cand-line">
                     <MarkedLine line={c.line} keys={heardKeys} />
                   </span>
-                  <LiveBar value={c.pct} />
-                  <LivePct value={c.pct} />
+                  <LiveBar value={rowVal(c)} />
+                  <LivePct value={rowVal(c)} />
                   <button
                     type="button"
                     className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
