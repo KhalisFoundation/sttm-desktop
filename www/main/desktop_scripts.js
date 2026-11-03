@@ -142,11 +142,20 @@ module.exports = {
     } else {
       localStorage.setItem('isDbDownloaded', true);
     }
-    isOnline().then((online) => {
-      if (online) {
+    // The online check (is-online) can say "offline" on networks that block its probe sites
+    // (some school or Gurdwara Sahib networks) even though the database server is reachable,
+    // which left STTM with no Gurbani database at all. Try the server anyway.
+    isOnline()
+      .catch(() => false)
+      .then(() => {
         request(
           `https://banidb.blob.core.windows.net/database/${database[dbPlatform].md5}`,
           (error, response, newestDBHash) => {
+            if ((error || response.statusCode !== 200) && force) {
+              if (global.core && global.core.search && global.core.search.offline) {
+                global.core.search.offline(10);
+              }
+            }
             if (!error && response.statusCode === 200) {
               const curDBHash = store.get('curDBHash');
               if (force || curDBHash !== newestDBHash) {
@@ -210,10 +219,7 @@ module.exports = {
             }
           },
         );
-      } else if (force) {
-        global.core.search.offline(10);
-      }
-    });
+      });
   },
 
   // Downloads the AI translations database (PSS) into userData when it is missing or
