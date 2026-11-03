@@ -591,6 +591,14 @@
     "OPEN": "Open",
     "OPEN_TIP": "Open this Shabad",
     "PROGRESS_TIP": "How close this Shabad is to being shown",
+    "HINT_PLACEHOLDER": "Type the first letters you hear, like Search",
+    "HINT_LABEL": "Not on screen yet? Help Autopilot find it",
+    "HINT_TIP": "Type the first letter of each word of the pangti being sung, from any point in the pangti, the same way as in Search. Two or three letters are usually enough: Autopilot picks the Shabad it is hearing. Enter opens the top match, Esc clears.",
+    "HINT_TITLE": "Pangtis with your letters",
+    "HINT_NONE": "No Shabad matches these letters.",
+    "HINT_HEARD": "heard",
+    "ACCEPT_TIP": "Ctrl+Enter (Cmd+Enter on Mac) switches to this Shabad now",
+    "DISMISS_TIP": "Not this one: stop suggesting this Shabad for a while",
     "END_OF_SHABAD": "End of Shabad",
     "END_OF_BANI": "End of Bani"
   }
