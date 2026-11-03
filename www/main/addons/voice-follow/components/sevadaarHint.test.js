@@ -37,16 +37,17 @@ describe('sevadaarHint', () => {
     const weak = rankHint(distinctShabads(rows), (id) => ({ s: { 1: 0.5, 2: 0.1, 3: 0 }[id] }));
     assert.equal(decideHint(weak), null);
   });
-  it('a mid-pangti match is picked only on a much clearer hearing', () => {
+  it('never picks a mid-pangti match by itself; those stay listed to tap', () => {
     const any = [
       { shabadId: 1, verseId: 10, kind: 'any' },
       { shabadId: 2, verseId: 20, kind: 'any' },
     ];
-    assert.equal(decideHint(rankHint([any[0]], () => ({ s: 0.9 }))), null);
-    assert.equal(decideHint(rankHint(any, (id) => ({ s: { 1: 0.7, 2: 0.3 }[id] }))), null);
+    assert.equal(decideHint(rankHint([any[0]], () => ({ s: 0.95 }))), null);
+    assert.equal(decideHint(rankHint(any, (id) => ({ s: { 1: 0.95, 2: 0.1 }[id] }))), null);
+    const mixed = [{ shabadId: 3, verseId: 30, kind: 'start' }, ...any];
     assert.equal(
-      decideHint(rankHint(any, (id) => ({ s: { 1: 0.9, 2: 0.3 }[id] }))).reason,
-      'heard-any',
+      decideHint(rankHint(mixed, (id) => ({ s: { 1: 0.95, 2: 0.1, 3: 0.2 }[id] }))).pick.shabadId,
+      3,
     );
   });
   it('opens at the heard pangti when clear, else at the typed one', () => {
