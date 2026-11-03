@@ -4,11 +4,11 @@
 // ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ ਵਾਹਿ ਜੀਉ), so VoiceFollow also needs nothing to fit the Shabad on screen.
 /* eslint-disable no-param-reassign */ // s: the slide's own state, updated in place
 const WAHEGURU = 'ਵਾਹਿਗੁਰੂ';
-const SIMRAN_W = 20000; // what was heard over this window
-const SIMRAN_MIN_HEARD = 10; // transcripts in the window before anything is judged
+const SIMRAN_W = 10000; // what was heard over this window
+const SIMRAN_MIN_HEARD = 5; // transcripts in the window before anything is judged
 const SIMRAN_ON = 0.6; // this share of the transcripts have a Waheguru: Simran
 const SIMRAN_OFF = 0.3; // under this share: not Simran
-const SIMRAN_TRIG = 8000; // Simran this long: the slide goes up
+const SIMRAN_TRIG = 4000; // Simran this long: the slide goes up (about 10 s after it starts)
 const SIMRAN_END = 10000; // stopped this long: Simran is over (a short Dhan Guru line is not)
 const SIMRAN_NOW_W = 6000; // 'heard right now' (the lock gate): the last few seconds only
 
@@ -28,13 +28,13 @@ function dist(a, b) {
   return prev[b.length];
 }
 
-// A heard word that is ਵਾਹਿਗੁਰੂ, as the speech model may spell it (ਵਾਹਗੁਰੂ, ਵਾਹਿਗੁਰ, ਵਾਹਿੁਰ...).
+// A heard word that is ਵਾਹਿਗੁਰੂ, allowing for the speech model losing a letter or a vowel sign.
 const isWaheguru = (w) => {
   const n = norm(w);
   return n.length >= 5 && n.length <= 11 && dist(n, WAHEGURU) <= 2;
 };
 
-// Of these heard words, how many are Waheguru (ਵਾਹਿ ਗੁਰੂ heard as two words counts once).
+// Of these heard words, how many are Waheguru (Waheguru heard as two words counts once).
 function countSimran(words) {
   let hits = 0;
   let total = 0;
@@ -43,7 +43,7 @@ function countSimran(words) {
     if (isWaheguru(words[i])) hits += 1;
     else if (
       i + 1 < words.length &&
-      dist(norm(words[i]), 'ਵਾਹਿ') <= 1 && // only ਵਾਹਿ + ਗੁਰੂ, never another word + ਗੁਰੂ
+      dist(norm(words[i]), 'ਵਾਹਿ') <= 1 && // only Waheguru heard as two words, never another word + ਗੁਰੂ
       isWaheguru(words[i] + words[i + 1])
     ) {
       hits += 1;
@@ -53,9 +53,9 @@ function countSimran(words) {
   return { hits, total };
 }
 
-// The Fateh said aloud (ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖ਼ਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫ਼ਤਿਹ), as the speech model hears it
-// (ਵਾਹਿਗੁਰ ਜੀ ਕਾ ਖਾਸਾ, ਵਹਿਗੁਰ ਚੀ ਕ ਖਾਲਸਾ, ਵਾਹਿਗੁਰ ਜੀ ਕੀ ਫਤਿਹ...): a Waheguru, then ਜੀ, then ਕਾ + a
-// word in ਖ or ਕੀ + a word in ਫ/ਪ. In Gurbani only the headings say it (never sung or read as kirtan).
+// The Fateh said aloud (ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖ਼ਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫ਼ਤਿਹ), allowing for the speech model
+// losing a letter or a vowel sign: a Waheguru, then ਜੀ, then ਕਾ + a word in ਖ or ਕੀ + a word
+// in ਫ/ਪ. In Gurbani only the headings say it (never sung or read as kirtan).
 function fatehIn(text) {
   const w = String(text || '')
     .split(/\s+/)
@@ -75,9 +75,9 @@ function fatehIn(text) {
 
 const createSimran = () => ({ heard: [], onSince: null, offSince: null, on: false, fatehAt: 0 });
 
-// A recognizer transcript (its last few seconds of audio). Mis-heard spellings (ਵਹਿੁਰ, ਵਾਹਿ ਕਰ)
-// and words in between (ਸਤਿ ਨਾਮ ਵਾਹਿਗੁਰੂ) are common, so what counts is how many transcripts
-// have a Waheguru, not how many of the words are.
+// A recognizer transcript (its last few seconds of audio). Words the model hears imperfectly
+// and other words in between are common, so what counts is how many transcripts have a
+// Waheguru, not how many of the words are.
 function noteHeard(s, now, text) {
   const { hits } = countSimran(
     String(text || '')

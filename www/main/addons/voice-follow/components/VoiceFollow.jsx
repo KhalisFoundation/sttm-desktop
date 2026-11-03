@@ -2538,6 +2538,32 @@ const VoiceFollow = () => {
       }
       if (!ng.hold) ngTalkCheck(now);
       if (simranStep(ng.simran, now) === 'end') ng.simranSkip = false;
+      // Waheguru Simran while searching (before the first Shabad, or searching again): the
+      // Waheguru slide too, not a blank screen. Only over a blank screen or what Autopilot put
+      // there, never the sevadaar's own; the Shabad found takes it down (the lock).
+      if (
+        autopilotRef.current &&
+        phaseRef.current !== 'following' &&
+        ng.simran.on &&
+        !ng.simranSkip &&
+        !ng.ours &&
+        !ng.hold &&
+        !isMiscSlideRef.current &&
+        !lockingRef.current &&
+        ngScreenOurs() &&
+        // a Shabad the sevadaar opened before Autopilot found one is theirs: leave it
+        (shadowing() ||
+          vfScreenRef.current.screenKey == null ||
+          vfScreenRef.current.screenKey === vfScreenRef.current.appKey)
+      ) {
+        ng.simranUp = true;
+        sessionLog.logEvent('simran_detected', {
+          session: sessionIdRef.current,
+          shabadId: currentShabadIdRef.current,
+          phase: 'searching',
+        });
+        ngRaise('simran', null);
+      }
       const active =
         autopilotRef.current &&
         phaseRef.current === 'following' &&
