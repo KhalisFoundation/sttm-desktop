@@ -32,7 +32,10 @@ class MainProcessWorker extends EventEmitter {
     if (this.closed) throw new Error('Canonical retrieval transport is closed');
     this.ipc.invoke(CHANNEL, { operation: 'search', token: this.token, text, cap }).then(
       (candidates) => {
-        if (!this.closed) this.emit('message', { id, candidates });
+        if (this.closed) return;
+        // A busy answer fails this one request; the session stays usable.
+        if (candidates && candidates.busy === true) this.emit('message', { id, error: 'busy' });
+        else this.emit('message', { id, candidates });
       },
       () => {
         if (!this.closed) this.emit('error', new Error('Canonical retrieval search failed'));
