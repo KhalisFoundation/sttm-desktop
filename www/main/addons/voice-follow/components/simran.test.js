@@ -5,6 +5,7 @@ const {
   isWaheguru,
   countSimran,
   fatehIn,
+  waheguruLine,
   createSimran,
   noteHeard,
   simranStep,
@@ -187,4 +188,12 @@ test('a few Waheguru words before a pause: never the slide over the Shabad (rn03
     if (simranStep(slow, t2) === 'start') heard = simranHeard(slow, t2);
   }
   assert.strictEqual(heard, true);
+});
+
+test('a pangti that is mostly Waheguru (the Bhatt Swaiye refrain) says nothing during Simran', () => {
+  assert.strictEqual(waheguruLine(`${W} ${W} ${W} ${twoWords[0]} ਜੀਉ`), true);
+  assert.strictEqual(waheguruLine(`${W} ${W}`), true);
+  assert.strictEqual(waheguruLine(SINGING), false);
+  assert.strictEqual(waheguruLine(`${W} ${SINGING}`), false);
+  assert.strictEqual(waheguruLine(''), false);
 });

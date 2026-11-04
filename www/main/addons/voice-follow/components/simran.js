@@ -73,6 +73,17 @@ function fatehIn(text) {
   return false;
 }
 
+// A pangti that is mostly ਵਾਹਿਗੁਰੂ (the Bhatt Swaiye's refrain): heard during Simran, it says
+// nothing about which Shabad is being sung.
+function waheguruLine(text) {
+  const { hits, total } = countSimran(
+    String(text || '')
+      .split(/\s+/)
+      .filter((w) => norm(w)),
+  );
+  return total > 0 && hits * 2 >= total;
+}
+
 const createSimran = () => ({ heard: [], onSince: null, offSince: null, on: false, fatehAt: 0 });
 
 // A recognizer transcript (its last few seconds of audio). Words the model hears imperfectly
@@ -147,6 +158,7 @@ module.exports = {
   isWaheguru,
   countSimran,
   fatehIn,
+  waheguruLine,
   createSimran,
   noteHeard,
   simranStep,
