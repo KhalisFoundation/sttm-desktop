@@ -9,6 +9,7 @@ const {
   noteHeard,
   simranStep,
   simranNow,
+  simranHeard,
   simranGone,
 } = require('./simran');
 
@@ -163,4 +164,27 @@ test('Simran after kirtan: start within about 10 s (a short sung Simran shows th
     if (st) steps = steps.concat(st);
   }
   assert.deepStrictEqual(steps, ['start']);
+});
+
+test('a few Waheguru words before a pause: never the slide over the Shabad (rn03, 148 s)', () => {
+  const s = createSimran();
+  let r = hear(s, 0, 30, SINGING);
+  r = hear(s, r.t, 6, `${W} ${SINGING}`); // a short burst inside the kirtan
+  // then a pause: only a transcript now and then, none with a Waheguru
+  let { t } = r;
+  const up = [500, 2500, 1000, 500, 1100, 4500, 500, 500].some((gap) => {
+    t += gap;
+    noteHeard(s, t, 'ਨਾ');
+    simranStep(s, t);
+    return s.on && simranHeard(s, t);
+  });
+  assert.strictEqual(up, false);
+  // real Simran: heard, on a slow PC too (two transcripts in the last 6 s)
+  const slow = createSimran();
+  let heard = false;
+  for (let t2 = 0; t2 < 30000; t2 += 2000) {
+    noteHeard(slow, t2, `${W} ${W}`);
+    if (simranStep(slow, t2) === 'start') heard = simranHeard(slow, t2);
+  }
+  assert.strictEqual(heard, true);
 });

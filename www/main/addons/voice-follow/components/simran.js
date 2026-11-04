@@ -130,6 +130,14 @@ function simranNow(s, now) {
 
 // Simran has clearly stopped: the last few seconds were heard (3+ transcripts, so a slow PC
 // with few transcripts never ends it early) and almost none held a Waheguru.
+// Simran still being heard (the slide goes up): most of the last few seconds have a Waheguru,
+// so a few Waheguru words before a pause never put it up over the Shabad. Two transcripts are
+// enough (a slow PC hears one every 2 s).
+function simranHeard(s, now) {
+  const w = s.heard.filter((x) => now - x.t <= SIMRAN_NOW_W);
+  return w.length >= 2 && w.filter((x) => x.has).length / w.length >= SIMRAN_ON;
+}
+
 function simranGone(s, now) {
   const w = s.heard.filter((x) => now - x.t <= SIMRAN_NOW_W);
   return w.length >= 3 && w.filter((x) => x.has).length / w.length < SIMRAN_OFF;
@@ -143,5 +151,6 @@ module.exports = {
   noteHeard,
   simranStep,
   simranNow,
+  simranHeard,
   simranGone,
 };

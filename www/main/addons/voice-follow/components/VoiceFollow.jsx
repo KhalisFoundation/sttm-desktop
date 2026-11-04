@@ -174,6 +174,7 @@ const {
   noteHeard: noteSimran,
   simranStep,
   simranNow,
+  simranHeard,
   simranGone,
 } = require('./simran');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
@@ -2545,6 +2546,7 @@ const VoiceFollow = () => {
         autopilotRef.current &&
         phaseRef.current !== 'following' &&
         ng.simran.on &&
+        simranHeard(ng.simran, now) && // still heard: not a short burst before a pause
         !ng.simranSkip &&
         !ng.ours &&
         !ng.hold &&
@@ -2608,7 +2610,13 @@ const VoiceFollow = () => {
           shabadId: currentShabadIdRef.current,
         });
         ngRaise('fateh', null);
-      } else if (free && ng.simran.on && !ng.simranSkip && now - ng.lastFit > NG_SIMRAN_FIT_MS) {
+      } else if (
+        free &&
+        ng.simran.on &&
+        simranHeard(ng.simran, now) && // heard right now, not a few Waheguru words before a pause
+        !ng.simranSkip &&
+        now - ng.lastFit > NG_SIMRAN_FIT_MS
+      ) {
         ng.simranUp = true;
         sessionLog.logEvent('simran_detected', {
           session: sessionIdRef.current,
