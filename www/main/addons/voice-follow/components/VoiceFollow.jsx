@@ -174,6 +174,7 @@ const {
   noteHeard: noteSimran,
   simranStep,
   simranNow,
+  simranHeard,
   simranGone,
 } = require('./simran');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
@@ -2538,6 +2539,33 @@ const VoiceFollow = () => {
       }
       if (!ng.hold) ngTalkCheck(now);
       if (simranStep(ng.simran, now) === 'end') ng.simranSkip = false;
+      // Waheguru Simran while searching (before the first Shabad, or searching again): the
+      // Waheguru slide too, not a blank screen. Only over a blank screen or what Autopilot put
+      // there, never the sevadaar's own; the Shabad found takes it down (the lock).
+      if (
+        autopilotRef.current &&
+        phaseRef.current !== 'following' &&
+        ng.simran.on &&
+        simranHeard(ng.simran, now) && // still heard: not a short burst before a pause
+        !ng.simranSkip &&
+        !ng.ours &&
+        !ng.hold &&
+        !isMiscSlideRef.current &&
+        !lockingRef.current &&
+        ngScreenOurs() &&
+        // a Shabad the sevadaar opened before Autopilot found one is theirs: leave it
+        (shadowing() ||
+          vfScreenRef.current.screenKey == null ||
+          vfScreenRef.current.screenKey === vfScreenRef.current.appKey)
+      ) {
+        ng.simranUp = true;
+        sessionLog.logEvent('simran_detected', {
+          session: sessionIdRef.current,
+          shabadId: currentShabadIdRef.current,
+          phase: 'searching',
+        });
+        ngRaise('simran', null);
+      }
       const active =
         autopilotRef.current &&
         phaseRef.current === 'following' &&
@@ -2582,7 +2610,13 @@ const VoiceFollow = () => {
           shabadId: currentShabadIdRef.current,
         });
         ngRaise('fateh', null);
-      } else if (free && ng.simran.on && !ng.simranSkip && now - ng.lastFit > NG_SIMRAN_FIT_MS) {
+      } else if (
+        free &&
+        ng.simran.on &&
+        simranHeard(ng.simran, now) && // heard right now, not a few Waheguru words before a pause
+        !ng.simranSkip &&
+        now - ng.lastFit > NG_SIMRAN_FIT_MS
+      ) {
         ng.simranUp = true;
         sessionLog.logEvent('simran_detected', {
           session: sessionIdRef.current,
