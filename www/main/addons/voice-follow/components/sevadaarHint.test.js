@@ -37,6 +37,13 @@ describe('sevadaarHint', () => {
     const weak = rankHint(distinctShabads(rows), (id) => ({ s: { 1: 0.5, 2: 0.1, 3: 0 }[id] }));
     assert.equal(decideHint(weak), null);
   });
+  it('asks for a clearer hearing when the letters name many Shabads', () => {
+    const many = [1, 2, 3, 4, 5].map((i) => ({ shabadId: i, verseId: i * 10, kind: 'start' }));
+    const s = { 1: 0.62, 2: 0.45, 3: 0.1, 4: 0.1, 5: 0.1 };
+    assert.equal(decideHint(rankHint(many, (id) => ({ s: s[id] }))), null);
+    s[1] = 0.7;
+    assert.equal(decideHint(rankHint(many, (id) => ({ s: s[id] }))).pick.shabadId, 1);
+  });
   it('never picks a mid-pangti match by itself; those stay listed to tap', () => {
     const any = [
       { shabadId: 1, verseId: 10, kind: 'any' },

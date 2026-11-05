@@ -4486,8 +4486,10 @@ const VoiceFollow = () => {
     if (!prof || !prof.linesNorm || !hyp) return { s: 0, index: -1 };
     if (!prof.fl) prof.fl = (prof.displayLines || []).map((l) => toAsciiFirstLetters(l));
     const named = new Set();
+    // The pangti the letters name, and the next one (the singer may have moved on by the time
+    // Autopilot hears enough).
     prof.fl.forEach((fl, i) => {
-      if (fl && fl.includes(q)) [i - 1, i, i + 1].forEach((k) => named.add(k));
+      if (fl && fl.includes(q)) [i, i + 1].forEach((k) => named.add(k));
     });
     const lines = prof.linesNorm.map((l, i) => (named.has(i) ? l : ''));
     const m = bestLineMatch(hyp, lines, SWITCH_CAND_MIN_LINE_CHARS);

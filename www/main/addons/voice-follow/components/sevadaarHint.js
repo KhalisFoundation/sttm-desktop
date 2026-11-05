@@ -12,6 +12,11 @@ const DEFAULTS = {
   pickMin: 0.55, // the hearing must match the best Shabad at least this well ...
   pickMargin: 0.12, // ... and beat the next one by this much
   lineMin: 0.6, // open at the heard pangti when it matches this well, else at the typed one
+  // Few letters naming many Shabads (benchmark: every wrong pick was a first 3-letter hint, 1-3 s
+  // after typing): the hearing must be clearer before Autopilot picks among them.
+  manyAt: 4,
+  manyMin: 0.65,
+  manyMargin: 0.18,
 };
 
 // One row per Shabad (its first matching pangti), in the database's order.
@@ -47,7 +52,10 @@ function decideHint(ranked, cfg = DEFAULTS) {
   if (!start.length) return null;
   const [a, b] = start;
   if (start.length === 1) return { pick: a, reason: 'only' };
-  if (a.s >= cfg.pickMin && a.s - b.s >= cfg.pickMargin) return { pick: a, reason: 'heard' };
+  const many = start.length >= cfg.manyAt;
+  const min = many ? cfg.manyMin : cfg.pickMin;
+  const margin = many ? cfg.manyMargin : cfg.pickMargin;
+  if (a.s >= min && a.s - b.s >= margin) return { pick: a, reason: 'heard' };
   return null;
 }
 
