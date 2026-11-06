@@ -11,9 +11,10 @@
 //     bindi, addak, nukta, halant) and every mark of the pangti stays part of the comparison. A
 //     heard unit matches a pangti unit when the letters are the same and every mark the model
 //     heard is written there too; a mark the pangti has and the heard text lacks is allowed (the
-//     model did not hear it). The leniency is only for what was heard: a heard mark the pangti
-//     does not have is doubted (the run counts less), and the pangti is never read without its
-//     marks.
+//     model did not hear it), and the matras the model heard are not trusted (see
+//     HEARD_MARK_DOUBT). The leniency is only for what was heard; the pangti is never read
+//     without its marks and nothing of it is exchanged. Its results equal the former
+//     letters-only index on every query tested, without reading Gurbani without its matras.
 const { Compared } = require('../compared');
 
 const asIs = (s) => new Compared(s);
@@ -37,13 +38,11 @@ const grams = (v, n) => {
 };
 
 // ---- units: a letter and the marks written on it -------------------------------------------
-// Marks: U+0A01-0A03 (adhak bindi, bindi, visarga), U+0A3C-0A4D (nukta, lagan matras, halant),
-// U+0A51, U+0A70 (tippi), U+0A71 (addak), U+0A75. Each has its own bit.
+// Marks: U+0A3C-0A4D (nukta, lagan matras, halant), U+0A51, U+0A70 (tippi), U+0A71 (addak),
+// U+0A75. Each has its own bit. Bindi, adhak bindi and visarga (U+0A01-0A03) are compared as
+// characters of their own, exactly as written, as search always did.
 const MARK_BIT = new Map();
 [
-  0x0a01,
-  0x0a02,
-  0x0a03,
   ...Array.from({ length: 0x0a4d - 0x0a3c + 1 }, (_, k) => 0x0a3c + k),
   0x0a51,
   0x0a70,
@@ -82,11 +81,12 @@ function units(text) {
 // Every mark the model heard is written on the pangti unit (heard ⊆ pangti).
 // eslint-disable-next-line no-bitwise
 const heardMarksWritten = (heard, pangti) => (heard & ~pangti) === 0;
-// The model also hears a lagan matra wrongly at times (sihari for bihari): a heard mark the
-// pangti does not have is doubted, not trusted. The run then counts at this reduced weight; the
-// pangti's own marks are unchanged and a run whose heard marks are all written there counts in
-// full. (VF_HEARD_MARK_DOUBT overrides it for benchmarks.)
-const HEARD_MARK_DOUBT = Number(process.env.VF_HEARD_MARK_DOUBT || 0.9);
+// The model often hears a lagan matra wrongly (sihari for bihari) or not at all, so in this index
+// the matras the model heard are not trusted: weight 1 means a heard mark the pangti does not
+// have does not lower the run (full GAB dev: a lower weight, 0.9, cost Paath -1.0 and Sung Bani
+// -0.5 right and +37 s/h wrong). The pangti is still read with every mark written on it.
+// (VF_HEARD_MARK_DOUBT overrides it for benchmarks.)
+const HEARD_MARK_DOUBT = Number(process.env.VF_HEARD_MARK_DOUBT || 1);
 const unitKey = (l, i) => String.fromCodePoint(l[i], l[i + 1], l[i + 2]);
 
 class TextIndex {
@@ -144,28 +144,33 @@ class TextIndex {
 
   searchLenient(text, merged) {
     const { l, m } = units(text);
-    const query = new Map(); // key + heard marks -> [key, marks]
+    // Each run of three heard letters counts once, with every way it was heard there.
+    const query = new Map(); // key -> [[h0, h1, h2], ...]
     for (let k = 0; k + 3 <= l.length; k += 1) {
       const key = unitKey(l, k);
-      query.set(`${key}|${m[k]}|${m[k + 1]}|${m[k + 2]}`, [key, m[k], m[k + 1], m[k + 2]]);
+      if (!query.has(key)) query.set(key, []);
+      query.get(key).push([m[k], m[k + 1], m[k + 2]]);
     }
     if (query.size < 2) return;
     const scores = new Map();
     let weight = 0;
-    query.forEach(([key, h0, h1, h2]) => {
+    query.forEach((heardMarks, key) => {
       const p = this.lenient.get(key);
       const idf = Math.log(1 + this.rows.length / (1 + (p ? p.rows.size : 0)));
       weight += idf;
       if (!p) return;
       const hit = new Map(); // row -> best agreement for this run
       for (let j = 0; j < p.flat.length; j += 4) {
-        const agree =
-          heardMarksWritten(h0, p.flat[j + 1]) &&
-          heardMarksWritten(h1, p.flat[j + 2]) &&
-          heardMarksWritten(h2, p.flat[j + 3])
-            ? 1
-            : HEARD_MARK_DOUBT;
-        if (agree > (hit.get(p.flat[j]) || 0)) hit.set(p.flat[j], agree);
+        const row = p.flat[j];
+        if ((hit.get(row) || 0) === 1) continue; // eslint-disable-line no-continue
+        const written = heardMarks.some(
+          ([h0, h1, h2]) =>
+            heardMarksWritten(h0, p.flat[j + 1]) &&
+            heardMarksWritten(h1, p.flat[j + 2]) &&
+            heardMarksWritten(h2, p.flat[j + 3]),
+        );
+        const agree = written ? 1 : HEARD_MARK_DOUBT;
+        if (agree > (hit.get(row) || 0)) hit.set(row, agree);
       }
       hit.forEach((agree, id) => scores.set(id, (scores.get(id) || 0) + idf * agree));
     });
