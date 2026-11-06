@@ -71,7 +71,8 @@
   $teeka,
   $transliteration,
   $visraam,
-  $yamki
+  $yamki,
+  $teleprompter: $gurbani
 ) {
   @if $type == 'light' {
     @include light-base();
@@ -96,6 +97,15 @@
 
   .slide-transliteration {
     color: $transliteration;
+  }
+
+  .pane-projection-stage .shabad-li {
+    &,
+    .verse-content,
+    .fa-check,
+    .fa-home {
+      color: $teleprompter;
+    }
   }
 
   @include vishraamStyles($visraam, $yamki);

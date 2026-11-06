@@ -47,6 +47,7 @@
         "content2-font-size",
         "content3-font-size",
         "announcements-font-size",
+        "teleprompter-font-size",
         "reset-font-sizes"
       ]
     },
@@ -115,6 +116,10 @@
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
+    "teleprompter-font-size": {
+      "title": "TELEPROMPTER",
+      "initialValue": 10
+    },
     "reset-font-sizes": {
       "title": "RESET_FONT_SIZES",
       "type": "reset-button",
@@ -123,7 +128,8 @@
         "content1-font-size",
         "content2-font-size",
         "content3-font-size",
-        "announcements-font-size"
+        "announcements-font-size",
+        "teleprompter-font-size"
       ]
     },
     "content1-visibility": {
