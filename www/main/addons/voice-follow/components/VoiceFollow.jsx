@@ -865,26 +865,40 @@ const VOL_SILENT_WINDOWS = 32; // 8 s of silence before "No sound" (a pause is n
 const VOL_ORDER = ['none', 'low', 'good', 'great'];
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in candidate lines
-// Recognizer spellings are loose: ignore a final short vowel, fold ਣ/ਨ and the nukta, and
-// count a word as matched when most of it agrees with a word of the line.
-const wordKey = (w) =>
-  heardForComparing(w)
-    .replace(/[\u0a3f\u0a41]$/, '')
-    .replace(/\u0a23/g, '\u0a28')
-    .replace(/\u0a3c/g, '');
-const commonPrefix = (a, b) => {
+// Marking heard words in a candidate line. The pangti word is used exactly as the database
+// gives it; the leniency is for the recognizer's loose spelling only: where the heard word
+// lacks a mark the pangti has (a final sihari or aunkar, a nukta), or writes ਨ for ਣ (or ਣ for
+// ਨ), it still counts. The heard key is the heard word, compared as heard.
+const wordKey = (w) => heardForComparing(w);
+const GURBANI_MARK_HEARD_MAY_LACK = new Set(['\u0a3c', '\u0a3f', '\u0a41']);
+const heardMatchesChar = (h, p) =>
+  h === p || (h === '\u0a28' && p === '\u0a23') || (h === '\u0a23' && p === '\u0a28');
+// How many characters of the pangti word the heard key agrees with from the start, letting the
+// heard key lack a mark the pangti has. Returns [pangti chars read, heard chars read].
+const commonPrefix = (heard, pangti) => {
   let i = 0;
-  while (i < a.length && i < b.length && a[i] === b[i]) i += 1;
-  return i;
+  let j = 0;
+  while (i < heard.length && j < pangti.length) {
+    if (heardMatchesChar(heard[i], pangti[j])) {
+      i += 1;
+      j += 1;
+    } else if (GURBANI_MARK_HEARD_MAY_LACK.has(pangti[j])) j += 1;
+    else break;
+  }
+  return [j, i];
 };
-const wordMatches = (k, l) =>
-  k.length >= 2 &&
-  (l === k || commonPrefix(k, l) >= Math.max(4, Math.ceil(0.7 * Math.min(k.length, l.length))));
-const lineWordsOf = (line) =>
-  (line || '')
-    .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean);
+const lettersIn = (w) => [...w].filter((c) => /[\u0a05-\u0a39\u0a59-\u0a5e]/.test(c)).length;
+const wordMatches = (k, l) => {
+  if (k.length < 2 || !lettersIn(l)) return false;
+  const [pj, hi] = commonPrefix(k, l);
+  const rest = l.slice(pj);
+  const pangtiDone = pj === l.length || [...rest].every((c) => GURBANI_MARK_HEARD_MAY_LACK.has(c));
+  if (hi === k.length && pangtiDone) return true;
+  return hi >= Math.max(4, Math.ceil(0.7 * Math.min(k.length, lettersIn(l))));
+};
+// A pangti's words exactly as the database gives them (split at spaces only); ॥੧॥ and the like
+// stay as they are, shown and never marked.
+const lineWordsOf = (line) => (line || '').split(/\s+/).filter(Boolean);
 // Gurbani is shown in the app's Gurmukhi font (the .gurmukhi class), which is ASCII-encoded.
 // The engine works in Unicode, so text is converted only for display.
 const toAkhar = (uni) => (uni ? anvaad.unicode(uni, true) : '');
@@ -898,7 +912,7 @@ const MarkedLine = ({ line, keys }) => {
   return (
     <span className="gurmukhi">
       {words.map((w, i) => {
-        const hit = keys.some((k) => wordMatches(k, wordKey(w)));
+        const hit = keys.some((k) => wordMatches(k, w));
         return (
           // eslint-disable-next-line react/no-array-index-key
           <span key={i} className={hit ? 'vf2-hl' : ''}>

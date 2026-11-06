@@ -155,20 +155,13 @@ function orderFreeLineScore(hypWords, linesWords, minLineChars = 0) {
 // shabad vs its copy in the Aarti Bani, a Sohila shabad repeated elsewhere)
 // search as an exact tie, and a tie can never lock. sameGurbani(a, b) says
 // whether two shabads' display lines are such a copy: at least 80% of the
-// shorter one's real lines (headings dropped, vowel signs and small spelling
-// differences ignored) appear in the longer one.
+// shorter one's real lines (headings dropped) appear in the longer one, each line compared as
+// written or found by the similarity test.
 const DUP_HEADING = /ੴ|ਮਹਲਾ|ਪਾਤਿਸਾਹੀ|ਘਰੁ|^ਪਉੜੀ|^ਸਲੋਕ|^ਰਾਗੁ/;
-const DUP_VOWELS = { ਆ: 'ਅ', ਈ: 'ਇ', ਊ: 'ਉ', ਐ: 'ਏ', ਔ: 'ਓ' };
-// While comparing two copies: vowel signs are skipped and ਆ ਈ ਊ ਐ ਔ count as ਅ ਇ ਉ ਏ ਓ (the
-// lines themselves stay exactly as the database gives them).
-const DUP_SIGNS = /[ਾ-ੌਁ-ਃੰੱ਼੍]/; // eslint-disable-line no-misleading-character-class
-const DUP_FOLD = new Map(
-  Object.entries(DUP_VOWELS).map(([k, v]) => [k.codePointAt(0), v.codePointAt(0)]),
-);
-const DUP_RULES = {
-  skip: (cp) => DUP_SIGNS.test(String.fromCodePoint(cp)),
-  fold: (cp) => DUP_FOLD.get(cp) || cp,
-};
+// Lines are compared as written: every lagan matra and letter counts (only spaces, dandas and
+// numbers are skipped while comparing); nothing of Gurbani is skipped or exchanged. Near copies
+// are still found by the similarity test below, which reads both lines as written.
+const DUP_RULES = undefined;
 // The distinct real lines of a shabad (headings and short lines dropped), as comparison views;
 // two lines that compare the same count once. has(v): is a line that compares as v here?
 function dupLines(lines) {
