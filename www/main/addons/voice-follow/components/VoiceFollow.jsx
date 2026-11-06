@@ -4461,7 +4461,14 @@ const VoiceFollow = () => {
   //    by what it is hearing (sevadaarHint.js); a single match opens at once.
   // 2. Ctrl/Cmd+Enter accepts the Shabad in the "Changing to" card.
   // 3. The x on that card: "not this one" (the tap veto every switch route already respects).
-  const hintRef = useRef({ q: '', at: 0, cands: [], profiles: new Map(), seq: 0 });
+  const hintRef = useRef({
+    q: '',
+    at: 0,
+    cands: [],
+    named: new Map(),
+    profiles: new Map(),
+    seq: 0,
+  });
   const lastHeardRef = useRef('');
   const [hintQ, setHintQ] = useState('');
   const [hintRows, setHintRows] = useState([]);
@@ -4471,31 +4478,33 @@ const VoiceFollow = () => {
       q: '',
       at: 0,
       cands: [],
+      named: new Map(),
       profiles: hintRef.current.profiles,
       seq: hintRef.current.seq + 1,
     };
     setHintQ('');
     setHintRows([]);
   }, []);
-  // The hearing is judged on the pangti the letters name (and its neighbours), not on every line of
-  // the Shabad: a long Shabad would otherwise win on some line by chance.
+  // The hearing is judged on the pangti the letters name (and the next one), not on every line of
+  // the Shabad: a long Shabad would otherwise win on some line by chance. The named pangtis are the
+  // ones the database's own first-letter search returned; each is compared exactly as the database
+  // gives it (leniency only on the heard side).
   const hintScore = useCallback((shabadId) => {
     const prof = hintRef.current.profiles.get(shabadId);
-    const hyp = lastHeardRef.current;
-    const { q } = hintRef.current;
-    if (!prof || !prof.linesNorm || !hyp) return { s: 0, index: -1 };
-    if (!prof.fl) prof.fl = (prof.displayLines || []).map((l) => toAsciiFirstLetters(l));
+    const heardText = lastHeardRef.current;
+    const ids = hintRef.current.named && hintRef.current.named.get(shabadId);
+    if (!prof || !prof.linesCompared || !heardText || !ids) return { s: 0, index: -1 };
     const named = new Set();
-    // The pangti the letters name, and the next one (the singer may have moved on by the time
-    // Autopilot hears enough).
-    prof.fl.forEach((fl, i) => {
-      if (fl && fl.includes(q)) [i, i + 1].forEach((k) => named.add(k));
+    (prof.verses || []).forEach((v, i) => {
+      if (ids.has(v.verseId)) [i, i + 1].forEach((k) => named.add(k));
     });
-    const lines = prof.linesNorm.map((l, i) => (named.has(i) ? l : ''));
-    const m = bestLineMatch(hyp, lines, SWITCH_CAND_MIN_LINE_CHARS);
-    const words = hyp.split(' ').filter(Boolean);
-    const lw = lines.map((l) => (l || '').split(' ').filter(Boolean));
-    const of = orderFreeLineScore(words, lw, SWITCH_CAND_MIN_LINE_CHARS);
+    const lines = prof.linesCompared.map((l, i) => (named.has(i) ? l : ''));
+    const m = bestLineMatch(heardForComparing(heardText), lines, SWITCH_CAND_MIN_LINE_CHARS);
+    const heardWords = tokenize(heardText).map(heardForComparing).filter(Boolean);
+    const lw = (prof.verses || []).map((v, i) =>
+      named.has(i) ? (v.words || []).map((w) => new Compared(w)).filter((w) => w.length) : [],
+    );
+    const of = orderFreeLineScore(heardWords, lw, SWITCH_CAND_MIN_LINE_CHARS);
     return { s: Math.max(m.s, of), index: m.index };
   }, []);
   // Re-rank the typed matches by the hearing; open one when it is clear (or the only one).
@@ -4561,6 +4570,17 @@ const VoiceFollow = () => {
         rows = [];
       }
       if (hintRef.current.seq !== seq) return; // typed on
+      // Per Shabad, the verse ids the database's search matched (the pangtis the letters name).
+      const named = new Map();
+      rows.forEach(({ r }) => {
+        try {
+          const sid = r.Shabads[0].ShabadID;
+          if (!named.has(sid)) named.set(sid, new Set());
+          named.get(sid).add(r.ID);
+        } catch (_) {
+          /* row without a Shabad: not offered */
+        }
+      });
       const cands = sevadaarHint.distinctShabads(
         rows
           .map(({ r, kind }) => {
@@ -4585,7 +4605,7 @@ const VoiceFollow = () => {
           ),
       );
       if (hintRef.current.seq !== seq) return;
-      hintRef.current = { ...hintRef.current, cands };
+      hintRef.current = { ...hintRef.current, cands, named };
       if (!cands.length) setHintRows([]);
       evaluateHint();
     },
@@ -4643,11 +4663,9 @@ const VoiceFollow = () => {
       if (!recognizingRef.current) return;
       // Shadow activity log: words are being heard (singing or speech) right now.
       if (SHADOW_BUILD) shadowBus.heard(text || '');
-      {
-        const heardNow = vfNorm(text || '');
-        if (heardNow.length >= HINT_HEARD_MIN) lastHeardRef.current = heardNow;
-        if (hintRef.current.q) evaluateHint();
-      }
+      // Sevadaar hint: keep the latest heard text, re-judge the typed letters on it.
+      if (heardForComparing(text || '').length >= HINT_HEARD_MIN) lastHeardRef.current = text;
+      if (hintRef.current.q) evaluateHint();
       const session = sessionRef.current;
       // Accumulate distinct hypotheses while identifying the first Shabad.
       // Canonical retrieval supplies identities; recognized text is never displayed.
