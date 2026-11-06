@@ -14,11 +14,8 @@ const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_M
 const SR = 16000;
 const BLANK = 256;
 
-// Heard text only (the speech model's output, never a pangti): strip whitespace, dandas,
-// Gurmukhi/ASCII digits, punctuation (matches _STRIP). A pangti is compared through a Compared
-// view (compared.js), which skips these characters while comparing and leaves the pangti as is.
-const STRIP = /[\s।॥|0-9੦-੯.,;:!?\-]+/g;
-const norm = (s) => (s || '').replace(STRIP, '');
+// Heard text only (never a pangti), made ready for comparing: see compared.js.
+const { heardForComparing } = require('./compared');
 
 function resampleTo16k(pcm, inSr) {
   if (inSr === SR) return pcm;
@@ -177,4 +174,12 @@ class Infer {
   }
 }
 
-module.exports = { Infer, resampleTo16k, norm, SR, BLANK };
+module.exports = {
+  Infer,
+  resampleTo16k,
+  heardForComparing,
+  // compatibility: the research tools (search-sim.js, analyze-switches.js) still require it as `norm`
+  norm: heardForComparing,
+  SR,
+  BLANK,
+};

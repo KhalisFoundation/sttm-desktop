@@ -143,10 +143,11 @@ const databaseFilesPresent = () => {
 };
 const WARM_INDEX_DELAY_MS = 1500; // after the window's first paint
 
-// vfNorm: heard text only. A pangti is compared through a Compared view: kept exactly as the
-// database gives it, with spaces, dandas and numbers skipped while comparing (engine/compared.js).
-const { norm: vfNorm, partialRatio } = engine;
-const { Compared, sameCompared } = require('../engine/compared');
+// heardForComparing: heard text only. A pangti is compared through a Compared view: kept exactly
+// as the database gives it, with spaces, dandas and numbers skipped while comparing
+// (engine/compared.js).
+const { partialRatio } = engine;
+const { Compared, sameCompared, heardForComparing } = require('../engine/compared');
 
 // Pure, unit-tested switch/display policy (see switchPolicy.js + .test.js).
 const {
@@ -190,16 +191,16 @@ const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
 // Used to score the CURRENT shabad from where we actually are, so a coincidental
 // match to a distant line can't keep the current shabad artificially ahead of a real
 // new one. Falls back to the global max when the cursor is unknown.
-function cursorLineScore(hypNorm, linesNorm, cursor, back, ahead) {
-  if (!hypNorm || !linesNorm || !linesNorm.length) return 0;
-  if (cursor == null || cursor < 0) return maxLineScore(hypNorm, linesNorm);
+function cursorLineScore(heard, linesCompared, cursor, back, ahead) {
+  if (!heard || !linesCompared || !linesCompared.length) return 0;
+  if (cursor == null || cursor < 0) return maxLineScore(heard, linesCompared);
   const lo = Math.max(0, cursor - back);
-  const hi = Math.min(linesNorm.length - 1, cursor + ahead);
+  const hi = Math.min(linesCompared.length - 1, cursor + ahead);
   let best = 0;
   for (let i = lo; i <= hi; i += 1) {
-    const ln = linesNorm[i];
+    const ln = linesCompared[i];
     if (ln) {
-      const s = partialRatio(hypNorm, ln) / 100;
+      const s = partialRatio(heard, ln) / 100;
       if (s > best) best = s;
     }
   }
@@ -867,8 +868,7 @@ const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in ca
 // Recognizer spellings are loose: ignore a final short vowel, fold ਣ/ਨ and the nukta, and
 // count a word as matched when most of it agrees with a word of the line.
 const wordKey = (w) =>
-  engine
-    .norm(w)
+  heardForComparing(w)
     .replace(/[\u0a3f\u0a41]$/, '')
     .replace(/\u0a23/g, '\u0a28')
     .replace(/\u0a3c/g, '');
@@ -1051,9 +1051,9 @@ async function loadFollowRows(baniId, col) {
   });
 }
 
-// Split a Unicode Gurmukhi line into word tokens for the aligner. The server
-// normalizes further (strips punctuation/matras irrelevant to matching); this
-// only needs to break on whitespace and drop dandas/line numbers.
+// Split a Unicode Gurmukhi line into word tokens for the aligner (each word as written). The
+// server's matching skips further characters (punctuation/matras irrelevant to matching); this
+// only needs to break on whitespace and dandas/line numbers.
 const tokenize = (uni) =>
   (uni || '')
     .replace(/[॥।]|\d+/g, ' ')
@@ -1764,9 +1764,9 @@ const VoiceFollow = () => {
   const sampleRateRef = useRef(null); // mic sample rate, for building engine sessions
   const currentShabadIdRef = useRef(null); // shabad currently projected (avoid re-open)
   // The current shabad's pangtis (acoustic scoring) and each pangti's words (order-free defense), as
-  // Compared views: the text exactly as BaniDB gives it, read in place (names kept for the bench harness).
-  const curLinesNormRef = useRef([]);
-  const curWordsNormRef = useRef([]);
+  // Compared views: the text exactly as BaniDB gives it, read in place.
+  const curLinesComparedRef = useRef([]);
+  const curWordsComparedRef = useRef([]);
   const curProfileRef = useRef(null); // full profile of the current shabad (kept for a fast return)
   const prevShabadRef = useRef(null); // { id, profile, decodesSince } — shabad we just switched away from
   const returnSlotRef = useRef(null); // { shabadId, wins, index, lastScore } — in-flight return evaluation
@@ -1980,7 +1980,7 @@ const VoiceFollow = () => {
     }
   }, [switchView]);
   // Acoustic switch candidate being evaluated while following:
-  // { shabadId, verseId, verse, linesNorm, wins, loading }
+  // { shabadId, verseId, verse, linesCompared, wins, loading }
   const switchCandRef = useRef(null);
   // Acoustic backstop contender (same shape + display/lastScore/committed):
   // the best line-text match across the screened shabad field.
@@ -1988,7 +1988,7 @@ const VoiceFollow = () => {
   // Read-only canonical retrieval service, isolated from the renderer process (warmIndex).
   const runStartedAtRef = useRef(Date.now()); // when the current run began (retry gate)
   const startInFlightRef = useRef(null); // the Start being set up right now, if any
-  const lineCacheRef = useRef(new Map()); // shabadId -> { linesNorm, verses } | null (loading)
+  const lineCacheRef = useRef(new Map()); // shabadId -> { linesCompared, verses } | null (loading)
   const bsWinsRef = useRef(new Map()); // backstop wins banked per shabadId (survives screen flap)
   const sameGurbaniRef = useRef(new Map()); // 'a:b' -> Promise<boolean> (DUP_AWARE_LOCK)
   const bsAdoptKeyRef = useRef(''); // last screened field we ran adoption against
@@ -2052,7 +2052,7 @@ const VoiceFollow = () => {
     // The Shabad on screen when the Ardas began, and its lines (see the lock gate).
     if (kind && !prev) {
       ng.before = currentShabadIdRef.current;
-      ng.beforeLines = (curLinesNormRef.current || []).slice();
+      ng.beforeLines = (curLinesComparedRef.current || []).slice();
     }
     sessionLog.logEvent('not_gurbani_hold', {
       session: sessionIdRef.current || ng.session,
@@ -2302,7 +2302,8 @@ const VoiceFollow = () => {
       if (!last || typeof cand.verse !== 'string') return false;
       const line = new Compared(anvaad.unicode(cand.verse));
       return (
-        maxLineScore(vfNorm(last.text), [line], SWITCH_CAND_MIN_LINE_CHARS) >= NG_HOLD_EXIT_SCORE
+        maxLineScore(heardForComparing(last.text), [line], SWITCH_CAND_MIN_LINE_CHARS) >=
+        NG_HOLD_EXIT_SCORE
       );
     } catch (_) {
       return false;
@@ -2771,12 +2772,12 @@ const VoiceFollow = () => {
   ngHeardRef.current = (rout) => {
     try {
       const text = rout.text || '';
-      const hyp = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+      const hyp = heardForComparing(text).slice(-SWITCH_HYP_SLICE);
       ngRef.current.lastHyp = hyp;
       if (hyp.length < SWITCH_HYP_MIN) return;
-      const lines = curLinesNormRef.current || [];
+      const lines = curLinesComparedRef.current || [];
       let all = lines;
-      let words = curWordsNormRef.current || [];
+      let words = curWordsComparedRef.current || [];
       const cur = curCursorRef.current;
       if (baniIdOf(currentShabadIdRef.current) != null && cur != null) {
         const from = Math.max(0, cur - BANI_CUR_SPAN);
@@ -2787,7 +2788,7 @@ const VoiceFollow = () => {
         cursorLineScore(hyp, lines, cur, CUR_SCORE_BACK, CUR_SCORE_AHEAD),
         maxLineScore(hyp, all, SWITCH_CAND_MIN_LINE_CHARS),
         orderFreeLineScore(
-          tokenize(text).map(vfNorm).filter(Boolean),
+          tokenize(text).map(heardForComparing).filter(Boolean),
           words,
           SWITCH_CAND_MIN_LINE_CHARS,
         ),
@@ -3149,8 +3150,8 @@ const VoiceFollow = () => {
     phaseRef.current = 'searching';
     lockingRef.current = false;
     currentShabadIdRef.current = null;
-    curLinesNormRef.current = [];
-    curWordsNormRef.current = [];
+    curLinesComparedRef.current = [];
+    curWordsComparedRef.current = [];
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     paathSeqRef.current = { ...PAATH_SEQ_OFF };
@@ -3362,8 +3363,8 @@ const VoiceFollow = () => {
   const enterSearching = useCallback(async () => {
     phaseRef.current = 'searching';
     followerRef.current = null;
-    curLinesNormRef.current = [];
-    curWordsNormRef.current = [];
+    curLinesComparedRef.current = [];
+    curWordsComparedRef.current = [];
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     paathSeqRef.current = { ...PAATH_SEQ_OFF };
@@ -3407,7 +3408,7 @@ const VoiceFollow = () => {
 
   ngEnterSearchingRef.current = enterSearching;
 
-  // Load a shabad's verses (tokenized, for a Follower) and normalized line texts
+  // Load a shabad's verses (tokenized, for a Follower) and its lines for comparing
   // (for acoustic scoring). Throws if it can't be loaded / has no usable lines.
   const getBaniIndex = useCallback(() => {
     const col = BANI_LENGTH_COLS[userLength()] || BANI_LENGTH_COLS.short;
@@ -3516,7 +3517,7 @@ const VoiceFollow = () => {
     }));
     const displayLines = filtered.map((r) => anvaad.unicode(r.Gurmukhi));
     // each pangti as BaniDB gives it, read in place when matching (nothing removed from it)
-    const linesNorm = displayLines.map((t) => new Compared(t));
+    const linesCompared = displayLines.map((t) => new Compared(t));
     const rawLines = filtered.map((r) => r.Gurmukhi);
     // Every length's shabads belong to the Bani being followed: a reader of the
     // long Rehras reads shabads the short one lacks, and those must hold the
@@ -3526,7 +3527,7 @@ const VoiceFollow = () => {
       BANI_LENGTH_ALL.map((c) => banidb.loadBaniIndex(c).catch(() => ({}))),
     );
     all.forEach((idx) => ((idx && idx[baniId]) || []).forEach((sid) => shabadIds.add(sid)));
-    return { verses, linesNorm, displayLines, rawLines, shabadIds, offScreen, screenLines };
+    return { verses, linesCompared, displayLines, rawLines, shabadIds, offScreen, screenLines };
   }, []);
 
   const loadShabadProfile = useCallback(async (shabadId) => {
@@ -3542,9 +3543,9 @@ const VoiceFollow = () => {
     // alignment words (which omit punctuation and verse numbers).
     const displayLines = filtered.map((it) => anvaad.unicode(it.verse));
     // each pangti as BaniDB gives it, read in place when matching (nothing removed from it)
-    const linesNorm = displayLines.map((t) => new Compared(t));
+    const linesCompared = displayLines.map((t) => new Compared(t));
     const rawLines = filtered.map((it) => it.verse);
-    return { verses, linesNorm, displayLines, rawLines };
+    return { verses, linesCompared, displayLines, rawLines };
   }, []);
 
   // Akhand Paath reading window: Shabad `shabadId` and the next PAATH_SEQ_AHEAD of Sri Guru
@@ -3605,7 +3606,7 @@ const VoiceFollow = () => {
       return {
         // the paath follower aligns letters: each row's text as BaniDB writes it
         verses: cat('verses').map((v, i) => ({ ...v, text: anvaad.unicode(rawLines[i] || '') })),
-        linesNorm: cat('linesNorm'),
+        linesCompared: cat('linesCompared'),
         displayLines: cat('displayLines'),
         rawLines,
         shabadIds,
@@ -3872,8 +3873,8 @@ const VoiceFollow = () => {
         curCursorPrevRef.current = null;
         returnSlotRef.current = null;
         curProfileRef.current = profile;
-        curLinesNormRef.current = profile.linesNorm;
-        curWordsNormRef.current = profile.verses.map((v) =>
+        curLinesComparedRef.current = profile.linesCompared;
+        curWordsComparedRef.current = profile.verses.map((v) =>
           (v.words || []).map((w) => new Compared(w)).filter((w) => w.length),
         );
         setCurrentView({ id: cand.shabadId, line: anvaad.unicode(cand.verse) });
@@ -4280,7 +4281,10 @@ const VoiceFollow = () => {
       return;
     }
     if (!sq.lines.has(out.lineIndex)) {
-      sq.seen.push({ t: Date.now(), words: (curWordsNormRef.current[out.lineIndex] || []).length });
+      sq.seen.push({
+        t: Date.now(),
+        words: (curWordsComparedRef.current[out.lineIndex] || []).length,
+      });
     }
     sq.lines.add(out.lineIndex);
     sq.last = out.lineIndex;
@@ -4396,7 +4400,7 @@ const VoiceFollow = () => {
         memory.step += 1;
         const { step } = memory;
         memory.entries = memory.entries.filter((e) => step - e.step <= 24);
-        const hyp = vfNorm(text);
+        const hyp = heardForComparing(text);
         // Pankti Cumulation clock: sung decodes fade the evidence, quiet ones (alaap, tabla) may freeze it
         if (PANKTI_CUMULATION_FIND > 0 && memory.kf)
           pcElapse(
@@ -4607,7 +4611,7 @@ const VoiceFollow = () => {
               let cur = [];
               for (let i = words.length - 1; i >= 0 && pieces.length < PC_FRAG_PIECES; i -= 1) {
                 cur.unshift(words[i]); // whole words only
-                if (vfNorm(cur.join(' ')).length >= PC_FRAG_LETTERS) {
+                if (heardForComparing(cur.join(' ')).length >= PC_FRAG_LETTERS) {
                   pieces.push(cur.join(' '));
                   cur = [];
                 }
@@ -4793,7 +4797,7 @@ const VoiceFollow = () => {
         if (kfSwitchRef.current.cur !== curId || kfSwitchRef.current.session !== session)
           kfSwitchRef.current = { cur: curId, session, store: new Map(), last: '', rep: new Map() };
         const ks = kfSwitchRef.current;
-        const kfHeard = vfNorm(text);
+        const kfHeard = heardForComparing(text);
         if (curId != null && baniIdOf(curId) == null) {
           pcElapse(ks.store, AP_REC_HOP_S, kfHeard.length < PC_QUIET_LETTERS, PC_SWITCH);
           if (kfHeard.length >= PC_SWITCH_MIN_LETTERS && kfHeard !== ks.last) {
@@ -4877,7 +4881,7 @@ const VoiceFollow = () => {
         // Runs here, before the first-letter gate below: a piece of one or two words (the case
         // that matters: a slow pangti heard in 5-9 letter pieces) never reaches the judge.
         const curId = currentShabadIdRef.current;
-        const hypFull = vfNorm(text).slice(-SWITCH_HYP_SLICE);
+        const hypFull = heardForComparing(text).slice(-SWITCH_HYP_SLICE);
         {
           const fr = fragRef.current;
           if (fr.cur !== curId || fr.session !== session) {
@@ -4892,7 +4896,7 @@ const VoiceFollow = () => {
           const nowMs = Date.now();
           // Nominate the top Shabad of the full-text search for a long enough piece (reusing
           // Pankti Cumulation (switch)'s search of this decode when it ran).
-          const heardAll = vfNorm(text);
+          const heardAll = heardForComparing(text);
           if (heardAll.length >= PC_SWITCH_MIN_LETTERS && heardAll !== fr.searched) {
             fr.searched = heardAll;
             const ks = kfSwitchRef.current;
@@ -4952,14 +4956,14 @@ const VoiceFollow = () => {
           const fc = fragCacheRef.current;
           ids.slice(0, PC_FRAGMENT_CANDS).forEach(({ id, role }) => {
             const prof =
-              (fc.get(id) && fc.get(id).linesNorm ? fc.get(id) : null) ||
+              (fc.get(id) && fc.get(id).linesCompared ? fc.get(id) : null) ||
               lineCacheRef.current.get(id);
-            if (prof && prof.linesNorm) {
-              const real = prof.linesNorm.filter(
+            if (prof && prof.linesCompared) {
+              const real = prof.linesCompared.filter(
                 (l) => l && l.length >= PC_FRAGMENT.minLineLetters,
               ).length;
               if (!(PC_FRAGMENT_MIN_PANGTIS > 0 && real < PC_FRAGMENT_MIN_PANGTIS))
-                cands.push({ id, role, linesNorm: prof.linesNorm, prof });
+                cands.push({ id, role, linesCompared: prof.linesCompared, prof });
             } else if (!fc.has(id) && loads < 2) {
               loads += 1;
               if (fc.size >= PC_FRAGMENT_CACHE) {
@@ -4980,7 +4984,7 @@ const VoiceFollow = () => {
           });
           const r = fragStep(
             fr.store,
-            { hyp: hypFull, cur: { linesNorm: curLinesNormRef.current }, cands },
+            { hyp: hypFull, cur: { linesCompared: curLinesComparedRef.current }, cands },
             partialRatio,
             PC_FRAGMENT,
           );
@@ -5336,12 +5340,12 @@ const VoiceFollow = () => {
             });
           }
         }
-        const hypFull = vfNorm(text).slice(-SWITCH_HYP_SLICE); // recent decoded audio
+        const hypFull = heardForComparing(text).slice(-SWITCH_HYP_SLICE); // recent decoded audio
         // Current shabad scored from the cursor, candidates scored across all
         // their lines (a new shabad may be entered anywhere, usually its start).
         const sCurWindow = cursorLineScore(
           hypFull,
-          curLinesNormRef.current,
+          curLinesComparedRef.current,
           curCursorRef.current,
           CUR_SCORE_BACK,
           CUR_SCORE_AHEAD,
@@ -5351,9 +5355,9 @@ const VoiceFollow = () => {
         // ALL its lines (the rahao lives outside the cursor window when it is
         // re-sung) and with word order ignored (kirtan rotates phrases). The
         // candidate keeps its own scoring; only the bar it must clear is honest.
-        const hypWordsNorm = tokenize(text).map(vfNorm).filter(Boolean);
-        let curLinesAll = curLinesNormRef.current;
-        let curWordsAll = curWordsNormRef.current;
+        const heardWords = tokenize(text).map(heardForComparing).filter(Boolean);
+        let curLinesAll = curLinesComparedRef.current;
+        let curWordsAll = curWordsComparedRef.current;
         if (baniIdOf(curId) != null && curCursorRef.current != null && curLinesAll) {
           const from = Math.max(0, curCursorRef.current - BANI_CUR_SPAN);
           const to = curCursorRef.current + BANI_CUR_SPAN + 1;
@@ -5362,7 +5366,7 @@ const VoiceFollow = () => {
         }
         const sCurAll = Math.max(
           maxLineScore(hypFull, curLinesAll, SWITCH_CAND_MIN_LINE_CHARS),
-          orderFreeLineScore(hypWordsNorm, curWordsAll, SWITCH_CAND_MIN_LINE_CHARS),
+          orderFreeLineScore(heardWords, curWordsAll, SWITCH_CAND_MIN_LINE_CHARS),
         );
         const sCurFull = Math.max(sCurWindow, sCurAll);
         const acousticCfg = {
@@ -5418,7 +5422,7 @@ const VoiceFollow = () => {
             {
               isBani: BANI_END_EXIT_BANIS.has(Number(baniIdOf(curId))),
               cursor: curCursorRef.current,
-              nLines: (curLinesNormRef.current || []).length,
+              nLines: (curLinesComparedRef.current || []).length,
               decisive: step.decisive,
             },
             BANI_END_EXIT,
@@ -5470,19 +5474,19 @@ const VoiceFollow = () => {
                 shabadId: contId,
                 verseId: row.verseId,
                 verse: row.verse,
-                linesNorm: null,
+                linesCompared: null,
                 wins: 0,
               };
               switchCandRef.current = sc;
               loadShabadProfile(contId)
                 .then((p) => {
-                  if (switchCandRef.current === sc) sc.linesNorm = p.linesNorm;
+                  if (switchCandRef.current === sc) sc.linesCompared = p.linesCompared;
                 })
                 .catch(() => {
                   if (switchCandRef.current === sc) switchCandRef.current = null;
                 });
-            } else if (sc.linesNorm) {
-              const sCand = maxLineScore(hypFull, sc.linesNorm, SWITCH_CAND_MIN_LINE_CHARS);
+            } else if (sc.linesCompared) {
+              const sCand = maxLineScore(hypFull, sc.linesCompared, SWITCH_CAND_MIN_LINE_CHARS);
               sc.committed = stepSlot(sc, sCand);
             }
           }
@@ -5520,8 +5524,8 @@ const VoiceFollow = () => {
               let top = null;
               screened.forEach(({ id }) => {
                 const prof = lineCacheRef.current.get(id);
-                if (prof && prof.linesNorm) {
-                  const m = bestLineMatch(hypFull, prof.linesNorm, SWITCH_CAND_MIN_LINE_CHARS);
+                if (prof && prof.linesCompared) {
+                  const m = bestLineMatch(hypFull, prof.linesCompared, SWITCH_CAND_MIN_LINE_CHARS);
                   if (m.index >= 0 && (!top || m.s > top.m.s)) top = { id, prof, m };
                 }
               });
@@ -5532,7 +5536,7 @@ const VoiceFollow = () => {
                   verseId: v.verseId,
                   verse: null, // ascii verse fetched once, at commit
                   display: top.prof.displayLines[top.m.index] || '',
-                  linesNorm: top.prof.linesNorm,
+                  linesCompared: top.prof.linesCompared,
                   // Keep matching lines and their canonical identities together
                   // while the shared cache can evict/reload this profile.
                   profile: top.prof,
@@ -5576,8 +5580,8 @@ const VoiceFollow = () => {
                   if (cache.get(id) === pendingProfile) cache.delete(id);
                 });
             });
-          if (bs && bs.linesNorm) {
-            const m = bestLineMatch(hypFull, bs.linesNorm, SWITCH_CAND_MIN_LINE_CHARS);
+          if (bs && bs.linesCompared) {
+            const m = bestLineMatch(hypFull, bs.linesCompared, SWITCH_CAND_MIN_LINE_CHARS);
             if (m.index >= 0) {
               const prof = bs.profile;
               const v = prof.verses[m.index] || {};
@@ -5603,7 +5607,7 @@ const VoiceFollow = () => {
             prev.id !== curId &&
             !knownSame(prev.id, curId) &&
             prev.profile &&
-            prev.profile.linesNorm
+            prev.profile.linesCompared
           ) {
             prev.decodesSince += 1;
             if (prev.decodesSince > RETURN_WINDOW_DECODES) {
@@ -5615,7 +5619,11 @@ const VoiceFollow = () => {
                 rs = { shabadId: prev.id, wins: 0, index: -1, lastScore: null };
                 returnSlotRef.current = rs;
               }
-              const m = bestLineMatch(hypFull, prev.profile.linesNorm, SWITCH_CAND_MIN_LINE_CHARS);
+              const m = bestLineMatch(
+                hypFull,
+                prev.profile.linesCompared,
+                SWITCH_CAND_MIN_LINE_CHARS,
+              );
               if (m.index >= 0) {
                 const step = nextSwitchWins(rs.wins, m.s, sCurFull, acousticCfg);
                 const kfShared =
@@ -6026,8 +6034,8 @@ const VoiceFollow = () => {
     phaseRef.current = 'searching';
     lockingRef.current = false;
     currentShabadIdRef.current = null;
-    curLinesNormRef.current = [];
-    curWordsNormRef.current = [];
+    curLinesComparedRef.current = [];
+    curWordsComparedRef.current = [];
     curProfileRef.current = null;
     curBaniShabadsRef.current = null;
     paathSeqRef.current = { ...PAATH_SEQ_OFF };
@@ -6164,8 +6172,8 @@ const VoiceFollow = () => {
                 seqNextRef.current = null;
                 followerRef.current = nx.follower;
                 curProfileRef.current = nx.profile;
-                curLinesNormRef.current = nx.profile.linesNorm;
-                curWordsNormRef.current = nx.profile.verses.map((v) =>
+                curLinesComparedRef.current = nx.profile.linesCompared;
+                curWordsComparedRef.current = nx.profile.verses.map((v) =>
                   (v.words || []).map((w) => new Compared(w)).filter((w) => w.length),
                 );
                 curBaniShabadsRef.current = nx.profile.shabadIds;

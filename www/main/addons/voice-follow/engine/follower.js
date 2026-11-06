@@ -1,6 +1,6 @@
 // JS port of karansea_engine.py KaranseaEngine: streaming CTC + online
 // token-passing line decoder + CTC word alignment. Mirrors push().
-const { resampleTo16k, norm, SR, BLANK } = require('./infer');
+const { resampleTo16k, heardForComparing, SR, BLANK } = require('./infer');
 const pace = require('./pace');
 const { partialRatio, partialRatioAlignment } = require('./fuzz');
 const { Compared, ComparedJoin } = require('./compared');
@@ -17,7 +17,7 @@ const DEFAULTS = {
   // challenger line clearly better than the current line (a word shared by both
   // lines is not evidence of a jump). 0 disables.
   jumpEmisGap: 0.0,
-  // A fragment shorter than this (normalized chars) cannot move the cursor anywhere
+  // A fragment shorter than this (compared characters) cannot move the cursor anywhere
   // but the next line: one common word is not evidence of a jump. 0 disables.
   minHypJump: 8,
   // Pankti Cumulation (follower): a pangti that the heard words match clearly better than every
@@ -227,7 +227,7 @@ class Follower {
     this.acc = 0;
 
     const emis0 = await this.infer.emissions(this.buf);
-    const hyp = norm(this.infer.decode(this._greedy(emis0)));
+    const hyp = heardForComparing(this.infer.decode(this._greedy(emis0)));
     if (hyp.length < c.minHyp) return this._freeze();
 
     const emis = this.linesCmp.map((ln) => (ln ? partialRatio(hyp, ln) / 100.0 : 0.0));

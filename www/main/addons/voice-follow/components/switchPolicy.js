@@ -63,13 +63,13 @@ function nextEmptyStreak(streak, hasVotes, holdDecodes) {
 // benchmark; the audio harness is kept out of the repo with the audio corpus).
 // lines: the pangtis as the database gives them (strings or Compared views); a line's length is
 // the number of characters a comparison looks at (spaces, dandas and numbers are skipped).
-function maxLineScore(hypNorm, lines, minLineChars = 0) {
-  if (!hypNorm || !lines || !lines.length) return 0;
+function maxLineScore(heard, lines, minLineChars = 0) {
+  if (!heard || !lines || !lines.length) return 0;
   let best = 0;
   for (let i = 0; i < lines.length; i += 1) {
     const ln = lines[i] && compared(lines[i]); // the pangti as given, read in place
     if (ln) {
-      let s = partialRatio(hypNorm, ln) / 100;
+      let s = partialRatio(heard, ln) / 100;
       if (minLineChars > 0) s *= Math.min(1, ln.length / minLineChars);
       if (s > best) best = s;
     }
@@ -105,14 +105,14 @@ function screenByFirstLetters(heardFL, flBySid, excludeId, minOverlap, cap) {
 // line back to its verse (for display + lock payload). Same scoring as
 // maxLineScore (share the penalty semantics); returns { s, index } with
 // index -1 when nothing scores.
-function bestLineMatch(hypNorm, lines, minLineChars = 0) {
-  if (!hypNorm || !lines || !lines.length) return { s: 0, index: -1 };
+function bestLineMatch(heard, lines, minLineChars = 0) {
+  if (!heard || !lines || !lines.length) return { s: 0, index: -1 };
   let best = 0;
   let at = -1;
   for (let i = 0; i < lines.length; i += 1) {
     const ln = lines[i] && compared(lines[i]); // the pangti as given, read in place
     if (ln) {
-      let s = partialRatio(hypNorm, ln) / 100;
+      let s = partialRatio(heard, ln) / 100;
       if (minLineChars > 0) s *= Math.min(1, ln.length / minLineChars);
       if (s > best) {
         best = s;
@@ -131,7 +131,7 @@ function bestLineMatch(hypNorm, lines, minLineChars = 0) {
 // false-switch mechanism on long live kirtan (Level 2 benchmark, clip 20:
 // every wrong switch left the correct shabad while its rahao was being sung).
 // Compare the words in sorted order instead: the same bag of words scores the same
-// regardless of order. hypWords: heard words (normalized); linesWords: each pangti's words,
+// regardless of order. hypWords: heard words (ready for comparing); linesWords: each pangti's words,
 // untouched (strings or Compared views), read in sorted order without building a new text.
 // minLineChars applies the same length-aware containment penalty as
 // maxLineScore so a tiny line cannot win by being contained in the hyp.

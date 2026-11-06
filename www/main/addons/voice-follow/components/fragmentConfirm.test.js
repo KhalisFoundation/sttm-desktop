@@ -5,11 +5,11 @@ const assert = require('node:assert/strict');
 const { partialRatio } = require('../engine/fuzz');
 const { DEFAULTS, step, elapse, of } = require('./fragmentConfirm');
 
-// Shabad 2879 (owner's test, Oct 18) and the Shabad that was on screen (1455), normalized.
+// Shabad 2879 (owner's test, Oct 18) and the Shabad that was on screen (1455), written without spaces (spaces are skipped when comparing).
 const X = {
   id: 2879,
   role: 'change',
-  linesNorm: [
+  linesCompared: [
     'ਜੇਭੁਲੀਜੇਚੁਕੀਸਾਈਂਭੀਤਹਿੰਜੀਕਾਢੀਆ',
     'ਜਿਨੑਾਨੇਹੁਦੂਜਾਣੇਲਗਾਝੂਰਿਮਰਹੁਸੇਵਾਢੀਆ',
     'ਹਉਨਾਛੋਡਉਕੰਤਪਾਸਰਾ',
@@ -17,7 +17,7 @@ const X = {
   ],
 };
 const CUR = {
-  linesNorm: [
+  linesCompared: [
     'ਨਉਨਿਧਿਤੇਰੈਸਗਲਨਿਧਾਨ',
     'ਇਛਾਪੂਰਕੁਰਖੈਨਿਦਾਨ',
     'ਤੂੰਮੇਰੋਪਿਆਰੋਤਾਕੈਸੀਭੂਖਾ',
@@ -56,7 +56,7 @@ describe('fragment confirm', () => {
 
   it('a piece that fits another board candidate too adds little', () => {
     const s = new Map();
-    const Y = { id: 99, role: 'list', linesNorm: ['ਕੋਈਜੇਭੁਲੀਜੇਚੁਕੀਸਾਈਂਹੋਰ'] };
+    const Y = { id: 99, role: 'list', linesCompared: ['ਕੋਈਜੇਭੁਲੀਜੇਚੁਕੀਸਾਈਂਹੋਰ'] };
     const r = run(s, 'ਭਲੀਜੇਚੁਕੀ', [X, Y]);
     assert.equal(r.hits.length, 2);
     r.hits.forEach((h) => assert.equal(h.w, DEFAULTS.sharedW));
@@ -66,7 +66,7 @@ describe('fragment confirm', () => {
 
   it('a piece that fits the Shabad on screen adds nothing', () => {
     const s = new Map();
-    const Z = { id: 7, role: 'change', linesNorm: ['ਤੂੰਮੇਰੋਪਿਆਰੋਹੋਰਕੁਝ'] };
+    const Z = { id: 7, role: 'change', linesCompared: ['ਤੂੰਮੇਰੋਪਿਆਰੋਹੋਰਕੁਝ'] };
     const r = run(s, 'ਤੂੰਮੇਰੋਪਿਆਰੋ', [Z]);
     assert.equal(r.hits.length, 0);
   });

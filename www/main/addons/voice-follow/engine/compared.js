@@ -22,6 +22,12 @@ const IGNORED_UNIT = new Uint8Array(0x10000);
 for (let u = 0; u < 0x10000; u += 1) if (IGNORED.test(String.fromCharCode(u))) IGNORED_UNIT[u] = 1;
 const isIgnored = (ch) => IGNORED.test(ch);
 
+// Heard text only (the speech model's output, never a pangti), made ready for comparing: the
+// same characters dropped (matches _STRIP). A pangti is read through a Compared view instead,
+// which skips them while comparing and leaves the pangti as the database gives it.
+const HEARD_SKIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g;
+const heardForComparing = (s) => (s || '').replace(HEARD_SKIP, '');
+
 class Compared {
   constructor(text, { skip = null, fold = null } = {}) {
     const t = typeof text === 'string' ? text : '';
@@ -116,6 +122,7 @@ function hashCompared(v) {
 /* eslint-enable no-bitwise */
 
 module.exports = {
+  heardForComparing,
   Compared,
   ComparedJoin,
   compared,
