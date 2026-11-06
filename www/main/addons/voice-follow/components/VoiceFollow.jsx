@@ -881,7 +881,11 @@ const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in ca
 // does not hear it), never nothing. The heard key is the heard word, compared as heard.
 const wordKey = (w) => heardForComparing(w);
 const isGurbaniMark = (cp) =>
-  (cp >= 0x0a3c && cp <= 0x0a4d) || cp === 0x0a51 || cp === 0x0a70 || cp === 0x0a71 || cp === 0x0a75;
+  (cp >= 0x0a3c && cp <= 0x0a4d) ||
+  cp === 0x0a51 ||
+  cp === 0x0a70 ||
+  cp === 0x0a71 ||
+  cp === 0x0a75;
 const isLetter = (cp) => (cp >= 0x0a05 && cp <= 0x0a39) || (cp >= 0x0a59 && cp <= 0x0a5e);
 const wordMatches = (k, l) => {
   const v = new Compared(l);
