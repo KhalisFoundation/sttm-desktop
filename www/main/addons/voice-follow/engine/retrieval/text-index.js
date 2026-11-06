@@ -86,7 +86,7 @@ const heardMarksWritten = (heard, pangti) => (heard & ~pangti) === 0;
 // pangti does not have is doubted, not trusted. The run then counts at this reduced weight; the
 // pangti's own marks are unchanged and a run whose heard marks are all written there counts in
 // full. (VF_HEARD_MARK_DOUBT overrides it for benchmarks.)
-const HEARD_MARK_DOUBT = Number(process.env.VF_HEARD_MARK_DOUBT || 0.7);
+const HEARD_MARK_DOUBT = Number(process.env.VF_HEARD_MARK_DOUBT || 0.9);
 const unitKey = (l, i) => String.fromCodePoint(l[i], l[i + 1], l[i + 2]);
 
 class TextIndex {
