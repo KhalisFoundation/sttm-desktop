@@ -168,7 +168,8 @@
       "!www/assets/*.db"
     ],
     "asarUnpack": [
-      "node_modules/better-sqlite3/**/*"
+      "node_modules/better-sqlite3/**/*",
+      "node_modules/onnxruntime-node/bin/**/*"
     ],
     "npmRebuild": false,
     "extraResources": [
@@ -214,6 +215,7 @@
       }
     },
     "afterSign": "./notarize.js",
+    "afterPack": "./packaging/after-pack-vc-runtime.js",
     "nsis": {
       "artifactName": "SikhiToTheMaxSetup-${version}.${ext}",
       "deleteAppDataOnUninstall": true,
