@@ -8,6 +8,8 @@ $themeKhalsaGold: (
   transliteration: #413b3d,
   visraam: #c0392b,
   yamki: #ffc500,
+  // The teleprompter has no background image, so white Gurbani would sit on a near-white pane.
+  teleprompter: #4d2b00,
 );
 
 .theme-khalsa-gold {

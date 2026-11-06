@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { StoreProvider, useStoreState } from 'easy-peasy';
 import { ipcRenderer } from 'electron';
@@ -40,12 +40,10 @@ const PaneProjection = () => {
   const projectionReady = useStoreState((state) => state.projection.ready);
   const paneWidth = useStoreState((state) => state.projection.width);
   const paneHeight = useStoreState((state) => state.projection.height);
-  const { currentWorkspace, theme, defaultPaneId } = useStoreState((state) => state.userSettings);
+  const { currentWorkspace, theme, defaultPaneId, teleprompterFontSize } = useStoreState(
+    (state) => state.userSettings,
+  );
   const activePaneId = useStoreState((state) => state.navigator.activePaneId);
-  const [screenSize, setScreenSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
   const screenRef = useRef(null);
 
   useEffect(() => {
@@ -57,14 +55,6 @@ const PaneProjection = () => {
       location: window.location.href,
     });
   }, [currentWorkspace, paneHeight, paneWidth, projectionReady]);
-
-  useEffect(() => {
-    const updateScreenSize = () => {
-      setScreenSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    window.addEventListener('resize', updateScreenSize);
-    return () => window.removeEventListener('resize', updateScreenSize);
-  }, []);
 
   useEffect(() => {
     if (projectionReady) return undefined;
@@ -103,7 +93,7 @@ const PaneProjection = () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
     };
-  }, [projectionReady, theme, paneWidth, paneHeight, screenSize.width, screenSize.height]);
+  }, [projectionReady, theme, paneWidth, paneHeight]);
 
   if (!projectionReady || !paneWidth || !paneHeight) {
     return <div className={`pane-projection-screen theme-${theme}`} ref={screenRef} />;
@@ -113,32 +103,9 @@ const PaneProjection = () => {
   // Follow the live controller pane in multi-pane; single-pane uses defaultPaneId.
   const multiPaneId = isMultiPane ? activePaneId || defaultPaneId || 1 : false;
 
-  // In Presentation the source pane is half-width; multi-pane source columns
-  // are one-third-width. Use the multi-pane-equivalent width for matching text size.
-  const projectionWidth = isMultiPane ? paneWidth : (paneWidth * 2) / 3;
-
-  // Fill the display. Do not lock the stage to the controller pane height:
-  // width-fitting a short multi-pane column used to scale that box taller than
-  // the screen, and overflow:hidden on the stage clipped the bottom rows with
-  // no scroller. Font size still comes from the controller pane width.
-  const layoutWidth = projectionWidth > 0 ? projectionWidth : screenSize.width;
-  const layoutHeight =
-    layoutWidth > 0 ? (screenSize.height * layoutWidth) / screenSize.width : paneHeight;
-  const textScale =
-    isMultiPane && paneWidth > 0 && paneHeight > 0 && layoutHeight > 0
-      ? Math.min(1, paneHeight / layoutHeight)
-      : 1;
-
   return (
     <div className={`pane-projection-screen theme-${theme}`} ref={screenRef}>
-      <div
-        className="pane-projection-stage"
-        style={{
-          width: layoutWidth,
-          height: layoutHeight,
-          transform: `scale(${screenSize.width / layoutWidth})`,
-        }}
-      >
+      <div className="pane-projection-stage">
         <ShabadPane
           key={`projection-pane-${multiPaneId || 'default'}`}
           className=""
@@ -149,7 +116,9 @@ const PaneProjection = () => {
             height: '100%',
             maxHeight: 'none',
             flex: 'none',
-            ['--projection-text-scale']: textScale,
+            // In vh, so text size depends on the setting and the display, not the
+            // size of the controller pane.
+            '--teleprompter-font-size': `${teleprompterFontSize}vh`,
           }}
         />
       </div>
