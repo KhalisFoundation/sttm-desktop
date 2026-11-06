@@ -12,7 +12,8 @@
 //     heard unit matches a pangti unit when the letters are the same and every mark the model
 //     heard is written there too; a mark the pangti has and the heard text lacks is allowed (the
 //     model did not hear it). The leniency is only for what was heard: a heard mark the pangti
-//     does not have is a mismatch, and the pangti is never read without its marks.
+//     does not have is doubted (the run counts less), and the pangti is never read without its
+//     marks.
 const { Compared } = require('../compared');
 
 const asIs = (s) => new Compared(s);
@@ -81,6 +82,11 @@ function units(text) {
 // Every mark the model heard is written on the pangti unit (heard ⊆ pangti).
 // eslint-disable-next-line no-bitwise
 const heardMarksWritten = (heard, pangti) => (heard & ~pangti) === 0;
+// The model also hears a lagan matra wrongly at times (sihari for bihari): a heard mark the
+// pangti does not have is doubted, not trusted. The run then counts at this reduced weight; the
+// pangti's own marks are unchanged and a run whose heard marks are all written there counts in
+// full. (VF_HEARD_MARK_DOUBT overrides it for benchmarks.)
+const HEARD_MARK_DOUBT = Number(process.env.VF_HEARD_MARK_DOUBT || 0.7);
 const unitKey = (l, i) => String.fromCodePoint(l[i], l[i + 1], l[i + 2]);
 
 class TextIndex {
@@ -151,16 +157,17 @@ class TextIndex {
       const idf = Math.log(1 + this.rows.length / (1 + (p ? p.rows.size : 0)));
       weight += idf;
       if (!p) return;
-      const hit = new Set();
+      const hit = new Map(); // row -> best agreement for this run
       for (let j = 0; j < p.flat.length; j += 4) {
-        if (
+        const agree =
           heardMarksWritten(h0, p.flat[j + 1]) &&
           heardMarksWritten(h1, p.flat[j + 2]) &&
           heardMarksWritten(h2, p.flat[j + 3])
-        )
-          hit.add(p.flat[j]);
+            ? 1
+            : HEARD_MARK_DOUBT;
+        if (agree > (hit.get(p.flat[j]) || 0)) hit.set(p.flat[j], agree);
       }
-      hit.forEach((id) => scores.set(id, (scores.get(id) || 0) + idf));
+      hit.forEach((agree, id) => scores.set(id, (scores.get(id) || 0) + idf * agree));
     });
     this.mergeScores(scores, weight, merged);
   }
