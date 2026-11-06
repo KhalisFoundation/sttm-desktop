@@ -14,7 +14,9 @@ const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_M
 const SR = 16000;
 const BLANK = 256;
 
-// strip whitespace, dandas, Gurmukhi/ASCII digits, punctuation (matches _STRIP)
+// Heard text only (the speech model's output, never a pangti): strip whitespace, dandas,
+// Gurmukhi/ASCII digits, punctuation (matches _STRIP). A pangti is compared through a Compared
+// view (compared.js), which skips these characters while comparing and leaves the pangti as is.
 const STRIP = /[\s।॥|0-9੦-੯.,;:!?\-]+/g;
 const norm = (s) => (s || '').replace(STRIP, '');
 

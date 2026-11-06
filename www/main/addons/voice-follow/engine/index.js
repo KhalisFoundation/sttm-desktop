@@ -96,9 +96,10 @@ module.exports = {
   // Speech or singing (optional YAMNet classifier; see speech-music).
   speechMusic,
   // Text helpers reused by the supervisor for acoustic switch-scoring: `norm`
-  // strips whitespace/punctuation the way the follower does, and `partialRatio`
-  // is the same fuzzy matcher, so a shabad scored here is comparable to the
-  // follower's own line confidences.
+  // strips whitespace/punctuation from HEARD text only (never a pangti), and
+  // `partialRatio` is the follower's fuzzy matcher, which reads a pangti as the
+  // database gives it (skipping spaces/dandas/numbers while comparing), so a
+  // shabad scored here is comparable to the follower's own line confidences.
   norm,
   partialRatio,
   modelPath: modelManager.modelPath,

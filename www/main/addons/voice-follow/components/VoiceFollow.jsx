@@ -143,7 +143,10 @@ const databaseFilesPresent = () => {
 };
 const WARM_INDEX_DELAY_MS = 1500; // after the window's first paint
 
+// vfNorm: heard text only. A pangti is compared through a Compared view: kept exactly as the
+// database gives it, with spaces, dandas and numbers skipped while comparing (engine/compared.js).
 const { norm: vfNorm, partialRatio } = engine;
+const { Compared, sameCompared } = require('../engine/compared');
 
 // Pure, unit-tested switch/display policy (see switchPolicy.js + .test.js).
 const {
@@ -1760,8 +1763,10 @@ const VoiceFollow = () => {
   const lockingRef = useRef(false); // a lock/switch is mid-commit — don't double-fire
   const sampleRateRef = useRef(null); // mic sample rate, for building engine sessions
   const currentShabadIdRef = useRef(null); // shabad currently projected (avoid re-open)
-  const curLinesNormRef = useRef([]); // normalized lines of the current shabad (acoustic scoring)
-  const curWordsNormRef = useRef([]); // per-line normalized words of the current shabad (order-free defense)
+  // The current shabad's pangtis (acoustic scoring) and each pangti's words (order-free defense), as
+  // Compared views: the text exactly as BaniDB gives it, read in place (names kept for the bench harness).
+  const curLinesNormRef = useRef([]);
+  const curWordsNormRef = useRef([]);
   const curProfileRef = useRef(null); // full profile of the current shabad (kept for a fast return)
   const prevShabadRef = useRef(null); // { id, profile, decodesSince } — shabad we just switched away from
   const returnSlotRef = useRef(null); // { shabadId, wins, index, lastScore } — in-flight return evaluation
@@ -2295,7 +2300,7 @@ const VoiceFollow = () => {
       const { texts } = ngRef.current;
       const last = texts[texts.length - 1];
       if (!last || typeof cand.verse !== 'string') return false;
-      const line = vfNorm(anvaad.unicode(cand.verse));
+      const line = new Compared(anvaad.unicode(cand.verse));
       return (
         maxLineScore(vfNorm(last.text), [line], SWITCH_CAND_MIN_LINE_CHARS) >= NG_HOLD_EXIT_SCORE
       );
@@ -3509,8 +3514,9 @@ const VoiceFollow = () => {
       words: tokenize(anvaad.unicode(r.Gurmukhi)),
       text: anvaad.unicode(r.Gurmukhi),
     }));
-    const linesNorm = verses.map((v) => vfNorm((v.words || []).join(' ')));
     const displayLines = filtered.map((r) => anvaad.unicode(r.Gurmukhi));
+    // each pangti as BaniDB gives it, read in place when matching (nothing removed from it)
+    const linesNorm = displayLines.map((t) => new Compared(t));
     const rawLines = filtered.map((r) => r.Gurmukhi);
     // Every length's shabads belong to the Bani being followed: a reader of the
     // long Rehras reads shabads the short one lacks, and those must hold the
@@ -3532,10 +3538,11 @@ const VoiceFollow = () => {
       verseId: it.verseId,
       words: tokenize(anvaad.unicode(it.verse)),
     }));
-    const linesNorm = verses.map((v) => vfNorm((v.words || []).join(' ')));
     // Preserve the exact BaniDB text for display, separately from tokenized
     // alignment words (which omit punctuation and verse numbers).
     const displayLines = filtered.map((it) => anvaad.unicode(it.verse));
+    // each pangti as BaniDB gives it, read in place when matching (nothing removed from it)
+    const linesNorm = displayLines.map((t) => new Compared(t));
     const rawLines = filtered.map((it) => it.verse);
     return { verses, linesNorm, displayLines, rawLines };
   }, []);
@@ -3867,7 +3874,7 @@ const VoiceFollow = () => {
         curProfileRef.current = profile;
         curLinesNormRef.current = profile.linesNorm;
         curWordsNormRef.current = profile.verses.map((v) =>
-          (v.words || []).map(vfNorm).filter(Boolean),
+          (v.words || []).map((w) => new Compared(w)).filter((w) => w.length),
         );
         setCurrentView({ id: cand.shabadId, line: anvaad.unicode(cand.verse) });
         lockedVerseRef.current = { verseId: cand.verseId, verse: cand.verse };
@@ -6159,7 +6166,7 @@ const VoiceFollow = () => {
                 curProfileRef.current = nx.profile;
                 curLinesNormRef.current = nx.profile.linesNorm;
                 curWordsNormRef.current = nx.profile.verses.map((v) =>
-                  (v.words || []).map(vfNorm).filter(Boolean),
+                  (v.words || []).map((w) => new Compared(w)).filter((w) => w.length),
                 );
                 curBaniShabadsRef.current = nx.profile.shabadIds;
                 curCursorRef.current = line;
@@ -6381,11 +6388,11 @@ const VoiceFollow = () => {
                     }
                     // The Aarti row with this line's text (the copy's own verse id differs).
                     const prof = await loadBaniProfile(AARTI_BANI);
-                    const want = vfNorm(anvaad.unicode(lineText));
-                    let at = prof.rawLines.findIndex((l) => vfNorm(anvaad.unicode(l)) === want);
+                    const want = new Compared(anvaad.unicode(lineText));
+                    let at = prof.rawLines.findIndex((l) => sameCompared(anvaad.unicode(l), want));
                     if (at < 0)
                       at = prof.rawLines.findIndex(
-                        (l) => partialRatio(vfNorm(anvaad.unicode(l)), want) >= 90,
+                        (l) => partialRatio(anvaad.unicode(l), want) >= 90,
                       );
                     if (at < 0 || currentShabadIdRef.current !== sid || lockingRef.current) return;
                     autopilotLockRef.current(
@@ -7019,8 +7026,7 @@ const VoiceFollow = () => {
       : '') || '';
   const sameAsCurrent = (line) =>
     !!line &&
-    ((liveLine && engine.norm(line) === engine.norm(liveLine)) ||
-      (curFirst && engine.norm(line) === engine.norm(curFirst)));
+    ((liveLine && sameCompared(line, liveLine)) || (curFirst && sameCompared(line, curFirst)));
   // The listed cards come from the shelf (publishBoard): held, ordered by confidence and
   // fading there. They are not tied to the hearing strip: a pause does not empty the list.
   const boardOthers = shelf

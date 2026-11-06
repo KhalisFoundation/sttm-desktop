@@ -37,7 +37,11 @@ const DEFAULTS = {
 };
 const LIVE = 0.3;
 
-/** Best pangti of `linesNorm` for the heard piece `hyp`: { s, index } (s 0..1, index -1 = none). */
+/**
+ * Best pangti of `linesNorm` for the heard piece `hyp`: { s, index } (s 0..1, index -1 = none).
+ * linesNorm: the pangtis as Compared views (engine/compared.js: each pangti exactly as the database
+ * gives it; a view's length counts only the characters a comparison looks at).
+ */
 function bestPangti(hyp, linesNorm, ratio, cfg = DEFAULTS) {
   let best = { s: 0, index: -1 };
   (linesNorm || []).forEach((ln, i) => {
@@ -67,7 +71,7 @@ function totalOf(lines) {
 }
 
 /**
- * One heard piece. hyp = normalized heard text; cur = { linesNorm } of the Shabad on screen;
+ * One heard piece. hyp = normalized heard text; cur = { linesNorm } (Compared views) of the Shabad on screen;
  * cands = [{ id, linesNorm, role: 'change' | 'list' }]. ratio = partialRatio(a, b) -> 0..100.
  * Returns { hits: [{ id, index, s, w }], ready: { id, index } | null, sCur } (sCur = the Shabad on
  * screen's best pangti for this piece).
