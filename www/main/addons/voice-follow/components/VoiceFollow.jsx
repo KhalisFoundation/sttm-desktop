@@ -399,10 +399,19 @@ const ngArdasShabad = (id) => Object.prototype.hasOwnProperty.call(NG_ARDAS_SHAB
 // A heading line that is the Fateh itself (ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ, at the top of many compositions):
 // heard in an announcement's opening Fateh, it is never a Shabad being sung or read.
 const NG_FATEH_LINE = 'ਵਾਹਿਗੁਰੂਜੀਕੀਫਤਹ';
+// The pangti is read in place through a Compared view (spaces and dandas skipped while
+// comparing); no changed copy of it is made.
+const NG_FATEH_CODES = Array.from(NG_FATEH_LINE, (ch) => ch.codePointAt(0));
 const ngFatehLine = (c) => {
   try {
-    const letters = anvaad.unicode(c.verse).replace(/[^\u0A00-\u0A75]/g, '');
-    return letters.length <= NG_FATEH_LINE.length + 4 && letters.includes(NG_FATEH_LINE);
+    const v = new Compared(anvaad.unicode(c.verse));
+    if (v.length > NG_FATEH_CODES.length + 4) return false;
+    for (let s = 0; s + NG_FATEH_CODES.length <= v.length; s += 1) {
+      let k = 0;
+      while (k < NG_FATEH_CODES.length && v.code(s + k) === NG_FATEH_CODES[k]) k += 1;
+      if (k === NG_FATEH_CODES.length) return true;
+    }
+    return false;
   } catch (_) {
     return false;
   }
@@ -865,36 +874,41 @@ const VOL_SILENT_WINDOWS = 32; // 8 s of silence before "No sound" (a pause is n
 const VOL_ORDER = ['none', 'low', 'good', 'great'];
 const HEARD_MIN_CONF = 0.88; // what-it-hears strip: below this the text is letters, not words
 const HEARD_KEYS_KEEP = 14; // recent heard words kept for marking matches in candidate lines
-// Marking heard words in a candidate line. The pangti word is used exactly as the database
-// gives it; the leniency is for the recognizer's loose spelling only: where the heard word
-// lacks a mark the pangti has (a final sihari or aunkar, a nukta), or writes ਨ for ਣ (or ਣ for
-// ਨ), it still counts. The heard key is the heard word, compared as heard.
+// Marking heard words in a candidate line. The pangti word is read exactly as the database gives
+// it (a Compared view: only dandas and numbers attached to it are skipped), every letter and
+// lagan matra counted; no letter is ever exchanged. The leniency is for the heard word only: a
+// lagan matra of the pangti that the heard word lacks costs half a character (the model often
+// does not hear it), never nothing. The heard key is the heard word, compared as heard.
 const wordKey = (w) => heardForComparing(w);
-const GURBANI_MARK_HEARD_MAY_LACK = new Set(['\u0a3c', '\u0a3f', '\u0a41']);
-const heardMatchesChar = (h, p) =>
-  h === p || (h === '\u0a28' && p === '\u0a23') || (h === '\u0a23' && p === '\u0a28');
-// How many characters of the pangti word the heard key agrees with from the start, letting the
-// heard key lack a mark the pangti has. Returns [pangti chars read, heard chars read].
-const commonPrefix = (heard, pangti) => {
+const isGurbaniMark = (cp) =>
+  (cp >= 0x0a3c && cp <= 0x0a4d) || cp === 0x0a51 || cp === 0x0a70 || cp === 0x0a71 || cp === 0x0a75;
+const isLetter = (cp) => (cp >= 0x0a05 && cp <= 0x0a39) || (cp >= 0x0a59 && cp <= 0x0a5e);
+const wordMatches = (k, l) => {
+  const v = new Compared(l);
+  let letters = 0;
+  for (let j = 0; j < v.length; j += 1) if (isLetter(v.code(j))) letters += 1;
+  if (k.length < 2 || !letters) return false;
+  const heard = Array.from(k, (ch) => ch.codePointAt(0));
   let i = 0;
   let j = 0;
-  while (i < heard.length && j < pangti.length) {
-    if (heardMatchesChar(heard[i], pangti[j])) {
+  let missed = 0; // pangti marks the heard word lacks
+  while (i < heard.length && j < v.length) {
+    const p = v.code(j);
+    if (heard[i] === p) {
       i += 1;
       j += 1;
-    } else if (GURBANI_MARK_HEARD_MAY_LACK.has(pangti[j])) j += 1;
-    else break;
+    } else if (isGurbaniMark(p)) {
+      missed += 1;
+      j += 1;
+    } else break;
   }
-  return [j, i];
-};
-const lettersIn = (w) => [...w].filter((c) => /[\u0a05-\u0a39\u0a59-\u0a5e]/.test(c)).length;
-const wordMatches = (k, l) => {
-  if (k.length < 2 || !lettersIn(l)) return false;
-  const [pj, hi] = commonPrefix(k, l);
-  const rest = l.slice(pj);
-  const pangtiDone = pj === l.length || [...rest].every((c) => GURBANI_MARK_HEARD_MAY_LACK.has(c));
-  if (hi === k.length && pangtiDone) return true;
-  return hi >= Math.max(4, Math.ceil(0.7 * Math.min(k.length, lettersIn(l))));
+  while (j < v.length && isGurbaniMark(v.code(j))) {
+    missed += 1;
+    j += 1;
+  }
+  const agreed = i - missed / 2;
+  if (i === heard.length && j === v.length) return agreed >= heard.length - 1;
+  return agreed >= Math.max(4, Math.ceil(0.7 * Math.min(heard.length, letters)));
 };
 // A pangti's words exactly as the database gives them (split at spaces only); ॥੧॥ and the like
 // stay as they are, shown and never marked.
@@ -1065,9 +1079,11 @@ async function loadFollowRows(baniId, col) {
   });
 }
 
-// Split a Unicode Gurmukhi line into word tokens for the aligner (each word as written). The
-// server's matching skips further characters (punctuation/matras irrelevant to matching); this
-// only needs to break on whitespace and dandas/line numbers.
+// Split a Unicode Gurmukhi line into word tokens for the aligner (each word as written), breaking
+// only on whitespace and dandas/line numbers; no letter or lagan matra of a word is changed.
+// A pangti's pieces for the acoustic tokenizer: each piece exactly as written, split only at
+// spaces, dandas, the | separator, numbers and punctuation (never inside a word).
+const pangtiPieces = (line) => (line || '').split(/[\s।॥|0-9੦-੯.,;:!?-]+/).filter(Boolean);
 const tokenize = (uni) =>
   (uni || '')
     .replace(/[॥।]|\d+/g, ' ')
@@ -4551,11 +4567,10 @@ const VoiceFollow = () => {
                   id: leaders[index].shabadId,
                   score: Math.max(
                     ...profile.displayLines.map((line) => {
-                      const tokens = memory.acousticSP.encode(
-                        line
-                          .replace(/[।॥|0-9੦-੯.,;:!?-]+/g, ' ')
-                          .replace(/\s+/g, ' ')
-                          .trim(),
+                      // The pangti's own pieces, each exactly as written (split only at spaces,
+                      // dandas and numbers), encoded one after another.
+                      const tokens = pangtiPieces(line).flatMap((piece) =>
+                        memory.acousticSP.encode(piece),
                       );
                       // Reuse the follower scorer so acquisition uses the same audio evidence.
                       return tokens.length

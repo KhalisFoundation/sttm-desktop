@@ -161,7 +161,6 @@ const DUP_HEADING = /ੴ|ਮਹਲਾ|ਪਾਤਿਸਾਹੀ|ਘਰੁ|^ਪਉ
 // Lines are compared as written: every lagan matra and letter counts (only spaces, dandas and
 // numbers are skipped while comparing); nothing of Gurbani is skipped or exchanged. Near copies
 // are still found by the similarity test below, which reads both lines as written.
-const DUP_RULES = undefined;
 // The distinct real lines of a shabad (headings and short lines dropped), as comparison views;
 // two lines that compare the same count once. has(v): is a line that compares as v here?
 function dupLines(lines) {
@@ -170,7 +169,7 @@ function dupLines(lines) {
   const has = (v) => (byHash.get(hashCompared(v)) || []).some((u) => sameCompared(u, v));
   (lines || [])
     .filter((l) => l && !DUP_HEADING.test(l))
-    .map((l) => new Compared(l, DUP_RULES))
+    .map((l) => new Compared(l))
     .filter((v) => v.length >= 8)
     .forEach((v) => {
       if (has(v)) return;

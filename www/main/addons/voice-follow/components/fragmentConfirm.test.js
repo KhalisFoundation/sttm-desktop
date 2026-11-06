@@ -5,23 +5,24 @@ const assert = require('node:assert/strict');
 const { partialRatio } = require('../engine/fuzz');
 const { DEFAULTS, step, elapse, of } = require('./fragmentConfirm');
 
-// Shabad 2879 (owner's test, Oct 18) and the Shabad that was on screen (1455), written without spaces (spaces are skipped when comparing).
+// Shabad 2879 (owner's test, Oct 18) and the Shabad that was on screen (1455): pangtis exactly as
+// BaniDB gives them (verse IDs 32496-32499 and 17141-17144); spaces and dandas are skipped while comparing.
 const X = {
   id: 2879,
   role: 'change',
   linesCompared: [
-    'ਜੇਭੁਲੀਜੇਚੁਕੀਸਾਈਂਭੀਤਹਿੰਜੀਕਾਢੀਆ',
-    'ਜਿਨੑਾਨੇਹੁਦੂਜਾਣੇਲਗਾਝੂਰਿਮਰਹੁਸੇਵਾਢੀਆ',
-    'ਹਉਨਾਛੋਡਉਕੰਤਪਾਸਰਾ',
-    'ਸਦਾਰੰਗੀਲਾਲਾਲੁਪਿਆਰਾਏਹੁਮਹਿੰਜਾਆਸਰਾ',
+    'ਜੇ ਭੁਲੀ ਜੇ ਚੁਕੀ ਸਾਈਂ ਭੀ ਤਹਿੰਜੀ ਕਾਢੀਆ ॥',
+    'ਜਿਨੑਾ ਨੇਹੁ ਦੂਜਾਣੇ ਲਗਾ ਝੂਰਿ ਮਰਹੁ ਸੇ ਵਾਢੀਆ ॥੧॥',
+    'ਹਉ ਨਾ ਛੋਡਉ ਕੰਤ ਪਾਸਰਾ ॥',
+    'ਸਦਾ ਰੰਗੀਲਾ ਲਾਲੁ ਪਿਆਰਾ ਏਹੁ ਮਹਿੰਜਾ ਆਸਰਾ ॥੧॥ ਰਹਾਉ ॥',
   ],
 };
 const CUR = {
   linesCompared: [
-    'ਨਉਨਿਧਿਤੇਰੈਸਗਲਨਿਧਾਨ',
-    'ਇਛਾਪੂਰਕੁਰਖੈਨਿਦਾਨ',
-    'ਤੂੰਮੇਰੋਪਿਆਰੋਤਾਕੈਸੀਭੂਖਾ',
-    'ਤੂੰਮਨਿਵਸਿਆਲਗੈਨਦੂਖਾ',
+    'ਨਉ ਨਿਧਿ ਤੇਰੈ ਸਗਲ ਨਿਧਾਨ ॥',
+    'ਇਛਾ ਪੂਰਕੁ ਰਖੈ ਨਿਦਾਨ ॥੧॥',
+    'ਤੂੰ ਮੇਰੋ ਪਿਆਰੋ ਤਾ ਕੈਸੀ ਭੂਖਾ ॥',
+    'ਤੂੰ ਮਨਿ ਵਸਿਆ ਲਗੈ ਨ ਦੂਖਾ ॥੧॥ ਰਹਾਉ ॥',
   ],
 };
 const run = (store, hyp, cands = [X]) => step(store, { hyp, cur: CUR, cands }, partialRatio);
@@ -56,7 +57,8 @@ describe('fragment confirm', () => {
 
   it('a piece that fits another board candidate too adds little', () => {
     const s = new Map();
-    const Y = { id: 99, role: 'list', linesCompared: ['ਕੋਈਜੇਭੁਲੀਜੇਚੁਕੀਸਾਈਂਹੋਰ'] };
+    // Another board candidate holding the same pangti (a Shabad copy), as BaniDB gives it (verse 32496).
+    const Y = { id: 99, role: 'list', linesCompared: ['ਜੇ ਭੁਲੀ ਜੇ ਚੁਕੀ ਸਾਈਂ ਭੀ ਤਹਿੰਜੀ ਕਾਢੀਆ ॥'] };
     const r = run(s, 'ਭਲੀਜੇਚੁਕੀ', [X, Y]);
     assert.equal(r.hits.length, 2);
     r.hits.forEach((h) => assert.equal(h.w, DEFAULTS.sharedW));
@@ -66,7 +68,8 @@ describe('fragment confirm', () => {
 
   it('a piece that fits the Shabad on screen adds nothing', () => {
     const s = new Map();
-    const Z = { id: 7, role: 'change', linesCompared: ['ਤੂੰਮੇਰੋਪਿਆਰੋਹੋਰਕੁਝ'] };
+    // A candidate holding the on-screen Shabad's own pangti, as BaniDB gives it (verse 17143).
+    const Z = { id: 7, role: 'change', linesCompared: ['ਤੂੰ ਮੇਰੋ ਪਿਆਰੋ ਤਾ ਕੈਸੀ ਭੂਖਾ ॥'] };
     const r = run(s, 'ਤੂੰਮੇਰੋਪਿਆਰੋ', [Z]);
     assert.equal(r.hits.length, 0);
   });

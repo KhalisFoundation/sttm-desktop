@@ -7,11 +7,8 @@
 // comparing (ignored); nothing is removed from the text and no shortened copy of it is made.
 // Heard text (the speech model's output) is read through the same view.
 //
-// Optional rules for a view, used only while comparing:
-//   skip(cp)  - also skip this character (a code point; e.g. vowel signs, for a letters-only
-//               comparison)
-//   fold(cp)  - compare this character as another one (e.g. a letter with a nukta as the
-//               letter itself); the text still holds the character as written.
+// A view never skips or exchanges anything else: every letter and lagan matra of a pangti is part
+// of every comparison (owner rule 2b). Leniency for the speech model belongs on the heard side.
 
 /* eslint-disable max-classes-per-file */ // a view and its several-words form
 
@@ -29,25 +26,24 @@ const HEARD_SKIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g;
 const heardForComparing = (s) => (s || '').replace(HEARD_SKIP, '');
 
 class Compared {
-  constructor(text, { skip = null, fold = null } = {}) {
+  constructor(text) {
     const t = typeof text === 'string' ? text : '';
     this.text = t; // as given, never changed
-    this.fold = fold;
     const at = [];
     for (let i = 0; i < t.length;) {
       const cp = t.codePointAt(i);
       const w = cp > 0xffff ? 2 : 1;
-      if (!(w === 1 && IGNORED_UNIT[cp]) && !(skip && skip(cp))) at.push(i);
+      if (!(w === 1 && IGNORED_UNIT[cp])) at.push(i);
       i += w;
     }
     this.at = Int32Array.from(at); // where in `text` each compared character is
     this.length = at.length; // how many characters a comparison looks at
   }
 
-  // The k-th compared character, as a code point (after `fold`, if the view has one).
+  // The k-th compared character, as a code point.
   code(k) {
     const cp = this.text.codePointAt(this.at[k]);
-    return this.fold ? this.fold(cp) : cp;
+    return cp;
   }
 }
 
@@ -67,7 +63,6 @@ class ComparedJoin extends Compared {
     });
     this.texts = vs.map((v) => v.text);
     this.text = null; // several texts: see `texts`
-    this.fold = vs.length ? vs[0].fold : null;
     this.part = Int32Array.from(part); // which text each compared character is in
     this.at = Int32Array.from(at); // where in that text
     this.length = at.length;
@@ -75,7 +70,7 @@ class ComparedJoin extends Compared {
 
   code(k) {
     const cp = this.texts[this.part[k]].codePointAt(this.at[k]);
-    return this.fold ? this.fold(cp) : cp;
+    return cp;
   }
 }
 

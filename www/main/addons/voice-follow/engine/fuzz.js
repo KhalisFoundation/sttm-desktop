@@ -1,5 +1,5 @@
 // JS port of the two rapidfuzz functions the follower uses.
-// fuzz.ratio = normalized Indel similarity = 200*LCS/(len1+len2).
+// fuzz.ratio = Indel similarity (0-100) = 200*LCS/(len1+len2).
 // partial_ratio = best ratio of the shorter string against any equal-length
 // window of the longer string.
 //
