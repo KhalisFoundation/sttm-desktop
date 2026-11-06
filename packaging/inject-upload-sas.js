@@ -1,10 +1,10 @@
-// Runs after `npm run build` (the package.json postbuild script): puts the Azure upload SAS
-// from the VF_UPLOAD_SAS environment variable into the compiled shadow config, so the SAS is
-// never in the source tree. Without the variable the build still succeeds and the app simply
-// does not upload (a plain dev build); set VF_REQUIRE_UPLOAD_SAS=1 to make a missing SAS fail
-// the build instead, which the tester-installer workflow does.
+// Runs after `npm run build` (the package.json postbuild script): injects upload credentials
+// from environment variables into the compiled shadow config, so secrets are never in source.
+// Azure uploads remain optional unless VF_REQUIRE_UPLOAD_SAS=1; Hugging Face uploads work
+// independently when VF_HF_TOKEN is provided.
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const file = path.join(
   __dirname,
@@ -30,8 +30,10 @@ if (src.includes('__VF_BUILD_COMMIT__')) {
   let commit = (process.env.GITHUB_SHA || '').trim();
   if (!commit) {
     try {
-      commit = require('child_process')
-        .execSync('git rev-parse HEAD', { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'] })
+      commit = execSync('git rev-parse HEAD', {
+        cwd: path.join(__dirname, '..'),
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
         .toString()
         .trim();
     } catch (e) {
@@ -44,32 +46,45 @@ if (src.includes('__VF_BUILD_COMMIT__')) {
     console.log(`inject-upload-sas: build commit ${commit.slice(0, 12)} stamped`);
   }
 }
+let out = src;
 if (!sas) {
   if (process.env.VF_REQUIRE_UPLOAD_SAS === '1') {
     console.error('inject-upload-sas: VF_UPLOAD_SAS is not set and VF_REQUIRE_UPLOAD_SAS=1');
     process.exit(1);
   }
-  console.log('inject-upload-sas: VF_UPLOAD_SAS not set; this build will not upload sessions');
-  process.exit(0);
-}
-if (!src.includes(PLACEHOLDER)) {
-  if (src.includes(sas)) {
-    console.log('inject-upload-sas: already injected');
-    process.exit(0);
+  console.log('inject-upload-sas: VF_UPLOAD_SAS not set; Azure uploads are disabled');
+} else if (!src.includes(PLACEHOLDER)) {
+  if (!src.includes(sas)) {
+    console.error('inject-upload-sas: placeholder not found in the compiled config');
+    process.exit(2);
   }
-  console.error('inject-upload-sas: placeholder not found in the compiled config');
-  process.exit(2);
-}
-if (/['\\\n\r]/.test(sas)) {
+  console.log('inject-upload-sas: already injected');
+} else if (/['\\\n\r]/.test(sas)) {
   console.error('inject-upload-sas: the SAS contains characters that cannot be injected');
   process.exit(3);
+} else {
+  out = out.replace(PLACEHOLDER, sas);
 }
-let out = src.replace(PLACEHOLDER, sas);
 // Optional: a Hugging Face write token for the second copy (never required).
 const hf = (process.env.VF_HF_TOKEN || '').trim();
-if (hf && !/['\\\n\r]/.test(hf) && out.includes('__VF_HF_TOKEN__')) {
-  out = out.replace('__VF_HF_TOKEN__', hf);
-  console.log('inject-upload-sas: Hugging Face token injected');
+if (hf) {
+  if (/['\\\n\r]/.test(hf)) {
+    console.error(
+      'inject-upload-sas: the Hugging Face token contains characters that cannot be injected',
+    );
+    process.exit(4);
+  }
+  if (out.includes('__VF_HF_TOKEN__')) {
+    out = out.replace('__VF_HF_TOKEN__', hf);
+    console.log('inject-upload-sas: Hugging Face token injected');
+  } else if (out.includes(hf)) {
+    console.log('inject-upload-sas: Hugging Face token already injected');
+  } else {
+    console.error(
+      'inject-upload-sas: Hugging Face token placeholder not found in the compiled config',
+    );
+    process.exit(5);
+  }
 }
 fs.writeFileSync(file, out);
-console.log('inject-upload-sas: upload SAS injected');
+if (sas) console.log('inject-upload-sas: upload SAS injected');
