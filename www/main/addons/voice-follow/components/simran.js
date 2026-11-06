@@ -12,16 +12,29 @@ const SIMRAN_TRIG = 4000; // Simran this long: the slide goes up (about 10 s aft
 const SIMRAN_END = 10000; // stopped this long: Simran is over (a short Dhan Guru line is not)
 const SIMRAN_NOW_W = 6000; // 'heard right now' (the lock gate): the last few seconds only
 
-const STRIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g; // as the engine's norm (engine/infer.js)
+const STRIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g; // as the engine's norm (engine/infer.js); heard words only
 const norm = (s) => (s || '').replace(STRIP, '');
+// Dandas, numbers, spaces and punctuation are skipped while comparing, never removed from the text:
+// a word is read through the positions of its letters.
+const IGNORED = /[\s।॥|0-9੦-੯.,;:!?-]/;
+const letterAt = (w) => {
+  const at = [];
+  for (let i = 0; i < w.length; i += 1) if (!IGNORED.test(w[i])) at.push(i);
+  return at;
+};
+const hasLetters = (w) => letterAt(String(w || '')).length > 0;
 
-// Edit distance, small strings only.
-function dist(a, b) {
+// Edit distance between the letters of a (at the positions in at) and b, small strings only.
+function dist(a, at, b) {
   let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i += 1) {
+  for (let i = 1; i <= at.length; i += 1) {
     const cur = [i];
     for (let j = 1; j <= b.length; j += 1) {
-      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      cur[j] = Math.min(
+        prev[j] + 1,
+        cur[j - 1] + 1,
+        prev[j - 1] + (a[at[i - 1]] === b[j - 1] ? 0 : 1),
+      );
     }
     prev = cur;
   }
@@ -30,8 +43,9 @@ function dist(a, b) {
 
 // A heard word that is ਵਾਹਿਗੁਰੂ, allowing for the speech model losing a letter or a vowel sign.
 const isWaheguru = (w) => {
-  const n = norm(w);
-  return n.length >= 5 && n.length <= 11 && dist(n, WAHEGURU) <= 2;
+  const a = String(w || '');
+  const at = letterAt(a);
+  return at.length >= 5 && at.length <= 11 && dist(a, at, WAHEGURU) <= 2;
 };
 
 // Of these heard words, how many are Waheguru (Waheguru heard as two words counts once).
@@ -43,7 +57,7 @@ function countSimran(words) {
     if (isWaheguru(words[i])) hits += 1;
     else if (
       i + 1 < words.length &&
-      dist(norm(words[i]), 'ਵਾਹਿ') <= 1 && // only Waheguru heard as two words, never another word + ਗੁਰੂ
+      dist(words[i], letterAt(words[i]), 'ਵਾਹਿ') <= 1 && // only Waheguru heard as two words, never another word + ਗੁਰੂ
       isWaheguru(words[i] + words[i + 1])
     ) {
       hits += 1;
@@ -79,7 +93,7 @@ function waheguruLine(text) {
   const { hits, total } = countSimran(
     String(text || '')
       .split(/\s+/)
-      .filter((w) => norm(w)),
+      .filter(hasLetters),
   );
   return total > 0 && hits * 2 >= total;
 }
