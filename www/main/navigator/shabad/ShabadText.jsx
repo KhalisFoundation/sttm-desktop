@@ -75,6 +75,7 @@ export const ShabadText = ({
     intelligentSpacebar,
     akhandpatt,
     defaultPaneId,
+    teleprompterFontSize,
   } = useStoreState((state) => state.userSettings);
 
   const {
@@ -347,8 +348,8 @@ export const ShabadText = ({
   ]);
 
   // Display 2: full DOM list (no Virtuoso windowing). Scroll active row into view.
-  // Virtuoso only mounts viewport rows — with scaled stage height, bottom rows never
-  // enter the item-list and cannot scroll into view. Full list fixes that.
+  // Virtuoso only mounts viewport rows, and bottom rows could fail to enter the
+  // item-list and scroll into view. Full list fixes that.
   useEffect(() => {
     if (!isProjection || !filteredItems.length) return undefined;
     const liveActiveId = activeVerseId || paneAttributes?.activeVerse;
@@ -376,7 +377,14 @@ export const ShabadText = ({
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [isProjection, filteredItems, activeVerseId, paneAttributes?.activeVerse]);
+    // teleprompterFontSize: changing it moves every row, so centre the active one again.
+  }, [
+    isProjection,
+    filteredItems,
+    activeVerseId,
+    paneAttributes?.activeVerse,
+    teleprompterFontSize,
+  ]);
 
   useEffect(() => {
     // Display 2 has no Virtuoso list. Calling scrollToIndex on the null ref
