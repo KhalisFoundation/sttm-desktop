@@ -88,14 +88,26 @@ function fatehIn(text) {
 }
 
 // A pangti that is mostly ਵਾਹਿਗੁਰੂ (the Bhatt Swaiye's refrain): heard during Simran, it says
-// nothing about which Shabad is being sung.
+// nothing about which Shabad is being sung. Gurbani is compared exactly as written, every letter
+// and lagan matra (only dandas, numbers and spaces are skipped); the speech-model leniency of
+// isWaheguru is for heard words only.
+const sameLetters = (w, target) => {
+  const at = letterAt(w);
+  return at.length === target.length && at.every((k, n) => w[k] === target[n]);
+};
 function waheguruLine(text) {
-  const { hits, total } = countSimran(
-    String(text || '')
-      .split(/\s+/)
-      .filter(hasLetters),
-  );
-  return total > 0 && hits * 2 >= total;
+  const words = String(text || '')
+    .split(/\s+/)
+    .filter(hasLetters);
+  let hits = 0;
+  for (let i = 0; i < words.length; i += 1) {
+    if (sameLetters(words[i], WAHEGURU)) hits += 1;
+    else if (i + 1 < words.length && sameLetters(words[i] + words[i + 1], WAHEGURU)) {
+      hits += 1; // ਵਾਹਿ ਗੁਰੂ written as two words
+      i += 1;
+    }
+  }
+  return words.length > 0 && hits * 2 >= words.length;
 }
 
 const createSimran = () => ({ heard: [], onSince: null, offSince: null, on: false, fatehAt: 0 });
