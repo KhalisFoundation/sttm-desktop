@@ -73,8 +73,8 @@ const DEFAULTS = {
   akhEndSlack: 2,
   // A pangti mark (tippi, bindi, addak, nukta, halant) the heard unit lacks, per mark, in
   // alignment points (a matched unit is worth 2): missing / a different mark in its place.
-  markMiss: 0,
-  markWrong: 0,
+  markMiss: 0.1,
+  markWrong: 0.25,
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
