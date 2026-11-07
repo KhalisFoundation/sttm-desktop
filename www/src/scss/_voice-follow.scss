@@ -1467,3 +1467,104 @@ $vf2-yellow-bar: #f2c200;
   margin-top: 2px;
   line-height: 1.4;
 }
+
+// Sevadaar assist (experimental): the hint box, its matches, the accept key and "not this one".
+// The hint box: Search's own input and Gurmukhi keyboard, styled as an inviting field at the bottom.
+.vf2-hint-dock {
+  flex: none;
+  padding: 6px 12px 8px;
+  border-top: 1px solid var(--vf-line);
+  background: var(--vf-surface);
+}
+.vf2-hint {
+  margin: 0;
+  padding: 10px 12px 12px;
+  border-radius: 12px;
+  background: var(--vf-card);
+  border: 1px solid var(--vf-line);
+  .vf2-hint-label {
+    margin: 0 0 6px 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--vf-muted);
+  }
+  .search-content {
+    position: relative;
+    align-items: center;
+    gap: 8px;
+    border-top: 0 !important;
+    background: transparent !important;
+  }
+  .vf2-hint-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 14px;
+    color: var(--vf-muted);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .search-content input.input-box {
+    height: 42px;
+    padding: 0 12px 0 36px;
+    border: 1.5px solid color-mix(in srgb, var(--vf-accent) 55%, var(--vf-line)) !important;
+    border-radius: 10px;
+    background: var(--vf-surface) !important;
+    color: var(--vf-ink) !important;
+    font-size: 22px !important;
+    cursor: text;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    &::-webkit-input-placeholder,
+    &::placeholder {
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: var(--vf-muted);
+    }
+    &:hover {
+      border-color: var(--vf-accent) !important;
+    }
+    &:focus {
+      outline: none;
+      border-color: var(--vf-accent) !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--vf-accent) 22%, transparent);
+    }
+  }
+  .input-buttons {
+    gap: 6px;
+    height: 42px;
+  }
+}
+.vf2-hint-heard {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--vf-accent);
+  background: color-mix(in srgb, var(--vf-accent) 16%, transparent);
+}
+.vf2-accept-key {
+  flex: none;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--vf-line);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vf-muted);
+}
+.vf2-dismiss {
+  flex: none;
+  margin-left: 6px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--vf-muted);
+  cursor: pointer;
+  &:hover {
+    background: color-mix(in srgb, var(--vf-ink) 10%, transparent);
+  }
+}

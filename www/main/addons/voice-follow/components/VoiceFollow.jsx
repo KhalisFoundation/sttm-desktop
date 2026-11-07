@@ -7,7 +7,7 @@ import { filterRequiredVerseItems } from '../../../navigator/shabad/utils/filter
 import { loadBani as loadBaniRows } from '../../../navigator/utils/load-bani';
 import { useNewShabad } from '../../../navigator/search/hooks/use-new-shabad';
 import updateMultipane from '../../../navigator/search/utils/update-multipane';
-import { VoiceWave } from '../../../common/sttm-ui';
+import { VoiceWave, IconButton } from '../../../common/sttm-ui';
 import { i18n } from '../../../common/i18n';
 import { useAutopilotSlot } from './autopilotSlot';
 import HwCheck from './HwCheck';
@@ -25,6 +25,7 @@ const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
+const sevadaarHint = require('./sevadaarHint');
 const { installDemoAudio } = require('./devAudio');
 const { vfAnalytics, createRunStats } = require('./vfAnalytics');
 
@@ -611,6 +612,13 @@ const RETURN_CONFIRM = 2;
 // A sevadaar tap is folded into the judge, not bolted beside it: the shabad the
 // sevadaar tapped AWAY from is vetoed as a switch candidate for a while, so the
 // same false evidence that put it on screen cannot pull it straight back.
+// Sevadaar assist: hint letters, how long a hint stays live, rows shown, hearing kept.
+const HINT_MIN_LETTERS = 2;
+const ACCEPT_KEY_LABEL =
+  typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform || '') ? '⌘↵' : 'Ctrl+↵';
+const HINT_TTL_MS = 60000;
+const HINT_SHOW = 5;
+const HINT_HEARD_MIN = 8;
 const TAP_VETO_DECODES = 120; // judged decodes (~1 min of kirtan) the left shabad stays vetoed
 // Bani follow: when two shabads of the same Bani are heard in recitation order
 // (the second within BANI_NEXT_MAX shabads of the first), the recitation is that
@@ -1120,6 +1128,17 @@ const UNI_TO_ASCII_FL = (() => {
 const toAsciiFirstLetters = (uniText) => {
   const fl = anvaad.firstLetters(uniText || '') || '';
   return Array.from(fl, (ch) => UNI_TO_ASCII_FL[ch] || '').join('');
+};
+
+// Search's on-screen Gurmukhi keyboard, loaded only when the sevadaar opens it (first letters, no matras).
+const HintKeyboard = ({ query, setQuery }) => {
+  // eslint-disable-next-line global-require
+  const { GurmukhiKeyboard } = require('../../../navigator/search/components/GurmukhiKeyboard');
+  return <GurmukhiKeyboard searchType={0} query={query} setQuery={setQuery} />;
+};
+HintKeyboard.propTypes = {
+  query: PropTypes.string.isRequired,
+  setQuery: PropTypes.func.isRequired,
 };
 
 const STATUS_LABEL = {
@@ -4437,6 +4456,205 @@ const VoiceFollow = () => {
     [autopilotLock],
   );
 
+  // ---- Sevadaar assist (experimental): the sevadaar's actions are hints, never "Autopilot off".
+  // 1. Type a few first letters (as in STTM's search): Autopilot picks among the matching Shabads
+  //    by what it is hearing (sevadaarHint.js); a single match opens at once.
+  // 2. Ctrl/Cmd+Enter accepts the Shabad in the "Changing to" card.
+  // 3. The x on that card: "not this one" (the tap veto every switch route already respects).
+  const hintRef = useRef({
+    q: '',
+    at: 0,
+    cands: [],
+    named: new Map(),
+    profiles: new Map(),
+    seq: 0,
+  });
+  const lastHeardRef = useRef('');
+  const [hintQ, setHintQ] = useState('');
+  const [hintRows, setHintRows] = useState([]);
+  const [hintKeyboard, setHintKeyboard] = useState(false);
+  const clearHint = useCallback(() => {
+    hintRef.current = {
+      q: '',
+      at: 0,
+      cands: [],
+      named: new Map(),
+      profiles: hintRef.current.profiles,
+      seq: hintRef.current.seq + 1,
+    };
+    setHintQ('');
+    setHintRows([]);
+  }, []);
+  // The hearing is judged on the pangti the letters name (and the next one), not on every line of
+  // the Shabad: a long Shabad would otherwise win on some line by chance. The named pangtis are the
+  // ones the database's own first-letter search returned; each is compared exactly as the database
+  // gives it (leniency only on the heard side).
+  const hintScore = useCallback((shabadId) => {
+    const prof = hintRef.current.profiles.get(shabadId);
+    const heardText = lastHeardRef.current;
+    const ids = hintRef.current.named && hintRef.current.named.get(shabadId);
+    if (!prof || !prof.linesCompared || !heardText || !ids) return { s: 0, index: -1 };
+    const named = new Set();
+    (prof.verses || []).forEach((v, i) => {
+      if (ids.has(v.verseId)) [i, i + 1].forEach((k) => named.add(k));
+    });
+    const lines = prof.linesCompared.map((l, i) => (named.has(i) ? l : ''));
+    const m = bestLineMatch(heardForComparing(heardText), lines, SWITCH_CAND_MIN_LINE_CHARS);
+    const heardWords = tokenize(heardText).map(heardForComparing).filter(Boolean);
+    const lw = (prof.verses || []).map((v, i) =>
+      named.has(i) ? (v.words || []).map((w) => new Compared(w)).filter((w) => w.length) : [],
+    );
+    const of = orderFreeLineScore(heardWords, lw, SWITCH_CAND_MIN_LINE_CHARS);
+    return { s: Math.max(m.s, of), index: m.index };
+  }, []);
+  // Re-rank the typed matches by the hearing; open one when it is clear (or the only one).
+  const evaluateHint = useCallback(() => {
+    const h = hintRef.current;
+    if (!h.q || !h.cands.length || lockingRef.current) return;
+    if (Date.now() - h.at > HINT_TTL_MS) {
+      clearHint();
+      return;
+    }
+    const ranked = sevadaarHint.rankHint(h.cands, hintScore);
+    setHintRows(ranked.slice(0, HINT_SHOW));
+    const d = sevadaarHint.decideHint(ranked);
+    if (!d) return;
+    const prof = h.profiles.get(d.pick.shabadId);
+    if (d.pick.shabadId === currentShabadIdRef.current) {
+      clearHint(); // already on screen
+      return;
+    }
+    if (!prof) return; // its pangtis are still loading: next decode
+    const at = sevadaarHint.openAt(
+      d.pick,
+      (prof.verses || []).map((v) => v.verseId),
+    );
+    const i = (prof.verses || []).findIndex((v) => v.verseId === at.verseId);
+    const verse = i >= 0 ? prof.rawLines[i] : d.pick.verse;
+    sessionLog.logEvent('vf_hint_pick', {
+      session: sessionIdRef.current,
+      letters: h.q.length,
+      reason: d.reason,
+      heardLine: at.heard,
+      shabadId: d.pick.shabadId,
+      ms: Date.now() - h.at,
+    });
+    clearHint();
+    pickCandidate({ shabadId: d.pick.shabadId, verseId: at.verseId, verse });
+  }, [clearHint, hintScore, pickCandidate]);
+  // The sevadaar typed: search the first letters, load the matches' pangtis, then evaluate.
+  const giveHint = useCallback(
+    async (raw) => {
+      const q = (raw || '').trim();
+      setHintQ(raw || '');
+      if (q.length < HINT_MIN_LETTERS) {
+        hintRef.current = { ...hintRef.current, q: '', cands: [], seq: hintRef.current.seq + 1 };
+        setHintRows([]);
+        return;
+      }
+      const seq = hintRef.current.seq + 1;
+      hintRef.current = { ...hintRef.current, q, at: Date.now(), seq };
+      // Pangtis that start with the letters first (as First Letter (Start) in Search), then any pangti
+      // containing them (the sevadaar may catch a pangti midway).
+      let rows = [];
+      try {
+        const [atStart, anywhere] = await Promise.all([
+          banidb.query(q, FIRST_LETTERS_START, 'all', 40),
+          banidb.query(q, FIRST_LETTERS_ANYWHERE, 'all', 40),
+        ]);
+        rows = [
+          ...(atStart || []).map((r) => ({ r, kind: 'start' })),
+          ...(anywhere || []).map((r) => ({ r, kind: 'any' })),
+        ];
+      } catch (_) {
+        rows = [];
+      }
+      if (hintRef.current.seq !== seq) return; // typed on
+      // Per Shabad, the verse ids the database's search matched (the pangtis the letters name).
+      const named = new Map();
+      rows.forEach(({ r }) => {
+        try {
+          const sid = r.Shabads[0].ShabadID;
+          if (!named.has(sid)) named.set(sid, new Set());
+          named.get(sid).add(r.ID);
+        } catch (_) {
+          /* row without a Shabad: not offered */
+        }
+      });
+      const cands = sevadaarHint.distinctShabads(
+        rows
+          .map(({ r, kind }) => {
+            let sid = null;
+            try {
+              sid = r.Shabads[0].ShabadID;
+            } catch (_) {
+              sid = null;
+            }
+            return { shabadId: sid, verseId: r.ID, verse: r.Gurmukhi, kind };
+          })
+          .filter((r) => typeof r.shabadId === 'number'),
+      );
+      const { profiles } = hintRef.current;
+      await Promise.all(
+        cands
+          .filter((c) => !profiles.has(c.shabadId))
+          .map((c) =>
+            loadShabadProfile(c.shabadId)
+              .then((pr) => profiles.set(c.shabadId, pr))
+              .catch(() => {}),
+          ),
+      );
+      if (hintRef.current.seq !== seq) return;
+      hintRef.current = { ...hintRef.current, cands, named };
+      if (!cands.length) setHintRows([]);
+      evaluateHint();
+    },
+    [evaluateHint, loadShabadProfile],
+  );
+  // "Not this one": the Shabad in the change card stops being suggested for a while.
+  const dismissCandidate = useCallback(
+    (c) => {
+      if (!c || c.shabadId == null) return;
+      vetoRef.current = { id: c.shabadId, left: TAP_VETO_DECODES };
+      if (switchCandRef.current && switchCandRef.current.shabadId === c.shabadId)
+        switchCandRef.current = null;
+      if (backstopRef.current && backstopRef.current.shabadId === c.shabadId)
+        backstopRef.current = null;
+      if (returnSlotRef.current && returnSlotRef.current.shabadId === c.shabadId)
+        returnSlotRef.current = null;
+      setLiveCands((prev) => ({
+        ...prev,
+        items: prev.items.filter((x) => x.shabadId !== c.shabadId),
+      }));
+      setSwitchView(null);
+      if (seekingRef.current) {
+        seekingRef.current = false;
+        try {
+          setIsMiscSlide(false);
+        } catch (_) {
+          /* store unavailable */
+        }
+      }
+      sessionLog.logEvent('vf_dismiss', { session: sessionIdRef.current, shabadId: c.shabadId });
+    },
+    [setIsMiscSlide],
+  );
+  // Ctrl/Cmd+Enter: accept the Shabad in the change card (set each render below).
+  const acceptRef = useRef(null);
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Enter' || !(e.ctrlKey || e.metaKey) || !acceptRef.current) return;
+      e.preventDefault();
+      sessionLog.logEvent('vf_accept_key', {
+        session: sessionIdRef.current,
+        shabadId: acceptRef.current.shabadId,
+      });
+      pickCandidate(acceptRef.current);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [pickCandidate]);
+
   // Each decode from the recognizer: turn it into Gurmukhi first-letters, slide
   // several n-grams across them, search banidb for each, and vote. Surface the
   // running shortlist, and auto-select once one shabad is confidently ahead.
@@ -4445,6 +4663,9 @@ const VoiceFollow = () => {
       if (!recognizingRef.current) return;
       // Shadow activity log: words are being heard (singing or speech) right now.
       if (SHADOW_BUILD) shadowBus.heard(text || '');
+      // Sevadaar hint: keep the latest heard text, re-judge the typed letters on it.
+      if (heardForComparing(text || '').length >= HINT_HEARD_MIN) lastHeardRef.current = text;
+      if (hintRef.current.q) evaluateHint();
       const session = sessionRef.current;
       // Accumulate distinct hypotheses while identifying the first Shabad.
       // Canonical retrieval supplies identities; recognized text is never displayed.
@@ -5994,6 +6215,7 @@ const VoiceFollow = () => {
       searchCanonicalText,
       setIsMiscSlide,
       setMiscSlideText,
+      evaluateHint,
     ],
   );
 
@@ -7066,7 +7288,9 @@ const VoiceFollow = () => {
       )
     : [];
   // Lead for display = the candidate furthest along in confirmation (ties by score).
-  const liveLead = liveItems.reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
+  const liveLead = liveItems
+    .filter((c) => !(vetoRef.current && vetoRef.current.id === c.shabadId))
+    .reduce((best, c) => (!best || c.wins > best.wins ? c : best), null);
   const changeLabel = 'Changing to';
   // Live board: the current Shabad's calibrated % and the others in contention.
   const boardCur = currentView ? board.find((b) => b.role === 'current') : null;
@@ -7093,6 +7317,7 @@ const VoiceFollow = () => {
   // The listed cards come from the shelf (publishBoard): held, ordered by confidence and
   // fading there. They are not tied to the hearing strip: a pause does not empty the list.
   const boardOthers = shelf
+    .filter((b) => !(vetoRef.current && vetoRef.current.id === b.shabadId))
     .filter((b) => !(currentView && b.shabadId === currentView.id))
     .filter((b) => !(liveLead && b.shabadId === liveLead.shabadId))
     .map((b) => ({ ...b, line: nameLine(b) }))
@@ -7111,6 +7336,7 @@ const VoiceFollow = () => {
   // A change in progress is the one thing to look at. The same Gurbani under another id is
   // not a change.
   const changing = !!(liveLead && leadLine && !sameAsCurrent(leadLine));
+  acceptRef.current = changing && !ngHoldView ? liveLead : null;
 
   const heardStrip = (() => {
     // A rolling window: only the last few settled words, newest kept in view.
@@ -7291,6 +7517,21 @@ const VoiceFollow = () => {
                   <span className="vf2-dot is-seeking" />
                   {changeLabel}
                   <LivePct value={leadPct} />
+                  <span className="vf2-accept-key" title={i18n.t('VOICE_FOLLOW.ACCEPT_TIP')}>
+                    {ACCEPT_KEY_LABEL}
+                  </span>
+                  <button
+                    type="button"
+                    className="vf2-dismiss"
+                    title={i18n.t('VOICE_FOLLOW.DISMISS_TIP')}
+                    aria-label={i18n.t('VOICE_FOLLOW.DISMISS_TIP')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dismissCandidate(liveLead);
+                    }}
+                  >
+                    ×
+                  </button>
                 </div>
                 <div className="vf2-cand-line">
                   <MarkedLine line={leadLine} keys={heardKeys} />
@@ -7299,57 +7540,96 @@ const VoiceFollow = () => {
               </section>
             )}
 
-            <section
-              className={`vf2-shabads${ngHoldView ? ` is-folded${holdListOpen ? ' is-open' : ''}` : ''}`}
-              aria-live="polite"
-            >
-              <div
-                className="vf2-shabads-head"
-                {...(ngHoldView
-                  ? {
-                      role: 'button',
-                      tabIndex: 0,
-                      'aria-expanded': holdListOpen,
-                      onClick: () => setHoldListOpen((v) => !v),
-                      onKeyDown: (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') setHoldListOpen((v) => !v);
-                      },
-                    }
-                  : {})}
-              >
-                {ngHoldView && (
-                  <i className="fa-solid fa-chevron-right vf2-fold-mark" aria-hidden="true" />
-                )}
-                <span className="vf2-shabads-title">{i18n.t(shabadsTitleKey)}</span>
-                {boardOthers.length > 0 && (
-                  <span className="vf2-shabads-count">{boardOthers.length}</span>
-                )}
-              </div>
-              {boardOthers.length === 0 && (
-                <div className="vf2-empty">
-                  {i18n.t(currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT')}
-                </div>
-              )}
-              {boardOthers.map((c, i) => (
-                <div className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`} key={c.shabadId}>
-                  <span className="vf2-cand-line">
-                    <MarkedLine line={c.line} keys={heardKeys} />
-                  </span>
-                  <LiveBar value={c.pct} />
-                  <LivePct value={c.pct} />
-                  <button
-                    type="button"
-                    className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
-                    onClick={() => pickCandidate({ ...c, pos: i })}
-                    title={i18n.t(
-                      currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP',
-                    )}
+            {hintQ.trim().length < HINT_MIN_LETTERS && (
+              <>
+                <section
+                  className={`vf2-shabads${ngHoldView ? ` is-folded${holdListOpen ? ' is-open' : ''}` : ''}`}
+                  aria-live="polite"
+                >
+                  <div
+                    className="vf2-shabads-head"
+                    {...(ngHoldView
+                      ? {
+                          role: 'button',
+                          tabIndex: 0,
+                          'aria-expanded': holdListOpen,
+                          onClick: () => setHoldListOpen((v) => !v),
+                          onKeyDown: (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') setHoldListOpen((v) => !v);
+                          },
+                        }
+                      : {})}
                   >
-                    {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
-                  </button>
+                    {ngHoldView && (
+                      <i className="fa-solid fa-chevron-right vf2-fold-mark" aria-hidden="true" />
+                    )}
+                    <span className="vf2-shabads-title">{i18n.t(shabadsTitleKey)}</span>
+                    {boardOthers.length > 0 && (
+                      <span className="vf2-shabads-count">{boardOthers.length}</span>
+                    )}
+                  </div>
+                  {boardOthers.length === 0 && (
+                    <div className="vf2-empty">
+                      {i18n.t(
+                        currentView ? 'VOICE_FOLLOW.NONE_NOW' : 'VOICE_FOLLOW.LISTENING_HINT',
+                      )}
+                    </div>
+                  )}
+                  {boardOthers.map((c, i) => (
+                    <div
+                      className={`vf2-shabad-row${c.fading ? ' is-fading' : ''}`}
+                      key={c.shabadId}
+                    >
+                      <span className="vf2-cand-line">
+                        <MarkedLine line={c.line} keys={heardKeys} />
+                      </span>
+                      <LiveBar value={c.pct} />
+                      <LivePct value={c.pct} />
+                      <button
+                        type="button"
+                        className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
+                        onClick={() => pickCandidate({ ...c, pos: i })}
+                        title={i18n.t(
+                          currentView ? 'VOICE_FOLLOW.SWITCH_TIP' : 'VOICE_FOLLOW.OPEN_TIP',
+                        )}
+                      >
+                        {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
+                      </button>
+                    </div>
+                  ))}
+                </section>
+              </>
+            )}
+            {hintQ.trim().length >= HINT_MIN_LETTERS && (
+              <section className="vf2-shabads vf2-hint-list" aria-live="polite">
+                <div className="vf2-shabads-head">
+                  <span className="vf2-shabads-title">{i18n.t('VOICE_FOLLOW.HINT_TITLE')}</span>
                 </div>
-              ))}
-            </section>
+                {hintRows.length === 0 && (
+                  <div className="vf2-empty">{i18n.t('VOICE_FOLLOW.HINT_NONE')}</div>
+                )}
+                {hintRows.map((c, i) => (
+                  <div className="vf2-shabad-row" key={c.shabadId}>
+                    <span className="vf2-cand-line">
+                      <Gurmukhi text={anvaad.unicode(c.verse || '')} />
+                    </span>
+                    {c.s >= sevadaarHint.DEFAULTS.pickMin && (
+                      <span className="vf2-hint-heard">{i18n.t('VOICE_FOLLOW.HINT_HEARD')}</span>
+                    )}
+                    <button
+                      type="button"
+                      className={`vf2-switch${i === 0 ? ' is-primary' : ''}`}
+                      onClick={() => {
+                        clearHint();
+                        pickCandidate({ shabadId: c.shabadId, verseId: c.verseId, verse: c.verse });
+                      }}
+                    >
+                      {i18n.t(currentView ? 'VOICE_FOLLOW.SWITCH' : 'VOICE_FOLLOW.OPEN')}
+                    </button>
+                  </div>
+                ))}
+              </section>
+            )}
           </>
           {(hiddenRun || (status !== 'listening' && !detecting)) && (
             <div className="vf-status">{statusText}</div>
@@ -7357,6 +7637,43 @@ const VoiceFollow = () => {
         </div>
       )}
 
+      {active && !ngHoldView && (
+        <div className="vf2-hint-dock">
+          <div className={`vf2-hint${hintQ ? ' is-active' : ''}`}>
+            <div className="vf2-hint-label">{i18n.t('VOICE_FOLLOW.HINT_LABEL')}</div>
+            <div className="search-content">
+              <i className="fa fa-search vf2-hint-icon" aria-hidden="true" />
+              <input
+                className="input-box gurmukhi disable-kb-shortcuts"
+                type="text"
+                value={hintQ}
+                placeholder={i18n.t('VOICE_FOLLOW.HINT_PLACEHOLDER')}
+                title={i18n.t('VOICE_FOLLOW.HINT_TIP')}
+                spellCheck={false}
+                onChange={(e) => giveHint(e.target.value)}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === 'Escape') clearHint();
+                  if (e.key === 'Enter' && hintRows[0]) {
+                    const top = hintRows[0];
+                    clearHint();
+                    pickCandidate({
+                      shabadId: top.shabadId,
+                      verseId: top.verseId,
+                      verse: top.verse,
+                    });
+                  }
+                }}
+              />
+              <div className="input-buttons">
+                {hintQ && <IconButton icon="fa fa-times" onClick={clearHint} />}
+                <IconButton icon="fa fa-keyboard-o" onClick={() => setHintKeyboard((v) => !v)} />
+              </div>
+            </div>
+            {hintKeyboard && <HintKeyboard query={hintQ} setQuery={giveHint} />}
+          </div>
+        </div>
+      )}
       {active && (
         <div className="vf-ap-bar">
           <div className="vf-ap-heard" title={i18n.t('VOICE_FOLLOW.HEARING_TIP')}>
