@@ -87,6 +87,7 @@ const state = {
   steppedAt: 0,
   steps: 0,
   scoped: false, // see current()
+  baniFollow: false, // a Bani (read or sung) is being followed: no kirtan pace
   akhand: false, // Akhand Paath being followed (see setAkhand)
   selfTest: null,
   blockedUntil: {}, // tier index -> ms: left because of backlog, do not re-enter before
@@ -228,7 +229,7 @@ const searchHopS = (ms, winS = SEARCH_WINDOW_S) => {
 // Paced kirtan: decided once from the self-test, never from live pass times.
 const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && searchHopS(state.passMs) > 0.5;
 function kirtanRecHopS(winS) {
-  if (state.scoped || !kirtanPaced()) return 0;
+  if (state.scoped || state.baniFollow || !kirtanPaced()) return 0;
   const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
@@ -377,6 +378,13 @@ function observe(backlogSec, nowMs = Date.now()) {
   return null;
 }
 
+// While a Bani (read or sung) is being followed the kirtan pace is off: the search that
+// recovers a released Bani line and the switch judge run at today's rate (sim 0.48, aa24 Aarti:
+// with the paced search a released line was never re-acquired, 100 -> 75).
+function setBaniFollow(on) {
+  state.baniFollow = !!on;
+}
+
 function onStep(fn) {
   state.listeners.add(fn);
   return () => state.listeners.delete(fn);
@@ -389,6 +397,7 @@ module.exports = {
   describe,
   notePass,
   setScoped,
+  setBaniFollow,
   setAkhand,
   AKHAND,
   hopS,

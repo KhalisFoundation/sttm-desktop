@@ -6202,6 +6202,13 @@ const VoiceFollow = () => {
               !!(followerRef.current && followerRef.current.readBani) &&
               !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
           );
+          // A Bani (read or sung) being followed: no kirtan pace on slow PCs (engine/pace).
+          if (engine.pace.setBaniFollow) {
+            engine.pace.setBaniFollow(
+              phaseRef.current === 'following' &&
+                !!(followerRef.current && followerRef.current.isBani),
+            );
+          }
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
           syncAkpViewRef.current(
             visibleRef.current &&

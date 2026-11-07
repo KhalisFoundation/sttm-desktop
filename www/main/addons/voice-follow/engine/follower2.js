@@ -331,6 +331,7 @@ class FollowerV2 {
     // A read Bani: the only following the performance tiers apply to. Aarti (Bani 22) is sung like
     // kirtan, so it never gets the tiers even when it follows on this follower.
     this.readBani = !this.sung && Number(opts.baniId) !== 22;
+    this.isBani = true; // a Bani is being followed (engine/pace: no kirtan pace meanwhile)
     this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
