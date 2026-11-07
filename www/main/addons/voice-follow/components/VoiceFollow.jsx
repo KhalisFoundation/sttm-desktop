@@ -728,6 +728,10 @@ const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 // a count of k searches becomes k / scale, and each vote is worth scale times as much and fades
 // scale times as fast. At scale 1 every rule is exactly as before.
 const perSearch = (k, scale) => (scale > 1 ? Math.max(1, Math.round(k / scale)) : k);
+// A leader must still hold for at least two searches in a row: one search alone never locks
+// (at the 0.75 s hop, round(2 / 1.5) = 1 let single searches lock wrong Shabads; GCP 0.65 pt01).
+const perSearchStable = (k, scale) =>
+  scale > 1 ? Math.max(Math.min(k, 2), Math.round(k / scale)) : k;
 // ...but a paced lock still needs as much audio behind it as today's: the searches it won must
 // span at least today's 4 wins x 0.5 s (fewer, longer-spaced searches may not lock on ~1 s of a
 // short phrase that today's schedule would have outgrown; sim 0.48 pt01).
@@ -5352,7 +5356,7 @@ const VoiceFollow = () => {
             if (
               row &&
               row.verse &&
-              poolStableRef.current.count >= perSearch(PAATH_POOL_STABLE, scale)
+              poolStableRef.current.count >= perSearchStable(PAATH_POOL_STABLE, scale)
             ) {
               poolStableRef.current = { bani: null, count: 0 };
               autopilotLock({ shabadId: pooled.sid, verseId: row.verseId, verse: row.verse });
@@ -5365,7 +5369,7 @@ const VoiceFollow = () => {
             fl.length >= AP_LOCK_MIN_LETTERS &&
             lead >= AUTO_LOCK_CONF &&
             best >= DETECT_MIN_EVIDENCE &&
-            st.count >= perSearch(AP_LOCK_STABLE, scale)
+            st.count >= perSearchStable(AP_LOCK_STABLE, scale)
           ) {
             let leaders = await searchCanonicalText(text, 2 + DUP_AWARE_LOCK, abort.signal);
             if (DUP_AWARE_LOCK) leaders = await distinctLeaders(leaders, 2);
@@ -6028,7 +6032,7 @@ const VoiceFollow = () => {
       if (
         lead >= AUTO_LOCK_CONF &&
         best >= DETECT_MIN_EVIDENCE &&
-        st.count >= perSearch(DETECT_STABLE, scale)
+        st.count >= perSearchStable(DETECT_STABLE, scale)
       ) {
         lockOnto(cand);
       }
