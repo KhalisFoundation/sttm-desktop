@@ -128,3 +128,15 @@ test('live trigger stops at the 450 ms cap: a laptop at 520 ms live keeps today\
   pace.observe(0, 1e6);
   assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
 });
+
+test('live trigger reports once when it latches (perf_tier reason kirtan-live)', async () => {
+  const pace = await paceAt(140);
+  const seen = [];
+  pace.onStep((ev) => seen.push(ev));
+  for (let k = 0; k < 240; k += 1) pace.notePass(360, 4 * 16000);
+  pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 1000);
+  assert.strictEqual(seen.length, 1);
+  assert.strictEqual(seen[0].reason, 'kirtan-live');
+  assert.strictEqual(seen[0].liveMedianMs, 360);
+});
