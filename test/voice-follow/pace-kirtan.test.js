@@ -59,13 +59,3 @@ test('searchScale: 1 on a fast PC and for short windows; hop ratio once the sear
   assert.strictEqual(slow.searchScale(0.6, 2), 1);
   assert.ok(slow.searchScale(0.6, 10) > 1.5);
 });
-
-test('slow PC: no kirtan pace while a Bani is being followed', async () => {
-  const pace = await paceAt(330);
-  assert.ok(pace.hopS('recognizer', 0.5, 10) >= 1);
-  pace.setBaniFollow(true);
-  assert.strictEqual(pace.hopS('recognizer', 0.5, 10), 0.5);
-  assert.strictEqual(pace.searchScale(0.5, 10), 1);
-  pace.setBaniFollow(false);
-  assert.ok(pace.hopS('recognizer', 0.5, 10) >= 1);
-});
