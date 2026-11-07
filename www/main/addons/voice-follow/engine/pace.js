@@ -212,6 +212,8 @@ const SEARCH_WINDOW_S = 10;
 // evidence per search (searchScale 1).
 const PACE_BY_WINDOW = process.env.VF_KIRTAN_BY_WINDOW === '1';
 const PACE_EVIDENCE = process.env.VF_KIRTAN_EVIDENCE !== '0';
+// Benchmarks only: cap the evidence scale (unset = no cap).
+const SCALE_MAX = Number(process.env.VF_KIRTAN_SCALE_MAX) || Infinity;
 const SEARCH_LOAD = 0.9;
 const KIRTAN_FOLLOW_HOP_S = 0.375;
 const KIRTAN_GUARD = {
@@ -245,7 +247,7 @@ function searchScale(ownHopS, winS) {
     ? Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS)
     : Math.max(ownHopS, current().recognizerHopS);
   const now = hopS('recognizer', ownHopS, winS);
-  return now > today ? now / today : 1;
+  return now > today ? Math.min(now / today, SCALE_MAX) : 1;
 }
 // Benchmarks only: pace just one engine kind ('recognizer' or 'follower'). Unset = both.
 const KIRTAN_PACE_ONLY = process.env.VF_KIRTAN_PACE_ONLY || null;
