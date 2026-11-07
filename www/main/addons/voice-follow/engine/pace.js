@@ -200,17 +200,17 @@ function hopS(kind, ownHopS, winS) {
 // slower under load. Only computers the self-test classes slow get the paced schedule, and on
 // those a live guard adds 0.25 s to the recognizer when the kirtan audio backlog stays above
 // 0.5 s (other apps, a hot CPU) and gives it back once it has kept up for a minute.
-// The search pass costs in proportion to its window, so the recognizer is paced by the window it
-// has now: at a session's start the window grows from 1 s and short windows keep today's 0.5 s
-// schedule (a Bani such as Jaap Sahib locks in its first seconds on 5 agreeing searches; paced at
-// 1 s from the first pass, the window grew past 5 s first and Jaap never locked: sim 0.48,
-// pt33 100 -> 0). VF_KIRTAN_PACE=0 turns it all off.
+// With fewer searches, the component keeps a paath Bani's lock evidence per second (searchScale;
+// VoiceFollow perSearch), which is what lets Jaap and Japji lock in their first seconds.
+// VF_KIRTAN_PACE=0 turns it all off.
 const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
 const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
 const SEARCH_WINDOW_S = 10;
-// Benchmarks only: VF_KIRTAN_BY_WINDOW=0 paces the search as if its window were always full;
-// VF_KIRTAN_EVIDENCE=0 keeps the component's lock evidence per search (searchScale 1).
-const PACE_BY_WINDOW = process.env.VF_KIRTAN_BY_WINDOW !== '0';
+// Benchmarks only: VF_KIRTAN_BY_WINDOW=1 paces the search by its current window (off: the
+// per-second lock evidence alone lets Jaap and Japji lock, and window pacing cost long kirtan
+// clips 81.8 -> 74.2 right at sim 0.48); VF_KIRTAN_EVIDENCE=0 keeps the component's lock
+// evidence per search (searchScale 1).
+const PACE_BY_WINDOW = process.env.VF_KIRTAN_BY_WINDOW === '1';
 const PACE_EVIDENCE = process.env.VF_KIRTAN_EVIDENCE !== '0';
 const SEARCH_LOAD = 0.9;
 const KIRTAN_FOLLOW_HOP_S = 0.375;

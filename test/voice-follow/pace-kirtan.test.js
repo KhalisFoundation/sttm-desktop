@@ -44,18 +44,15 @@ test('slow PC: the Bani follower (Paath, sung Banis) never takes the kirtan pace
   assert.strictEqual(pace.hopS('bani', 0.25), 0.25);
 });
 
-test('slow PC: short search windows at a session start keep the 0.5 s schedule', async () => {
+test('slow PC: the search is paced from its first pass (window pacing is bench-only)', async () => {
   const pace = await paceAt(330);
-  assert.strictEqual(pace.hopS('recognizer', 0.5, 2), 0.5);
-  assert.strictEqual(pace.hopS('recognizer', 0.5, 4), 0.5);
-  assert.ok(pace.hopS('recognizer', 0.5, 10) >= 1);
-  assert.strictEqual(pace.hopS('recognizer', 0.5), pace.hopS('recognizer', 0.5, 10));
+  assert.ok(pace.hopS('recognizer', 0.5, 2) >= 1);
+  assert.strictEqual(pace.hopS('recognizer', 0.5, 2), pace.hopS('recognizer', 0.5, 10));
 });
 
 test('searchScale: 1 on a fast PC and for short windows; hop ratio once the search is paced', async () => {
   const fast = await paceAt(135);
   assert.strictEqual(fast.searchScale(0.6, 10), 1);
   const slow = await paceAt(330);
-  assert.strictEqual(slow.searchScale(0.6, 2), 1);
   assert.ok(slow.searchScale(0.6, 10) > 1.5);
 });
