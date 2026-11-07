@@ -81,13 +81,17 @@ class Infer {
     // ONNX Runtime defaults to one spinning thread per core (9.9 cores busy on a 20-core PC
     // for work 4 threads finish in 239 ms of the 500 ms hop). 4 threads give bit-identical
     // output to the default (58/58 kirtan windows, zero confidence difference) and use 2.3
-    // of 8 cores. Machines with fewer than 8 logical cores get 2 threads: 4 would still take
-    // 3.1 of 4 cores; 2 keep up (325 ms) at ~1 core with near-identical text (49/58 windows).
+    // of 8 cores. Machines with 4-7 logical cores also get 4 threads (Nov 2026, real hardware,
+    // 4 s window): 4 physical cores 126 -> 73 ms per pass (1.7x; an older 4-core i5 then keeps
+    // up instead of dropping audio), 2 cores x 2 hyper-threads 133-179 -> 137-175 ms (no loss).
+    // The CPU time per pass is about the same (4 x 73 vs 2 x 126 core-ms); it just finishes
+    // sooner. 2-3 logical cores keep 2 threads: on 2 virtual cores more threads were slower
+    // (311 -> 520 ms).
     // eslint-disable-next-line global-require
     const cores = require('os').cpus().length;
     // VF_ORT_THREADS (benchmarks, A/B of thread counts) overrides the rule.
     const env = parseInt(process.env.VF_ORT_THREADS || '', 10);
-    let threads = cores >= 8 ? 4 : Math.max(1, Math.min(2, cores));
+    let threads = cores >= 4 ? 4 : Math.max(1, Math.min(2, cores));
     if (env > 0) threads = env;
     const sess = await ort().InferenceSession.create(modelPath, {
       intraOpNumThreads: threads,
