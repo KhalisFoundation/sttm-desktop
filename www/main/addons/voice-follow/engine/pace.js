@@ -195,7 +195,7 @@ function hopS(kind, ownHopS, winS) {
 // 505 ms -> 1.5 s, each the best schedule measured at that speed. The line followers then run
 // every 0.375 s (same Shabads found as rec / 2, but line lag at i9 level: 3.5-4.3 s vs 5.8 s).
 // Every window still overlaps its neighbours. Whether a computer is paced is decided once, from
-// the startup self-test: at about 180 ms per 4 s pass or faster (e.g. Renton's Ryzen 9, ~135 ms)
+// the startup self-test: at 250 ms per 4 s pass or faster (e.g. Renton's Ryzen 9, 132-200 ms)
 // it keeps exactly today's schedule for the whole session, even while it falls behind or runs
 // slower under load. Only computers the self-test classes slow get the paced schedule, and on
 // those a live guard adds 0.25 s to the recognizer when the kirtan audio backlog stays above
@@ -232,8 +232,13 @@ const searchHopS = (ms, winArg = SEARCH_WINDOW_S) => {
   const cost = (SEARCH_COST * ms * Math.min(winS, SEARCH_WINDOW_S)) / SEARCH_WINDOW_S / 1000;
   return Math.max(0.5, Math.ceil((cost / SEARCH_LOAD) * 4 - 1e-9) / 4);
 };
-// Paced kirtan: decided once from the self-test, never from live pass times.
-const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && searchHopS(state.passMs) > 0.5;
+// Paced kirtan: decided once from the self-test, never from live pass times, and only above
+// 250 ms per 4 s pass. Renton's Ryzen 9 3900XT self-tested 132-200 ms over 33 field sessions
+// (Oct 25-Nov 7), so it must stay on today's schedule with a margin; at 180 ms it would have been
+// paced in 3 sessions (and was, in the sim at 0.9x: 185 ms). PCs paced at 250: i3-5005U,
+// i7-2600, i5-4200U, i7-4770K, i7-7500U, and some i7-1255U / i7-11370H sessions.
+const KIRTAN_PACE_MIN_MS = 250;
+const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && state.passMs > KIRTAN_PACE_MIN_MS;
 function kirtanRecHopS(winS) {
   if (state.scoped || !kirtanPaced()) return 0;
   const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;

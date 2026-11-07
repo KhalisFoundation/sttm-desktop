@@ -56,3 +56,12 @@ test('searchScale: 1 on a fast PC and for short windows; hop ratio once the sear
   const slow = await paceAt(330);
   assert.ok(slow.searchScale(0.6, 10) > 1.5);
 });
+
+test("Renton-class self-tests up to 250 ms keep today's kirtan schedule", async () => {
+  const pace = await paceAt(210);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  for (let k = 0; k < 8; k += 1) pace.notePass(400, 4 * 16000);
+  for (let t = 0; t <= 300000; t += 500) pace.observe(3, 1e6 + t);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  assert.strictEqual(pace.searchScale(0.5, 10), 1);
+});
