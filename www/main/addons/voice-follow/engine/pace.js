@@ -82,6 +82,9 @@ const state = {
   kirtanBehindSince: null,
   kirtanClearSince: null,
   recent: [],
+  long: [], // last LIVE.passes pass times (4 s-window cost), for the kirtan live trigger
+  kirtanLive: false, // kirtan paced because live passes stayed slow (laptops: the self-test runs on turbo)
+  kirtanLiveAt: 0,
   behindSince: null,
   headroomSince: null,
   steppedAt: 0,
@@ -169,6 +172,8 @@ function notePass(ms, samples) {
   const ms4 = samples > 0 ? (ms * 4 * 16000) / samples : ms;
   state.recent.push(ms4);
   if (state.recent.length > RECENT) state.recent.shift();
+  state.long.push(ms4);
+  if (state.long.length > KIRTAN_LIVE.passes) state.long.shift(); // eslint-disable-line no-use-before-define
 }
 
 // Hop for an engine: its own hop, or the tier's when that is longer.
@@ -232,24 +237,54 @@ const searchHopS = (ms, winArg = SEARCH_WINDOW_S) => {
   const cost = (SEARCH_COST * ms * Math.min(winS, SEARCH_WINDOW_S)) / SEARCH_WINDOW_S / 1000;
   return Math.max(0.5, Math.ceil((cost / SEARCH_LOAD) * 4 - 1e-9) / 4);
 };
-// Paced kirtan: decided once from the self-test, never from live pass times, and only above
-// 250 ms per 4 s pass. Renton's Ryzen 9 3900XT self-tested 132-200 ms over 33 field sessions
-// (Oct 25-Nov 7), so it must stay on today's schedule with a margin; at 180 ms it would have been
-// paced in 3 sessions (and was, in the sim at 0.9x: 185 ms). PCs paced at 250: i3-5005U,
-// i7-2600, i5-4200U, i7-4770K, i7-7500U, and some i7-1255U / i7-11370H sessions.
+// Paced kirtan from the self-test: only above 250 ms per 4 s pass. Renton's Ryzen 9 3900XT
+// self-tested 132-200 ms over 33 field sessions (Oct 25-Nov 7), so it must stay on today's schedule
+// with a margin; at 180 ms it would have been paced in 3 sessions (and was, in the sim at 0.9x:
+// 185 ms). PCs paced at 250: i3-5005U, i7-2600, i5-4200U, i7-4770K, i7-7500U, and some i7-1255U /
+// i7-11370H sessions.
 const KIRTAN_PACE_MIN_MS = 250;
 // ...and only up to 450 ms: at ~505 ms (sim 0.33, i5-6400 class) Japji was lost (100 -> 32) and
 // Paath must hold, so the slowest PCs keep today's schedule until that is solved.
 // VF_KIRTAN_PACE_MAX_MS overrides it for benchmarks.
 const KIRTAN_PACE_MAX_MS = Number(process.env.VF_KIRTAN_PACE_MAX_MS) || 450;
-const kirtanPaced = () =>
-  KIRTAN_PACE &&
-  state.passMs != null &&
-  state.passMs > KIRTAN_PACE_MIN_MS &&
-  state.passMs <= KIRTAN_PACE_MAX_MS;
+// Live trigger. A laptop's startup self-test runs on a cool CPU at turbo clocks and often reads
+// fast (field, Oct 25-Nov 7: 12 of 149 sessions self-tested at <= 180 ms but passed at 200-330 ms
+// live and fell behind 100-3000 times). So a computer the self-test called fast is also paced
+// once the median of its last ~240 real passes (40 s of fast kirtan) rises above onMs, and then
+// stays paced for the session (no flapping). onMs is above the worst 5-minute median Renton's
+// Ryzen 9 ever logged (317 ms, 36 sessions), so Renton keeps today's schedule; laptops that slow
+// down hard still cross it (worst 5-min medians: Ryzen 5 7520U 516, i5-1335U 443, i5-1235U 435,
+// Ultra 7 265U 416, i9-12900H laptop 377, Ultra 7 155U 368 ms). Like the self-test rule it stops at
+// KIRTAN_PACE_MAX_MS: a computer slower than that live keeps today's schedule (Japji, see above).
+// VF_KIRTAN_LIVE=0 = off.
+const KIRTAN_LIVE = {
+  on: process.env.VF_KIRTAN_LIVE !== '0',
+  passes: 240,
+  minPasses: 120,
+  onMs: Number(process.env.VF_KIRTAN_LIVE_MS || 0) || 330,
+};
+const longMedianMs = () => (state.long.length >= KIRTAN_LIVE.minPasses ? median(state.long) : null);
+function observeKirtanLive(nowMs) {
+  if (!KIRTAN_LIVE.on || !KIRTAN_PACE) return;
+  if (state.kirtanLive) return;
+  const m = longMedianMs();
+  if (m != null && m > KIRTAN_LIVE.onMs && m <= KIRTAN_PACE_MAX_MS) {
+    state.kirtanLive = true;
+    state.kirtanLiveAt = nowMs;
+  }
+}
+// Paced kirtan: from the self-test, or from the live trigger above.
+const selfTestPaced = () =>
+  state.passMs != null && state.passMs > KIRTAN_PACE_MIN_MS && state.passMs <= KIRTAN_PACE_MAX_MS;
+const kirtanPaced = () => KIRTAN_PACE && (selfTestPaced() || state.kirtanLive);
 function kirtanRecHopS(winS) {
   if (state.scoped || !kirtanPaced()) return 0;
-  const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;
+  const live = state.kirtanLive && !selfTestPaced();
+  // latched: paced at least as for onMs
+  const ms = live
+    ? Math.min(Math.max(longMedianMs() || 0, KIRTAN_LIVE.onMs + 1), KIRTAN_PACE_MAX_MS)
+    : livePassMs();
+  const rec = searchHopS(ms, winS) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
 // The recognizer's hop now / today's hop (1 unless the kirtan pace is slowing the search): the
@@ -373,6 +408,7 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
+  if (!state.scoped && !selfTestPaced()) observeKirtanLive(nowMs);
   if (!state.scoped && kirtanPaced()) observeKirtan(backlogSec, nowMs);
   if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
