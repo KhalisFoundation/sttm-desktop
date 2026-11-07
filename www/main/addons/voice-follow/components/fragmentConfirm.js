@@ -37,10 +37,14 @@ const DEFAULTS = {
 };
 const LIVE = 0.3;
 
-/** Best pangti of `linesNorm` for the heard piece `hyp`: { s, index } (s 0..1, index -1 = none). */
-function bestPangti(hyp, linesNorm, ratio, cfg = DEFAULTS) {
+/**
+ * Best pangti of `linesCompared` for the heard piece `hyp`: { s, index } (s 0..1, index -1 = none).
+ * linesCompared: the pangtis as Compared views (engine/compared.js: each pangti exactly as the database
+ * gives it; a view's length counts only the characters a comparison looks at).
+ */
+function bestPangti(hyp, linesCompared, ratio, cfg = DEFAULTS) {
   let best = { s: 0, index: -1 };
-  (linesNorm || []).forEach((ln, i) => {
+  (linesCompared || []).forEach((ln, i) => {
     if (!ln || ln.length < cfg.minLineLetters) return;
     const s = ratio(hyp, ln) / 100;
     if (s > best.s) best = { s, index: i };
@@ -67,20 +71,20 @@ function totalOf(lines) {
 }
 
 /**
- * One heard piece. hyp = normalized heard text; cur = { linesNorm } of the Shabad on screen;
- * cands = [{ id, linesNorm, role: 'change' | 'list' }]. ratio = partialRatio(a, b) -> 0..100.
+ * One heard piece. hyp = heard text ready for comparing; cur = { linesCompared } (Compared views) of the Shabad on screen;
+ * cands = [{ id, linesCompared, role: 'change' | 'list' }]. ratio = partialRatio(a, b) -> 0..100.
  * Returns { hits: [{ id, index, s, w }], ready: { id, index } | null, sCur } (sCur = the Shabad on
  * screen's best pangti for this piece).
  */
 function step(store, { hyp, cur, cands }, ratio, cfg = DEFAULTS) {
   const out = { hits: [], ready: null, sCur: 0 };
   if (!hyp || hyp.length < cfg.minLetters) return out;
-  const sCur = cur ? bestPangti(hyp, cur.linesNorm, ratio, cfg).s : 0;
+  const sCur = cur ? bestPangti(hyp, cur.linesCompared, ratio, cfg).s : 0;
   out.sCur = sCur;
   if (sCur >= cfg.minScore) return out; // fits the Shabad on screen too: no evidence either way
   const fitMin = hyp.length < cfg.shortLetters ? cfg.shortScore : cfg.minScore;
   const fits = cands
-    .map((c) => ({ c, m: bestPangti(hyp, c.linesNorm, ratio, cfg) }))
+    .map((c) => ({ c, m: bestPangti(hyp, c.linesCompared, ratio, cfg) }))
     .filter(({ m }) => m.index >= 0 && m.s >= fitMin && m.s - sCur >= cfg.minMargin);
   fits.forEach(({ c, m }) => {
     const shared = fits.some((o) => o.c.id !== c.id);
