@@ -180,6 +180,7 @@ const {
   simranNow,
   simranHeard,
   simranGone,
+  waheguruLine,
 } = require('./simran');
 const { elapse: pcElapse, addHit: pcAddHit } = require('./panktiCumulation');
 const { elapse: fragElapse, step: fragStep } = require('./fragmentConfirm');
@@ -2370,15 +2371,36 @@ const VoiceFollow = () => {
       ) {
         return true; // a heading that is only the Fateh: never a Shabad to open
       }
-      // Searching while Waheguru Simran is heard right now: no Shabad is opened over it (Renton: a
-      // Shabad of Bhai Nand Lal Ji went up 25 s into the sangat's Simran; its pangti matched what
-      // was heard at 0.44-0.60). Never while following (switching, a Bani or Akhand Paath moving
-      // on), and never a pangti that is clearly what is being sung (Akhand Kirtan, where ਵਾਹਿਗੁਰੂ
-      // runs through the singing): only the first Shabad is held back.
-      if (phaseRef.current !== 'following' && simranNow(ng.simran, now) && !ngCandHeard(cand)) {
+      // Waheguru Simran: no Shabad is opened over it (Renton: a Shabad of Bhai Nand Lal Ji went up
+      // 25 s into the sangat's Simran; its pangti matched what was heard at 0.44-0.60), unless its
+      // pangti is clearly what is being sung (Akhand Kirtan, where ਵਾਹਿਗੁਰੂ runs through the
+      // singing) and is not itself mostly ਵਾਹਿਗੁਰੂ. While following, no switch either until the
+      // Simran is over (a laptop mic in Simran after Japji Sahib: a Bhatt Swaiye with the ਵਾਹਿਗੁਰੂ
+      // refrain replaced the Waheguru slide, during the Simran and just after it): none while our
+      // Simran slide is up unless its pangti is clearly sung, and never to a mostly-ਵਾਹਿਗੁਰੂ pangti
+      // while Waheguru is heard. A first Shabad after the sangat's Simran is not held back longer
+      // than before. Never the Shabad or Bani on screen moving on, and never in Akhand Paath.
+      const following = phaseRef.current === 'following';
+      const refrainLine = waheguruLine(anvaad.unicode(cand.verse));
+      const candHeard = ngCandHeard(cand);
+      if (
+        !(
+          following &&
+          (opts.promote || opts.window || cand.shabadId === currentShabadIdRef.current)
+        ) &&
+        !(following && paathSeqRef.current && paathSeqRef.current.on) &&
+        ((simranNow(ng.simran, now) && (!candHeard || refrainLine)) ||
+          (following &&
+            ((refrainLine && (ng.simran.on || simranHeard(ng.simran, now))) ||
+              (ng.ours && ng.simranUp && !candHeard))))
+      ) {
         if (now - ng.holdLogAt > 5000) {
           ng.holdLogAt = now;
-          sessionLog.logEvent('simran_block', { session: sessionIdRef.current, to: cand.shabadId });
+          sessionLog.logEvent('simran_block', {
+            session: sessionIdRef.current,
+            to: cand.shabadId,
+            phase: phaseRef.current,
+          });
         }
         return true;
       }
