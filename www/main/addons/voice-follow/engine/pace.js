@@ -225,9 +225,12 @@ function kirtanRecHopS() {
   const rec = searchHopS(livePassMs()) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
+// Benchmarks only: pace just one engine kind ('recognizer' or 'follower'). Unset = both.
+const KIRTAN_PACE_ONLY = process.env.VF_KIRTAN_PACE_ONLY || null;
 function kirtanHopS(kind) {
   const rec = kirtanRecHopS();
   if (!rec) return 0;
+  if (KIRTAN_PACE_ONLY && kind !== KIRTAN_PACE_ONLY) return 0;
   return kind === 'recognizer' ? rec : KIRTAN_FOLLOW_HOP_S;
 }
 // Kirtan guard: called by observe() while no read Bani is followed.
