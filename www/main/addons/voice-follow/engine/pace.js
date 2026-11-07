@@ -175,7 +175,27 @@ function hopS(kind, ownHopS) {
   }
   const t = current();
   const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
-  return Math.max(ownHopS, tierHop);
+  return Math.max(ownHopS, tierHop, kirtanHopS(kind)); // eslint-disable-line no-use-before-define
+}
+
+// Kirtan pace. Outside a read Bani the tiers do not apply and every computer runs the fast
+// schedule. The 10 s Shabad-search pass costs about 2.5x a 4 s pass; a computer whose search pass
+// takes longer than the time between search passes falls behind and stops finding Shabads (Mac
+// screen, 5 kirtan clips: the 0.5 s schedule found 86% at 196 ms per 4 s pass, 11% at 238 ms and
+// 0% at 309 ms). So the recognizer waits at least searchPass / 0.85 between passes (rounded up to
+// 0.25 s, never less than today's 0.5 s) and the line followers half of that; every window still
+// overlaps its neighbours. Computers at about 170 ms per 4 s pass or faster keep exactly today's
+// schedule. VF_KIRTAN_PACE=0 turns it off.
+const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
+const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
+const SEARCH_LOAD = 0.85;
+function kirtanHopS(kind) {
+  const ms = livePassMs();
+  if (!KIRTAN_PACE || state.scoped || ms == null) return 0;
+  const need = (SEARCH_COST * ms) / 1000 / SEARCH_LOAD;
+  const rec = Math.max(0.5, Math.ceil(need * 4 - 1e-9) / 4);
+  if (rec <= 0.5) return 0;
+  return kind === 'recognizer' ? rec : rec / 2;
 }
 
 function backlogBoundS() {
