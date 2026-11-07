@@ -271,6 +271,16 @@ function observeKirtanLive(nowMs) {
   if (m != null && m > KIRTAN_LIVE.onMs && m <= KIRTAN_PACE_MAX_MS) {
     state.kirtanLive = true;
     state.kirtanLiveAt = nowMs;
+    // Logged like a tier step (perf_tier, reason 'kirtan-live') so field sessions and benches
+    // see when and at what live speed the trigger latched.
+    const ev = { reason: 'kirtan-live', liveMedianMs: Math.round(m), ...describe() };
+    state.listeners.forEach((fn) => {
+      try {
+        fn(ev);
+      } catch (_) {
+        /* a listener must never disturb the engines */
+      }
+    });
   }
 }
 // Paced kirtan: from the self-test, or from the live trigger above.
