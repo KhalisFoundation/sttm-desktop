@@ -1,4 +1,6 @@
-import { i18n } from './common/i18n';
+/* eslint import/no-unresolved: 0, import/extensions: 0 */
+// Loaded by a <script> tag, so paths resolve from the HTML file in www/, not from www/js/.
+import { i18n } from './js/common/i18n';
 
 const marked = require('marked');
 const fs = require('fs');
