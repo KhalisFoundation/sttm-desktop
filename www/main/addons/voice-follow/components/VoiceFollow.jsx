@@ -3785,8 +3785,9 @@ const VoiceFollow = () => {
         return await client.search(text, cap, { signal });
       } catch (error) {
         if (error.name !== 'AbortError') {
-          // The worker is gone (timeout, crash): let it go so the next call rebuilds.
-          warmIndex.fail(client);
+          // A dead worker (timeout, crash) is let go so the next call rebuilds; a ready one
+          // only skipped this search (queue full, e.g. many decodes released at once).
+          if (!warmIndex.searchFailed(client)) return null;
           vfError('retrieval_search_failed');
           diag(`vf retrieval search failed: ${error.message}`);
           if (SHADOW_BUILD && shadowBus.active()) {
