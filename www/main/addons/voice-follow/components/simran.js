@@ -4,37 +4,51 @@
 // ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ ਵਾਹਿ ਜੀਉ), so VoiceFollow also needs nothing to fit the Shabad on screen.
 /* eslint-disable no-param-reassign */ // s: the slide's own state, updated in place
 const WAHEGURU = 'ਵਾਹਿਗੁਰੂ';
-const SIMRAN_W = 20000; // what was heard over this window
-const SIMRAN_MIN_HEARD = 10; // transcripts in the window before anything is judged
+const SIMRAN_W = 10000; // what was heard over this window
+const SIMRAN_MIN_HEARD = 5; // transcripts in the window before anything is judged
 const SIMRAN_ON = 0.6; // this share of the transcripts have a Waheguru: Simran
 const SIMRAN_OFF = 0.3; // under this share: not Simran
-const SIMRAN_TRIG = 8000; // Simran this long: the slide goes up
+const SIMRAN_TRIG = 4000; // Simran this long: the slide goes up (about 10 s after it starts)
 const SIMRAN_END = 10000; // stopped this long: Simran is over (a short Dhan Guru line is not)
 const SIMRAN_NOW_W = 6000; // 'heard right now' (the lock gate): the last few seconds only
 
-const STRIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g; // as the engine's norm (engine/infer.js)
+const STRIP = /[\s।॥|0-9੦-੯.,;:!?-]+/g; // as the engine's norm (engine/infer.js); heard words only
 const norm = (s) => (s || '').replace(STRIP, '');
+// Dandas, numbers, spaces and punctuation are skipped while comparing, never removed from the text:
+// a word is read through the positions of its letters.
+const IGNORED = /[\s।॥|0-9੦-੯.,;:!?-]/;
+const letterAt = (w) => {
+  const at = [];
+  for (let i = 0; i < w.length; i += 1) if (!IGNORED.test(w[i])) at.push(i);
+  return at;
+};
+const hasLetters = (w) => letterAt(String(w || '')).length > 0;
 
-// Edit distance, small strings only.
-function dist(a, b) {
+// Edit distance between the letters of a (at the positions in at) and b, small strings only.
+function dist(a, at, b) {
   let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i += 1) {
+  for (let i = 1; i <= at.length; i += 1) {
     const cur = [i];
     for (let j = 1; j <= b.length; j += 1) {
-      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      cur[j] = Math.min(
+        prev[j] + 1,
+        cur[j - 1] + 1,
+        prev[j - 1] + (a[at[i - 1]] === b[j - 1] ? 0 : 1),
+      );
     }
     prev = cur;
   }
   return prev[b.length];
 }
 
-// A heard word that is ਵਾਹਿਗੁਰੂ, as the speech model may spell it (ਵਾਹਗੁਰੂ, ਵਾਹਿਗੁਰ, ਵਾਹਿੁਰ...).
+// A heard word that is ਵਾਹਿਗੁਰੂ, allowing for the speech model losing a letter or a vowel sign.
 const isWaheguru = (w) => {
-  const n = norm(w);
-  return n.length >= 5 && n.length <= 11 && dist(n, WAHEGURU) <= 2;
+  const a = String(w || '');
+  const at = letterAt(a);
+  return at.length >= 5 && at.length <= 11 && dist(a, at, WAHEGURU) <= 2;
 };
 
-// Of these heard words, how many are Waheguru (ਵਾਹਿ ਗੁਰੂ heard as two words counts once).
+// Of these heard words, how many are Waheguru (Waheguru heard as two words counts once).
 function countSimran(words) {
   let hits = 0;
   let total = 0;
@@ -43,7 +57,7 @@ function countSimran(words) {
     if (isWaheguru(words[i])) hits += 1;
     else if (
       i + 1 < words.length &&
-      dist(norm(words[i]), 'ਵਾਹਿ') <= 1 && // only ਵਾਹਿ + ਗੁਰੂ, never another word + ਗੁਰੂ
+      dist(words[i], letterAt(words[i]), 'ਵਾਹਿ') <= 1 && // only Waheguru heard as two words, never another word + ਗੁਰੂ
       isWaheguru(words[i] + words[i + 1])
     ) {
       hits += 1;
@@ -53,9 +67,9 @@ function countSimran(words) {
   return { hits, total };
 }
 
-// The Fateh said aloud (ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖ਼ਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫ਼ਤਿਹ), as the speech model hears it
-// (ਵਾਹਿਗੁਰ ਜੀ ਕਾ ਖਾਸਾ, ਵਹਿਗੁਰ ਚੀ ਕ ਖਾਲਸਾ, ਵਾਹਿਗੁਰ ਜੀ ਕੀ ਫਤਿਹ...): a Waheguru, then ਜੀ, then ਕਾ + a
-// word in ਖ or ਕੀ + a word in ਫ/ਪ. In Gurbani only the headings say it (never sung or read as kirtan).
+// The Fateh said aloud (ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖ਼ਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫ਼ਤਿਹ), allowing for the speech model
+// losing a letter or a vowel sign: a Waheguru, then ਜੀ, then ਕਾ + a word in ਖ or ਕੀ + a word
+// in ਫ/ਪ. In Gurbani only the headings say it (never sung or read as kirtan).
 function fatehIn(text) {
   const w = String(text || '')
     .split(/\s+/)
@@ -73,11 +87,34 @@ function fatehIn(text) {
   return false;
 }
 
+// A pangti that is mostly ਵਾਹਿਗੁਰੂ (the Bhatt Swaiye's refrain): heard during Simran, it says
+// nothing about which Shabad is being sung. Gurbani is compared exactly as written, every letter
+// and lagan matra (only dandas, numbers and spaces are skipped); the speech-model leniency of
+// isWaheguru is for heard words only.
+const sameLetters = (w, target) => {
+  const at = letterAt(w);
+  return at.length === target.length && at.every((k, n) => w[k] === target[n]);
+};
+function waheguruLine(text) {
+  const words = String(text || '')
+    .split(/\s+/)
+    .filter(hasLetters);
+  let hits = 0;
+  for (let i = 0; i < words.length; i += 1) {
+    if (sameLetters(words[i], WAHEGURU)) hits += 1;
+    else if (i + 1 < words.length && sameLetters(words[i] + words[i + 1], WAHEGURU)) {
+      hits += 1; // ਵਾਹਿ ਗੁਰੂ written as two words
+      i += 1;
+    }
+  }
+  return words.length > 0 && hits * 2 >= words.length;
+}
+
 const createSimran = () => ({ heard: [], onSince: null, offSince: null, on: false, fatehAt: 0 });
 
-// A recognizer transcript (its last few seconds of audio). Mis-heard spellings (ਵਹਿੁਰ, ਵਾਹਿ ਕਰ)
-// and words in between (ਸਤਿ ਨਾਮ ਵਾਹਿਗੁਰੂ) are common, so what counts is how many transcripts
-// have a Waheguru, not how many of the words are.
+// A recognizer transcript (its last few seconds of audio). Words the model hears imperfectly
+// and other words in between are common, so what counts is how many transcripts have a
+// Waheguru, not how many of the words are.
 function noteHeard(s, now, text) {
   const { hits } = countSimran(
     String(text || '')
@@ -130,6 +167,14 @@ function simranNow(s, now) {
 
 // Simran has clearly stopped: the last few seconds were heard (3+ transcripts, so a slow PC
 // with few transcripts never ends it early) and almost none held a Waheguru.
+// Simran still being heard (the slide goes up): most of the last few seconds have a Waheguru,
+// so a few Waheguru words before a pause never put it up over the Shabad. Two transcripts are
+// enough (a slow PC hears one every 2 s).
+function simranHeard(s, now) {
+  const w = s.heard.filter((x) => now - x.t <= SIMRAN_NOW_W);
+  return w.length >= 2 && w.filter((x) => x.has).length / w.length >= SIMRAN_ON;
+}
+
 function simranGone(s, now) {
   const w = s.heard.filter((x) => now - x.t <= SIMRAN_NOW_W);
   return w.length >= 3 && w.filter((x) => x.has).length / w.length < SIMRAN_OFF;
@@ -139,9 +184,11 @@ module.exports = {
   isWaheguru,
   countSimran,
   fatehIn,
+  waheguruLine,
   createSimran,
   noteHeard,
   simranStep,
   simranNow,
+  simranHeard,
   simranGone,
 };

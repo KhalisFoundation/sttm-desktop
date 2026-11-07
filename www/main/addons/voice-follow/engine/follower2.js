@@ -13,9 +13,11 @@
 // needs no confirmation. A jump elsewhere must beat the local match clearly and hold
 // for several windows. Same streaming contract as the v1 Follower: push(pcm) returns
 // { verseIndex, verseId, lineIndex, wordIndex, confidence } or null.
+/* eslint-disable max-classes-per-file */ // the follower and the compared stream it reads
 const { resampleTo16k, SR } = require('./infer');
 const pace = require('./pace');
-const { spoken } = require('./spoken');
+const { spokenPair, EK_OANKAR, EK_OANKAR_SAID } = require('./spoken');
+const { compared, isIgnored, hashCompared, sameCompared } = require('./compared');
 
 // Tuned on research/follower-bench at a 0.125 s listening step; ships at 0.25 s, the same
 // model cost as the line follower (a gurdwara PC that already decodes slower than real
@@ -69,6 +71,10 @@ const DEFAULTS = {
   akhEnterLetters: 1,
   akhEnterGain: 3,
   akhEndSlack: 2,
+  // A pangti mark (tippi, bindi, addak, nukta, halant) the heard unit lacks, per mark, in
+  // alignment points (a matched unit is worth 2): missing / a different mark in its place.
+  markMiss: 0.1,
+  markWrong: 0.25,
 };
 // Sung Banis (kirtan-style, not read): Asa di Vaar (BaniDB Bani 90). Ragis repeat a pauri
 // or a chhant stanza from its top (a jump 4-6 lines back, which the recited profile treats
@@ -84,15 +90,237 @@ const SUNG_BANIS = {
   90: { back: 8, backDwell: 2, backDwell1: 4, distCost: 0.01, skipGain: 3, noMatchHops: 48 },
 };
 
-// Letters only, with marks that recognition often drops or adds removed, so that
-// spelling noise costs little.
-const SIMPLE = /[\s।॥|0-9੦-੯.,;:!?\-ੰਂੱ਼੍]/g; // eslint-disable-line no-misleading-character-class
-// NFD first: BaniDB writes ਸ਼ ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਲ਼ as single characters, the model as letter + dot.
-const simplify = (s) => (s || '').normalize('NFD').replace(SIMPLE, '');
-
 const MATCH = 2;
 const MISMATCH = -1;
 const GAP = -1;
+
+// How a pangti is compared with what is heard. The pangti is read in place, every character as
+// the database gives it; spaces, dandas and numbers are skipped while comparing (compared.js).
+// Each compared unit is a letter or vowel sign together with the marks written on it (tippi,
+// bindi, addak, nukta, halant). A unit matches a heard unit with the same letter; a mark the
+// pangti has and the heard unit lacks (or holds a different one in its place) costs
+// markMiss / markWrong. Every mark stays part of the comparison. Only the heard side (the
+// speech model's output) is read leniently: its marks never cost anything.
+const MARK_BITS = { 0x0a70: 1, 0x0a02: 2, 0x0a71: 4, 0x0a3c: 8, 0x0a4d: 16 }; // ੰ ਂ ੱ ਼ ੍
+const markBit = (cp) => MARK_BITS[cp] || 0;
+// BaniDB writes ਲ਼ ਸ਼ ਖ਼ ਗ਼ ਜ਼ ਫ਼ as one character; the speech model as letter + nukta. Compared
+// per code point by its canonical decomposition: the letter, and the nukta as its mark.
+const GURMUKHI = 0x0a00;
+const LETTER_OF = new Int32Array(0x80);
+const OWN_MARKS = new Uint8Array(0x80);
+for (let k = 0; k < 0x80; k += 1) {
+  const parts = Array.from(String.fromCodePoint(GURMUKHI + k).normalize('NFD'), (c) =>
+    c.codePointAt(0),
+  );
+  [LETTER_OF[k]] = parts;
+  parts.slice(1).forEach((cp) => {
+    OWN_MARKS[k] |= markBit(cp); // eslint-disable-line no-bitwise
+  });
+}
+const inBlock = (cp) => cp >= GURMUKHI && cp < GURMUKHI + 0x80;
+const letterOf = (cp) => (inBlock(cp) ? LETTER_OF[cp - GURMUKHI] : cp);
+const ownMarks = (cp) => (inBlock(cp) ? OWN_MARKS[cp - GURMUKHI] : 0);
+
+// Heard text (the speech model's output only) as units: { l: letters, m: mark bits }.
+function heardUnits(s) {
+  const l = [];
+  const m = [];
+  Array.from((s || '').normalize('NFD')).forEach((ch) => {
+    if (isIgnored(ch)) return;
+    const cp = ch.codePointAt(0);
+    const b = markBit(cp);
+    if (b) {
+      if (m.length) m[m.length - 1] |= b; // eslint-disable-line no-bitwise
+    } else {
+      l.push(cp);
+      m.push(0);
+    }
+  });
+  return { l: Int32Array.from(l), m: Uint8Array.from(m), length: l.length };
+}
+
+// The stream of compared units of a whole text (a Bani, or the other Gurbani), each unit
+// pointing back to the pangti code point it reads (`code`, as given). A spoken reading
+// (spoken.js) is a second path over its span: both the written units and the reading's units
+// are columns, and the column after the span may be reached from either.
+class Stream {
+  constructor() {
+    Object.assign(this, { code: [], mk: [], pA: [], pB: [], lineAt: [], wordAt: [], depth: [] });
+    this.leave = []; // cost of going on from this column (the end of a written path, see span)
+    this.tails = [{ col: -1, depth: 0 }]; // where the next column continues from (1 or 2 paths)
+    this.line = 0;
+    this.word = 0;
+  }
+
+  // a new line: letters are counted from its start
+  startLine(line) {
+    this.line = line;
+    this.tails = this.tails.map((t) => ({ col: t.col, depth: 0 }));
+  }
+
+  column(cp, marks) {
+    const [t0, t1] = this.tails;
+    const col = this.code.length;
+    this.code.push(cp);
+    this.mk.push(marks);
+    this.pA.push(t0.col);
+    this.pB.push(t1 ? t1.col : -1);
+    this.leave.push(0);
+    this.lineAt.push(this.line);
+    this.wordAt.push(this.word);
+    this.depth.push(t0.depth + 1); // along the first path (the spoken one, when there are two)
+    this.tails = [{ col, depth: t0.depth + 1 }];
+  }
+
+  // the compared units of `text` (a pangti word as given, or a spoken reading)
+  units(text, spokenToo = true) {
+    let last = -1;
+    for (let i = 0; i < text.length;) {
+      const cp = text.codePointAt(i);
+      const ch = String.fromCodePoint(cp);
+      i += ch.length;
+      if (!isIgnored(ch)) {
+        const b = markBit(cp);
+        if (b) {
+          if (last >= 0) this.mk[last] |= b; // eslint-disable-line no-bitwise
+        } else if (cp === EK_OANKAR && spokenToo) {
+          this.span(() => this.column(cp, 0), EK_OANKAR_SAID);
+          last = -1;
+        } else {
+          this.column(cp, ownMarks(cp));
+          last = this.code.length - 1;
+        }
+      }
+    }
+  }
+
+  // The written units (`written()` adds them) or the spoken reading, as two paths. Going on
+  // from the written path costs what leaving the reading's extra units unheard would (a gap
+  // each): the numeral of ਮਹਲਾ ੫ is said, so the written path must not let the reading be
+  // passed over for free (ਆਸਾ ਮਹਲਾ ... would then fit every ਆਸਾ ਮਹਲਾ heading alike).
+  span(written, reading) {
+    const from = this.tails;
+    const c0 = this.code.length;
+    this.units(reading, false);
+    const said = this.code.length - c0;
+    const saidEnd = this.tails[0];
+    this.tails = from;
+    const c1 = this.code.length;
+    written();
+    const wrote = this.code.length - c1;
+    const writtenEnd = this.tails[0];
+    if (writtenEnd.col === saidEnd.col) {
+      this.tails = [saidEnd];
+      return;
+    }
+    if (writtenEnd.col >= 0) this.leave[writtenEnd.col] = -GAP * Math.max(0, said - wrote);
+    this.tails = [saidEnd, writtenEnd];
+  }
+
+  separator() {
+    this.column(-1, 0); // never matches anything heard (between lines of other Gurbani)
+  }
+
+  // A line given as words (each a piece of the pangti as written). `wordNo(k)` is the
+  // number the k-th word's units are shown under.
+  addLine(words, wordNo = () => 0) {
+    words.forEach((wd, k) => {
+      this.word = wordNo(k);
+      const pair = spokenPair(wd, words[k + 1]);
+      if (pair && pair.reading) this.span(() => this.units(wd), pair.reading);
+      else this.units(wd);
+    });
+  }
+
+  done() {
+    const out = {
+      code: Int32Array.from(this.code),
+      mk: Uint8Array.from(this.mk),
+      pA: Int32Array.from(this.pA),
+      pB: Int32Array.from(this.pB),
+      leave: Float32Array.from(this.leave),
+      lineAt: this.lineAt,
+      wordAt: this.wordAt,
+      depth: Int32Array.from(this.depth),
+    };
+    // columns not simply after the one before them (a path start, or two paths joining)
+    out.join = Uint8Array.from(this.pA, (p, j) => (p !== j - 1 || this.pB[j] >= 0 ? 1 : 0));
+    out.length = this.code.length;
+    return out;
+  }
+}
+
+// Does a line say anything (any Gurmukhi letter)? Asa di Vaar's "❁" dividers do not.
+const saysSomething = (words) =>
+  words.some((w) => {
+    const v = compared(w);
+    for (let k = 0; k < v.length; k += 1) {
+      const cp = v.code(k);
+      if (inBlock(cp) && !markBit(cp)) return true;
+    }
+    return false;
+  });
+// Does a word have anything compared (a letter, vowel sign or mark)?
+const hasCompared = (w) => compared(w).length > 0;
+
+// What a pangti unit's marks cost when matched by a heard unit with the same letter, indexed
+// [pangti marks * 32 + heard marks]: each pangti mark the heard unit lacks costs markMiss, or
+// markWrong when the heard unit holds a different mark in its place. Heard marks the pangti
+// does not have cost nothing (leniency is for the heard side only).
+const bitCount = (x) => {
+  let k = 0;
+  for (let v = x; v; v >>= 1) k += v & 1; // eslint-disable-line no-bitwise
+  return k;
+};
+function markCosts(c) {
+  const t = new Float32Array(32 * 32);
+  for (let p = 0; p < 32; p += 1) {
+    for (let q = 0; q < 32; q += 1) {
+      /* eslint-disable no-bitwise */
+      const lacks = bitCount(p & ~q);
+      const other = (q & ~p) !== 0;
+      /* eslint-enable no-bitwise */
+      t[p * 32 + q] = lacks * (other ? c.markWrong : c.markMiss);
+    }
+  }
+  return t;
+}
+
+// One row of the local alignment of heard unit (letter hl, marks hm) against stream columns
+// a..a+m-1, from the row before (`prev`) into `cur`. Index 0 is the boundary (score 0); a
+// column whose path comes from before the window starts from the boundary too.
+/* eslint-disable no-param-reassign */ // fills the caller's row in place (hot loop)
+function fillRow(S, a, m, hl, hm, prev, cur, MC) {
+  const { code, mk, join, pA, pB, leave } = S;
+  cur[0] = 0;
+  for (let j = 1; j <= m; j++) {
+    const g = a + j - 1;
+    const pc = code[g];
+    const s = hl === letterOf(pc) ? MATCH - MC[mk[g] * 32 + hm] : MISMATCH;
+    let d;
+    let l;
+    if (join[g] === 0) {
+      d = prev[j - 1] + s;
+      l = cur[j - 1];
+    } else {
+      const x = pA[g] >= a ? pA[g] - a + 1 : 0;
+      d = prev[x] + s;
+      l = cur[x];
+      if (pB[g] >= 0) {
+        const y = pB[g] >= a ? pB[g] - a + 1 : 0;
+        const w = leave[pB[g]];
+        if (prev[y] + s - w > d) d = prev[y] + s - w;
+        if (cur[y] - w > l) l = cur[y] - w;
+      }
+    }
+    l += GAP;
+    const u = prev[j] + GAP;
+    let v = d > u ? d : u;
+    if (l > v) v = l;
+    cur[j] = v > 0 ? v : 0;
+  }
+}
+/* eslint-enable no-param-reassign */
 
 class FollowerV2 {
   constructor(infer, lines, opts = {}) {
@@ -106,54 +334,72 @@ class FollowerV2 {
     this.hopS = this.c.hopS;
     this.inputSr = opts.inputSr || 48000;
     this.verseIds = lines.map((l) => l.verseId);
-    // Stream of letters; lineAt[k] = line of letter k; lineStart[i] = first letter.
-    const text = [];
-    const lineAt = [];
-    const wordAt = [];
+    // Stream of compared units (see Stream above); lineAt[k] = line of unit k, lineStart[i] =
+    // its first unit, lineEnd[i] its last, lineLen[i] how many units it says (along the spoken
+    // reading where there is one).
+    const st = new Stream();
     const lineStart = [];
     const lineEnd = [];
+    const lineLen = [];
     lines.forEach((l, i) => {
-      lineStart.push(text.length);
-      // The line as it is said aloud (ੴ, ਮਹਲਾ ੧ ...), letters only. Each written word is
-      // expanded on its own, so wordAt maps every spoken letter to the word that says it
-      // (a numeral after ਮਹਲਾ belongs to the ਮਹਲਾ word; verse numbers say nothing).
+      lineStart.push(st.code.length);
+      st.startLine(i);
+      // Each written word is read in place; a word said together with the numeral after it
+      // (ਮਹਲਾ ੧ ...) gets its spoken reading as a second path, and its units belong to it.
       let written = (l.text || (l.words || []).join(' ')).split(/[\s॥।]+/).filter(Boolean);
       // A row with no Gurmukhi letter at all (Asa di Vaar's 24 "❁" dividers) is never said:
       // as a one-letter line it was the "next line" after every pauri, so the screen left
       // the pauri's last line for the divider while that line was still being sung.
-      if (!/[਀-੿]/.test(simplify(spoken(written.join(' '))))) written = [];
-      const shown = (l.words && l.words.length ? l.words : written).map((x) => simplify(spoken(x)));
+      if (!saysSomething(written)) written = [];
+      const shown = (l.words && l.words.length ? l.words : written).map(hasCompared);
+      // the written word each unit belongs to, in l.words' numbering (words with nothing
+      // compared, such as verse numbers, are passed over)
+      const wordNo = [];
       let wi = 0;
       written.forEach((wd, k) => {
-        const next = written[k + 1] || '';
-        // ਮਹਲਾ/ਮਃ + numeral (or ਪਾਤਿਸ਼ਾਹੀ ੧੦) are said together: expand them as a pair.
-        const pair = /^(ਮਹਲਾ|ਮਃ|ਪਾਤਿਸ਼?ਾਹੀ)$/.test(wd.normalize('NFC')) && /^[੦-੯]+/.test(next);
-        let say = pair ? `${wd} ${next}` : wd;
-        if (!pair && /^[੦-੯॥।]+$/.test(wd)) say = ''; // verse numbers say nothing
-        const said = simplify(spoken(say));
-        if (!said) return;
-        // the written word this letter run belongs to, in l.words' numbering
+        if (!hasCompared(wd)) return;
         while (wi < shown.length - 1 && !shown[wi]) wi += 1;
-        [...said].forEach((ch) => {
-          text.push(ch);
-          lineAt.push(i);
-          wordAt.push(Math.min(wi, Math.max(0, shown.length - 1)));
-        });
+        wordNo[k] = Math.min(wi, Math.max(0, shown.length - 1));
         wi += 1;
       });
-      lineEnd.push(text.length - 1);
+      st.addLine(written, (k) => wordNo[k] || 0);
+      lineEnd.push(st.code.length - 1);
+      lineLen.push(st.code.length > lineStart[i] ? st.tails[0].depth : 0);
     });
-    Object.assign(this, { text, lineAt, wordAt, lineStart, lineEnd });
+    const text = st.done();
+    Object.assign(this, {
+      text,
+      lineAt: text.lineAt,
+      wordAt: text.wordAt,
+      lineStart,
+      lineEnd,
+      lineLen,
+    });
+    this.markCost = markCosts(this.c);
     this.lastEnd = -1;
     // Other Gurbani (lines), minus any line this Bani also has: shared text (So Dar in
-    // Japji and Rehras, Gagan mai thaal in Sohila and Aarti) is evidence for both.
+    // Japji and Rehras, Gagan mai thaal in Sohila and Aarti) is evidence for both. Lines are
+    // matched as written (compared views), never through an altered copy.
     if (opts.background) {
-      const own = new Set(lines.map((l) => simplify(spoken(l.text || (l.words || []).join(' ')))));
-      const bg = []
-        .concat(opts.background)
-        .map((t) => simplify(spoken(t)))
-        .filter((t) => t && !own.has(t));
-      this.bg = [...bg.join('|')];
+      const own = new Map();
+      lines.forEach((l) => {
+        const v = compared(l.text || (l.words || []).join(' '));
+        const key = hashCompared(v);
+        if (!own.has(key)) own.set(key, []);
+        own.get(key).push(v);
+      });
+      const isOwn = (v) => (own.get(hashCompared(v)) || []).some((o) => sameCompared(o, v));
+      const bg = new Stream();
+      let any = false;
+      [].concat(opts.background).forEach((t) => {
+        const v = compared(t);
+        const words = (t || '').split(/[\s॥।]+/).filter(Boolean);
+        if (!v.length || isOwn(v) || !words.some(hasCompared)) return;
+        if (any) bg.separator();
+        any = true;
+        bg.addLine(words);
+      });
+      this.bg = any ? bg.done() : null;
     } else this.bg = null;
     this.foreign = 0; // windows in a row that other Gurbani explains better
     this.noMatch = 0; // windows in a row where nothing near the current line matched
@@ -229,16 +475,7 @@ class FollowerV2 {
     let cur = new Float32Array(m + 1);
     const tail = []; // rows n-2..n
     for (let i = 1; i <= n; i++) {
-      cur[0] = 0;
-      const hc = h[i - 1];
-      for (let j = 1; j <= m; j++) {
-        const d = prev[j - 1] + (hc === this.text[a + j - 1] ? MATCH : MISMATCH);
-        const u = prev[j] + GAP;
-        const l = cur[j - 1] + GAP;
-        let v = d > u ? d : u;
-        if (l > v) v = l;
-        cur[j] = v > 0 ? v : 0;
-      }
+      fillRow(this.text, a, m, h.l[i - 1], h.m[i - 1], prev, cur, this.markCost);
       if (i >= n - 2) tail.push({ row: cur.slice(), drop: n - i });
       [prev, cur] = [cur, prev];
     }
@@ -294,19 +531,10 @@ class FollowerV2 {
     let cur = new Float32Array(m + 1);
     let best = 0;
     for (let i = 1; i <= n; i++) {
-      cur[0] = 0;
-      const hc = h[i - 1];
-      for (let j = 1; j <= m; j++) {
-        const d = prev[j - 1] + (hc === this.bg[j - 1] ? MATCH : MISMATCH);
-        const u = prev[j] + GAP;
-        const l = cur[j - 1] + GAP;
-        let v = d > u ? d : u;
-        if (l > v) v = l;
-        cur[j] = v > 0 ? v : 0;
-        if (i >= n - 2) {
-          const w = v - (n - i);
-          if (w > best) best = w;
-        }
+      fillRow(this.bg, 0, m, h.l[i - 1], h.m[i - 1], prev, cur, this.markCost);
+      if (i >= n - 2) {
+        const drop = n - i;
+        for (let j = 1; j <= m; j++) if (cur[j] - drop > best) best = cur[j] - drop;
       }
       [prev, cur] = [cur, prev];
     }
@@ -358,7 +586,7 @@ class FollowerV2 {
         return null;
       }
       const line = this.lineAt[G.end];
-      if (G.end - this.lineStart[line] + 1 < c.enterLetters && line > 0) return null;
+      if (this.text.depth[G.end] < c.enterLetters && line > 0) return null;
       if (!this.confirm(line, c.lockDwell)) return null;
       this.cur = line;
       this.noMatch = 0;
@@ -402,12 +630,12 @@ class FollowerV2 {
       line === this.cur + 1 &&
       this.lastEnd >= 0 &&
       this.lineAt[this.lastEnd] === this.cur &&
-      this.lastEnd >= this.lineEnd[this.cur] - c.akhEndSlack;
+      this.text.depth[this.lastEnd] >= this.lineLen[this.cur] - c.akhEndSlack;
     const needLetters = endHeard ? c.akhEnterLetters : c.enterLetters;
     const needGain = endHeard ? c.akhEnterGain : c.enterGain;
     if (
       line > this.cur &&
-      (Lc.end - this.lineStart[line] + 1 < needLetters || this.gainOver(Lc, line - 1) < needGain)
+      (this.text.depth[Lc.end] < needLetters || this.gainOver(Lc, line - 1) < needGain)
     ) {
       line -= 1;
       while (line > this.cur && this.lineEnd[line] < this.lineStart[line]) line -= 1;
@@ -522,10 +750,10 @@ class FollowerV2 {
     if ((this.acc < this.hop && !pace.onBeat(pcm)) || this.buf.length < SR) return null;
     this.acc = 0;
     const emis = await this.infer.emissions(this.buf);
-    const h = [...simplify(this.infer.decode(this.infer.greedy(emis)))];
+    const h = heardUnits(this.infer.decode(this.infer.greedy(emis)));
     if (h.length < this.c.minHyp) return null;
     return this.decide(h);
   }
 }
 
-module.exports = { FollowerV2, DEFAULTS, simplify };
+module.exports = { FollowerV2, DEFAULTS, heardUnits };

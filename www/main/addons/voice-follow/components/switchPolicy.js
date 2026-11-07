@@ -3,6 +3,14 @@
 // Only dependency is the engine's pure string-similarity module (no ONNX,
 // no native code), so plain node can require it directly.
 const { partialRatio, lcs } = require('../engine/fuzz');
+const {
+  Compared,
+  ComparedJoin,
+  compared,
+  sameCompared,
+  orderCompared,
+  hashCompared,
+} = require('../engine/compared');
 
 // Advance the consecutive-win counter for an in-flight switch evaluation.
 // cfg: { min, margin, strongMin, strongMargin }. The commit threshold lives
@@ -53,13 +61,15 @@ function nextEmptyStreak(streak, hasVotes, holdDecodes) {
 // on the 86-min stream (13.2->10.5) and the 20-singer stream (~34->28) with no
 // recall loss and neutral on clean short-segment streams (offline sung-kirtan
 // benchmark; the audio harness is kept out of the repo with the audio corpus).
-function maxLineScore(hypNorm, linesNorm, minLineChars = 0) {
-  if (!hypNorm || !linesNorm || !linesNorm.length) return 0;
+// lines: the pangtis as the database gives them (strings or Compared views); a line's length is
+// the number of characters a comparison looks at (spaces, dandas and numbers are skipped).
+function maxLineScore(heard, lines, minLineChars = 0) {
+  if (!heard || !lines || !lines.length) return 0;
   let best = 0;
-  for (let i = 0; i < linesNorm.length; i += 1) {
-    const ln = linesNorm[i];
+  for (let i = 0; i < lines.length; i += 1) {
+    const ln = lines[i] && compared(lines[i]); // the pangti as given, read in place
     if (ln) {
-      let s = partialRatio(hypNorm, ln) / 100;
+      let s = partialRatio(heard, ln) / 100;
       if (minLineChars > 0) s *= Math.min(1, ln.length / minLineChars);
       if (s > best) best = s;
     }
@@ -95,14 +105,14 @@ function screenByFirstLetters(heardFL, flBySid, excludeId, minOverlap, cap) {
 // line back to its verse (for display + lock payload). Same scoring as
 // maxLineScore (share the penalty semantics); returns { s, index } with
 // index -1 when nothing scores.
-function bestLineMatch(hypNorm, linesNorm, minLineChars = 0) {
-  if (!hypNorm || !linesNorm || !linesNorm.length) return { s: 0, index: -1 };
+function bestLineMatch(heard, lines, minLineChars = 0) {
+  if (!heard || !lines || !lines.length) return { s: 0, index: -1 };
   let best = 0;
   let at = -1;
-  for (let i = 0; i < linesNorm.length; i += 1) {
-    const ln = linesNorm[i];
+  for (let i = 0; i < lines.length; i += 1) {
+    const ln = lines[i] && compared(lines[i]); // the pangti as given, read in place
     if (ln) {
-      let s = partialRatio(hypNorm, ln) / 100;
+      let s = partialRatio(heard, ln) / 100;
       if (minLineChars > 0) s *= Math.min(1, ln.length / minLineChars);
       if (s > best) {
         best = s;
@@ -120,8 +130,9 @@ function bestLineMatch(hypNorm, linesNorm, minLineChars = 0) {
 // happens to hold the same words in the sung order scores ~0.9 — the dominant
 // false-switch mechanism on long live kirtan (Level 2 benchmark, clip 20:
 // every wrong switch left the correct shabad while its rahao was being sung).
-// Compare word-sorted strings instead: the same bag of words scores the same
-// regardless of order. hypWords / linesWords are arrays of normalized words.
+// Compare the words in sorted order instead: the same bag of words scores the same
+// regardless of order. hypWords: heard words (ready for comparing); linesWords: each pangti's words,
+// untouched (strings or Compared views), read in sorted order without building a new text.
 // minLineChars applies the same length-aware containment penalty as
 // maxLineScore so a tiny line cannot win by being contained in the hyp.
 function orderFreeLineScore(hypWords, linesWords, minLineChars = 0) {
@@ -131,7 +142,7 @@ function orderFreeLineScore(hypWords, linesWords, minLineChars = 0) {
   for (let i = 0; i < linesWords.length; i += 1) {
     const words = linesWords[i];
     if (words && words.length) {
-      const ln = words.slice().sort().join('');
+      const ln = new ComparedJoin(words.map((w) => compared(w)).sort(orderCompared));
       let s = partialRatio(hyp, ln) / 100;
       if (minLineChars > 0) s *= Math.min(1, ln.length / minLineChars);
       if (s > best) best = s;
@@ -144,22 +155,31 @@ function orderFreeLineScore(hypWords, linesWords, minLineChars = 0) {
 // shabad vs its copy in the Aarti Bani, a Sohila shabad repeated elsewhere)
 // search as an exact tie, and a tie can never lock. sameGurbani(a, b) says
 // whether two shabads' display lines are such a copy: at least 80% of the
-// shorter one's real lines (headings dropped, vowel signs and small spelling
-// differences ignored) appear in the longer one.
+// shorter one's real lines (headings dropped) appear in the longer one, each line compared as
+// written or found by the similarity test.
 const DUP_HEADING = /ੴ|ਮਹਲਾ|ਪਾਤਿਸਾਹੀ|ਘਰੁ|^ਪਉੜੀ|^ਸਲੋਕ|^ਰਾਗੁ/;
-const DUP_VOWELS = { ਆ: 'ਅ', ਈ: 'ਇ', ਊ: 'ਉ', ਐ: 'ਏ', ਔ: 'ਓ' };
-const dupLines = (lines) =>
-  new Set(
-    (lines || [])
-      .filter((l) => l && !DUP_HEADING.test(l))
-      .map((l) =>
-        l
-          .replace(/[।॥|0-9੦-੯.,;:!?\-\s]+/g, '')
-          .replace(/[ਾ-ੌਁ-ਃੰੱ਼੍]/g, '')
-          .replace(/[ਆਈਊਐਔ]/g, (c) => DUP_VOWELS[c]),
-      )
-      .filter((l) => l.length >= 8),
-  );
+// Lines are compared as written: every lagan matra and letter counts (only spaces, dandas and
+// numbers are skipped while comparing); nothing of Gurbani is skipped or exchanged. Near copies
+// are still found by the similarity test below, which reads both lines as written.
+// The distinct real lines of a shabad (headings and short lines dropped), as comparison views;
+// two lines that compare the same count once. has(v): is a line that compares as v here?
+function dupLines(lines) {
+  const byHash = new Map();
+  const list = [];
+  const has = (v) => (byHash.get(hashCompared(v)) || []).some((u) => sameCompared(u, v));
+  (lines || [])
+    .filter((l) => l && !DUP_HEADING.test(l))
+    .map((l) => new Compared(l))
+    .filter((v) => v.length >= 8)
+    .forEach((v) => {
+      if (has(v)) return;
+      const h = hashCompared(v);
+      if (!byHash.has(h)) byHash.set(h, []);
+      byHash.get(h).push(v);
+      list.push(v);
+    });
+  return { list, has, size: list.length };
+}
 function sameGurbani(linesA, linesB) {
   const a = dupLines(linesA);
   const b = dupLines(linesB);
@@ -167,9 +187,9 @@ function sameGurbani(linesA, linesB) {
   if (small.size < 2) return false;
   const near = (l) =>
     big.has(l) ||
-    [...big].some((m) => Math.abs(l.length - m.length) <= 4 && partialRatio(l, m) >= 90);
+    big.list.some((m) => Math.abs(l.length - m.length) <= 4 && partialRatio(l, m) >= 90);
   let k = 0;
-  small.forEach((l) => {
+  small.list.forEach((l) => {
     if (near(l)) k += 1;
   });
   return k >= 0.8 * small.size;

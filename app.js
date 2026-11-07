@@ -1358,6 +1358,20 @@ app.on('ready', () => {
     syncViewerWindows();
   });
   mainWindow.loadURL(`file://${__dirname}/www/index.html`);
+  // A window that stays white means the page failed while loading. Write why to the log file
+  // (electron-log, userData/logs/main.log) so a tester's report carries the cause.
+  mainWindow.webContents.on('console-message', (_e, level, message, line, sourceId) => {
+    // electron-log echoes main-process lines into the page console: skip those, or this loops.
+    if (level >= 3 && !String(message).includes('[renderer]')) {
+      log.error(`[renderer] ${message} (${sourceId}:${line})`);
+    }
+  });
+  mainWindow.webContents.on('render-process-gone', (_e, details) => {
+    log.error(`[renderer] gone: ${JSON.stringify(details)}`);
+  });
+  mainWindow.webContents.on('did-fail-load', (_e, code, description, url) => {
+    log.error(`[renderer] failed to load ${url}: ${code} ${description}`);
+  });
 
   // Automated smoke test: `VF_SMOKE=1 electron .` (or `npm run smoke`).
   // Launches the real app, waits for the renderer to settle, then checks

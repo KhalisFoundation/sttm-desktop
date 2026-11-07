@@ -118,7 +118,7 @@ class RetrievalClient {
       return;
     }
     // Whitelist protocol fields: even a faulty response cannot turn an acoustic
-    // hypothesis or internal normalized key into displayed canonical text.
+    // hypothesis or internal compared key into displayed canonical text.
     this.finish(
       message.id,
       null,
