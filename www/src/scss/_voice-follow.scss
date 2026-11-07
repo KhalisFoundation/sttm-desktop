@@ -298,6 +298,21 @@ $vf2-yellow-bar: #f2c200;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+// On the last pangti: a quiet "End of Shabad" / "End of Bani" in the next pangti's place.
+.vf2-next-line.is-end {
+  font-family: $body-font-family;
+  font-size: 12px !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vf-faint);
+  animation: vf2-fade 0.28s ease-out;
+  > .vf2-next-mark {
+    height: 3px;
+    width: 14px;
+    border-radius: 2px;
+  }
+}
 // The next pangti and Stop share one row under the current pangti.
 .vf2-next-row {
   display: flex;
