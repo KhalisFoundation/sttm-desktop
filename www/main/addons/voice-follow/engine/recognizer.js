@@ -29,6 +29,7 @@ class Recognizer {
     // performance tier; the kirtan pace follows the window this pass will search
     this.hop = Math.floor(pace.hopS('recognizer', this.hopS, this.buf.length / SR) * SR);
     if (this.acc < this.hop || this.buf.length < SR) return null;
+    const paceScale = pace.searchScale ? pace.searchScale(this.hopS, this.buf.length / SR) : 1;
     this.acc = 0;
     pace.markBeat(pcm);
 
@@ -39,6 +40,7 @@ class Recognizer {
       text: hyp,
       confidence: Number(this.infer.confidence(emis).toFixed(3)),
       audioSec: Number((this.buf.length / SR).toFixed(1)),
+      paceScale,
     };
   }
 }

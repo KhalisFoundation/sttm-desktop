@@ -721,6 +721,13 @@ const PAATH_POOL_HITS = 5;
 // the same score floor fires on no kirtan cold start (41 Level 2 clips) that 5 of 8 did not.
 const PAATH_POOL_HITS_BY_BANI = { [AARTI_BANI]: 4 };
 const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
+// Kirtan pace (engine/pace.js): on a slow PC the Shabad search runs less often (searchScale =
+// its hop / today's hop, 1 on every PC that is not paced). The search's lock evidence is counted
+// per search, so with fewer searches a Bani such as Japji never gathered enough before its
+// opening passed (sim 0.48: Japji 100 -> 0). Counts and vote fading are kept per second instead:
+// a count of k searches becomes k / scale, and each vote is worth scale times as much and fades
+// scale times as fast. At scale 1 every rule is exactly as before.
+const perSearch = (k, scale) => (scale > 1 ? Math.max(1, Math.round(k / scale)) : k);
 // Rehras and Aarti are followed at the extra-long length, Kirtan Sohila at the long length,
 // whatever the user's own Sundar Gutka length (see baniLength.js): while one of them is open
 // the Bani length is raised to it (never lowered) and restored when it ends.
@@ -2965,6 +2972,7 @@ const VoiceFollow = () => {
   const detectRowsRef = useRef(new Map()); // shabadId -> best {verseId, verse, shabadId, rank}
   const detectStableRef = useRef({ id: null, count: 0 }); // leader-stability counter
   const poolStableRef = useRef({ bani: null, count: 0 }); // PAATH_POOL_STABLE counter
+  const searchScaleRef = useRef(1); // kirtan pace: this search's hop / today's (see perSearch)
   const emptyStreakRef = useRef(0); // consecutive no-hit decodes (shortlist hold)
 
   const cleanup = useCallback(() => {
@@ -4458,6 +4466,7 @@ const VoiceFollow = () => {
   const handleTranscript = useCallback(
     async (text) => {
       if (!recognizingRef.current) return;
+      const scale = searchScaleRef.current; // kirtan pace (see perSearch)
       // Shadow activity log: words are being heard (singing or speech) right now.
       if (SHADOW_BUILD) shadowBus.heard(text || '');
       const session = sessionRef.current;
@@ -4558,11 +4567,13 @@ const VoiceFollow = () => {
                   .map((x) => x.bani)
                   .find((b) => PAATH_POOL_BANIS.includes(b))
               : undefined;
-          memory.pool = [...(memory.pool || []), poolBani ?? null].slice(-PAATH_POOL_WINDOW);
+          memory.pool = [...(memory.pool || []), poolBani ?? null].slice(
+            -perSearch(PAATH_POOL_WINDOW, scale),
+          );
           if (
             poolBani != null &&
             memory.pool.filter((b) => b === poolBani).length >=
-              (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS)
+              perSearch(PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS, scale)
           ) {
             let poolProfile;
             try {
@@ -4748,7 +4759,7 @@ const VoiceFollow = () => {
                 anchor: top.score >= 0.8 && margin >= 0.2,
               });
             }
-            memory.entries = memory.entries.slice(-12);
+            memory.entries = memory.entries.slice(-perSearch(12, scale));
             const tally = new Map();
             memory.entries.forEach((e) =>
               e.candidates.forEach((candidate, rank) => {
@@ -4786,7 +4797,9 @@ const VoiceFollow = () => {
               };
               rankedContext.forEach((c) => {
                 // Same gates as the lock below, so a full bar means a lock is due.
-                const p = Math.min(c.count / 6, c.wins / 4) * (lineEvidenceOk(c) ? 1 : 0.7);
+                const p =
+                  Math.min(c.count / perSearch(6, scale), c.wins / perSearch(4, scale)) *
+                  (lineEvidenceOk(c) ? 1 : 0.7);
                 bump(c.id, (leaders.find((l) => l.shabadId === c.id) || {}).verseId, p);
               });
               if (poolBani != null)
@@ -4794,7 +4807,7 @@ const VoiceFollow = () => {
                   top.shabadId,
                   top.verseId,
                   memory.pool.filter((b) => b === poolBani).length /
-                    (PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS),
+                    perSearch(PAATH_POOL_HITS_BY_BANI[poolBani] || PAATH_POOL_HITS, scale),
                 );
               const agreeingNow = (memory.acousticVotes || []).filter(
                 (v) => v.id === top.shabadId,
@@ -4824,10 +4837,10 @@ const VoiceFollow = () => {
             if (
               winner?.id === top.shabadId &&
               margin >= AP_LOCK_TEXT_MARGIN &&
-              winner.count >= 6 &&
-              winner.wins >= 4 &&
+              winner.count >= perSearch(6, scale) &&
+              winner.wins >= perSearch(4, scale) &&
               lineEvidenceOk(winner) &&
-              winner.score - (rankedContext[1]?.score || 0) >= 1
+              winner.score - (rankedContext[1]?.score || 0) >= (scale > 1 ? 1 / scale : 1)
             ) {
               let profile;
               try {
@@ -5161,7 +5174,7 @@ const VoiceFollow = () => {
       // sung now, not a false start from a few seconds ago.
       const votes = detectVotesRef.current;
       votes.forEach((v, k) => {
-        const nv = v * DETECT_VOTE_DECAY;
+        const nv = v * (scale > 1 ? DETECT_VOTE_DECAY ** scale : DETECT_VOTE_DECAY);
         if (nv < 0.4) votes.delete(k);
         else votes.set(k, nv);
       });
@@ -5216,7 +5229,7 @@ const VoiceFollow = () => {
           }
           if (sid == null) return;
           // Longer gram + higher rank in its result set => stronger evidence.
-          const weight = g.w * ((r.length - i) / r.length);
+          const weight = g.w * ((r.length - i) / r.length) * (scale > 1 ? scale : 1);
           // Cap the tally so a long-running shabad can't build a lead so large it
           // becomes impossible to ever switch away from it.
           votes.set(sid, Math.min(VOTE_CAP, (votes.get(sid) || 0) + weight));
@@ -5326,7 +5339,11 @@ const VoiceFollow = () => {
             else if (ps.bani === pooled.bani) ps.count += 1;
             else poolStableRef.current = { bani: pooled.bani, count: 1 };
             const row = pooled && rowByShabad.get(pooled.sid);
-            if (row && row.verse && poolStableRef.current.count >= PAATH_POOL_STABLE) {
+            if (
+              row &&
+              row.verse &&
+              poolStableRef.current.count >= perSearch(PAATH_POOL_STABLE, scale)
+            ) {
               poolStableRef.current = { bani: null, count: 0 };
               autopilotLock({ shabadId: pooled.sid, verseId: row.verseId, verse: row.verse });
               return;
@@ -5338,7 +5355,7 @@ const VoiceFollow = () => {
             fl.length >= AP_LOCK_MIN_LETTERS &&
             lead >= AUTO_LOCK_CONF &&
             best >= DETECT_MIN_EVIDENCE &&
-            st.count >= AP_LOCK_STABLE
+            st.count >= perSearch(AP_LOCK_STABLE, scale)
           ) {
             let leaders = await searchCanonicalText(text, 2 + DUP_AWARE_LOCK, abort.signal);
             if (DUP_AWARE_LOCK) leaders = await distinctLeaders(leaders, 2);
@@ -5998,7 +6015,11 @@ const VoiceFollow = () => {
         return;
       }
 
-      if (lead >= AUTO_LOCK_CONF && best >= DETECT_MIN_EVIDENCE && st.count >= DETECT_STABLE) {
+      if (
+        lead >= AUTO_LOCK_CONF &&
+        best >= DETECT_MIN_EVIDENCE &&
+        st.count >= perSearch(DETECT_STABLE, scale)
+      ) {
         lockOnto(cand);
       }
     },
@@ -6062,6 +6083,7 @@ const VoiceFollow = () => {
         if (session !== sessionRef.current || recognizerRef.current !== r) return;
         if (out && out.text) {
           noteHeard(out.text, out.confidence);
+          searchScaleRef.current = out.paceScale || 1;
           handleTranscript(out.text);
         }
       });
@@ -6217,6 +6239,7 @@ const VoiceFollow = () => {
             noteHeard(rout.text, rout.confidence);
             ngRetProbeRef.current(rout);
             if (phaseRef.current === 'following') ngHeardRef.current(rout);
+            searchScaleRef.current = rout.paceScale || 1;
             handleTranscript(rout.text);
           }
         }

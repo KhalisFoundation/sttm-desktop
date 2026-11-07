@@ -232,6 +232,15 @@ function kirtanRecHopS(winS) {
   const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
+// The recognizer's hop now / today's hop (1 unless the kirtan pace is slowing the search): the
+// component keeps its lock evidence per second with it (VoiceFollow perSearch).
+function searchScale(ownHopS, winS) {
+  const today = akhandOn()
+    ? Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS)
+    : Math.max(ownHopS, current().recognizerHopS);
+  const now = hopS('recognizer', ownHopS, winS);
+  return now > today ? now / today : 1;
+}
 // Benchmarks only: pace just one engine kind ('recognizer' or 'follower'). Unset = both.
 const KIRTAN_PACE_ONLY = process.env.VF_KIRTAN_PACE_ONLY || null;
 function kirtanHopS(kind, winS) {
@@ -383,6 +392,7 @@ module.exports = {
   setAkhand,
   AKHAND,
   hopS,
+  searchScale,
   backlogBoundS,
   windowS,
   markBeat,
