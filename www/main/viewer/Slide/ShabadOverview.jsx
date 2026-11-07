@@ -2,9 +2,8 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useShabadOverview } from '../hooks/use-shabad-overview';
 import { useQrCode } from '../hooks/use-qr-code';
+import { useShabadUrl } from '../hooks/use-shabad-url';
 import { i18n } from '../../common/i18n';
-
-const SHABAD_URL = 'https://sttm.co/s';
 
 // A slide introducing the shabad, shown from the overview row above its lines
 // in the shabad pane instead of them: the home line, the raag (in Gurmukhi) and writer
@@ -13,7 +12,7 @@ const SHABAD_URL = 'https://sttm.co/s';
 // colours it the same way: the home line as Gurbani, the rest as translation.
 export const ShabadOverview = ({ shabadId, verseId }) => {
   const overview = useShabadOverview(shabadId, verseId);
-  const qr = useQrCode(`${SHABAD_URL}/${shabadId}`);
+  const qr = useQrCode(useShabadUrl(shabadId));
 
   // The slide fills in as the details and QR code arrive.
   useEffect(() => {
