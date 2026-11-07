@@ -6,13 +6,13 @@ const { partialRatio } = require('../engine/fuzz');
 const { DEFAULTS, step, elapse, of } = require('./fragmentConfirm');
 
 // Shabad 2879 (owner's test, Oct 18) and the Shabad that was on screen (1455): pangtis exactly as
-// BaniDB gives them (verse IDs 32496-32499 and 17141-17144); spaces and dandas are skipped while comparing.
+// BaniDB gives them (verse IDs 32496, 32500, 32498, 32499 and 17141-17144); spaces and dandas are skipped while comparing.
 const X = {
   id: 2879,
   role: 'change',
   linesCompared: [
     'ਜੇ ਭੁਲੀ ਜੇ ਚੁਕੀ ਸਾਈਂ ਭੀ ਤਹਿੰਜੀ ਕਾਢੀਆ ॥',
-    'ਜਿਨੑਾ ਨੇਹੁ ਦੂਜਾਣੇ ਲਗਾ ਝੂਰਿ ਮਰਹੁ ਸੇ ਵਾਢੀਆ ॥੧॥',
+    'ਸਜਣੁ ਤੂਹੈ ਸੈਣੁ ਤੂ ਮੈ ਤੁਝ ਉਪਰਿ ਬਹੁ ਮਾਣੀਆ ॥',
     'ਹਉ ਨਾ ਛੋਡਉ ਕੰਤ ਪਾਸਰਾ ॥',
     'ਸਦਾ ਰੰਗੀਲਾ ਲਾਲੁ ਪਿਆਰਾ ਏਹੁ ਮਹਿੰਜਾ ਆਸਰਾ ॥੧॥ ਰਹਾਉ ॥',
   ],
@@ -33,7 +33,7 @@ describe('fragment confirm', () => {
     const a = run(s, 'ਭਲੀਜੇਚੁਕੀ'); // piece of pangti 1
     assert.equal(a.hits.length, 1);
     assert.equal(a.ready, null);
-    const b = run(s, 'ਦੂਜਾਣੇ'); // piece of pangti 2
+    const b = run(s, 'ਤੁਝਉਪਰਿ'); // piece of pangti 2
     assert.deepEqual(b.ready, { id: 2879, index: 1 });
   });
 
@@ -49,7 +49,7 @@ describe('fragment confirm', () => {
     const s = new Map();
     const L = { ...X, role: 'list' };
     run(s, 'ਭਲੀਜੇਚੁਕੀ', [L]);
-    const two = run(s, 'ਦੂਜਾਣੇ', [L]);
+    const two = run(s, 'ਤੁਝਉਪਰਿ', [L]);
     assert.equal(two.ready, null);
     const three = run(s, 'ਛੋਡਉਕੰਤ', [L]);
     assert.deepEqual(three.ready, { id: 2879, index: 2 });
@@ -62,7 +62,7 @@ describe('fragment confirm', () => {
     const r = run(s, 'ਭਲੀਜੇਚੁਕੀ', [X, Y]);
     assert.equal(r.hits.length, 2);
     r.hits.forEach((h) => assert.equal(h.w, DEFAULTS.sharedW));
-    run(s, 'ਦੂਜਾਣੇ', [X, Y]);
+    run(s, 'ਤੁਝਉਪਰਿ', [X, Y]);
     assert.equal(of(s, 2879).total < DEFAULTS.lock, true);
   });
 
@@ -77,7 +77,7 @@ describe('fragment confirm', () => {
   it('a short piece must be found verbatim in the pangti; a longer one may differ a little', () => {
     const s = new Map();
     assert.equal(run(s, 'ਵੇਭਲੀ').hits.length, 0); // 5 letters, fits pangti 1 at 0.8 by chance
-    assert.equal(run(s, 'ਦੂਜਾਣ').hits.length, 1); // 5 letters, verbatim in pangti 2
+    assert.equal(run(s, 'ਤੁਝਉਪ').hits.length, 1); // 5 letters, verbatim in pangti 2
     assert.equal(run(s, 'ਭਲੀਜੇਚੁਕੀਸ').hits.length, 1); // 10 letters, one letter off
   });
 

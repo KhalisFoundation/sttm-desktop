@@ -14,7 +14,7 @@ describe('live board: fragment confirm feeds the evidence bars', () => {
       now: now + 500,
       cur: 1455,
       sCur: 0.4,
-      cands: [{ shabadId: 2879, verseId: 32496, line: 'ਜੇ ਭੁਲੀ ਜੇ ਚੁਕੀ ਸਾਈਂ', score: 0.9 }],
+      cands: [{ shabadId: 2879, verseId: 32496, line: 'ਜੇ ਭੁਲੀ ਜੇ ਚੁਕੀ ਸਾਈਂ ਭੀ ਤਹਿੰਜੀ ਕਾਢੀਆ ॥', score: 0.9 }],
     });
     const one = board.evidenceOf(2879, now + 500);
     assert.equal(one.distinct, 1);
@@ -23,7 +23,7 @@ describe('live board: fragment confirm feeds the evidence bars', () => {
       now: now + 1000,
       cur: 1455,
       sCur: 0.4,
-      cands: [{ shabadId: 2879, verseId: 32497, line: 'ਜਿਨੑਾ ਨੇਹੁ ਦੂਜਾਣੇ ਲਗਾ', score: 0.83 }],
+      cands: [{ shabadId: 2879, verseId: 32500, line: 'ਸਜਣੁ ਤੂਹੈ ਸੈਣੁ ਤੂ ਮੈ ਤੁਝ ਉਪਰਿ ਬਹੁ ਮਾਣੀਆ ॥', score: 0.83 }],
     });
     const two = board.evidenceOf(2879, now + 1000);
     assert.equal(two.distinct, 2);
