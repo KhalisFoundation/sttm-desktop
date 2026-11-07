@@ -172,7 +172,8 @@ function notePass(ms, samples) {
 }
 
 // Hop for an engine: its own hop, or the tier's when that is longer.
-function hopS(kind, ownHopS) {
+// winS: the recognizer's current window in seconds (its search pass costs in proportion).
+function hopS(kind, ownHopS, winS) {
   if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('bani', ownHopS);
   if (kind === 'recognizer' && akhandOn()) {
     return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
@@ -182,7 +183,7 @@ function hopS(kind, ownHopS) {
   // The Bani follower ('bani': Paath and sung Banis) never takes the kirtan pace; it keeps its
   // own hop outside the read-Bani tiers, exactly as before.
   if (kind === 'bani') return Math.max(ownHopS, tierHop);
-  return Math.max(ownHopS, tierHop, kirtanHopS(kind)); // eslint-disable-line no-use-before-define
+  return Math.max(ownHopS, tierHop, kirtanHopS(kind, winS)); // eslint-disable-line no-use-before-define
 }
 
 // Kirtan pace. Outside a read Bani the tiers do not apply and every computer runs the fast
@@ -199,9 +200,14 @@ function hopS(kind, ownHopS) {
 // slower under load. Only computers the self-test classes slow get the paced schedule, and on
 // those a live guard adds 0.25 s to the recognizer when the kirtan audio backlog stays above
 // 0.5 s (other apps, a hot CPU) and gives it back once it has kept up for a minute.
-// VF_KIRTAN_PACE=0 turns it all off.
+// The search pass costs in proportion to its window, so the recognizer is paced by the window it
+// has now: at a session's start the window grows from 1 s and short windows keep today's 0.5 s
+// schedule (a Bani such as Jaap Sahib locks in its first seconds on 5 agreeing searches; paced at
+// 1 s from the first pass, the window grew past 5 s first and Jaap never locked: sim 0.48,
+// pt33 100 -> 0). VF_KIRTAN_PACE=0 turns it all off.
 const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
 const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
+const SEARCH_WINDOW_S = 10;
 const SEARCH_LOAD = 0.9;
 const KIRTAN_FOLLOW_HOP_S = 0.375;
 const KIRTAN_GUARD = {
@@ -214,21 +220,22 @@ const KIRTAN_GUARD = {
   maxS: 1.0,
 };
 // Recognizer hop the search pass needs at a given pass time (0.5 = today's schedule).
-const searchHopS = (ms) =>
-  ms == null
-    ? 0.5
-    : Math.max(0.5, Math.ceil(((SEARCH_COST * ms) / 1000 / SEARCH_LOAD) * 4 - 1e-9) / 4);
+const searchHopS = (ms, winS = SEARCH_WINDOW_S) => {
+  if (ms == null) return 0.5;
+  const cost = (SEARCH_COST * ms * Math.min(winS, SEARCH_WINDOW_S)) / SEARCH_WINDOW_S / 1000;
+  return Math.max(0.5, Math.ceil((cost / SEARCH_LOAD) * 4 - 1e-9) / 4);
+};
 // Paced kirtan: decided once from the self-test, never from live pass times.
 const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && searchHopS(state.passMs) > 0.5;
-function kirtanRecHopS() {
+function kirtanRecHopS(winS) {
   if (state.scoped || !kirtanPaced()) return 0;
-  const rec = searchHopS(livePassMs()) + state.kirtanExtraS;
+  const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
 // Benchmarks only: pace just one engine kind ('recognizer' or 'follower'). Unset = both.
 const KIRTAN_PACE_ONLY = process.env.VF_KIRTAN_PACE_ONLY || null;
-function kirtanHopS(kind) {
-  const rec = kirtanRecHopS();
+function kirtanHopS(kind, winS) {
+  const rec = kirtanRecHopS(winS);
   if (!rec) return 0;
   if (KIRTAN_PACE_ONLY && kind !== KIRTAN_PACE_ONLY) return 0;
   return kind === 'recognizer' ? rec : KIRTAN_FOLLOW_HOP_S;

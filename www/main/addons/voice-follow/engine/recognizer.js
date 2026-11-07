@@ -26,7 +26,8 @@ class Recognizer {
       this.buf = merged;
       this.acc += res.length;
     }
-    this.hop = Math.floor(pace.hopS('recognizer', this.hopS) * SR); // performance tier
+    // performance tier; the kirtan pace follows the window this pass will search
+    this.hop = Math.floor(pace.hopS('recognizer', this.hopS, this.buf.length / SR) * SR);
     if (this.acc < this.hop || this.buf.length < SR) return null;
     this.acc = 0;
     pace.markBeat(pcm);
