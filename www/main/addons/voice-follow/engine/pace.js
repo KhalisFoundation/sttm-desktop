@@ -77,6 +77,10 @@ const state = {
   tier: 0,
   pinned: null,
   passMs: null, // self-test median
+  kirtanExtraS: 0, // kirtan guard: extra seconds between recognizer passes
+  kirtanSteppedAt: 0,
+  kirtanBehindSince: null,
+  kirtanClearSince: null,
   recent: [],
   behindSince: null,
   headroomSince: null,
@@ -181,21 +185,67 @@ function hopS(kind, ownHopS) {
 // Kirtan pace. Outside a read Bani the tiers do not apply and every computer runs the fast
 // schedule. The 10 s Shabad-search pass costs about 2.5x a 4 s pass; a computer whose search pass
 // takes longer than the time between search passes falls behind and stops finding Shabads (Mac
-// screen, 5 kirtan clips: the 0.5 s schedule found 86% at 196 ms per 4 s pass, 11% at 238 ms and
-// 0% at 309 ms). So the recognizer waits at least searchPass / 0.85 between passes (rounded up to
-// 0.25 s, never less than today's 0.5 s) and the line followers half of that; every window still
-// overlaps its neighbours. Computers at about 170 ms per 4 s pass or faster keep exactly today's
-// schedule. VF_KIRTAN_PACE=0 turns it off.
+// screens on the fixed simulator, kirtan dev clips: the 0.5 s schedule found 0 of 10 at 270 ms
+// and 370 ms per 4 s pass). So the recognizer waits at least searchPass / 0.9 between passes
+// (rounded up to 0.25 s, never less than today's 0.5 s): 256 ms -> 0.75 s, 347 ms -> 1 s,
+// 505 ms -> 1.5 s, each the best schedule measured at that speed. The line followers then run
+// every 0.375 s (same Shabads found as rec / 2, but line lag at i9 level: 3.5-4.3 s vs 5.8 s).
+// Every window still overlaps its neighbours. Computers at about 180 ms per 4 s pass or faster
+// keep exactly today's schedule. A live guard adds 0.25 s to the recognizer when the kirtan
+// audio backlog stays above 0.5 s (other apps, a hot CPU) and gives it back once it has kept up
+// for a minute. VF_KIRTAN_PACE=0 turns it all off.
 const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
 const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
-const SEARCH_LOAD = 0.85;
-function kirtanHopS(kind) {
+const SEARCH_LOAD = 0.9;
+const KIRTAN_FOLLOW_HOP_S = 0.375;
+const KIRTAN_GUARD = {
+  behindS: 0.5,
+  behindMs: 3000,
+  clearS: 0.1,
+  clearMs: 60000,
+  holdMs: 10000,
+  stepS: 0.25,
+  maxS: 1.0,
+};
+function kirtanRecHopS() {
   const ms = livePassMs();
-  if (!KIRTAN_PACE || state.scoped || ms == null) return 0;
-  const need = (SEARCH_COST * ms) / 1000 / SEARCH_LOAD;
-  const rec = Math.max(0.5, Math.ceil(need * 4 - 1e-9) / 4);
-  if (rec <= 0.5) return 0;
-  return kind === 'recognizer' ? rec : rec / 2;
+  if (!KIRTAN_PACE || state.scoped) return 0;
+  const need = ms == null ? 0 : (SEARCH_COST * ms) / 1000 / SEARCH_LOAD;
+  const rec = Math.max(0.5, Math.ceil(need * 4 - 1e-9) / 4) + state.kirtanExtraS;
+  return rec > 0.5 ? rec : 0;
+}
+function kirtanHopS(kind) {
+  const rec = kirtanRecHopS();
+  if (!rec) return 0;
+  return kind === 'recognizer' ? rec : KIRTAN_FOLLOW_HOP_S;
+}
+// Kirtan guard: called by observe() while no read Bani is followed.
+function observeKirtan(backlogSec, nowMs) {
+  const g = KIRTAN_GUARD;
+  const held = nowMs - state.kirtanSteppedAt < g.holdMs;
+  if (backlogSec > g.behindS) {
+    state.kirtanClearSince = null;
+    if (state.kirtanBehindSince == null) state.kirtanBehindSince = nowMs;
+    else if (
+      !held &&
+      nowMs - state.kirtanBehindSince >= g.behindMs &&
+      state.kirtanExtraS < g.maxS
+    ) {
+      state.kirtanExtraS += g.stepS;
+      state.kirtanSteppedAt = nowMs;
+      state.kirtanBehindSince = null;
+    }
+    return;
+  }
+  state.kirtanBehindSince = null;
+  if (backlogSec < g.clearS && state.kirtanExtraS > 0) {
+    if (state.kirtanClearSince == null) state.kirtanClearSince = nowMs;
+    else if (!held && nowMs - state.kirtanClearSince >= g.clearMs) {
+      state.kirtanExtraS -= g.stepS;
+      state.kirtanSteppedAt = nowMs;
+      state.kirtanClearSince = null;
+    }
+  } else state.kirtanClearSince = null;
 }
 
 function backlogBoundS() {
@@ -272,6 +322,7 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
+  if (!state.scoped && KIRTAN_PACE) observeKirtan(backlogSec, nowMs);
   if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
   const held = nowMs - state.steppedAt < HOLD_MS;
