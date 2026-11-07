@@ -190,10 +190,13 @@ function hopS(kind, ownHopS) {
 // (rounded up to 0.25 s, never less than today's 0.5 s): 256 ms -> 0.75 s, 347 ms -> 1 s,
 // 505 ms -> 1.5 s, each the best schedule measured at that speed. The line followers then run
 // every 0.375 s (same Shabads found as rec / 2, but line lag at i9 level: 3.5-4.3 s vs 5.8 s).
-// Every window still overlaps its neighbours. Computers at about 180 ms per 4 s pass or faster
-// keep exactly today's schedule. A live guard adds 0.25 s to the recognizer when the kirtan
-// audio backlog stays above 0.5 s (other apps, a hot CPU) and gives it back once it has kept up
-// for a minute. VF_KIRTAN_PACE=0 turns it all off.
+// Every window still overlaps its neighbours. Whether a computer is paced is decided once, from
+// the startup self-test: at about 180 ms per 4 s pass or faster (e.g. Renton's Ryzen 9, ~135 ms)
+// it keeps exactly today's schedule for the whole session, even while it falls behind or runs
+// slower under load. Only computers the self-test classes slow get the paced schedule, and on
+// those a live guard adds 0.25 s to the recognizer when the kirtan audio backlog stays above
+// 0.5 s (other apps, a hot CPU) and gives it back once it has kept up for a minute.
+// VF_KIRTAN_PACE=0 turns it all off.
 const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
 const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
 const SEARCH_LOAD = 0.9;
@@ -207,11 +210,16 @@ const KIRTAN_GUARD = {
   stepS: 0.25,
   maxS: 1.0,
 };
+// Recognizer hop the search pass needs at a given pass time (0.5 = today's schedule).
+const searchHopS = (ms) =>
+  ms == null
+    ? 0.5
+    : Math.max(0.5, Math.ceil(((SEARCH_COST * ms) / 1000 / SEARCH_LOAD) * 4 - 1e-9) / 4);
+// Paced kirtan: decided once from the self-test, never from live pass times.
+const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && searchHopS(state.passMs) > 0.5;
 function kirtanRecHopS() {
-  const ms = livePassMs();
-  if (!KIRTAN_PACE || state.scoped) return 0;
-  const need = ms == null ? 0 : (SEARCH_COST * ms) / 1000 / SEARCH_LOAD;
-  const rec = Math.max(0.5, Math.ceil(need * 4 - 1e-9) / 4) + state.kirtanExtraS;
+  if (state.scoped || !kirtanPaced()) return 0;
+  const rec = searchHopS(livePassMs()) + state.kirtanExtraS;
   return rec > 0.5 ? rec : 0;
 }
 function kirtanHopS(kind) {
@@ -322,7 +330,7 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
-  if (!state.scoped && KIRTAN_PACE) observeKirtan(backlogSec, nowMs);
+  if (!state.scoped && kirtanPaced()) observeKirtan(backlogSec, nowMs);
   if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
   const held = nowMs - state.steppedAt < HOLD_MS;
