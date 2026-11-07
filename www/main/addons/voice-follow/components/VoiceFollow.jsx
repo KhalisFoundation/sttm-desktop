@@ -4485,11 +4485,14 @@ const VoiceFollow = () => {
       // Lock evidence is kept per second only for a Shabad of a Bani (Paath, sung Banis); a kirtan
       // Shabad keeps today's per-search rules under the plain pace (sim 0.48: per-second evidence
       // on kirtan cost ~17 points right vs plain pacing; it is what lets Japji and Jaap lock).
+      // Only a paath Bani's Shabads (PAATH_BANIS: Japji, Jaap, Anand, Savaiye, Chaupai, Aarti):
+      // ordinary kirtan Shabads that merely appear in some Bani (Sukhmani, Asa di Vaar, Rehras)
+      // keep the kirtan rules (sim 0.48: scaling every Shabad in the Bani index cost rn79 98 -> 14).
       const scaleFor = (sid) => {
         const idx = baniIndexReadyRef.current;
-        return scale > 1 && idx && (idx.byShabad.has(sid) || idx.byShabad.has(Number(sid)))
-          ? scale
-          : 1;
+        if (!(scale > 1) || !idx || PAATH_SKIP_SHABADS.has(Number(sid))) return 1;
+        const of = idx.byShabad.get(sid) || idx.byShabad.get(Number(sid)) || [];
+        return of.some((x) => PAATH_BANIS.includes(x.bani)) ? scale : 1;
       };
       // Shadow activity log: words are being heard (singing or speech) right now.
       if (SHADOW_BUILD) shadowBus.heard(text || '');
