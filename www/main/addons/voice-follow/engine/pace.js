@@ -208,6 +208,10 @@ function hopS(kind, ownHopS, winS) {
 const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
 const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
 const SEARCH_WINDOW_S = 10;
+// Benchmarks only: VF_KIRTAN_BY_WINDOW=0 paces the search as if its window were always full;
+// VF_KIRTAN_EVIDENCE=0 keeps the component's lock evidence per search (searchScale 1).
+const PACE_BY_WINDOW = process.env.VF_KIRTAN_BY_WINDOW !== '0';
+const PACE_EVIDENCE = process.env.VF_KIRTAN_EVIDENCE !== '0';
 const SEARCH_LOAD = 0.9;
 const KIRTAN_FOLLOW_HOP_S = 0.375;
 const KIRTAN_GUARD = {
@@ -220,8 +224,9 @@ const KIRTAN_GUARD = {
   maxS: 1.0,
 };
 // Recognizer hop the search pass needs at a given pass time (0.5 = today's schedule).
-const searchHopS = (ms, winS = SEARCH_WINDOW_S) => {
+const searchHopS = (ms, winArg = SEARCH_WINDOW_S) => {
   if (ms == null) return 0.5;
+  const winS = PACE_BY_WINDOW ? winArg : SEARCH_WINDOW_S;
   const cost = (SEARCH_COST * ms * Math.min(winS, SEARCH_WINDOW_S)) / SEARCH_WINDOW_S / 1000;
   return Math.max(0.5, Math.ceil((cost / SEARCH_LOAD) * 4 - 1e-9) / 4);
 };
@@ -235,6 +240,7 @@ function kirtanRecHopS(winS) {
 // The recognizer's hop now / today's hop (1 unless the kirtan pace is slowing the search): the
 // component keeps its lock evidence per second with it (VoiceFollow perSearch).
 function searchScale(ownHopS, winS) {
+  if (!PACE_EVIDENCE) return 1;
   const today = akhandOn()
     ? Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS)
     : Math.max(ownHopS, current().recognizerHopS);
