@@ -238,7 +238,15 @@ const searchHopS = (ms, winArg = SEARCH_WINDOW_S) => {
 // paced in 3 sessions (and was, in the sim at 0.9x: 185 ms). PCs paced at 250: i3-5005U,
 // i7-2600, i5-4200U, i7-4770K, i7-7500U, and some i7-1255U / i7-11370H sessions.
 const KIRTAN_PACE_MIN_MS = 250;
-const kirtanPaced = () => KIRTAN_PACE && state.passMs != null && state.passMs > KIRTAN_PACE_MIN_MS;
+// ...and only up to 450 ms: at ~505 ms (sim 0.33, i5-6400 class) Japji was lost (100 -> 32) and
+// Paath must hold, so the slowest PCs keep today's schedule until that is solved.
+// VF_KIRTAN_PACE_MAX_MS overrides it for benchmarks.
+const KIRTAN_PACE_MAX_MS = Number(process.env.VF_KIRTAN_PACE_MAX_MS) || 450;
+const kirtanPaced = () =>
+  KIRTAN_PACE &&
+  state.passMs != null &&
+  state.passMs > KIRTAN_PACE_MIN_MS &&
+  state.passMs <= KIRTAN_PACE_MAX_MS;
 function kirtanRecHopS(winS) {
   if (state.scoped || !kirtanPaced()) return 0;
   const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;

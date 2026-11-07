@@ -65,3 +65,9 @@ test("Renton-class self-tests up to 250 ms keep today's kirtan schedule", async 
   assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
   assert.strictEqual(pace.searchScale(0.5, 10), 1);
 });
+
+test("the slowest PCs (self-test above 450 ms) keep today's kirtan schedule", async () => {
+  const pace = await paceAt(520);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  assert.strictEqual(pace.searchScale(0.5, 10), 1);
+});
