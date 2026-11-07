@@ -7275,14 +7275,25 @@ const VoiceFollow = () => {
               {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
                   sits near the top of the panel without adding a line. */}
               <div className="vf2-next-row">
-                {nextLine ? (
+                {nextLine && (
                   <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
                     <span className="vf2-next-mark" aria-hidden="true" />
                     <Gurmukhi text={nextLine} />
                   </div>
-                ) : (
-                  <span className="vf2-next-line is-empty" />
                 )}
+                {/* On the last pangti there is no next one: a quiet "End of Shabad" (or
+                    "End of Bani") takes its place instead of an empty gap. */}
+                {!nextLine && atEnd && (
+                  <div className="vf2-next-line is-end">
+                    <span className="vf2-next-mark" aria-hidden="true" />
+                    {i18n.t(
+                      curBaniShabadsRef.current
+                        ? 'VOICE_FOLLOW.END_OF_BANI'
+                        : 'VOICE_FOLLOW.END_OF_SHABAD',
+                    )}
+                  </div>
+                )}
+                {!nextLine && !atEnd && <span className="vf2-next-line is-empty" />}
                 {stopButton}
               </div>
               {boardCur && <LiveBar value={boardCur.pct} />}
