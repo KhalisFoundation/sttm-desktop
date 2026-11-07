@@ -728,6 +728,14 @@ const PAATH_POOL_TEXT_MIN = 0.2; // minimum full-text score of that top line
 // a count of k searches becomes k / scale, and each vote is worth scale times as much and fades
 // scale times as fast. At scale 1 every rule is exactly as before.
 const perSearch = (k, scale) => (scale > 1 ? Math.max(1, Math.round(k / scale)) : k);
+// ...but a paced lock still needs as much audio behind it as today's: the searches it won must
+// span at least today's 4 wins x 0.5 s (fewer, longer-spaced searches may not lock on ~1 s of a
+// short phrase that today's schedule would have outgrown; sim 0.48 pt01).
+const LOCK_WIN_SPAN_MS = 1500;
+const winSpanMs = (entries, id) => {
+  const t = entries.filter((e) => e.candidates[0]?.shabadId === id && e.at).map((e) => e.at);
+  return t.length > 1 ? Math.max(...t) - Math.min(...t) : 0;
+};
 // Rehras and Aarti are followed at the extra-long length, Kirtan Sohila at the long length,
 // whatever the user's own Sundar Gutka length (see baniLength.js): while one of them is open
 // the Bani length is raised to it (never lowered) and restored when it ends.
@@ -4754,6 +4762,7 @@ const VoiceFollow = () => {
             if (!memory.entries.some((e) => e.hyp === hyp)) {
               memory.entries.push({
                 step,
+                at: Date.now(),
                 hyp,
                 candidates: leaders,
                 anchor: top.score >= 0.8 && margin >= 0.2,
@@ -4839,6 +4848,7 @@ const VoiceFollow = () => {
               margin >= AP_LOCK_TEXT_MARGIN &&
               winner.count >= perSearch(6, scale) &&
               winner.wins >= perSearch(4, scale) &&
+              (scale <= 1 || winSpanMs(memory.entries, winner.id) >= LOCK_WIN_SPAN_MS) &&
               lineEvidenceOk(winner) &&
               winner.score - (rankedContext[1]?.score || 0) >= (scale > 1 ? 1 / scale : 1)
             ) {
