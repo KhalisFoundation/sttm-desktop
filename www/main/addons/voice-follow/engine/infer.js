@@ -1,5 +1,12 @@
 // Shared karansea CTC inference core (JS port of the numpy bits).
-const ort = require('onnxruntime-node');
+// onnxruntime-node is a native addon. Load it on first use, not when the app opens: on a PC that
+// cannot load it (old CPU, missing Microsoft C++ runtime) only Voice Autopilot fails, with a message,
+// instead of the whole window staying white.
+let ortModule = null;
+const ort = () => {
+  if (!ortModule) ortModule = require('onnxruntime-node'); // eslint-disable-line global-require
+  return ortModule;
+};
 const VOCAB = require('./assets/vocab'); // id -> piece
 const pace = require('./pace');
 
@@ -7,9 +14,8 @@ const TEST_PASS_MS = process.env.VF_TEST_WAV ? Number(process.env.VF_TEST_PASS_M
 const SR = 16000;
 const BLANK = 256;
 
-// strip whitespace, dandas, Gurmukhi/ASCII digits, punctuation (matches _STRIP)
-const STRIP = /[\s।॥|0-9੦-੯.,;:!?\-]+/g;
-const norm = (s) => (s || '').replace(STRIP, '');
+// Heard text only (never a pangti), made ready for comparing: see compared.js.
+const { heardForComparing } = require('./compared');
 
 function resampleTo16k(pcm, inSr) {
   if (inSr === SR) return pcm;
@@ -83,7 +89,7 @@ class Infer {
     const env = parseInt(process.env.VF_ORT_THREADS || '', 10);
     let threads = cores >= 8 ? 4 : Math.max(1, Math.min(2, cores));
     if (env > 0) threads = env;
-    const sess = await ort.InferenceSession.create(modelPath, {
+    const sess = await ort().InferenceSession.create(modelPath, {
       intraOpNumThreads: threads,
       interOpNumThreads: 1,
       extra: { session: { 'session.intra_op.allow_spinning': '0' } },
@@ -119,8 +125,8 @@ class Infer {
   // One model pass, untimed (emissions() times it: a benchmark that slows the model wraps run).
   async run(buf) {
     const feeds = {
-      audio: new ort.Tensor('float32', buf, [1, buf.length]),
-      audio_len: new ort.Tensor('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
+      audio: new (ort().Tensor)('float32', buf, [1, buf.length]),
+      audio_len: new (ort().Tensor)('int64', BigInt64Array.from([BigInt(buf.length)]), [1]),
     };
     const out = await this.sess.run(feeds);
     const lp = out.log_probs;
@@ -168,4 +174,12 @@ class Infer {
   }
 }
 
-module.exports = { Infer, resampleTo16k, norm, SR, BLANK };
+module.exports = {
+  Infer,
+  resampleTo16k,
+  heardForComparing,
+  // compatibility: the research tools (search-sim.js, analyze-switches.js) still require it as `norm`
+  norm: heardForComparing,
+  SR,
+  BLANK,
+};

@@ -1,5 +1,5 @@
 // JS port of karansea_recognize.py KaranseaRecognizer.
-const { resampleTo16k, norm, SR } = require('./infer');
+const { resampleTo16k, heardForComparing, SR } = require('./infer');
 const pace = require('./pace');
 
 class Recognizer {
@@ -33,7 +33,7 @@ class Recognizer {
 
     const emis = await this.infer.emissions(this.buf);
     const hyp = this.infer.decode(this.infer.greedy(emis));
-    if (norm(hyp).length < this.minHyp) return null;
+    if (heardForComparing(hyp).length < this.minHyp) return null;
     return {
       text: hyp,
       confidence: Number(this.infer.confidence(emis).toFixed(3)),
