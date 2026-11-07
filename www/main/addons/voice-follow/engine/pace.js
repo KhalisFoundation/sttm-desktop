@@ -173,12 +173,15 @@ function notePass(ms, samples) {
 
 // Hop for an engine: its own hop, or the tier's when that is longer.
 function hopS(kind, ownHopS) {
-  if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('follower', ownHopS);
+  if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('bani', ownHopS);
   if (kind === 'recognizer' && akhandOn()) {
     return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
   }
   const t = current();
-  const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
+  const tierHop = kind === 'recognizer' ? t.recognizerHopS : t.followerHopS;
+  // The Bani follower ('bani': Paath and sung Banis) never takes the kirtan pace; it keeps its
+  // own hop outside the read-Bani tiers, exactly as before.
+  if (kind === 'bani') return Math.max(ownHopS, tierHop);
   return Math.max(ownHopS, tierHop, kirtanHopS(kind)); // eslint-disable-line no-use-before-define
 }
 

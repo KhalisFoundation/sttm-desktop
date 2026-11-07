@@ -35,3 +35,11 @@ test('slow PC (self-test 330 ms): paced kirtan and the backlog guard apply', asy
   for (let t = 0; t <= 20000; t += 500) pace.observe(3, 1e6 + t);
   assert.ok(pace.hopS('recognizer', 0.5) > rec, 'guard adds time when behind');
 });
+
+test('slow PC: the Bani follower (Paath, sung Banis) never takes the kirtan pace', async () => {
+  const pace = await paceAt(330);
+  assert.strictEqual(pace.hopS('bani', 0.25), 0.25);
+  assert.strictEqual(pace.hopS('akhand', 0.25), 0.25);
+  for (let t = 0; t <= 20000; t += 500) pace.observe(3, 1e6 + t);
+  assert.strictEqual(pace.hopS('bani', 0.25), 0.25);
+});

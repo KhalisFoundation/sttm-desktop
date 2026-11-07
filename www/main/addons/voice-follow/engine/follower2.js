@@ -741,7 +741,7 @@ class FollowerV2 {
     }
     // Performance tier: a longer hop, with the window-counted dwells scaled so they keep
     // their wall-clock meaning (see scaled()).
-    const hopS = pace.hopS(this.c.akhand ? 'akhand' : 'follower', this.base.hopS);
+    const hopS = pace.hopS(this.c.akhand ? 'akhand' : 'bani', this.base.hopS);
     if (hopS !== this.hopS) {
       this.hopS = hopS;
       this.hop = Math.floor(hopS * SR);
