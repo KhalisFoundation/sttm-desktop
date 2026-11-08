@@ -1482,3 +1482,76 @@ $vf2-yellow-bar: #f2c200;
   margin-top: 2px;
   line-height: 1.4;
 }
+
+// Wrong-microphone hints (micWarning.js): small and calm, in the sevadaar's panel only.
+.vf-mic-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 7px 8px 7px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--vf-muted);
+  background: rgba(127, 127, 127, 0.1);
+  text-align: left;
+
+  &.is-silent,
+  &.is-quiet {
+    color: #8a6000;
+    background: rgba(240, 180, 40, 0.14);
+  }
+  &.is-virtual {
+    max-width: 340px;
+    margin: 6px auto 0;
+  }
+}
+.vf-mic-hint-icon {
+  margin-top: 2px;
+  font-size: 12px;
+}
+.vf-mic-hint-body {
+  flex: 1;
+  min-width: 0;
+}
+.vf-mic-hint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.vf-mic-hint-btn {
+  max-width: 100%;
+  padding: 3px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &.is-primary {
+    border-color: transparent;
+    background: rgba(240, 180, 40, 0.3);
+    font-weight: 600;
+  }
+  &:hover {
+    background: rgba(127, 127, 127, 0.14);
+  }
+}
+.vf-mic-hint-close {
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+}

@@ -25,6 +25,7 @@ const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
+const { virtualMicKind, createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
 const { installDemoAudio } = require('./devAudio');
 const { vfAnalytics, createRunStats } = require('./vfAnalytics');
 
@@ -1027,6 +1028,55 @@ const saveMicPref = (deviceId) => {
     else window.localStorage.removeItem(MIC_PREF_KEY);
   } catch (e) {
     // Storage unavailable: the choice lasts for this run only.
+  }
+};
+
+// How loud another input is right now: open it for a moment, read its level, close it. Nothing
+// is recorded, kept or sent; only the loudness (80th percentile of ~100 ms reads) comes back.
+const MIC_PROBE_MS = 1500;
+// A device name goes into the text as written (React escapes it; i18next must not as well).
+const NO_ESCAPE = { interpolation: { escapeValue: false } };
+const probeMicLevel = async (ctx, deviceId) => {
+  let stream = null;
+  let src = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        deviceId: { exact: deviceId },
+        channelCount: 1,
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    });
+    src = ctx.createMediaStreamSource(stream);
+    const an = ctx.createAnalyser();
+    an.fftSize = 2048;
+    src.connect(an);
+    const buf = new Float32Array(an.fftSize);
+    const reads = [];
+    const until = Date.now() + MIC_PROBE_MS;
+    while (Date.now() < until) {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => {
+        setTimeout(r, 100);
+      });
+      an.getFloatTimeDomainData(buf);
+      let e = 0;
+      for (let i = 0; i < buf.length; i += 1) e += buf[i] * buf[i];
+      reads.push(Math.sqrt(e / buf.length));
+    }
+    reads.sort((a, b) => a - b);
+    return reads.length ? reads[Math.floor(0.8 * (reads.length - 1))] : 0;
+  } catch (_) {
+    return null; // busy, gone or blocked: not offered
+  } finally {
+    try {
+      src?.disconnect();
+    } catch (_) {
+      /* already gone */
+    }
+    stream?.getTracks().forEach((t) => t.stop());
   }
 };
 
@@ -2902,6 +2952,17 @@ const VoiceFollow = () => {
   const [micId, setMicId] = useState(readMicPref);
   const micIdRef = useRef(micId);
   micIdRef.current = micId;
+  // Wrong-microphone hints (micWarning.js), in the sevadaar's panel only: the input the run
+  // listens through, the hint showing now, an input a short probe found sound on, and the
+  // hints the sevadaar dismissed (per kind and device, for as long as the panel lives).
+  const liveMicRef = useRef({ deviceId: '', groupId: '', label: '' });
+  const micWatchRef = useRef(createMicWatch());
+  const micHeardAtRef = useRef(0);
+  const [micHint, setMicHint] = useState(null); // 'silent' | 'quiet' | null
+  const [micProbe, setMicProbe] = useState(null); // { deviceId, label, rms } with sound
+  const micDismissedRef = useRef(new Set());
+  const micShownRef = useRef(new Set()); // hints already logged as shown
+  const [, setMicDismissTick] = useState(0);
   // The system has blocked the microphone: the start screen asks for access instead.
   const [micDenied, setMicDenied] = useState(false);
   // The live microphone stream as state, so the hearing meter draws from the first second
@@ -3102,6 +3163,16 @@ const VoiceFollow = () => {
     setCurrentView(null);
     const device = stream.getAudioTracks?.()[0]?.label || 'Microphone';
     setAudioView({ seconds: 0, level: 0, rms: 0, peak: 0, device });
+    const liveSettings = stream.getAudioTracks?.()[0]?.getSettings?.() || {};
+    liveMicRef.current = {
+      deviceId: liveSettings.deviceId || '',
+      groupId: liveSettings.groupId || '',
+      label: device,
+    };
+    micWatchRef.current.reset();
+    micHeardAtRef.current = Date.now();
+    setMicHint(null);
+    setMicProbe(null);
     volumeRef.current = { hist: [], state: 'good' };
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     ctxRef.current = ctx;
@@ -3208,6 +3279,11 @@ const VoiceFollow = () => {
         const volHist = volumeRef.current.hist;
         volHist.push(rms);
         if (volHist.length > VOL_SILENT_WINDOWS) volHist.shift();
+        // Wrong-microphone watch: this window's level, and whether words came through.
+        const heardNow = heardLastRef.current > micHeardAtRef.current;
+        micHeardAtRef.current = now;
+        const hint = micWatchRef.current.push({ rms, heard: heardNow });
+        setMicHint((h) => (h === hint ? h : hint));
         setAudioView({
           seconds: Math.floor(capture.samples / ctx.sampleRate),
           level: Math.min(1, rms * 8),
@@ -6828,6 +6904,124 @@ const VoiceFollow = () => {
     setMicId(deviceId);
     saveMicPref(deviceId);
   };
+  // Another input than the one the run listens through (the 'default' alias is the same device).
+  const otherMic = (d) => {
+    const cur = liveMicRef.current;
+    return d.deviceId !== cur.deviceId && !(cur.groupId && d.groupId === cur.groupId);
+  };
+  // Wrong-microphone hints: log each once when shown, and the sevadaar's dismissals.
+  const micLog = (type, fields) =>
+    sessionLog.logEvent(type, { session: sessionIdRef.current, ...fields });
+  const micHintShown = (kind, deviceId, label) => {
+    const key = dismissKey(kind, deviceId, label);
+    if (micDismissedRef.current.has(key)) return false;
+    if (!micShownRef.current.has(key)) {
+      micShownRef.current.add(key);
+      micLog('mic_warning', { kind, device: label || '' });
+    }
+    return true;
+  };
+  const dismissMicHint = (kind, deviceId, label) => {
+    micDismissedRef.current.add(dismissKey(kind, deviceId, label));
+    micLog('mic_warning_dismiss', { kind, device: label || '' });
+    setMicDismissTick((n) => n + 1);
+  };
+  // Switch the running session to another input in place: the new microphone feeds the same
+  // pipeline, so what Autopilot has found so far is kept. Only ever on the sevadaar's click.
+  const switchMic = async (deviceId, why) => {
+    const from = liveMicRef.current.label;
+    chooseMic(deviceId);
+    const ctx = ctxRef.current;
+    const node = nodeRef.current;
+    if (!running || !ctx || !node) return;
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: { exact: deviceId },
+          channelCount: 1,
+          echoCancellation: false,
+          noiseSuppression: false,
+        },
+      });
+    } catch (e) {
+      micLog('mic_switch', { from, to: '', why, error: (e && e.name) || 'error' });
+      return;
+    }
+    if (ctxRef.current !== ctx || nodeRef.current !== node) {
+      stream.getTracks().forEach((t) => t.stop());
+      return;
+    }
+    const src = ctx.createMediaStreamSource(stream);
+    src.connect(node);
+    try {
+      srcRef.current?.disconnect();
+    } catch (_) {
+      /* already gone */
+    }
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    srcRef.current = src;
+    streamRef.current = stream;
+    setMicStream(stream);
+    const label = stream.getAudioTracks()[0]?.label || '';
+    liveMicRef.current = {
+      deviceId,
+      groupId: stream.getAudioTracks()[0]?.getSettings?.()?.groupId || '',
+      label,
+    };
+    volumeRef.current = { hist: [], state: 'good' };
+    micWatchRef.current.reset();
+    setMicHint(null);
+    setMicProbe(null);
+    micLog('mic_switch', { from, to: label, why });
+  };
+  // No sound from the input: listen for a moment to each other input (one at a time, closed
+  // right after) and offer the one clearly picking up sound. Never switches on its own.
+  const probeRef = useRef({ busy: false, rounds: 0 });
+  const silentShown =
+    active &&
+    micHint === 'silent' &&
+    !micDismissedRef.current.has(
+      dismissKey('silent', liveMicRef.current.deviceId, liveMicRef.current.label),
+    );
+  useEffect(() => {
+    if (!silentShown) {
+      probeRef.current.rounds = 0;
+      return undefined;
+    }
+    let live = true;
+    const round = async () => {
+      const pr = probeRef.current;
+      const ctx = ctxRef.current;
+      if (pr.busy || pr.rounds >= 4 || !ctx) return;
+      pr.busy = true;
+      pr.rounds += 1;
+      try {
+        const others = mics.list.filter((d) => otherMic(d) && !virtualMicKind(d.label));
+        const results = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const d of others.slice(0, 6)) {
+          if (!live) break;
+          // eslint-disable-next-line no-await-in-loop
+          const rms = await probeMicLevel(ctx, d.deviceId);
+          if (rms != null) results.push({ deviceId: d.deviceId, label: d.label, rms });
+        }
+        const pick = pickProbedMic(results, { goodRms: VOL_GOOD_RMS });
+        if (live && pick) {
+          setMicProbe(pick);
+          micLog('mic_probe', { found: pick.label || '', rms: Math.round(pick.rms * 1e4) / 1e4 });
+        }
+      } finally {
+        pr.busy = false;
+      }
+    };
+    round();
+    const timer = setInterval(round, 30000);
+    return () => {
+      live = false;
+      clearInterval(timer);
+    };
+  }, [silentShown, mics.list]);
   // The picker shows the saved microphone, else the system default, else the first one.
   const shownMic =
     mics.list.find((d) => d.deviceId === micId) ||
@@ -7255,6 +7449,90 @@ const VoiceFollow = () => {
     if (await checkMicAccess()) return; // still blocked: stay on this screen
     onMainClick();
   };
+  // Wrong-microphone hints, small and calm, in this panel only (never on a sangat screen).
+  const liveMic = liveMicRef.current;
+  const liveName = liveMic.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
+  const micCloseButton = (kind, deviceId, label) => (
+    <button
+      type="button"
+      className="vf-mic-hint-close"
+      onClick={() => dismissMicHint(kind, deviceId, label)}
+      title={i18n.t('VOICE_FOLLOW.MIC_HINT_DISMISS')}
+      aria-label={i18n.t('VOICE_FOLLOW.MIC_HINT_DISMISS')}
+    >
+      <i className="fa fa-times" aria-hidden="true" />
+    </button>
+  );
+  let micHintView = null;
+  if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
+    const others = mics.list.filter(otherMic).slice(0, 4);
+    micHintView = (
+      <div className="vf-mic-hint is-silent" role="status">
+        <i className="fa fa-microphone-slash vf-mic-hint-icon" aria-hidden="true" />
+        <div className="vf-mic-hint-body">
+          {micProbe ? (
+            <>
+              <div>
+                {i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', {
+                  mic: micProbe.label || '',
+                  ...NO_ESCAPE,
+                })}
+              </div>
+              <div className="vf-mic-hint-actions">
+                <button
+                  type="button"
+                  className="vf-mic-hint-btn is-primary"
+                  onClick={() => switchMic(micProbe.deviceId, 'probe')}
+                >
+                  {i18n.t('VOICE_FOLLOW.MIC_SWITCH')}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>{i18n.t('VOICE_FOLLOW.MIC_SILENT', { mic: liveName, ...NO_ESCAPE })}</div>
+              {others.length > 0 && (
+                <div className="vf-mic-hint-actions">
+                  {others.map((d) => (
+                    <button
+                      key={d.deviceId}
+                      type="button"
+                      className="vf-mic-hint-btn"
+                      onClick={() => switchMic(d.deviceId, 'list')}
+                    >
+                      {d.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC')}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        {micCloseButton('silent', liveMic.deviceId, liveMic.label)}
+      </div>
+    );
+  } else if (
+    active &&
+    micHint === 'quiet' &&
+    micHintShown('quiet', liveMic.deviceId, liveMic.label)
+  ) {
+    micHintView = (
+      <div className="vf-mic-hint is-quiet" role="status">
+        <i className="fa fa-microphone vf-mic-hint-icon" aria-hidden="true" />
+        <div className="vf-mic-hint-body">{i18n.t('VOICE_FOLLOW.MIC_QUIET')}</div>
+        {micCloseButton('quiet', liveMic.deviceId, liveMic.label)}
+      </div>
+    );
+  }
+  // Start screen: the chosen input's name looks like a virtual one (phone-as-webcam, cable).
+  const virtualKind = shownMic && virtualMicKind(shownMic.label);
+  const virtualNote =
+    !active && virtualKind && micHintShown('virtual', shownMic.deviceId, shownMic.label) ? (
+      <div className="vf-mic-hint is-virtual" role="note">
+        <div className="vf-mic-hint-body">{i18n.t('VOICE_FOLLOW.MIC_VIRTUAL')}</div>
+        {micCloseButton('virtual', shownMic.deviceId, shownMic.label)}
+      </div>
+    ) : null;
   const autopilotView = (
     <div className={`vf-autopilot${active ? ' is-active' : ' is-idle'}`} data-vf-cards={cardStyle}>
       {!active && micDenied && (
@@ -7315,6 +7593,7 @@ const VoiceFollow = () => {
               </select>
             </span>
           </label>
+          {virtualNote}
           <HwCheck />
           {dlBar}
           {status === 'error' && <div className="vf-status">{statusText}</div>}
@@ -7325,6 +7604,7 @@ const VoiceFollow = () => {
       {active && (
         <div className={`vf2-body${!changing && boardOthers.length === 0 ? ' is-quiet' : ''}`}>
           {dlBar}
+          {micHintView}
           {holdCard}
           <>
             <section
