@@ -2085,6 +2085,7 @@ const VoiceFollow = () => {
     hops: [],
     lastProgress: 0,
     lastFollow: 0,
+    lastMove: 0, // the follower's last move on, at any confidence (read-Bani tier clock)
     followLine: null,
     followWord: -1,
     back: 0,
@@ -6248,13 +6249,15 @@ const VoiceFollow = () => {
             !(paathSeqRef.current.on && paathSeqRef.current.streak === 0);
           const akhandRead = paathSeqRef.current.on && paathSeqRef.current.streak >= 1;
           const lastRead = Math.max(
+            ngs.lastMove || 0,
             ngs.lastFollow || 0,
             ngs.lastProgress || 0,
             lastAutoDecisionRef.current || 0,
           );
           const readOver =
+            readOn &&
             !akhandRead &&
-            engine.pace.describe().tier === 'sync' &&
+            engine.pace.tierName() === 'sync' &&
             (ngs.ours || Date.now() - lastRead >= READ_TIER_IDLE_MS);
           engine.pace.setScoped(readOn && !readOver);
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
@@ -6349,6 +6352,7 @@ const VoiceFollow = () => {
               (out.lineIndex === ngf.followLine && out.wordIndex > ngf.followWord);
             ngf.followLine = out.lineIndex;
             ngf.followWord = out.wordIndex == null ? -1 : out.wordIndex;
+            if (moved) ngf.lastMove = Date.now(); // the reading goes on, however surely heard
             if (moved && out.confidence >= NG_FOLLOW_CONF && Date.now() - ngf.lastFollow >= 500) {
               ngf.lastFollow = Date.now();
               ngTickRef.current({ follow: true });
