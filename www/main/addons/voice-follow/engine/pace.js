@@ -77,6 +77,10 @@ const state = {
   tier: 0,
   pinned: null,
   passMs: null, // self-test median
+  kirtanExtraS: 0, // kirtan guard: extra seconds between recognizer passes
+  kirtanSteppedAt: 0,
+  kirtanBehindSince: null,
+  kirtanClearSince: null,
   recent: [],
   behindSince: null,
   headroomSince: null,
@@ -168,14 +172,131 @@ function notePass(ms, samples) {
 }
 
 // Hop for an engine: its own hop, or the tier's when that is longer.
-function hopS(kind, ownHopS) {
-  if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('follower', ownHopS);
+// winS: the recognizer's current window in seconds (its search pass costs in proportion).
+function hopS(kind, ownHopS, winS) {
+  if (kind === 'akhand') return akhandFast() ? AKHAND.followerHopS : hopS('bani', ownHopS);
   if (kind === 'recognizer' && akhandOn()) {
     return Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS);
   }
   const t = current();
-  const tierHop = kind === 'follower' ? t.followerHopS : t.recognizerHopS;
-  return Math.max(ownHopS, tierHop);
+  const tierHop = kind === 'recognizer' ? t.recognizerHopS : t.followerHopS;
+  // The Bani follower ('bani': Paath and sung Banis) never takes the kirtan pace; it keeps its
+  // own hop outside the read-Bani tiers, exactly as before.
+  if (kind === 'bani') return Math.max(ownHopS, tierHop);
+  return Math.max(ownHopS, tierHop, kirtanHopS(kind, winS)); // eslint-disable-line no-use-before-define
+}
+
+// Kirtan pace. Outside a read Bani the tiers do not apply and every computer runs the fast
+// schedule. The 10 s Shabad-search pass costs about 2.5x a 4 s pass; a computer whose search pass
+// takes longer than the time between search passes falls behind and stops finding Shabads (Mac
+// screens on the fixed simulator, kirtan dev clips: the 0.5 s schedule found 0 of 10 at 270 ms
+// and 370 ms per 4 s pass). So the recognizer waits at least searchPass / 0.9 between passes
+// (rounded up to 0.25 s, never less than today's 0.5 s): 256 ms -> 0.75 s, 347 ms -> 1 s,
+// 505 ms -> 1.5 s, each the best schedule measured at that speed. The line followers then run
+// every 0.375 s (same Shabads found as rec / 2, but line lag at i9 level: 3.5-4.3 s vs 5.8 s).
+// Every window still overlaps its neighbours. Whether a computer is paced is decided once, from
+// the startup self-test: at 250 ms per 4 s pass or faster (e.g. Renton's Ryzen 9, 132-200 ms)
+// it keeps exactly today's schedule for the whole session, even while it falls behind or runs
+// slower under load. Only computers the self-test classes slow get the paced schedule, and on
+// those a live guard adds 0.25 s to the recognizer when the kirtan audio backlog stays above
+// 0.5 s (other apps, a hot CPU) and gives it back once it has kept up for a minute.
+// With fewer searches, the component keeps a paath Bani's lock evidence per second (searchScale;
+// VoiceFollow perSearch), which is what lets Jaap and Japji lock in their first seconds.
+// VF_KIRTAN_PACE=0 turns it all off.
+const KIRTAN_PACE = process.env.VF_KIRTAN_PACE !== '0';
+const SEARCH_COST = 2.5; // 10 s window vs 4 s window (the model is linear in the window)
+const SEARCH_WINDOW_S = 10;
+// Benchmarks only: VF_KIRTAN_BY_WINDOW=1 paces the search by its current window (off: the
+// per-second lock evidence alone lets Jaap and Japji lock, and window pacing cost long kirtan
+// clips 81.8 -> 74.2 right at sim 0.48); VF_KIRTAN_EVIDENCE=0 keeps the component's lock
+// evidence per search (searchScale 1).
+const PACE_BY_WINDOW = process.env.VF_KIRTAN_BY_WINDOW === '1';
+const PACE_EVIDENCE = process.env.VF_KIRTAN_EVIDENCE !== '0';
+// Benchmarks only: cap the evidence scale (unset = no cap).
+const SCALE_MAX = Number(process.env.VF_KIRTAN_SCALE_MAX) || Infinity;
+const SEARCH_LOAD = 0.9;
+const KIRTAN_FOLLOW_HOP_S = 0.375;
+const KIRTAN_GUARD = {
+  behindS: 0.5,
+  behindMs: 3000,
+  clearS: 0.1,
+  clearMs: 60000,
+  holdMs: 10000,
+  stepS: 0.25,
+  maxS: 1.0,
+};
+// Recognizer hop the search pass needs at a given pass time (0.5 = today's schedule).
+const searchHopS = (ms, winArg = SEARCH_WINDOW_S) => {
+  if (ms == null) return 0.5;
+  const winS = PACE_BY_WINDOW ? winArg : SEARCH_WINDOW_S;
+  const cost = (SEARCH_COST * ms * Math.min(winS, SEARCH_WINDOW_S)) / SEARCH_WINDOW_S / 1000;
+  return Math.max(0.5, Math.ceil((cost / SEARCH_LOAD) * 4 - 1e-9) / 4);
+};
+// Paced kirtan: decided once from the self-test, never from live pass times, and only above
+// 250 ms per 4 s pass. Renton's Ryzen 9 3900XT self-tested 132-200 ms over 33 field sessions
+// (Oct 25-Nov 7), so it must stay on today's schedule with a margin; at 180 ms it would have been
+// paced in 3 sessions (and was, in the sim at 0.9x: 185 ms). PCs paced at 250: i3-5005U,
+// i7-2600, i5-4200U, i7-4770K, i7-7500U, and some i7-1255U / i7-11370H sessions.
+const KIRTAN_PACE_MIN_MS = 250;
+// ...and only up to 450 ms: at ~505 ms (sim 0.33, i5-6400 class) Japji was lost (100 -> 32) and
+// Paath must hold, so the slowest PCs keep today's schedule until that is solved.
+// VF_KIRTAN_PACE_MAX_MS overrides it for benchmarks.
+const KIRTAN_PACE_MAX_MS = Number(process.env.VF_KIRTAN_PACE_MAX_MS) || 450;
+const kirtanPaced = () =>
+  KIRTAN_PACE &&
+  state.passMs != null &&
+  state.passMs > KIRTAN_PACE_MIN_MS &&
+  state.passMs <= KIRTAN_PACE_MAX_MS;
+function kirtanRecHopS(winS) {
+  if (state.scoped || !kirtanPaced()) return 0;
+  const rec = searchHopS(livePassMs(), winS) + state.kirtanExtraS;
+  return rec > 0.5 ? rec : 0;
+}
+// The recognizer's hop now / today's hop (1 unless the kirtan pace is slowing the search): the
+// component keeps its lock evidence per second with it (VoiceFollow perSearch).
+function searchScale(ownHopS, winS) {
+  if (!PACE_EVIDENCE) return 1;
+  const today = akhandOn()
+    ? Math.max(ownHopS, current().recognizerHopS, AKHAND.recognizerHopS)
+    : Math.max(ownHopS, current().recognizerHopS);
+  const now = hopS('recognizer', ownHopS, winS);
+  return now > today ? Math.min(now / today, SCALE_MAX) : 1;
+}
+// Benchmarks only: pace just one engine kind ('recognizer' or 'follower'). Unset = both.
+const KIRTAN_PACE_ONLY = process.env.VF_KIRTAN_PACE_ONLY || null;
+function kirtanHopS(kind, winS) {
+  const rec = kirtanRecHopS(winS);
+  if (!rec) return 0;
+  if (KIRTAN_PACE_ONLY && kind !== KIRTAN_PACE_ONLY) return 0;
+  return kind === 'recognizer' ? rec : KIRTAN_FOLLOW_HOP_S;
+}
+// Kirtan guard: called by observe() while no read Bani is followed.
+function observeKirtan(backlogSec, nowMs) {
+  const g = KIRTAN_GUARD;
+  const held = nowMs - state.kirtanSteppedAt < g.holdMs;
+  if (backlogSec > g.behindS) {
+    state.kirtanClearSince = null;
+    if (state.kirtanBehindSince == null) state.kirtanBehindSince = nowMs;
+    else if (
+      !held &&
+      nowMs - state.kirtanBehindSince >= g.behindMs &&
+      state.kirtanExtraS < g.maxS
+    ) {
+      state.kirtanExtraS += g.stepS;
+      state.kirtanSteppedAt = nowMs;
+      state.kirtanBehindSince = null;
+    }
+    return;
+  }
+  state.kirtanBehindSince = null;
+  if (backlogSec < g.clearS && state.kirtanExtraS > 0) {
+    if (state.kirtanClearSince == null) state.kirtanClearSince = nowMs;
+    else if (!held && nowMs - state.kirtanClearSince >= g.clearMs) {
+      state.kirtanExtraS -= g.stepS;
+      state.kirtanSteppedAt = nowMs;
+      state.kirtanClearSince = null;
+    }
+  } else state.kirtanClearSince = null;
 }
 
 function backlogBoundS() {
@@ -252,6 +373,7 @@ async function selfTest(infer, { passes = 5, warm = 2 } = {}) {
 
 // Called by the audio loop with the seconds of audio waiting for the engines.
 function observe(backlogSec, nowMs = Date.now()) {
+  if (!state.scoped && kirtanPaced()) observeKirtan(backlogSec, nowMs);
   if (state.pinned != null || !state.scoped) return null;
   const i = state.tier;
   const held = nowMs - state.steppedAt < HOLD_MS;
@@ -291,6 +413,7 @@ module.exports = {
   setAkhand,
   AKHAND,
   hopS,
+  searchScale,
   backlogBoundS,
   windowS,
   markBeat,
