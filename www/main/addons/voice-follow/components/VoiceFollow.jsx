@@ -276,7 +276,9 @@ const AP_SEARCH_WIN_S = 10; // recognizer window while SEARCHING (matches standa
 const AP_FOLLOW_WIN_S = 4; // recognizer window while FOLLOWING (fast switching)
 // A read Bani's sync tier (engine/pace) holds only while the reading moves on: no
 // follower move or Autopilot decision for this long, and the fast schedule comes back.
-const READ_TIER_IDLE_MS = Number(process.env.VF_READ_TIER_IDLE_MS) || 10000;
+const READ_TIER_IDLE_MS =
+  (typeof process !== 'undefined' && process.env && Number(process.env.VF_READ_TIER_IDLE_MS)) ||
+  10000;
 const AP_REC_HOP_S = 0.5; // recognizer decode hop while in autopilot
 // Audio the engines have not consumed yet is a backlog: recognised text (and the screen)
 // is that far behind the room. On a computer that decodes slower than real time it
