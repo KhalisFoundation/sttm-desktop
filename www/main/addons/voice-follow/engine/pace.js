@@ -403,11 +403,15 @@ function onStep(fn) {
   return () => state.listeners.delete(fn);
 }
 
+// The tier this computer runs a read Bani at (cheap: no os.cpus(), unlike describe()).
+const tierName = () => TIERS[state.tier].name;
+
 module.exports = {
   TIERS,
   LOAD_MAX,
   current,
   describe,
+  tierName,
   notePass,
   setScoped,
   setAkhand,
