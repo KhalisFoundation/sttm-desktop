@@ -274,6 +274,9 @@ const AP_SEARCH_WIN_S = 10; // recognizer window while SEARCHING (matches standa
 // second raagi's stream but REGRESSED the primary 86-min stream (erroneous 13.2->14.9,
 // recall 85->83) and was ~a wash on the 9s stress stream — not voice-agnostic, so 4 stays.
 const AP_FOLLOW_WIN_S = 4; // recognizer window while FOLLOWING (fast switching)
+// A read Bani's performance tier (engine/pace) holds only while the reading moves on: no
+// follower move or Autopilot decision for this long, and the fast schedule comes back.
+const READ_TIER_IDLE_MS = Number(process.env.VF_READ_TIER_IDLE_MS) || 10000;
 const AP_REC_HOP_S = 0.5; // recognizer decode hop while in autopilot
 // Audio the engines have not consumed yet is a backlog: recognised text (and the screen)
 // is that far behind the room. On a computer that decodes slower than real time it
@@ -6232,10 +6235,19 @@ const VoiceFollow = () => {
         // Performance tiers only while the paath follower follows a read Bani (engine/pace).
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
+          // Only while the reading goes on: once the follower has not moved on for
+          // READ_TIER_IDLE_MS, or our Waheguru slide is up over the Bani, the reading is over
+          // and the fast schedule's 4 s switch window comes back, so the Shabad sung next can
+          // take over (Renton, Nov 4 and 6: Rehras stayed current through Aarti's first
+          // Shabad on 2.5 s windows). A computer in the fast tier runs the same either way.
+          const ngs = ngRef.current;
           engine.pace.setScoped(
             phaseRef.current === 'following' &&
               !!(followerRef.current && followerRef.current.readBani) &&
-              !(paathSeqRef.current.on && paathSeqRef.current.streak === 0),
+              !(paathSeqRef.current.on && paathSeqRef.current.streak === 0) &&
+              !ngs.ours &&
+              Date.now() - Math.max(ngs.lastProgress || 0, lastAutoDecisionRef.current || 0) <
+                READ_TIER_IDLE_MS,
           );
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
           syncAkpViewRef.current(
