@@ -1,0 +1,132 @@
+// Shadower: collects diwan audio and what the sevadaar puts on screen, fully automatically
+// (the sevadaar does nothing new), and uploads both to Khalis's private storage (uploader.js).
+// What the sevadaar shows is the human label for that audio.
+const SHADOW_BUILD = true;
+// PROD build (Oct 22 decision): no speech model on the Gurdwara Sahib's computer. Nothing here
+// loads a model or onnxruntime, there is no hidden Autopilot run and no live scoring; speech
+// recognition, error rates and datasets are made offline, server-side, from the uploads.
+// The experimental build (vf-prod-collector) sets this true and keeps the hidden run + score.
+const PROD_INFERENCE = false;
+// Prod data collector: no Voice Autopilot UI. Sharing is asked once (the consent pill) and set
+// in Settings (collector-level).
+const PROD_COLLECTOR = true;
+const COLLECTOR_VERSION = 'proto-1';
+// TODO(prod): replace the baked container SAS with a signed-URL endpoint before this ships.
+// Opus in WebM at this bit rate is ~14 MB per hour and plenty for speech recognition.
+const SHADOW_AUDIO_BPS = 32000;
+// MediaRecorder hands over audio this often (ms); each piece is appended at once, so a
+// crash or power cut loses at most this much.
+const SHADOW_SLICE_MS = 5000;
+// A new self-contained audio file this often; each finished one uploads within a minute,
+// so a laptop dying mid-service loses at most a few minutes. Nobody has to quit the app.
+const SHADOW_SEGMENT_MS = 2 * 60 * 1000;
+// A session runs from the sevadaar's first screen change until they have made none for
+// SHADOW_IDLE_STOP_MS; while words are still being heard it waits, up to the hard stop.
+// (Scripted tests that feed audio with VF_TEST_WAV may shorten these.)
+const testMs = (name, ms) =>
+  process.env.VF_TEST_WAV && process.env[name] ? Number(process.env[name]) : ms;
+const SHADOW_IDLE_STOP_MS = testMs('VF_TEST_IDLE_STOP_MS', 8 * 60 * 1000);
+const SHADOW_IDLE_HARD_STOP_MS = testMs('VF_TEST_IDLE_HARD_STOP_MS', 20 * 60 * 1000);
+const SHADOW_HEARD_GRACE_MS = testMs('VF_TEST_HEARD_GRACE_MS', 2 * 60 * 1000);
+// Kirtan in the room starts a session even when nobody touches the laptop (listener.js):
+// the room counts as sounding when loudness (RMS) stays above SHADOW_SOUND_LEVEL for
+// SHADOW_SOUND_SHARE of SHADOW_SOUND_WINDOW_MS. A fan or an empty hall is ~0.001-0.003;
+// a sound system through a laptop mic is well above 0.01.
+const SHADOW_SOUND_LEVEL = 0.006;
+const SHADOW_SOUND_WINDOW_MS = testMs('VF_TEST_SOUND_WINDOW_MS', 40 * 1000);
+const SHADOW_SOUND_SHARE = 0.75;
+// Every session begins with up to this much of the audio from before it started.
+const SHADOW_PRE_ROLL_S = 120;
+// A session ends once the room has been quiet (no sound and no words) this long and the
+// screen has not changed for SHADOW_CHANGE_GRACE_MS. While kirtan plays it never ends.
+// Prod collector: 30 min with neither room voice nor a screen change (an Akhand Kirtan
+// Shabad sits on one pangti for 20+ min; the pangti alone must never end a session).
+const SHADOW_QUIET_STOP_MS = testMs('VF_TEST_QUIET_STOP_MS', (PROD_COLLECTOR ? 30 : 5) * 60 * 1000);
+const SHADOW_CHANGE_GRACE_MS = testMs(
+  'VF_TEST_CHANGE_GRACE_MS',
+  (PROD_COLLECTOR ? 30 : 2) * 60 * 1000,
+);
+// A session the room started (no sevadaar) where Voice-Follow was listening this long and
+// recognised no words at all is noise, not kirtan: it is discarded, not uploaded.
+// (Only with PROD_INFERENCE; the prod build has no words to go by.)
+const SHADOW_EMPTY_GATE_MS = testMs('VF_TEST_EMPTY_GATE_MS', 3 * 60 * 1000);
+// Prod build: a session in which the sevadaar showed no Gurbani at all (no Shabad, Bani or
+// pangti change) and that lasted under this long is discarded, not uploaded. Anything longer
+// is kept even without a screen change (unattended kirtan); offline jobs filter the rest.
+const SHADOW_SHORT_DISCARD_MS = testMs('VF_TEST_SHORT_DISCARD_MS', 5 * 60 * 1000);
+// After such a discard, sound alone does not start another session for this long (a
+// screen change or Start still does), so a loud fan cannot keep restarting sessions.
+const SHADOW_DISCARD_COOLDOWN_MS = testMs('VF_TEST_DISCARD_COOLDOWN_MS', 5 * 60 * 1000);
+// Disk safety (storage.js). Audio is uncompressed 16 kHz mono (~115 MB per hour).
+const SHADOW_KEEP_BYTES = 8e9; // local recordings kept for a missing HF key, at most
+const SHADOW_MIN_FREE_START_BYTES = 3e9; // no new session below this much free disk
+const SHADOW_MIN_FREE_RUN_BYTES = 1.5e9; // a running session stops below this
+// Prod collector: the whole session store stays under this; over it, the oldest sessions
+// that are already uploaded are deleted whole (storage.js capStore).
+const SHADOW_STORE_CAP_BYTES = 2e9;
+// Shadow scoring (PROD_INFERENCE only) pauses while the computer is this busy (1-minute load
+// per core) and resumes below SHADOW_CPU_RESUME, so a Gurdwara laptop never slows down for it.
+const SHADOW_CPU_PAUSE = 0.9;
+const SHADOW_CPU_RESUME = 0.6;
+// Sessions upload straight to Khalis's Azure Blob storage, into UPLOAD_CONTAINER, with a
+// container SAS that allows only create and write (uploader.js only ever PUTs). Prod uploads go
+// to the private `shadower-prod` container; swap the name here when its key arrives. The SAS is
+// never committed: after `npm run build`, packaging/inject-upload-sas.js replaces the
+// placeholder in the compiled copy of this file from the VF_UPLOAD_SAS environment variable
+// (CI sets it from a repository secret). Without it the build simply does not upload.
+const UPLOAD_ACCOUNT_URL = 'https://banidb.blob.core.windows.net';
+const UPLOAD_CONTAINER = 'shadower-prod';
+const UPLOAD_URL = `${UPLOAD_ACCOUNT_URL}/${UPLOAD_CONTAINER}`;
+// TODO(prod): UPLOAD_SAS may go away for a signed-URL endpoint that hands out a short-lived PUT
+// URL per file (uploader.putFile is the one place that builds the URL).
+const UPLOAD_SAS = '__VF_UPLOAD_SAS__';
+// Server switch (remote.js): a tiny JSON fetched at launch and hourly. Hosted on GitHub, on the
+// orphan branch `shadower-config` of the fork (schema in its README.md), independent of the
+// upload container and its key. GitHub's CDN caches it for ~5 min, so a change reaches every
+// install within about an hour. {"enabled": false} (the default there) keeps everyone idle.
+const COLLECTOR_CONFIG_URL =
+  'https://raw.githubusercontent.com/Arash2348/sttm-desktop/shadower-config/shadower/config.json';
+const COLLECTOR_CONFIG_EVERY_MS = 60 * 60 * 1000;
+// A cached server answer is trusted this long when the server cannot be reached (prod build).
+const COLLECTOR_CONFIG_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+// Which Voice-Follow release produced a session. VF_FEATURE_VERSION is bumped with every merged
+// Voice-Follow PR (MVP numbering); VF_BUILD_COMMIT is the exact commit, injected after
+// `npm run build` by packaging/inject-upload-sas.js (CI: GITHUB_SHA; local: git HEAD).
+const VF_FEATURE_VERSION = '9.0.5';
+const VF_BUILD_COMMIT = '__VF_BUILD_COMMIT__';
+
+module.exports = {
+  SHADOW_BUILD,
+  PROD_INFERENCE,
+  PROD_COLLECTOR,
+  COLLECTOR_VERSION,
+  VF_FEATURE_VERSION,
+  VF_BUILD_COMMIT,
+  SHADOW_AUDIO_BPS,
+  SHADOW_SLICE_MS,
+  SHADOW_SEGMENT_MS,
+  SHADOW_IDLE_STOP_MS,
+  SHADOW_IDLE_HARD_STOP_MS,
+  SHADOW_HEARD_GRACE_MS,
+  SHADOW_SOUND_LEVEL,
+  SHADOW_SOUND_WINDOW_MS,
+  SHADOW_SOUND_SHARE,
+  SHADOW_PRE_ROLL_S,
+  SHADOW_QUIET_STOP_MS,
+  SHADOW_CHANGE_GRACE_MS,
+  SHADOW_EMPTY_GATE_MS,
+  SHADOW_SHORT_DISCARD_MS,
+  SHADOW_DISCARD_COOLDOWN_MS,
+  SHADOW_KEEP_BYTES,
+  SHADOW_MIN_FREE_START_BYTES,
+  SHADOW_MIN_FREE_RUN_BYTES,
+  SHADOW_STORE_CAP_BYTES,
+  COLLECTOR_CONFIG_URL,
+  COLLECTOR_CONFIG_EVERY_MS,
+  COLLECTOR_CONFIG_MAX_AGE_MS,
+  SHADOW_CPU_PAUSE,
+  SHADOW_CPU_RESUME,
+  UPLOAD_CONTAINER,
+  UPLOAD_URL,
+  UPLOAD_SAS,
+};

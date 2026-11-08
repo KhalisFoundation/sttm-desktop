@@ -22,6 +22,9 @@ const GlobalState = createStore({
     overlayScreen: DEFAULT_OVERLAY,
     isListeners: false,
     userToken: '',
+    // Shadower (prod data collector): what it is doing with the microphone ('off' | 'listening' |
+    // 'recording'), for the Sharing indicator (shadow/RecordingNotice.jsx).
+    shadowMicState: 'off',
     setOverlayScreen: action((state, payload) => {
       state.overlayScreen = payload;
       return state;
@@ -33,6 +36,9 @@ const GlobalState = createStore({
     setUserToken: action((state, payload) => {
       state.userToken = payload;
       return state;
+    }),
+    setShadowMicState: action((state, payload) => {
+      state.shadowMicState = payload || 'off';
     }),
   },
   baniController: {

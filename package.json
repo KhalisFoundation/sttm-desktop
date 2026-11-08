@@ -11,8 +11,10 @@
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
     "test:lint:js": "eslint app.js packaging www/main",
+    "test:unit": "node --test www/main/addons/voice-follow/shadow/",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
+    "postbuild": "node packaging/inject-upload-sas.js",
     "build:local": "npm run build-css & npm run build-js:sm",
     "pack:mac": "npm run build && electron-builder --mac --x64 --publish never",
     "pack:macArm": "npm run build && npm run rebuild-sqlite && electron-builder -c packaging/electron-builder.macArm.yml --mac --arm64 --publish never",
@@ -27,7 +29,7 @@
     "build-css": "run-p build-css:*",
     "build-css:main": "node-sass --output-style compressed --include-path www/src/scss www/src/scss/styles.scss www/assets/css/bundle.css",
     "build-css:obs": "node-sass --output-style compressed --include-path www/src/scss/obs www/src/scss/obs/styles.scss www/obs/bundle.css",
-    "build-js": "rm -rf www/js & babel ./www/main -d ./www/js",
+    "build-js": "rm -rf www/js & babel ./www/main -d ./www/js --ignore \"**/*.test.js\"",
     "build-js:sm": "rm -rf www/js & babel ./www/main -d ./www/js --source-maps",
     "watch-js": "babel ./www/main --watch -d ./www/js --source-maps",
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
@@ -186,7 +188,7 @@
       "hardenedRuntime": true,
       "artifactName": "SikhiToTheMax-${version}-${os}-${arch}.${ext}",
       "extendInfo": {
-        "NSMicrophoneUsageDescription": "Please give us access to your microphone for voice search",
+        "NSMicrophoneUsageDescription": "STTM uses the microphone for voice search and, if you allow it, to share diwan audio that helps improve Shabad search",
         "NSCameraUsageDescription": "Please give us access to your camera",
         "com.apple.security.device.audio-input": true,
         "com.apple.security.device.camera": true

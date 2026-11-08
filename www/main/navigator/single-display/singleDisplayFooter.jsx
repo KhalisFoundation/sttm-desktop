@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { classNames } from '../../common/utils';
+import { SharingIndicator } from '../../addons/voice-follow/shadow/RecordingNotice';
 
 export const singleDisplayFooter = () => {
   const { singleDisplayActiveTab } = useStoreState((state) => state.navigator);
@@ -64,6 +65,7 @@ export const singleDisplayFooter = () => {
       >
         <i className="fa fa-ellipsis-h" />
       </button>
+      <SharingIndicator />
     </div>
   );
 };
