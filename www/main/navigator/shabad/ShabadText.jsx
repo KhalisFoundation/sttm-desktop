@@ -3,6 +3,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import { Virtuoso } from 'react-virtuoso';
 import { ipcRenderer } from 'electron';
 import PropTypes from 'prop-types';
+import { useRecordingState } from '../../common/hooks';
 
 import { loadShabad, loadBani, loadCeremony } from '../utils';
 import { ShabadVerse } from '../../common/sttm-ui';
@@ -56,6 +57,7 @@ export const ShabadText = ({
   const visibleRangeRef = useRef(null);
   const positionItemsRef = useRef(null);
   const autopilotLive = useStoreState((state) => state.app.autopilotLive);
+  const isRecording = useRecordingState();
 
   const {
     activeVerseId,
@@ -162,6 +164,9 @@ export const ShabadText = ({
       activeShabadId,
       paneAttributes,
     });
+    if (isRecording) {
+      ipcRenderer.send('recording-event', { event: 'verse', verseId: newTraversedVerse });
+    }
   };
 
   const updateHomeVerse = (verseIndex) => {
