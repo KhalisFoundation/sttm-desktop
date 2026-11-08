@@ -274,9 +274,6 @@ const AP_SEARCH_WIN_S = 10; // recognizer window while SEARCHING (matches standa
 // second raagi's stream but REGRESSED the primary 86-min stream (erroneous 13.2->14.9,
 // recall 85->83) and was ~a wash on the 9s stress stream — not voice-agnostic, so 4 stays.
 const AP_FOLLOW_WIN_S = 4; // recognizer window while FOLLOWING (fast switching)
-// A read Bani's sync tier (engine/pace) holds only while the reading moves on: no
-// follower move or Autopilot decision for this long, and the fast schedule comes back.
-const READ_TIER_IDLE_MS = Number(process.env.VF_READ_TIER_IDLE_MS) || 10000;
 const AP_REC_HOP_S = 0.5; // recognizer decode hop while in autopilot
 // Audio the engines have not consumed yet is a backlog: recognised text (and the screen)
 // is that far behind the room. On a computer that decodes slower than real time it
@@ -2085,7 +2082,6 @@ const VoiceFollow = () => {
     hops: [],
     lastProgress: 0,
     lastFollow: 0,
-    lastMove: 0, // the follower's last move on, at any confidence (read-Bani tier clock)
     followLine: null,
     followWord: -1,
     back: 0,
@@ -6237,28 +6233,19 @@ const VoiceFollow = () => {
         if (engine.pace) {
           // (A single Shabad read straight through, not yet crossed: untiered, as before.)
           // The sync tier (the only one with a short 2.5 s switch window) holds only while the
-          // reading goes on: once the follower has not moved on for READ_TIER_IDLE_MS, or our
-          // Waheguru slide is up over the Bani, the reading is over and the 4 s switch window
-          // comes back, so the Shabad sung next can take over (Renton, Nov 4 and 6: Rehras
-          // stayed current through Aarti's first Shabad on 2.5 s windows). A crossed Akhand
+          // reading goes on: once our Waheguru slide is up over the Bani (the reading is over:
+          // quiet, Simran, Ardas), the 4 s switch window comes back, so the Shabad sung next can
+          // take over (Renton, Nov 4 and 6: Rehras stayed current through Aarti's first Shabad
+          // on 2.5 s windows). No idle timer: kirtan of a Shabad that is also in a read Bani
+          // (rn75, Japji's first Shabad) moves slowly and is still that Bani. A crossed Akhand
           // Paath reading keeps its schedule; fast, lean and min computers run as before.
-          const ngs = ngRef.current;
           const readOn =
             phaseRef.current === 'following' &&
             !!(followerRef.current && followerRef.current.readBani) &&
             !(paathSeqRef.current.on && paathSeqRef.current.streak === 0);
           const akhandRead = paathSeqRef.current.on && paathSeqRef.current.streak >= 1;
-          const lastRead = Math.max(
-            ngs.lastMove || 0,
-            ngs.lastFollow || 0,
-            ngs.lastProgress || 0,
-            lastAutoDecisionRef.current || 0,
-          );
           const readOver =
-            readOn &&
-            !akhandRead &&
-            engine.pace.tierName() === 'sync' &&
-            (ngs.ours || Date.now() - lastRead >= READ_TIER_IDLE_MS);
+            readOn && !akhandRead && ngRef.current.ours && engine.pace.tierName() === 'sync';
           engine.pace.setScoped(readOn && !readOver);
           // Akhand Paath view on the projector while Voice Autopilot drives a crossed reading.
           syncAkpViewRef.current(
@@ -6352,7 +6339,6 @@ const VoiceFollow = () => {
               (out.lineIndex === ngf.followLine && out.wordIndex > ngf.followWord);
             ngf.followLine = out.lineIndex;
             ngf.followWord = out.wordIndex == null ? -1 : out.wordIndex;
-            if (moved) ngf.lastMove = Date.now(); // the reading goes on, however surely heard
             if (moved && out.confidence >= NG_FOLLOW_CONF && Date.now() - ngf.lastFollow >= 500) {
               ngf.lastFollow = Date.now();
               ngTickRef.current({ follow: true });
