@@ -29,6 +29,9 @@ const DEFAULTS = {
   uniqueDwell: 1,
   // Decodes a 2..skipSpan-line skip must persist (default: same as dwellAdv).
   dwellSkip: null,
+  // A move to the next line on one decode only when the fragment fits it this much better than
+  // the line on screen; less sure (a phrase both lines share) waits the full dwellAdv. null: off.
+  advSureGap: null,
 };
 
 function argmax(a) { let bi = 0, bv = -Infinity; for (let i = 0; i < a.length; i++) if (a[i] > bv) { bv = a[i]; bi = i; } return bi; }
@@ -285,8 +288,10 @@ class Follower {
       else { this.challenger = top; this.dwell = 1; }
       const d = top - this.cur;
       let need;
-      if (d === 1) need = c.dwellAdv;
-      else if (d >= 2 && d <= c.skipSpan) need = c.dwellSkip == null ? c.dwellAdv : c.dwellSkip;
+      if (d === 1) {
+        need = c.dwellAdv;
+        if (c.advSureGap != null && emis[top] - emis[this.cur] >= c.advSureGap) need = 1;
+      } else if (d >= 2 && d <= c.skipSpan) need = c.dwellSkip == null ? c.dwellAdv : c.dwellSkip;
       else if (d >= -c.backSpan && d <= -1) need = c.dwellBack;
       else need = c.dwell;
       const uniq = this.uniqueLine(emis, top);

@@ -66,7 +66,14 @@ function registerRetrievalService({
     if (operation !== 'search' || !entry || entry.token !== token) {
       throw new Error('Canonical retrieval session is unavailable');
     }
-    return entry.client.search(text, cap);
+    const { client } = entry;
+    // One search turned away while the worker is healthy (its queue is full of searches the
+    // presenter already abandoned, or this one query failed) is that search's answer only:
+    // the presenter skips it. Only a dead worker fails the presenter's whole session.
+    return client.search(text, cap).catch((error) => {
+      if (client.state === 'ready') return { busy: true };
+      throw error;
+    });
   });
   return {
     async dispose() {

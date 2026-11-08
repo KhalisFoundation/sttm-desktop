@@ -63,6 +63,14 @@ function createWarmIndex({ create, onReady = () => {}, onError = () => {}, now =
       if (c && (client === c || (building && building.client === c))) failedAt = now();
       drop(c);
     },
+    // A search was turned away. A client that is still ready only skipped that one search
+    // (its queue was full, or the one query failed): keep it. Only a dead client (worker
+    // crashed, hung or closed) is let go to be rebuilt. Returns true when it was let go.
+    searchFailed(c) {
+      if (c && c.state === 'ready') return false;
+      this.fail(c);
+      return true;
+    },
     failedAt: () => failedAt,
     // The database changed or the window is going away: release everything.
     reset() {

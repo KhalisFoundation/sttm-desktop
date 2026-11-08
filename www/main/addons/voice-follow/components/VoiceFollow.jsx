@@ -861,6 +861,20 @@ const BANI_CUR_SPAN = 8;
 // any reasonably confident frame. (Kept modest so a freshly-switched follower, which
 // starts with low confidence, isn't frozen in place — that read as "stops working".)
 const UI_MOVE_CONF = 0.4;
+// Kirtan Shabad follower: the next pangti shows on one decode when the words heard fit it clearly
+// better than the pangti on screen; when they fit both (a phrase the two pangtis share) it waits for
+// a second decode (Renton, Nov 1: such a phrase moved the screen for 2-4 s, then it came back).
+// Benchmarks may override it (VF_KIRTAN_FOLLOW, JSON).
+const KIRTAN_FOLLOW = (() => {
+  try {
+    if (typeof process !== 'undefined' && process.env && process.env.VF_KIRTAN_FOLLOW) {
+      return JSON.parse(process.env.VF_KIRTAN_FOLLOW);
+    }
+  } catch (_) {
+    /* a bad override: the default below */
+  }
+  return { dwellAdv: 2, advSureGap: 0.15 };
+})();
 // Volume label lines (mic loudness as rms of the raw signal, 0..1; no gain control is applied):
 // below SILENT = no sound, below GOOD = low, below GREAT = good, above = great.
 // The label reads the louder moments (80th percentile of 250 ms windows over the last 4 s),
@@ -3365,7 +3379,7 @@ const VoiceFollow = () => {
             inputSr: sampleRate,
             baniId: sundarGutkaBaniId,
           })
-        : await engine.createFollower(verses, { inputSr: sampleRate });
+        : await engine.createFollower(verses, { inputSr: sampleRate, ...KIRTAN_FOLLOW });
       if (session !== sessionRef.current) return;
       followerRef.current = follower;
     } catch (e) {
@@ -3771,8 +3785,9 @@ const VoiceFollow = () => {
         return await client.search(text, cap, { signal });
       } catch (error) {
         if (error.name !== 'AbortError') {
-          // The worker is gone (timeout, crash): let it go so the next call rebuilds.
-          warmIndex.fail(client);
+          // A dead worker (timeout, crash) is let go so the next call rebuilds; a ready one
+          // only skipped this search (queue full, e.g. many decodes released at once).
+          if (!warmIndex.searchFailed(client)) return null;
           vfError('retrieval_search_failed');
           diag(`vf retrieval search failed: ${error.message}`);
           if (SHADOW_BUILD && shadowBus.active()) {
@@ -3888,6 +3903,7 @@ const VoiceFollow = () => {
                   })
                 : await engine.createFollower(profile.verses, {
                     inputSr: sampleRateRef.current,
+                    ...KIRTAN_FOLLOW,
                   });
         } catch (e) {
           if (session !== sessionRef.current) return;
@@ -7259,14 +7275,25 @@ const VoiceFollow = () => {
               {/* The next pangti (marked by a thin grey bar) and Stop share one row, so Stop
                   sits near the top of the panel without adding a line. */}
               <div className="vf2-next-row">
-                {nextLine ? (
+                {nextLine && (
                   <div className="vf2-next-line" title={i18n.t('VOICE_FOLLOW.NEXT')}>
                     <span className="vf2-next-mark" aria-hidden="true" />
                     <Gurmukhi text={nextLine} />
                   </div>
-                ) : (
-                  <span className="vf2-next-line is-empty" />
                 )}
+                {/* On the last pangti there is no next one: a quiet "End of Shabad" (or
+                    "End of Bani") takes its place instead of an empty gap. */}
+                {!nextLine && atEnd && (
+                  <div className="vf2-next-line is-end">
+                    <span className="vf2-next-mark" aria-hidden="true" />
+                    {i18n.t(
+                      curBaniShabadsRef.current
+                        ? 'VOICE_FOLLOW.END_OF_BANI'
+                        : 'VOICE_FOLLOW.END_OF_SHABAD',
+                    )}
+                  </div>
+                )}
+                {!nextLine && !atEnd && <span className="vf2-next-line is-empty" />}
                 {stopButton}
               </div>
               {boardCur && <LiveBar value={boardCur.pct} />}
