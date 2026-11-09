@@ -250,9 +250,10 @@ const KIRTAN_PACE_MAX_MS = Number(process.env.VF_KIRTAN_PACE_MAX_MS) || 450;
 // Live trigger. A laptop's startup self-test runs on a cool CPU at turbo clocks and often reads
 // fast (field, Oct 25-Nov 7: 12 of 149 sessions self-tested at <= 180 ms but passed at 200-330 ms
 // live and fell behind 100-3000 times). So a computer the self-test called fast is also paced
-// once the median of its last ~240 real passes (40 s of fast kirtan) rises above onMs, and then
-// stays paced for the session (no flapping). onMs is above the worst 5-minute median Renton's
-// Ryzen 9 ever logged (317 ms, 36 sessions), so Renton keeps today's schedule; laptops that slow
+// once the median of its last ~240 real passes (40 s of fast kirtan) stays above onMs for holdMs
+// (a full minute), and then stays paced for the session (no flapping). Renton's Ryzen 9 (58 field
+// sessions, 18,682 logged minutes, Oct 12-Nov 9) passed above 330 ms in only 6 isolated minutes and
+// never in two consecutive minutes, so the one-minute hold keeps it on today's schedule; laptops that slow
 // down hard still cross it (worst 5-min medians: Ryzen 5 7520U 516, i5-1335U 443, i5-1235U 435,
 // Ultra 7 265U 416, i9-12900H laptop 377, Ultra 7 155U 368 ms). Like the self-test rule it stops at
 // KIRTAN_PACE_MAX_MS: a computer slower than that live keeps today's schedule (Japji, see above).
@@ -262,13 +263,19 @@ const KIRTAN_LIVE = {
   passes: 240,
   minPasses: 120,
   onMs: Number(process.env.VF_KIRTAN_LIVE_MS || 0) || 330,
+  holdMs: 60000,
 };
 const longMedianMs = () => (state.long.length >= KIRTAN_LIVE.minPasses ? median(state.long) : null);
 function observeKirtanLive(nowMs) {
   if (!KIRTAN_LIVE.on || !KIRTAN_PACE) return;
   if (state.kirtanLive) return;
   const m = longMedianMs();
-  if (m != null && m > KIRTAN_LIVE.onMs && m <= KIRTAN_PACE_MAX_MS) {
+  if (!(m != null && m > KIRTAN_LIVE.onMs && m <= KIRTAN_PACE_MAX_MS)) {
+    state.kirtanLiveSince = null;
+    return;
+  }
+  if (state.kirtanLiveSince == null) state.kirtanLiveSince = nowMs;
+  if (nowMs - state.kirtanLiveSince >= KIRTAN_LIVE.holdMs) {
     state.kirtanLive = true;
     state.kirtanLiveAt = nowMs;
     // Logged like a tier step (perf_tier, reason 'kirtan-live') so field sessions and benches

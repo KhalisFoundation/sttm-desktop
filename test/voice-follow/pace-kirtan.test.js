@@ -80,6 +80,8 @@ test('laptop (self-test 140 ms, live 360 ms for 40 s): live trigger paces kirtan
   assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
   for (let k = 0; k < 140; k += 1) pace.notePass(360, 4 * 16000);
   pace.observe(0, 1e6 + 1000);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]); // slow, but not yet for a full minute
+  pace.observe(0, 1e6 + 61000);
   assert.deepStrictEqual(hops(pace), [1, 0.375]);
   for (let k = 0; k < 240; k += 1) pace.notePass(120, 4 * 16000); // cooled down: stays paced
   pace.observe(0, 1e6 + 120000);
@@ -118,6 +120,7 @@ test('live trigger paces the search, never the Bani follower', async () => {
   const pace = await paceAt(140);
   for (let k = 0; k < 240; k += 1) pace.notePass(360, 4 * 16000);
   pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 60000);
   assert.strictEqual(pace.hopS('recognizer', 0.5, 10), 1);
   assert.strictEqual(pace.hopS('bani', 0.25), 0.25);
 });
@@ -135,8 +138,21 @@ test('live trigger reports once when it latches (perf_tier reason kirtan-live)',
   pace.onStep((ev) => seen.push(ev));
   for (let k = 0; k < 240; k += 1) pace.notePass(360, 4 * 16000);
   pace.observe(0, 1e6);
-  pace.observe(0, 1e6 + 1000);
+  pace.observe(0, 1e6 + 60000);
+  pace.observe(0, 1e6 + 61000);
   assert.strictEqual(seen.length, 1);
   assert.strictEqual(seen[0].reason, 'kirtan-live');
   assert.strictEqual(seen[0].liveMedianMs, 360);
+});
+
+test('live trigger needs a full minute: a slow spell under 60 s (a Renton-style spike) never latches', async () => {
+  const pace = await paceAt(140);
+  for (let k = 0; k < 240; k += 1) pace.notePass(380, 4 * 16000);
+  pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 50000);
+  for (let k = 0; k < 240; k += 1) pace.notePass(150, 4 * 16000); // back to normal before the minute is up
+  pace.observe(0, 1e6 + 55000);
+  for (let k = 0; k < 240; k += 1) pace.notePass(380, 4 * 16000);
+  pace.observe(0, 1e6 + 70000); // a new spell starts its own minute
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
 });
