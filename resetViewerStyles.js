@@ -59,7 +59,8 @@ body.viewer-pane-projection #root,
 }
 .pane-projection-stage {
   flex: none;
-  transform-origin: center center;
+  width: 100%;
+  height: 100%;
   overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -158,18 +159,33 @@ body.viewer-pane-projection #root,
 .pane-projection-stage .verse-block [data-viewport-type] {
   max-height: none !important;
 }
-/* Viewer lacks controller font CSS — restore Gurmukhi on Display 2.
-   --projection-text-scale shrinks multi-pane text toward Presentation density.
-   The stage itself is display-shaped, so the verse list can scroll. */
+/* Viewer lacks controller font CSS — restore Gurmukhi on Display 2. */
 .pane-projection-stage .gurmukhi {
   font-family: 'gurbaniakhar' !important;
-  font-size: calc(1.1em * var(--projection-text-scale, 1));
 }
+/* --teleprompter-font-size comes from the Teleprompter font size setting. No font
+   transition: the active row is re-centred right after a size change. */
 .pane-projection-stage .verse-content {
-  font-size: calc(1em * var(--projection-text-scale, 1));
+  font-size: var(--teleprompter-font-size, 10vh);
   line-height: 1.3;
+  transition: none !important;
 }
-/* Keep default list row sizing (scaled via stage transform — do not shrink font) */
+/* Tick on the left, home icon on the right, both sized with the text. Both columns
+   keep their width when empty, so lines don't re-wrap as verses are read. */
+.pane-projection-stage .shabad-li .shabad-pane-controls,
+.pane-projection-stage .shabad-li > .fa-home {
+  flex: none;
+  width: calc(var(--teleprompter-font-size, 10vh) * 0.7);
+  text-align: center;
+}
+.pane-projection-stage .shabad-li .shabad-pane-controls i,
+.pane-projection-stage .shabad-li > .fa-home {
+  font-size: calc(var(--teleprompter-font-size, 10vh) * 0.4) !important;
+}
+.pane-projection-stage .shabad-li > .hoverIcon {
+  display: inline-block !important;
+  visibility: hidden;
+}
 .pane-projection-stage .shabad-pane-active {
   background-color: rgba(0, 120, 215, 0.18) !important;
 }
