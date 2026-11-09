@@ -14,6 +14,7 @@ const { HF_TOKEN, VF_FEATURE_VERSION, VF_BUILD_COMMIT } = require('./config');
 const service = require('./service');
 const listener = require('./listener');
 const pcm = require('./pcm');
+const { openMic } = require('./mic');
 const storage = require('./storage');
 const { logDir } = require('../engine/session-log');
 const { vfAnalytics } = require('../components/vfAnalytics');
@@ -309,9 +310,7 @@ const ShadowCollector = () => {
     const start = async () => {
       startingRef.current = true;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-        });
+        const stream = await openMic();
         if (stopped) {
           stream.getTracks().forEach((t) => t.stop());
           return;
@@ -383,9 +382,7 @@ const ShadowCollector = () => {
           } catch (_) {
             /* already gone */
           }
-          s.stream = await navigator.mediaDevices.getUserMedia({
-            audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-          });
+          s.stream = await openMic();
           event({ type: 'mic_restarted', microphone: s.stream.getAudioTracks()[0]?.label || '' });
         };
         // Audio in self-contained segments so finished ones can upload during the service.
