@@ -10,6 +10,7 @@ const {
   SHADOW_SOUND_SHARE,
   SHADOW_PRE_ROLL_S,
 } = require('./config');
+const { openMic } = require('./mic');
 
 const RATE = 16000;
 const TICK_MS = 500; // one loudness reading per half second
@@ -54,9 +55,7 @@ async function start(onSound) {
   if (st) return;
   gen += 1;
   const mine = gen;
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false },
-  });
+  const stream = await openMic(); // the chosen microphone, as the recognizer hears it
   if (mine !== gen || st) {
     stream.getTracks().forEach((t) => t.stop());
     return;
