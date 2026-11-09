@@ -10,19 +10,36 @@
     <link rel="stylesheet" href="assets/css/vendor/tingle.css" />
   </head>
   <body class="viewer">
+    <script>
+      if (new URLSearchParams(window.location.search).has('paneProjection')) {
+        document.body.classList.add('viewer-pane-projection');
+      }
+    </script>
     <div id="viewer-container"></div>
     <script>
         const { ipcRenderer } = require('electron');
         let root = null;
 
-        ipcRenderer.on('wc-webview-enabled', () => {
-          const app = require('./js/viewer/viewerApp.js').default;
-          const { createRoot } = require('react-dom/client');
+        window.addEventListener('error', (event) => {
+          ipcRenderer.send('viewer-runtime-error', event.error?.stack || event.message || 'Unknown renderer error');
+        });
+        window.addEventListener('unhandledrejection', (event) => {
+          ipcRenderer.send('viewer-runtime-error', event.reason?.stack || String(event.reason));
+        });
 
-          if (!root) {
-            root = createRoot(document.getElementById('viewer-container'));
+        ipcRenderer.on('wc-webview-enabled', () => {
+          try {
+            ipcRenderer.send('viewer-render-start', window.location.href);
+            const app = require('./js/viewer/viewerApp.js').default;
+            const { createRoot } = require('react-dom/client');
+
+            if (!root) {
+              root = createRoot(document.getElementById('viewer-container'));
+            }
+            root.render(app());
+          } catch (error) {
+            ipcRenderer.send('viewer-boot-error', error.stack || error.message);
           }
-          root.render(app());
         });
     </script>
   </body>
