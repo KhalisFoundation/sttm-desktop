@@ -8,12 +8,13 @@ import PropTypes from 'prop-types';
 // what we want; webcams, phones, Bluetooth headsets and virtual/streaming inputs are usually
 // picked by accident, so the card warns about them.
 export const MIC_PATTERNS = [
+  // Phone-as-webcam apps (DroidCam, EpocCam) first, so they read as a phone, not a webcam.
+  ['phone', /iphone|ipad|android|galaxy|pixel|\bphone\b|droid ?cam|epoc ?cam/i],
   ['webcam', /webcam|camera|cam\b|c9[0-9]{2}|brio|facetime|kiyo|elgato facecam/i],
-  ['phone', /iphone|ipad|android|galaxy|pixel|\bphone\b/i],
   ['bluetooth', /airpods|bluetooth|hands-?free|buds|headset|bose|beats|jabra/i],
   [
     'virtual',
-    /virtual|iriun|ndi|zoom ?audio|teams|blackhole|loopback|soundflower|vb-?audio|voicemeeter|splashtop|obs|stereo mix|cable output|discord|camo/i,
+    /virtual|iriun|\bndi\b|zoom ?audio|\bteams\b|blackhole|loopback|soundflower|vb-?audio|voicemeeter|splashtop|\bobs\b|stereo mix|cable output|discord|\bcamo\b|nvidia broadcast|rtx voice/i,
   ],
   ['mixer', /line ?in/i], // a cable into the PC's line-in jack
   ['laptop', /built-?in|internal|macbook|microphone array|realtek/i],
