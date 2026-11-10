@@ -920,25 +920,6 @@ ul {
     }
   }
 
-  .mic-tip {
-    color: #92400e;
-    font-size: 12px;
-    margin: 0;
-
-    &.warn {
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      border-radius: 6px;
-      color: #92400e;
-      font-weight: 600;
-      padding: 6px 8px;
-    }
-
-    &.good {
-      color: #166534;
-    }
-  }
-
   .mic-device {
     align-items: center;
     display: flex;
@@ -992,59 +973,4 @@ ul {
       }
     }
   }
-}
-
-// Live microphone level (Record card, and small while recording).
-.mic-level {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-
-  .mic-level-bar {
-    background: #e5e7eb;
-    border-radius: 4px;
-    flex: 1;
-    height: 8px;
-    min-width: 80px;
-    overflow: hidden;
-  }
-
-  .mic-level-fill {
-    background: #16a34a;
-    display: block;
-    height: 100%;
-    transition: width 0.1s linear;
-
-    &.silent {
-      background: #9ca3af;
-    }
-  }
-
-  .mic-level-text {
-    color: #166534;
-    font-size: 12px;
-    white-space: nowrap;
-
-    &.silent {
-      color: #b42318;
-      font-weight: 600;
-    }
-  }
-
-  &.compact {
-    display: inline-flex;
-    vertical-align: middle;
-
-    .mic-level-bar {
-      height: 6px;
-      min-width: 40px;
-      width: 40px;
-    }
-  }
-}
-
-.recording-status .mic-silent-warn {
-  color: #b42318;
-  font-weight: 600;
-  margin-left: 6px;
 }
