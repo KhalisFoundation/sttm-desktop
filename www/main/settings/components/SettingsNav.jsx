@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
+import { useStoreState } from 'easy-peasy';
 import { i18n } from '../../common/i18n';
 
 const SettingsNav = ({ settingsNavObj }) => {
   const [activeTab, setActiveTab] = useState('slide-layout');
+  const { dataRecording } = useStoreState((state) => state.userSettings);
 
   const isActiveClass = (activeCategory) => {
     switch (activeCategory) {
@@ -14,6 +16,8 @@ const SettingsNav = ({ settingsNavObj }) => {
         return activeTab === 'app-settings' ? 'settings-nav-active' : '';
       case 'bani-and-languages':
         return activeTab === 'bani-and-languages' ? 'settings-nav-active' : '';
+      case 'recording-settings':
+        return activeTab === 'recording-settings' ? 'settings-nav-active' : '';
       default:
         return activeTab === 'slide-layout' ? 'settings-nav-active' : '';
     }
@@ -21,6 +25,7 @@ const SettingsNav = ({ settingsNavObj }) => {
 
   const settingNavItems = [];
   Object.keys(settingsNavObj).forEach((category, index) => {
+    if (category === 'recording-settings' && dataRecording !== true) return;
     const { title } = settingsNavObj[category];
     settingNavItems.push(
       <span

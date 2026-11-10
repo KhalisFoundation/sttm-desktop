@@ -23,6 +23,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       APTABASE_KEY: ${{ secrets.APTABASE_KEY }}
+      # STTM Data recordings: Hugging Face write token, injected after the build (optional).
+      VF_HF_TOKEN: ${{ secrets.VF_HF_TOKEN }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       AUDIO_TRANSCRIPT_API: ${{ secrets.AUDIO_TRANSCRIPT_API }}
       AUDIO_TRANSCRIPT_API_KEY: ${{ secrets.AUDIO_TRANSCRIPT_API_KEY }}

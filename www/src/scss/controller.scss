@@ -65,6 +65,161 @@ $gurmukhi-font-family-thick: 'gurbaniakharthick';
 /*
   Custom Styles
 */
+.workspace-bar {
+  position: relative;
+}
+
+.recording-controls {
+  align-items: center;
+  display: flex;
+  font-family: $body-font-family;
+  flex-direction: row-reverse; // the button sits at the far right, its status to the left
+  gap: 8px;
+  right: 14px;
+  position: absolute;
+  top: 3px;
+  z-index: 3;
+
+  // Inside the workspace bar's right end, beside the Voice Autopilot mic chip.
+  &.in-bar {
+    position: static;
+  }
+
+  button {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    font-family: $body-font-family;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  .recording-kinds {
+    background: #eef0f3;
+    border-radius: 14px;
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .recording-kind {
+    background: transparent;
+    border-radius: 12px;
+    color: var(--kind);
+    font-size: 12px;
+    height: 24px;
+    padding: 0 8px;
+    white-space: nowrap;
+
+    &.on {
+      background: var(--kind);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+    }
+  }
+
+  .recording-visibility {
+    align-items: center;
+    border-radius: 14px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 6px;
+    height: 28px;
+    line-height: 1;
+    padding: 0 12px;
+
+    &.private {
+      background: #1f2937;
+    }
+
+    &.public {
+      background: #059669;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+
+  .recording-status {
+    color: #6b7280;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+
+    b {
+      color: #a32d2d;
+    }
+  }
+
+  .record-toggle {
+    align-items: center;
+    background: #fff;
+    border: 2px solid #dc3545 !important;
+    border-radius: 14px;
+    color: #dc3545;
+    display: inline-flex;
+    font-variant-numeric: tabular-nums;
+    gap: 7px;
+    height: 28px;
+    min-width: 86px;
+    padding: 0 12px;
+
+    .dot {
+      background: #dc3545;
+      border-radius: 50%;
+      height: 10px;
+      width: 10px;
+    }
+
+    &.recording {
+      background: #dc3545;
+      color: #fff;
+
+      .dot {
+        animation: recording-pulse 1.2s ease-in-out infinite;
+        background: #fff;
+        border-radius: 2px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1600px) {
+  .recording-controls {
+    .recording-kind {
+      font-size: 11px;
+      padding: 0 6px;
+    }
+
+    .recording-visibility .label {
+      display: none;
+    }
+  }
+}
+
+@keyframes recording-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
 body {
   background-color: #fff;
   color: #222;
@@ -555,3 +710,266 @@ ul {
 
 @import 'foundation/foundation', 'animations', 'footer', 'forms', 'header', 'helpers', 'search',
 'share-sync', 'settings', 'notifications';
+.recording-consent-backdrop {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 1000;
+}
+
+.recording-consent {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: #111;
+  font-family: $body-font-family;
+  max-width: 380px;
+  padding: 18px 22px;
+
+  h3 {
+    margin: 0 0 8px;
+  }
+
+  p,
+  li {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  ul {
+    margin: 8px 0 14px;
+    padding-left: 18px;
+  }
+
+  .recording-ask {
+    color: #4b5563;
+    margin: 6px 0 0;
+  }
+
+  .recording-points {
+    display: grid;
+    gap: 9px;
+    list-style: none;
+    margin: 12px 0 14px;
+    padding: 0;
+
+    li {
+      align-items: flex-start;
+      display: flex;
+      font-size: 13px;
+      gap: 10px;
+      line-height: 1.4;
+    }
+
+    i {
+      color: #6b7280;
+      flex: none;
+      line-height: 1.4;
+      text-align: center;
+      width: 16px;
+    }
+
+    .fa-lock {
+      color: #1f2937;
+    }
+
+    .fa-microphone {
+      color: #dc3545;
+    }
+
+    .fa-heart {
+      color: #e0607e;
+    }
+  }
+
+  .recording-consent-field {
+    display: grid;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 4px;
+    margin: 4px 0 10px;
+
+    input {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 6px 8px;
+    }
+  }
+
+  &.recording-vis {
+    display: grid;
+    gap: 8px;
+    max-height: calc(100vh - 40px);
+    max-width: 420px;
+    overflow-y: auto;
+
+    .vis-kinds {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    // What is being recorded: same neutral look as the Private/Public options.
+    .vis-option.kind {
+      align-items: center;
+      align-self: stretch;
+      color: #1f2937;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: flex-start;
+      min-height: 112px;
+      padding: 10px 8px;
+      text-align: center;
+
+      .kind-icon {
+        color: #6b7280;
+        font-size: 16px;
+      }
+
+      b {
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      small {
+        color: #4b5563;
+        font-size: 11px;
+        line-height: 1.3;
+      }
+    }
+
+    h3 {
+      margin-bottom: 4px;
+    }
+  }
+
+  .vis-option {
+    align-items: center;
+    background: #f6f7f9;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    text-align: left;
+
+    > span {
+      display: grid;
+      gap: 2px;
+    }
+
+    b {
+      font-size: 14px;
+    }
+
+    small {
+      color: #4b5563;
+      font-size: 12px;
+    }
+
+    .tick {
+      color: #9ca3af;
+      font-size: 18px;
+    }
+
+    &.on {
+      background: #fff;
+      border-color: currentColor;
+
+      .tick {
+        color: inherit;
+      }
+    }
+
+    &.private {
+      color: #1f2937;
+    }
+
+    &.public {
+      color: #047857;
+    }
+  }
+
+  .vis-option.mic {
+    color: #1f2937;
+
+    b {
+      align-items: center;
+      display: flex;
+      gap: 6px;
+    }
+
+    .recommended {
+      background: #e5e7eb;
+      border-radius: 8px;
+      color: #374151;
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 600;
+      padding: 1px 6px;
+    }
+  }
+
+  .mic-tip {
+    color: #92400e;
+    font-size: 12px;
+    margin: 0;
+  }
+
+  .mic-device {
+    align-items: center;
+    display: flex;
+    font-size: 12px;
+    gap: 8px;
+
+    span {
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    select {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      flex: 1;
+      font-size: 12px;
+      min-width: 0;
+      padding: 4px 6px;
+    }
+  }
+
+  .recording-consent-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+    }
+
+    .secondary {
+      background: #eee;
+      color: #111;
+    }
+
+    .primary {
+      background: rgb(220, 53, 69);
+      color: #fff;
+
+      &:disabled {
+        cursor: default;
+        opacity: 0.5;
+      }
+    }
+  }
+}

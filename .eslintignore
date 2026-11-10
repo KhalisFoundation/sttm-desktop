@@ -3,3 +3,4 @@ builds
 www/js/vendor/*
 www/obs/socket.io.js
 www/main/addons/voice-follow/shadow/vendor/
+www/main/data-recording/vendor/

@@ -38,6 +38,7 @@ const maxChangeLogSeenCount = 5;
 
 /* eslint-disable import/no-unresolved, import/extensions */
 const Store = require('./www/js/store');
+const { HF_TOKEN: injectedHfToken } = require('./www/js/data-recording/config');
 const {
   registerRetrievalService,
 } = require('./www/js/addons/voice-follow/engine/retrieval/main-service');
@@ -157,6 +158,120 @@ let pinnedPresenterDisplayId = null;
 let pinnedProjectionDisplayId = null;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
+
+// by the renderer's uploader (shadow/hf.js, no Python needed). Kept in userData so the
+// installed app can always write them; a recording is deleted locally once it is pushed.
+const recordingsDir = path.join(app.getPath('userData'), 'recordings');
+const RECORDING_KINDS = ['kirtan', 'paath', 'sung_bani', 'akhand_kirtan', 'katha', 'other'];
+const RECORDING_VISIBILITY = ['public', 'private'];
+const RECORDING_CONSENT_VERSION = 3;
+let isRecording = false;
+let recordingStartTime = null;
+let recordingSessionId = null;
+let recordingSessionDir = null;
+let recordingEvents = [];
+let recordingKind = 'kirtan';
+let recordingVisibility = 'private';
+let recordingMic = null; // { source: 'mixer' | 'laptop', label } as the sevadaar answered
+
+const injectedTokenOk = () => Boolean(injectedHfToken && !injectedHfToken.startsWith('__'));
+
+function recordingPrefs() {
+  const consent = store.get('recording.consent') || null;
+  return {
+    gurdwaraName: store.get('recording.gurdwaraName') || '',
+    hfTokenAvailable: injectedTokenOk(),
+    consentGiven: Boolean(consent && consent.version === RECORDING_CONSENT_VERSION),
+    consentVersion: RECORDING_CONSENT_VERSION,
+    recordingsDir,
+  };
+}
+
+function trackRecording(action, fields = {}) {
+  if (!global.analytics) return;
+  const { gurdwaraName } = recordingPrefs();
+  global.analytics.trackEvent({
+    category: 'recording',
+    action,
+    label: gurdwaraName || '',
+    value: fields.value == null ? '' : String(fields.value),
+  });
+}
+
+function recordingReady() {
+  const prefs = recordingPrefs();
+  // No upload token (a local build): recordings are still made and kept in userData/recordings.
+  return prefs.consentGiven; // the Gurdwara Sahib name is optional
+}
+
+// Written at Stop, next to the WAV the renderer saves into <dir>/hf/: the verses the sevadaar
+// showed (human.jsonl, the shadow format the uploader reads) and the session's metadata.
+function writeRecordingFiles() {
+  fs.mkdirSync(recordingSessionDir, { recursive: true });
+  const human = recordingEvents
+    .map((e) => JSON.stringify({ t: e.t, verseId: e.verseId }))
+    .join('\n');
+  fs.writeFileSync(path.join(recordingSessionDir, 'human.jsonl'), human ? `${human}\n` : '');
+  fs.writeFileSync(
+    path.join(recordingSessionDir, 'session.json'),
+    JSON.stringify(
+      {
+        kind: recordingKind,
+        visibility: recordingVisibility,
+        mic: recordingMic,
+        tester: { gurdwara: recordingPrefs().gurdwaraName },
+        consent: store.get('recording.consent') || null,
+        startedAt: new Date(recordingStartTime).toISOString(),
+        durationS: (Date.now() - recordingStartTime) / 1000,
+        appVersion: app.getVersion(),
+        platform: process.platform,
+      },
+      null,
+      1,
+    ),
+  );
+}
+
+function toggleRecording(payload = {}) {
+  if (!recordingReady()) return;
+
+  if (!isRecording) {
+    isRecording = true;
+    recordingStartTime = Date.now();
+    recordingSessionId = new Date(recordingStartTime).toISOString().replace(/[:.]/g, '-');
+    recordingSessionDir = path.join(recordingsDir, recordingSessionId);
+    fs.mkdirSync(recordingSessionDir, { recursive: true });
+    recordingEvents = [];
+    recordingKind = RECORDING_KINDS.includes(payload.kind) ? payload.kind : 'kirtan';
+    recordingVisibility = RECORDING_VISIBILITY.includes(payload.visibility)
+      ? payload.visibility
+      : 'private'; // unmarked is never treated as public
+    recordingMic = {
+      source: ['mixer', 'laptop'].includes(payload.mic) ? payload.mic : null,
+      label: typeof payload.micLabel === 'string' ? payload.micLabel.slice(0, 120) : '',
+    };
+    trackRecording('recording-started', { value: `${recordingKind}/${recordingVisibility}` });
+  } else {
+    isRecording = false;
+    writeRecordingFiles();
+    trackRecording('recording-stopped');
+  }
+
+  const state = {
+    isRecording,
+    sessionId: recordingSessionId,
+    folderPath: recordingSessionDir,
+    kind: recordingKind,
+    visibility: recordingVisibility,
+    startedAt: recordingStartTime,
+  };
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('recording-toggle', state);
+  }
+  if (viewerWindow && !viewerWindow.isDestroyed()) {
+    viewerWindow.webContents.send('recording-state', isRecording);
+  }
+}
 
 app.setAsDefaultProtocolClient('sttm-desktop');
 
@@ -1508,6 +1623,56 @@ ipcMain.on('clear-apv', () => {
 
 ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
+});
+
+ipcMain.on('toggle-recording', (_event, payload) => {
+  toggleRecording(payload || {});
+});
+
+// The renderer's microphone really started: time the verse events from here, so the
+// verse timestamps line up with the WAV.
+ipcMain.on('recording-audio-started', (_event, { at } = {}) => {
+  if (isRecording && Number.isFinite(at)) recordingStartTime = at;
+});
+
+ipcMain.on('recording-upload-result', (_event, { ok, seconds } = {}) => {
+  trackRecording(ok ? 'upload-succeeded' : 'upload-failed', {
+    value: Number.isFinite(seconds) ? seconds.toFixed(1) : '',
+  });
+});
+
+ipcMain.handle('get-recording-settings', () => recordingPrefs());
+
+ipcMain.handle('save-recording-settings', (_event, { gurdwaraName } = {}) => {
+  const wasReady = recordingReady();
+  if (typeof gurdwaraName === 'string') store.set('recording.gurdwaraName', gurdwaraName);
+  if (!wasReady && recordingReady()) {
+    trackRecording('recording-settings-saved');
+  }
+  return recordingPrefs();
+});
+
+// The sevadaar agreed to the recording consent (shown before the first recording, and again
+// whenever its wording changes: RECORDING_CONSENT_VERSION).
+ipcMain.handle('give-recording-consent', () => {
+  store.set('recording.consent', {
+    version: RECORDING_CONSENT_VERSION,
+    at: new Date().toISOString(),
+    gurdwara: store.get('recording.gurdwaraName') || '',
+  });
+  trackRecording('consent-given');
+  return recordingPrefs();
+});
+
+ipcMain.on('recording-event', (_event, payload) => {
+  if (!isRecording || !payload || payload.event !== 'verse' || payload.verseId == null) {
+    return;
+  }
+
+  recordingEvents.push({
+    verseId: payload.verseId,
+    t: Math.max(0, (Date.now() - recordingStartTime) / 1000),
+  });
 });
 
 ipcMain.on('deleteToken', () => {
