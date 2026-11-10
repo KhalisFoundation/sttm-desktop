@@ -30,16 +30,127 @@ const listInputs = async () => {
       .filter((d) => d.kind === 'audioinput' && d.deviceId !== 'communications')
       .map((d) => ({
         id: d.deviceId,
-        label: (d.label || 'Microphone').replace(/^Default - /, ''),
+        label: (d.label || 'Microphone').replace(/^Default - (.*)$/, 'System default ($1)'),
       }));
   } catch (_) {
     return [];
   }
 };
 
-// A computer's own microphone, by its usual names (Mac, Windows laptops).
-const looksBuiltIn = (label) =>
-  /built-?in|internal|macbook|microphone array|realtek/i.test(label || '');
+// What kind of input this is, from its name. Only the mixer (best) or the computer's own mic is
+// what we want; webcams, phones, Bluetooth headsets and virtual/streaming inputs are usually
+// picked by accident, so the card warns about them.
+const MIC_PATTERNS = [
+  ['webcam', /webcam|camera|cam\b|c9[0-9]{2}|brio|facetime|kiyo|elgato facecam/i],
+  ['phone', /iphone|ipad|android|galaxy|pixel|\bphone\b/i],
+  ['bluetooth', /airpods|bluetooth|hands-?free|buds|headset|bose|beats|jabra/i],
+  [
+    'virtual',
+    /virtual|iriun|ndi|zoom ?audio|teams|blackhole|loopback|soundflower|vb-?audio|voicemeeter|splashtop|obs|stereo mix|cable output|discord|camo/i,
+  ],
+  ['mixer', /line ?in/i], // a cable into the PC's line-in jack
+  ['laptop', /built-?in|internal|macbook|microphone array|realtek/i],
+  [
+    'mixer',
+    /mixer|usb audio|codec|interface|line ?in|focusrite|scarlett|behringer|yamaha|zoom h|tascam|presonus|mackie|rode|xlr|soundcraft|allen|m-?audio|motu|steinberg|audient|umc|xenyx/i,
+  ],
+];
+const micKind = (label) => {
+  const hit = MIC_PATTERNS.find(([, re]) => re.test(label || ''));
+  return hit ? hit[0] : 'other';
+};
+const MIC_WARN = {
+  webcam: 'This looks like a webcam mic.',
+  phone: 'This looks like a phone mic.',
+  bluetooth: 'This looks like Bluetooth earphones or a headset.',
+  virtual: 'This looks like a virtual or streaming input, not a microphone.',
+};
+
+// Live loudness of one input (0..1), and whether we have heard anything in the last few seconds.
+const useInputLevel = (deviceId, active) => {
+  const [level, setLevel] = useState(0);
+  const [heard, setHeard] = useState(null); // null: still listening, true/false after ~2 s
+  useEffect(() => {
+    if (!active) return undefined;
+    let stopped = false;
+    let stream = null;
+    let ctx = null;
+    let timer = null;
+    setLevel(0);
+    setHeard(null);
+    const opened = Date.now();
+    let lastSound = 0;
+    (async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            deviceId: !deviceId || deviceId === 'default' ? undefined : { exact: deviceId },
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+          },
+        });
+        if (stopped) return;
+        ctx = new AudioContext();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 1024;
+        ctx.createMediaStreamSource(stream).connect(analyser);
+        const buf = new Float32Array(analyser.fftSize);
+        timer = setInterval(() => {
+          analyser.getFloatTimeDomainData(buf);
+          let peak = 0;
+          for (let i = 0; i < buf.length; i += 1) peak = Math.max(peak, Math.abs(buf[i]));
+          const db = 20 * Math.log10(peak || 1e-6); // -120 (silence) .. 0 (full scale)
+          setLevel(Math.max(0, Math.min(1, (db + 60) / 60)));
+          const now = Date.now();
+          if (db > -50) lastSound = now;
+          if (now - opened > 2000) setHeard(now - lastSound < 3000);
+        }, 100);
+      } catch (_) {
+        if (!stopped) setHeard(false);
+      }
+    })();
+    return () => {
+      stopped = true;
+      if (timer) clearInterval(timer);
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      if (ctx) ctx.close().catch(() => {});
+    };
+  }, [deviceId, active]);
+  return { level, heard };
+};
+
+const LevelMeter = ({ level, heard, compact }) => (
+  <span className={`mic-level${compact ? ' compact' : ''}`}>
+    <span className="mic-level-bar">
+      <span
+        className={`mic-level-fill${heard === false ? ' silent' : ''}`}
+        style={{ width: `${Math.round(level * 100)}%` }}
+      />
+    </span>
+    {!compact && (
+      <span className={`mic-level-text${heard === false ? ' silent' : ''}`}>
+        {heard === null && 'Listening...'}
+        {heard === true && (
+          <>
+            <i className="fa fa-check" /> We can hear it
+          </>
+        )}
+        {heard === false && (
+          <>
+            <i className="fa fa-exclamation-triangle" /> Silent: no sound from this input
+          </>
+        )}
+      </span>
+    )}
+  </span>
+);
+
+LevelMeter.propTypes = {
+  level: PropTypes.number,
+  heard: PropTypes.bool,
+  compact: PropTypes.bool,
+};
 
 const VIS = [
   [
@@ -121,12 +232,17 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
   const [choice, setChoice] = useState(null);
   const [inputs, setInputs] = useState([]);
   const [device, setDevice] = useState('default');
+  const [recDevice, setRecDevice] = useState(null); // the input being recorded from
   const [welcome, setWelcome] = useState(false);
   const [startAfter, setStartAfter] = useState(false);
   const [gurdwara, setGurdwara] = useState('');
   const [startedAt, setStartedAt] = useState(null);
   const [now, setNow] = useState(Date.now());
   const welcomedRef = useRef(false); // the welcome card opens by itself once per launch
+  // Live level: in the Record card for the chosen input, and while recording (Silent warning).
+  const cardDevice = inputs.some((d) => d.id === device) ? device : (inputs[0] || {}).id;
+  const cardLevel = useInputLevel(cardDevice, enabled && askVis && inputs.length > 0);
+  const recLevel = useInputLevel(recDevice, enabled && isRecording && recDevice !== null);
   // The right end of the workspace bar (next to the Voice Autopilot mic chip), when it is there.
   const [slot, setSlot] = useState(null);
 
@@ -185,10 +301,11 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
     }
     const chosen = inputs.find((d) => d.id === device) || inputs[0];
     const label = chosen ? chosen.label : '';
+    setRecDevice(chosen ? chosen.id : 'default');
     ipcRenderer.send('toggle-recording', {
       kind: k,
       visibility: vis,
-      mic: looksBuiltIn(label) ? 'laptop' : 'mixer', // inferred from the input's name
+      mic: micKind(label), // inferred from the input's name
       micLabel: label,
     });
   };
@@ -249,6 +366,13 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
           {visibility === 'private' ? 'Private' : 'Public'}
           {' · '}
           <b>{startedAt ? fmt(Math.max(0, now - startedAt) / 1000) : '0:00'}</b>
+          {' · '}
+          <LevelMeter level={recLevel.level} heard={recLevel.heard} compact />
+          {recLevel.heard === false && (
+            <span className="mic-silent-warn">
+              <i className="fa fa-exclamation-triangle" /> No sound
+            </span>
+          )}
         </span>
       )}
     </div>
@@ -294,12 +418,6 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
                 </span>
               </button>
             ))}
-            {looksBuiltIn((inputs.find((d) => d.id === device) || inputs[0] || {}).label) && (
-              <p className="mic-tip">
-                <i className="fa fa-lightbulb-o" /> This is the computer&apos;s own mic. A cable
-                from the mixer is much more valuable to us, with much clearer audio.
-              </p>
-            )}
             {inputs.length > 0 && (
               <label className="mic-device" htmlFor="recording-mic-device">
                 <span>Recording from</span>
@@ -317,6 +435,34 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
                 </select>
               </label>
             )}
+            {inputs.length > 0 && <LevelMeter level={cardLevel.level} heard={cardLevel.heard} />}
+            {(() => {
+              const kindNow = micKind((inputs.find((d) => d.id === cardDevice) || {}).label);
+              if (MIC_WARN[kindNow]) {
+                return (
+                  <p className="mic-tip warn">
+                    <i className="fa fa-exclamation-triangle" /> {MIC_WARN[kindNow]} Please pick the
+                    mixer (best) or this computer&apos;s own mic.
+                  </p>
+                );
+              }
+              if (kindNow === 'laptop') {
+                return (
+                  <p className="mic-tip">
+                    <i className="fa fa-lightbulb-o" /> This is the computer&apos;s own mic. A cable
+                    from the mixer is much more valuable to us, with much clearer audio.
+                  </p>
+                );
+              }
+              if (kindNow === 'mixer') {
+                return (
+                  <p className="mic-tip good">
+                    <i className="fa fa-check-circle" /> Looks like the mixer. Thank you!
+                  </p>
+                );
+              }
+              return null;
+            })()}
             <div className="recording-consent-actions">
               <button type="button" className="secondary" onClick={() => setAskVis(false)}>
                 Cancel

@@ -172,7 +172,9 @@ let recordingSessionDir = null;
 let recordingEvents = [];
 let recordingKind = 'kirtan';
 let recordingVisibility = 'private';
-let recordingMic = null; // { source: 'mixer' | 'laptop', label } as the sevadaar answered
+// Kind of input, inferred from its name in the Record card (RecordingControls.jsx micKind).
+const MIC_SOURCES = ['mixer', 'laptop', 'webcam', 'phone', 'bluetooth', 'virtual', 'other'];
+let recordingMic = null; // { source, label } of the input recorded from
 
 const injectedTokenOk = () => Boolean(injectedHfToken && !injectedHfToken.startsWith('__'));
 
@@ -247,7 +249,7 @@ function toggleRecording(payload = {}) {
       ? payload.visibility
       : 'private'; // unmarked is never treated as public
     recordingMic = {
-      source: ['mixer', 'laptop'].includes(payload.mic) ? payload.mic : null,
+      source: MIC_SOURCES.includes(payload.mic) ? payload.mic : null,
       label: typeof payload.micLabel === 'string' ? payload.micLabel.slice(0, 120) : '',
     };
     trackRecording('recording-started', { value: `${recordingKind}/${recordingVisibility}` });
