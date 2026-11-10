@@ -57,12 +57,13 @@ const onError = (message) => {
 };
 
 // The receiver (sttm-chromecast) has its own stylesheet, which doesn't know
-// some of ours: the shabad info bar, and the Devanagari and Shahmukhi text that
-// shouldn't be bold. Those rules are taken from ours and sent along with the
-// slide. The info bar's are scoped under #viewer-container here; the scope is
+// some of ours: the shabad info bar, the translation review QR code, the shabad
+// overview slide, and the Devanagari and Shahmukhi text that shouldn't be bold.
+// Those rules are taken from ours and sent along with the slide. The info bar's,
+// QR code's and overview's are scoped under #viewer-container here; the scope is
 // dropped so they work in the receiver's own container.
 const RECEIVER_MISSING_RULES =
-  /shabad-info|shabad-deck--with-info|\.slide-(translation|transliteration)\.(devanagari|shahmukhi)/;
+  /shabad-info|shabad-deck--with-info|translation-review-qr|shabad-overview|\.slide-(translation|transliteration)\.(devanagari|shahmukhi)/;
 
 // Rules only the receiver needs: its .shabad-deck has a bottom padding that
 // would leave a gap under the info bar.
@@ -101,7 +102,8 @@ const getSanitizedViewer = () => {
   viewerHtml.querySelector('.shabad-deck')?.removeAttribute('style');
   viewerHtml.querySelector('.verse-slide-wrapper')?.removeAttribute('style');
 
-  const hasShabadInfo = !!viewerHtml.querySelector('.shabad-info');
+  // The info bar, or the QR code on its own once the bar hides.
+  const hasShabadInfo = !!viewerHtml.querySelector('.shabad-deck--with-info');
   const slideWrapper = viewerHtml.querySelector('#viewer-container-slide-wrapper');
   if (slideWrapper) {
     slideWrapper.style.width = '100%';
