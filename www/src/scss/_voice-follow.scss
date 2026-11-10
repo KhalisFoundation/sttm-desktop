@@ -1483,33 +1483,55 @@ $vf2-yellow-bar: #f2c200;
   line-height: 1.4;
 }
 
-// Wrong-microphone hints (micWarning.js): small and calm, in the sevadaar's panel only.
+// Wrong-microphone warnings (micWarning.js), in the sevadaar's panel only. The level bar and tips
+// are the shared mic check (_mic-check.scss, as on the tester Record card); a wrong input or no
+// sound is a red warning here (Autopilot hears nothing), not the Record card's amber.
+.vf-mic-check {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 380px;
+  margin: 2px auto 0;
+  text-align: left;
+}
 .vf-mic-hint {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   margin: 6px 0;
-  padding: 7px 8px 7px 10px;
+  padding: 8px 8px 8px 10px;
   border-radius: 8px;
   font-size: 12.5px;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--vf-muted);
   background: rgba(127, 127, 127, 0.1);
   text-align: left;
 
-  &.is-silent,
+  // Wrong input or no sound: Autopilot hears nothing, so it is a red warning.
+  &.is-danger {
+    color: #912018;
+    background: #fef3f2;
+    border: 1px solid #f97066;
+  }
   &.is-quiet {
     color: #8a6000;
     background: rgba(240, 180, 40, 0.14);
   }
-  &.is-virtual {
-    max-width: 340px;
-    margin: 6px auto 0;
-  }
 }
 .vf-mic-hint-icon {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 14px;
+
+  .is-danger > & {
+    color: #d92d20;
+  }
+}
+.vf-mic-hint-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #b42318;
+  margin-bottom: 2px;
 }
 .vf-mic-hint-body {
   flex: 1;
@@ -1519,39 +1541,50 @@ $vf2-yellow-bar: #f2c200;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 7px;
 }
 .vf-mic-hint-btn {
   max-width: 100%;
-  padding: 3px 10px;
-  border: 1px solid rgba(127, 127, 127, 0.3);
+  padding: 4px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
   border-radius: 6px;
-  background: transparent;
-  color: inherit;
+  background: #fff;
+  color: #1f2937;
   font: inherit;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
 
+  > i {
+    margin-right: 2px;
+    opacity: 0.7;
+  }
   &.is-primary {
-    border-color: transparent;
-    background: rgba(240, 180, 40, 0.3);
-    font-weight: 600;
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+
+    > i {
+      opacity: 1;
+    }
   }
   &:hover {
-    background: rgba(127, 127, 127, 0.14);
+    filter: brightness(0.96);
   }
 }
+// Dismiss is secondary: small and faint until hovered.
 .vf-mic-hint-close {
   padding: 0 2px;
   border: 0;
   background: transparent;
   color: inherit;
-  opacity: 0.6;
+  font-size: 11px;
+  opacity: 0.4;
   cursor: pointer;
 
   &:hover {
-    opacity: 1;
+    opacity: 0.9;
   }
 }

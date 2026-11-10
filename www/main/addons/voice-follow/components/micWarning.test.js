@@ -1,36 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { virtualMicKind, createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
-
-test('virtual input names are recognised', () => {
-  assert.strictEqual(virtualMicKind('Iriun Webcam #4'), 'Iriun');
-  assert.strictEqual(virtualMicKind('DroidCam Virtual Audio'), 'DroidCam');
-  assert.strictEqual(virtualMicKind('Camo Microphone'), 'Camo');
-  assert.strictEqual(virtualMicKind('CABLE Output (VB-Audio Virtual Cable)'), 'VB-Audio');
-  assert.strictEqual(virtualMicKind('Stereo Mix (Realtek(R) Audio)'), 'Stereo Mix');
-  assert.strictEqual(virtualMicKind('Microphone (NVIDIA Broadcast)'), 'NVIDIA Broadcast');
-  assert.strictEqual(virtualMicKind('ZoomAudioDevice'), 'Zoom');
-  assert.strictEqual(virtualMicKind('Microsoft Teams Audio'), 'Teams');
-  assert.strictEqual(virtualMicKind('OBS Virtual Camera'), 'OBS');
-  assert.strictEqual(virtualMicKind('BlackHole 2ch'), 'BlackHole');
-  assert.strictEqual(virtualMicKind('Some Virtual Mic'), 'Virtual');
-});
-
-test('real microphones and mixers are not flagged', () => {
-  [
-    'MacBook Pro Microphone',
-    'Microphone Array (Realtek(R) Audio)',
-    'USB Audio CODEC',
-    'Zoom H4n',
-    'L-8 (ZOOM)',
-    'Yeti Stereo Microphone',
-    'Microphone (Behringer UMC204HD)',
-    'Line In (Realtek High Definition Audio)',
-    'Observer Mic',
-    '',
-    null,
-  ].forEach((name) => assert.strictEqual(virtualMicKind(name), null, name));
-});
+const { createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
 
 // Feed `seconds` of 250 ms windows at a level, with heard words every `heardEvery` windows.
 const feed = (w, seconds, rms, heardEvery = 0) => {
@@ -81,7 +51,7 @@ test('reset clears the history (new session or new input)', () => {
   assert.strictEqual(feed(w, 10, 0), null);
 });
 
-test('probe pick: the loudest real input clearly picking up sound; virtual never offered', () => {
+test('probe pick: the loudest real input clearly picking up sound; a wrong-kind input never offered', () => {
   assert.strictEqual(pickProbedMic([]), null);
   assert.strictEqual(
     pickProbedMic([
@@ -90,11 +60,15 @@ test('probe pick: the loudest real input clearly picking up sound; virtual never
     ]),
     null,
   );
-  const pick = pickProbedMic([
-    { deviceId: 'v', label: 'Stereo Mix', rms: 0.2 },
-    { deviceId: 'a', label: 'USB Audio CODEC', rms: 0.01 },
-    { deviceId: 'b', label: 'Microphone Array', rms: 0.03 },
-  ]);
+  const isWrong = (label) => /stereo mix|iriun/i.test(label);
+  const pick = pickProbedMic(
+    [
+      { deviceId: 'v', label: 'Stereo Mix', rms: 0.2 },
+      { deviceId: 'a', label: 'USB Audio CODEC', rms: 0.01 },
+      { deviceId: 'b', label: 'Microphone Array', rms: 0.03 },
+    ],
+    { isWrong },
+  );
   assert.strictEqual(pick.deviceId, 'b');
 });
 

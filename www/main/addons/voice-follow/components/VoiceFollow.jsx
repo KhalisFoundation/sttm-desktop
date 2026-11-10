@@ -11,6 +11,7 @@ import { VoiceWave } from '../../../common/sttm-ui';
 import { i18n } from '../../../common/i18n';
 import { useAutopilotSlot } from './autopilotSlot';
 import HwCheck from './HwCheck';
+import { micKind, MIC_WARN, useInputLevel, LevelMeter } from '../../../common/mic-check';
 
 const anvaad = require('anvaad-js');
 const { ipcRenderer, shell } = require('electron');
@@ -25,7 +26,7 @@ const { createWarmIndex } = require('./warmIndex');
 const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
-const { virtualMicKind, createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
+const { createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
 const { installDemoAudio } = require('./devAudio');
 const { vfAnalytics, createRunStats } = require('./vfAnalytics');
 
@@ -1030,6 +1031,20 @@ const saveMicPref = (deviceId) => {
     // Storage unavailable: the choice lasts for this run only.
   }
 };
+
+// The wrong-input kind a device name looks like (webcam, phone, Bluetooth, virtual), else null.
+// One shared list with the tester Record card (common/mic-check).
+const wrongMicKind = (label) => {
+  const kind = micKind(label);
+  return MIC_WARN[kind] ? kind : null;
+};
+// The start screen's live level for the chosen input (opened only while shown).
+const MicMeter = ({ deviceId }) => {
+  const { level, heard } = useInputLevel(deviceId, true);
+  return <LevelMeter level={level} heard={heard} />;
+};
+MicMeter.propTypes = { deviceId: PropTypes.string };
+MicMeter.defaultProps = { deviceId: '' };
 
 // How loud another input is right now: open it for a moment, read its level, close it. Nothing
 // is recorded, kept or sent; only the loudness (80th percentile of ~100 ms reads) comes back.
@@ -6997,7 +7012,7 @@ const VoiceFollow = () => {
       pr.busy = true;
       pr.rounds += 1;
       try {
-        const others = mics.list.filter((d) => otherMic(d) && !virtualMicKind(d.label));
+        const others = mics.list.filter((d) => otherMic(d) && !wrongMicKind(d.label));
         const results = [];
         // eslint-disable-next-line no-restricted-syntax
         for (const d of others.slice(0, 6)) {
@@ -7006,7 +7021,7 @@ const VoiceFollow = () => {
           const rms = await probeMicLevel(ctx, d.deviceId);
           if (rms != null) results.push({ deviceId: d.deviceId, label: d.label, rms });
         }
-        const pick = pickProbedMic(results, { goodRms: VOL_GOOD_RMS });
+        const pick = pickProbedMic(results, { goodRms: VOL_GOOD_RMS, isWrong: wrongMicKind });
         if (live && pick) {
           setMicProbe(pick);
           micLog('mic_probe', { found: pick.label || '', rms: Math.round(pick.rms * 1e4) / 1e4 });
@@ -7449,9 +7464,13 @@ const VoiceFollow = () => {
     if (await checkMicAccess()) return; // still blocked: stay on this screen
     onMainClick();
   };
-  // Wrong-microphone hints, small and calm, in this panel only (never on a sangat screen).
+  // Wrong-microphone warnings, in this panel only (never on a sangat screen). The same look and
+  // input-kind list as the tester Record card (common/mic-check). A wrong
+  // input or no sound is serious (Autopilot hears nothing), so those two are red; the
+  // "hears very little" hint stays amber.
   const liveMic = liveMicRef.current;
   const liveName = liveMic.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
+  const micName = (d) => (d && d.label) || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
   const micCloseButton = (kind, deviceId, label) => (
     <button
       type="button"
@@ -7463,20 +7482,37 @@ const VoiceFollow = () => {
       <i className="fa fa-times" aria-hidden="true" />
     </button>
   );
+  // One-tap buttons for the other inputs that are not a wrong kind themselves.
+  const micButtons = (list, onPick) =>
+    list.length > 0 && (
+      <div className="vf-mic-hint-actions">
+        {list.map((d) => (
+          <button
+            key={d.deviceId}
+            type="button"
+            className="vf-mic-hint-btn"
+            onClick={() => onPick(d.deviceId)}
+          >
+            <i className="fa fa-microphone" aria-hidden="true" /> {micName(d)}
+          </button>
+        ))}
+      </div>
+    );
+  const goodOthers = (exclude) =>
+    mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 4);
   let micHintView = null;
   if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
-    const others = mics.list.filter(otherMic).slice(0, 4);
     micHintView = (
-      <div className="vf-mic-hint is-silent" role="status">
-        <i className="fa fa-microphone-slash vf-mic-hint-icon" aria-hidden="true" />
+      <div className="vf-mic-hint is-danger" role="alert">
+        <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
         <div className="vf-mic-hint-body">
+          <div className="vf-mic-hint-title">
+            {i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', { mic: liveName, ...NO_ESCAPE })}
+          </div>
           {micProbe ? (
             <>
               <div>
-                {i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', {
-                  mic: micProbe.label || '',
-                  ...NO_ESCAPE,
-                })}
+                {i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', { mic: micName(micProbe), ...NO_ESCAPE })}
               </div>
               <div className="vf-mic-hint-actions">
                 <button
@@ -7484,27 +7520,15 @@ const VoiceFollow = () => {
                   className="vf-mic-hint-btn is-primary"
                   onClick={() => switchMic(micProbe.deviceId, 'probe')}
                 >
-                  {i18n.t('VOICE_FOLLOW.MIC_SWITCH')}
+                  <i className="fa fa-microphone" aria-hidden="true" />{' '}
+                  {i18n.t('VOICE_FOLLOW.MIC_SWITCH_TO', { mic: micName(micProbe), ...NO_ESCAPE })}
                 </button>
               </div>
             </>
           ) : (
             <>
-              <div>{i18n.t('VOICE_FOLLOW.MIC_SILENT', { mic: liveName, ...NO_ESCAPE })}</div>
-              {others.length > 0 && (
-                <div className="vf-mic-hint-actions">
-                  {others.map((d) => (
-                    <button
-                      key={d.deviceId}
-                      type="button"
-                      className="vf-mic-hint-btn"
-                      onClick={() => switchMic(d.deviceId, 'list')}
-                    >
-                      {d.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC')}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div>{i18n.t('VOICE_FOLLOW.MIC_SILENT')}</div>
+              {micButtons(goodOthers(otherMic), (id) => switchMic(id, 'list'))}
             </>
           )}
         </div>
@@ -7524,15 +7548,55 @@ const VoiceFollow = () => {
       </div>
     );
   }
-  // Start screen: the chosen input's name looks like a virtual one (phone-as-webcam, cable).
-  const virtualKind = shownMic && virtualMicKind(shownMic.label);
-  const virtualNote =
-    !active && virtualKind && micHintShown('virtual', shownMic.deviceId, shownMic.label) ? (
-      <div className="vf-mic-hint is-virtual" role="note">
-        <div className="vf-mic-hint-body">{i18n.t('VOICE_FOLLOW.MIC_VIRTUAL')}</div>
-        {micCloseButton('virtual', shownMic.deviceId, shownMic.label)}
+  // Start screen, under the picker: the chosen input's live level, then what kind of input it
+  // looks like. A wrong kind (virtual, phone, webcam, Bluetooth) is a red warning with one-tap
+  // buttons for the other inputs; the computer's own mic gets a tip; the mixer a green tick.
+  let micCheck = null;
+  if (!active && !micDenied && shownMic) {
+    const kind = micKind(shownMic.label);
+    const wrong = wrongMicKind(shownMic.label);
+    let tip = null;
+    if (wrong && micHintShown(wrong, shownMic.deviceId, shownMic.label)) {
+      tip = (
+        <div className="vf-mic-hint is-danger" role="alert">
+          <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
+          <div className="vf-mic-hint-body">
+            <div className="vf-mic-hint-title">{i18n.t('VOICE_FOLLOW.MIC_WRONG_TITLE')}</div>
+            <div>
+              {i18n.t('VOICE_FOLLOW.MIC_WRONG', {
+                mic: micName(shownMic),
+                kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
+                ...NO_ESCAPE,
+              })}
+            </div>
+            {micButtons(
+              goodOthers((d) => d.deviceId !== shownMic.deviceId),
+              chooseMic,
+            )}
+          </div>
+          {micCloseButton(wrong, shownMic.deviceId, shownMic.label)}
+        </div>
+      );
+    } else if (kind === 'laptop') {
+      tip = (
+        <div className="mic-tip">
+          <i className="fa fa-lightbulb-o" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_LAPTOP')}
+        </div>
+      );
+    } else if (kind === 'mixer') {
+      tip = (
+        <div className="mic-tip good">
+          <i className="fa fa-check-circle" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_MIXER')}
+        </div>
+      );
+    }
+    micCheck = (
+      <div className="vf-mic-check">
+        <MicMeter key={shownMic.deviceId} deviceId={shownMic.deviceId} />
+        {tip}
       </div>
-    ) : null;
+    );
+  }
   const autopilotView = (
     <div className={`vf-autopilot${active ? ' is-active' : ' is-idle'}`} data-vf-cards={cardStyle}>
       {!active && micDenied && (
@@ -7593,7 +7657,7 @@ const VoiceFollow = () => {
               </select>
             </span>
           </label>
-          {virtualNote}
+          {micCheck}
           <HwCheck />
           {dlBar}
           {status === 'error' && <div className="vf-status">{statusText}</div>}

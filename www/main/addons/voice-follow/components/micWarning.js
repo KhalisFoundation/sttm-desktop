@@ -2,37 +2,9 @@
 // Fleet logs showed Gurdwara Sahibs listening through a phone-as-webcam virtual mic (level
 // 0.000, nothing heard for 40 min) or a weak laptop mic (words heard 4% of the time), while
 // the sevadaar did everything by hand. Three calm hints:
-//   virtual : the chosen input's name looks like a virtual / loopback device
 //   silent  : the input has given no sound for ~20 s while Autopilot runs
 //   quiet   : ~3 min of a low (non-zero) level with words heard very rarely
 // Pure logic only (no DOM, no audio), so it is unit-tested; VoiceFollow.jsx wires it up.
-
-// Names of inputs that are usually not a real microphone in the hall: phone-as-webcam apps,
-// virtual cables, loopback / screen-capture inputs, meeting-app virtual devices.
-const VIRTUAL_PATTERNS = [
-  ['Iriun', /\biriun\b/i],
-  ['DroidCam', /droid\s*cam/i],
-  ['Camo', /\bcamo\b/i],
-  ['EpocCam', /epoc\s*cam/i],
-  ['OBS', /\bobs\b/i],
-  ['VB-Audio', /\bvb-?(audio|cable)\b|voicemeeter/i],
-  ['Stereo Mix', /stereo\s*mix|what\s*u\s*hear|wave\s*out\s*mix/i],
-  ['NVIDIA Broadcast', /nvidia\s*broadcast|rtx\s*voice/i],
-  // Meeting-app devices only: a Zoom H-series recorder or L-series mixer is a real input.
-  ['Zoom', /zoom\s*audio\s*device|zoomaudiodevice/i],
-  ['Teams', /microsoft\s*teams\s*audio/i],
-  ['BlackHole', /blackhole/i],
-  ['Loopback', /loopback|soundflower/i],
-  ['Virtual', /\bvirtual\b/i],
-];
-
-// The kind of virtual input a device name looks like ('Iriun', 'Virtual', ...), else null.
-function virtualMicKind(label) {
-  const name = String(label || '');
-  if (!name) return null;
-  const hit = VIRTUAL_PATTERNS.find(([, re]) => re.test(name));
-  return hit ? hit[0] : null;
-}
 
 const DEFAULTS = {
   windowMs: 250, // one sample per volume window
@@ -102,12 +74,14 @@ function createMicWatch(opts = {}) {
 }
 
 // From a short probe of the other inputs ([{ deviceId, label, rms }]), the one clearly picking
-// up sound: level at least "good", the loudest. Virtual inputs are never offered (a Stereo Mix
-// with sound is the computer's own playback, not the hall).
+// up sound: level at least "good", the loudest. An input opts.isWrong(label) flags (virtual,
+// phone, webcam, Bluetooth: common/mic-check) is never offered; a Stereo Mix with sound is the
+// computer's own playback, not the hall.
 function pickProbedMic(results, opts = {}) {
   const goodRms = opts.goodRms || DEFAULTS.goodRms;
+  const isWrong = opts.isWrong || (() => false);
   const sounding = (results || []).filter(
-    (r) => r && Number.isFinite(r.rms) && r.rms >= goodRms && !virtualMicKind(r.label),
+    (r) => r && Number.isFinite(r.rms) && r.rms >= goodRms && !isWrong(r.label),
   );
   if (!sounding.length) return null;
   sounding.sort((a, b) => b.rms - a.rms);
@@ -117,4 +91,4 @@ function pickProbedMic(results, opts = {}) {
 // One dismissal per hint kind and device for as long as the panel lives.
 const dismissKey = (kind, deviceId, label) => `${kind}:${deviceId || label || ''}`;
 
-module.exports = { virtualMicKind, createMicWatch, pickProbedMic, dismissKey, MIC_WATCH: DEFAULTS };
+module.exports = { createMicWatch, pickProbedMic, dismissKey, MIC_WATCH: DEFAULTS };
