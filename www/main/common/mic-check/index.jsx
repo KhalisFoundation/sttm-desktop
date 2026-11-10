@@ -9,12 +9,18 @@ import PropTypes from 'prop-types';
 // picked by accident, so the card warns about them.
 export const MIC_PATTERNS = [
   // Phone-as-webcam apps (DroidCam, EpocCam) first, so they read as a phone, not a webcam.
-  ['phone', /iphone|ipad|android|galaxy|pixel|\bphone\b|droid ?cam|epoc ?cam/i],
+  [
+    'phone',
+    /iphone|ipad|android|galaxy|pixel|\bphone\b|smartphone|\bmobile\b|droid ?cam|epoc ?cam|wo ?mic|ivcam/i,
+  ],
   ['webcam', /webcam|camera|cam\b|c9[0-9]{2}|brio|facetime|kiyo|elgato facecam/i],
-  ['bluetooth', /airpods|bluetooth|hands-?free|buds|headset|bose|beats|jabra/i],
+  [
+    'bluetooth',
+    /airpods|bluetooth|hands-?free|buds|headset|headphone|earphone|bose|beats|jabra|soundcore|wh-?1000|\bhfp\b/i,
+  ],
   [
     'virtual',
-    /virtual|iriun|\bndi\b|zoom ?audio|\bteams\b|blackhole|loopback|soundflower|vb-?audio|voicemeeter|splashtop|\bobs\b|stereo mix|cable output|discord|\bcamo\b|nvidia broadcast|rtx voice/i,
+    /virtual|iriun|\bndi\b|zoom ?audio|\bteams\b|blackhole|loopback|soundflower|vb-?audio|voicemeeter|splashtop|\bobs\b|stereo mix|cable output|discord|\bcamo\b|nvidia broadcast|rtx voice|webex|krisp|xsplit|streamlabs|steam streaming|sonar|nahimic|what ?u ?hear|wave ?out/i,
   ],
   ['mixer', /line ?in/i], // a cable into the PC's line-in jack
   ['laptop', /built-?in|internal|macbook|microphone array|realtek/i],

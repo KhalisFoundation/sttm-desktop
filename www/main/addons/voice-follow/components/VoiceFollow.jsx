@@ -11,7 +11,7 @@ import { VoiceWave } from '../../../common/sttm-ui';
 import { i18n } from '../../../common/i18n';
 import { useAutopilotSlot } from './autopilotSlot';
 import HwCheck from './HwCheck';
-import { micKind, MIC_WARN, useInputLevel, LevelMeter } from '../../../common/mic-check';
+import { micKind, MIC_WARN } from '../../../common/mic-check';
 
 const anvaad = require('anvaad-js');
 const { ipcRenderer, shell } = require('electron');
@@ -1038,13 +1038,6 @@ const wrongMicKind = (label) => {
   const kind = micKind(label);
   return MIC_WARN[kind] ? kind : null;
 };
-// The start screen's live level for the chosen input (opened only while shown).
-const MicMeter = ({ deviceId }) => {
-  const { level, heard } = useInputLevel(deviceId, true);
-  return <LevelMeter level={level} heard={heard} />;
-};
-MicMeter.propTypes = { deviceId: PropTypes.string };
-MicMeter.defaultProps = { deviceId: '' };
 
 // How loud another input is right now: open it for a moment, read its level, close it. Nothing
 // is recorded, kept or sent; only the loudness (80th percentile of ~100 ms reads) comes back.
@@ -7482,59 +7475,58 @@ const VoiceFollow = () => {
       <i className="fa fa-times" aria-hidden="true" />
     </button>
   );
-  // One-tap buttons for the other inputs that are not a wrong kind themselves.
+  // One-tap buttons for the other inputs that are not a wrong kind themselves (short; the full
+  // name is the tooltip).
   const micButtons = (list, onPick) =>
-    list.length > 0 && (
-      <div className="vf-mic-hint-actions">
-        {list.map((d) => (
-          <button
-            key={d.deviceId}
-            type="button"
-            className="vf-mic-hint-btn"
-            onClick={() => onPick(d.deviceId)}
-          >
-            <i className="fa fa-microphone" aria-hidden="true" /> {micName(d)}
-          </button>
-        ))}
-      </div>
-    );
+    list.map((d) => (
+      <button
+        key={d.deviceId}
+        type="button"
+        className="vf-mic-hint-btn"
+        title={micName(d)}
+        onClick={() => onPick(d.deviceId)}
+      >
+        <i className="fa fa-microphone" aria-hidden="true" /> {micName(d)}
+      </button>
+    ));
   const goodOthers = (exclude) =>
-    mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 4);
+    mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 2);
+  // The red warning, compact so the panel never scrolls: one row with the icon, the bold title,
+  // the one-tap buttons and a faint x; one short line under it.
+  const dangerBox = ({ title, line, buttons, close }) => (
+    <div className="vf-mic-hint is-danger" role="alert">
+      <div className="vf-mic-hint-row">
+        <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
+        <span className="vf-mic-hint-title" title={title}>
+          {title}
+        </span>
+        <span className="vf-mic-hint-actions">{buttons}</span>
+        {close}
+      </div>
+      {line && <div className="vf-mic-hint-line">{line}</div>}
+    </div>
+  );
   let micHintView = null;
   if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
-    micHintView = (
-      <div className="vf-mic-hint is-danger" role="alert">
-        <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
-        <div className="vf-mic-hint-body">
-          <div className="vf-mic-hint-title">
-            {i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', { mic: liveName, ...NO_ESCAPE })}
-          </div>
-          {micProbe ? (
-            <>
-              <div>
-                {i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', { mic: micName(micProbe), ...NO_ESCAPE })}
-              </div>
-              <div className="vf-mic-hint-actions">
-                <button
-                  type="button"
-                  className="vf-mic-hint-btn is-primary"
-                  onClick={() => switchMic(micProbe.deviceId, 'probe')}
-                >
-                  <i className="fa fa-microphone" aria-hidden="true" />{' '}
-                  {i18n.t('VOICE_FOLLOW.MIC_SWITCH_TO', { mic: micName(micProbe), ...NO_ESCAPE })}
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div>{i18n.t('VOICE_FOLLOW.MIC_SILENT')}</div>
-              {micButtons(goodOthers(otherMic), (id) => switchMic(id, 'list'))}
-            </>
-          )}
-        </div>
-        {micCloseButton('silent', liveMic.deviceId, liveMic.label)}
-      </div>
-    );
+    micHintView = dangerBox({
+      title: i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', { mic: liveName, ...NO_ESCAPE }),
+      line: micProbe
+        ? i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', { mic: micName(micProbe), ...NO_ESCAPE })
+        : i18n.t('VOICE_FOLLOW.MIC_SILENT'),
+      buttons: micProbe ? (
+        <button
+          type="button"
+          className="vf-mic-hint-btn is-primary"
+          title={micName(micProbe)}
+          onClick={() => switchMic(micProbe.deviceId, 'probe')}
+        >
+          <i className="fa fa-microphone" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_SWITCH')}
+        </button>
+      ) : (
+        micButtons(goodOthers(otherMic), (id) => switchMic(id, 'list'))
+      ),
+      close: micCloseButton('silent', liveMic.deviceId, liveMic.label),
+    });
   } else if (
     active &&
     micHint === 'quiet' &&
@@ -7542,61 +7534,48 @@ const VoiceFollow = () => {
   ) {
     micHintView = (
       <div className="vf-mic-hint is-quiet" role="status">
-        <i className="fa fa-microphone vf-mic-hint-icon" aria-hidden="true" />
-        <div className="vf-mic-hint-body">{i18n.t('VOICE_FOLLOW.MIC_QUIET')}</div>
-        {micCloseButton('quiet', liveMic.deviceId, liveMic.label)}
+        <div className="vf-mic-hint-row">
+          <i className="fa fa-microphone vf-mic-hint-icon" aria-hidden="true" />
+          <span className="vf-mic-hint-line">{i18n.t('VOICE_FOLLOW.MIC_QUIET')}</span>
+          {micCloseButton('quiet', liveMic.deviceId, liveMic.label)}
+        </div>
       </div>
     );
   }
-  // Start screen, under the picker: the chosen input's live level, then what kind of input it
-  // looks like. A wrong kind (virtual, phone, webcam, Bluetooth) is a red warning with one-tap
-  // buttons for the other inputs; the computer's own mic gets a tip; the mixer a green tick.
+  // Start screen, under the picker: judged by the input's name only (no level: a mixer with no
+  // one talking reads silent and must not scare the sevadaar off it). A name that looks wrong
+  // (virtual, phone, webcam, Bluetooth) gets the compact red warning with one-tap buttons for
+  // the other inputs; a fine or unknown name shows nothing.
   let micCheck = null;
-  if (!active && !micDenied && shownMic) {
-    const kind = micKind(shownMic.label);
-    const wrong = wrongMicKind(shownMic.label);
-    let tip = null;
-    if (wrong && micHintShown(wrong, shownMic.deviceId, shownMic.label)) {
-      tip = (
-        <div className="vf-mic-hint is-danger" role="alert">
-          <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
-          <div className="vf-mic-hint-body">
-            <div className="vf-mic-hint-title">{i18n.t('VOICE_FOLLOW.MIC_WRONG_TITLE')}</div>
-            <div>
-              {i18n.t('VOICE_FOLLOW.MIC_WRONG', {
-                mic: micName(shownMic),
-                kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
-                ...NO_ESCAPE,
-              })}
-            </div>
-            {micButtons(
-              goodOthers((d) => d.deviceId !== shownMic.deviceId),
-              chooseMic,
-            )}
-          </div>
-          {micCloseButton(wrong, shownMic.deviceId, shownMic.label)}
-        </div>
-      );
-    } else if (kind === 'laptop') {
-      tip = (
-        <div className="mic-tip">
-          <i className="fa fa-lightbulb-o" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_LAPTOP')}
-        </div>
-      );
-    } else if (kind === 'mixer') {
-      tip = (
-        <div className="mic-tip good">
-          <i className="fa fa-check-circle" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_MIXER')}
-        </div>
-      );
-    }
+  const wrong = !active && !micDenied && shownMic ? wrongMicKind(shownMic.label) : null;
+  if (wrong && micHintShown(wrong, shownMic.deviceId, shownMic.label)) {
     micCheck = (
       <div className="vf-mic-check">
-        <MicMeter key={shownMic.deviceId} deviceId={shownMic.deviceId} />
-        {tip}
+        {dangerBox({
+          title: i18n.t('VOICE_FOLLOW.MIC_WRONG_TITLE'),
+          line: i18n.t('VOICE_FOLLOW.MIC_WRONG', {
+            kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
+          }),
+          buttons: micButtons(
+            goodOthers((d) => d.deviceId !== shownMic.deviceId),
+            chooseMic,
+          ),
+          close: micCloseButton(wrong, shownMic.deviceId, shownMic.label),
+        })}
       </div>
     );
   }
+  // While running: is Autopilot hearing sound through the input? Always shown in the bottom
+  // bar: a green dot "Hearing" (with the volume label beside it), or a red "No sound" (the
+  // volume label's own no-sound reading, which it then replaces); the input's name is the
+  // tooltip.
+  const hearing = volState !== 'none';
+  const micLive = (
+    <span className={`vf-mic-live ${hearing ? 'is-on' : 'is-off'}`} role="status" title={liveName}>
+      <i className="vf-mic-live-dot" aria-hidden="true" />
+      {i18n.t(hearing ? 'VOICE_FOLLOW.MIC_HEARING' : 'VOICE_FOLLOW.MIC_NO_SOUND')}
+    </span>
+  );
   const autopilotView = (
     <div className={`vf-autopilot${active ? ' is-active' : ' is-idle'}`} data-vf-cards={cardStyle}>
       {!active && micDenied && (
@@ -7830,7 +7809,8 @@ const VoiceFollow = () => {
               {heardStrip}
             </span>
           </div>
-          {volumeLabel}
+          {micLive}
+          {hearing && volumeLabel}
         </div>
       )}
     </div>
