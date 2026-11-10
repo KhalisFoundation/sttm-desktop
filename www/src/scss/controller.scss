@@ -802,11 +802,15 @@ ul {
   }
 
   &.recording-vis {
+    box-sizing: border-box;
     display: grid;
     gap: 8px;
+    grid-template-columns: minmax(0, 1fr); // long input names never widen the card
     max-height: calc(100vh - 40px);
-    max-width: 420px;
+    max-width: calc(100vw - 32px);
+    overflow-x: hidden;
     overflow-y: auto;
+    width: 420px;
 
     .vis-kinds {
       display: grid;
@@ -952,7 +956,10 @@ ul {
       flex: 1;
       font-size: 12px;
       min-width: 0;
+      overflow: hidden;
       padding: 4px 6px;
+      text-overflow: ellipsis;
+      width: 100%;
     }
   }
 
