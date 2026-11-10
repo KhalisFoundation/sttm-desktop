@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { ipcRenderer } from 'electron';
-import { useStoreState } from 'easy-peasy';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { useKeys, useRecordingState } from '../common/hooks';
 
@@ -51,6 +51,8 @@ const VIS = [
   ['public', 'fa-globe', 'Public', 'Livestreamed or posted (YouTube, Instagram, Facebook...).'],
 ];
 
+const AUTOPILOT_KEY = 'sttm-data-autopilot-before'; // Autopilot settings to restore when switched off
+
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 // STTM Data recording bar (top right of the workspace; shown when the Settings switch is on): pick what is being recorded,
@@ -59,8 +61,57 @@ const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(
 // with the consent (and an optional Gurdwara Sahib name) shows once, when the app opens.
 const RecordingControls = ({ refreshKey, searchRef }) => {
   // Off unless Settings > Other Options > STTM Data recording is on (testers).
-  const { dataRecording } = useStoreState((state) => state.userSettings);
+  const { dataRecording, voiceFollowEnabled, shadowRecording } = useStoreState(
+    (state) => state.userSettings,
+  );
+  const { setDataRecording, setVoiceFollowEnabled, setShadowRecording } = useStoreActions(
+    (actions) => actions.userSettings,
+  );
+  const { setAutopilotEnabled } = useStoreActions((actions) => actions.app);
   const enabled = dataRecording === true;
+
+  // STTM Data recording and Voice Autopilot are one or the other. Turning recording on hides
+  // Autopilot and stops its mic (its tab and its own recording); turning it off brings back the
+  // Autopilot settings from before. Turning Autopilot back on turns recording off.
+  // Starts as 'off', so a launch with recording on also applies the rule.
+  const prevRef = useRef({ dataRecording: false, voiceFollowEnabled });
+  useEffect(() => {
+    const prev = prevRef.current;
+    prevRef.current = { dataRecording, voiceFollowEnabled };
+    if (dataRecording === true && prev.dataRecording !== true) {
+      try {
+        if (!window.localStorage.getItem(AUTOPILOT_KEY)) {
+          window.localStorage.setItem(
+            AUTOPILOT_KEY,
+            JSON.stringify({ voiceFollowEnabled, shadowRecording }),
+          );
+        }
+      } catch (_) {
+        /* restored as on */
+      }
+      setAutopilotEnabled(false);
+      if (voiceFollowEnabled !== false) setVoiceFollowEnabled(false);
+      if (shadowRecording !== false) setShadowRecording(false);
+    } else if (dataRecording !== true && prev.dataRecording === true) {
+      let before = { voiceFollowEnabled: true, shadowRecording: true };
+      try {
+        before = JSON.parse(window.localStorage.getItem(AUTOPILOT_KEY)) || before;
+        window.localStorage.removeItem(AUTOPILOT_KEY);
+      } catch (_) {
+        /* defaults: on */
+      }
+      if (voiceFollowEnabled === false && before.voiceFollowEnabled !== false) {
+        setVoiceFollowEnabled(true);
+      }
+      if (shadowRecording === false && before.shadowRecording !== false) setShadowRecording(true);
+    } else if (
+      dataRecording === true &&
+      voiceFollowEnabled !== false &&
+      prev.voiceFollowEnabled === false
+    ) {
+      setDataRecording(false);
+    }
+  }, [dataRecording, voiceFollowEnabled]);
   const isRecording = useRecordingState();
   const [prefs, setPrefs] = useState(null);
   const [kind, setKind] = useState(null);
