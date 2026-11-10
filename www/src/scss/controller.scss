@@ -712,7 +712,7 @@ ul {
 'share-sync', 'settings', 'notifications';
 .recording-consent-backdrop {
   align-items: center;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(17, 24, 39, 0.18); // a light dim; the card's shadow sets it apart
   display: flex;
   inset: 0;
   justify-content: center;
