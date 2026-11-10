@@ -38,7 +38,7 @@ const maxChangeLogSeenCount = 5;
 
 /* eslint-disable import/no-unresolved, import/extensions */
 const Store = require('./www/js/store');
-const { HF_TOKEN: injectedHfToken } = require('./www/js/data-recording/config');
+const { UPLOAD_SAS: injectedUploadSas } = require('./www/js/addons/voice-follow/shadow/config');
 const {
   registerRetrievalService,
 } = require('./www/js/addons/voice-follow/engine/retrieval/main-service');
@@ -159,8 +159,9 @@ let pinnedProjectionDisplayId = null;
 let startChangelogOpenTimer;
 let endChangelogOpenTimer;
 
-// by the renderer's uploader (shadow/hf.js, no Python needed). Kept in userData so the
-// installed app can always write them; a recording is deleted locally once it is pushed.
+// STTM Data recordings (Record / Stop): one folder each, uploaded to Azure under sttm-data/ by
+// the renderer (data-recording/azure-upload.js). Kept in userData so the installed app can
+// always write them; a recording is deleted locally once it is uploaded.
 const recordingsDir = path.join(app.getPath('userData'), 'recordings');
 const RECORDING_KINDS = ['kirtan', 'paath', 'sung_bani', 'akhand_kirtan', 'katha', 'other'];
 const RECORDING_VISIBILITY = ['public', 'private'];
@@ -176,13 +177,13 @@ let recordingVisibility = 'private';
 const MIC_SOURCES = ['mixer', 'laptop', 'webcam', 'phone', 'bluetooth', 'virtual', 'other'];
 let recordingMic = null; // { source, label } of the input recorded from
 
-const injectedTokenOk = () => Boolean(injectedHfToken && !injectedHfToken.startsWith('__'));
+const uploadKeyOk = () => Boolean(injectedUploadSas && !injectedUploadSas.startsWith('__'));
 
 function recordingPrefs() {
   const consent = store.get('recording.consent') || null;
   return {
     gurdwaraName: store.get('recording.gurdwaraName') || '',
-    hfTokenAvailable: injectedTokenOk(),
+    uploadsAvailable: uploadKeyOk(),
     consentGiven: Boolean(consent && consent.version === RECORDING_CONSENT_VERSION),
     consentVersion: RECORDING_CONSENT_VERSION,
     recordingsDir,
@@ -206,7 +207,7 @@ function recordingReady() {
   return prefs.consentGiven; // the Gurdwara Sahib name is optional
 }
 
-// Written at Stop, next to the WAV the renderer saves into <dir>/hf/: the verses the sevadaar
+// Written at Stop, next to the WAV the renderer saves into <dir>/audio/: the verses the sevadaar
 // showed (human.jsonl, the shadow format the uploader reads) and the session's metadata.
 function writeRecordingFiles() {
   fs.mkdirSync(recordingSessionDir, { recursive: true });
@@ -218,6 +219,9 @@ function writeRecordingFiles() {
     path.join(recordingSessionDir, 'session.json'),
     JSON.stringify(
       {
+        source: 'sttm-data', // the STTM Data initiative (not the Shadower or Autopilot)
+        sourceVersion: 1,
+        id: path.basename(recordingSessionDir),
         kind: recordingKind,
         visibility: recordingVisibility,
         mic: recordingMic,

@@ -6,7 +6,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { useKeys, useRecordingState } from '../common/hooks';
 
-// What is being recorded (the dataset type on Hugging Face).
+// What is being recorded (the folder under sttm-data/<private|public>/ in Azure).
 const KINDS = [
   ['kirtan', 'Kirtan', 'fa-music', 'Shabad Kirtan by Ragi Singhs'],
   ['paath', 'Paath', 'fa-book', 'Japji Sahib Ji, Rehras Sahib Ji'],

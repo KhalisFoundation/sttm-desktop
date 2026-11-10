@@ -3,11 +3,12 @@ import { ipcRenderer } from 'electron';
 
 const fs = require('fs');
 const path = require('path');
-const hf = require('../../data-recording/hf-upload');
-const { hfToken } = require('../../data-recording/config');
+const azure = require('../../data-recording/azure-upload');
+// The Shadower's Azure container and its append-only key, injected at build (VF_UPLOAD_SAS).
+const { UPLOAD_URL, UPLOAD_SAS } = require('../../addons/voice-follow/shadow/config');
 const pcm = require('../../data-recording/pcm');
 
-const token = hfToken;
+const uploadsOn = () => azure.configured(UPLOAD_URL, UPLOAD_SAS);
 
 const readSession = (dir) => {
   try {
@@ -17,15 +18,14 @@ const readSession = (dir) => {
   }
 };
 
-// Upload one finished recording; on success the local copy is removed (it is on Hugging Face).
+// Upload one finished recording; on success the local copy is removed (it is in Azure).
 // On failure (offline) it stays and is retried at the next launch.
 const pushRecording = async (dir) => {
   const session = readSession(dir);
-  const tok = token();
-  if (!session || !tok) return false;
+  if (!session || !uploadsOn()) return false;
   const started = Date.now();
   try {
-    const repo = await hf.pushRecording(dir, tok);
+    const repo = await azure.pushRecording(dir, { url: UPLOAD_URL, sas: UPLOAD_SAS });
     // eslint-disable-next-line no-console
     console.log(`recording: pushed ${path.basename(dir)} -> ${repo}`);
     fs.rmSync(dir, { recursive: true, force: true });
@@ -49,7 +49,7 @@ const pushRecording = async (dir) => {
 const pushPending = async () => {
   const prefs = await ipcRenderer.invoke('get-recording-settings');
   const root = prefs && prefs.recordingsDir;
-  if (!root || !token() || !fs.existsSync(root)) return;
+  if (!root || !uploadsOn() || !fs.existsSync(root)) return;
   const dirs = fs
     .readdirSync(root)
     .map((id) => path.join(root, id))
@@ -57,7 +57,7 @@ const pushPending = async () => {
       const id = path.basename(d);
       return (
         fs.existsSync(path.join(d, 'session.json')) &&
-        fs.existsSync(path.join(d, 'hf', `${id}.wav`))
+        fs.existsSync(path.join(d, 'audio', `${id}.wav`))
       );
     })
     .sort();
@@ -99,9 +99,9 @@ export const useAudioRecorder = () => {
       streamRef.current = stream;
       const rec = await pcm.open(stream, { holdSeconds: 0 });
       recRef.current = rec;
-      const hfDir = path.join(folderPath, 'hf');
-      fs.mkdirSync(hfDir, { recursive: true });
-      rec.begin(path.join(hfDir, `${sessionId}.wav`));
+      const audioDir = path.join(folderPath, 'audio');
+      fs.mkdirSync(audioDir, { recursive: true });
+      rec.begin(path.join(audioDir, `${sessionId}.wav`));
       ipcRenderer.send('recording-audio-started', { at: Date.now() });
     };
 
