@@ -13,7 +13,7 @@ const WRONG_KINDS = ['webcam', 'phone', 'bluetooth', 'virtual'];
 
 // What is being recorded (the folder under sttm-data/<private|public>/ in Azure).
 const KINDS = [
-  ['kirtan', 'Kirtan', 'fa-music', 'Shabad Kirtan by Ragi Singhs'],
+  ['kirtan', 'Kirtan', 'fa-music', 'Shabad Kirtan by Ragi jathas'],
   ['paath', 'Paath', 'fa-book', 'Japji Sahib Ji, Rehras Sahib Ji'],
   ['akhand_kirtan', 'Sangat Roopi Kirtan', 'fa-refresh', 'Akhand Kirtan, AKJ Smagams'],
 ];
