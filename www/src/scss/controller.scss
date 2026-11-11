@@ -984,3 +984,45 @@ ul {
 .workspace-bar .recording-controls:hover {
   background-color: transparent !important;
 }
+
+// Record card: level, 'Hearing it' and one tip, on a single line.
+.recording-vis .mic-status {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+
+  .mic-level.compact .mic-level-bar {
+    min-width: 56px;
+    width: 56px;
+  }
+
+  .mic-heard {
+    color: #6b7280;
+
+    &.on {
+      color: #166534;
+    }
+  }
+
+  .mic-note {
+    color: #4b5563;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.warn {
+      color: #b42318;
+    }
+
+    &.quiet {
+      color: #6b7280;
+    }
+
+    &.good {
+      color: #166534;
+    }
+  }
+}

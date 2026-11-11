@@ -5,7 +5,17 @@ import { ipcRenderer } from 'electron';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 
 import { useKeys, useRecordingState } from '../common/hooks';
-import { micKind, MIC_WARN, useInputLevel, LevelMeter } from '../common/mic-check';
+import { micKind, useInputLevel, LevelMeter } from '../common/mic-check';
+
+const HEARD_TEXT = { true: 'Hearing it', null: 'Listening', false: 'Quiet' };
+
+// One-line notes for inputs that are probably the wrong one (kinds from common/mic-check).
+const SHORT_WARN = {
+  webcam: 'Webcam mic?',
+  phone: 'Phone mic?',
+  bluetooth: 'Bluetooth earphones?',
+  virtual: 'Virtual input, not a mic?',
+};
 
 // What is being recorded (the folder under sttm-data/<private|public>/ in Azure).
 const KINDS = [
@@ -321,34 +331,52 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
                 </select>
               </label>
             )}
-            {inputs.length > 0 && <LevelMeter level={cardLevel.level} heard={cardLevel.heard} />}
-            {(() => {
-              const kindNow = micKind((inputs.find((d) => d.id === cardDevice) || {}).label);
-              if (MIC_WARN[kindNow]) {
+            {inputs.length > 0 &&
+              (() => {
+                // One short line under the input: how it sounds, then one tip. Never blocks Start;
+                // a quiet mixer (nothing playing yet, a fader down) only gets a gentle check.
+                const kindNow = micKind((inputs.find((d) => d.id === cardDevice) || {}).label);
+                const { heard } = cardLevel;
+                let tip = null;
+                if (SHORT_WARN[kindNow]) {
+                  tip = (
+                    <span className="mic-note warn">
+                      <i className="fa fa-exclamation-circle" /> {SHORT_WARN[kindNow]} The mixer is
+                      best.
+                    </span>
+                  );
+                } else if (heard === false) {
+                  tip = (
+                    <span className="mic-note quiet">
+                      <i className="fa fa-info-circle" />{' '}
+                      {kindNow === 'laptop'
+                        ? 'No sound yet. Is the mic muted?'
+                        : 'No sound yet. Check the mixer and cable.'}
+                    </span>
+                  );
+                } else if (kindNow === 'laptop') {
+                  tip = (
+                    <span className="mic-note">
+                      <i className="fa fa-lightbulb-o" /> Computer mic. The mixer is much clearer.
+                    </span>
+                  );
+                } else if (kindNow === 'mixer') {
+                  tip = (
+                    <span className="mic-note good">
+                      <i className="fa fa-check-circle" /> Mixer. Thank you!
+                    </span>
+                  );
+                }
                 return (
-                  <p className="mic-tip warn">
-                    <i className="fa fa-exclamation-triangle" /> {MIC_WARN[kindNow]} Please pick the
-                    mixer (best) or this computer&apos;s own mic.
-                  </p>
+                  <div className="mic-status">
+                    <LevelMeter level={cardLevel.level} heard={heard} compact />
+                    <span className={`mic-heard${heard === true ? ' on' : ''}`}>
+                      {HEARD_TEXT[String(heard)]}
+                    </span>
+                    {tip}
+                  </div>
                 );
-              }
-              if (kindNow === 'laptop') {
-                return (
-                  <p className="mic-tip">
-                    <i className="fa fa-lightbulb-o" /> This is the computer&apos;s own mic. A cable
-                    from the mixer is much more valuable to us, with much clearer audio.
-                  </p>
-                );
-              }
-              if (kindNow === 'mixer') {
-                return (
-                  <p className="mic-tip good">
-                    <i className="fa fa-check-circle" /> Looks like the mixer. Thank you!
-                  </p>
-                );
-              }
-              return null;
-            })()}
+              })()}
             <div className="recording-consent-actions">
               <button type="button" className="secondary" onClick={() => setAskVis(false)}>
                 Cancel
