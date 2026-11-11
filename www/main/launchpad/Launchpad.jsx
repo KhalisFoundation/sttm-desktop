@@ -5,7 +5,8 @@ import { ipcRenderer } from 'electron';
 import Toolbar from '../toolbar';
 import Navigator from '../navigator';
 import WorkspaceBar from '../workspace-bar';
-import { useKeys, useSlides } from '../common/hooks';
+import { useKeys, useSlides, useAudioRecorder } from '../common/hooks';
+import RecordingControls from './RecordingControls';
 
 import {
   Ceremonies,
@@ -127,6 +128,7 @@ const Launchpad = () => {
     ipcRenderer.on('projection-state-request', requestProjectionState);
     return () => ipcRenderer.removeListener('projection-state-request', requestProjectionState);
   }, []);
+  useAudioRecorder();
 
   const onScreenClose = React.useCallback(
     (evt) => {
@@ -278,6 +280,7 @@ const Launchpad = () => {
   return (
     <>
       <WorkspaceBar />
+      <RecordingControls refreshKey={String(overlayScreen)} searchRef={ref} />
       <div className={`launchpad${isSingleDisplayMode ? ' single-display misc-pane' : ''}`}>
         <Toolbar />
         {isSundarGutkaOverlay && <SundarGutka onScreenClose={onScreenClose} />}
