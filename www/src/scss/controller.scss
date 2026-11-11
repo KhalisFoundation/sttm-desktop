@@ -82,6 +82,8 @@ $gurmukhi-font-family-thick: 'gurbaniakharthick';
 
   // Inside the workspace bar's right end, beside the Voice Autopilot mic chip.
   &.in-bar {
+    height: auto;
+    min-width: 0; // the bar sizes every div like a 200px tab
     position: static;
   }
 
@@ -974,4 +976,11 @@ ul {
       }
     }
   }
+}
+
+// The workspace bar greys any div on hover (its tabs, every theme). The right end holds the
+// Record button and the mic chip, not tabs: never grey it.
+.workspace-bar .workspace-bar-right:hover,
+.workspace-bar .recording-controls:hover {
+  background-color: transparent !important;
 }
