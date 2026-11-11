@@ -712,7 +712,7 @@ ul {
 'share-sync', 'settings', 'notifications';
 .recording-consent-backdrop {
   align-items: center;
-  background: rgba(17, 24, 39, 0.18); // a light dim; the card's shadow sets it apart
+  background: transparent; // no dim over the app (it showed unevenly around the bar); the card's shadow sets it apart
   display: flex;
   inset: 0;
   justify-content: center;
@@ -723,7 +723,8 @@ ul {
 .recording-consent {
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
   color: #111;
   font-family: $body-font-family;
   max-width: 380px;
