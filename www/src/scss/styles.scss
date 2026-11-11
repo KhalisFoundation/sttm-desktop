@@ -43,7 +43,7 @@ $tag-popular-color: #ce744e;
   width: calc(#{$presenter-panes-container} - calc(#{$presenter-pane-gap} * 1.5));
 }
 
-@import 'controller.scss', 'mic-check', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
+@import 'controller.scss', 'markdown', 'themes/themes', 'update', 'viewer', 'window', 'addon', 'akhandpaatt',
   'overlay', 'animations', 'noty', 'ui-library', 'workspace-bar', 'navigator/common/pane',
   'navigator/common/verse-block', 'navigator/search/searchNew', 'navigator/shabad/shabad', 'navigator/shabad/multipane',
   'navigator/misc/misc', 'navigator/common/icon-button', 'navigator/viewer/viewer',
