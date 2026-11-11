@@ -146,7 +146,52 @@ function autoPauseMinutes(env) {
   return Number.isFinite(v) && v > 0 ? v : AUTOPAUSE_MIN_DEFAULT;
 }
 
+// A short, friendly name for an input, for the warning lines only (the picker, switching and
+// logs keep the real label and deviceId). Drops what every OS wraps around the real name:
+// "Default - ", "Communications - ", "Microphone (X)" / "Line In (X)" / "Headset (X)" -> X,
+// trailing USB ids "(3547:0407)", "(Virtual)" and "(Built-in)".
+const WRAPPERS = /^(?:microphone|line in|headset|headset microphone|mic in|input)\s*\((.+)\)$/i;
+function friendlyMicName(label, { keepBuiltIn = false } = {}) {
+  let n = String(label || '').trim();
+  n = n.replace(/^(?:default|communications)\s+-\s+/i, '');
+  let prev;
+  do {
+    prev = n;
+    n = n.replace(/\s*\([0-9a-f]{4}:[0-9a-f]{4}\)\s*$/i, '');
+    n = n.replace(/\s*\(virtual\)\s*$/i, '');
+    if (!keepBuiltIn) n = n.replace(/\s*\(built-?in\)\s*$/i, '');
+    const m = n.match(WRAPPERS);
+    if (m) n = m[1].trim();
+  } while (n !== prev);
+  return n || String(label || '').trim();
+}
+
+// Friendly names for a whole list ([{ deviceId, label }] -> Map deviceId -> name). Two inputs
+// that would read the same keep "(Built-in)" first, then a number, so they can still be told
+// apart.
+function friendlyMicNames(list) {
+  const out = new Map();
+  const first = (list || []).map((d) => ({ d, n: friendlyMicName(d.label) }));
+  const dupes = (items, name) => items.filter((x) => x.n === name).length > 1;
+  const items = first.map((x) =>
+    dupes(first, x.n) ? { d: x.d, n: friendlyMicName(x.d.label, { keepBuiltIn: true }) } : x,
+  );
+  const seen = new Map();
+  items.forEach((x) => {
+    let { n } = x;
+    if (dupes(items, n)) {
+      const k = (seen.get(n) || 0) + 1;
+      seen.set(n, k);
+      if (k > 1) n = `${n} (${k})`;
+    }
+    out.set(x.d.deviceId, n);
+  });
+  return out;
+}
+
 module.exports = {
+  friendlyMicName,
+  friendlyMicNames,
   createMicWatch,
   pickProbedMic,
   dismissKey,

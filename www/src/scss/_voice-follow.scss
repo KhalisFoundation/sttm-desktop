@@ -1492,16 +1492,11 @@ $vf2-yellow-bar: #f2c200;
 .vf2-body > .vf-mic-status {
   margin: 0 0 8px;
 }
-// One line each: the verdict and its links never wrap (an ellipsis if the panel is narrow); on the
-// start screen the line may run wider than the 360 px column so it fits on one line.
+// On the start screen the line may run wider than the 360 px column so it fits on one line.
+// Never cut with an ellipsis: the verdict stays on one line where it fits, and the links wrap
+// onto a second line if they must.
 .vf-mic-status .vf-hw-verdict,
 .vf-mic-status .vf-hw-detail {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-// The Start confirm is a full sentence: its verdict may take two lines.
-.vf-mic-status.is-wrap .vf-hw-verdict {
   white-space: normal;
 }
 .vf-ap-start > .vf-mic-status {

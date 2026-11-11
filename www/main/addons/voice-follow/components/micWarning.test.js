@@ -148,3 +148,43 @@ test('auto-pause minutes: 30 by default, VF_AUTOPAUSE_MIN overrides for tests', 
   assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: 'x' }), 30);
   assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: '-1' }), 30);
 });
+
+const { friendlyMicName, friendlyMicNames } = require('./micWarning');
+
+test('friendly input names (display only), on names from the field logs', () => {
+  const cases = {
+    'Microphone (Iriun Webcam #4)': 'Iriun Webcam #4',
+    'Default - Microphone (Iriun Webcam #4)': 'Iriun Webcam #4',
+    'Microphone (Wireless Microphone) (3547:0407)': 'Wireless Microphone',
+    'Communications - Microphone (Wireless Microphone) (3547:0407)': 'Wireless Microphone',
+    'MacBook Pro Microphone (Built-in)': 'MacBook Pro Microphone',
+    'Default - MacBook Pro Microphone (Built-in)': 'MacBook Pro Microphone',
+    'ZoomAudioDevice (Virtual)': 'ZoomAudioDevice',
+    'Microphone (AudioRelay Virtual Mic)': 'AudioRelay Virtual Mic',
+    'Analogue 1 + 2 (Scarlett Solo 4th Gen)': 'Analogue 1 + 2 (Scarlett Solo 4th Gen)',
+    'Microphone (Scarlett Solo 4th Gen) (1235:8211)': 'Scarlett Solo 4th Gen',
+    'Dante Via Receive (Dante Via)': 'Dante Via Receive (Dante Via)',
+    'Microphone Array (Intel® Smart Sound Technology for Digital Microphones)':
+      'Microphone Array (Intel® Smart Sound Technology for Digital Microphones)',
+    'Line In (Realtek(R) Audio)': 'Realtek(R) Audio',
+    'Headset (Jabra Evolve 20)': 'Jabra Evolve 20',
+    'USB Audio CODEC': 'USB Audio CODEC',
+    '': '',
+  };
+  Object.entries(cases).forEach(([label, name]) =>
+    assert.strictEqual(friendlyMicName(label), name),
+  );
+});
+
+test('friendly names stay distinct when two inputs would read the same', () => {
+  const names = friendlyMicNames([
+    { deviceId: 'a', label: 'MacBook Pro Microphone (Built-in)' },
+    { deviceId: 'b', label: 'Microphone (MacBook Pro Microphone)' },
+    { deviceId: 'c', label: 'Microphone (USB Audio CODEC) (08bb:2902)' },
+    { deviceId: 'd', label: 'Line In (USB Audio CODEC) (08bb:2902)' },
+  ]);
+  assert.strictEqual(names.get('a'), 'MacBook Pro Microphone (Built-in)');
+  assert.strictEqual(names.get('b'), 'MacBook Pro Microphone');
+  assert.strictEqual(names.get('c'), 'USB Audio CODEC');
+  assert.strictEqual(names.get('d'), 'USB Audio CODEC (2)');
+});

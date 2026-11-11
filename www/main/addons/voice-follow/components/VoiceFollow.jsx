@@ -27,6 +27,8 @@ const sessionLog = require('../engine/session-log');
 const { createBoard, mergeTranscript, switchProgress } = require('./liveBoard');
 const { createShelf } = require('./candidateShelf');
 const {
+  friendlyMicName,
+  friendlyMicNames,
   createMicWatch,
   pickProbedMic,
   dismissKey,
@@ -7543,18 +7545,20 @@ const VoiceFollow = () => {
   const liveMic = liveMicRef.current;
   const liveName = liveMic.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
   const micName = (d) => (d && d.label) || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
-  // Long device names are cut with an ellipsis; the full name is the tooltip.
-  const shortName = (name) => (name.length > 30 ? `${name.slice(0, 29)}…` : name);
+  // Warning lines name an input by its friendly name (no "Microphone (…)", USB ids or
+  // "(Virtual)"; never cut with an ellipsis); the full label is the tooltip, and the picker,
+  // switching and logs keep the real label.
+  const friendlyNames = friendlyMicNames(mics.list);
+  const friendly = (d) =>
+    (d && (friendlyNames.get(d.deviceId) || friendlyMicName(d.label))) ||
+    i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
   const goodOthers = (exclude) =>
     mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 2);
   // The same status line as "Check this computer" (HwCheck.jsx): a coloured icon and verdict,
   // then a muted line of underlined links that say what they do. Red: wrong input or nothing
   // heard; orange: hears very little; nothing when the input looks fine.
-  const micStatus = ({ tone, icon, verdict, title, note, links, wrap }) => (
-    <div
-      className={`vf-hw vf-mic-status is-${tone}${wrap ? ' is-wrap' : ''}`}
-      role={tone === 'wrong' ? 'alert' : 'status'}
-    >
+  const micStatus = ({ tone, icon, verdict, title, note, links }) => (
+    <div className={`vf-hw vf-mic-status is-${tone}`} role={tone === 'wrong' ? 'alert' : 'status'}>
       <div className="vf-hw-verdict" title={title}>
         <i className={`fa ${icon}`} aria-hidden="true" /> {verdict}
       </div>
@@ -7576,7 +7580,7 @@ const VoiceFollow = () => {
     title: micName(d),
     onClick: () => onPick(d.deviceId),
     label: i18n.t(found ? 'VOICE_FOLLOW.MIC_USE_FOUND' : 'VOICE_FOLLOW.MIC_USE', {
-      mic: shortName(micName(d)),
+      mic: friendly(d),
       ...NO_ESCAPE,
     }),
   });
@@ -7611,7 +7615,7 @@ const VoiceFollow = () => {
       tone: 'wrong',
       icon: 'fa-exclamation-triangle',
       verdict: i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', {
-        mic: shortName(liveName),
+        mic: friendly(liveMic),
         ...NO_ESCAPE,
       }),
       title: liveName,
@@ -7655,9 +7659,8 @@ const VoiceFollow = () => {
     micCheck = micStatus({
       tone: 'wrong',
       icon: 'fa-exclamation-triangle',
-      wrap: true,
       verdict: i18n.t('VOICE_FOLLOW.MIC_START_CONFIRM', {
-        mic: shortName(micName(shownMic)),
+        mic: friendly(shownMic),
         kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
         ...NO_ESCAPE,
       }),
@@ -7689,7 +7692,7 @@ const VoiceFollow = () => {
       tone: 'wrong',
       icon: 'fa-exclamation-triangle',
       verdict: i18n.t('VOICE_FOLLOW.MIC_WRONG', {
-        mic: shortName(micName(shownMic)),
+        mic: friendly(shownMic),
         kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
         ...NO_ESCAPE,
       }),
