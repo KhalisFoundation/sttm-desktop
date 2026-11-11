@@ -2681,6 +2681,16 @@ const VoiceFollow = () => {
         ng.lastFit = now;
         ng.hops = [];
         ng.back = 0;
+        // The follower moving on through an Akhand Paath reading that crossed is Gurbani being
+        // read: the katha check (ngTalkOk) must see it. Without this only a crossing counted,
+        // so any Shabad read for longer than NG_TALK_SEQ_QUIET_MS could be taken for katha
+        // mid-reading: the Waheguru slide, the reading order reset and a fresh search
+        // (Wolverhampton, 45 s after each crossing).
+        if (d && d.follow && phaseRef.current === 'following') {
+          ng.lastProgress = now;
+          ng.progress.push(now);
+          while (ng.progress.length && now - ng.progress[0] > NG_KEEP_MS) ng.progress.shift();
+        }
         return;
       }
       if (!ng.lastFit) ng.lastFit = now;
