@@ -77,3 +77,74 @@ test('dismiss key is per kind and device', () => {
   assert.notStrictEqual(dismissKey('silent', 'x'), dismissKey('silent', 'y'));
   assert.strictEqual(dismissKey('virtual', '', 'Iriun'), 'virtual:Iriun');
 });
+
+// Stand-ins for common/mic-check's micKind / MIC_WARN (the real list is tested in micKind.test.js).
+const kindOf = (label) => {
+  if (/iriun|virtual|webcam/i.test(label)) return 'virtual';
+  if (/usb audio|codec|wireless microphone|mixer/i.test(label)) return 'mixer';
+  if (/macbook|built-in|array/i.test(label)) return 'laptop';
+  return 'other';
+};
+const isWrong = (label) => kindOf(label) === 'virtual';
+const mic = (deviceId, label) => ({ deviceId, label });
+const {
+  pickDefaultMic,
+  bestOtherMic,
+  createSilenceClock,
+  autoPauseMinutes,
+  AUTOPAUSE_MIN_DEFAULT,
+} = require('./micWarning');
+
+test('default input: a flagged system default is passed over for a real one (Hicksville)', () => {
+  const iriun = mic('i', 'Microphone (Iriun Webcam #4)');
+  const wireless = mic('w', 'Microphone (Wireless Microphone)');
+  const r = pickDefaultMic([iriun, wireless], iriun, { kindOf, isWrong });
+  assert.strictEqual(r.device.deviceId, 'w');
+  assert.strictEqual(r.avoided.deviceId, 'i');
+});
+
+test('default input: only a flagged input -> keep it (the Start confirm then asks)', () => {
+  const iriun = mic('i', 'Microphone (Iriun Webcam #4)');
+  const r = pickDefaultMic([iriun], iriun, { kindOf, isWrong });
+  assert.strictEqual(r.device.deviceId, 'i');
+  assert.strictEqual(r.avoided, null);
+  assert.strictEqual(bestOtherMic([iriun], 'i', { kindOf, isWrong }), null);
+});
+
+test('default input: a fine system default is kept; preference mixer > built-in > other', () => {
+  const mac = mic('m', 'MacBook Pro Microphone (Built-in)');
+  const usb = mic('u', 'USB Audio CODEC');
+  const yeti = mic('y', 'Yeti Stereo Microphone');
+  const zoom = mic('z', 'ZoomAudioDevice (Virtual)');
+  assert.strictEqual(pickDefaultMic([mac, usb], mac, { kindOf, isWrong }).avoided, null);
+  assert.strictEqual(pickDefaultMic([zoom, yeti, mac, usb], zoom, { kindOf, isWrong }).device, usb);
+  assert.strictEqual(pickDefaultMic([zoom, yeti, mac], zoom, { kindOf, isWrong }).device, mac);
+  assert.strictEqual(pickDefaultMic([zoom, yeti], zoom, { kindOf, isWrong }).device, yeti);
+  assert.strictEqual(pickDefaultMic([], null, { kindOf, isWrong }).device, null);
+});
+
+test('auto-pause clock: pauses after the full stretch of no sound; any sound restarts it', () => {
+  const c = createSilenceClock({ pauseMs: 30 * 60000 });
+  let t = 0;
+  const run = (ms, rms) => {
+    let out = false;
+    for (let end = t + ms; t < end; t += 250) out = c.push({ now: t, rms });
+    return out;
+  };
+  assert.strictEqual(run(29 * 60000, 0), false);
+  assert.strictEqual(run(60000 + 250, 0.0001), true); // below the no-sound line: still silent
+  assert.ok(c.silentMs(t) >= 30 * 60000);
+  c.reset();
+  assert.strictEqual(run(20 * 60000, 0), false);
+  assert.strictEqual(run(250, 0.02), false); // one sound window restarts the clock
+  assert.strictEqual(run(20 * 60000, 0), false);
+});
+
+test('auto-pause minutes: 30 by default, VF_AUTOPAUSE_MIN overrides for tests', () => {
+  assert.strictEqual(AUTOPAUSE_MIN_DEFAULT, 30);
+  assert.strictEqual(autoPauseMinutes({}), 30);
+  assert.strictEqual(autoPauseMinutes(undefined), 30);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: '0.5' }), 0.5);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: 'x' }), 30);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: '-1' }), 30);
+});

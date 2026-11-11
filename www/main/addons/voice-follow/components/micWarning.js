@@ -91,4 +91,69 @@ function pickProbedMic(results, opts = {}) {
 // One dismissal per hint kind and device for as long as the panel lives.
 const dismissKey = (kind, deviceId, label) => `${kind}:${deviceId || label || ''}`;
 
-module.exports = { createMicWatch, pickProbedMic, dismissKey, MIC_WATCH: DEFAULTS };
+// The order to prefer inputs in when the app chooses one itself: the mixer, then the
+// computer's own mic, then anything else; a wrong kind (virtual, phone, webcam, Bluetooth) last.
+const KIND_RANK = { mixer: 0, laptop: 1, other: 2 };
+const rankOf = (kindOf, isWrong, d) => (isWrong(d.label) ? 9 : (KIND_RANK[kindOf(d.label)] ?? 2));
+
+// The best input other than `exclude` (deviceId), by KIND_RANK; null when there is none that
+// is not a wrong kind. kindOf(label) and isWrong(label) come from common/mic-check.
+function bestOtherMic(list, exclude, { kindOf, isWrong }) {
+  const others = (list || []).filter((d) => d.deviceId !== exclude && !isWrong(d.label));
+  if (!others.length) return null;
+  return others
+    .map((d, i) => ({ d, i, r: rankOf(kindOf, isWrong, d) }))
+    .sort((a, b) => a.r - b.r || a.i - b.i)[0].d;
+}
+
+// The input to use when the sevadaar has not chosen one (first run, or the saved one is gone):
+// the system default, unless its name looks wrong and another input exists; then the best other
+// (field logs: every silent Gurdwara Sahib session ran on a default like "Iriun Webcam #4" while
+// "Wireless Microphone" sat unused). Returns { device, avoided } where avoided is the default
+// that was passed over (null when the default is kept).
+function pickDefaultMic(list, defaultDevice, { kindOf, isWrong }) {
+  const all = list || [];
+  const def = defaultDevice || all[0] || null;
+  if (!def || !isWrong(def.label)) return { device: def, avoided: null };
+  const best = bestOtherMic(all, def.deviceId, { kindOf, isWrong });
+  return best ? { device: best, avoided: def } : { device: def, avoided: null };
+}
+
+// Auto-pause: fed one level per volume window while Autopilot runs; says when there has been no
+// sound for pauseMs (an empty hall after the programme: a Mac ran 57 h listening to nothing).
+function createSilenceClock({ pauseMs, silentRms = DEFAULTS.silentRms }) {
+  let quietSince = null;
+  return {
+    reset() {
+      quietSince = null;
+    },
+    silentMs: (now) => (quietSince == null ? 0 : now - quietSince),
+    push({ now, rms }) {
+      if (Number.isFinite(rms) && rms >= silentRms) {
+        quietSince = null;
+        return false;
+      }
+      if (quietSince == null) quietSince = now;
+      return now - quietSince >= pauseMs;
+    },
+  };
+}
+
+// Minutes of no sound before Autopilot pauses itself; VF_AUTOPAUSE_MIN overrides it for tests.
+const AUTOPAUSE_MIN_DEFAULT = 30;
+function autoPauseMinutes(env) {
+  const v = Number(env && env.VF_AUTOPAUSE_MIN);
+  return Number.isFinite(v) && v > 0 ? v : AUTOPAUSE_MIN_DEFAULT;
+}
+
+module.exports = {
+  createMicWatch,
+  pickProbedMic,
+  dismissKey,
+  bestOtherMic,
+  pickDefaultMic,
+  createSilenceClock,
+  autoPauseMinutes,
+  AUTOPAUSE_MIN_DEFAULT,
+  MIC_WATCH: DEFAULTS,
+};

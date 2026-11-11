@@ -1500,6 +1500,10 @@ $vf2-yellow-bar: #f2c200;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+// The Start confirm is a full sentence: its verdict may take two lines.
+.vf-mic-status.is-wrap .vf-hw-verdict {
+  white-space: normal;
+}
 .vf-ap-start > .vf-mic-status {
   width: max-content;
   max-width: 540px;
