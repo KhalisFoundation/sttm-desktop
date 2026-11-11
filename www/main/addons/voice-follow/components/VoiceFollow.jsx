@@ -7458,112 +7458,103 @@ const VoiceFollow = () => {
     onMainClick();
   };
   // Wrong-microphone warnings, in this panel only (never on a sangat screen). The same look and
-  // input-kind list as the tester Record card (common/mic-check). A wrong
-  // input or no sound is serious (Autopilot hears nothing), so those two are red; the
-  // "hears very little" hint stays amber.
+  // input-kind list as the tester Record card (common/mic-check), shown in the "Check this
+  // computer" status-line style.
   const liveMic = liveMicRef.current;
   const liveName = liveMic.label || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
   const micName = (d) => (d && d.label) || i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
-  const micCloseButton = (kind, deviceId, label) => (
-    <button
-      type="button"
-      className="vf-mic-hint-close"
-      onClick={() => dismissMicHint(kind, deviceId, label)}
-      title={i18n.t('VOICE_FOLLOW.MIC_HINT_DISMISS')}
-      aria-label={i18n.t('VOICE_FOLLOW.MIC_HINT_DISMISS')}
-    >
-      <i className="fa fa-times" aria-hidden="true" />
-    </button>
-  );
-  // One-tap buttons for the other inputs that are not a wrong kind themselves (short; the full
-  // name is the tooltip).
-  const micButtons = (list, onPick) =>
-    list.map((d) => (
-      <button
-        key={d.deviceId}
-        type="button"
-        className="vf-mic-hint-btn"
-        title={micName(d)}
-        onClick={() => onPick(d.deviceId)}
-      >
-        <i className="fa fa-microphone" aria-hidden="true" /> {micName(d)}
-      </button>
-    ));
+  // Long device names are cut with an ellipsis; the full name is the tooltip.
+  const shortName = (name) => (name.length > 30 ? `${name.slice(0, 29)}…` : name);
   const goodOthers = (exclude) =>
     mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 2);
-  // The red warning, compact so the panel never scrolls: one row with the icon, the bold title,
-  // the one-tap buttons and a faint x; one short line under it.
-  const dangerBox = ({ title, line, buttons, close }) => (
-    <div className="vf-mic-hint is-danger" role="alert">
-      <div className="vf-mic-hint-row">
-        <i className="fa fa-exclamation-triangle vf-mic-hint-icon" aria-hidden="true" />
-        <span className="vf-mic-hint-title" title={title}>
-          {title}
-        </span>
-        <span className="vf-mic-hint-actions">{buttons}</span>
-        {close}
+  // The same status line as "Check this computer" (HwCheck.jsx): a coloured icon and verdict,
+  // then a muted line of underlined links that say what they do. Red: wrong input or nothing
+  // heard; orange: hears very little; nothing when the input looks fine.
+  const micStatus = ({ tone, icon, verdict, title, note, links }) => (
+    <div className={`vf-hw vf-mic-status is-${tone}`} role={tone === 'wrong' ? 'alert' : 'status'}>
+      <div className="vf-hw-verdict" title={title}>
+        <i className={`fa ${icon}`} aria-hidden="true" /> {verdict}
       </div>
-      {line && <div className="vf-mic-hint-line">{line}</div>}
+      <div className="vf-hw-detail">
+        {note && `${note} · `}
+        {links.map((l, i) => (
+          <React.Fragment key={l.key}>
+            {i > 0 && ' · '}
+            <button type="button" className="vf-hw-link" title={l.title} onClick={l.onClick}>
+              {l.label}
+            </button>
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
+  const useLink = (d, onPick, found) => ({
+    key: d.deviceId,
+    title: micName(d),
+    onClick: () => onPick(d.deviceId),
+    label: i18n.t(found ? 'VOICE_FOLLOW.MIC_USE_FOUND' : 'VOICE_FOLLOW.MIC_USE', {
+      mic: shortName(micName(d)),
+      ...NO_ESCAPE,
+    }),
+  });
+  const dismissLink = (kind, deviceId, label) => ({
+    key: 'dismiss',
+    title: i18n.t('VOICE_FOLLOW.MIC_HINT_DISMISS'),
+    onClick: () => dismissMicHint(kind, deviceId, label),
+    label: i18n.t('VOICE_FOLLOW.MIC_DISMISS'),
+  });
   let micHintView = null;
   if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
-    micHintView = dangerBox({
-      title: i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', { mic: liveName, ...NO_ESCAPE }),
-      line: micProbe
-        ? i18n.t('VOICE_FOLLOW.MIC_PROBE_FOUND', { mic: micName(micProbe), ...NO_ESCAPE })
-        : i18n.t('VOICE_FOLLOW.MIC_SILENT'),
-      buttons: micProbe ? (
-        <button
-          type="button"
-          className="vf-mic-hint-btn is-primary"
-          title={micName(micProbe)}
-          onClick={() => switchMic(micProbe.deviceId, 'probe')}
-        >
-          <i className="fa fa-microphone" aria-hidden="true" /> {i18n.t('VOICE_FOLLOW.MIC_SWITCH')}
-        </button>
-      ) : (
-        micButtons(goodOthers(otherMic), (id) => switchMic(id, 'list'))
-      ),
-      close: micCloseButton('silent', liveMic.deviceId, liveMic.label),
+    const others = micProbe
+      ? [useLink(micProbe, (id) => switchMic(id, 'probe'), true)]
+      : goodOthers(otherMic).map((d) => useLink(d, (id) => switchMic(id, 'list')));
+    micHintView = micStatus({
+      tone: 'wrong',
+      icon: 'fa-exclamation-triangle',
+      verdict: i18n.t('VOICE_FOLLOW.MIC_SILENT_TITLE', {
+        mic: shortName(liveName),
+        ...NO_ESCAPE,
+      }),
+      title: liveName,
+      note: others.length ? '' : i18n.t('VOICE_FOLLOW.MIC_SILENT'),
+      links: [...others, dismissLink('silent', liveMic.deviceId, liveMic.label)],
     });
   } else if (
     active &&
     micHint === 'quiet' &&
     micHintShown('quiet', liveMic.deviceId, liveMic.label)
   ) {
-    micHintView = (
-      <div className="vf-mic-hint is-quiet" role="status">
-        <div className="vf-mic-hint-row">
-          <i className="fa fa-microphone vf-mic-hint-icon" aria-hidden="true" />
-          <span className="vf-mic-hint-line">{i18n.t('VOICE_FOLLOW.MIC_QUIET')}</span>
-          {micCloseButton('quiet', liveMic.deviceId, liveMic.label)}
-        </div>
-      </div>
-    );
+    micHintView = micStatus({
+      tone: 'below',
+      icon: 'fa-exclamation-triangle',
+      verdict: i18n.t('VOICE_FOLLOW.MIC_QUIET_TITLE'),
+      title: liveName,
+      note: i18n.t('VOICE_FOLLOW.MIC_QUIET'),
+      links: [dismissLink('quiet', liveMic.deviceId, liveMic.label)],
+    });
   }
   // Start screen, under the picker: judged by the input's name only (no level: a mixer with no
   // one talking reads silent and must not scare the sevadaar off it). A name that looks wrong
-  // (virtual, phone, webcam, Bluetooth) gets the compact red warning with one-tap buttons for
+  // (virtual, phone, webcam, Bluetooth) gets the red status line with "Use <mic>" links for
   // the other inputs; a fine or unknown name shows nothing.
   let micCheck = null;
   const wrong = !active && !micDenied && shownMic ? wrongMicKind(shownMic.label) : null;
   if (wrong && micHintShown(wrong, shownMic.deviceId, shownMic.label)) {
-    micCheck = (
-      <div className="vf-mic-check">
-        {dangerBox({
-          title: i18n.t('VOICE_FOLLOW.MIC_WRONG_TITLE'),
-          line: i18n.t('VOICE_FOLLOW.MIC_WRONG', {
-            kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
-          }),
-          buttons: micButtons(
-            goodOthers((d) => d.deviceId !== shownMic.deviceId),
-            chooseMic,
-          ),
-          close: micCloseButton(wrong, shownMic.deviceId, shownMic.label),
-        })}
-      </div>
-    );
+    micCheck = micStatus({
+      tone: 'wrong',
+      icon: 'fa-exclamation-triangle',
+      verdict: i18n.t('VOICE_FOLLOW.MIC_WRONG', {
+        mic: shortName(micName(shownMic)),
+        kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
+        ...NO_ESCAPE,
+      }),
+      title: micName(shownMic),
+      note: '',
+      links: [
+        ...goodOthers((d) => d.deviceId !== shownMic.deviceId).map((d) => useLink(d, chooseMic)),
+        dismissLink(wrong, shownMic.deviceId, shownMic.label),
+      ],
+    });
   }
   // While running: is Autopilot hearing sound through the input? Always shown in the bottom
   // bar: a green dot "Hearing" (with the volume label beside it), or a red "No sound" (which

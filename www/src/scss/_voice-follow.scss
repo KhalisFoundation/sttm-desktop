@@ -1483,14 +1483,27 @@ $vf2-yellow-bar: #f2c200;
   line-height: 1.4;
 }
 
-// Wrong-microphone warnings (micWarning.js), in the sevadaar's panel only. The level bar and tips
-// are the shared mic check (_mic-check.scss, as on the tester Record card); a wrong input or no
-// sound is a red warning here (Autopilot hears nothing), not the Record card's amber.
-.vf-mic-check {
-  width: 100%;
-  max-width: 360px; // about the mic picker row with a long device name
-  margin: 0 auto;
-  text-align: left;
+// Wrong-microphone status (micWarning.js), in the sevadaar's panel only: the "Check this
+// computer" line above (.vf-hw), plus the red it has no use for. Red: wrong input or nothing
+// heard; orange (.is-below): hears very little.
+.vf-hw.is-wrong .vf-hw-verdict {
+  color: $vf2-red;
+}
+.vf2-body > .vf-mic-status {
+  margin: 0 0 8px;
+}
+// One line each: the verdict and its links never wrap (an ellipsis if the panel is narrow); on the
+// start screen the line may run wider than the 360 px column so it fits on one line.
+.vf-mic-status .vf-hw-verdict,
+.vf-mic-status .vf-hw-detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vf-ap-start > .vf-mic-status {
+  width: max-content;
+  max-width: 540px;
+  margin-top: -6px;
 }
 // Running: "Hearing" (green dot) or "No sound" (red), in the bottom bar.
 .vf-mic-live {
@@ -1523,116 +1536,4 @@ $vf2-yellow-bar: #f2c200;
   height: 7px;
   border-radius: 50%;
   background: currentColor;
-}
-// Compact: one row (icon, bold title, one-tap buttons, faint x) and one short line, so the
-// start screen and the running panel never need to scroll.
-.vf-mic-hint {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin: 4px 0;
-  padding: 5px 6px 5px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.35;
-  color: var(--vf-muted);
-  background: rgba(127, 127, 127, 0.1);
-  text-align: left;
-
-  // Wrong input or no sound: Autopilot hears nothing, so it is a red warning.
-  &.is-danger {
-    color: #912018;
-    background: #fef3f2;
-    border: 1px solid #f97066;
-  }
-  &.is-quiet {
-    color: #8a6000;
-    background: rgba(240, 180, 40, 0.14);
-  }
-}
-.vf-mic-hint-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-.vf-mic-hint-icon {
-  flex: none;
-  font-size: 13px;
-
-  .is-danger & {
-    color: #d92d20;
-  }
-}
-.vf-mic-hint-title {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 700;
-  font-size: 12.5px;
-  color: #b42318;
-}
-.vf-mic-hint-line {
-  flex: 1;
-  min-width: 0;
-  padding-left: 19px; // under the title, past the icon
-
-  .vf-mic-hint-row > & {
-    padding-left: 0;
-  }
-}
-.vf-mic-hint-actions {
-  display: flex;
-  flex: 0 1 auto;
-  gap: 4px;
-  min-width: 0;
-  margin-left: auto;
-}
-.vf-mic-hint-btn {
-  max-width: 150px;
-  padding: 2px 8px;
-  border: 1px solid rgba(127, 127, 127, 0.35);
-  border-radius: 5px;
-  background: #fff;
-  color: #1f2937;
-  font: inherit;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-
-  > i {
-    margin-right: 2px;
-    opacity: 0.7;
-  }
-  &.is-primary {
-    border-color: #16a34a;
-    background: #16a34a;
-    color: #fff;
-
-    > i {
-      opacity: 1;
-    }
-  }
-  &:hover {
-    filter: brightness(0.96);
-  }
-}
-// Dismiss is secondary: small and faint until hovered.
-.vf-mic-hint-close {
-  flex: none;
-  padding: 0 2px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font-size: 11px;
-  opacity: 0.4;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.9;
-  }
 }
