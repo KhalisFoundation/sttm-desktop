@@ -7,15 +7,9 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { useKeys, useRecordingState } from '../common/hooks';
 import { micKind, useInputLevel, LevelMeter } from '../common/mic-check';
 
-const HEARD_TEXT = { true: 'Hearing it', null: 'Listening', false: 'Quiet' };
-
-// One-line notes for inputs that are probably the wrong one (kinds from common/mic-check).
-const SHORT_WARN = {
-  webcam: 'Webcam mic?',
-  phone: 'Phone mic?',
-  bluetooth: 'Bluetooth earphones?',
-  virtual: 'Virtual input, not a mic?',
-};
+const HEARD_TEXT = { true: 'Hearing it', null: 'Listening', false: 'No sound' };
+// Inputs that are probably the wrong one (kinds from common/mic-check): their note is red.
+const WRONG_KINDS = ['webcam', 'phone', 'bluetooth', 'virtual'];
 
 // What is being recorded (the folder under sttm-data/<private|public>/ in Azure).
 const KINDS = [
@@ -27,9 +21,9 @@ const DEVICE_KEY = 'sttm-data-mic-device'; // the input chosen on this PC (useAu
 
 const savedDevice = () => {
   try {
-    return window.localStorage.getItem(DEVICE_KEY) || 'default';
+    return window.localStorage.getItem(DEVICE_KEY);
   } catch (_) {
-    return 'default';
+    return null;
   }
 };
 
@@ -128,6 +122,8 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
   const [choice, setChoice] = useState(null);
   const [inputs, setInputs] = useState([]);
   const [device, setDevice] = useState('default');
+  // Start was pressed once while the input was silent: the next press records anyway.
+  const [silentOk, setSilentOk] = useState(false);
   const [recDevice, setRecDevice] = useState(null); // the input being recorded from
   const [welcome, setWelcome] = useState(false);
   const [startAfter, setStartAfter] = useState(false);
@@ -139,6 +135,9 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
   const cardDevice = inputs.some((d) => d.id === device) ? device : (inputs[0] || {}).id;
   const cardLevel = useInputLevel(cardDevice, enabled && askVis && inputs.length > 0);
   const recLevel = useInputLevel(recDevice, enabled && isRecording && recDevice !== null);
+  useEffect(() => {
+    if (cardLevel.heard === true) setSilentOk(false); // sound came back: ask again next time
+  }, [cardLevel.heard]);
   // The right end of the workspace bar (next to the Voice Autopilot mic chip), when it is there.
   const [slot, setSlot] = useState(null);
 
@@ -181,8 +180,15 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
   const askThenStart = () => {
     setChoice(null);
     setKindChoice(null);
-    setDevice(savedDevice());
-    listInputs().then(setInputs);
+    setSilentOk(false);
+    const saved = savedDevice();
+    setDevice(saved || 'default');
+    listInputs().then((list) => {
+      setInputs(list);
+      // Nothing chosen on this PC yet: start on the mixer when there is one.
+      const mixer = list.find((d) => micKind(d.label) === 'mixer');
+      if (!saved && mixer) setDevice(mixer.id);
+    });
     setAskVis(true);
   };
 
@@ -266,7 +272,7 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
           <LevelMeter level={recLevel.level} heard={recLevel.heard} compact />
           {recLevel.heard === false && (
             <span className="mic-silent-warn">
-              <i className="fa fa-exclamation-triangle" /> No sound
+              <i className="fa fa-exclamation-triangle" /> No sound. Check the mic
             </span>
           )}
         </span>
@@ -321,56 +327,67 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
                   id="recording-mic-device"
                   className="disable-kb-shortcuts"
                   value={inputs.some((d) => d.id === device) ? device : inputs[0].id}
-                  onChange={(e) => setDevice(e.target.value)}
+                  onChange={(e) => {
+                    setDevice(e.target.value);
+                    setSilentOk(false);
+                  }}
                 >
-                  {inputs.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.label}
-                    </option>
-                  ))}
+                  {(() => {
+                    const opt = (d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.label}
+                      </option>
+                    );
+                    const mixers = inputs.filter((d) => micKind(d.label) === 'mixer');
+                    if (!mixers.length) return inputs.map(opt);
+                    return [
+                      <optgroup key="mixer" label="Mixer: best for training">
+                        {mixers.map(opt)}
+                      </optgroup>,
+                      <optgroup key="other" label="Other inputs">
+                        {inputs.filter((d) => micKind(d.label) !== 'mixer').map(opt)}
+                      </optgroup>,
+                    ];
+                  })()}
                 </select>
               </label>
             )}
             {inputs.length > 0 &&
               (() => {
-                // One short line under the input: how it sounds, then one tip. Never blocks Start;
-                // a quiet mixer (nothing playing yet, a fader down) only gets a gentle check.
+                // Under the input: how it sounds, then one note. Silence comes first (a mic that
+                // hears nothing records nothing); otherwise the mixer is thanked and anything else
+                // is told it is less useful for training. Start is never blocked.
                 const kindNow = micKind((inputs.find((d) => d.id === cardDevice) || {}).label);
                 const { heard } = cardLevel;
                 let tip = null;
-                if (SHORT_WARN[kindNow]) {
+                if (heard === false) {
                   tip = (
-                    <span className="mic-note warn">
-                      <i className="fa fa-exclamation-circle" /> {SHORT_WARN[kindNow]} The mixer is
-                      best.
-                    </span>
-                  );
-                } else if (heard === false) {
-                  tip = (
-                    <span className="mic-note quiet">
-                      <i className="fa fa-info-circle" />{' '}
-                      {kindNow === 'laptop'
-                        ? 'No sound yet. Is the mic muted?'
-                        : 'No sound yet. Check the mixer and cable.'}
-                    </span>
-                  );
-                } else if (kindNow === 'laptop') {
-                  tip = (
-                    <span className="mic-note">
-                      <i className="fa fa-lightbulb-o" /> Computer mic. The mixer is much clearer.
+                    <span className={`mic-note ${silentOk ? 'warn' : 'quiet'}`}>
+                      <i className="fa fa-exclamation-circle" />{' '}
+                      {silentOk
+                        ? 'Press again to record anyway.'
+                        : 'Is it on? Or pick another input.'}
                     </span>
                   );
                 } else if (kindNow === 'mixer') {
                   tip = (
                     <span className="mic-note good">
-                      <i className="fa fa-check-circle" /> Mixer. Thank you!
+                      <i className="fa fa-check-circle" /> Mixer: best for training. Thank you!
+                    </span>
+                  );
+                } else {
+                  tip = (
+                    <span className={`mic-note${WRONG_KINDS.includes(kindNow) ? ' warn' : ''}`}>
+                      <i className="fa fa-info-circle" /> Not the mixer: less useful for training.
                     </span>
                   );
                 }
                 return (
                   <div className="mic-status">
                     <LevelMeter level={cardLevel.level} heard={heard} compact />
-                    <span className={`mic-heard${heard === true ? ' on' : ''}`}>
+                    <span
+                      className={`mic-heard${heard === true ? ' on' : ''}${heard === false ? ' off' : ''}`}
+                    >
                       {HEARD_TEXT[String(heard)]}
                     </span>
                     {tip}
@@ -385,9 +402,16 @@ const RecordingControls = ({ refreshKey, searchRef }) => {
                 type="button"
                 className="primary"
                 disabled={!choice || !kindChoice}
-                onClick={() => startWith(kindChoice, choice)}
+                onClick={() => {
+                  // A silent input: say so once; a second press records anyway.
+                  if (cardLevel.heard === false && !silentOk) {
+                    setSilentOk(true);
+                    return;
+                  }
+                  startWith(kindChoice, choice);
+                }}
               >
-                Start recording
+                {cardLevel.heard === false && silentOk ? 'Record anyway' : 'Start recording'}
               </button>
             </div>
           </div>

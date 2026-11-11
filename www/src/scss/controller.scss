@@ -1005,6 +1005,11 @@ ul {
     &.on {
       color: #166534;
     }
+
+    &.off {
+      color: #b42318;
+      font-weight: 600;
+    }
   }
 
   .mic-note {
