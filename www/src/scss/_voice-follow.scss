@@ -1513,6 +1513,10 @@ $vf2-yellow-bar: #f2c200;
     color: #b42318;
     background: rgba(214, 69, 65, 0.14);
   }
+  &.is-wait {
+    color: var(--vf-muted);
+    background: rgba(127, 127, 127, 0.12);
+  }
 }
 .vf-mic-live-dot {
   width: 7px;

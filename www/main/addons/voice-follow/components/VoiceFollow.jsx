@@ -7566,14 +7566,17 @@ const VoiceFollow = () => {
     );
   }
   // While running: is Autopilot hearing sound through the input? Always shown in the bottom
-  // bar: a green dot "Hearing" (with the volume label beside it), or a red "No sound" (the
-  // volume label's own no-sound reading, which it then replaces); the input's name is the
-  // tooltip.
-  const hearing = volState !== 'none';
+  // bar: a green dot "Hearing" (with the volume label beside it), or a red "No sound" (which
+  // then replaces the volume label); the input's name is the tooltip. It reads the last ~4 s
+  // of level itself (sound above the "no sound" line), so a dead input shows "No sound" within
+  // seconds, not after the volume label's 8 s; a grey "Checking" fills the first second.
+  let hearState = 'wait';
+  if (vol.hist.length >= 4) hearState = rmsMid >= VOL_SILENT_RMS ? 'on' : 'off';
+  const hearKey = { wait: 'MIC_CHECKING', on: 'MIC_HEARING', off: 'MIC_NO_SOUND' }[hearState];
   const micLive = (
-    <span className={`vf-mic-live ${hearing ? 'is-on' : 'is-off'}`} role="status" title={liveName}>
+    <span className={`vf-mic-live is-${hearState}`} role="status" title={liveName}>
       <i className="vf-mic-live-dot" aria-hidden="true" />
-      {i18n.t(hearing ? 'VOICE_FOLLOW.MIC_HEARING' : 'VOICE_FOLLOW.MIC_NO_SOUND')}
+      {i18n.t(`VOICE_FOLLOW.${hearKey}`)}
     </span>
   );
   const autopilotView = (
@@ -7810,7 +7813,7 @@ const VoiceFollow = () => {
             </span>
           </div>
           {micLive}
-          {hearing && volumeLabel}
+          {hearState === 'on' && volumeLabel}
         </div>
       )}
     </div>

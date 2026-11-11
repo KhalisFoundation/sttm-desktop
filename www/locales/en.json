@@ -585,6 +585,7 @@
     "MIC_KIND_PHONE": "Phone mic",
     "MIC_KIND_WEBCAM": "Webcam mic",
     "MIC_KIND_BLUETOOTH": "Bluetooth headset",
+    "MIC_CHECKING": "Checking…",
     "MIC_HEARING": "Hearing",
     "MIC_NO_SOUND": "No sound",
     "MIC_HINT_DISMISS": "Don't show this again for this microphone",
