@@ -702,6 +702,16 @@ const AKP_VIEW_KEY = 'vf-akhand-view-ours';
 const PAATH_SEQ_OFF = { on: false, streak: 0, backs: 0, cross: { sid: null, n: 0 }, back: null };
 const PAATH_SEQ_BACK_FIXES = 4; // confident fixes in the Shabad just left...
 const PAATH_SEQ_BACK_MS = 3000; // ...over at least this long: go back to it
+// A reading lost for a moment at a Shabad's end (the seeking slide, a search, a judge switch):
+// a lock within PAATH_SEQ_CARRY_MS onto the Shabad it was in or one of the next PAATH_SEQ_AHEAD
+// goes straight back to Akhand Paath following, the Shabads already read carried over (no new
+// PAATH_SEQ_LINES detection, no first-crossing caution: the next crossing opens on the spot).
+const PAATH_SEQ_CARRY_MS = 120000;
+// A step over a Shabad's end: from its last PAATH_SEQ_END_ROWS pangtis into the first
+// PAATH_SEQ_HEAD_ROWS of the next Shabad is a plain step too (a closing pangti or the next
+// Shabad's heading read quickly or softly is often not followed on its own).
+const PAATH_SEQ_END_ROWS = 3;
+const PAATH_SEQ_HEAD_ROWS = 3;
 // A move back of two pangtis or more from `prev` (the last line followed) to `line`.
 const prev2Back = (prev, line) => prev != null && line < prev - 1;
 // Rehras, Sohila, and Japji (whose opening shabad starts with the Mool Mantar, which
@@ -1643,6 +1653,8 @@ const VoiceFollow = () => {
   const paathSeqRef = useRef({ ...PAATH_SEQ_OFF });
   const curCursorPrevRef = useRef(null);
   const seqNextRef = useRef(null);
+  // The last Akhand Paath reading followed ({ session, sid, streak, at }; PAATH_SEQ_CARRY_MS).
+  const seqMemoRef = useRef(null);
   // Akhand Paath detection per plain Shabad (see seqDetectRef), and the Shabad before it.
   const seqPaceRef = useRef({ id: null });
   // Was Shabad `sid` (just followed) read in order at a measured reading pace (at least
@@ -1826,6 +1838,23 @@ const VoiceFollow = () => {
   const backlogRef = useRef({ chunks: [], samples: 0, seconds: 0, peak: 0, merges: 0, notedAt: 0 });
   const paceOffRef = useRef(null); // unsubscribes this session's tier-step listener
   const sessionRef = useRef(0); // invalidates asynchronous work after cleanup/restart
+  // Shabads carried over if Shabad `sid` is locked now (null: no reading to carry on).
+  const seqCarryOf = (sid) => {
+    const m = seqMemoRef.current;
+    if (!m || m.session !== sessionRef.current || typeof sid !== 'number') return null;
+    if (Date.now() - m.at > PAATH_SEQ_CARRY_MS || sid < m.sid || sid - m.sid > PAATH_SEQ_AHEAD)
+      return null;
+    return m.streak + (sid > m.sid ? 1 : 0);
+  };
+  const seqRemember = (sid, streak) => {
+    const carried = seqCarryOf(sid);
+    seqMemoRef.current = {
+      session: sessionRef.current,
+      sid,
+      streak: Math.max(streak, carried == null ? 0 : carried),
+      at: Date.now(),
+    };
+  };
   const transcriptSeqRef = useRef(0);
   const transcriptAbortRef = useRef(null);
   // Autopilot: one continuous session that detects, follows, and auto-switches
@@ -3879,7 +3908,16 @@ const VoiceFollow = () => {
         let profile;
         // Akhand Paath: any lock that is not the reading window itself (a judge switch, a
         // tap, a Bani) ends Akhand Paath following.
-        const seqWindow = !!opts.window && baniId == null && typeof cand.shabadId === 'number';
+        // A reading followed a moment ago and this lock lands where it was going (seqMemoRef):
+        // straight back to Akhand Paath following, its Shabads carried over.
+        // (Never for the sevadaar's own pick, nor for the Shabad follower taking over when the
+        // reading turned out to be sung: promote without window.)
+        const carry =
+          baniId == null && !opts.manual && (!opts.promote || opts.window)
+            ? seqCarryOf(cand.shabadId)
+            : null;
+        const seqWindow =
+          (!!opts.window || carry != null) && baniId == null && typeof cand.shabadId === 'number';
         if (paathSeqRef.current.on && !seqWindow) {
           paathSeqRef.current = { ...PAATH_SEQ_OFF };
           seqNextRef.current = null;
@@ -3966,8 +4004,18 @@ const VoiceFollow = () => {
         } else if (!isSwitch || opts.promote) prevShabadRef.current = null;
         curBaniShabadsRef.current = baniId != null || seqWindow ? profile.shabadIds : null;
         if (seqWindow) {
-          paathSeqRef.current = { ...PAATH_SEQ_OFF, on: true, cross: { sid: null, n: 0 } };
+          const streak = carry == null ? 0 : carry;
+          paathSeqRef.current = { ...PAATH_SEQ_OFF, on: true, streak, cross: { sid: null, n: 0 } };
           seqNextRef.current = null;
+          seqRemember(cand.shabadId, streak);
+          if (!opts.window) {
+            sessionLog.logEvent('paath_seq_carry', {
+              session: sessionIdRef.current,
+              from: fromId,
+              to: cand.shabadId,
+              streak,
+            });
+          }
         }
         curCursorPrevRef.current = null;
         returnSlotRef.current = null;
@@ -4284,6 +4332,7 @@ const VoiceFollow = () => {
     const verse = (prof.rawLines || [])[out.lineIndex];
     const ps = paathSeqRef.current;
     ps.streak += 1;
+    seqRemember(sid, ps.streak);
     ps.cross = { sid: null, n: 0 };
     ps.backs = 0;
     currentShabadIdRef.current = sid;
@@ -4348,6 +4397,7 @@ const VoiceFollow = () => {
     const verse = ((curProfileRef.current && curProfileRef.current.rawLines) || [])[out.lineIndex];
     paathSeqRef.current = { ...PAATH_SEQ_OFF };
     seqNextRef.current = null;
+    seqMemoRef.current = null; // sung, not read: nothing to carry on
     sessionLog.logEvent('paath_seq_off', { session: sessionIdRef.current, shabadId: sid, why });
     if (typeof sid === 'number' && verse && autopilotLockRef.current && !lockingRef.current) {
       autopilotLockRef.current({ shabadId: sid, verseId: out.verseId, verse }, { promote: true });
@@ -6403,11 +6453,25 @@ const VoiceFollow = () => {
                 }
                 ps.back = null;
                 const prev = curCursorPrevRef.current;
-                const stepped =
+                const prevIn =
                   prev != null &&
-                  prof.verseShabad.get((prof.verses[prev] || {}).verseId) === curSid &&
+                  prof.verseShabad.get((prof.verses[prev] || {}).verseId) === curSid;
+                // rows of the current Shabad after `prev` (0: prev is its last pangti)
+                let rowsLeft = 0;
+                if (prevIn) {
+                  for (let row = prev + 1; row < prof.verses.length; row += 1) {
+                    if (prof.verseShabad.get(prof.verses[row].verseId) !== curSid) break;
+                    rowsLeft += 1;
+                  }
+                }
+                const headRow = (prof.screenLines || [])[out.lineIndex];
+                const stepped =
+                  prevIn &&
                   out.lineIndex > prev &&
-                  out.lineIndex - prev <= 2;
+                  (out.lineIndex - prev <= 2 ||
+                    (rowsLeft < PAATH_SEQ_END_ROWS &&
+                      headRow != null &&
+                      headRow < PAATH_SEQ_HEAD_ROWS));
                 const nowMs = Date.now();
                 ps.cross =
                   ps.cross.sid === vs
@@ -6425,6 +6489,7 @@ const VoiceFollow = () => {
                 if (!((stepped && isNext && ps.streak >= 1) || stayed)) return;
                 seqCrossRef.current(vs, out);
               } else if (vs === curSid && out.confidence >= UI_MOVE_CONF) {
+                seqRemember(curSid, ps.streak); // the reading goes on here
                 ps.cross = { sid: null, n: 0 };
                 ps.back = null; // the reading is in the current Shabad: no going back
                 // Lines coming back (sung, not read): back to the Shabad follower.
