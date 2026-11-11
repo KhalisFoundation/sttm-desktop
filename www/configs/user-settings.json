@@ -46,6 +46,7 @@
         "content2-font-size",
         "content3-font-size",
         "announcements-font-size",
+        "teleprompter-font-size",
         "reset-font-sizes"
       ]
     },
@@ -87,7 +88,7 @@
     "other-options": {
       "title": "OTHER_OPTIONS",
       "type": "switch",
-      "settings": ["limit-change-log", "statistics", "voice-follow-enabled", "improve-voice-follow", "shadow-recording"]
+      "settings": ["limit-change-log", "statistics", "voice-follow-enabled", "improve-voice-follow", "shadow-recording", "data-recording"]
     }
   },
   "settings": {
@@ -114,6 +115,10 @@
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
+    "teleprompter-font-size": {
+      "title": "TELEPROMPTER",
+      "initialValue": 10
+    },
     "reset-font-sizes": {
       "title": "RESET_FONT_SIZES",
       "type": "reset-button",
@@ -122,7 +127,8 @@
         "content1-font-size",
         "content2-font-size",
         "content3-font-size",
-        "announcements-font-size"
+        "announcements-font-size",
+        "teleprompter-font-size"
       ]
     },
     "content1-visibility": {
@@ -404,6 +410,12 @@
       "title": "HF_TOKEN",
       "dontApplyClass": true,
       "initialValue": ""
+    },
+    "data-recording": {
+      "title": "DATA_RECORDING",
+      "dontApplyClass": true,
+      "initialValue": false,
+      "notes": "DATA_RECORDING_MSG"
     },
     "improve-voice-follow": {
       "title": "IMPROVE_VOICE_FOLLOW",
