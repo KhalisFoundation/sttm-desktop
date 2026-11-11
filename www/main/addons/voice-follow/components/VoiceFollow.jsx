@@ -7552,8 +7552,6 @@ const VoiceFollow = () => {
   const friendly = (d) =>
     (d && (friendlyNames.get(d.deviceId) || friendlyMicName(d.label))) ||
     i18n.t('VOICE_FOLLOW.DEFAULT_MIC');
-  const goodOthers = (exclude) =>
-    mics.list.filter((d) => exclude(d) && !wrongMicKind(d.label)).slice(0, 2);
   // The same status line as "Check this computer" (HwCheck.jsx): a coloured icon and verdict,
   // then a muted line of underlined links that say what they do. Red: wrong input or nothing
   // heard; orange: hears very little; nothing when the input looks fine.
@@ -7575,11 +7573,11 @@ const VoiceFollow = () => {
       </div>
     </div>
   );
-  const useLink = (d, onPick, found) => ({
+  const useLink = (d, onPick) => ({
     key: d.deviceId,
     title: micName(d),
     onClick: () => onPick(d.deviceId),
-    label: i18n.t(found ? 'VOICE_FOLLOW.MIC_USE_FOUND' : 'VOICE_FOLLOW.MIC_USE', {
+    label: i18n.t('VOICE_FOLLOW.MIC_USE', {
       mic: friendly(d),
       ...NO_ESCAPE,
     }),
@@ -7608,9 +7606,8 @@ const VoiceFollow = () => {
       ],
     });
   } else if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
-    const others = micProbe
-      ? [useLink(micProbe, (id) => switchMic(id, 'probe'), true)]
-      : goodOthers(otherMic).map((d) => useLink(d, (id) => switchMic(id, 'list')));
+    // A "Use" link only for an input the short probe heard sound on, so the link says it all.
+    const others = micProbe ? [useLink(micProbe, (id) => switchMic(id, 'probe'))] : [];
     micHintView = micStatus({
       tone: 'wrong',
       icon: 'fa-exclamation-triangle',
@@ -7619,7 +7616,7 @@ const VoiceFollow = () => {
         ...NO_ESCAPE,
       }),
       title: liveName,
-      note: others.length ? '' : i18n.t('VOICE_FOLLOW.MIC_SILENT'),
+      note: '',
       links: [...others, dismissLink('silent', liveMic.deviceId, liveMic.label)],
     });
   } else if (
@@ -7631,8 +7628,8 @@ const VoiceFollow = () => {
       tone: 'below',
       icon: 'fa-exclamation-triangle',
       verdict: i18n.t('VOICE_FOLLOW.MIC_QUIET_TITLE'),
-      title: liveName,
-      note: i18n.t('VOICE_FOLLOW.MIC_QUIET'),
+      title: i18n.t('VOICE_FOLLOW.MIC_QUIET'),
+      note: '',
       links: [dismissLink('quiet', liveMic.deviceId, liveMic.label)],
     });
   }
@@ -7664,7 +7661,7 @@ const VoiceFollow = () => {
         kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
         ...NO_ESCAPE,
       }),
-      title: micName(shownMic),
+      title: `${i18n.t('VOICE_FOLLOW.MIC_CANT_HEAR')} (${micName(shownMic)})`,
       note: '',
       links: [
         ...(bestMic
@@ -7696,7 +7693,7 @@ const VoiceFollow = () => {
         kind: i18n.t(`VOICE_FOLLOW.MIC_KIND_${wrong.toUpperCase()}`),
         ...NO_ESCAPE,
       }),
-      title: micName(shownMic),
+      title: `${i18n.t('VOICE_FOLLOW.MIC_CANT_HEAR')} (${micName(shownMic)})`,
       note: '',
       links: [
         ...(bestMic ? [useLink(bestMic, chooseMic)] : []),
