@@ -1,138 +1,190 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const mw = require('./micWarning');
+const { createMicWatch, pickProbedMic, dismissKey } = require('./micWarning');
 
-// Feed `sec` seconds of 250 ms windows at one level, words heard every `every` windows.
-let clock = 0;
-const run = (w, sec, rms, every = 0) => {
-  let r;
-  for (let i = 0; i < sec * 4; i += 1, clock += 250) {
-    r = w.push({ rms, heard: every > 0 && i % every === 0, now: clock });
+// Feed `seconds` of 250 ms windows at a level, with heard words every `heardEvery` windows.
+const feed = (w, seconds, rms, heardEvery = 0) => {
+  let st = null;
+  for (let i = 0; i < seconds * 4; i += 1) {
+    st = w.push({ rms, heard: heardEvery > 0 && i % heardEvery === 0 });
   }
-  return r;
+  return st;
 };
 
-test('no sound: silent after 20 s (not before), clears with sound; a pause is not a dead mic', () => {
-  const w = mw.createMicWatch();
-  assert.strictEqual(run(w, 19, 0).hint, null);
-  assert.strictEqual(run(w, 1, 0).hint, 'silent');
-  assert.strictEqual(run(w, 5, 0.02).hint, null);
-  const v = mw.createMicWatch();
+test('silent: no sound for 20 s, not before; clears when sound returns', () => {
+  const w = createMicWatch();
+  assert.strictEqual(feed(w, 19, 0), null);
+  assert.strictEqual(feed(w, 1, 0), 'silent');
+  assert.strictEqual(feed(w, 5, 0.02), null);
+});
+
+test('silent: a pause between lines is not a dead mic', () => {
+  const w = createMicWatch();
   for (let i = 0; i < 12; i += 1) {
-    run(v, 1.5, 0.03); // singing
-    run(v, 2, 0); // pause between lines
+    feed(w, 1.5, 0.03); // singing
+    feed(w, 2, 0); // pause
   }
-  assert.strictEqual(v.push({ rms: 0 }).hint, null);
+  assert.strictEqual(w.state(), null);
 });
 
-test('hears very little: 3 min of a low level with words almost never; not when words or level', () => {
-  const w = mw.createMicWatch();
-  assert.strictEqual(run(w, 170, 0.002, 100).hint, null);
-  assert.strictEqual(run(w, 10, 0.002, 100).hint, 'quiet');
-  assert.strictEqual(run(w, 180, 0.03, 100).hint, null);
-  assert.strictEqual(run(mw.createMicWatch(), 200, 0.002, 4).hint, null); // words 25% of the time
-  assert.strictEqual(run(mw.createMicWatch(), 200, 0.05).hint, null); // loud feed (katha etc.)
+test('quiet: low level, words almost never, for 3 min (laptop mic at the back)', () => {
+  const w = createMicWatch();
+  assert.strictEqual(feed(w, 170, 0.002, 100), null); // ~1% of windows
+  assert.strictEqual(feed(w, 10, 0.002, 100), 'quiet');
+  // Good level again: the hint goes.
+  assert.strictEqual(feed(w, 180, 0.03, 100), null);
 });
 
-test('hearing dot: null in the first second, then the last 4 s; reset clears', () => {
-  const w = mw.createMicWatch();
-  assert.strictEqual(w.hearing(), null);
-  run(w, 2, 0.02);
-  assert.strictEqual(w.hearing(), true);
-  run(w, 4, 0);
-  assert.strictEqual(w.hearing(), false);
+test('quiet: not when words come through often, nor when the level is good', () => {
+  const a = createMicWatch();
+  assert.strictEqual(feed(a, 200, 0.002, 4), null); // words in 25% of windows
+  const b = createMicWatch();
+  assert.strictEqual(feed(b, 200, 0.05, 0), null); // loud feed, nothing recognised (katha etc.)
+});
+
+test('reset clears the history (new session or new input)', () => {
+  const w = createMicWatch();
+  feed(w, 25, 0);
+  assert.strictEqual(w.state(), 'silent');
   w.reset();
-  assert.strictEqual(w.hearing(), null);
+  assert.strictEqual(w.state(), null);
+  assert.strictEqual(feed(w, 10, 0), null);
 });
 
-test('auto-pause: once, after the full stretch of no sound; any sound restarts the clock', () => {
-  const w = mw.createMicWatch({ pauseMs: 30 * 60000 });
-  assert.strictEqual(run(w, 20 * 60, 0).pause, false);
-  assert.strictEqual(run(w, 0.25, 0.02).pause, false); // one sound window
-  assert.strictEqual(run(w, 29 * 60, 0.0001).pause, false);
-  let paused = 0;
-  for (let i = 0; i < 4 * 61; i += 1) if (run(w, 0.25, 0).pause) paused += 1;
-  assert.strictEqual(paused, 1);
-  assert.ok(w.silentMs(clock) >= 30 * 60000);
-  [
-    [{}, 30],
-    [undefined, 30],
-    [{ VF_AUTOPAUSE_MIN: '0.5' }, 0.5],
-    [{ VF_AUTOPAUSE_MIN: 'x' }, 30],
-    [{ VF_AUTOPAUSE_MIN: '-1' }, 30],
-  ].forEach(([env, min]) => assert.strictEqual(mw.autoPauseMinutes(env), min));
-});
-
-// Stand-ins for common/mic-check's micKind / MIC_WARN.
-const kindOf = (l) =>
-  (/iriun|virtual/i.test(l) && 'virtual') ||
-  (/usb audio|wireless microphone/i.test(l) && 'mixer') ||
-  (/macbook/i.test(l) && 'laptop') ||
-  'other';
-const kinds = { kindOf, isWrong: (l) => kindOf(l) === 'virtual' };
-const mic = (label) => ({ deviceId: label, label });
-
-test('default input: a flagged system default is passed over (Hicksville); else kept', () => {
-  const iriun = mic('Microphone (Iriun Webcam #4)');
-  const wireless = mic('Microphone (Wireless Microphone)');
-  const mac = mic('MacBook Pro Microphone (Built-in)');
-  const usb = mic('USB Audio CODEC');
-  const yeti = mic('Yeti Stereo Microphone');
-  [
-    [[iriun, wireless], iriun, wireless, iriun],
-    [[iriun], iriun, iriun, null], // only a flagged input: kept, the Start confirm asks
-    [[mac, usb], mac, mac, null], // a fine default is kept
-    [[iriun, yeti, mac, usb], iriun, usb, iriun], // mixer first
-    [[iriun, yeti, mac], iriun, mac, iriun], // then built-in
-    [[iriun, yeti], iriun, yeti, iriun], // then any
-    [[], null, null, null],
-  ].forEach(([list, def, device, avoided]) =>
-    assert.deepStrictEqual(mw.pickDefaultMic(list, def, kinds), { device, avoided }),
-  );
-});
-
-test('probe pick: the loudest input clearly picking up sound', () => {
-  assert.strictEqual(mw.pickProbedMic([{ rms: 0.001 }, { rms: 0 }]), null);
+test('probe pick: the loudest real input clearly picking up sound; a wrong-kind input never offered', () => {
+  assert.strictEqual(pickProbedMic([]), null);
   assert.strictEqual(
-    mw.pickProbedMic([
-      { id: 'a', rms: 0.01 },
-      { id: 'b', rms: 0.03 },
-    ]).id,
-    'b',
+    pickProbedMic([
+      { deviceId: 'a', label: 'MacBook Pro Microphone', rms: 0.001 },
+      { deviceId: 'b', label: 'Iriun Webcam', rms: 0 },
+    ]),
+    null,
+  );
+  const isWrong = (label) => /stereo mix|iriun/i.test(label);
+  const pick = pickProbedMic(
+    [
+      { deviceId: 'v', label: 'Stereo Mix', rms: 0.2 },
+      { deviceId: 'a', label: 'USB Audio CODEC', rms: 0.01 },
+      { deviceId: 'b', label: 'Microphone Array', rms: 0.03 },
+    ],
+    { isWrong },
+  );
+  assert.strictEqual(pick.deviceId, 'b');
+});
+
+test('dismiss key is per kind and device', () => {
+  assert.notStrictEqual(dismissKey('silent', 'x'), dismissKey('quiet', 'x'));
+  assert.notStrictEqual(dismissKey('silent', 'x'), dismissKey('silent', 'y'));
+  assert.strictEqual(dismissKey('virtual', '', 'Iriun'), 'virtual:Iriun');
+});
+
+// Stand-ins for common/mic-check's micKind / MIC_WARN (the real list is tested in micKind.test.js).
+const kindOf = (label) => {
+  if (/iriun|virtual|webcam/i.test(label)) return 'virtual';
+  if (/usb audio|codec|wireless microphone|mixer/i.test(label)) return 'mixer';
+  if (/macbook|built-in|array/i.test(label)) return 'laptop';
+  return 'other';
+};
+const isWrong = (label) => kindOf(label) === 'virtual';
+const mic = (deviceId, label) => ({ deviceId, label });
+const {
+  pickDefaultMic,
+  bestOtherMic,
+  createSilenceClock,
+  autoPauseMinutes,
+  AUTOPAUSE_MIN_DEFAULT,
+} = require('./micWarning');
+
+test('default input: a flagged system default is passed over for a real one (Hicksville)', () => {
+  const iriun = mic('i', 'Microphone (Iriun Webcam #4)');
+  const wireless = mic('w', 'Microphone (Wireless Microphone)');
+  const r = pickDefaultMic([iriun, wireless], iriun, { kindOf, isWrong });
+  assert.strictEqual(r.device.deviceId, 'w');
+  assert.strictEqual(r.avoided.deviceId, 'i');
+});
+
+test('default input: only a flagged input -> keep it (the Start confirm then asks)', () => {
+  const iriun = mic('i', 'Microphone (Iriun Webcam #4)');
+  const r = pickDefaultMic([iriun], iriun, { kindOf, isWrong });
+  assert.strictEqual(r.device.deviceId, 'i');
+  assert.strictEqual(r.avoided, null);
+  assert.strictEqual(bestOtherMic([iriun], 'i', { kindOf, isWrong }), null);
+});
+
+test('default input: a fine system default is kept; preference mixer > built-in > other', () => {
+  const mac = mic('m', 'MacBook Pro Microphone (Built-in)');
+  const usb = mic('u', 'USB Audio CODEC');
+  const yeti = mic('y', 'Yeti Stereo Microphone');
+  const zoom = mic('z', 'ZoomAudioDevice (Virtual)');
+  assert.strictEqual(pickDefaultMic([mac, usb], mac, { kindOf, isWrong }).avoided, null);
+  assert.strictEqual(pickDefaultMic([zoom, yeti, mac, usb], zoom, { kindOf, isWrong }).device, usb);
+  assert.strictEqual(pickDefaultMic([zoom, yeti, mac], zoom, { kindOf, isWrong }).device, mac);
+  assert.strictEqual(pickDefaultMic([zoom, yeti], zoom, { kindOf, isWrong }).device, yeti);
+  assert.strictEqual(pickDefaultMic([], null, { kindOf, isWrong }).device, null);
+});
+
+test('auto-pause clock: pauses after the full stretch of no sound; any sound restarts it', () => {
+  const c = createSilenceClock({ pauseMs: 30 * 60000 });
+  let t = 0;
+  const run = (ms, rms) => {
+    let out = false;
+    for (let end = t + ms; t < end; t += 250) out = c.push({ now: t, rms });
+    return out;
+  };
+  assert.strictEqual(run(29 * 60000, 0), false);
+  assert.strictEqual(run(60000 + 250, 0.0001), true); // below the no-sound line: still silent
+  assert.ok(c.silentMs(t) >= 30 * 60000);
+  c.reset();
+  assert.strictEqual(run(20 * 60000, 0), false);
+  assert.strictEqual(run(250, 0.02), false); // one sound window restarts the clock
+  assert.strictEqual(run(20 * 60000, 0), false);
+});
+
+test('auto-pause minutes: 30 by default, VF_AUTOPAUSE_MIN overrides for tests', () => {
+  assert.strictEqual(AUTOPAUSE_MIN_DEFAULT, 30);
+  assert.strictEqual(autoPauseMinutes({}), 30);
+  assert.strictEqual(autoPauseMinutes(undefined), 30);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: '0.5' }), 0.5);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: 'x' }), 30);
+  assert.strictEqual(autoPauseMinutes({ VF_AUTOPAUSE_MIN: '-1' }), 30);
+});
+
+const { friendlyMicName, friendlyMicNames } = require('./micWarning');
+
+test('friendly input names (display only), on names from the field logs', () => {
+  const cases = {
+    'Microphone (Iriun Webcam #4)': 'Iriun Webcam #4',
+    'Default - Microphone (Iriun Webcam #4)': 'Iriun Webcam #4',
+    'Microphone (Wireless Microphone) (3547:0407)': 'Wireless Microphone',
+    'Communications - Microphone (Wireless Microphone) (3547:0407)': 'Wireless Microphone',
+    'MacBook Pro Microphone (Built-in)': 'MacBook Pro Microphone',
+    'Default - MacBook Pro Microphone (Built-in)': 'MacBook Pro Microphone',
+    'ZoomAudioDevice (Virtual)': 'ZoomAudioDevice',
+    'Microphone (AudioRelay Virtual Mic)': 'AudioRelay Virtual Mic',
+    'Analogue 1 + 2 (Scarlett Solo 4th Gen)': 'Analogue 1 + 2 (Scarlett Solo 4th Gen)',
+    'Microphone (Scarlett Solo 4th Gen) (1235:8211)': 'Scarlett Solo 4th Gen',
+    'Dante Via Receive (Dante Via)': 'Dante Via Receive (Dante Via)',
+    'Microphone Array (Intel® Smart Sound Technology for Digital Microphones)':
+      'Microphone Array (Intel® Smart Sound Technology for Digital Microphones)',
+    'Line In (Realtek(R) Audio)': 'Realtek(R) Audio',
+    'Headset (Jabra Evolve 20)': 'Jabra Evolve 20',
+    'USB Audio CODEC': 'USB Audio CODEC',
+    '': '',
+  };
+  Object.entries(cases).forEach(([label, name]) =>
+    assert.strictEqual(friendlyMicName(label), name),
   );
 });
 
-test('friendly names (display only), on names from the field logs; duplicates kept apart', () => {
-  [
-    ['Microphone (Iriun Webcam #4)', 'Iriun Webcam #4'],
-    ['Default - Microphone (Iriun Webcam #4)', 'Iriun Webcam #4'],
-    ['Communications - Microphone (Wireless Microphone) (3547:0407)', 'Wireless Microphone'],
-    ['Default - MacBook Pro Microphone (Built-in)', 'MacBook Pro Microphone'],
-    ['ZoomAudioDevice (Virtual)', 'ZoomAudioDevice'],
-    ['Microphone (AudioRelay Virtual Mic)', 'AudioRelay Virtual Mic'],
-    ['Microphone (Scarlett Solo 4th Gen) (1235:8211)', 'Scarlett Solo 4th Gen'],
-    ['Dante Via Receive (Dante Via)', 'Dante Via Receive (Dante Via)'],
-    [
-      'Microphone Array (Intel® Smart Sound Technology)',
-      'Microphone Array (Intel® Smart Sound Technology)',
-    ],
-    ['Line In (Realtek(R) Audio)', 'Realtek(R) Audio'],
-    ['Headset (Jabra Evolve 20)', 'Jabra Evolve 20'],
-    ['', ''],
-  ].forEach(([label, name]) => assert.strictEqual(mw.friendlyMicName(label), name, label));
-  const names = mw.friendlyMicNames([
-    mic('MacBook Pro Microphone (Built-in)'),
-    mic('Microphone (MacBook Pro Microphone)'),
-    mic('Microphone (USB Audio CODEC) (08bb:2902)'),
-    mic('Line In (USB Audio CODEC) (08bb:2902)'),
+test('friendly names stay distinct when two inputs would read the same', () => {
+  const names = friendlyMicNames([
+    { deviceId: 'a', label: 'MacBook Pro Microphone (Built-in)' },
+    { deviceId: 'b', label: 'Microphone (MacBook Pro Microphone)' },
+    { deviceId: 'c', label: 'Microphone (USB Audio CODEC) (08bb:2902)' },
+    { deviceId: 'd', label: 'Line In (USB Audio CODEC) (08bb:2902)' },
   ]);
-  assert.deepStrictEqual(
-    [...names.values()],
-    [
-      'MacBook Pro Microphone (Built-in)',
-      'MacBook Pro Microphone',
-      'USB Audio CODEC',
-      'USB Audio CODEC (2)',
-    ],
-  );
+  assert.strictEqual(names.get('a'), 'MacBook Pro Microphone (Built-in)');
+  assert.strictEqual(names.get('b'), 'MacBook Pro Microphone');
+  assert.strictEqual(names.get('c'), 'USB Audio CODEC');
+  assert.strictEqual(names.get('d'), 'USB Audio CODEC (2)');
 });

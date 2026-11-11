@@ -1483,21 +1483,56 @@ $vf2-yellow-bar: #f2c200;
   line-height: 1.4;
 }
 
-// Wrong-microphone status (MicWarnings.jsx), the "Check this computer" line (.vf-hw) plus a red
-// tone: red = wrong input or nothing heard; orange (.is-below) = hears very little.
+// Wrong-microphone status (micWarning.js), in the sevadaar's panel only: the "Check this
+// computer" line above (.vf-hw), plus the red it has no use for. Red: wrong input or nothing
+// heard; orange (.is-below): hears very little.
 .vf-hw.is-wrong .vf-hw-verdict {
   color: $vf2-red;
 }
 .vf2-body > .vf-mic-status {
   margin: 0 0 8px;
 }
-// On the start screen the line may run wider than the 360 px column, so it fits on one line.
+// On the start screen the line may run wider than the 360 px column so it fits on one line.
+// Never cut with an ellipsis: the verdict stays on one line where it fits, and the links wrap
+// onto a second line if they must.
+.vf-mic-status .vf-hw-verdict,
+.vf-mic-status .vf-hw-detail {
+  white-space: normal;
+}
 .vf-ap-start > .vf-mic-status {
   width: max-content;
   max-width: 540px;
   margin-top: -6px;
 }
-// The "Hearing" / "No sound" pill reuses the volume label (.vf-ap-vol); its dot is small.
-.vf-mic-live .fa {
-  font-size: 7px;
+// Running: "Hearing" (green dot) or "No sound" (red), in the bottom bar.
+.vf-mic-live {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: $body-font-family;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.is-on {
+    color: #166534;
+    background: rgba(22, 163, 74, 0.12);
+  }
+  &.is-off {
+    color: #b42318;
+    background: rgba(214, 69, 65, 0.14);
+  }
+  &.is-wait {
+    color: var(--vf-muted);
+    background: rgba(127, 127, 127, 0.12);
+  }
+}
+.vf-mic-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
 }
