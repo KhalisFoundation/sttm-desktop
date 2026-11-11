@@ -71,3 +71,88 @@ test("the slowest PCs (self-test above 450 ms) keep today's kirtan schedule", as
   assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
   assert.strictEqual(pace.searchScale(0.5, 10), 1);
 });
+
+test('laptop (self-test 140 ms, live 360 ms for 40 s): live trigger paces kirtan for the rest of the session', async () => {
+  const pace = await paceAt(140);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  for (let k = 0; k < 100; k += 1) pace.notePass(360, 4 * 16000);
+  pace.observe(0, 1e6); // too few passes yet
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  for (let k = 0; k < 140; k += 1) pace.notePass(360, 4 * 16000);
+  pace.observe(0, 1e6 + 1000);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]); // slow, but not yet for a full minute
+  pace.observe(0, 1e6 + 61000);
+  assert.deepStrictEqual(hops(pace), [1, 0.375]);
+  for (let k = 0; k < 240; k += 1) pace.notePass(120, 4 * 16000); // cooled down: stays paced
+  pace.observe(0, 1e6 + 120000);
+  assert.deepStrictEqual(hops(pace), [1, 0.375]);
+});
+
+test('Renton-class (self-test 135 ms, live 150 ms with spikes, backlog): today\'s kirtan hops all session', async () => {
+  const pace = await paceAt(135);
+  for (let t = 0; t <= 600000; t += 500) {
+    pace.notePass(t % 5000 === 0 ? 900 : 150, 4 * 16000);
+    pace.observe(t % 20000 < 4000 ? 1.5 : 0, 1e6 + t);
+  }
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+});
+
+test('live 320 ms (under the 330 ms trigger, above Renton\'s worst 317) keeps today\'s kirtan hops', async () => {
+  const pace = await paceAt(140);
+  for (let k = 0; k < 240; k += 1) pace.notePass(320, 4 * 16000);
+  pace.observe(0, 1e6);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+});
+
+test('VF_KIRTAN_LIVE=0 keeps the self-test-only rule', async () => {
+  process.env.VF_KIRTAN_LIVE = '0';
+  try {
+    const pace = await paceAt(140);
+    for (let k = 0; k < 240; k += 1) pace.notePass(400, 4 * 16000);
+    pace.observe(0, 1e6);
+    assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+  } finally {
+    delete process.env.VF_KIRTAN_LIVE;
+  }
+});
+
+test('live trigger paces the search, never the Bani follower', async () => {
+  const pace = await paceAt(140);
+  for (let k = 0; k < 240; k += 1) pace.notePass(360, 4 * 16000);
+  pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 60000);
+  assert.strictEqual(pace.hopS('recognizer', 0.5, 10), 1);
+  assert.strictEqual(pace.hopS('bani', 0.25), 0.25);
+});
+
+test('live trigger stops at the 450 ms cap: a laptop at 520 ms live keeps today\'s kirtan hops', async () => {
+  const pace = await paceAt(140);
+  for (let k = 0; k < 240; k += 1) pace.notePass(520, 4 * 16000);
+  pace.observe(0, 1e6);
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+});
+
+test('live trigger reports once when it latches (perf_tier reason kirtan-live)', async () => {
+  const pace = await paceAt(140);
+  const seen = [];
+  pace.onStep((ev) => seen.push(ev));
+  for (let k = 0; k < 240; k += 1) pace.notePass(360, 4 * 16000);
+  pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 60000);
+  pace.observe(0, 1e6 + 61000);
+  assert.strictEqual(seen.length, 1);
+  assert.strictEqual(seen[0].reason, 'kirtan-live');
+  assert.strictEqual(seen[0].liveMedianMs, 360);
+});
+
+test('live trigger needs a full minute: a slow spell under 60 s (a Renton-style spike) never latches', async () => {
+  const pace = await paceAt(140);
+  for (let k = 0; k < 240; k += 1) pace.notePass(380, 4 * 16000);
+  pace.observe(0, 1e6);
+  pace.observe(0, 1e6 + 50000);
+  for (let k = 0; k < 240; k += 1) pace.notePass(150, 4 * 16000); // back to normal before the minute is up
+  pace.observe(0, 1e6 + 55000);
+  for (let k = 0; k < 240; k += 1) pace.notePass(380, 4 * 16000);
+  pace.observe(0, 1e6 + 70000); // a new spell starts its own minute
+  assert.deepStrictEqual(hops(pace), [0.5, 0.25]);
+});
