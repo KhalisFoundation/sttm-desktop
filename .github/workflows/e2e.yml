@@ -22,6 +22,8 @@ jobs:
           # node-sass (the CSS build) has binaries up to Node 20.
           node-version: '18.18.0'
           cache: npm
+      # The mdns module (Chromecast discovery) compiles against these.
+      - run: sudo apt-get update && sudo apt-get install -y libavahi-compat-libdnssd-dev
       - run: npm ci
       - run: npm run build
       - name: Realm database
@@ -51,12 +53,30 @@ jobs:
         os: [ubuntu-latest, windows-2022, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
+    env:
+      BONJOUR_SDK_HOME: 'C:\\Program Files\\Bonjour SDK'
     steps:
       - uses: actions/checkout@v4
+      # node-gyp 9 needs distutils, which Python 3.12 dropped.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
           cache: npm
+      # The mdns module (Chromecast discovery) compiles against Avahi on
+      # Linux and the Bonjour SDK on Windows; macOS has it built in.
+      - name: Avahi headers
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libavahi-compat-libdnssd-dev
+      - name: Bonjour SDK
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/Bonjour64.msi" -OutFile "Bonjour64.msi"
+          Start-Process msiexec.exe -ArgumentList "/i Bonjour64.msi /qn" -Wait
+          Invoke-WebRequest -Uri "https://github.com/KhalisFoundation/sttm-desktop/raw/master/assets/bonjoursdksetup.exe" -OutFile "bonjoursdksetup.exe"
+          Start-Process bonjoursdksetup.exe -ArgumentList "/quiet" -Wait
       - run: npm ci
       - run: npm run build
       - name: Realm database
