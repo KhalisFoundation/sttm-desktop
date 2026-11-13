@@ -10,7 +10,7 @@
     "test": "run-p test:*",
     "test:lint": "run-p test:lint:*",
     "test:lint:html": "htmlhint --config .htmlhintrc www",
-    "test:lint:js": "eslint app.js packaging www/main",
+    "test:lint:js": "eslint app.js packaging www/main e2e playwright.config.js",
     "start": "npm run build:local && concurrently --kill-others \"npm run watch-css\" \"npm run watch-js\" \"cross-env NODE_ENV=development electron .\"",
     "build": "npm run build-css & npm run build-js",
     "build:local": "npm run build-css & npm run build-js:sm",
@@ -33,7 +33,11 @@
     "watch-css": "nodemon --watch www -e scss -x \"npm run build-css\"",
     "rebuild-realm": "$(npm bin)/electron-rebuild -f -w realm",
     "rebuild-sqlite": "cross-env npm_config_build_from_source=true electron-rebuild -f --only better-sqlite3",
-    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite"
+    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite",
+    "e2e": "playwright test",
+    "e2e:fast": "playwright test --grep @fast",
+    "e2e:cases": "node e2e/scripts/build-cases.mjs e2e/cases/sttm-desktop-9.3.2.csv > e2e/cases.json",
+    "e2e:report": "node e2e/scripts/sheet-report.mjs"
   },
   "repository": {
     "type": "git",
@@ -48,6 +52,7 @@
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
     "@electron/notarize": "^2.3.0",
+    "@playwright/test": "1.57.0",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
     "electron": "^26.2.4",

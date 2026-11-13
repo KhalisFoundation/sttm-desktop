@@ -1,0 +1,594 @@
+{
+  "sheetVersion": "9.3.2",
+  "generatedFrom": "e2e/cases/sttm-desktop-9.3.2.csv",
+  "cases": [
+    {
+      "id": "CORE-01",
+      "group": "CORE",
+      "row": 6,
+      "text": "Connect secondary display and ensure presenter view displays correctly",
+      "automation": "manual"
+    },
+    {
+      "id": "CORE-02",
+      "group": "CORE",
+      "row": 7,
+      "text": "Toggle Presenter View to \"off\", ensure windows display correctly",
+      "automation": "partial"
+    },
+    {
+      "id": "CORE-03",
+      "group": "CORE",
+      "row": 8,
+      "text": "Open a random shabad, cycle through a few lines in both presenter view and single-display mode, ensure functionality",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-01",
+      "group": "SRCH",
+      "row": 11,
+      "text": "Guru Granth Sahib: Search: “qnjqnh”, veirfy “Teerath Naavan Jao..” appears",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-02",
+      "group": "SRCH",
+      "row": 12,
+      "text": "Dasam Granth Sahib: Search: “sksls”, verify that “Sach Kahoun Sun …” appears",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-03",
+      "group": "SRCH",
+      "row": 13,
+      "text": "Bhai Gurdaas Ji Check: Search: “nsls”, verify that “Nakh Sis Lo...” appears",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-04",
+      "group": "SRCH",
+      "row": 14,
+      "text": "Short Letter Search: Search “jh”, verify that shorter results such as “jale hain” appear first in the results",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-05",
+      "group": "SRCH",
+      "row": 15,
+      "text": "Verify all above examples work with all search methods (Start, Anywhere, etc)",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-06",
+      "group": "SRCH",
+      "row": 16,
+      "text": "Choose English search and use all of its search methods (Full Words, First Word Anywhere)",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-07",
+      "group": "SRCH",
+      "row": 17,
+      "text": "Verify * wildcard works",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-08",
+      "group": "SRCH",
+      "row": 18,
+      "text": "Make sure keyboard loads when clicking on the icon",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-09",
+      "group": "SRCH",
+      "row": 19,
+      "text": "Verify Ang search works. Open Ang 917 and verify Anand Sahib appears",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-10",
+      "group": "SRCH",
+      "row": 20,
+      "text": "Use each filter and check the results",
+      "automation": "auto"
+    },
+    {
+      "id": "SRCH-11",
+      "group": "SRCH",
+      "row": 21,
+      "text": "Search for Kmrh and see if the shabad Khalsa mero roop hai khaas appears",
+      "automation": "auto"
+    },
+    {
+      "id": "MISC-01",
+      "group": "MISC",
+      "row": 24,
+      "text": "Ensure Random Shabad works",
+      "automation": "auto"
+    },
+    {
+      "id": "MISC-02",
+      "group": "MISC",
+      "row": 25,
+      "text": "Verify Daily Hukamnama is accurate",
+      "automation": "auto"
+    },
+    {
+      "id": "HIST-01",
+      "group": "HIST",
+      "row": 28,
+      "text": "Search for a few shabads at random",
+      "automation": "auto"
+    },
+    {
+      "id": "HIST-02",
+      "group": "HIST",
+      "row": 29,
+      "text": "Ensure the history menu shows results correctly",
+      "automation": "auto"
+    },
+    {
+      "id": "HIST-03",
+      "group": "HIST",
+      "row": 30,
+      "text": "Verify you can click and open one of the results",
+      "automation": "auto"
+    },
+    {
+      "id": "THEME-01",
+      "group": "THEME",
+      "row": 33,
+      "text": "Open theme picker and ensure each theme loads correctly",
+      "automation": "auto"
+    },
+    {
+      "id": "THEME-02",
+      "group": "THEME",
+      "row": 34,
+      "text": "Upload Custom Theme, ensure functionality",
+      "automation": "partial"
+    },
+    {
+      "id": "DISP-01",
+      "group": "DISP",
+      "row": 37,
+      "text": "Open quick tools, ensure font size adjustments work for each option",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-02",
+      "group": "DISP",
+      "row": 38,
+      "text": "Open quick tools, change the text content from the dropdown for each option",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-03",
+      "group": "DISP",
+      "row": 39,
+      "text": "Open quick tools, ensure visibility toggle works for each option",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-04",
+      "group": "DISP",
+      "row": 40,
+      "text": "Open Settings, verify on/off toggle works for each \"field to display\"",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-05",
+      "group": "DISP",
+      "row": 41,
+      "text": "Open Settings, font size sliders work for each option",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-06",
+      "group": "DISP",
+      "row": 42,
+      "text": "Open Settings, verify Akhand Paath View and Auto-Play function correctly",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-07",
+      "group": "DISP",
+      "row": 43,
+      "text": "Open Settings, Larivaar displays correctly",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-08",
+      "group": "DISP",
+      "row": 44,
+      "text": "Open Settings, verify left-align functionality",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-09",
+      "group": "DISP",
+      "row": 45,
+      "text": "Open Settings, verify Live Feed Text files allows location to be chosen and files generate",
+      "automation": "partial"
+    },
+    {
+      "id": "DISP-10",
+      "group": "DISP",
+      "row": 46,
+      "text": "Verify Vishraams function correctly",
+      "automation": "auto"
+    },
+    {
+      "id": "DISP-11",
+      "group": "DISP",
+      "row": 47,
+      "text": "Verify Intelligent spacebar works",
+      "automation": "auto"
+    },
+    {
+      "id": "TRAY-01",
+      "group": "TRAY",
+      "row": 50,
+      "text": "Verify all options work",
+      "automation": "auto"
+    },
+    {
+      "id": "TRAY-02",
+      "group": "TRAY",
+      "row": 51,
+      "text": "Verify minimize/open work",
+      "automation": "auto"
+    },
+    {
+      "id": "OVERLAY-01",
+      "group": "OVERLAY",
+      "row": 54,
+      "text": "Verify Bani Overlay menu opens",
+      "automation": "auto"
+    },
+    {
+      "id": "OVERLAY-02",
+      "group": "OVERLAY",
+      "row": 55,
+      "text": "Resize and Recolor Text",
+      "automation": "auto"
+    },
+    {
+      "id": "OVERLAY-03",
+      "group": "OVERLAY",
+      "row": 56,
+      "text": "Change layout",
+      "automation": "auto"
+    },
+    {
+      "id": "OVERLAY-04",
+      "group": "OVERLAY",
+      "row": 57,
+      "text": "Copy URL into OBS and verify",
+      "automation": "manual"
+    },
+    {
+      "id": "CAST-01",
+      "group": "CAST",
+      "row": 60,
+      "text": "Search for Chromecast and verify stable connection",
+      "automation": "manual"
+    },
+    {
+      "id": "CAST-02",
+      "group": "CAST",
+      "row": 61,
+      "text": "Open a few shabads at random and ensure connection does not interrupt",
+      "automation": "manual"
+    },
+    {
+      "id": "CAST-03",
+      "group": "CAST",
+      "row": 62,
+      "text": "Change theme/font size/display options and verify chromecast adjusts accordingly",
+      "automation": "manual"
+    },
+    {
+      "id": "SG-01",
+      "group": "SG",
+      "row": 65,
+      "text": "Check all the options",
+      "automation": "auto"
+    },
+    {
+      "id": "SG-02",
+      "group": "SG",
+      "row": 66,
+      "text": "Open Rehras Sahib and very different length options work",
+      "automation": "auto"
+    },
+    {
+      "id": "SG-03",
+      "group": "SG",
+      "row": 67,
+      "text": "Open Anand Karaj Ceremony, run through the entire deck, ensure displays correcrly",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-01",
+      "group": "KEYS",
+      "row": 70,
+      "text": "CTRL(or CMD for Mac) + / = Search Bar",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-02",
+      "group": "KEYS",
+      "row": 71,
+      "text": "CTRL(or CMD for Mac) + 1 = Waheguru Slide",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-03",
+      "group": "KEYS",
+      "row": 72,
+      "text": "CTRL(or CMD for Mac) + 2 = Mool Mantra",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-04",
+      "group": "KEYS",
+      "row": 73,
+      "text": "CTRL(or CMD for Mac) + 3 = Blank Slide",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-05",
+      "group": "KEYS",
+      "row": 74,
+      "text": "CTRL(or CMD for Mac) + 4 = Anand Sahib (Bhog)",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-06",
+      "group": "KEYS",
+      "row": 75,
+      "text": "CTRL(or CMD for Mac) + 5 = Help Menu",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-07",
+      "group": "KEYS",
+      "row": 76,
+      "text": "CTRL(or CMD for Mac) + 6 = Shortcut Legend",
+      "automation": "auto"
+    },
+    {
+      "id": "KEYS-08",
+      "group": "KEYS",
+      "row": 77,
+      "text": "CTRL(or CMD for Mac) + G = Insert Slide",
+      "automation": "auto"
+    },
+    {
+      "id": "SYNC-01",
+      "group": "SYNC",
+      "row": 80,
+      "text": "Open Sync from bottom left  and see if code/PIN is visible",
+      "automation": "auto"
+    },
+    {
+      "id": "SYNC-02",
+      "group": "SYNC",
+      "row": 81,
+      "text": "Change theme from dark to light and see if icon is still visible",
+      "automation": "auto"
+    },
+    {
+      "id": "SYNC-03",
+      "group": "SYNC",
+      "row": 82,
+      "text": "Click on present and make sure screen is visible",
+      "automation": "auto"
+    },
+    {
+      "id": "SYNC-04",
+      "group": "SYNC",
+      "row": 83,
+      "text": "Go to https://www.sikhitothemax.org/control and enter the code, make sure it connects",
+      "automation": "partial"
+    },
+    {
+      "id": "SYNC-05",
+      "group": "SYNC",
+      "row": 84,
+      "text": "Navigate through a few lines via /control, ensure it works",
+      "automation": "partial"
+    },
+    {
+      "id": "SYNC-06",
+      "group": "SYNC",
+      "row": 85,
+      "text": "Go to https://www.sikhitothemax.org/sync and enter the code, make sure it connects",
+      "automation": "partial"
+    },
+    {
+      "id": "SYNC-07",
+      "group": "SYNC",
+      "row": 86,
+      "text": "Open random shabad in desktop and make sure its opened in web",
+      "automation": "partial"
+    },
+    {
+      "id": "SYNC-08",
+      "group": "SYNC",
+      "row": 87,
+      "text": "Change tukks in desktop and see if they are reflected on web as well",
+      "automation": "partial"
+    },
+    {
+      "id": "SYNC-09",
+      "group": "SYNC",
+      "row": 88,
+      "text": "Open Sync menu and check if stop session button works",
+      "automation": "auto"
+    },
+    {
+      "id": "SINGLE-01",
+      "group": "SINGLE",
+      "row": 91,
+      "text": "Search any shabad and verify that it doesn't cut off from any margins",
+      "automation": "auto"
+    },
+    {
+      "id": "SINGLE-02",
+      "group": "SINGLE",
+      "row": 92,
+      "text": "Verify all above functions",
+      "automation": "auto"
+    },
+    {
+      "id": "FAV-01",
+      "group": "FAV",
+      "row": 95,
+      "text": "Login with your Khalis account, make sure it works",
+      "automation": "manual"
+    },
+    {
+      "id": "FAV-02",
+      "group": "FAV",
+      "row": 96,
+      "text": "Go to favourites tab and verify you see previously saved shabads",
+      "automation": "partial"
+    },
+    {
+      "id": "FAV-03",
+      "group": "FAV",
+      "row": 97,
+      "text": "Favourite a new shabad and verify it is in favourites list",
+      "automation": "partial"
+    },
+    {
+      "id": "FAV-04",
+      "group": "FAV",
+      "row": 98,
+      "text": "Unfavourite any shabad and verify it is removed from favourites list",
+      "automation": "partial"
+    },
+    {
+      "id": "FAV-05",
+      "group": "FAV",
+      "row": 99,
+      "text": "Login with same account in sttm-web and check if shabad favorited from sttm-desktop appears in web",
+      "automation": "manual"
+    },
+    {
+      "id": "MULTI-01",
+      "group": "MULTI",
+      "row": 102,
+      "text": "Choose three shabads on random and display on all three frames, verify it works",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-02",
+      "group": "MULTI",
+      "row": 103,
+      "text": "Switch to different panels, make sure it works",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-03",
+      "group": "MULTI",
+      "row": 104,
+      "text": "Lock a panel and try to set a bani on it, make sure it fails to assign bani",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-04",
+      "group": "MULTI",
+      "row": 105,
+      "text": "Open three sundar gutka banis in all panes",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-05",
+      "group": "MULTI",
+      "row": 106,
+      "text": "Open a shabad from history in any one of the pane",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-06",
+      "group": "MULTI",
+      "row": 107,
+      "text": "Open multiple combinations of banis, ceremonies and shabads in each pane",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-07",
+      "group": "MULTI",
+      "row": 108,
+      "text": "Open Asa di vaar in multipane workspace 3-4 times and check if it loads fine every time.",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-08",
+      "group": "MULTI",
+      "row": 109,
+      "text": "Clear a pane by clicking on clear pane",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-09",
+      "group": "MULTI",
+      "row": 110,
+      "text": "Add Misc Slides from any one of the pane",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-10",
+      "group": "MULTI",
+      "row": 111,
+      "text": "Make sure the when clicked on search result, it opens in the default pane",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-11",
+      "group": "MULTI",
+      "row": 112,
+      "text": "Change the default pane value from search footer, and open a shabad",
+      "automation": "auto"
+    },
+    {
+      "id": "MULTI-12",
+      "group": "MULTI",
+      "row": 113,
+      "text": "Favorite a different shabad in all three panes",
+      "automation": "auto"
+    },
+    {
+      "id": "VOICE-01",
+      "group": "VOICE",
+      "row": 116,
+      "text": "Click on voice icon and see if the waveform appears as you speak",
+      "automation": "partial"
+    },
+    {
+      "id": "VOICE-02",
+      "group": "VOICE",
+      "row": 117,
+      "text": "Say \"Devteya darshan ke Tayi\" after clicking on voice icon and see if shabad appears",
+      "automation": "manual"
+    },
+    {
+      "id": "VOICE-03",
+      "group": "VOICE",
+      "row": 118,
+      "text": "Try searching for few more shabads",
+      "automation": "manual"
+    },
+    {
+      "id": "VOICE-04",
+      "group": "VOICE",
+      "row": 119,
+      "text": "See if the voice search stops automatically after 15 seconds",
+      "automation": "partial"
+    }
+  ]
+}
