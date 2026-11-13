@@ -13,7 +13,8 @@ jobs:
   # Every PR: the quick set on Linux.
   fast:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    # Playwright 1.57 has no Chromium for the newer image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-2022, macos-latest]
+        os: [ubuntu-24.04, windows-2022, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     env:
