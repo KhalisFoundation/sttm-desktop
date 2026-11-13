@@ -31,7 +31,8 @@
         "shabad-info-source",
         "shabad-info-ang",
         "shabad-info-writer",
-        "shabad-info-raag"
+        "shabad-info-raag",
+        "shabad-info-translation-review"
       ]
     },
     "font-sizes": {
@@ -46,6 +47,7 @@
         "content2-font-size",
         "content3-font-size",
         "announcements-font-size",
+        "teleprompter-font-size",
         "reset-font-sizes"
       ]
     },
@@ -114,6 +116,10 @@
       "title": "ANNOUNCEMENTS",
       "initialValue": 7
     },
+    "teleprompter-font-size": {
+      "title": "TELEPROMPTER",
+      "initialValue": 10
+    },
     "reset-font-sizes": {
       "title": "RESET_FONT_SIZES",
       "type": "reset-button",
@@ -122,7 +128,8 @@
         "content1-font-size",
         "content2-font-size",
         "content3-font-size",
-        "announcements-font-size"
+        "announcements-font-size",
+        "teleprompter-font-size"
       ]
     },
     "content1-visibility": {
@@ -255,6 +262,10 @@
     },
     "shabad-info-raag": {
       "title": "SHABAD_INFO_RAAG",
+      "initialValue": true
+    },
+    "shabad-info-translation-review": {
+      "title": "SHABAD_INFO_TRANSLATION_REVIEW",
       "initialValue": true
     },
     "reset-padding": {

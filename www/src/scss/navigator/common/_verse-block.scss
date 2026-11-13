@@ -41,6 +41,9 @@
     }
   }
   .shabad-pane-active {
+    .verse-content {
+      font-weight: 700;
+    }
     .theme-light-theme & {
       background-color: $transparent-blue;
     }

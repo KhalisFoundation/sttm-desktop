@@ -75,6 +75,20 @@
       }
     }
 
+    .clear-pane-btn {
+      background-color: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 14px;
+      height: 40px;
+      margin: 0 0 0 4px;
+      padding: 0 8px;
+
+      &:hover {
+        background-color: #eaeaea;
+      }
+    }
+
     > i {
       border-radius: 50%;
       font-size: 18px;
@@ -95,5 +109,19 @@
 
   i {
     padding-right: 8px;
+  }
+}
+
+// The shabad's overview row ("slide 0"), above its lines. It's a line of the
+// list, so it gets the themes' hover and on-display highlight, but in the
+// app's English type, smaller, with a rule under it, so it doesn't read as
+// part of the shabad.
+.verse-block li.shabad-overview-row {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  font-family: $body-font-family;
+  font-size: 0.9rem;
+
+  .fa-circle-info {
+    margin-right: 8px;
   }
 }

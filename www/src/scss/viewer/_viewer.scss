@@ -1,4 +1,5 @@
-@import 'shabad-deck/shabad-deck', 'verse-slide/verse-slide', 'shabad-info/shabad-info';
+@import 'shabad-deck/shabad-deck', 'verse-slide/verse-slide', 'shabad-info/shabad-info',
+  'translation-review-qr/translation-review-qr', 'shabad-overview/shabad-overview';
 
 #viewer-container {
   height: 100%;
@@ -14,7 +15,7 @@
     transition: 0s border-radius linear;
     transition: 0.2s font-size ease-in;
   }
-  
+
   &-slide-wrapper {
     height: 100%;
     width: 100%;

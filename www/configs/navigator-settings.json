@@ -23,12 +23,14 @@
   "miscSlideText": "",
   "isMiscSlideGurmukhi": false,
   "isAnnouncement": false,
+  "shabadOverview": null,
 
   "isRandomShabad": false,
   "isSundarGutkaBani": false,
   "sundarGutkaBaniId": null,
   "ceremonyId": null,
   "isCeremonyBani": false,
+  "paneCleared": null,
   "singleDisplayActiveTab": "search",
   "shortcuts": {
     "openWaheguruSlide": false,
