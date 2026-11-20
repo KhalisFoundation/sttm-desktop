@@ -7,8 +7,9 @@ export const loadShabad = (shabadID) =>
     .loadShabad(shabadID)
     .then((rows) => rows)
     .catch((err) => {
-      const dbStatus = !!localStorage.getItem('isDbDownloaded');
-      if (dbStatus) {
+      // localStorage keeps strings, so check for 'false' rather than truthiness
+      const isDbDownloading = localStorage.getItem('isDbDownloaded') === 'false';
+      if (isDbDownloading) {
         new Noty({
           type: 'error',
           text: `${i18n.t('BANI.DATABASE_DOWNLOADING')}`,

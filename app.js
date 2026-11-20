@@ -1574,6 +1574,27 @@ ipcMain.on('update-settings', () => {
   mainWindow.webContents.send('sync-settings');
 });
 
+// A Gurbani database with a new schema version was downloaded. It is put in place on
+// the next launch (see installPendingDB in desktop_scripts.js), so offer a restart.
+ipcMain.on('database-update-pending', () => {
+  dialog
+    .showMessageBox(mainWindow, {
+      type: 'info',
+      buttons: [i18n.t('DATABASE_UPDATE.LATER'), i18n.t('DATABASE_UPDATE.RESTART_NOW')],
+      defaultId: 1,
+      cancelId: 0,
+      title: i18n.t('DATABASE_UPDATE.TITLE'),
+      message: i18n.t('DATABASE_UPDATE.TITLE'),
+      detail: i18n.t('DATABASE_UPDATE.DETAIL'),
+    })
+    .then(({ response }) => {
+      if (response === 1) {
+        app.relaunch();
+        app.exit(0);
+      }
+    });
+});
+
 // A new AI translations database was downloaded; every window reopens it
 ipcMain.on('ai-translations-updated', () => {
   BrowserWindow.getAllWindows().forEach((win) => {

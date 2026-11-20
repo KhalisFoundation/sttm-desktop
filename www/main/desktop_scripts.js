@@ -42,6 +42,16 @@ const newDBSchema = dbSchemaPath(newDBFolder);
 
 const { store } = remote.require('./app');
 
+// schemaVersion from a realm schema file, or null if it can't be read. Read with fs
+// rather than require, which would return a cached copy.
+const getSchemaVersion = (schemaPath) => {
+  try {
+    return JSON.parse(fs.readFileSync(schemaPath, 'utf8')).schemaVersion;
+  } catch (err) {
+    return null;
+  }
+};
+
 const POLLING_INTERVAL = 120 * 60000; // poll for new notifications every 2hrs.
 
 function windowAction(e) {
@@ -108,6 +118,10 @@ module.exports = {
   },
 
   init() {
+    // A database with a new schema version is only put in place at launch, before
+    // anything has the realm file open
+    this.installPendingDB();
+
     // Initialize DB right away if it exists
     if (
       fs.existsSync(dbPath) &&
@@ -134,6 +148,28 @@ module.exports = {
       modal.setContent(`<h1 class="model-title">${i18n.t('UNSUPPORT_OS')}</h1>`);
       modal.open();
     }
+  },
+
+  // Puts a database that was downloaded with a new schema version (see downloadLatestDB)
+  // in place. Runs at launch, while nothing has the current realm file open.
+  installPendingDB() {
+    const pendingDBHash = store.get('pendingDBHash');
+    if (!pendingDBHash) return;
+
+    try {
+      if (fs.existsSync(newDBPath) && (dbPlatform !== 'realm' || fs.existsSync(newDBSchema))) {
+        fs.renameSync(newDBPath, dbPath);
+        if (dbPlatform === 'realm') {
+          fs.renameSync(newDBSchema, dbSchema);
+        }
+        store.set('curDBHash', pendingDBHash);
+      }
+    } catch (err) {
+      /* eslint-disable-next-line no-console */
+      console.log(`Could not install downloaded database: ${err}`);
+    }
+    // If the files were missing or could not be moved, the download is tried again
+    store.delete('pendingDBHash');
   },
 
   downloadLatestDB(force = false) {
@@ -164,20 +200,40 @@ module.exports = {
                     win.setProgressBar(state.percent);
                     ipcRenderer.emit('database-progress', JSON.stringify(state));
                   })
-                  .on('end', () => {
+                  .pipe(fs.createWriteStream(dbCompressed))
+                  // Wait for the zip to be fully written before extracting it
+                  .on('finish', () => {
                     ipcRenderer.emit('database-progress', JSON.stringify({ percent: 1 }));
-                    try {
-                      extract(dbCompressed, { dir: newDBFolder }).then(() => {
+                    extract(dbCompressed, { dir: newDBFolder })
+                      .then(() => {
                         fs.chmodSync(newDBPath, '755');
-                        // Save the hash for comparison next time
-                        store.set('curDBHash', newestDBHash);
                         // Delete compressed database
                         fs.unlinkSync(dbCompressed);
+
+                        // The open database keeps using the schema it was opened with,
+                        // so a new schema version only works after a restart. Keep the
+                        // new files in new-db and put them in place on the next launch.
+                        const curSchemaVersion = getSchemaVersion(dbSchema);
+                        if (
+                          fs.existsSync(dbPath) &&
+                          curSchemaVersion !== null &&
+                          curSchemaVersion !== getSchemaVersion(newDBSchema)
+                        ) {
+                          store.set('pendingDBHash', newestDBHash);
+                          remote.getCurrentWindow().setProgressBar(-1);
+                          ipcRenderer.send('database-update-pending');
+                          return;
+                        }
+
                         // Replace current DB file with new version
                         fs.renameSync(newDBPath, dbPath);
                         if (dbPlatform === 'realm') {
                           fs.renameSync(newDBSchema, dbSchema);
                         }
+                        // Save the hash for comparison next time
+                        store.set('curDBHash', newestDBHash);
+                        store.delete('pendingDBHash');
+                        localStorage.setItem('isDbDownloaded', true);
                         module.exports.initDB();
                         // Delete old DBs
                         // TODO: Update to check if directory and use fs.rmdir
@@ -198,14 +254,12 @@ module.exports = {
                         });
                         const win = remote.getCurrentWindow();
                         win.setProgressBar(-1);
+                      })
+                      .catch((err) => {
+                        /* eslint-disable-next-line no-console */
+                        console.log(`Could not install database: ${err}`);
                       });
-                    } catch (err) {
-                      // handle any errors
-                      /* eslint-disable-next-line no-console */
-                      console.log(err);
-                    }
-                  })
-                  .pipe(fs.createWriteStream(dbCompressed));
+                  });
               }
             }
           },
