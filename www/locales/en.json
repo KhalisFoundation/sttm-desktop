@@ -511,6 +511,12 @@
     "LOAD_ERROR": "Error loading {{erroneousOperation}}. Please restart the application. If error persists, report it at www.sttm.co",
     "DATABASE_DOWNLOADING": "Database is downloading, please wait..."
   },
+  "DATABASE_UPDATE": {
+    "TITLE": "Gurbani database updated",
+    "DETAIL": "A new version of the Gurbani database has been downloaded. Restart SikhiToTheMax to start using it.",
+    "RESTART_NOW": "Restart Now",
+    "LATER": "Later"
+  },
   "SHORTCUT": {
     "COPY_TO_CLIPBOARD": "Verse copied to clipboard!"
   },
