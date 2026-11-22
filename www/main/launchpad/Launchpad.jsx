@@ -239,13 +239,12 @@ const Launchpad = () => {
     }
   };
 
+  // Always re-request: a request no shabad picked up must not block later copies
   const handleCtrlC = () => {
-    if (!shortcuts.copyToClipboard) {
-      setShortcuts({
-        ...shortcuts,
-        copyToClipboard: true,
-      });
-    }
+    setShortcuts({
+      ...shortcuts,
+      copyToClipboard: true,
+    });
   };
 
   useKeys('Digit1', 'combination', handleCtrlPlus1);
