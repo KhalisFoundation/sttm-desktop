@@ -1,0 +1,119 @@
+Version Number: 9.3.2,,,,
+,macOS,,Windows 11,
+Test,QA 1 (intel build),QA 2 (arm64) - Gaurav,QA 1(vimala),QA 2 - Raman
+,,,,
+Core Functionality,,,,
+Connect secondary display and ensure presenter view displays correctly,,Pass,,Pass
+"Toggle Presenter View to ""off"", ensure windows display correctly",,Pass,,Pass
+"Open a random shabad, cycle through a few lines in both presenter view and single-display mode, ensure functionality",,Pass,,Pass
+,,,,
+Search,,,,
+"Guru Granth Sahib: Search: “qnjqnh”, veirfy “Teerath Naavan Jao..” appears",,Pass,Pass,Pass
+"Dasam Granth Sahib: Search: “sksls”, verify that “Sach Kahoun Sun …” appears",,Pass,Pass,Pass
+"Bhai Gurdaas Ji Check: Search: “nsls”, verify that “Nakh Sis Lo...” appears",,Pass,"Fail (first shabad in results is from Ang 318, second shabad is ""nakh sikh lo sagal""",Pass  
+"Short Letter Search: Search “jh”, verify that shorter results such as “jale hain” appear first in the results",,Pass,Pass,Pass
+"Verify all above examples work with all search methods (Start, Anywhere, etc) ",,Pass,,Pass
+"Choose English search and use all of its search methods (Full Words, First Word Anywhere)",,Pass,,Pass
+Verify * wildcard works,,Pass,,
+Make sure keyboard loads when clicking on the icon,,Pass,,Pass
+Verify Ang search works. Open Ang 917 and verify Anand Sahib appears,,Pass,,Pass
+Use each filter and check the results,,Pass,,Pass
+Search for Kmrh and see if the shabad Khalsa mero roop hai khaas appears,,Pass,,Pass
+,,,,
+Additional options,,,,
+Ensure Random Shabad works,,Pass,,Pass
+Verify Daily Hukamnama is accurate,,Pass,,Pass
+,,,,
+History,,,,
+Search for a few shabads at random,,Pass,,Pass
+Ensure the history menu shows results correctly,,Pass,,Pass
+Verify you can click and open one of the results,,Pass,,Pass
+,,,,
+Themes,,,,
+Open theme picker and ensure each theme loads correctly,,Pass,,Pass ( Video themes show a little blank space on one side)
+"Upload Custom Theme, ensure functionality",,Pass,,Pass
+,,,,
+Display Options,,,,
+"Open quick tools, ensure font size adjustments work for each option",,Pass,,Pass
+"Open quick tools, change the text content from the dropdown for each option",,Pass,,Pass
+"Open quick tools, ensure visibility toggle works for each option",,Pass,,Pass
+"Open Settings, verify on/off toggle works for each ""field to display""",,Pass,,Pass
+"Open Settings, font size sliders work for each option",,Pass,,Pass
+"Open Settings, verify Akhand Paath View and Auto-Play function correctly",,Pass,,Pass
+"Open Settings, Larivaar displays correctly",,Pass,,Pass
+"Open Settings, verify left-align functionality",,Pass,,Pass
+"Open Settings, verify Live Feed Text files allows location to be chosen and files generate",,Pass,,Pass
+Verify Vishraams function correctly,,Pass,,Pass
+Verify Intelligent spacebar works,,Pass,,Fail
+,,,,
+Shortcut Tray,,Pass,,
+Verify all options work,,Pass,,Pass
+Verify minimize/open work ,,,,Pass
+,,,,
+Bani Overlay,,,,
+Verify Bani Overlay menu opens,,Pass,,Pass
+Resize and Recolor Text,,Pass,,Pass
+Change layout,,Pass,,Pass
+Copy URL into OBS and verify,,Pass,,Pass
+,,,,
+Chromecast,,,,
+Search for Chromecast and verify stable connection,,Pass,,Pass
+Open a few shabads at random and ensure connection does not interrupt,,Pass,,Pass
+Change theme/font size/display options and verify chromecast adjusts accordingly,,Pass,,Pass
+,,,,
+Sunder Gutka/Ceremonies,,,,
+Check all the options,,Pass,,Pass
+Open Rehras Sahib and very different length options work,,Pass,,Pass
+"Open Anand Karaj Ceremony, run through the entire deck, ensure displays correcrly",,Pass,,Pass
+,,,,
+KeyBoard shortcuts,,,,
+CTRL(or CMD for Mac) + / = Search Bar,,Pass,,Pass
+CTRL(or CMD for Mac) + 1 = Waheguru Slide,,Pass,,Pass
+CTRL(or CMD for Mac) + 2 = Mool Mantra,,Pass,,Pass
+CTRL(or CMD for Mac) + 3 = Blank Slide,,Pass,,Pass
+CTRL(or CMD for Mac) + 4 = Anand Sahib (Bhog),,Pass,,Pass
+CTRL(or CMD for Mac) + 5 = Help Menu,,Pass,,Pass
+CTRL(or CMD for Mac) + 6 = Shortcut Legend,,Pass,,Pass
+CTRL(or CMD for Mac) + G = Insert Slide,,Pass,,Pass
+,,,,
+Sync,,,,
+Open Sync from bottom left  and see if code/PIN is visible,,Pass,,Pass
+Change theme from dark to light and see if icon is still visible,,Pass,,Pass
+Click on present and make sure screen is visible,,Pass,,Pass
+"Go to https://www.sikhitothemax.org/control and enter the code, make sure it connects",,Pass,,Pass
+"Navigate through a few lines via /control, ensure it works",,Pass,,Pass
+"Go to https://www.sikhitothemax.org/sync and enter the code, make sure it connects",,Pass,,Pass
+Open random shabad in desktop and make sure its opened in web,,Pass,,Pass
+Change tukks in desktop and see if they are reflected on web as well,,Pass,,Pass
+Open Sync menu and check if stop session button works,,Pass,,Pass
+,,,,
+Single Display Mode,,,,
+Search any shabad and verify that it doesn't cut off from any margins,,Pass,,Pass
+Verify all above functions,,Pass,,Pass
+,,,,
+Login and Favourites,,,,
+"Login with your Khalis account, make sure it works",,Pass,,Pass
+Go to favourites tab and verify you see previously saved shabads,,Pass,,Pass
+Favourite a new shabad and verify it is in favourites list,,Pass,,Pass
+Unfavourite any shabad and verify it is removed from favourites list,,Pass,,Pass
+Login with same account in sttm-web and check if shabad favorited from sttm-desktop appears in web,,Pass,,Pass
+,,,,
+Multi-pane feature,,,,
+"Choose three shabads on random and display on all three frames, verify it works",,Pass,,Pass
+"Switch to different panels, make sure it works",,Pass,,Pass
+"Lock a panel and try to set a bani on it, make sure it fails to assign bani ",,Pass,,Pass
+Open three sundar gutka banis in all panes,,Pass,,Pass
+Open a shabad from history in any one of the pane,,Pass,,Pass
+"Open multiple combinations of banis, ceremonies and shabads in each pane",,Pass,,Pass
+Open Asa di vaar in multipane workspace 3-4 times and check if it loads fine every time.,,Pass,,Pass
+Clear a pane by clicking on clear pane,,Pass,,Pass
+Add Misc Slides from any one of the pane,,Pass,,Pass
+"Make sure the when clicked on search result, it opens in the default pane",,Pass,,Pass
+"Change the default pane value from search footer, and open a shabad",,Pass,,Pass
+Favorite a different shabad in all three panes,,Pass,,Pass
+,,,,
+Voice Search,,,,
+Click on voice icon and see if the waveform appears as you speak,,Pass,,Pass
+"Say ""Devteya darshan ke Tayi"" after clicking on voice icon and see if shabad appears",,Pass,,Pass
+Try searching for few more shabads,,Pass,,Pass
+See if the voice search stops automatically after 15 seconds,,Pass,,Pass

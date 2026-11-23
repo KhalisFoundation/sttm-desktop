@@ -1,17 +1,25 @@
 {
-  "extends": ["airbnb-base", "prettier", "plugin:react/recommended"],
+  "extends": [
+    "airbnb-base",
+    "prettier",
+    "plugin:react/recommended"
+  ],
   "env": {
     "browser": true,
     "mocha": true,
     "node": true
   },
-  "plugins": ["prettier"],
+  "plugins": [
+    "prettier"
+  ],
   "parserOptions": {
     "ecmaVersion": 2020
   },
   "rules": {
     "no-mixed-operators": "off",
-    "prettier/prettier": ["error"],
+    "prettier/prettier": [
+      "error"
+    ],
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": "off",
     "import/no-cycle": "off",
@@ -23,8 +31,32 @@
     "import/core-modules": "electron",
     "import/resolver": {
       "node": {
-        "extensions": [".js",".jsx"]
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "e2e/**/*.js",
+        "e2e/**/*.mjs",
+        "playwright.config.js"
+      ],
+      "rules": {
+        "no-await-in-loop": "off",
+        "no-restricted-syntax": "off",
+        "no-underscore-dangle": "off",
+        "no-console": "off",
+        "no-empty": [
+          "error",
+          {
+            "allowEmptyCatch": true
+          }
+        ]
+      }
+    }
+  ]
 }
