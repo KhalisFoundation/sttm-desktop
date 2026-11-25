@@ -131,7 +131,7 @@
       document.querySelector('.o-teeka').innerHTML = '';
       document.querySelector('.o-transliteration').innerHTML = '';
       // A blank slide is a misc slide with no text: show nothing, not an empty bar.
-      setOverlayVisible(text.trim() !== '');
+      setOverlayVisible(typeof text === 'string' && text.trim() !== '');
     };
 
     const applyOverlayPrefs = () => {

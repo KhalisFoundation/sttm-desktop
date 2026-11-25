@@ -33,7 +33,7 @@
       },
       "text-format-options": {
         "title": "",
-        "type": "icon-toggle",
+        "type": "text-format-icon",
         "settings": ["text-format"]
       },
       "background": {
