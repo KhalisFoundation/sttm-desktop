@@ -31,7 +31,6 @@ $overlay-radius: 8px;
   font-size: 13px;
   inset: 0;
   line-height: 1.4;
-  min-width: 900px;
   position: fixed;
 
   button,
@@ -269,7 +268,7 @@ $overlay-radius: 8px;
   flex: none;
   flex-direction: column;
   min-height: 0;
-  width: 340px;
+  width: clamp(270px, 28vw, 340px);
 }
 
 .overlay-sections {
@@ -552,10 +551,66 @@ $overlay-radius: 8px;
       text-decoration: underline;
     }
   }
+}
 
-  .overlay-sidebar-note {
-    color: $overlay-muted;
-    font-size: 11px;
-    text-align: right;
+// Small and scaled screens. Most people run this on older Windows laptops,
+// often 1366x768 at 125% scaling, which leaves a window of about 1090x550.
+@media (max-width: 1200px) {
+  .overlay-url .overlay-url-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .overlay-url input[type='text'] {
+    width: 180px;
+  }
+
+  .overlay-toolbar .overlay-subcategory-title {
+    display: none;
+  }
+
+  .overlay-layouts button {
+    padding: 4px 6px;
+  }
+}
+
+@media (max-height: 700px) {
+  .overlay-header {
+    min-height: 44px;
+    padding: 6px 12px;
+  }
+
+  .overlay-stage {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .overlay-section summary {
+    padding: 10px 14px;
+  }
+
+  .overlay-section-body {
+    padding: 0 14px 12px;
+
+    .overlay-subcategory {
+      gap: 6px;
+    }
+  }
+
+  .overlay-theme {
+    height: 36px;
+  }
+
+  .overlay-sidebar-footer {
+    padding: 8px 14px;
+  }
+}
+
+// Very short windows: drop the icon labels so the preview keeps its space.
+@media (max-height: 560px) {
+  .overlay-layouts button {
+    font-size: 0;
+    gap: 0;
   }
 }

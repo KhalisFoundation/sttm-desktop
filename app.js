@@ -184,9 +184,11 @@ function openSecondaryWindow(windowName) {
   if (openWindow.length > 0) {
     openWindow[0].show();
   } else {
+    // Fit small or scaled screens (a 1366x768 laptop at 125% has about 1093x582 to use).
+    const workArea = electron.screen.getPrimaryDisplay().workAreaSize;
     window.obj = new BrowserWindow({
-      width: 1366,
-      height: 768,
+      width: Math.min(1366, workArea.width),
+      height: Math.min(768, workArea.height),
       show: false,
       webPreferences: {
         nodeIntegration: true,

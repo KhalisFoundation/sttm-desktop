@@ -72,8 +72,7 @@
     "LAYOUT_VERTICAL_LEFT": "Left",
     "LAYOUT_CLASSIC": "Classic",
     "RESET_DEFAULTS": "Reset to defaults",
-    "RESET_CONFIRM": "Reset all Bani Overlay settings to their defaults?",
-    "CHANGES_LIVE": "Changes show in the overlay straight away"
+    "RESET_CONFIRM": "Reset all Bani Overlay settings to their defaults?"
   },
   "FAV_SHABAD": {
     "LOGGED_OUT": "You need to login to view the favorite shabads",

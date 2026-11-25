@@ -12,6 +12,7 @@ const LayoutSelector = ({ options, value, onChange }) => (
         key={layout}
         type="button"
         data-layout={layout}
+        title={i18n.t(`BANI_OVERLAY.${options[layout].label}`)}
         aria-pressed={layout === value}
         onClick={() => layout !== value && onChange(layout)}
       >

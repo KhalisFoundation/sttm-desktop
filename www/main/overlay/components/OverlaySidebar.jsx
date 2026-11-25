@@ -31,7 +31,6 @@ export const OverlaySidebar = () => {
         <button type="button" className="overlay-reset" onClick={resetToDefaults}>
           {i18n.t('BANI_OVERLAY.RESET_DEFAULTS')}
         </button>
-        <span className="overlay-sidebar-note">{i18n.t('BANI_OVERLAY.CHANGES_LIVE')}</span>
       </footer>
     </aside>
   );
