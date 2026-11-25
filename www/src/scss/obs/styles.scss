@@ -129,20 +129,28 @@ body .overlay-wrapper[hidden] {
     position: absolute;
     width: 90%;
   }
+  // One rounded box around all the text, as wide as the longest line.
+  .other-layouts {
+    background: var(--overlay-bg);
+    border-radius: 1vh;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: calc(var(--overlay-padding, 0.5vh) + 1vh) 3vw;
+    width: fit-content;
+  }
+
   .content-bar {
     background: transparent;
     padding: 0;
-    width: auto;
   }
+
   .logo-wrapper {
     top: 2vh;
   }
 
   .o-gurbani,
   .o-translation {
-    background: rgba(0, 0, 0, 0.8);
     margin: 0;
-    padding: 5px;
 
     &:empty {
       display: none;

@@ -146,7 +146,9 @@ const OverlaySetting = ({ settingKey, settingObj, stateVar, stateFunction }) => 
       break;
     case 'custom':
       if (settingObj.key === 'LayoutSelector') {
-        control = <LayoutSelector value={value} onChange={setValue} />;
+        control = (
+          <LayoutSelector options={settingObj.options} value={value} onChange={setValue} />
+        );
       } else if (settingObj.key === 'ThemeSelector') {
         control = <ThemeSelector />;
       }

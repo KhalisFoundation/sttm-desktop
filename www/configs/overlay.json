@@ -234,7 +234,15 @@
       },
       "layout": {
         "key": "LayoutSelector",
-        "initialValue": "split"
+        "initialValue": "split",
+        "options": {
+          "top": { "label": "LAYOUT_TOP", "icon": [[0, 0, 34, 6]] },
+          "bottom": { "label": "LAYOUT_BOTTOM", "icon": [[0, 14, 34, 6]] },
+          "split": { "label": "LAYOUT_SPLIT", "icon": [[0, 0, 34, 4], [0, 16, 34, 4]] },
+          "vertical-left": { "label": "LAYOUT_VERTICAL_LEFT", "icon": [[0, 0, 17, 20]] },
+          "vertical": { "label": "LAYOUT_VERTICAL", "icon": [[17, 0, 17, 20]] },
+          "classic": { "label": "LAYOUT_CLASSIC", "icon": [[4, 12, 26, 5, 1.5]] }
+        }
       },
       "toggle-logo": {
         "title": "LOGO",

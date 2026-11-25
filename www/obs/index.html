@@ -62,6 +62,11 @@
     let lastAnnouncement = {};
     let fitTextInstances = [];
 
+    // Layouts drawn with the full-width bar markup (.layout-top-bottom). Every
+    // other layout uses .other-layouts and is styled by its .layout-<name> rule
+    // in src/scss/obs/styles.scss, so a new layout needs no change here.
+    const BAR_LAYOUTS = ['top', 'bottom'];
+
     const hexToRgb = hex => {
       if (hex === '#000') {
         return '0, 0, 0';
@@ -151,7 +156,7 @@
       getElements('.o-gurbani').setProperty('fontSize',
         `${(preview && overlayPrefs.fitTextSwitch) ? 5 : overlayPrefs.gurbaniSize}vh`);
 
-      if (!preview && ['top', 'bottom'].includes(overlayPrefs.layout)) {
+      if (!preview && BAR_LAYOUTS.includes(overlayPrefs.layout)) {
         if (overlayPrefs.fitTextSwitch) {
           fitTextInstances = fitty('.layout-top-bottom .o-gurbani', {
             minSize: 18,
@@ -173,14 +178,9 @@
         }
       }
 
-      document.body.classList.remove(
-        'layout-top',
-        'layout-bottom',
-        'layout-split',
-        'layout-classic',
-        'layout-vertical',
-        'layout-vertical-left',
-      );
+      [...document.body.classList]
+        .filter(className => className.startsWith('layout-'))
+        .forEach(className => document.body.classList.remove(className));
 
       const { gurbaniFont, textFont, toggleAnnouncement } = overlayPrefs;
       getElements('.o-gurbani').setProperty('fontFamily', gurbaniFont);
@@ -189,7 +189,7 @@
 
       document.body.classList.add('layout-' + overlayPrefs.layout);
 
-      if (['top', 'bottom'].includes(overlayPrefs.layout)) {
+      if (BAR_LAYOUTS.includes(overlayPrefs.layout)) {
         document.querySelector('.layout-top-bottom').style.display = 'flex';
         document.querySelector('.other-layouts').style.display = 'none';
       } else {
@@ -232,20 +232,19 @@
           el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
         });
 
-      // Special style overrides for classic layout
+      // Layouts that draw their own box (such as classic) read these in CSS.
+      document.body.style.setProperty(
+        '--overlay-bg',
+        `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`,
+      );
+      document.body.style.setProperty('--overlay-padding', `${overlayPrefs.padding}vh`);
+
+      // Classic: one box around all the text (styled in CSS), not a band per line
       document
         .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
         .forEach(el => {
           el.style.backgroundColor = 'transparent';
-          const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
           el.style.padding = '0';
-
-          document.querySelectorAll('span.o-gurbani, span.o-translation').forEach(spanEl => {
-            spanEl.style.backgroundColor = overlayBgColor;
-            spanEl.style.padding = `${overlayPrefs.padding}vh`;
-            spanEl.style.lineHeight = '1.5em';
-          });
-          document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
         });
 
       document.body.style.backgroundColor = overlayColor;
