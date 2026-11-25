@@ -11,8 +11,11 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
     const stateVarName = convertToCamelCase(settingKey);
     const stateFuncName = `set${convertToCamelCase(settingKey, true)}`;
 
+    // Only fall back to the default when nothing was saved: a saved `false`
+    // (a switch turned off) must not be replaced by a default of `true`.
+    const savedValue = savedSettings.baniOverlay[settingKey];
     userSettingsState[stateVarName] =
-      savedSettings.baniOverlay[settingKey] || settingsSchema[settingKey].initialValue;
+      savedValue !== undefined ? savedValue : settingsSchema[settingKey].initialValue;
 
     userSettingsState[stateFuncName] = action((state, payload) => {
       // eslint-disable-next-line no-param-reassign

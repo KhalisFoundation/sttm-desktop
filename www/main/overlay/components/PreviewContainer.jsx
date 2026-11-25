@@ -1,16 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import OverlaySettings from './Options';
+import OverlaySettingsContainer from './OverlaySettingsContainer';
 
 import { bottomSettings } from '../utils/parse-overlay-options';
 
 export const PreviewContainer = ({ url }) => (
-  <section className="preview-container">
-    <webview className="preview" src={url}></webview>
-    <section className="bottom-settings">
-      <OverlaySettings settingsObj={bottomSettings} />
-    </section>
+  <section className="overlay-stage">
+    <div className="overlay-preview-area">
+      <div className="overlay-preview-frame">
+        <webview className="overlay-preview" src={url}></webview>
+      </div>
+    </div>
+    <div className="overlay-toolbar">
+      <OverlaySettingsContainer settingsObj={bottomSettings} variant="toolbar" />
+    </div>
   </section>
 );
 

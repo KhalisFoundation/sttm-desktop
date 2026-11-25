@@ -2,170 +2,179 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import LayoutSelector from './LayoutSelector';
-import { getDefaultSettings } from '../../common/store/user-settings/get-saved-overlay-settings';
+import { ThemeSelector } from './ThemeSelector';
 import { convertToCamelCase } from '../../common/utils';
 import { Switch } from '../../common/sttm-ui';
 import { i18n } from '../../common/i18n';
 
-const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
+// Avoid values like 0.30000000000000004 when stepping by 0.1.
+const roundToStep = (value) => Math.round(value * 1000) / 1000;
+
+// Show as many decimals as the step has (0.25 → 2, 0.1 → 1).
+const formatValue = (value, { format, step }) => {
+  if (format === 'percent') return `${Math.round(value * 100)}%`;
+  const decimals = (String(step).split('.')[1] || '').length;
+  return value.toFixed(decimals);
+};
+
+const OverlaySetting = ({ settingKey, settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
   const baniOverlayState = useStoreState((state) => state.baniOverlay);
   const baniOverlayActions = useStoreActions((state) => state.baniOverlay);
+  const value = baniOverlayState[stateVar];
 
-  const handleInputChange = (event) => {
-    const value = event.target ? event.target.value : event;
-    baniOverlayActions[stateFunction](value);
-  };
+  // A setting can depend on another one being on, or only apply to some layouts.
+  // It stays visible but disabled, with a hint saying why.
+  const missingRequirement = settingObj.requires && !baniOverlayState[settingObj.requires];
+  const wrongLayout = settingObj.layouts && !settingObj.layouts.includes(baniOverlayState.layout);
+  const disabled = Boolean(missingRequirement || wrongLayout);
+  const hint = wrongLayout ? settingObj.layoutsHint : settingObj.hint;
 
-  const handleSizeIcon = (event) => {
-    const { max, min, step } = settingObj;
-    const value = event.currentTarget ? event.currentTarget.dataset.value : event;
-    const currentValue = baniOverlayState[stateVar];
-    let updatedValue;
+  const setValue = (newValue) => baniOverlayActions[stateFunction](newValue);
 
-    if (value === 'plus' && currentValue < max) {
-      updatedValue = currentValue + step;
-      baniOverlayActions[stateFunction](updatedValue);
-    } else if (value === 'minus' && currentValue > min) {
-      updatedValue = baniOverlayState[stateVar] - step;
-      baniOverlayActions[stateFunction](updatedValue);
+  // Changing a size by hand turns automatic sizing (Fit text) off.
+  const setNumber = (newValue) => {
+    const { max, min } = settingObj;
+    const clamped = roundToStep(Math.min(max, Math.max(min, newValue)));
+    if (clamped !== value) {
+      setValue(clamped);
     }
-
-    if (settingObj?.disableOnChange?.length > 0) {
-      settingObj.disableOnChange.forEach((disableSetting) => {
-        const disabledSetting = convertToCamelCase(disableSetting);
-        const setDisabledSetting = `set${convertToCamelCase(disableSetting, true)}`;
-        if (baniOverlayState[disabledSetting] !== false) {
-          baniOverlayActions[setDisabledSetting](false);
-        }
-      });
-    }
+    (settingObj.disableOnChange || []).forEach((disableSetting) => {
+      const disabledSetting = convertToCamelCase(disableSetting);
+      if (baniOverlayState[disabledSetting] !== false) {
+        baniOverlayActions[`set${convertToCamelCase(disableSetting, true)}`](false);
+      }
+    });
   };
 
-  const handleToggleChange = () => {
-    if (stateVar === 'reset') {
-      const defaultSettings = getDefaultSettings();
-      Object.keys(baniOverlayState).forEach((state) => {
-        if (baniOverlayState[state] !== defaultSettings[state]) {
-          baniOverlayActions[`set${convertToCamelCase(state, true)}`](defaultSettings[state]);
-        }
-      });
-    } else {
-      const existingValue = baniOverlayState[stateVar];
-      baniOverlayActions[stateFunction](!existingValue);
-    }
-  };
+  const toggleFormat = (format) => setValue({ ...value, [format]: !value[format] });
 
-  const handleLayoutChange = (event) => {
-    const currentLayout = baniOverlayState[stateVar];
-    const newLayout = event.currentTarget.dataset.layout;
-    if (newLayout !== currentLayout) {
-      baniOverlayActions[stateFunction](newLayout);
-    }
-  };
-
-  const handleFormatIcon = (event) => {
-    const clickedEvent = event.currentTarget ? event.currentTarget.dataset.value : event;
-    const currentFormat = { ...baniOverlayState[stateVar] };
-    currentFormat[clickedEvent] = !currentFormat[clickedEvent];
-    baniOverlayActions[stateFunction](currentFormat);
-  };
-
-  const settingDOM = [];
-
-  if (title) {
-    settingDOM.push(<span>{i18n.t(`BANI_OVERLAY.${title}`)}</span>);
-  }
+  const label = title ? i18n.t(`BANI_OVERLAY.${title}`) : null;
+  let control;
 
   switch (type) {
     case 'dropdown':
-      settingDOM.push(
-        <select onChange={handleInputChange} value={baniOverlayState[stateVar]}>
-          {Object.keys(settingObj.options).map((op, opIndex) => (
-            <option key={`control-dropdown-options-${opIndex}`} value={op}>
+      control = (
+        <select aria-label={label} onChange={(event) => setValue(event.target.value)} value={value}>
+          {Object.keys(settingObj.options).map((op) => (
+            <option key={op} value={op}>
               {settingObj.options[op]}
             </option>
           ))}
-        </select>,
+        </select>
       );
       break;
     case 'color-input':
-      settingDOM.push(
-        <input
-          type="color"
-          className={`control-color-input-${title}`}
-          onChange={handleInputChange}
-          value={baniOverlayState[stateVar]}
-        />,
+      control = (
+        <label className="overlay-color">
+          <input
+            type="color"
+            aria-label={label}
+            onChange={(event) => setValue(event.target.value)}
+            value={value}
+          />
+          <code>{value.toUpperCase()}</code>
+        </label>
       );
       break;
     case 'size-icon':
-      settingDOM.push(
-        <span className={`size-icon-container`}>
-          <div className="size-icon icon-left" data-value="plus" onClick={handleSizeIcon}>
-            <i className="fa fa-plus"></i>
-          </div>
-          <div className="size-icon icon-right" data-value="minus" onClick={handleSizeIcon}>
-            <i className="fa fa-minus"></i>
-          </div>
-        </span>,
+      control = (
+        <div className="overlay-stepper">
+          <button
+            type="button"
+            aria-label={i18n.t('BANI_OVERLAY.DECREASE')}
+            disabled={value <= settingObj.min}
+            onClick={() => setNumber(value - settingObj.step)}
+          >
+            <i className="fa fa-minus" />
+          </button>
+          <output>{formatValue(value, settingObj)}</output>
+          <button
+            type="button"
+            aria-label={i18n.t('BANI_OVERLAY.INCREASE')}
+            disabled={value >= settingObj.max}
+            onClick={() => setNumber(value + settingObj.step)}
+          >
+            <i className="fa fa-plus" />
+          </button>
+        </div>
+      );
+      break;
+    case 'slider':
+      control = (
+        <div className="overlay-slider">
+          <input
+            type="range"
+            aria-label={label}
+            min={settingObj.min}
+            max={settingObj.max}
+            step={settingObj.step}
+            value={value}
+            onChange={(event) => setNumber(Number(event.target.value))}
+          />
+          <output>{formatValue(value, settingObj)}</output>
+        </div>
       );
       break;
     case 'text-format-icon':
-      settingDOM.push(
-        <span className={`text-icon-container`}>
-          <div
-            className={`text-icon icon-bold ${baniOverlayState[stateVar].bold && 'active'}`}
-            data-value="bold"
-            onClick={handleFormatIcon}
-          >
-            <i className="fa fa-bold"></i>
-          </div>
-          <div
-            className={`text-icon icon-italic ${baniOverlayState[stateVar].italic && 'active'}`}
-            data-value="italic"
-            onClick={handleFormatIcon}
-          >
-            <i className="fa fa-italic"></i>
-          </div>
-        </span>,
-      );
-      break;
-    case 'icon-toggle':
-      settingDOM.push(
-        <div className="size-icon-container" onClick={handleToggleChange}>
-          <span
-            className="icon-toggle"
-            title={settingObj.tooltip}
-            style={{
-              backgroundImage: `url('assets/img/icons/${settingObj.icon}')`,
-            }}
-          ></span>
-        </div>,
+      control = (
+        <div className="overlay-toggles">
+          {['bold', 'italic'].map((format) => (
+            <button
+              key={format}
+              type="button"
+              title={i18n.t(`BANI_OVERLAY.${format.toUpperCase()}`)}
+              aria-pressed={Boolean(value[format])}
+              onClick={() => toggleFormat(format)}
+            >
+              <i className={`fa fa-${format}`} />
+            </button>
+          ))}
+        </div>
       );
       break;
     case 'switch':
-      settingDOM.push(
+      control = (
         <Switch
-          controlId={`${title}-switch`}
-          className={`control-item-switch`}
-          value={baniOverlayState[stateVar]}
-          onToggle={handleToggleChange}
-        />,
+          controlId={`overlay-${settingKey}-switch`}
+          className="overlay-switch"
+          value={Boolean(value) && !disabled}
+          disabled={disabled}
+          onToggle={() => setValue(!value)}
+        />
       );
       break;
     case 'custom':
       if (settingObj.key === 'LayoutSelector') {
-        settingDOM.push(<LayoutSelector changeLayout={handleLayoutChange} />);
+        control = (
+          <LayoutSelector options={settingObj.options} value={value} onChange={setValue} />
+        );
+      } else if (settingObj.key === 'ThemeSelector') {
+        control = <ThemeSelector />;
       }
       break;
     default:
       return null;
   }
-  return settingDOM;
+
+  return (
+    <div
+      id={settingKey}
+      className={`overlay-control overlay-control-${type}${disabled ? ' is-disabled' : ''}`}
+    >
+      {label && type !== 'custom' && (
+        <span className="overlay-control-label">
+          {label}
+          {hint && <span className="overlay-control-hint">{i18n.t(`BANI_OVERLAY.${hint}`)}</span>}
+        </span>
+      )}
+      {control}
+    </div>
+  );
 };
 
 OverlaySetting.propTypes = {
+  settingKey: PropTypes.string,
   settingObj: PropTypes.object,
   stateVar: PropTypes.string,
   stateFunction: PropTypes.string,

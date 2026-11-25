@@ -7,6 +7,12 @@ const copy = require('copy-to-clipboard');
 export const CopyToClipboard = ({ url }) => {
   const [copied, setCopied] = React.useState(false);
 
+  React.useEffect(() => {
+    if (!copied) return undefined;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
   const handleCopy = () => {
     copy(url);
     setCopied(true);
@@ -14,24 +20,20 @@ export const CopyToClipboard = ({ url }) => {
 
   return (
     <div className="overlay-url">
-      <p className="overlay-window-text live-url-header">{i18n.t(`BANI_OVERLAY.LIVE_URL`)}</p>
-      <div className="url-container">
+      <label className="overlay-url-field">
+        <span className="overlay-url-label">{i18n.t('BANI_OVERLAY.LIVE_URL')}</span>
         <input
           type="text"
-          className="url-text"
-          onClick={handleCopy}
-          onFocus={(event) => event.target.select()} // Select all text on focus
-          onMouseLeave={() => setCopied(false)}
-          readOnly={true}
+          readOnly
           value={url}
+          onFocus={(event) => event.target.select()} // Select all text on focus
         />
-        <span className="export-btn" onClick={handleCopy} onMouseLeave={() => setCopied(false)}>
-          <i className="fa fa-files-o cp-icon"></i>
-        </span>
-        <span className="tooltip">
-          {copied ? i18n.t('BANI_OVERLAY.COPIED_URL') : i18n.t('BANI_OVERLAY.COPY_URL')}
-        </span>
-      </div>
+      </label>
+      <button type="button" className="overlay-url-copy" onClick={handleCopy}>
+        <i className={`fa ${copied ? 'fa-check' : 'fa-files-o'}`} />
+        {copied ? i18n.t('BANI_OVERLAY.COPIED_URL') : i18n.t('BANI_OVERLAY.COPY_URL')}
+      </button>
+      <p className="overlay-url-hint">{i18n.t('BANI_OVERLAY.LIVE_URL_HINT')}</p>
     </div>
   );
 };

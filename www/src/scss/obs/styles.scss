@@ -16,6 +16,12 @@ body {
   position: relative;
 }
 
+// Layouts such as vertical set a display value on .overlay-wrapper, which would
+// override the hidden attribute used for blank slides and empty lines.
+body .overlay-wrapper[hidden] {
+  display: none;
+}
+
 .overlay-wrapper {
   position: relative;
   width: 100%;
@@ -43,6 +49,49 @@ body {
 
 .gurmukhi {
   font-family: 'Gurbani Akhar';
+}
+
+// Date and time card, separate from the text. placeClock() in index.html
+// puts it in a screen corner clear of the text and logo.
+.o-clock {
+  background: var(--overlay-bg);
+  border-radius: 1.2vh;
+  box-shadow: 0 0.4vh 1.6vh rgba(0, 0, 0, 0.25);
+  display: none;
+  flex-direction: column;
+  gap: 0.4vh;
+  line-height: 1.1;
+  padding: 1.4vh 1.8vw;
+  position: fixed;
+  transition: top 0.2s ease;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.show-datetime .o-clock {
+  display: flex;
+}
+
+// A blank slide shows nothing, the clock included.
+.overlay-wrapper[hidden] ~ .o-clock {
+  display: none;
+}
+
+.o-clock-time {
+  font-size: 4.4vh;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.o-clock-date {
+  font-size: 1.7vh;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+  text-transform: uppercase;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .content-bar {
@@ -123,20 +172,36 @@ body {
     position: absolute;
     width: 90%;
   }
+  // One rounded box around all the text, as wide as the longest line.
+  .other-layouts {
+    background: var(--overlay-bg);
+    border-radius: 1vh;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: calc(var(--overlay-padding, 0.5vh) + 1vh) 3vw;
+    width: fit-content;
+  }
+
+  // The box replaces the per-section bands that applyOverlayPrefs() paints
+  // inline on .content-top/.content-bottom, hence !important.
+  .content-top,
+  .content-bottom {
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
   .content-bar {
     background: transparent;
     padding: 0;
-    width: auto;
   }
+
   .logo-wrapper {
     top: 2vh;
   }
 
   .o-gurbani,
   .o-translation {
-    background: rgba(0, 0, 0, 0.8);
     margin: 0;
-    padding: 5px;
 
     &:empty {
       display: none;
@@ -146,6 +211,21 @@ body {
   .o-teeka,
   .o-transliteration {
     display: none;
+  }
+}
+
+// Classic with the box near the top, and the logo moved out of its way.
+.layout-classic-top {
+  @extend .layout-classic;
+
+  .overlay-wrapper {
+    bottom: auto;
+    top: 10%;
+  }
+
+  .logo-wrapper {
+    bottom: 2vh;
+    top: auto;
   }
 }
 
