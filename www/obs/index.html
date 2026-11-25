@@ -91,8 +91,86 @@
         .join(overlayLarivaar ? '' : ' ');
     };
 
+    // Date and time card. It sits in the first screen corner that is clear of
+    // the text boxes and the logo, so it works with any layout. If every corner
+    // is covered (as in split), it slides down from the top-left past them.
+    const CLOCK_CORNERS = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+
+    const intersects = (a, b) =>
+      a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+    const getClockObstacles = () => {
+      const isPainted = el => {
+        const bg = getComputedStyle(el).backgroundColor;
+        return bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)';
+      };
+      const boxes = [
+        ...document.querySelectorAll(
+          '.overlay-wrapper, .layout-top-bottom, .content-top, .content-bottom, .other-layouts',
+        ),
+      ].filter(isPainted);
+      const content = [
+        ...document.querySelectorAll(
+          '.o-gurbani, .o-translation, .o-teeka, .o-transliteration, .sttm-logo-white',
+        ),
+      ];
+      return [...boxes, ...content]
+        .map(el => el.getBoundingClientRect())
+        .filter(rect => rect.width > 0 && rect.height > 0);
+    };
+
+    const placeClock = () => {
+      if (!document.body.classList.contains('show-datetime')) return;
+      const clock = document.querySelector('.o-clock');
+      const margin = Math.round(window.innerHeight * 0.03);
+      const { offsetWidth: width, offsetHeight: height } = clock;
+      const { innerWidth: screenWidth, innerHeight: screenHeight } = window;
+      const obstacles = getClockObstacles();
+      const rectAt = ([left, top]) => ({ left, top, right: left + width, bottom: top + height });
+      const fits = spot => {
+        const rect = rectAt(spot);
+        return rect.bottom <= screenHeight && !obstacles.some(o => intersects(rect, o));
+      };
+      const corners = {
+        'top-left': [margin, margin],
+        'top-right': [screenWidth - width - margin, margin],
+        'bottom-left': [margin, screenHeight - height - margin],
+        'bottom-right': [screenWidth - width - margin, screenHeight - height - margin],
+      };
+      let spot = CLOCK_CORNERS.map(corner => corners[corner]).find(fits);
+      if (!spot) {
+        const tops = obstacles.map(o => o.bottom + margin).sort((a, b) => a - b);
+        spot = tops.map(top => [margin, top]).find(fits) || corners['top-left'];
+      }
+      clock.style.left = `${spot[0]}px`;
+      clock.style.top = `${spot[1]}px`;
+    };
+
+    // Shown in the format of the computer running the overlay.
+    const renderDateTime = () => {
+      if (!overlayPrefs || !overlayPrefs.toggleDateTime) return;
+      const now = new Date();
+      document.querySelector('.o-clock-time').textContent = new Intl.DateTimeFormat(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: !overlayPrefs.clock24Hour,
+      }).format(now);
+      document.querySelector('.o-clock-date').textContent = overlayPrefs.showDate
+        ? new Intl.DateTimeFormat(undefined, {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        }).format(now)
+        : '';
+      placeClock();
+    };
+    setInterval(renderDateTime, 10000);
+    window.addEventListener('resize', placeClock);
+
     const setOverlayVisible = visible => {
       document.querySelector('.overlay-wrapper').hidden = !visible;
+      // New text can change the boxes' size, so find the clock a clear spot again.
+      requestAnimationFrame(placeClock);
     };
 
     const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
@@ -197,6 +275,11 @@
         document.querySelector('.layout-top-bottom').style.display = 'none';
       }
       document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
+      document.body.classList.toggle('show-datetime', Boolean(overlayPrefs.toggleDateTime));
+      const clock = document.querySelector('.o-clock');
+      clock.style.fontFamily = textFont;
+      clock.querySelector('.o-clock-time').style.color = overlayPrefs.gurbaniTextColor;
+      clock.querySelector('.o-clock-date').style.color = overlayPrefs.textColor;
 
       if (toggleAnnouncement) {
         if (hasAnnouncement && Object.keys(lastAnnouncement).length) {
@@ -266,6 +349,7 @@
         el.style.fontStyle = overlayPrefs.textFormat.italic ? 'italic' : 'normal';
       });
 
+      renderDateTime();
     };
 
     socket.on('show-line', request => {
@@ -331,6 +415,10 @@
       </div>
     </div>
   </section>
+  <div class="o-clock" aria-hidden="true">
+    <div class="o-clock-time"></div>
+    <div class="o-clock-date"></div>
+  </div>
   <!-- TODO: Refactor the above code to use gurbani and translation divs for each layout -->
   <script type="text/javascript">
     if (preview) {

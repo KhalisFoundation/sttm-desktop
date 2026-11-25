@@ -58,13 +58,13 @@
       },
       "date-time": {
         "title": "DATE_AND_TIME",
-        "toggle": true,
+        "type": "title",
         "subcategories": ["date-time-options"]
       },
       "date-time-options": {
         "title": "",
-        "type": "dropdown",
-        "settings": ["date-format", "time-format"]
+        "type": "switch",
+        "settings": ["toggle-date-time", "show-date", "clock-24-hour"]
       },
       "advanced-options": {
         "title": "ADVANCED_OPTIONS",
@@ -183,22 +183,19 @@
         "initialValue": "a-new-day"
       },
 
-      "date-format": {
-        "title": "",
-        "options": {
-          "format1": "MM_DD_YYYY",
-          "format2": "MM_DD_YYYY",
-          "format3": "MM_DD_YYYY"
-        },
-        "initialValue": "format1"
+      "toggle-date-time": {
+        "title": "SHOW_DATE_TIME",
+        "initialValue": false
       },
-      "time-format": {
-        "title": "",
-        "options": {
-          "format1": "12HR",
-          "format2": "24HR"
-        },
-        "initialValue": "format1"
+      "show-date": {
+        "title": "SHOW_DATE",
+        "requires": "toggleDateTime",
+        "initialValue": true
+      },
+      "clock-24-hour": {
+        "title": "CLOCK_24_HOUR",
+        "requires": "toggleDateTime",
+        "initialValue": false
       }
     }
   },

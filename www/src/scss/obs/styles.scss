@@ -51,6 +51,49 @@ body .overlay-wrapper[hidden] {
   font-family: 'Gurbani Akhar';
 }
 
+// Date and time card, separate from the text. placeClock() in index.html
+// puts it in a screen corner clear of the text and logo.
+.o-clock {
+  background: var(--overlay-bg);
+  border-radius: 1.2vh;
+  box-shadow: 0 0.4vh 1.6vh rgba(0, 0, 0, 0.25);
+  display: none;
+  flex-direction: column;
+  gap: 0.4vh;
+  line-height: 1.1;
+  padding: 1.4vh 1.8vw;
+  position: fixed;
+  transition: top 0.2s ease;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.show-datetime .o-clock {
+  display: flex;
+}
+
+// A blank slide shows nothing, the clock included.
+.overlay-wrapper[hidden] ~ .o-clock {
+  display: none;
+}
+
+.o-clock-time {
+  font-size: 4.4vh;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.o-clock-date {
+  font-size: 1.7vh;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+  text-transform: uppercase;
+
+  &:empty {
+    display: none;
+  }
+}
+
 .content-bar {
   left: 0;
   margin: auto;
