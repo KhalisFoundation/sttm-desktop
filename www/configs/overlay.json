@@ -1,23 +1,38 @@
 {
   "sidebar": {
     "categories": {
-      "subtitles": {
-        "title": "SUBTITLES",
+      "themes": {
+        "title": "THEME_HEADING",
         "type": "title",
-        "subcategories": ["gurbani-options", "text-options", "text-format-options"]
+        "subcategories": ["theme-options"]
+      },
+      "theme-options": {
+        "title": "",
+        "type": "custom",
+        "settings": ["overlay-theme"]
+      },
+      "gurbani": {
+        "title": "GURBANI",
+        "type": "title",
+        "subcategories": ["gurbani-options"]
       },
       "gurbani-options": {
-        "title": "GURBANI",
+        "title": "",
         "type": "dropdown",
-        "settings": ["gurbani-text-color", "gurbani-font", "gurbani-size"]
+        "settings": ["gurbani-font", "gurbani-text-color", "gurbani-size"]
+      },
+      "translation": {
+        "title": "TRANSLATION",
+        "type": "title",
+        "subcategories": ["text-options", "text-format-options"]
       },
       "text-options": {
-        "title": "TEXT",
+        "title": "",
         "type": "dropdown",
-        "settings": ["text-color", "text-font", "text-size"]
+        "settings": ["text-font", "text-color", "text-size"]
       },
       "text-format-options": {
-        "title": "TEXT_FORMAT",
+        "title": "",
         "type": "icon-toggle",
         "settings": ["text-format"]
       },
@@ -29,9 +44,8 @@
       "background-options": {
         "title": "",
         "type": "size-icon",
-        "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
+        "settings": ["bg-color", "padding", "bg-opacity"]
       },
-
       "larivaar-title": {
         "title": "LARIVAAR",
         "type": "title",
@@ -42,26 +56,21 @@
         "type": "switch",
         "settings": ["overlayLarivaar", "larivaarAssist"]
       },
-     
-     
       "date-time": {
         "title": "DATE_AND_TIME",
         "toggle": true,
         "subcategories": ["date-time-options"]
       },
-
       "date-time-options": {
         "title": "",
         "type": "dropdown",
         "settings": ["date-format", "time-format"]
       },
-
       "advanced-options": {
         "title": "ADVANCED_OPTIONS",
         "type": "title",
         "subcategories": ["advanced-settings"]
       },
-
       "advanced-settings": {
         "title": "",
         "type": "switch",
@@ -71,11 +80,11 @@
     "settings": {
       "gurbani-text-color": {
         "type": "color-input",
-        "title": "",
+        "title": "COLOR",
         "initialValue": "#0e2654"
       },
       "gurbani-font": {
-        "title": "",
+        "title": "FONT",
         "options": {
           "Anmol Lipi": "Anmol Lipi",
           "Anmol Lipi Bold": "Anmol Lipi Bold",
@@ -90,25 +99,26 @@
       },
       "overlayLarivaar": {
         "title": "LARIVAAR",
-        "tooltip": "Toggle Larivaar",
         "initialValue": false
       },
       "fit-text-switch": {
         "title": "FIT_TEXT",
-        "tooltip": "Automatically set text size to fit screen",
+        "hint": "FIT_TEXT_HINT",
+        "layouts": ["top", "bottom"],
+        "layoutsHint": "FIT_TEXT_LAYOUT_HINT",
         "initialValue": false
       },
       "toggle-announcement": {
         "title": "MISC_SLIDE_ANNOUNCEMENT",
-        "tooltip": "Toggle Announcement",
         "initialValue": true
       },
       "larivaarAssist": {
-        "title":"LARIVAAR_ASSIST",
+        "title": "LARIVAAR_ASSIST",
+        "requires": "overlayLarivaar",
         "initialValue": false
       },
       "gurbani-size": {
-        "title": "",
+        "title": "SIZE",
         "type": "size-icon",
         "initialValue": 5,
         "max": 15,
@@ -118,11 +128,11 @@
       },
       "text-color": {
         "type": "color-input",
-        "title": "",
+        "title": "COLOR",
         "initialValue": "#003a8c"
       },
       "text-font": {
-        "title": "",
+        "title": "FONT",
         "options": {
           "Muli": "Muli",
           "Caveat": "Caveat",
@@ -131,7 +141,7 @@
         "initialValue": "Muli"
       },
       "text-size": {
-        "title": "",
+        "title": "SIZE",
         "type": "size-icon",
         "initialValue": 3,
         "max": 14,
@@ -140,17 +150,18 @@
         "disableOnChange": ["fit-text-switch"]
       },
       "text-format": {
-        "title": "",
+        "title": "TEXT_FORMAT",
         "type": "text-format-icon",
         "initialValue": { "bold": false, "italic": false }
       },
       "bg-color": {
-        "title": "",
+        "title": "COLOR",
         "type": "color-input",
         "initialValue": "#97d6f7"
       },
       "padding": {
         "title": "HEIGHT",
+        "type": "slider",
         "initialValue": 0.5,
         "max": 5,
         "min": 0.5,
@@ -159,6 +170,8 @@
       },
       "bg-opacity": {
         "title": "OPACITY",
+        "type": "slider",
+        "format": "percent",
         "initialValue": 1,
         "max": 1,
         "min": 0.1,
@@ -166,7 +179,7 @@
       },
       "overlay-theme": {
         "title": "",
-        "type": "hidden",
+        "key": "ThemeSelector",
         "initialValue": "a-new-day"
       },
 
@@ -191,35 +204,25 @@
   },
   "bottomBar": {
     "categories": {
-      "left-side-icons": {
+      "layout-options": {
+        "title": "",
+        "type": "title",
+        "subcategories": ["layouts"]
+      },
+      "layouts": {
+        "title": "LAYOUT",
+        "type": "custom",
+        "settings": ["layout"]
+      },
+      "addon-options": {
         "title": "",
         "type": "title",
         "subcategories": ["addons"]
       },
       "addons": {
         "title": "",
-        "type": "icon-toggle",
+        "type": "switch",
         "settings": ["toggle-logo", "green-screen-toggle"]
-      },
-      "center-icons": {
-        "title": "",
-        "type": "title",
-        "subcategories": ["layouts"]
-      },
-      "layouts": {
-        "title": "",
-        "type": "custom",
-        "settings": ["layout"]
-      },
-      "right-side-icons": {
-        "title": "",
-        "type": "title",
-        "subcategories": ["reset-options"]
-      },
-      "reset-options": {
-        "title": "",
-        "type": "icon-toggle",
-        "settings": ["reset"]
       }
     },
 
@@ -234,8 +237,7 @@
         "initialValue": "split"
       },
       "toggle-logo": {
-        "icon": "sttm.png",
-        "tooltip": "Toggle Logo",
+        "title": "LOGO",
         "initialValue": false
       },
       "toggle-link": {
@@ -243,9 +245,7 @@
         "initialValue": false
       },
       "green-screen-toggle": {
-        "type": "icon-toggle",
-        "tooltip": "Toggle Green Screen",
-        "icon": "rectangle.svg",
+        "title": "GREEN_SCREEN",
         "initialValue": false
       }
     }

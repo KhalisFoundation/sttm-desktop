@@ -1,20 +1,24 @@
 import React from 'react';
 
+import { CopyToClipboard } from './CopyToClipboard';
 import { PreviewContainer } from './PreviewContainer';
-import { ThemeSelector } from './ThemeSelector';
+import { OverlaySidebar } from './OverlaySidebar';
 
 import getOverlayUrl from '../utils/get-overlay-url';
-import { ControlPanel } from './ControlPanel';
 
 const OverlayLayout = () => {
   const previewURL = getOverlayUrl();
 
   return (
-    <main className="canvas">
-      <ControlPanel url={previewURL} />
-      <PreviewContainer url={`${previewURL}?preview`} />
-      <ThemeSelector />
-    </main>
+    <div className="overlay-app">
+      <header className="overlay-header">
+        <CopyToClipboard url={previewURL} />
+      </header>
+      <div className="overlay-body">
+        <PreviewContainer url={`${previewURL}?preview`} />
+        <OverlaySidebar />
+      </div>
+    </div>
   );
 };
 
