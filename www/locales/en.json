@@ -18,9 +18,7 @@
   "VIEWER_TITLE": "{{appName}} Viewer",
   "UNSUPPORT_OS": "Windows 7 is no longer a supported operating system. You may experience issues while running SikhiToTheMax. Please update your Windows version.",
   "BANI_OVERLAY": {
-    "SUBTITLES": "Subtitles",
     "GURBANI": "Gurbani",
-    "TEXT": "Text",
     "TEXT_FORMAT": "Text Formatting",
     "BACKGROUND": "Background",
     "DATE_AND_TIME": "Date & Time",

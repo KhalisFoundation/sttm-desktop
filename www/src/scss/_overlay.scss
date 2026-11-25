@@ -124,8 +124,8 @@ $overlay-radius: 8px;
     font-weight: 500;
     gap: 6px;
     height: 34px;
-    min-width: 104px;
     justify-content: center;
+    min-width: 104px;
     padding: 0 14px;
   }
 
@@ -535,10 +535,9 @@ $overlay-radius: 8px;
   align-items: center;
   border-top: 1px solid $overlay-border;
   display: flex;
+  gap: 12px;
   justify-content: space-between;
   padding: 12px 16px;
-
-  gap: 12px;
 
   .overlay-reset {
     background: none;
