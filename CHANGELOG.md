@@ -1,9 +1,10 @@
 ## New Updates
 
-### 9.3.3 - ਊਨਾ Release _October 27, 2026_
+### 9.3.3 - ਊਨਾ Release _November 26, 2026_
 
 #### New Features and Improvements
 - **Shabad Info**: The viewer can now show the shabad's source, Ang, writer and raag below the Gurbani.
+- **Shabad Overview**: Show an overview of the current shabad on the display — its home line, raag, writer and what the raag is about — with a QR code that opens the full shabad on SikhiToTheMax.
 - **New Translations**: Added two new English translation sources: Prof Sahib Singh, and Prof Sahib Singh - Short.
 - **Search & Navigation**: More accurate first-letter and full-word search results, plus fixes that keep the Bani Controller and Navigator in sync.
 
