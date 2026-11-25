@@ -16,6 +16,12 @@ body {
   position: relative;
 }
 
+// Layouts such as vertical set a display value on .overlay-wrapper, which would
+// override the hidden attribute used for blank slides and empty lines.
+body .overlay-wrapper[hidden] {
+  display: none;
+}
+
 .overlay-wrapper {
   position: relative;
   width: 100%;

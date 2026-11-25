@@ -86,6 +86,10 @@
         .join(overlayLarivaar ? '' : ' ');
     };
 
+    const setOverlayVisible = visible => {
+      document.querySelector('.overlay-wrapper').hidden = !visible;
+    };
+
     const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
       lineBeforeAnnouncement = { Line, larivaar, larivaarAssist, languageSettings };
       getElements('.o-gurbani').setProperty('innerHTML',
@@ -105,8 +109,7 @@
       getElements('.o-teeka').setProperty('innerHTML', Line.Punjabi || '');
       getElements('.o-transliteration').setProperty('innerHTML', transliteration);
 
-      document.querySelector('.overlay-wrapper').hidden =
-        Line.Gurmukhi === '' && Line.English === '';
+      setOverlayVisible(Line.Gurmukhi !== '' || Line.English !== '');
     };
 
     const writeText = (text, isGurmukhi, isAnnouncement) => {
@@ -122,6 +125,8 @@
       }
       document.querySelector('.o-teeka').innerHTML = '';
       document.querySelector('.o-transliteration').innerHTML = '';
+      // A blank slide is a misc slide with no text: show nothing, not an empty bar.
+      setOverlayVisible(text.trim() !== '');
     };
 
     const applyOverlayPrefs = () => {
