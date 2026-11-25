@@ -182,6 +182,14 @@ body .overlay-wrapper[hidden] {
     width: fit-content;
   }
 
+  // The box replaces the per-section bands that applyOverlayPrefs() paints
+  // inline on .content-top/.content-bottom, hence !important.
+  .content-top,
+  .content-bottom {
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
   .content-bar {
     background: transparent;
     padding: 0;
@@ -203,6 +211,21 @@ body .overlay-wrapper[hidden] {
   .o-teeka,
   .o-transliteration {
     display: none;
+  }
+}
+
+// Classic with the box near the top, and the logo moved out of its way.
+.layout-classic-top {
+  @extend .layout-classic;
+
+  .overlay-wrapper {
+    bottom: auto;
+    top: 10%;
+  }
+
+  .logo-wrapper {
+    bottom: 2vh;
+    top: auto;
   }
 }
 

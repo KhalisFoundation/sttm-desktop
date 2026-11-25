@@ -68,6 +68,7 @@
     "LAYOUT_VERTICAL": "Right",
     "LAYOUT_VERTICAL_LEFT": "Left",
     "LAYOUT_CLASSIC": "Classic",
+    "LAYOUT_CLASSIC_TOP": "Classic top",
     "RESET_DEFAULTS": "Reset to defaults",
     "RESET_CONFIRM": "Reset all Bani Overlay settings to their defaults?",
     "SHOW_DATE_TIME": "Show date & time",

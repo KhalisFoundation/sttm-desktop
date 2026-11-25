@@ -322,14 +322,6 @@
       );
       document.body.style.setProperty('--overlay-padding', `${overlayPrefs.padding}vh`);
 
-      // Classic: one box around all the text (styled in CSS), not a band per line
-      document
-        .querySelectorAll('.layout-classic .content-top, .layout-classic .content-bottom')
-        .forEach(el => {
-          el.style.backgroundColor = 'transparent';
-          el.style.padding = '0';
-        });
-
       document.body.style.backgroundColor = overlayColor;
 
       const $gurbaniWrapper = document.querySelectorAll('.o-gurbani');
