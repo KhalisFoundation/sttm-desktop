@@ -54,8 +54,14 @@ const Launchpad = () => {
   } = useSlides();
 
   const ref = useRef();
+  const syncCode = useStoreState((state) => state.baniController.code);
   const projectionStateRef = useRef();
-  projectionStateRef.current = { app: appState, navigator: navigatorState, userSettings };
+  projectionStateRef.current = {
+    app: appState,
+    navigator: navigatorState,
+    userSettings,
+    baniController: { code: syncCode },
+  };
 
   const {
     activeShabadId,
@@ -120,6 +126,7 @@ const Launchpad = () => {
         app: serializeState(projectionStateRef.current.app),
         navigator: serializeState(projectionStateRef.current.navigator),
         userSettings: serializeState(projectionStateRef.current.userSettings),
+        baniController: projectionStateRef.current.baniController,
       });
     };
 

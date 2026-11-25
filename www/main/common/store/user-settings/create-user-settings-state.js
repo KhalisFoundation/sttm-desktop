@@ -90,6 +90,12 @@ const createUserSettingsState = (settingsSchema, savedSettings, userConfigPath) 
           type: 'settings',
           settings: {
             fontSizes,
+            // Followed only by a web reader who joined from the translation
+            // review QR (sttm-web ignores them for a typed code).
+            translationSources: {
+              english: global.getUserSettings.translationEnglishSource,
+              punjabi: global.getUserSettings.teekaSource,
+            },
           },
         });
       }
