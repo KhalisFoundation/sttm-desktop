@@ -17,6 +17,17 @@ const navigatorSettings = require('../../../configs/navigator-settings.json');
 
 global.platform = require('../../desktop_scripts');
 
+// The viewer windows keep their own store. Send them the sync code, which the
+// translation review QR links to. The admin PIN stays here.
+const sendSyncStateToViewer = (actionName, payload) => {
+  const message = JSON.stringify({ payload, actionName, settingType: 'baniController' });
+  if (global.platform) {
+    global.platform.ipc.send('update-viewer-setting', message);
+  } else if (global.webview) {
+    global.webview.send('update-viewer-setting', message);
+  }
+};
+
 const GlobalState = createStore({
   app: {
     overlayScreen: DEFAULT_OVERLAY,
@@ -45,6 +56,7 @@ const GlobalState = createStore({
     }),
     setCode: action((state, code) => {
       state.code = code;
+      sendSyncStateToViewer('setCode', code);
       return state;
     }),
     setConnection: action((state, connectionState) => {

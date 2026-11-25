@@ -7,8 +7,9 @@ export const searchShabads = (searchQuery, searchType, searchSource, howManyRows
     .query(searchQuery, searchType, searchSource, howManyRows)
     .then((verses) => verses)
     .catch((err) => {
-      const dbStatus = !!localStorage.getItem('isDbDownloaded');
-      if (dbStatus) {
+      // localStorage keeps strings, so check for 'false' rather than truthiness
+      const isDbDownloading = localStorage.getItem('isDbDownloaded') === 'false';
+      if (isDbDownloading) {
         new Noty({
           type: 'error',
           text: `${i18n.t('BANI.DATABASE_DOWNLOADING')}`,

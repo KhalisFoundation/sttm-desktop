@@ -45,6 +45,14 @@ const ViewerState = createStore({
     ...GlobalState.getState().navigator,
     ...createSettingsActions('navigator'),
   },
+  // The sync code from the controller window (no admin PIN).
+  baniController: {
+    code: null,
+    setCode: action((state, code) => {
+      // eslint-disable-next-line no-param-reassign
+      state.code = code;
+    }),
+  },
   projection: {
     ready: false,
     paneId: null,
@@ -114,6 +122,7 @@ const ViewerState = createStore({
     Object.assign(state.app, payload.app || {});
     Object.assign(state.navigator, pn, seeded);
     Object.assign(state.userSettings, us);
+    if (payload.baniController) Object.assign(state.baniController, payload.baniController);
     if (payload.viewport) Object.assign(state.projection, payload.viewport);
     // eslint-disable-next-line no-param-reassign
     state.projection.range = payload.range || state.projection.range;
