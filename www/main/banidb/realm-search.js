@@ -263,7 +263,8 @@ const toShabadOrderIndex = (ids, shabadIds) => {
 };
 
 // Reads every line's shabad a few thousand at a time, so the app stays
-// responsive. Until it finishes, searches sort in JS.
+// responsive. Started by the first search that matches more than
+// SORT_IN_JS_LIMIT lines; until it finishes, searches sort in JS.
 const indexShabadOrder = (realm) => {
   if (shabadOrderIndex || isIndexingShabadOrder) {
     return;
@@ -488,7 +489,12 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition, ...args);
         if (shabadOrder) {
-          indexShabadOrder(realm);
+          // Building the index reads every line, which on a slow computer
+          // freezes typing for seconds, so start it only for a search that
+          // uses it.
+          if (!shabadOrder.sortByLength && rows.length > SORT_IN_JS_LIMIT) {
+            indexShabadOrder(realm);
+          }
           const key = JSON.stringify([searchType, condition, args]);
           if (latestMatches.key !== key) {
             latestMatches = { key, matches: toOrderedMatches(rows, shabadOrder) };
