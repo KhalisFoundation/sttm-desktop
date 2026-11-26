@@ -11,7 +11,7 @@ import { VoiceWave } from '../../../common/sttm-ui';
 import { i18n } from '../../../common/i18n';
 import { useAutopilotSlot } from './autopilotSlot';
 import HwCheck from './HwCheck';
-import { micKind, MIC_WARN } from '../../../common/mic-check';
+import { micKind, micAvoid } from '../../../common/mic-check';
 
 const anvaad = require('anvaad-js');
 const { ipcRenderer, shell } = require('electron');
@@ -1042,12 +1042,12 @@ const saveMicPref = (deviceId) => {
   }
 };
 
-// The wrong-input kind a device name looks like (webcam, phone, Bluetooth, virtual), else null.
-// One shared list with the tester Record card (common/mic-check).
-const wrongMicKind = (label) => {
-  const kind = micKind(label);
-  return MIC_WARN[kind] ? kind : null;
-};
+// The kind of input a name shows is almost surely not the hall's feed (a phone relay, Bluetooth
+// headset or plain webcam), else null. The narrow list (common/mic-check micAvoid): desk-feed and
+// routing tools (NDI, Dante, Voicemeeter, Splashtop, ...) are never flagged.
+const wrongMicKind = (label) => micAvoid(label);
+// The probe never opens a Bluetooth headset's mic (that can switch it to its call profile).
+const isBluetoothMic = (label) => micKind(label) === 'bluetooth' || micAvoid(label) === 'bluetooth';
 
 // How loud another input is right now: open it for a moment, read its level, close it. Nothing
 // is recorded, kept or sent; only the loudness (80th percentile of ~100 ms reads) comes back.
@@ -7071,7 +7071,7 @@ const VoiceFollow = () => {
       pr.busy = true;
       pr.rounds += 1;
       try {
-        const others = mics.list.filter((d) => otherMic(d) && !wrongMicKind(d.label));
+        const others = mics.list.filter((d) => otherMic(d) && !isBluetoothMic(d.label));
         const results = [];
         // eslint-disable-next-line no-restricted-syntax
         for (const d of others.slice(0, 6)) {
@@ -7080,7 +7080,7 @@ const VoiceFollow = () => {
           const rms = await probeMicLevel(ctx, d.deviceId);
           if (rms != null) results.push({ deviceId: d.deviceId, label: d.label, rms });
         }
-        const pick = pickProbedMic(results, { goodRms: VOL_GOOD_RMS, isWrong: wrongMicKind });
+        const pick = pickProbedMic(results, { goodRms: VOL_GOOD_RMS, isWrong: isBluetoothMic });
         if (live && pick) {
           setMicProbe(pick);
           micLog('mic_probe', { found: pick.label || '', rms: Math.round(pick.rms * 1e4) / 1e4 });
@@ -7578,7 +7578,17 @@ const VoiceFollow = () => {
   const useLink = (d, onPick, found) => ({
     key: d.deviceId,
     title: micName(d),
-    onClick: () => onPick(d.deviceId),
+    onClick: () => {
+      // While running, switchMic logs the switch; on the start screen it is logged here.
+      if (!running) {
+        micLog('mic_switch', {
+          from: shownMic ? shownMic.label : '',
+          to: d.label,
+          why: 'use_link',
+        });
+      }
+      onPick(d.deviceId);
+    },
     label: i18n.t(found ? 'VOICE_FOLLOW.MIC_USE_FOUND' : 'VOICE_FOLLOW.MIC_USE', {
       mic: friendly(d),
       ...NO_ESCAPE,
@@ -7609,8 +7619,8 @@ const VoiceFollow = () => {
     });
   } else if (silentShown && micHintShown('silent', liveMic.deviceId, liveMic.label)) {
     const others = micProbe
-      ? [useLink(micProbe, (id) => switchMic(id, 'probe'), true)]
-      : goodOthers(otherMic).map((d) => useLink(d, (id) => switchMic(id, 'list')));
+      ? [useLink(micProbe, (id) => switchMic(id, 'use_link'), true)]
+      : goodOthers(otherMic).map((d) => useLink(d, (id) => switchMic(id, 'use_link')));
     micHintView = micStatus({
       tone: 'wrong',
       icon: 'fa-exclamation-triangle',

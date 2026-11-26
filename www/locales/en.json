@@ -582,7 +582,6 @@
     "MIC_HEARING": "Hearing",
     "MIC_NO_SOUND": "No sound",
     "MIC_WRONG": "Wrong microphone: {{mic}} is {{kind}}",
-    "MIC_KIND_VIRTUAL": "a virtual input",
     "MIC_KIND_PHONE": "a phone mic",
     "MIC_KIND_WEBCAM": "a webcam mic",
     "MIC_KIND_BLUETOOTH": "a Bluetooth headset",
