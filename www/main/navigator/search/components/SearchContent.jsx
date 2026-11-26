@@ -5,6 +5,7 @@ import { Virtuoso } from 'react-virtuoso';
 import isOnline from 'is-online';
 
 import banidb from '../../../common/constants/banidb';
+import { prepareSearch } from '../../../banidb';
 import { filters, searchShabads } from '../../utils';
 import { retrieveFilterOption } from '../utils';
 import { SilenceDetector, createAudioAnalyser } from './silence';
@@ -194,6 +195,13 @@ const SearchContent = () => {
       setSearchShabadsCount(filteredShabads.length);
     }
   }, [filteredShabads]);
+
+  // Once the database is there, get broad searches ready in idle time.
+  useEffect(() => {
+    if (databaseProgress >= 1) {
+      prepareSearch();
+    }
+  }, [databaseProgress]);
 
   ipcRenderer.on('database-progress', (data) => {
     const { percent } = JSON.parse(data);

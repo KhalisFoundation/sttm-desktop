@@ -221,7 +221,7 @@ const getShabadId = (verse) =>
  */
 const SORT_IN_JS_LIMIT = 3000;
 const MAX_LINES_TO_SKIP = 500;
-const LINES_PER_INDEX_STEP = 4000;
+const LINES_PER_INDEX_STEP = 100;
 let shabadOrderIndex = null;
 let isIndexingShabadOrder = false;
 
@@ -262,9 +262,24 @@ const toShabadOrderIndex = (ids, shabadIds) => {
   return { lastId: ids[lastPosition], skip };
 };
 
-// Reads every line's shabad a few thousand at a time, so the app stays
-// responsive. Started by the first search that matches more than
-// SORT_IN_JS_LIMIT lines; until it finishes, searches sort in JS.
+// Runs `step` when the app is idle, or soon where requestIdleCallback is
+// missing (the main process). `step` gets a function returning the
+// milliseconds left before it should give way.
+const whenIdle = (step) => {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback((deadline) => step(() => deadline.timeRemaining()));
+  } else {
+    setTimeout(() => {
+      const until = Date.now() + 16;
+      step(() => until - Date.now());
+    }, 0);
+  }
+};
+
+// Reads every line's shabad while the app is idle, a hundred lines at a
+// time, so typing never waits on it: on a slow computer reading thousands
+// of lines in one go froze the search box for seconds. Until it finishes,
+// searches sort in JS.
 const indexShabadOrder = (realm) => {
   if (shabadOrderIndex || isIndexingShabadOrder) {
     return;
@@ -277,15 +292,17 @@ const indexShabadOrder = (realm) => {
   const shabadIds = new Float64Array(total);
   let position = 0;
 
-  const readNextLines = () => {
+  const readNextLines = (timeLeft) => {
     try {
-      const end = Math.min(position + LINES_PER_INDEX_STEP, total);
-      for (; position < end; position += 1) {
-        ids[position] = verses[position].ID;
-        shabadIds[position] = getShabadId(verses[position]);
-      }
+      do {
+        const end = Math.min(position + LINES_PER_INDEX_STEP, total);
+        for (; position < end; position += 1) {
+          ids[position] = verses[position].ID;
+          shabadIds[position] = getShabadId(verses[position]);
+        }
+      } while (position < total && timeLeft() > 1);
       if (position < total) {
-        setTimeout(readNextLines, 0);
+        whenIdle(readNextLines);
         return;
       }
       shabadOrderIndex = toShabadOrderIndex(ids, shabadIds);
@@ -294,7 +311,26 @@ const indexShabadOrder = (realm) => {
     }
     isIndexingShabadOrder = false;
   };
-  setTimeout(readNextLines, 0);
+  whenIdle(readNextLines);
+};
+
+/**
+ * Starts building the shabad-order index in idle time, so it is usually
+ * ready before the first search that needs it. Call once the database is
+ * downloaded; calling it again does nothing.
+ */
+const prepareSearch = () => {
+  if (shabadOrderIndex || isIndexingShabadOrder) {
+    return;
+  }
+  if (!initialized) {
+    init();
+  }
+  Realm.open(realmConfig)
+    .then(indexShabadOrder)
+    .catch(() => {
+      // No database yet; the first search starts the index instead.
+    });
 };
 
 const byShabad = (a, b) => a.shabadId - b.shabadId || a.id - b.id;
@@ -489,12 +525,7 @@ const query = (searchQuery, searchType, searchSource, resultRows = 20) =>
       .then((realm) => {
         const rows = realm.objects('Verse').filtered(condition, ...args);
         if (shabadOrder) {
-          // Building the index reads every line, which on a slow computer
-          // freezes typing for seconds, so start it only for a search that
-          // uses it.
-          if (!shabadOrder.sortByLength && rows.length > SORT_IN_JS_LIMIT) {
-            indexShabadOrder(realm);
-          }
+          indexShabadOrder(realm);
           const key = JSON.stringify([searchType, condition, args]);
           if (latestMatches.key !== key) {
             latestMatches = { key, matches: toOrderedMatches(rows, shabadOrder) };
@@ -826,6 +857,7 @@ const getFilterOption = (type, idArray) =>
 module.exports = {
   CONSTS,
   query,
+  prepareSearch,
   loadShabad,
   loadBanis,
   loadBani,
