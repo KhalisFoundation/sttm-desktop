@@ -105,13 +105,22 @@ $misc-footer-active: 70px;
         height: 54px;
         line-height: 1.15em;
         padding: 10px;
-        transition: 0.3s all ease;
+        transition: transform 0.3s ease;
 
         @include flex($jc-value: center, $width: fit-content);
 
+        // Scale, don't resize: resizing reflows the panes and can loop the hover.
         &:hover {
-          height: 60px;
-          padding: 14px;
+          transform: scale(1.1);
+        }
+
+        // Outer buttons grow inwards so they never stick out of the drawer.
+        &:first-child {
+          transform-origin: left center;
+        }
+
+        &:last-child {
+          transform-origin: right center;
         }
       }
     }
