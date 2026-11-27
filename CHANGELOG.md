@@ -1,6 +1,6 @@
 ## New Updates
 
-### 9.3.3 - ਊਨਾ Release _November 26, 2026_
+### 9.3.3 - ਊਨਾ Release _November 30, 2026_
 
 #### New Features and Improvements
 - **Shabad Info**: The viewer can now show the shabad's source, Ang, writer and raag below the Gurbani.
