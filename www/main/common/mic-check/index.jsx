@@ -40,6 +40,28 @@ export const MIC_WARN = {
   virtual: 'This looks like a virtual or streaming input, not a microphone.',
 };
 
+// Voice Autopilot only: names that are almost surely NOT the hall's feed, so Autopilot skips them
+// as its default input and asks before Start. Narrow on purpose (field logs, Nov 11-25): desk-feed
+// and routing tools carry the real kirtan at many Gurdwara Sahibs (NDI at Wolverhampton, Dante at
+// Regan Road, Splashtop at Jot Parkash Sahib, Voicemeeter), so they and a plain "Virtual" are
+// never flagged; this allow-list wins over everything.
+export const MIC_AVOID_OK =
+  /\bndi\b|dante|dvs receive|voicemeeter|vb-?audio|vb-?cable|splashtop|\bobs\b|blackhole|loopback|soundflower/i;
+export const MIC_AVOID = [
+  ['bluetooth', /airpods|hands-?free|\bhfp\b/i],
+  [
+    'phone',
+    /iriun|audio ?relay|droid ?cam|epoc ?cam|ivcam|wo ?mic|\bcamo\b|iphone|android|galaxy|pixel/i,
+  ],
+  ['webcam', /c9[0-9]{2}\b|brio|facetime|kiyo|facecam|webcam/i],
+];
+export const micAvoid = (label) => {
+  const name = label || '';
+  if (MIC_AVOID_OK.test(name)) return null;
+  const hit = MIC_AVOID.find(([, re]) => re.test(name));
+  return hit ? hit[0] : null;
+};
+
 // Live loudness of one input (0..1), and whether we have heard anything in the last few seconds.
 export const useInputLevel = (deviceId, active) => {
   const [level, setLevel] = useState(0);
