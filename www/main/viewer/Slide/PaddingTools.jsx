@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { convertToCamelCase } from '../../common/utils';
+import { track } from '../../common/analytics';
 
 const icons = [
   {
@@ -50,6 +51,7 @@ const PaddingTools = ({ isMiscSlide }) => {
         onClick={() => {
           if (!isIconDisabled) {
             const viewerSettingObj = createViewerSettingObject({ name, variant });
+            track('display', 'padding-tools', `${variant}-${name}`);
             global.platform.ipc.send('update-global-setting', JSON.stringify(viewerSettingObj));
           }
         }}

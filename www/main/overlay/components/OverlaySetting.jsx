@@ -6,6 +6,7 @@ import { getDefaultSettings } from '../../common/store/user-settings/get-saved-o
 import { convertToCamelCase } from '../../common/utils';
 import { Switch } from '../../common/sttm-ui';
 import { i18n } from '../../common/i18n';
+import { track, trackDebounced } from '../../common/analytics';
 
 const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type } = settingObj;
@@ -15,6 +16,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
     baniOverlayActions[stateFunction](value);
+    trackDebounced(`overlay-${stateVar}`, 'overlay', 'overlay-setting', stateVar, value);
   };
 
   const handleSizeIcon = (event) => {
@@ -23,6 +25,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     const currentValue = baniOverlayState[stateVar];
     let updatedValue;
 
+    trackDebounced(`overlay-${stateVar}`, 'overlay', 'overlay-setting', stateVar, value);
     if (value === 'plus' && currentValue < max) {
       updatedValue = currentValue + step;
       baniOverlayActions[stateFunction](updatedValue);
@@ -43,6 +46,12 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleToggleChange = () => {
+    track(
+      'overlay',
+      'overlay-setting',
+      stateVar,
+      stateVar === 'reset' ? 'reset' : !baniOverlayState[stateVar],
+    );
     if (stateVar === 'reset') {
       const defaultSettings = getDefaultSettings();
       Object.keys(baniOverlayState).forEach((state) => {
@@ -60,6 +69,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     const currentLayout = baniOverlayState[stateVar];
     const newLayout = event.currentTarget.dataset.layout;
     if (newLayout !== currentLayout) {
+      track('overlay', 'overlay-layout', newLayout);
       baniOverlayActions[stateFunction](newLayout);
     }
   };
@@ -68,6 +78,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     const clickedEvent = event.currentTarget ? event.currentTarget.dataset.value : event;
     const currentFormat = { ...baniOverlayState[stateVar] };
     currentFormat[clickedEvent] = !currentFormat[clickedEvent];
+    track('overlay', 'overlay-setting', `${stateVar}-${clickedEvent}`, currentFormat[clickedEvent]);
     baniOverlayActions[stateFunction](currentFormat);
   };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { shell } from 'electron';
 import { ZOOM_LINK } from '../../../common/constants';
 import { i18n } from '../../../common/i18n';
+import { track } from '../../../common/analytics';
 
 const remote = require('@electron/remote');
 
@@ -24,16 +25,19 @@ const ZoomController = () => {
     if (apiCode) {
       store.set('userPrefs.app.zoomToken', apiCode);
       setShowSaveBtn(false);
+      track('integrations', 'zoom-captions', 'api-key-saved');
     }
   };
 
   const clearApiCode = () => {
     setApiCode('');
     store.set('userPrefs.app.zoomToken', apiCode);
+    track('integrations', 'zoom-captions', 'api-key-cleared');
     setShowSaveBtn(true);
   };
 
   const openBrowser = () => {
+    track('integrations', 'zoom-captions', 'open-browser');
     shell.openExternal(ZOOM_LINK);
   };
 

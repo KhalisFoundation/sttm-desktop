@@ -6,6 +6,7 @@ import classNames from '../../common/utils/classnames';
 import FavShabadIcon from './FavShabadIcon';
 import ArrowIcon from './ArrowIcon';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const electron = require('electron');
 
@@ -40,6 +41,7 @@ const ShabadHeader = ({ data = {} }) => {
   const hasLines = Boolean(bottomLeftPane && bottomLeftPane.activeShabad);
 
   const clearLivePane = () => {
+    track('display', 'clear-teleprompter');
     const paneId = defaultPaneId || 1;
     const cleared = {
       locked: bottomLeftPane ? bottomLeftPane.locked : false,
@@ -94,7 +96,10 @@ const ShabadHeader = ({ data = {} }) => {
       <FavShabadIcon />
       <button
         className={classNames('button toggle-viewer-btn', !showViewer && 'btn-danger')}
-        onClick={() => setShowViewer(!showViewer)}
+        onClick={() => {
+          track('display', 'show-hide-viewer', showViewer ? 'hide' : 'show');
+          setShowViewer(!showViewer);
+        }}
         title={showViewer ? i18n.t('SHABAD_PANE.HIDE_BUTTON_TOOLTIP') : ''}
       >
         {showViewer ? (

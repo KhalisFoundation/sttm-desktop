@@ -4,6 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { convertToCamelCase } from '../../common/utils';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 global.platform = require('../../desktop_scripts');
 
@@ -113,6 +114,7 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
           onClick={() => {
             const globalObj = createGlobalPlatformObj(name, toolName, index, actionName);
             if (globalObj) {
+              track('display', 'quick-tools', `${toolName}-${name}`);
               global.platform.ipc.send('update-global-setting', JSON.stringify(globalObj));
             }
           }}
@@ -165,6 +167,7 @@ const QuickTools = ({ isMiscSlide, baniOptions }) => {
             const newOrder = [...baniOrder];
             newOrder[index] = event.target.value;
             setBaniOrder(newOrder);
+            track('display', 'quick-tools', `content${index}`, event.target.value);
             global.platform.ipc.send(
               'update-global-setting',
               JSON.stringify({

@@ -8,6 +8,7 @@ import { fetchFavShabad, removeFromFav } from '../utils';
 import banidb from '../../../banidb';
 import { SP_API } from '../../../common/constants/api-urls';
 import { i18n } from '../../../common/i18n';
+import { trackShabadOpen } from '../../../common/analytics';
 
 export const FavoritePane = ({ className, paneId }) => {
   const {
@@ -79,6 +80,7 @@ export const FavoritePane = ({ className, paneId }) => {
   };
 
   const openShabadFromFav = (shabadId, verseId) => {
+    trackShabadOpen('favorite', shabadId);
     const currentPane = paneId || defaultPaneId;
     switch (currentPane) {
       case 1:

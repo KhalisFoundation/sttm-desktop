@@ -1,5 +1,6 @@
 import { handleRequestControl, getFontSizeSlot } from '../utils';
 import { changeFontSize } from '../../../quick-tools-utils';
+import { trackShabadOpen } from '../../../common/analytics';
 
 const remote = require('@electron/remote');
 
@@ -54,6 +55,7 @@ const useSocketListeners = (
         }
 
         changeActiveShabad(shabadId, verseId);
+        trackShabadOpen('controller', shabadId);
         if (!Number.isNaN(lineCount) && lineNumber !== lineCount) setLineNumber(lineCount);
         analytics.trackEvent({
           category: 'controller',

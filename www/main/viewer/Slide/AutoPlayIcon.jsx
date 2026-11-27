@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState } from 'easy-peasy';
+import { track } from '../../common/analytics';
 
 const SIZE = 40;
 const STROKE = 4;
@@ -49,6 +50,7 @@ const AutoPlayIcon = () => {
   const { autoplayToggle, autoplayDelay } = useStoreState((state) => state.userSettings);
 
   const toggleAutoplay = () => {
+    track('display', 'autoplay', autoplayToggle ? 'stop' : 'start', autoplayDelay);
     const globalObj = {
       actionName: 'setAutoplayToggle',
       payload: !autoplayToggle,
@@ -60,6 +62,7 @@ const AutoPlayIcon = () => {
   const handleSpeedChange = (sum) => {
     const newDelay = autoplayDelay + sum;
     if (newDelay !== autoplayDelay && newDelay > 0 && newDelay <= 20) {
+      track('display', 'autoplay-speed', sum > 0 ? 'slower' : 'faster', newDelay);
       const globalObj = {
         actionName: 'setAutoplayDelay',
         payload: newDelay,

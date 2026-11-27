@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { i18n } from '../../../common/i18n';
+import { track, trackShabadOpen } from '../../../common/analytics';
 
 export const HistoryPane = ({ className, paneId }) => {
   const {
@@ -49,6 +50,11 @@ export const HistoryPane = ({ className, paneId }) => {
   };
 
   const openShabadFromHistory = (element) => {
+    if (element.type === 'shabad') {
+      trackShabadOpen('history', element.shabadId);
+    } else {
+      track('display', 'history-open', element.type, element.shabadId);
+    }
     const currentPane = paneId || defaultPaneId;
     switch (currentPane) {
       case 1:
