@@ -5,6 +5,7 @@ import { Virtuoso } from 'react-virtuoso';
 import isOnline from 'is-online';
 
 import banidb from '../../../common/constants/banidb';
+import { prepareSearch } from '../../../banidb';
 import { filters, searchShabads } from '../../utils';
 import { retrieveFilterOption } from '../utils';
 import { SilenceDetector, createAudioAnalyser } from './silence';
@@ -27,6 +28,10 @@ const remote = require('@electron/remote');
 const prodConfig = require('../../../../../config.prod.json');
 
 const analytics = remote.getGlobal('analytics');
+
+// How long typing must pause before a search runs.
+const QUERY_DELAY_MS = 50;
+const SHORT_QUERY_DELAY_MS = 600;
 
 const SearchContent = () => {
   const changeActiveShabad = useNewShabad();
@@ -204,18 +209,33 @@ const SearchContent = () => {
     }
   }, [filteredShabads]);
 
+  // Once the database is there, get broad searches ready in idle time.
+  useEffect(() => {
+    if (databaseProgress >= 1) {
+      prepareSearch();
+    }
+  }, [databaseProgress]);
+
   ipcRenderer.on('database-progress', (data) => {
     const { percent } = JSON.parse(data);
     setDatabaseProgress(percent);
   });
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (query !== searchQuery) {
-        setSearchQuery(query);
-        setSearchResultsCount(40);
-      }
-    }, 50);
+    // One or two letters match tens of thousands of lines, and on a slow
+    // computer that search blocks typing. Run it only once typing pauses, so
+    // typing on to three or more letters skips it. Ang numbers stay instant.
+    const typed = query.replace(/\s+/g, '');
+    const isShortQuery = typed.length > 0 && typed.length < 3 && !/^\d+$/.test(typed);
+    const timeoutId = setTimeout(
+      () => {
+        if (query !== searchQuery) {
+          setSearchQuery(query);
+          setSearchResultsCount(40);
+        }
+      },
+      isShortQuery ? SHORT_QUERY_DELAY_MS : QUERY_DELAY_MS,
+    );
     return () => {
       clearTimeout(timeoutId);
     };
