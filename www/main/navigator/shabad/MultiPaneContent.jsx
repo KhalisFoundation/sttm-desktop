@@ -6,6 +6,7 @@ import { ShabadText } from './ShabadText';
 import { FavoritePane, HistoryPane } from '../misc/components';
 import { useSlides } from '../../common/hooks';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const MultiPaneContent = ({ data }) => {
   const paneId = data.multiPaneId;
@@ -57,6 +58,7 @@ const MultiPaneContent = ({ data }) => {
       className="multipane-content-btn"
       style={paneAttributes.activeShabad ? {} : { display: 'none' }}
       onClick={() => {
+        track('navigation', 'multipane-change', `pane-${paneId}`, 'back-to-shabad');
         setPaneAttributes({ content: i18n.t('MULTI_PANE.SHABAD') });
       }}
       onMouseEnter={(e) => {

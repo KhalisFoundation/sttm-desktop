@@ -4,6 +4,7 @@ import { useStoreState, useStoreActions } from 'easy-peasy';
 import { randomShabad } from '../../../banidb';
 import { dailyHukamnama } from '../../utils';
 import { i18n } from '../../../common/i18n';
+import { trackShabadOpen } from '../../../common/analytics';
 
 const remote = require('@electron/remote');
 
@@ -79,6 +80,7 @@ export const OtherPane = ({ className }) => {
   const openRandomShabad = () => {
     randomShabad().then((randomId) => {
       setShabadId(randomId);
+      trackShabadOpen('random', randomId);
       analytics.trackEvent({
         category: 'display',
         action: 'random-shabad',
@@ -93,6 +95,7 @@ export const OtherPane = ({ className }) => {
       dailyHukamnama(setIsHukamnamaLoading).then((hukamId) => {
         setIsHukamnamaLoading(false);
         setShabadId(hukamId);
+        trackShabadOpen('hukamnama', hukamId);
         analytics.trackEvent({
           category: 'display',
           action: 'hukamnama',

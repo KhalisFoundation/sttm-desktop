@@ -4,6 +4,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import { DEFAULT_OVERLAY } from '../../common/constants';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const ToolbarItem = ({ itemName }) => {
   const { overlayScreen, userToken } = useStoreState((state) => state.app);
@@ -30,6 +31,7 @@ const ToolbarItem = ({ itemName }) => {
           return setOverlayScreen(DEFAULT_OVERLAY);
         }
 
+        track('navigation', 'toolbar-open', itemName);
         return setOverlayScreen(itemName);
       }}
     ></div>

@@ -6,10 +6,7 @@ import { Switch, Checkbox } from '../../common/sttm-ui';
 import { convertToCamelCase } from '../../common/utils';
 import { settings } from '../../../configs/user-settings.json';
 import { i18n } from '../../common/i18n';
-
-const remote = require('@electron/remote');
-
-const analytics = remote.getGlobal('analytics');
+import { track, trackDebounced } from '../../common/analytics';
 
 const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { title, type, min, max, step, options } = settingObj;
@@ -18,6 +15,9 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
 
   const { disabledContent, filteredBaniOptions } = useStoreState((state) => state.navigator);
+
+  // Turning "Collect statistics" off must not itself send an event.
+  const isStatisticsOff = (value) => stateVar === 'statistics' && !value;
 
   const handleInputChange = (event) => {
     const value = event.target ? event.target.value : event;
@@ -28,21 +28,18 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
         userSettingsActions[`set${convertToCamelCase(disableSetting, true)}`](false);
       }
     }
-    analytics.trackEvent({
-      category: 'setting',
-      action: userSettingsActions[stateFunction],
-      label: value,
-    });
+    // Sliders change many times while dragged, so only the final value is sent.
+    if (!isStatisticsOff(value)) {
+      trackDebounced(`setting-${stateVar}`, 'setting', stateVar, value);
+    }
   };
 
   const handleCheckboxChange = (event) => {
     const value = event.target.checked;
     userSettingsActions[stateFunction](value);
-    analytics.trackEvent({
-      category: 'setting',
-      action: userSettingsActions[stateFunction],
-      label: value,
-    });
+    if (!isStatisticsOff(value)) {
+      track('setting', stateVar, value);
+    }
   };
 
   let settingDOM;
@@ -100,11 +97,7 @@ const Setting = ({ settingObj, stateVar, stateFunction }) => {
     } else if (inputAction === 'RESET_PADDING') {
       handleResetPadding();
     }
-    analytics.trackEvent({
-      category: 'setting',
-      action: inputAction,
-      label: 'default',
-    });
+    track('setting', inputAction, 'default');
   };
 
   switch (type) {

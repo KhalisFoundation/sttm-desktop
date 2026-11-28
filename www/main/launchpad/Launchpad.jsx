@@ -19,10 +19,15 @@ import { Settings } from '../settings/';
 
 import { DEFAULT_OVERLAY } from '../common/constants';
 import { i18n } from '../common/i18n';
+import { track } from '../common/analytics';
 
 const remote = require('@electron/remote');
 
 const main = remote.require('./app');
+
+// One event per keyboard shortcut used. Arrows and Space aren't sent here:
+// verse-navigation (ShabadText) covers them.
+const trackShortcut = (shortcut) => track('navigation', 'shortcut-used', shortcut);
 
 const serializeState = (state) => {
   try {
@@ -160,21 +165,25 @@ const Launchpad = () => {
 
   // open waheguru slide shortcut
   const handleCtrlPlus1 = () => {
+    trackShortcut('ctrl+1');
     displayWaheguruSlide({ openedFrom: 'shortcuts' });
   };
 
   // open mool mantra slide shortcut
   const handleCtrlPlus2 = () => {
+    trackShortcut('ctrl+2');
     displayMoolMantraSlide({ openedFrom: 'shortcuts' });
   };
 
   // open blank slide shortcut
   const handleCtrlPlus3 = () => {
+    trackShortcut('ctrl+3');
     displayBlankViewer({ openedFrom: 'shortcuts' });
   };
 
   // open anand sahib bhog slide shortcut
   const handleCtrlPlus4 = () => {
+    trackShortcut('ctrl+4');
     if (currentWorkspace === i18n.t('WORKSPACES.MULTI_PANE')) {
       displayAnandSahibBhog({ openedFrom: 'shortcuts', paneId: defaultPaneId });
     } else {
@@ -183,16 +192,19 @@ const Launchpad = () => {
   };
 
   const handleCtrlPlus5 = () => {
+    trackShortcut('ctrl+5');
     main.openSecondaryWindow('helpWindow');
   };
 
   const handleCtrlPlus6 = () => {
+    trackShortcut('ctrl+6');
     main.openSecondaryWindow('shortcutLegend');
   };
 
   // focus on search shabad input shortcut
   const handleCtrlPlusSlash = () => {
     if (!shortcuts.focusInput) {
+      trackShortcut('ctrl+/');
       setShortcuts({
         ...shortcuts,
         focusInput: true,
@@ -230,6 +242,7 @@ const Launchpad = () => {
   const handleEnter = () => {
     if (!shortcuts.openFirstResult) {
       ref.current.blur();
+      trackShortcut('enter');
       setShortcuts({
         ...shortcuts,
         openFirstResult: true,
@@ -239,6 +252,7 @@ const Launchpad = () => {
 
   const handleCtrlG = () => {
     if (!shortcuts.openDhanGuruSlide) {
+      trackShortcut('ctrl+g');
       setShortcuts({
         ...shortcuts,
         openDhanGuruSlide: true,
@@ -248,6 +262,7 @@ const Launchpad = () => {
 
   const handleCtrlC = () => {
     if (!shortcuts.copyToClipboard) {
+      trackShortcut('ctrl+c');
       setShortcuts({
         ...shortcuts,
         copyToClipboard: true,

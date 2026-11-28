@@ -5,6 +5,18 @@ import { useStoreActions, useStoreState } from 'easy-peasy';
 import FavShabadIcon from './FavShabadIcon';
 import ArrowIcon from './ArrowIcon';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
+
+// The dropdown shows translated names; analytics gets these fixed keys instead.
+const paneContentKey = (content) => {
+  const keys = {
+    [i18n.t('MULTI_PANE.SHABAD')]: 'shabad',
+    [i18n.t('TOOLBAR.HISTORY')]: 'history',
+    [i18n.t('MULTI_PANE.FAVORITES')]: 'favorites',
+    [i18n.t('MULTI_PANE.MISC_SLIDES')]: 'misc-slides',
+  };
+  return keys[content] || content;
+};
 
 const MultiPaneHeader = ({ data }) => {
   const paneId = data.multiPaneId;
@@ -46,6 +58,12 @@ const MultiPaneHeader = ({ data }) => {
 
   const lockPane = () => {
     const updatedAttributes = { ...paneAttributes };
+    track(
+      'navigation',
+      'multipane-lock',
+      `pane-${paneId}`,
+      paneAttributes.locked ? 'unlock' : 'lock',
+    );
     if (paneAttributes.locked) {
       updatedAttributes.locked = false;
     } else if (!disableLock) {
@@ -74,6 +92,7 @@ const MultiPaneHeader = ({ data }) => {
   }, [navigatorState.pane1, navigatorState.pane2, navigatorState.pane3]);
 
   const selectPaneOption = (event) => {
+    track('navigation', 'multipane-change', `pane-${paneId}`, paneContentKey(event.target.value));
     setPaneAttributes({ content: event.target.value });
   };
 

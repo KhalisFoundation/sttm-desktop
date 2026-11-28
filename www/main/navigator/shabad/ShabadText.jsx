@@ -21,6 +21,7 @@ import {
   isFlowerVerse,
 } from './utils';
 import ShabadOverviewRow, { hasOverview } from './ShabadOverviewRow';
+import { track, createCounter } from '../../common/analytics';
 
 // The list's header: the shabad's overview row, when it has one. Outside the
 // component so the list doesn't remount it on every render.
@@ -105,6 +106,23 @@ export const ShabadText = ({
 
   const isAsaDiVaar = baniType === 'bani' && Number(shabadId) === ASA_DI_VAAR_BANI_ID;
 
+  // Analytics: how many lines of this shabad were shown and how the presenter
+  // moved between them, sent once when the shabad is closed or changed.
+  const linesShownRef = useRef(new Set());
+  const navCounterRef = useRef(createCounter('display', 'verse-navigation'));
+  useEffect(() => {
+    if (isProjection || shabadId === undefined || shabadId === null) return undefined;
+    return () => {
+      const linesShown = linesShownRef.current.size;
+      if (linesShown > 0) {
+        const label = baniType === 'shabad' ? shabadId : `${baniType}-${shabadId}`;
+        track('display', 'shabad-session-end', label, linesShown);
+      }
+      navCounterRef.current.flush();
+      linesShownRef.current = new Set();
+    };
+  }, [shabadId, baniType]);
+
   const updateTraversedVerse = (newTraversedVerse, verseIndex, crossPlatformId = null) => {
     if (isMiscSlide) {
       setIsMiscSlide(false);
@@ -120,6 +138,9 @@ export const ShabadText = ({
     const livePaneId = activePaneId || defaultPaneId || 1;
     if (livePaneId !== currentPane) {
       setActivePaneId(currentPane);
+    }
+    if (!isProjection) {
+      linesShownRef.current.add(newTraversedVerse);
     }
     changeVerse(newTraversedVerse, verseIndex, shabadId, {
       activeVerseId,
@@ -478,6 +499,7 @@ export const ShabadText = ({
       if (shortcuts.nextVerse) {
         const nextVerse = getVerse('next');
         if (nextVerse) {
+          navCounterRef.current.add('next');
           updateTraversedVerse(nextVerse.verseId, nextVerse.verseIndex);
           scrollToVerse(nextVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         } else if (akhandpatt && !isSundarGutkaBani && !isCeremonyBani) {
@@ -495,6 +517,7 @@ export const ShabadText = ({
       if (shortcuts.prevVerse) {
         const prevVerse = getVerse('prev');
         if (prevVerse) {
+          navCounterRef.current.add('prev');
           updateTraversedVerse(prevVerse.verseId, prevVerse.verseIndex);
           scrollToVerse(prevVerse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
@@ -514,6 +537,7 @@ export const ShabadText = ({
           intelligentSpacebar,
         });
         if (verse) {
+          navCounterRef.current.add('space');
           updateTraversedVerse(verse.verseId, verse.verseIndex);
           scrollToVerse(verse.verseId, filteredItems, virtuosoRef, isAsaDiVaar);
         }
@@ -583,7 +607,10 @@ export const ShabadText = ({
         verseId={verseId}
         isFlowerVerse={isFlowerVerse(verseId, isAsaDiVaar)}
         changeHomeVerse={updateHomeVerse}
-        updateTraversedVerse={updateTraversedVerse}
+        updateTraversedVerse={(...args) => {
+          navCounterRef.current.add('click');
+          updateTraversedVerse(...args);
+        }}
       />
     );
   };

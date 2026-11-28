@@ -12,6 +12,7 @@ const tingle = require('../assets/js/vendor/tingle');
 
 const { isUnsupportedWindow } = remote.require('./app');
 const { i18n } = require('./common/i18n');
+const { track } = require('./common/analytics');
 
 const ipc = electron.ipcRenderer;
 const userDataPath = remote.app.getPath('userData');
@@ -190,11 +191,18 @@ module.exports = {
                   userDataPath,
                   database[dbPlatform].dbCompressedName,
                 );
+                const downloadType = force ? 'first-install' : 'update';
+                const downloadStart = Date.now();
+                const downloadSeconds = () => Math.round((Date.now() - downloadStart) / 1000);
+                track('database', 'db-download', `start-${downloadType}`);
                 progress(
                   request(
                     `https://banidb.blob.core.windows.net/database/${database[dbPlatform].dbCompressedName}`,
                   ),
                 )
+                  .on('error', (err) => {
+                    track('database', 'db-download', `fail-${downloadType}`, err.message);
+                  })
                   .on('progress', (state) => {
                     const win = remote.getCurrentWindow();
                     win.setProgressBar(state.percent);
@@ -220,6 +228,12 @@ module.exports = {
                           curSchemaVersion !== getSchemaVersion(newDBSchema)
                         ) {
                           store.set('pendingDBHash', newestDBHash);
+                          track(
+                            'database',
+                            'db-download',
+                            `success-${downloadType}-pending-restart`,
+                            downloadSeconds(),
+                          );
                           remote.getCurrentWindow().setProgressBar(-1);
                           ipcRenderer.send('database-update-pending');
                           return;
@@ -234,6 +248,12 @@ module.exports = {
                         store.set('curDBHash', newestDBHash);
                         store.delete('pendingDBHash');
                         localStorage.setItem('isDbDownloaded', true);
+                        track(
+                          'database',
+                          'db-download',
+                          `success-${downloadType}`,
+                          downloadSeconds(),
+                        );
                         module.exports.initDB();
                         // Delete old DBs
                         // TODO: Update to check if directory and use fs.rmdir
@@ -258,6 +278,7 @@ module.exports = {
                       .catch((err) => {
                         /* eslint-disable-next-line no-console */
                         console.log(`Could not install database: ${err}`);
+                        track('database', 'db-download', `fail-${downloadType}`, err.message);
                       });
                   });
               }
@@ -309,6 +330,7 @@ module.exports = {
             .on('error', (err) => {
               /* eslint-disable-next-line no-console */
               console.log(`Could not download AI translations: ${err}`);
+              track('database', 'ai-translations-download', 'fail', err.message);
             })
             .pipe(fs.createWriteStream(dbCompressed))
             .on('finish', () => {
@@ -328,10 +350,12 @@ module.exports = {
                   // Windows reopen the new file on their next lookup; the old one is
                   // removed on the next launch, once nothing has it open
                   ipcRenderer.send('ai-translations-updated');
+                  track('database', 'ai-translations-download', 'success');
                 })
                 .catch((err) => {
                   /* eslint-disable-next-line no-console */
                   console.log(`Could not install AI translations: ${err}`);
+                  track('database', 'ai-translations-download', 'fail', err.message);
                 })
                 .finally(() => {
                   fs.rm(dbCompressed, { force: true }, () => {});

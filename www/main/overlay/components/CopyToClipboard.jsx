@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const copy = require('copy-to-clipboard');
 
@@ -9,6 +10,7 @@ export const CopyToClipboard = ({ url }) => {
 
   const handleCopy = () => {
     copy(url);
+    if (!copied) track('overlay', 'copy-overlay-url');
     setCopied(true);
   };
 

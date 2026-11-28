@@ -11,6 +11,7 @@ import {
   removeCustomBackgroundFile,
 } from '../utils';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const themeTypes = [
   { type: 'COLOR', title: 'COLORS' },
@@ -74,6 +75,7 @@ const ThemeContainer = () => {
             className="file-input"
             onChange={async (e) => {
               await uploadImage(e);
+              track('theme', 'custom-background', 'uploaded');
               upsertCustomBackgrounds(setCustomThemes);
             }}
             id="themebg-upload"
@@ -91,6 +93,7 @@ const ThemeContainer = () => {
                   applyTheme(tile, 'custom', setTheme, setThemeBg);
                 }}
                 onRemove={() => {
+                  track('theme', 'custom-background', 'removed');
                   removeCustomBackgroundFile(tile['background-image-path']);
                   upsertCustomBackgrounds(setCustomThemes);
                   if (tile['background-image'] === themeBg.url.href) {

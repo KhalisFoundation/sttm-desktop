@@ -89,6 +89,11 @@ const appVersion = app.getVersion();
 const overlayCast = true;
 
 // Reset to default theme if theme not found
+function trackApp(category, action, label, value) {
+  if (!global.analytics) return;
+  global.analytics.trackEvent({ category, action, label, value });
+}
+
 const currentTheme = themes.find((theme) => theme.key === store.getUserPref('app.theme'));
 if (currentTheme === undefined) {
   store.setUserPref('app.theme', themes[0].key);
@@ -179,6 +184,9 @@ let manualUpdate = false;
 let lastLine;
 
 function openSecondaryWindow(windowName) {
+  if (windowName === 'overlayWindow') {
+    trackApp('overlay', 'overlay-open');
+  }
   const window = secondaryWindows[windowName];
   const openWindow = BrowserWindow.getAllWindows().filter((item) => item.getURL() === window.url);
   if (openWindow.length > 0) {
@@ -263,6 +271,7 @@ autoUpdater.on('update-not-available', () => {
 autoUpdater.on('update-downloaded', () => {
   if (!isUnsupportedWindow) {
     mainWindow.webContents.send('update-downloaded');
+    trackApp('menu', 'update-dialog', 'shown');
     dialog
       .showMessageBox({
         type: 'info',
@@ -274,7 +283,9 @@ autoUpdater.on('update-downloaded', () => {
         cancelId: 0,
       })
       .then(({ response }) => {
-        if (response === 1 || response === '1') {
+        const install = response === 1 || response === '1';
+        trackApp('menu', 'update-dialog', install ? 'install' : 'later');
+        if (install) {
           autoUpdater.quitAndInstall();
         }
         global.analytics.trackEvent({
@@ -735,12 +746,14 @@ ipcMain.on('viewer-render-start', (event, url) => {
 ipcMain.on('viewer-boot-error', (event, message) => {
   if (event.sender === projectionWindow?.webContents) {
     log.error(`[projection] Viewer boot failed: ${message}`);
+    trackApp('error', 'viewer-boot-error', String(message).slice(0, 200));
   }
 });
 
 ipcMain.on('viewer-runtime-error', (event, message) => {
   if (event.sender === projectionWindow?.webContents) {
     log.error(`[projection] Viewer runtime failed: ${message}`);
+    trackApp('error', 'viewer-runtime-error', String(message).slice(0, 200));
   }
 });
 
@@ -1187,6 +1200,7 @@ app.on('ready', () => {
   }
   const analytics = new Analytics();
   global.analytics = analytics;
+  trackApp('app', 'app-start', process.platform, electron.screen.getAllDisplays().length);
 
   const screens = electron.screen;
   const { width, height } = screens.getPrimaryDisplay().workAreaSize;
@@ -1588,6 +1602,7 @@ ipcMain.on('database-update-pending', () => {
       detail: i18n.t('DATABASE_UPDATE.DETAIL'),
     })
     .then(({ response }) => {
+      trackApp('database', 'db-update-restart', response === 1 ? 'restart-now' : 'later');
       if (response === 1) {
         app.relaunch();
         app.exit(0);
@@ -1608,6 +1623,15 @@ ipcMain.on('save-settings', (event, setting) => {
 
 ipcMain.on('update-viewer-setting', (event, setting) => {
   sendToViewerWindows('update-viewer-setting', setting);
+  // "Collect statistics" in Settings turns analytics on or off straight away.
+  try {
+    const { stateName, payload } = JSON.parse(setting);
+    if (stateName === 'statistics' && global.analytics) {
+      global.analytics.setEnabled(payload);
+    }
+  } catch (e) {
+    // Not a setting update we need
+  }
 });
 
 ipcMain.on('update-global-setting', (event, setting) => {

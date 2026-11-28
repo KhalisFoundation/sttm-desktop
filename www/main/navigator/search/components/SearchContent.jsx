@@ -21,6 +21,7 @@ import {
 import { GurmukhiKeyboard } from './GurmukhiKeyboard';
 import { useNewShabad } from '../hooks/use-new-shabad';
 import { i18n } from '../../../common/i18n';
+import { track, trackShabadOpen } from '../../../common/analytics';
 
 const remote = require('@electron/remote');
 const prodConfig = require('../../../../../config.prod.json');
@@ -136,6 +137,7 @@ const SearchContent = () => {
       // Takes { shabadId, verseId, verse } from the first shabad in search result
       const { shabadId, verseId, verse } = filteredShabads[0];
       changeActiveShabad(shabadId, verseId, verse);
+      trackShabadOpen('search-first-result', shabadId);
     }
     analytics.trackEvent({
       category: 'search',
@@ -184,6 +186,17 @@ const SearchContent = () => {
       setFilteredShabads([]);
     }
   }, [searchQuery]);
+
+  // Waits until typing settles, so one search with no results sends one event.
+  useEffect(() => {
+    if (searchQuery.length < 2 || filteredShabads.length > 0 || databaseProgress < 1) {
+      return undefined;
+    }
+    const timeoutId = setTimeout(() => {
+      track('search', 'search-no-results', currentSearchType, searchQuery.length);
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, filteredShabads]);
 
   useEffect(() => {
     if (searchShabadsCount !== filteredShabads.length) {
@@ -404,7 +417,7 @@ const SearchContent = () => {
 
         reader.readAsDataURL(audioBlob);
 
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((mediaTrack) => mediaTrack.stop());
         setAudioStream(null);
 
         mediaRecorderRef.current = null;
@@ -634,7 +647,11 @@ const SearchContent = () => {
                 key={index}
                 ang={ang}
                 searchType={currentSearchType}
-                onClick={changeActiveShabad}
+                onClick={(...args) => {
+                  track('search', 'search-result-click', currentSearchType, index + 1);
+                  trackShabadOpen('search', shabadId);
+                  changeActiveShabad(...args);
+                }}
                 shabadId={shabadId}
                 raag={raag}
                 sourceId={sourceId}

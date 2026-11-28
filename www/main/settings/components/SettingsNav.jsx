@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { i18n } from '../../common/i18n';
+import { track } from '../../common/analytics';
 
 const SettingsNav = ({ settingsNavObj }) => {
   const [activeTab, setActiveTab] = useState('slide-layout');
@@ -29,6 +30,7 @@ const SettingsNav = ({ settingsNavObj }) => {
         onClick={() => {
           document.getElementById(category).scrollIntoView({ block: 'center', behavior: 'smooth' });
           setActiveTab(category);
+          track('setting', 'settings-section', category);
         }}
       >
         {i18n.t(`SETTINGS.${title}`)}
