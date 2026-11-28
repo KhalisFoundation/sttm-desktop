@@ -331,6 +331,10 @@
         "pss": "PROF_SAHIB_SINGH",
         "pss_simple": "PROF_SAHIB_SINGH_SIMPLIFIED"
       },
+      "valueNotes": {
+        "pss": "AI_SOURCE_FALLBACK_NOTE",
+        "pss_simple": "AI_SOURCE_FALLBACK_NOTE"
+      },
       "condition": "translation-language",
       "conditionValue": "English",
       "initialValue": "bdb"

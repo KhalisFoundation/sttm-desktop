@@ -350,6 +350,7 @@
     "LARIVAAR": "Larivaar",
     "LARIVAAR_ASSIST": "Larivaar Assist",
     "LARIVAAR_ASSIST_MSG": "(This will disable vishraams.)",
+    "AI_SOURCE_FALLBACK_NOTE": "If a verse doesn't have a Prof Sahib Singh translation, the BaniDB translation is shown instead.",
     "LEFT_ALIGN": "Left-Align",
     "NEXT_LINE": "Next Line",
     "AUTOPLAY_OPTIONS": "Autoplay Options",
