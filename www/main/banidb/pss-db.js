@@ -73,7 +73,29 @@ const reset = () => {
   cache.clear();
 };
 
-ipcRenderer.on('ai-translations-updated', reset);
+// Bumped on every new download, so views can re-render the verse on screen
+// instead of waiting for the next one.
+let version = 0;
+const listeners = new Set();
+
+const getVersion = () => version;
+
+/**
+ * Subscribe to new downloads of the database.
+ *
+ * @param {function(number)} listener Called with the new version
+ * @returns {function} Unsubscribe
+ */
+const onUpdate = (listener) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+ipcRenderer.on('ai-translations-updated', () => {
+  reset();
+  version += 1;
+  listeners.forEach((listener) => listener(version));
+});
 
 /**
  * Open the translations database. Called lazily on first lookup; the handle and
@@ -139,8 +161,51 @@ const getTranslation = (verseId, type = TYPES.PSS) => {
   return text;
 };
 
+// Shown in place of an AI source for verses it has no translation for, or while
+// the database hasn't been downloaded yet.
+const FALLBACK_SOURCE = 'bdb';
+
+/**
+ * Parse a verse's translations and, when the selected English source is served
+ * by this database, put that source's text under its own key (e.g.
+ * translations.en.pss_simple) so it can be read like any other source. If the
+ * verse has no AI translation, the BaniDB one is put there instead.
+ *
+ * @param {object} verseObj A verse with `ID` and the `Translations` JSON string
+ * @param {string} source A `translation-english-source` key
+ * @returns {{translations: object, shownSource: string}} The translations, and
+ *   the source whose English text is actually shown
+ */
+const getTranslationsWithAiSource = (verseObj, source) => {
+  const translations = JSON.parse(verseObj.Translations);
+  if (!isAiSource(source)) {
+    return { translations, shownSource: source };
+  }
+
+  if (!translations.en) {
+    translations.en = {};
+  }
+
+  const translationText = getTranslation(verseObj.ID, source);
+  if (translationText) {
+    translations.en[source] = translationText;
+    return { translations, shownSource: source };
+  }
+
+  const fallbackText = translations.en[FALLBACK_SOURCE];
+  if (fallbackText) {
+    translations.en[source] = fallbackText;
+    return { translations, shownSource: FALLBACK_SOURCE };
+  }
+
+  return { translations, shownSource: source };
+};
+
 module.exports = {
   TYPES,
   isAiSource,
   getTranslation,
+  getTranslationsWithAiSource,
+  getVersion,
+  onUpdate,
 };

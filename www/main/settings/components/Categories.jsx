@@ -67,6 +67,17 @@ const SettingsFactory = ({ subCategory }) => {
         />
       </div>,
     );
+
+    // 5. A note for the selected value, on its own line under the setting
+    const { valueNotes } = subCategory.settingObjs[settingKey];
+    const valueNote = valueNotes && valueNotes[userSettings[convertToCamelCase(settingKey)]];
+    if (valueNote) {
+      settingsDOM.push(
+        <div className="control-item-note notes" key={`${settingIndex}-note`}>
+          {i18n.t(`SETTINGS.${valueNote}`)}
+        </div>,
+      );
+    }
   });
   return settingsDOM;
 };

@@ -8,31 +8,11 @@ import SlideGurbani from './SlideGurbani';
 import SlideTranslation from './SlideTranslation';
 import SlideTransliteration from './SlideTransliteration';
 import SlideAnnouncement from './SlideAnnouncement';
+import { useAiTranslationsVersion } from '../../common/hooks/useAiTranslationsVersion';
 
 const aiTranslationDB = require('../../banidb/pss-db');
 
 global.platform = require('../../desktop_scripts');
-
-/**
- * Parse translations JSON and, when the selected English source is served by
- * the AI translations database, inject that source's text under its own key
- * (e.g. translations.en.pss) so SlideTranslation can read it as usual.
- */
-const getTranslationsWithPSS = (verseObj, source) => {
-  const translations = JSON.parse(verseObj.Translations);
-  if (!aiTranslationDB.isAiSource(source)) {
-    return translations;
-  }
-
-  const translationText = aiTranslationDB.getTranslation(verseObj.ID, source);
-  if (translationText) {
-    if (!translations.en) {
-      translations.en = {};
-    }
-    translations.en[source] = translationText;
-  }
-  return translations;
-};
 
 const Slide = React.memo((props) => {
   const { verseObj, nextLineObj, isMiscSlide, continuousView, updateVerseRef } = props;
@@ -56,6 +36,7 @@ const Slide = React.memo((props) => {
   } = useStoreState((state) => state.userSettings);
 
   const { activeVerseId } = useStoreState((state) => state.navigator);
+  const aiTranslationsVersion = useAiTranslationsVersion();
   const showContinuousVerses = akhandpatt || continuousView;
   const [showVerse, setShowVerse] = useState(true);
   const [orderMarkup, setOrderMarkup] = useState(null);
@@ -134,7 +115,10 @@ const Slide = React.memo((props) => {
             verseObj.Translations && (
               <SlideTranslation
                 getFontSize={getFontSize}
-                translationObj={getTranslationsWithPSS(verseObj, translationEnglishSource)}
+                translationObj={
+                  aiTranslationDB.getTranslationsWithAiSource(verseObj, translationEnglishSource)
+                    .translations
+                }
                 key={`line-${index}`}
                 lang={content}
                 position={index}
@@ -171,6 +155,8 @@ const Slide = React.memo((props) => {
     // the AI sources are injected per source, so the markup has to be rebuilt
     // when the selection changes and not only when the verse does
     translationEnglishSource,
+    // and when a download replaces the BaniDB fallback with the AI translation
+    aiTranslationsVersion,
   ]);
 
   return isMiscSlide ? (

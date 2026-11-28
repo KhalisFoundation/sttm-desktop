@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Slide from '../Slide/Slide';
@@ -19,6 +19,7 @@ import { TranslationReviewQr } from '../Slide/TranslationReviewQr';
 import { ShabadOverview } from '../Slide/ShabadOverview';
 import { useShabadInfo } from '../hooks/use-shabad-info';
 import { useTranslationReviewQr } from '../hooks/use-translation-review-qr';
+import { useAiTranslationsVersion } from '../../common/hooks/useAiTranslationsVersion';
 import { BASE_BANI_OPTIONS } from '../../banidb/constants';
 import { i18n } from '../../common/i18n';
 
@@ -68,6 +69,7 @@ function ShabadDeck() {
     shabadInfoTranslationReview,
   } = useStoreState((state) => state.userSettings);
   const { containerPadding } = useStoreState((state) => state.viewerSettings);
+  const aiTranslationsVersion = useAiTranslationsVersion();
   const showContinuousVerses = akhandpatt;
   const [activeVerse, setActiveVerse] = useState([]);
   const [nextVerse, setNextVerse] = useState({});
@@ -132,20 +134,13 @@ function ShabadDeck() {
     if (!activeVerse.length) return BASE_BANI_OPTIONS;
 
     try {
-      const translations = JSON.parse(activeVerse[0].Translations);
-
-      // Inject the AI translation when one of its sources is selected, so the
-      // English option's visibility is computed from the text actually shown
-      if (aiTranslationDB.isAiSource(translationEnglishSource)) {
-        const translationText = aiTranslationDB.getTranslation(
-          activeVerse[0].ID,
-          translationEnglishSource,
-        );
-        if (translationText) {
-          if (!translations.en) translations.en = {};
-          translations.en[translationEnglishSource] = translationText;
-        }
-      }
+      // Inject the AI translation (or its BaniDB fallback) when one of its sources
+      // is selected, so the English option's visibility is computed from the text
+      // actually shown
+      const { translations } = aiTranslationDB.getTranslationsWithAiSource(
+        activeVerse[0],
+        translationEnglishSource,
+      );
 
       const visibilityMap = {
         'teeka-punjabi': translations?.pu?.[teekaSource]?.length,
@@ -189,6 +184,18 @@ function ShabadDeck() {
     showsReviewQr ? activeVerse[0]?.ID : undefined,
   );
 
+  // The QR code names the translation shown for this verse, which is BaniDB's
+  // when the selected AI source has none for it.
+  const reviewSource = useMemo(() => {
+    if (!activeVerse[0]?.Translations) return translationEnglishSource;
+    try {
+      return aiTranslationDB.getTranslationsWithAiSource(activeVerse[0], translationEnglishSource)
+        .shownSource;
+    } catch (error) {
+      return translationEnglishSource;
+    }
+  }, [activeVerse, translationEnglishSource, aiTranslationsVersion]);
+
   // The bar is shown while there are details. Once it hides (or when it's off),
   // the QR code stays on its own, without the bar.
   const showsShabadInfo = !showsOverview && shabadInfoDetails.length > 0;
@@ -200,7 +207,7 @@ function ShabadDeck() {
   const shabadInfoKey = shabadInfoDetails.join('|');
   useEffect(() => {
     global.platform.ipc.send('cast-to-receiver');
-  }, [shabadInfoKey, reviewQr]);
+  }, [shabadInfoKey, reviewQr, reviewSource]);
 
   useEffect(() => {
     let currentShabad = activeShabadId;
@@ -357,7 +364,13 @@ function ShabadDeck() {
         settingType: 'navigator',
       }),
     );
-  }, [activeVerse, setFilteredBaniOptions, translationEnglishSource, teekaSource]);
+  }, [
+    activeVerse,
+    setFilteredBaniOptions,
+    translationEnglishSource,
+    teekaSource,
+    aiTranslationsVersion,
+  ]);
 
   return (
     <>
@@ -424,15 +437,13 @@ function ShabadDeck() {
             {reviewQr && (
               <TranslationReviewQr
                 src={reviewQr}
-                source={translationEnglishSource}
+                source={reviewSource}
                 color={getCurrentThemeInstance()['translation-color']}
               />
             )}
           </ShabadInfo>
         ) : null}
-        {showsCompactQr && (
-          <TranslationReviewQr src={reviewQr} source={translationEnglishSource} compact />
-        )}
+        {showsCompactQr && <TranslationReviewQr src={reviewQr} source={reviewSource} compact />}
       </div>
       {/* The info bar carries the logo while it's shown. */}
       {!showsShabadInfo && <ViewerIcon className="viewer-logo" />}

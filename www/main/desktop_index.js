@@ -12,4 +12,7 @@ global.setUserSettings = GlobalState.getActions().userSettings;
 global.core.menu.init();
 global.platform.init();
 
+// Location-based releases, e.g. a new default translation source
+require('./js/gradual-releases').runGradualReleases(GlobalState);
+
 document.body.classList.add(process.platform);
